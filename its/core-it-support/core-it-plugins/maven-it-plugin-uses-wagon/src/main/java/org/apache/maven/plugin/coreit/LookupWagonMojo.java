@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,13 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Properties;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.AbstractMojo;
@@ -30,12 +35,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.repository.Repository;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Properties;
-
 /**
  * Loads resources from a class loader used to load a wagon provider. The wagon is merely used to access the extension
  * class loader it came from which is otherwise not accessible to a plugin.
@@ -43,10 +42,8 @@ import java.util.Properties;
  * @author Benjamin Bentmann
  *
  */
-@Mojo( name = "lookup-wagon", defaultPhase = LifecyclePhase.VALIDATE )
-public class LookupWagonMojo
-    extends AbstractMojo
-{
+@Mojo(name = "lookup-wagon", defaultPhase = LifecyclePhase.VALIDATE)
+public class LookupWagonMojo extends AbstractMojo {
 
     /**
      * The Wagon manager used to retrieve wagon providers.
@@ -57,7 +54,7 @@ public class LookupWagonMojo
     /**
      * The path to the properties file used to track the results of the wagon lookups.
      */
-    @Parameter( property = "wagon.outputFile" )
+    @Parameter(property = "wagon.outputFile")
     private File outputFile;
 
     /**
@@ -71,63 +68,47 @@ public class LookupWagonMojo
      *
      * @throws MojoFailureException If the attached file has not been set.
      */
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         Properties loaderProperties = new Properties();
 
-        if ( urls != null )
-        {
-            for ( int i = 0; i < urls.length; i++ )
-            {
+        if (urls != null) {
+            for (int i = 0; i < urls.length; i++) {
                 String url = urls[i];
-                getLog().info( "[MAVEN-CORE-IT-LOG] Looking up wagon for URL " + url );
+                getLog().info("[MAVEN-CORE-IT-LOG] Looking up wagon for URL " + url);
 
-                try
-                {
-                    Repository repo = new Repository( "repo-" + i, url );
-                    Wagon wagon = wagonManager.getWagon( repo );
-                    getLog().info( "[MAVEN-CORE-IT-LOG]   " + wagon );
+                try {
+                    Repository repo = new Repository("repo-" + i, url);
+                    Wagon wagon = wagonManager.getWagon(repo);
+                    getLog().info("[MAVEN-CORE-IT-LOG]   " + wagon);
 
-                    loaderProperties.setProperty( url + ".hash", Integer.toString( System.identityHashCode( wagon ) ) );
-                    loaderProperties.setProperty( url + ".class", wagon.getClass().getName() );
-                }
-                catch ( Exception e )
-                {
-                    getLog().warn( "[MAVEN-CORE-IT-LOG] Failed to look up wagon for URL " + url, e );
+                    loaderProperties.setProperty(url + ".hash", Integer.toString(System.identityHashCode(wagon)));
+                    loaderProperties.setProperty(
+                            url + ".class", wagon.getClass().getName());
+                } catch (Exception e) {
+                    getLog().warn("[MAVEN-CORE-IT-LOG] Failed to look up wagon for URL " + url, e);
                 }
             }
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file " + outputFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file " + outputFile);
 
         OutputStream out = null;
-        try
-        {
+        try {
             outputFile.getParentFile().mkdirs();
-            out = new FileOutputStream( outputFile );
-            loaderProperties.store( out, "MAVEN-CORE-IT-LOG" );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Output file could not be created: " + outputFile, e );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                try
-                {
+            out = new FileOutputStream(outputFile);
+            loaderProperties.store(out, "MAVEN-CORE-IT-LOG");
+        } catch (IOException e) {
+            throw new MojoExecutionException("Output file could not be created: " + outputFile, e);
+        } finally {
+            if (out != null) {
+                try {
                     out.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // just ignore
                 }
             }
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Created output file " + outputFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Created output file " + outputFile);
     }
-
 }

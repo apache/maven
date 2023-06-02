@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4776ForkedReactorPluginVersionResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4776ForkedReactorPluginVersionResolutionTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-3,)" );
+    public MavenITmng4776ForkedReactorPluginVersionResolutionTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-3,)");
     }
 
     /**
@@ -48,21 +43,19 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitLifecycle()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4776" );
+    public void testitLifecycle() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4776");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub/target" );
-        verifier.setLogFileName( "log-lifecycle.txt" );
-        verifier.addCliArgument( "test" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("sub/target");
+        verifier.setLogFileName("log-lifecycle.txt");
+        verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "sub/target/log.txt" );
+        verifier.verifyFilePresent("sub/target/log.txt");
     }
 
     /**
@@ -73,21 +66,19 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCmdLine()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4776" );
+    public void testitCmdLine() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4776");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub/target" );
-        verifier.setLogFileName( "log-cli.txt" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("sub/target");
+        verifier.setLogFileName("log-cli.txt");
+        verifier.addCliArgument(
+                "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "sub/target/log.txt" );
+        verifier.verifyFilePresent("sub/target/log.txt");
     }
-
 }

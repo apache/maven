@@ -1,5 +1,3 @@
-package org.apache.maven.coreit.toolchain;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.coreit.toolchain;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.coreit.toolchain;
 
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.ToolchainFactory;
@@ -27,23 +26,16 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 /**
  * @author Benjamin Bentmann
  */
-public class CoreItToolchainFactory
-    implements ToolchainFactory
-{
+public class CoreItToolchainFactory implements ToolchainFactory {
 
-    public ToolchainPrivate createDefaultToolchain()
-    {
+    public ToolchainPrivate createDefaultToolchain() {
         return null;
     }
 
-    public ToolchainPrivate createToolchain( ToolchainModel model )
-        throws MisconfiguredToolchainException
-    {
-        if ( model == null )
-        {
+    public ToolchainPrivate createToolchain(ToolchainModel model) throws MisconfiguredToolchainException {
+        if (model == null) {
             return null;
         }
-        return new CoreItToolchain( model );
+        return new CoreItToolchain(model);
     }
-
 }

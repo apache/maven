@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -34,26 +33,24 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
  *
  * @author Benjamin Bentmann
  */
-@Component ( role = org.codehaus.plexus.component.configurator.ComponentConfigurator.class, hint = "coreit" )
-public class CustomComponentConfigurator
-    extends AbstractComponentConfigurator
-{
+@Component(role = org.codehaus.plexus.component.configurator.ComponentConfigurator.class, hint = "coreit")
+public class CustomComponentConfigurator extends AbstractComponentConfigurator {
 
     @Override
-    public void configureComponent( Object component, PlexusConfiguration configuration,
-                                    ExpressionEvaluator expressionEvaluator, ClassRealm containerRealm,
-                                    ConfigurationListener listener )
-        throws ComponentConfigurationException
-    {
+    public void configureComponent(
+            Object component,
+            PlexusConfiguration configuration,
+            ExpressionEvaluator expressionEvaluator,
+            ClassRealm containerRealm,
+            ConfigurationListener listener)
+            throws ComponentConfigurationException {
         ObjectWithFieldsConverter converter = new ObjectWithFieldsConverter();
 
-        converter.processConfiguration( converterLookup, component, containerRealm, configuration,
-                                        expressionEvaluator, listener );
+        converter.processConfiguration(
+                converterLookup, component, containerRealm, configuration, expressionEvaluator, listener);
 
-        if ( component instanceof CustomConfigMojo )
-        {
-            ( (CustomConfigMojo) component ).customParam = "configured";
+        if (component instanceof CustomConfigMojo) {
+            ((CustomConfigMojo) component).customParam = "configured";
         }
     }
-
 }

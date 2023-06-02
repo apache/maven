@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4788InstallationToCustomLocalRepoTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4788InstallationToCustomLocalRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4788InstallationToCustomLocalRepoTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-4,)" );
+    public MavenITmng4788InstallationToCustomLocalRepoTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-4,)");
     }
 
     /**
@@ -46,20 +41,18 @@ public class MavenITmng4788InstallationToCustomLocalRepoTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4788" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4788");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/local-repo/test-0.1-SNAPSHOT.jar" );
-        verifier.verifyFileNotPresent( "target/local-repo/org/apache/maven/its/mng4788/test/0.1-SNAPSHOT/test-0.1-SNAPSHOT.jar" );
+        verifier.verifyFilePresent("target/local-repo/test-0.1-SNAPSHOT.jar");
+        verifier.verifyFileNotPresent(
+                "target/local-repo/org/apache/maven/its/mng4788/test/0.1-SNAPSHOT/test-0.1-SNAPSHOT.jar");
     }
-
 }

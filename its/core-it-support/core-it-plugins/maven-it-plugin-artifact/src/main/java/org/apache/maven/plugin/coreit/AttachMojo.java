@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,9 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,24 +30,20 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 
-import java.io.File;
-
 /**
  * Attaches a secondary artifact to the current project. This mimics source/javadoc attachments or other assemblies.
  *
-  *
+ *
  * @author Benjamin Bentmann
  *
  */
-@Mojo( name = "attach", defaultPhase = LifecyclePhase.PACKAGE )
-public class AttachMojo
-    extends AbstractMojo
-{
+@Mojo(name = "attach", defaultPhase = LifecyclePhase.PACKAGE)
+public class AttachMojo extends AbstractMojo {
 
     /**
      * The current Maven project.
      */
-    @Parameter( defaultValue = "${project}", readonly = true, required = true )
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
     /**
@@ -59,20 +56,20 @@ public class AttachMojo
     /**
      * The path to the file to attach, relative to the project base directory. The plugin will not validate this path.
      */
-    @Parameter( property = "artifact.attachedFile", required = true )
+    @Parameter(property = "artifact.attachedFile", required = true)
     private String attachedFile;
 
     /**
      * The type of the artifact to attach.
      */
-    @Parameter( property = "artifact.artifactType" )
+    @Parameter(property = "artifact.artifactType")
     private String artifactType;
 
     /**
      * The classifier for the attached artifact. If unspecified, the default classifier for the specified artifact type
      * is used.
      */
-    @Parameter( property = "artifact.artifactClassifier" )
+    @Parameter(property = "artifact.artifactClassifier")
     private String artifactClassifier;
 
     /**
@@ -80,34 +77,28 @@ public class AttachMojo
      *
      * @throws MojoFailureException If the attached file has not been set.
      */
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        getLog().info( "[MAVEN-CORE-IT-LOG] Attaching artifact file: " + attachedFile );
-        getLog().info( "[MAVEN-CORE-IT-LOG] type=" + artifactType + ", classifier=" + artifactClassifier );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        getLog().info("[MAVEN-CORE-IT-LOG] Attaching artifact file: " + attachedFile);
+        getLog().info("[MAVEN-CORE-IT-LOG] type=" + artifactType + ", classifier=" + artifactClassifier);
 
-        if ( attachedFile == null || attachedFile.length() <= 0 )
-        {
-            throw new MojoFailureException( "Path name for attached artifact file has not been specified" );
+        if (attachedFile == null || attachedFile.length() <= 0) {
+            throw new MojoFailureException("Path name for attached artifact file has not been specified");
         }
 
         /*
          * NOTE: We do not want to test path translation here, so resolve relative paths manually.
          */
-        File artifactFile = new File( attachedFile );
-        if ( !artifactFile.isAbsolute() )
-        {
-            artifactFile = new File( project.getBasedir(), attachedFile );
+        File artifactFile = new File(attachedFile);
+        if (!artifactFile.isAbsolute()) {
+            artifactFile = new File(project.getBasedir(), attachedFile);
         }
 
-        if ( !artifactFile.exists() )
-        {
-            getLog().warn( "[MAVEN-CORE-IT-LOG] Attached artifact file does not exist: " + artifactFile );
+        if (!artifactFile.exists()) {
+            getLog().warn("[MAVEN-CORE-IT-LOG] Attached artifact file does not exist: " + artifactFile);
         }
 
-        helper.attachArtifact( project, artifactType, artifactClassifier, artifactFile );
+        helper.attachArtifact(project, artifactType, artifactClassifier, artifactFile);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Attached artifact file: " + artifactFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Attached artifact file: " + artifactFile);
     }
-
 }

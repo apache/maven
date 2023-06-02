@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 
@@ -34,10 +33,8 @@ import org.apache.maven.plugins.annotations.Parameter;
  * @author Benjamin Bentmann
  *
  */
-@Mojo( name = "install-custom" )
-public class InstallCustomMojo
-    extends InstallMojo
-{
+@Mojo(name = "install-custom")
+public class InstallCustomMojo extends InstallMojo {
 
     /**
      */
@@ -47,7 +44,7 @@ public class InstallCustomMojo
     /**
      * The base directory of the local repository to install to.
      */
-    @Parameter( property = "install.localRepoDir" )
+    @Parameter(property = "install.localRepoDir")
     private File localRepoDir;
 
     /**
@@ -55,24 +52,20 @@ public class InstallCustomMojo
      *
      * @throws MojoExecutionException If any artifact could not be installed.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
-        try
-        {
+    public void execute() throws MojoExecutionException {
+        try {
             String url = "file://" + localRepoDir.toURL().getPath();
 
-            localRepository =
-                repositoryFactory.createArtifactRepository( localRepository.getId(), url, new CustomRepositoryLayout(),
-                                                            localRepository.getSnapshots(),
-                                                            localRepository.getReleases() );
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "Failed to create custom local repository", e );
+            localRepository = repositoryFactory.createArtifactRepository(
+                    localRepository.getId(),
+                    url,
+                    new CustomRepositoryLayout(),
+                    localRepository.getSnapshots(),
+                    localRepository.getReleases());
+        } catch (Exception e) {
+            throw new MojoExecutionException("Failed to create custom local repository", e);
         }
 
         super.execute();
     }
-
 }

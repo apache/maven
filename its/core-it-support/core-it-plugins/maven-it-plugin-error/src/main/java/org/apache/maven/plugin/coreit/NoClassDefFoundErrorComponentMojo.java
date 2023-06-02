@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,12 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import junit.framework.TestCase;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
@@ -31,20 +29,15 @@ import org.apache.maven.plugins.annotations.Parameter;
  * Takes a parameter with a class from a provided-scope dependency, so that the mojo class itself won't be
  * loadable when that dependency is missing (in the runtime environment).
  */
-@Mojo( name = "no-class-def-found-error-param", requiresProject = false )
-public class NoClassDefFoundErrorComponentMojo
-    extends AbstractMojo
-{
+@Mojo(name = "no-class-def-found-error-param", requiresProject = false)
+public class NoClassDefFoundErrorComponentMojo extends AbstractMojo {
 
     /**
      */
-    @Parameter( defaultValue = "foo" )
+    @Parameter(defaultValue = "foo")
     private TestCase value;
 
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         value.getName();
     }
-
 }

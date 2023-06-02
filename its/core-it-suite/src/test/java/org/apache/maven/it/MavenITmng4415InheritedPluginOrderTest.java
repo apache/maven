@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,15 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,13 +32,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4415InheritedPluginOrderTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4415InheritedPluginOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4415InheritedPluginOrderTest()
-    {
-        super( "[2.0.5,)" );
+    public MavenITmng4415InheritedPluginOrderTest() {
+        super("[2.0.5,)");
     }
 
     /**
@@ -52,42 +47,38 @@ public class MavenITmng4415InheritedPluginOrderTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4415" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4415");
 
-        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/it.properties" );
-        assertNotNull( props.getProperty( "project.build.plugins" ) );
+        Properties props = verifier.loadProperties("target/it.properties");
+        assertNotNull(props.getProperty("project.build.plugins"));
 
         List<String> expected = new ArrayList<>();
-        expected.add( "maven-it-plugin-error" );
-        expected.add( "maven-it-plugin-configuration" );
-        expected.add( "maven-it-plugin-dependency-resolution" );
-        expected.add( "maven-it-plugin-packaging" );
-        expected.add( "maven-it-plugin-log-file" );
-        expected.add( "maven-it-plugin-expression" );
-        expected.add( "maven-it-plugin-fork" );
-        expected.add( "maven-it-plugin-touch" );
+        expected.add("maven-it-plugin-error");
+        expected.add("maven-it-plugin-configuration");
+        expected.add("maven-it-plugin-dependency-resolution");
+        expected.add("maven-it-plugin-packaging");
+        expected.add("maven-it-plugin-log-file");
+        expected.add("maven-it-plugin-expression");
+        expected.add("maven-it-plugin-fork");
+        expected.add("maven-it-plugin-touch");
 
         List<String> actual = new ArrayList<>();
 
-        int count = Integer.parseInt( props.getProperty( "project.build.plugins" ) );
-        for ( int i = 0; i < count; i++ )
-        {
-            actual.add( props.getProperty( "project.build.plugins." + i + ".artifactId" ) );
+        int count = Integer.parseInt(props.getProperty("project.build.plugins"));
+        for (int i = 0; i < count; i++) {
+            actual.add(props.getProperty("project.build.plugins." + i + ".artifactId"));
         }
 
-        actual.retainAll( expected );
+        actual.retainAll(expected);
 
-        assertEquals( actual, expected );
+        assertEquals(actual, expected);
     }
-
 }

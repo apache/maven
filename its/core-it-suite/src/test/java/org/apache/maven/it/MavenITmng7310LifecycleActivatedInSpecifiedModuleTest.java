@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
+
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 
 /**
  * An integration test which proves that the bug of MNG-7310 is fixed.
@@ -31,29 +30,24 @@ import java.io.File;
  * <a href="https://issues.apache.org/jira/browse/MNG-7310">MNG-7310</a>.
  *
  */
-public class MavenITmng7310LifecycleActivatedInSpecifiedModuleTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng7310LifecycleActivatedInSpecifiedModuleTest extends AbstractMavenIntegrationTestCase {
 
     public static final String BASE_TEST_DIR = "/mng-7310-lifecycle-activated-in-specified-module";
 
-    public MavenITmng7310LifecycleActivatedInSpecifiedModuleTest()
-    {
-        super( "[4.0.0-alpha-1,)" );
+    public MavenITmng7310LifecycleActivatedInSpecifiedModuleTest() {
+        super("[4.0.0-alpha-1,)");
     }
 
-    public void testItShouldNotLoadAnExtensionInASiblingSubmodule()
-        throws Exception
-    {
-        File extensionTestDir = ResourceExtractor.simpleExtractResources( getClass(), BASE_TEST_DIR + "/extension" );
-        File projectTestDir = ResourceExtractor.simpleExtractResources( getClass(), BASE_TEST_DIR + "/project" );
+    public void testItShouldNotLoadAnExtensionInASiblingSubmodule() throws Exception {
+        File extensionTestDir = ResourceExtractor.simpleExtractResources(getClass(), BASE_TEST_DIR + "/extension");
+        File projectTestDir = ResourceExtractor.simpleExtractResources(getClass(), BASE_TEST_DIR + "/project");
 
-        Verifier verifier = newVerifier( extensionTestDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "install" );
+        Verifier verifier = newVerifier(extensionTestDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
         verifier.execute();
 
-        Verifier verifier2 = newVerifier( projectTestDir.getAbsolutePath() );
-        verifier2.addCliArgument( "compile" );
+        Verifier verifier2 = newVerifier(projectTestDir.getAbsolutePath());
+        verifier2.addCliArgument("compile");
         verifier2.execute();
     }
 }

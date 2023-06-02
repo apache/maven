@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng2309ProfileInjectionOrderTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2309ProfileInjectionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2309ProfileInjectionOrderTest()
-    {
-        super( "[2.0.5,)" );
+    public MavenITmng2309ProfileInjectionOrderTest() {
+        super("[2.0.5,)");
     }
 
     /**
@@ -48,40 +43,32 @@ public class MavenITmng2309ProfileInjectionOrderTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG2309()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2309" );
+    public void testitMNG2309() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2309");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        if ( matchesVersionRange( "[4.0.0-alpha-1,)" ) )
-        {
-            verifier.addCliArgument( "-P"
-                    + "pom-a,pom-b,pom-e,pom-c,pom-d"
-                    + ",settings-a,settings-b,settings-e,settings-c,settings-d" );
-        }
-        else
-        {
-            verifier.addCliArgument( "-P"
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
+            verifier.addCliArgument(
+                    "-P" + "pom-a,pom-b,pom-e,pom-c,pom-d" + ",settings-a,settings-b,settings-e,settings-c,settings-d");
+        } else {
+            verifier.addCliArgument("-P"
                     + "pom-a,pom-b,pom-e,pom-c,pom-d"
                     + ",profiles-a,profiles-b,profiles-e,profiles-c,profiles-d"
-                    + ",settings-a,settings-b,settings-e,settings-c,settings-d" );
+                    + ",settings-a,settings-b,settings-e,settings-c,settings-d");
         }
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "e", props.getProperty( "project.properties.pomProperty" ) );
-        assertEquals( "e", props.getProperty( "project.properties.settingsProperty" ) );
-        if ( matchesVersionRange( "(,3.0-alpha-1)" ) )
-        {
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("e", props.getProperty("project.properties.pomProperty"));
+        assertEquals("e", props.getProperty("project.properties.settingsProperty"));
+        if (matchesVersionRange("(,3.0-alpha-1)")) {
             // MNG-4060, profiles.xml support dropped
-            assertEquals( "e", props.getProperty( "project.properties.profilesProperty" ) );
+            assertEquals("e", props.getProperty("project.properties.profilesProperty"));
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,50 +32,44 @@ import org.junit.jupiter.api.Test;
  * when the build/plugins section is missing that plugin, and that
  * plugin versions in build/plugins override those in build/pluginManagement.
  */
-public class MavenITmng3394POMPluginVersionDominanceTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3394POMPluginVersionDominanceTest extends AbstractMavenIntegrationTestCase {
 
     private static final String BASEDIR_PREFIX = "/mng-3394/";
 
-    public MavenITmng3394POMPluginVersionDominanceTest()
-    {
-        super( "(2.0.8,)" ); // only test in 2.0.9+
+    public MavenITmng3394POMPluginVersionDominanceTest() {
+        super("(2.0.8,)"); // only test in 2.0.9+
     }
 
     @Test
-    public void testitMNG3394a ()
-        throws Exception
-    {
-        //testShouldUsePluginVersionFromPluginMgmtForLifecycleMojoWhenNotInBuildPlugins
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt" );
+    public void testitMNG3394a() throws Exception {
+        // testShouldUsePluginVersionFromPluginMgmtForLifecycleMojoWhenNotInBuildPlugins
+        File testDir = ResourceExtractor.simpleExtractResources(
+                getClass(), BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "process-resources" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("process-resources");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/resources-resources.txt" );
+        verifier.verifyFilePresent("target/resources-resources.txt");
     }
 
     @Test
-    public void testitMNG3394b()
-        throws Exception
-    {
-        //testShouldPreferPluginVersionFromBuildPluginsOverThatInPluginMgmt
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR_PREFIX + "preferBuildPluginOverPluginMgmt" );
+    public void testitMNG3394b() throws Exception {
+        // testShouldPreferPluginVersionFromBuildPluginsOverThatInPluginMgmt
+        File testDir = ResourceExtractor.simpleExtractResources(
+                getClass(), BASEDIR_PREFIX + "preferBuildPluginOverPluginMgmt");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "clean" );
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/clean-clean.txt" );
+        verifier.verifyFilePresent("target/clean-clean.txt");
     }
-
 }

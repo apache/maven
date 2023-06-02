@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,25 +16,22 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5012">MNG-5012</a>.
  */
-public class MavenITmng5012CollectionVsArrayParamCoercionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5012CollectionVsArrayParamCoercionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5012CollectionVsArrayParamCoercionTest()
-    {
-        super( "[3.0.3,)" );
+    public MavenITmng5012CollectionVsArrayParamCoercionTest() {
+        super("[3.0.3,)");
     }
 
     /**
@@ -46,21 +41,19 @@ public class MavenITmng5012CollectionVsArrayParamCoercionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5012" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5012");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( new File( testDir, "src/main/java" ).getCanonicalFile(),
-                      new File( props.getProperty( "stringParams.0" ) ).getCanonicalFile() );
+        Properties props = verifier.loadProperties("target/config.properties");
+        assertEquals(
+                new File(testDir, "src/main/java").getCanonicalFile(),
+                new File(props.getProperty("stringParams.0")).getCanonicalFile());
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,37 +31,32 @@ import org.junit.jupiter.api.Test;
  *
  * @author jdcasey
  */
-public class MavenITmng3684BuildPluginParameterTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3684BuildPluginParameterTest()
-    {
-        super( "(2.0.9,)" );
+public class MavenITmng3684BuildPluginParameterTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3684BuildPluginParameterTest() {
+        super("(2.0.9,)");
     }
 
     @Test
-    public void testitMNG3684 ()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3684" );
-        File pluginDir = new File( testDir, "maven-mng3684-plugin" );
-        File projectDir = new File( testDir, "project" );
+    public void testitMNG3684() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3684");
+        File pluginDir = new File(testDir, "maven-mng3684-plugin");
+        File projectDir = new File(testDir, "project");
 
-        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "install" );
+        Verifier verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.setLogFileName( "log-validate.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier.setLogFileName("log-validate.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier.setLogFileName( "log-site.txt" );
-        verifier.addCliArgument( "site" );
+        verifier.setLogFileName("log-site.txt");
+        verifier.addCliArgument("site");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();

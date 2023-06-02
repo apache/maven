@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3904NestedBuildDirInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3904NestedBuildDirInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3904NestedBuildDirInterpolationTest()
-    {
-        super( "[2.1.0-M1,)" );
+    public MavenITmng3904NestedBuildDirInterpolationTest() {
+        super("[2.1.0-M1,)");
     }
 
     /**
@@ -49,25 +44,22 @@ public class MavenITmng3904NestedBuildDirInterpolationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3904()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3904" );
+    public void testitMNG3904() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3904");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertCanonicalFileEquals( new File( testDir, "target/classes/dir0" ),
-            new File( props.getProperty( "project.properties.dir0" ) ) );
-        assertCanonicalFileEquals( new File( testDir, "src/test/dir1" ),
-            new File( props.getProperty( "project.properties.dir1" ) ) );
-        assertCanonicalFileEquals( new File( testDir, "target/site/dir2" ),
-            new File( props.getProperty( "project.properties.dir2" ) ) );
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertCanonicalFileEquals(
+                new File(testDir, "target/classes/dir0"), new File(props.getProperty("project.properties.dir0")));
+        assertCanonicalFileEquals(
+                new File(testDir, "src/test/dir1"), new File(props.getProperty("project.properties.dir1")));
+        assertCanonicalFileEquals(
+                new File(testDir, "target/site/dir2"), new File(props.getProperty("project.properties.dir2")));
     }
-
 }

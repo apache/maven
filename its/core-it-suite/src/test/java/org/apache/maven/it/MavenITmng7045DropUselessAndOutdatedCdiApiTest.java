@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,38 +16,32 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng7045DropUselessAndOutdatedCdiApiTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng7045DropUselessAndOutdatedCdiApiTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7045DropUselessAndOutdatedCdiApiTest()
-    {
-        super( "[3.8.3,)" );
+    public MavenITmng7045DropUselessAndOutdatedCdiApiTest() {
+        super("[3.8.3,)");
     }
 
     @Test
-    public void testShouldNotLeakCdiApi()
-        throws IOException, VerificationException
-    {
+    public void testShouldNotLeakCdiApi() throws IOException, VerificationException {
         // in test Groovy 4.x is used which requires JDK 1.8, so simply skip it for older JDKs
-        requiresJavaVersion( "[1.8,)" );
+        requiresJavaVersion("[1.8,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7045" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath()) ;
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7045");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.addCliArgument( "process-classes" );
+        verifier.addCliArgument("process-classes");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng2693SitePluginRealmTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2693SitePluginRealmTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2693SitePluginRealmTest()
-    {
-        super( "(2.0.2,)" );
+    public MavenITmng2693SitePluginRealmTest() {
+        super("(2.0.2,)");
     }
 
     /**
@@ -47,30 +42,27 @@ public class MavenITmng2693SitePluginRealmTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2693" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "pre-site" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2693");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("pre-site");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
-        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );
-        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassB" ) );
-        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.SomeClass" ) );
-        assertNotNull( pclProps.getProperty( "org/apache/maven/plugin/coreit/a.properties" ) );
-        assertEquals( "1", pclProps.getProperty( "org/apache/maven/plugin/coreit/a.properties.count" ) );
-        assertNotNull( pclProps.getProperty( "org/apache/maven/plugin/coreit/b.properties" ) );
-        assertEquals( "1", pclProps.getProperty( "org/apache/maven/plugin/coreit/b.properties.count" ) );
-        assertNotNull( pclProps.getProperty( "org/apache/maven/plugin/coreit/it.properties" ) );
-        assertEquals( "2", pclProps.getProperty( "org/apache/maven/plugin/coreit/it.properties.count" ) );
+        Properties pclProps = verifier.loadProperties("target/pcl.properties");
+        assertNotNull(pclProps.getProperty("org.apache.maven.plugin.coreit.ClassA"));
+        assertNotNull(pclProps.getProperty("org.apache.maven.plugin.coreit.ClassB"));
+        assertNotNull(pclProps.getProperty("org.apache.maven.plugin.coreit.SomeClass"));
+        assertNotNull(pclProps.getProperty("org/apache/maven/plugin/coreit/a.properties"));
+        assertEquals("1", pclProps.getProperty("org/apache/maven/plugin/coreit/a.properties.count"));
+        assertNotNull(pclProps.getProperty("org/apache/maven/plugin/coreit/b.properties"));
+        assertEquals("1", pclProps.getProperty("org/apache/maven/plugin/coreit/b.properties.count"));
+        assertNotNull(pclProps.getProperty("org/apache/maven/plugin/coreit/it.properties"));
+        assertEquals("2", pclProps.getProperty("org/apache/maven/plugin/coreit/it.properties.count"));
 
-        Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
-        assertEquals( pclProps, tcclProps );
+        Properties tcclProps = verifier.loadProperties("target/tccl.properties");
+        assertEquals(pclProps, tcclProps);
     }
-
 }

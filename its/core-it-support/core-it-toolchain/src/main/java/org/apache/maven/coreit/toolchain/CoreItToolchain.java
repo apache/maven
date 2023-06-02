@@ -1,5 +1,3 @@
-package org.apache.maven.coreit.toolchain;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.coreit.toolchain;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.coreit.toolchain;
 
 import java.util.Map;
 
@@ -28,35 +27,27 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 /**
  * @author Benjamin Bentmann
  */
-public class CoreItToolchain
-    implements Toolchain, ToolchainPrivate
-{
+public class CoreItToolchain implements Toolchain, ToolchainPrivate {
 
     private ToolchainModel model;
 
-    public CoreItToolchain( ToolchainModel model )
-    {
+    public CoreItToolchain(ToolchainModel model) {
         this.model = model;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return "coreit";
     }
 
-    public String findTool( String toolName )
-    {
+    public String findTool(String toolName) {
         return toolName;
     }
 
-    public ToolchainModel getModel()
-    {
+    public ToolchainModel getModel() {
         return model;
     }
 
-    public boolean matchesRequirements( Map requirements )
-    {
+    public boolean matchesRequirements(Map requirements) {
         return true;
     }
-
 }

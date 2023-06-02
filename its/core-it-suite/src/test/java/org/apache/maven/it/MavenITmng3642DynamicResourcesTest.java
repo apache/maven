@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,21 +33,16 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  *
  */
-public class MavenITmng3642DynamicResourcesTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3642DynamicResourcesTest()
-    {
-        super( "(2.0.9,)" ); // only test in 2.0.9+
+public class MavenITmng3642DynamicResourcesTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3642DynamicResourcesTest() {
+        super("(2.0.9,)"); // only test in 2.0.9+
     }
 
     @Test
-    public void testitMNG3642 ()
-        throws Exception
-    {
+    public void testitMNG3642() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3642" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3642");
 
         Verifier verifier;
 
@@ -60,7 +53,7 @@ public class MavenITmng3642DynamicResourcesTest
          * unstable test results. Fortunately, the verifier
          * makes it easy to do this.
          */
-        verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier = newVerifier(testDir.getAbsolutePath());
 
         /*
          * The Command Line Options (CLI) are passed to the
@@ -70,7 +63,7 @@ public class MavenITmng3642DynamicResourcesTest
          * recurse. We are only installing the parent pom to
          * the local repo here.
          */
-        verifier.addCliArgument( "process-test-resources" );
+        verifier.addCliArgument("process-test-resources");
         verifier.execute();
 
         /*
@@ -84,10 +77,10 @@ public class MavenITmng3642DynamicResourcesTest
          */
         verifier.verifyErrorFreeLog();
 
-        File first = new File( testDir, "target/test-classes/one.txt" );
-        assertTrue( "First resource file was not present: " + first, first.exists() );
+        File first = new File(testDir, "target/test-classes/one.txt");
+        assertTrue("First resource file was not present: " + first, first.exists());
 
-        File second = new File( testDir, "target/test-classes/two.txt" );
-        assertTrue( "Second resource file was not present: " + second, second.exists() );
+        File second = new File(testDir, "target/test-classes/two.txt");
+        assertTrue("Second resource file was not present: " + second, second.exists());
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4318ProjectExecutionRootTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4318ProjectExecutionRootTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4318ProjectExecutionRootTest()
-    {
-        super( "[2.0.4,3.0-alpha-1),[3.0.3,)" );
+    public MavenITmng4318ProjectExecutionRootTest() {
+        super("[2.0.4,3.0-alpha-1),[3.0.3,)");
     }
 
     /**
@@ -48,38 +43,35 @@ public class MavenITmng4318ProjectExecutionRootTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4318" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4318");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub-1/target" );
-        verifier.deleteDirectory( "sub-2/target" );
-        verifier.deleteDirectory( "sub-2/sub-3/target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("sub-1/target");
+        verifier.deleteDirectory("sub-2/target");
+        verifier.deleteDirectory("sub-2/sub-3/target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props;
 
-        props = verifier.loadProperties( "target/project.properties" );
-        assertEquals( "true", props.getProperty( "project.executionRoot" ) );
+        props = verifier.loadProperties("target/project.properties");
+        assertEquals("true", props.getProperty("project.executionRoot"));
 
-        props = verifier.loadProperties( "sub-1/target/project.properties" );
-        assertEquals( "false", props.getProperty( "project.executionRoot" ) );
-        assertEquals( "true", props.getProperty( "project.parent.executionRoot" ) );
+        props = verifier.loadProperties("sub-1/target/project.properties");
+        assertEquals("false", props.getProperty("project.executionRoot"));
+        assertEquals("true", props.getProperty("project.parent.executionRoot"));
 
-        props = verifier.loadProperties( "sub-2/target/project.properties" );
-        assertEquals( "false", props.getProperty( "project.executionRoot" ) );
-        assertEquals( "true", props.getProperty( "project.parent.executionRoot" ) );
+        props = verifier.loadProperties("sub-2/target/project.properties");
+        assertEquals("false", props.getProperty("project.executionRoot"));
+        assertEquals("true", props.getProperty("project.parent.executionRoot"));
 
-        props = verifier.loadProperties( "sub-2/sub-3/target/project.properties" );
-        assertEquals( "false", props.getProperty( "project.executionRoot" ) );
-        assertEquals( "false", props.getProperty( "project.parent.executionRoot" ) );
-        assertEquals( "true", props.getProperty( "project.parent.parent.executionRoot" ) );
+        props = verifier.loadProperties("sub-2/sub-3/target/project.properties");
+        assertEquals("false", props.getProperty("project.executionRoot"));
+        assertEquals("false", props.getProperty("project.parent.executionRoot"));
+        assertEquals("true", props.getProperty("project.parent.parent.executionRoot"));
     }
-
 }

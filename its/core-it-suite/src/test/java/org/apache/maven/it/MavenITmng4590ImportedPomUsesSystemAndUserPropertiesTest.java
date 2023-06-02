@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest()
-    {
-        super( "[2.0.9,3.0-alpha-1),[3.0-beta-1,)" );
+    public MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest() {
+        super("[2.0.9,3.0-alpha-1),[3.0-beta-1,)");
     }
 
     /**
@@ -47,29 +42,27 @@ public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4590" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4590");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4590" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.setEnvironmentVariable( "MAVEN_OPTS", "-Dtest.file=pom.xml" );
-        verifier.addCliArgument( "-Dtest.dir=" + testDir.getAbsolutePath() );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4590");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.setEnvironmentVariable("MAVEN_OPTS", "-Dtest.file=pom.xml");
+        verifier.addCliArgument("-Dtest.dir=" + testDir.getAbsolutePath());
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "1", props.getProperty( "project.dependencyManagement.dependencies" ) );
-        assertEquals( "dep-a", props.getProperty( "project.dependencyManagement.dependencies.0.artifactId" ) );
-        assertEquals( new File( testDir, "pom.xml" ).getAbsoluteFile(),
-            new File( props.getProperty( "project.dependencyManagement.dependencies.0.systemPath" ) ) );
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("1", props.getProperty("project.dependencyManagement.dependencies"));
+        assertEquals("dep-a", props.getProperty("project.dependencyManagement.dependencies.0.artifactId"));
+        assertEquals(
+                new File(testDir, "pom.xml").getAbsoluteFile(),
+                new File(props.getProperty("project.dependencyManagement.dependencies.0.systemPath")));
     }
-
 }

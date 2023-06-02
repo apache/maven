@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4814ReResolutionOfDependenciesDuringReactorTest()
-    {
-        super( "[3.0,)" );
+    public MavenITmng4814ReResolutionOfDependenciesDuringReactorTest() {
+        super("[3.0,)");
     }
 
     /**
@@ -50,28 +44,26 @@ public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4814" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4814");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "consumer/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4814" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArguments( "validate",
-            "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:aggregate-test" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("consumer/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4814");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArguments(
+                "validate",
+                "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:aggregate-test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
+        List<String> compile = verifier.loadLines("consumer/target/compile.txt", "UTF-8");
 
-        assertFalse( compile.toString(), compile.contains( "0.1-SNAPSHOT/producer-0.1-SNAPSHOT.jar" ) );
-        assertTrue( compile.toString(), compile.contains( "producer/pom.xml" ) );
+        assertFalse(compile.toString(), compile.contains("0.1-SNAPSHOT/producer-0.1-SNAPSHOT.jar"));
+        assertTrue(compile.toString(), compile.contains("producer/pom.xml"));
     }
-
 }

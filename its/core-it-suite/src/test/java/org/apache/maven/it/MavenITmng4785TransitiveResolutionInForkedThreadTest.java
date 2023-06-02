@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4785TransitiveResolutionInForkedThreadTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4785TransitiveResolutionInForkedThreadTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4785TransitiveResolutionInForkedThreadTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-4,)" );
+    public MavenITmng4785TransitiveResolutionInForkedThreadTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-4,)");
     }
 
     /**
@@ -48,25 +43,22 @@ public class MavenITmng4785TransitiveResolutionInForkedThreadTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4785" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4785");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4785" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4785");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/artifacts.properties" );
-        String path = props.getProperty( "org.apache.maven.its.mng4785:dep:jar:0.1-SNAPSHOT", "" );
-        assertTrue( path, path.endsWith( "dep-0.1-SNAPSHOT.jar" ) );
+        Properties props = verifier.loadProperties("target/artifacts.properties");
+        String path = props.getProperty("org.apache.maven.its.mng4785:dep:jar:0.1-SNAPSHOT", "");
+        assertTrue(path, path.endsWith("dep-0.1-SNAPSHOT.jar"));
     }
-
 }

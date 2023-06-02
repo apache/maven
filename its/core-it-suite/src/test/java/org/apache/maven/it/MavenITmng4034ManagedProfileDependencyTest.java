@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,15 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,13 +33,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng4034ManagedProfileDependencyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4034ManagedProfileDependencyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4034ManagedProfileDependencyTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4034ManagedProfileDependencyTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -51,23 +46,20 @@ public class MavenITmng4034ManagedProfileDependencyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG4034()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4034" );
+    public void testitMNG4034() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4034");
 
-        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertEquals( Arrays.asList( new String[0] ), artifacts );
+        List<String> artifacts = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertEquals(Arrays.asList(new String[0]), artifacts);
 
-        artifacts = verifier.loadLines( "target/runtime.txt", "UTF-8" );
-        assertEquals( Collections.singletonList( "org.apache.maven.its:maven-core-it-support:jar:1.3" ), artifacts );
+        artifacts = verifier.loadLines("target/runtime.txt", "UTF-8");
+        assertEquals(Collections.singletonList("org.apache.maven.its:maven-core-it-support:jar:1.3"), artifacts);
     }
-
 }

@@ -1,5 +1,3 @@
-package org.codehaus.plexus.util.xml.pull;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.codehaus.plexus.util.xml.pull;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.codehaus.plexus.util.xml.pull;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.codehaus.plexus.util.xml.pull;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,136 +25,108 @@ import java.io.Writer;
 /**
  *
  */
-public class MXSerializer
-    implements XmlSerializer
-{
+public class MXSerializer implements XmlSerializer {
     private Writer output;
 
-    public void setOutput( Writer writer )
-    {
+    public void setOutput(Writer writer) {
         output = writer;
     }
 
-    public XmlSerializer attribute( String namespace, String name, String value )
-    {
+    public XmlSerializer attribute(String namespace, String name, String value) {
         return null;
     }
 
-    public void cdsect( String text )
-    {
+    public void cdsect(String text) {
         // ignore
     }
 
-    public void comment( String text )
-    {
+    public void comment(String text) {
         // ignore
     }
 
-    public void docdecl( String text )
-    {
+    public void docdecl(String text) {
         // ignore
     }
 
-    public void endDocument()
-    {
+    public void endDocument() {
         // ignore
     }
 
-    public XmlSerializer endTag( String namespace, String name )
-    {
+    public XmlSerializer endTag(String namespace, String name) {
         return null;
     }
 
-    public void entityRef( String text )
-    {
+    public void entityRef(String text) {
         // ignore
     }
 
-    public void flush()
-    {
+    public void flush() {
         // ignore
     }
 
-    public int getDepth()
-    {
+    public int getDepth() {
         return 0;
     }
 
-    public boolean getFeature( String name )
-    {
+    public boolean getFeature(String name) {
         return false;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return null;
     }
 
-    public String getNamespace()
-    {
+    public String getNamespace() {
         return null;
     }
 
-    public String getPrefix( String namespace, boolean generatePrefix )
-    {
+    public String getPrefix(String namespace, boolean generatePrefix) {
         return null;
     }
 
-    public Object getProperty( String name )
-    {
+    public Object getProperty(String name) {
         return null;
     }
 
-    public void ignorableWhitespace( String text )
-    {
+    public void ignorableWhitespace(String text) {
         // ignore
     }
 
-    public void processingInstruction( String text )
-    {
+    public void processingInstruction(String text) {
         // ignore
     }
 
-    public void setFeature( String name, boolean state )
-    {
+    public void setFeature(String name, boolean state) {
         // ignore
     }
 
-    public void setOutput( OutputStream os, String encoding )
-    {
+    public void setOutput(OutputStream os, String encoding) {
         // ignore
     }
 
-    public void setPrefix( String prefix, String namespace )
-    {
+    public void setPrefix(String prefix, String namespace) {
         // ignore
     }
 
-    public void setProperty( String name, Object value )
-    {
+    public void setProperty(String name, Object value) {
         // ignore
     }
 
-    public void startDocument( String encoding, Boolean standalone )
-    {
+    public void startDocument(String encoding, Boolean standalone) {
         // ignore
     }
 
-    public XmlSerializer startTag( String namespace, String name )
-        throws IOException
-    {
-        output.write( name );
+    public XmlSerializer startTag(String namespace, String name) throws IOException {
+        output.write(name);
 
         return this;
     }
 
-    public XmlSerializer text( String text )
-    {
+    public XmlSerializer text(String text) {
         return null;
     }
 
-    public XmlSerializer text( char[] buf, int start, int len )
-    {
+    public XmlSerializer text(char[] buf, int start, int len) {
         return null;
     }
 }

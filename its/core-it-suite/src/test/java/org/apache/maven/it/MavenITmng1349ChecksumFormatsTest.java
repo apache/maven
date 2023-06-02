@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng1349ChecksumFormatsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng1349ChecksumFormatsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1349ChecksumFormatsTest()
-    {
-        super( "(2.0.10,2.1.0-M1),(2.1.0-M1,)" );
+    public MavenITmng1349ChecksumFormatsTest() {
+        super("(2.0.10,2.1.0-M1),(2.1.0-M1,)");
     }
 
     /**
@@ -47,38 +42,35 @@ public class MavenITmng1349ChecksumFormatsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG1349()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1349" );
+    public void testitMNG1349() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1349");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng1349" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng1349");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "md5-a", "0.1", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "md5-a", "0.1", "pom" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-a", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-a", "0.1", "pom");
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "md5-b", "0.1", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "md5-b", "0.1", "pom" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-b", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-b", "0.1", "pom");
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "md5-c", "0.1", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "md5-c", "0.1", "pom" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-c", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-c", "0.1", "pom");
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "sha1-a", "0.1", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "sha1-a", "0.1", "pom" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-a", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-a", "0.1", "pom");
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "sha1-b", "0.1", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "sha1-b", "0.1", "pom" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-b", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-b", "0.1", "pom");
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "sha1-c", "0.1", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "sha1-c", "0.1", "pom" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-c", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-c", "0.1", "pom");
     }
-
 }

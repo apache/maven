@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng3470StrictChecksumVerificationOfDependencyPomTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3470StrictChecksumVerificationOfDependencyPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3470StrictChecksumVerificationOfDependencyPomTest()
-    {
-        super( "[2.0.3,2.0.4],[3.0-beta-1,)" );
+    public MavenITmng3470StrictChecksumVerificationOfDependencyPomTest() {
+        super("[2.0.3,2.0.4],[3.0-beta-1,)");
     }
 
     /**
@@ -47,44 +42,35 @@ public class MavenITmng3470StrictChecksumVerificationOfDependencyPomTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3470" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3470");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3470" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        try
-        {
-            verifier.setLogFileName( "log-1.txt" );
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3470");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        try {
+            verifier.setLogFileName("log-1.txt");
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Build did not fail despite broken checksum of dependency POM." );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Build did not fail despite broken checksum of dependency POM.");
+        } catch (VerificationException e) {
             // expected
         }
 
         // NOTE: This second try is to make sure the state caching in the local repo properly replays the error
-        try
-        {
-            verifier.setLogFileName( "log-2.txt" );
-            verifier.addCliArgument( "validate" );
+        try {
+            verifier.setLogFileName("log-2.txt");
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Build did not fail despite broken checksum of dependency POM." );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Build did not fail despite broken checksum of dependency POM.");
+        } catch (VerificationException e) {
             // expected
         }
     }
-
 }

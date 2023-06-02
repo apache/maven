@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng2222OutputDirectoryReactorResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2222OutputDirectoryReactorResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2222OutputDirectoryReactorResolutionTest()
-    {
-        super( "[3.0-beta-1,)" );
+    public MavenITmng2222OutputDirectoryReactorResolutionTest() {
+        super("[3.0-beta-1,)");
     }
 
     /**
@@ -49,22 +44,19 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2222" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2222");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "mod-a/target" );
-        verifier.deleteDirectory( "mod-b/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2222" );
-        verifier.addCliArgument( "compile" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("mod-a/target");
+        verifier.deleteDirectory("mod-b/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2222");
+        verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines( "mod-b/target/compile.txt", "UTF-8" );
-        assertTrue( classpath.toString(), classpath.contains( "mod-a/target/classes" ) );
+        List<String> classpath = verifier.loadLines("mod-b/target/compile.txt", "UTF-8");
+        assertTrue(classpath.toString(), classpath.contains("mod-a/target/classes"));
     }
-
 }

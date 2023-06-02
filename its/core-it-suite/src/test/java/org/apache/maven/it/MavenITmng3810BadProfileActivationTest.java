@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,34 +30,25 @@ import org.junit.jupiter.api.Test;
  * @author Brett Porter
  *
  */
-public class MavenITmng3810BadProfileActivationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3810BadProfileActivationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3810BadProfileActivationTest()
-    {
-        super( "(2.0.10,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" ); // 2.0.11+, 2.1.0-M2+
+    public MavenITmng3810BadProfileActivationTest() {
+        super("(2.0.10,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)"); // 2.0.11+, 2.1.0-M2+
     }
 
     @Test
-    public void testitMNG3810Property()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3810/property" );
+    public void testitMNG3810Property() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3810/property");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
-            fail( "Build should not succeed" );
-        }
-        catch ( Exception e )
-        {
-            verifier.verifyTextInLog( "The property name is required to activate the profile" );
+            fail("Build should not succeed");
+        } catch (Exception e) {
+            verifier.verifyTextInLog("The property name is required to activate the profile");
         }
     }
-
 }

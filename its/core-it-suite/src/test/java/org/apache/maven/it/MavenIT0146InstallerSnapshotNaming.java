@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,15 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Map;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
@@ -37,119 +35,102 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class MavenIT0146InstallerSnapshotNaming
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegrationTestCase {
     private Server server;
 
     private int port;
 
     private final File testDir;
 
-    public MavenIT0146InstallerSnapshotNaming()
-        throws IOException
-    {
-        super( "(2.0.2,)" );
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0146" );
+    public MavenIT0146InstallerSnapshotNaming() throws IOException {
+        super("(2.0.2,)");
+        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0146");
     }
 
     @BeforeEach
-    protected void setUp()
-        throws Exception
-    {
+    protected void setUp() throws Exception {
         ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase( new File( testDir, "repo" ).getAbsolutePath() );
+        resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
         HandlerList handlers = new HandlerList();
-        handlers.setHandlers( new Handler[]{ resourceHandler, new DefaultHandler() } );
+        handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
 
-        server = new Server( 0 );
-        server.setHandler( handlers );
+        server = new Server(0);
+        server.setHandler(handlers);
         server.start();
-        if ( server.isFailed() )
-        {
-            fail( "Couldn't bind the server socket to a free port!" );
+        if (server.isFailed()) {
+            fail("Couldn't bind the server socket to a free port!");
         }
-        port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-        System.out.println( "Bound server socket to the port " + port );
+        port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
+        System.out.println("Bound server socket to the port " + port);
     }
 
-
     @AfterEach
-    protected void tearDown()
-        throws Exception
-    {
-        if ( server != null )
-        {
+    protected void tearDown() throws Exception {
+        if (server != null) {
             server.stop();
             server.join();
         }
     }
 
     @Test
-    public void testitRemoteDownloadTimestampedName()
-        throws Exception
-    {
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+    public void testitRemoteDownloadTimestampedName() throws Exception {
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         Map<String, String> properties = verifier.newDefaultFilterMap();
-        properties.put( "@host@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
-        properties.put( "@port@", Integer.toString( port ) );
+        properties.put("@host@", InetAddress.getLoopbackAddress().getCanonicalHostName());
+        properties.put("@port@", Integer.toString(port));
 
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", properties);
 
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
 
-        verifier.deleteArtifacts( "org.apache.maven.its.it0146" );
+        verifier.deleteArtifacts("org.apache.maven.its.it0146");
 
-        verifier.addCliArgument( "-X" );
+        verifier.addCliArgument("-X");
 
-        verifier.deleteDirectory( "target" );
+        verifier.deleteDirectory("target");
 
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/appassembler/repo/dep-0.1-20110726.105319-1.jar" );
+        verifier.verifyFilePresent("target/appassembler/repo/dep-0.1-20110726.105319-1.jar");
     }
 
-
     @Test
-    public void testitNonTimestampedNameWithInstalledSNAPSHOT()
-        throws Exception
-    {
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifacts( "org.apache.maven.its.it0146" );
-        verifier.addCliArgument( "-f" );
-        verifier.addCliArgument( "project/pom.xml" );
-        verifier.deleteDirectory( "project/target" );
-        verifier.setLogFileName( "log2.txt" );
+    public void testitNonTimestampedNameWithInstalledSNAPSHOT() throws Exception {
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.deleteArtifacts("org.apache.maven.its.it0146");
+        verifier.addCliArgument("-f");
+        verifier.addCliArgument("project/pom.xml");
+        verifier.deleteDirectory("project/target");
+        verifier.setLogFileName("log2.txt");
 
-        verifier.addCliArgument( "install" );
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier = newVerifier(testDir.getAbsolutePath());
 
         Map<String, String> properties = verifier.newDefaultFilterMap();
-        properties.put( "@host@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
-        properties.put( "@port@", Integer.toString( port ) );
+        properties.put("@host@", InetAddress.getLoopbackAddress().getCanonicalHostName());
+        properties.put("@port@", Integer.toString(port));
 
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", properties);
 
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.setLogFileName( "log3.txt" );
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.setLogFileName("log3.txt");
 
+        verifier.addCliArgument("-X");
 
-        verifier.addCliArgument( "-X" );
+        verifier.deleteDirectory("target");
 
-        verifier.deleteDirectory( "target" );
-
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/appassembler/repo/dep-0.1-SNAPSHOT.jar" );
+        verifier.verifyFilePresent("target/appassembler/repo/dep-0.1-SNAPSHOT.jar");
     }
 }

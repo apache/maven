@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenIT0130CleanLifecycleTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenIT0130CleanLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0130CleanLifecycleTest()
-    {
-        super( "[2.0.0,)" );
+    public MavenIT0130CleanLifecycleTest() {
+        super("[2.0.0,)");
     }
 
     /**
@@ -46,18 +41,15 @@ public class MavenIT0130CleanLifecycleTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit0130()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0130" );
+    public void testit0130() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0130");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteDirectory( "target" );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "clean" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.deleteDirectory("target");
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("clean");
         verifier.execute();
-        verifier.verifyFilePresent( "target/clean-clean.txt" );
+        verifier.verifyFilePresent("target/clean-clean.txt");
         verifier.verifyErrorFreeLog();
     }
-
 }

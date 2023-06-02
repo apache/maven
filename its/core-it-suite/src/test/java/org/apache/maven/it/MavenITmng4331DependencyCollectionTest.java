@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4331DependencyCollectionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4331DependencyCollectionTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng4331DependencyCollectionTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -49,23 +44,21 @@ public class MavenITmng4331DependencyCollectionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitEarlyLifecyclePhase()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4331" );
+    public void testitEarlyLifecyclePhase() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4331");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4331" );
-        verifier.deleteDirectory( "sub-2/target" );
-        verifier.setLogFileName( "log-lifecycle.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4331");
+        verifier.deleteDirectory("sub-2/target");
+        verifier.setLogFileName("log-lifecycle.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines( "sub-2/target/compile.txt", "UTF-8" );
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4331:sub-1:jar:0.1" ) );
-        assertEquals( 1, artifacts.size() );
+        List<String> artifacts = verifier.loadLines("sub-2/target/compile.txt", "UTF-8");
+        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4331:sub-1:jar:0.1"));
+        assertEquals(1, artifacts.size());
     }
 
     /**
@@ -75,30 +68,28 @@ public class MavenITmng4331DependencyCollectionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCliAggregator()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4331" );
+    public void testitCliAggregator() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4331");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4331" );
-        verifier.addCliArgument( "-Ddepres.projectArtifacts=target/@artifactId@.txt" );
-        verifier.setLogFileName( "log-aggregator.txt" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-collection:2.1-SNAPSHOT:aggregate-test" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4331");
+        verifier.addCliArgument("-Ddepres.projectArtifacts=target/@artifactId@.txt");
+        verifier.setLogFileName("log-aggregator.txt");
+        verifier.addCliArgument(
+                "org.apache.maven.its.plugins:maven-it-plugin-dependency-collection:2.1-SNAPSHOT:aggregate-test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines( "target/sub-2.txt", "UTF-8" );
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4331:sub-1:jar:0.1" ) );
-        assertEquals( 1, artifacts.size() );
+        List<String> artifacts = verifier.loadLines("target/sub-2.txt", "UTF-8");
+        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4331:sub-1:jar:0.1"));
+        assertEquals(1, artifacts.size());
 
-        artifacts = verifier.loadLines( "target/sub-1.txt", "UTF-8" );
-        assertEquals( 0, artifacts.size() );
+        artifacts = verifier.loadLines("target/sub-1.txt", "UTF-8");
+        assertEquals(0, artifacts.size());
 
-        artifacts = verifier.loadLines( "target/test.txt", "UTF-8" );
-        assertEquals( 0, artifacts.size() );
+        artifacts = verifier.loadLines("target/test.txt", "UTF-8");
+        assertEquals(0, artifacts.size());
     }
-
 }

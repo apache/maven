@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,15 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,159 +33,148 @@ import org.junit.jupiter.api.Test;
  *
  * @author Slawomir Jaranowski
  */
-public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng7468UnsupportedPluginsParametersTest()
-    {
-        super( "[3.9.0,)" );
+public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng7468UnsupportedPluginsParametersTest() {
+        super("[3.9.0,)");
     }
 
     /**
      * Test that ensures that warning is not printed for empty configuration
      */
     @Test
-    public void testNoConfiguration() throws Exception
-    {
-        List<String> warnLines = performTest( "no-config" );
-        assertTrue( "Unwanted warnings: " + warnLines, warnLines.isEmpty() );
+    public void testNoConfiguration() throws Exception {
+        List<String> warnLines = performTest("no-config");
+        assertTrue("Unwanted warnings: " + warnLines, warnLines.isEmpty());
     }
 
     /**
      * Test that ensures that warning is not printed for valid parameters
      */
     @Test
-    public void testValidParameter() throws Exception
-    {
-        List<String> warnLines = performTest( "valid-parameter" );
-        assertTrue( "Unwanted warnings: " + warnLines, warnLines.isEmpty() );
+    public void testValidParameter() throws Exception {
+        List<String> warnLines = performTest("valid-parameter");
+        assertTrue("Unwanted warnings: " + warnLines, warnLines.isEmpty());
     }
 
     /**
      * Test that ensures that warning is not printed for valid parameters
      */
     @Test
-    public void testValidParameterAlias() throws Exception
-    {
-        List<String> warnLines = performTest( "valid-parameter-alias" );
-        assertTrue( "Unwanted warnings: " + warnLines, warnLines.isEmpty() );
+    public void testValidParameterAlias() throws Exception {
+        List<String> warnLines = performTest("valid-parameter-alias");
+        assertTrue("Unwanted warnings: " + warnLines, warnLines.isEmpty());
     }
 
     /**
      * Test that ensures that warning is not printed for valid parameters
      */
     @Test
-    public void testValidParameterForOtherGoal() throws Exception
-    {
-        List<String> warnLines = performTest( "valid-parameter-other-goal" );
-        assertTrue( "Unwanted warnings: " + warnLines, warnLines.isEmpty() );
+    public void testValidParameterForOtherGoal() throws Exception {
+        List<String> warnLines = performTest("valid-parameter-other-goal");
+        assertTrue("Unwanted warnings: " + warnLines, warnLines.isEmpty());
     }
 
     /**
      * Test that ensures that warning is printed for configuration
      */
     @Test
-    public void testInBuildPlugin() throws Exception
-    {
-        List<String> warnLines = performTest( "config-build-plugin" );
-        assertWarningContains( warnLines );
+    public void testInBuildPlugin() throws Exception {
+        List<String> warnLines = performTest("config-build-plugin");
+        assertWarningContains(warnLines);
     }
 
     /**
      * Test that ensures that warning is printed for configuration
      */
     @Test
-    public void testInBuildExecution() throws Exception
-    {
-        List<String> warnLines = performTest( "config-build-execution" );
-        assertWarningContains( warnLines );
+    public void testInBuildExecution() throws Exception {
+        List<String> warnLines = performTest("config-build-execution");
+        assertWarningContains(warnLines);
     }
 
     /**
      * Test that ensures that warning is printed for configuration
      */
     @Test
-    public void testInBuildMixed() throws Exception
-    {
-        List<String> warnLines = performTest( "config-build-mixed" );
-        assertWarningContains( warnLines );
+    public void testInBuildMixed() throws Exception {
+        List<String> warnLines = performTest("config-build-mixed");
+        assertWarningContains(warnLines);
     }
 
     /**
      * Test that ensures that warning is printed for configuration
      */
     @Test
-    public void testInPluginManagement() throws Exception
-    {
-        List<String> warnLines = performTest( "config-plugin-management" );
-        assertWarningContains( warnLines );
+    public void testInPluginManagement() throws Exception {
+        List<String> warnLines = performTest("config-plugin-management");
+        assertWarningContains(warnLines);
     }
 
     /**
      * Test that ensures that warning is printed for configuration
      */
     @Test
-    public void testInPluginManagementParent() throws Exception
-    {
-        List<String> warnLines = performTest( "config-plugin-management-parent" );
-        assertWarningContains( warnLines );
+    public void testInPluginManagementParent() throws Exception {
+        List<String> warnLines = performTest("config-plugin-management-parent");
+        assertWarningContains(warnLines);
     }
 
     /**
      * Test that ensures that warning is printed for configuration
      */
     @Test
-    public void testWithForkedGoalExecution() throws Exception
-    {
-        List<String> warnLines = performTest( "config-with-fork-goal" );
+    public void testWithForkedGoalExecution() throws Exception {
+        List<String> warnLines = performTest("config-with-fork-goal");
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'invalidXml' is unknown for plugin 'maven-it-plugin-fork:2.1-SNAPSHOT:fork-goal (fork)'" ) );
+        assertTrue(
+                warnLines.remove(
+                        "[WARNING] Parameter 'invalidXml' is unknown for plugin 'maven-it-plugin-fork:2.1-SNAPSHOT:fork-goal (fork)'"));
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'invalidParam' is unknown for plugin 'maven-it-plugin-fork:2.1-SNAPSHOT:fork-goal (fork)'" ) );
+        assertTrue(
+                warnLines.remove(
+                        "[WARNING] Parameter 'invalidParam' is unknown for plugin 'maven-it-plugin-fork:2.1-SNAPSHOT:fork-goal (fork)'"));
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'invalidXml' is unknown for plugin 'maven-it-plugin-fork:2.1-SNAPSHOT:touch (touch)'" ) );
+        assertTrue(
+                warnLines.remove(
+                        "[WARNING] Parameter 'invalidXml' is unknown for plugin 'maven-it-plugin-fork:2.1-SNAPSHOT:touch (touch)'"));
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'invalidParam' is unknown for plugin 'maven-it-plugin-fork:2.1-SNAPSHOT:touch (touch)'" ) );
+        assertTrue(
+                warnLines.remove(
+                        "[WARNING] Parameter 'invalidParam' is unknown for plugin 'maven-it-plugin-fork:2.1-SNAPSHOT:touch (touch)'"));
 
-        assertTrue( "Not verified line: " + warnLines, warnLines.isEmpty() );
+        assertTrue("Not verified line: " + warnLines, warnLines.isEmpty());
     }
 
-    private List<String> performTest( String project ) throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7468-unsupported-params" );
+    private List<String> performTest(String project) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7468-unsupported-params");
 
-        Verifier verifier = newVerifier( new File( testDir, project ).getAbsolutePath() );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        return findUnknownWarning( logLines );
+        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        return findUnknownWarning(logLines);
     }
 
-    private void assertWarningContains( List<String> warnLines )
-    {
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'invalidParam' is unknown for plugin 'maven-it-plugin-configuration:2.1-SNAPSHOT:touch (default)'" ) );
+    private void assertWarningContains(List<String> warnLines) {
+        assertTrue(
+                warnLines.remove(
+                        "[WARNING] Parameter 'invalidParam' is unknown for plugin 'maven-it-plugin-configuration:2.1-SNAPSHOT:touch (default)'"));
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'invalidXml' is unknown for plugin 'maven-it-plugin-configuration:2.1-SNAPSHOT:touch (default)'" ) );
+        assertTrue(
+                warnLines.remove(
+                        "[WARNING] Parameter 'invalidXml' is unknown for plugin 'maven-it-plugin-configuration:2.1-SNAPSHOT:touch (default)'"));
 
-        assertTrue( "Not verified line: " + warnLines, warnLines.isEmpty() );
+        assertTrue("Not verified line: " + warnLines, warnLines.isEmpty());
     }
 
-    private List<String> findUnknownWarning( List<String> logLines )
-    {
-        Pattern pattern = Pattern.compile( "\\[WARNING] Parameter .* is unknown.*" );
+    private List<String> findUnknownWarning(List<String> logLines) {
+        Pattern pattern = Pattern.compile("\\[WARNING] Parameter .* is unknown.*");
         List<String> result = new ArrayList<>();
-        for ( String line : logLines )
-        {
-            if ( pattern.matcher( line ).matches() )
-            {
-                result.add( line );
+        for (String line : logLines) {
+            if (pattern.matcher(line).matches()) {
+                result.add(line);
             }
         }
 

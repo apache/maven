@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,14 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.junit.jupiter.api.Test;
+package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -34,117 +33,102 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Benjamin Bentmann
  *
  */
-public class PropertyUtilTest
-{
+public class PropertyUtilTest {
 
     @Test
-    public void testStoreScalar()
-    {
+    public void testStoreScalar() {
         Properties props = new Properties();
-        PropertyUtil.store( props, "null", null );
-        PropertyUtil.store( props, "string", "str" );
-        PropertyUtil.store( props, "boolean", Boolean.TRUE );
-        PropertyUtil.store( props, "int", 7 );
-        PropertyUtil.store( props, "file", new File( "pom.xml" ) );
+        PropertyUtil.store(props, "null", null);
+        PropertyUtil.store(props, "string", "str");
+        PropertyUtil.store(props, "boolean", Boolean.TRUE);
+        PropertyUtil.store(props, "int", 7);
+        PropertyUtil.store(props, "file", new File("pom.xml"));
 
-        assertNull( props.get( "null" ) );
-        assertEquals( "str", props.get( "string" ) );
-        assertEquals( "true", props.get( "boolean" ) );
-        assertEquals( "7", props.get( "int" ) );
-        assertEquals( "pom.xml", props.get( "file" ) );
-        assertEquals( 4, props.size() );
+        assertNull(props.get("null"));
+        assertEquals("str", props.get("string"));
+        assertEquals("true", props.get("boolean"));
+        assertEquals("7", props.get("int"));
+        assertEquals("pom.xml", props.get("file"));
+        assertEquals(4, props.size());
     }
 
     @Test
-    public void testStoreArray()
-    {
+    public void testStoreArray() {
         Properties props = new Properties();
-        PropertyUtil.store( props, "arr", new String[]{ "one", "two" } );
+        PropertyUtil.store(props, "arr", new String[] {"one", "two"});
 
-        assertEquals( "2", props.get( "arr" ) );
-        assertEquals( "one", props.get( "arr.0" ) );
-        assertEquals( "two", props.get( "arr.1" ) );
-        assertEquals( 3, props.size() );
+        assertEquals("2", props.get("arr"));
+        assertEquals("one", props.get("arr.0"));
+        assertEquals("two", props.get("arr.1"));
+        assertEquals(3, props.size());
     }
 
     @Test
-    public void testStoreList()
-    {
+    public void testStoreList() {
         Properties props = new Properties();
-        PropertyUtil.store( props, "arr", Arrays.asList( new String[]{ "one", "two" } ) );
+        PropertyUtil.store(props, "arr", Arrays.asList(new String[] {"one", "two"}));
 
-        assertEquals( "2", props.get( "arr" ) );
-        assertEquals( "one", props.get( "arr.0" ) );
-        assertEquals( "two", props.get( "arr.1" ) );
-        assertEquals( 3, props.size() );
+        assertEquals("2", props.get("arr"));
+        assertEquals("one", props.get("arr.0"));
+        assertEquals("two", props.get("arr.1"));
+        assertEquals(3, props.size());
     }
 
     @Test
-    public void testStoreMap()
-    {
+    public void testStoreMap() {
         Properties props = new Properties();
-        PropertyUtil.store( props, "map", Collections.singletonMap( "key", "value" ) );
+        PropertyUtil.store(props, "map", Collections.singletonMap("key", "value"));
 
-        assertEquals( "1", props.get( "map" ) );
-        assertEquals( "value", props.get( "map.key" ) );
-        assertEquals( 2, props.size() );
+        assertEquals("1", props.get("map"));
+        assertEquals("value", props.get("map.key"));
+        assertEquals(2, props.size());
     }
 
     @Test
-    public void testStoreBean()
-    {
+    public void testStoreBean() {
         Properties props = new Properties();
-        PropertyUtil.store( props, "bean", new Bean() );
+        PropertyUtil.store(props, "bean", new Bean());
 
-        assertEquals( "name", props.get( "bean.name" ) );
-        assertEquals( "false", props.get( "bean.enabled" ) );
-        assertEquals( 2, props.size() );
+        assertEquals("name", props.get("bean.name"));
+        assertEquals("false", props.get("bean.enabled"));
+        assertEquals(2, props.size());
     }
 
     @Test
-    public void testStoreCycle()
-    {
-        Object[] arr = { null };
-        arr[0] = Collections.singleton( Collections.singletonMap( "key", arr ) );
+    public void testStoreCycle() {
+        Object[] arr = {null};
+        arr[0] = Collections.singleton(Collections.singletonMap("key", arr));
 
         Properties props = new Properties();
-        PropertyUtil.store( props, "cycle", arr );
-        assertTrue( true, "Should not die because of stack overflow" );
+        PropertyUtil.store(props, "cycle", arr);
+        assertTrue(true, "Should not die because of stack overflow");
     }
 
     @Test
-    public void testGetPropertyName()
-    {
-        assertEquals( "name", PropertyUtil.getPropertyName( "getName" ) );
-        assertEquals( "enabled", PropertyUtil.getPropertyName( "isEnabled" ) );
+    public void testGetPropertyName() {
+        assertEquals("name", PropertyUtil.getPropertyName("getName"));
+        assertEquals("enabled", PropertyUtil.getPropertyName("isEnabled"));
     }
 
-    public static class Bean
-    {
-        public String getName()
-        {
+    public static class Bean {
+        public String getName() {
             return "name";
         }
 
-        public boolean isEnabled()
-        {
+        public boolean isEnabled() {
             return false;
         }
 
-        public String toString()
-        {
+        public String toString() {
             return "excluded";
         }
 
-        public Object getUntypedReturnValue()
-        {
+        public Object getUntypedReturnValue() {
             return "excluded";
         }
 
-        public Bean getCyclicReference()
-        {
+        public Bean getCyclicReference() {
             return this;
         }
     }
-
 }

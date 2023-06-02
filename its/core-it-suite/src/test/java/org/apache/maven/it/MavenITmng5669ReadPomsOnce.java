@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Collections;
@@ -38,36 +37,31 @@ import org.junit.jupiter.api.Test;
  * <a href="https://issues.apache.org/jira/browse/MNG-5669">MNG-5669</a>.
  *
  */
-public class MavenITmng5669ReadPomsOnce
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5669ReadPomsOnce()
-    {
-        super( "[4.0.0-alpha-1,)" );
+    public MavenITmng5669ReadPomsOnce() {
+        super("[4.0.0-alpha-1,)");
     }
 
     @Test
-    public void testWithoutBuildConsumer()
-        throws Exception
-    {
+    public void testWithoutBuildConsumer() throws Exception {
         // prepare JavaAgent
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5669-read-poms-once" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        Map<String, String> filterProperties =
-            Collections.singletonMap( "${javaAgentJar}",
-                                      verifier.getArtifactPath( "org.apache.maven.its", "core-it-javaagent", "2.1-SNAPSHOT", "jar" ) );
-        verifier.filterFile( ".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5669-read-poms-once");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Map<String, String> filterProperties = Collections.singletonMap(
+                "${javaAgentJar}",
+                verifier.getArtifactPath("org.apache.maven.its", "core-it-javaagent", "2.1-SNAPSHOT", "jar"));
+        verifier.filterFile(".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties);
 
-        verifier.setForkJvm( true ); // pick up agent
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "-q" );
-        verifier.addCliArgument( "-U" );
-        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=false" );
-        verifier.addCliArgument( "verify");
+        verifier.setForkJvm(true); // pick up agent
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("-q");
+        verifier.addCliArgument("-U");
+        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=false");
+        verifier.addCliArgument("verify");
         verifier.execute();
 
-        List<String> logTxt = verifier.loadLines( "log.txt", "utf-8" );
+        List<String> logTxt = verifier.loadLines("log.txt", "utf-8");
 
         // count source items
         Map<String, Long> sourceMap = logTxt.stream()
@@ -85,27 +79,25 @@ public class MavenITmng5669ReadPomsOnce
     }
 
     @Test
-    public void testWithBuildConsumer()
-        throws Exception
-    {
+    public void testWithBuildConsumer() throws Exception {
         // prepare JavaAgent
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5669-read-poms-once" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        Map<String, String> filterProperties =
-            Collections.singletonMap( "${javaAgentJar}",
-                                      verifier.getArtifactPath( "org.apache.maven.its", "core-it-javaagent", "2.1-SNAPSHOT", "jar" ) );
-        verifier.filterFile( ".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5669-read-poms-once");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Map<String, String> filterProperties = Collections.singletonMap(
+                "${javaAgentJar}",
+                verifier.getArtifactPath("org.apache.maven.its", "core-it-javaagent", "2.1-SNAPSHOT", "jar"));
+        verifier.filterFile(".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties);
 
-        verifier.setLogFileName( "log-bc.txt" );
-        verifier.setForkJvm( true ); // pick up agent
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "-q" );
-        verifier.addCliArgument( "-U" );
-        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=true" );
-        verifier.addCliArgument( "verify" );
+        verifier.setLogFileName("log-bc.txt");
+        verifier.setForkJvm(true); // pick up agent
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("-q");
+        verifier.addCliArgument("-U");
+        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=true");
+        verifier.addCliArgument("verify");
         verifier.execute();
 
-        List<String> logTxt = verifier.loadLines( "log-bc.txt", "utf-8" );
+        List<String> logTxt = verifier.loadLines("log-bc.txt", "utf-8");
 
         // count source items
         Map<String, Long> sourceMap = logTxt.stream()
@@ -126,18 +118,16 @@ public class MavenITmng5669ReadPomsOnce
 
         final String buildSourceKey = "org.apache.maven.model.building.source=";
         final int keyLength = buildSourceKey.length();
-        int start = line.indexOf( buildSourceKey );
-        if ( start < 0 )
-        {
+        int start = line.indexOf(buildSourceKey);
+        if (start < 0) {
             return null;
         }
 
-        int end = line.indexOf( ", ", start );
-        if ( end < 0 )
-        {
+        int end = line.indexOf(", ", start);
+        if (end < 0) {
             end = line.length() - 1; // is the }
         }
 
-        return line.substring( start + keyLength, end );
+        return line.substring(start + keyLength, end);
     }
 }

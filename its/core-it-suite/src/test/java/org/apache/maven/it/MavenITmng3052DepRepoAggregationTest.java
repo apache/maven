@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,36 +38,33 @@ import org.junit.jupiter.api.Test;
  *
  * @author jdcasey
  */
-public class MavenITmng3052DepRepoAggregationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3052DepRepoAggregationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3052DepRepoAggregationTest()
-    {
-        super( "(2.0.9,)" ); // only test in 2.0.10+
+    public MavenITmng3052DepRepoAggregationTest() {
+        super("(2.0.9,)"); // only test in 2.0.10+
     }
 
     @Test
-    public void testitMNG3052 ()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3052" ).getCanonicalFile();
+    public void testitMNG3052() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3052")
+                .getCanonicalFile();
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3052" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.filterFile( "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/template.pom",
-            "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/direct-0.1-20090517.133956-1.pom", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3052");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile(
+                "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/template.pom",
+                "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/direct-0.1-20090517.133956-1.pom",
+                "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3052", "direct", "0.1-SNAPSHOT", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3052", "trans", "0.1-SNAPSHOT", "jar" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3052", "direct", "0.1-SNAPSHOT", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3052", "trans", "0.1-SNAPSHOT", "jar");
     }
-
 }

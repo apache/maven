@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Brett Porter
  *
  */
-public class MavenIT0040PackagingFromPluginExtensionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenIT0040PackagingFromPluginExtensionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0040PackagingFromPluginExtensionTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenIT0040PackagingFromPluginExtensionTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -47,19 +42,16 @@ public class MavenIT0040PackagingFromPluginExtensionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit0040()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0040" );
+    public void testit0040() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0040");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "package" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/maven-it-it0040-1.0-it.jar" );
+        verifier.verifyFilePresent("target/maven-it-it0040-1.0-it.jar");
     }
-
 }

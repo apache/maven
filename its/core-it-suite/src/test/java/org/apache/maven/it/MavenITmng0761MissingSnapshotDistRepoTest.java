@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Brett Porter
  *
  */
-public class MavenITmng0761MissingSnapshotDistRepoTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng0761MissingSnapshotDistRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0761MissingSnapshotDistRepoTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng0761MissingSnapshotDistRepoTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,20 +43,17 @@ public class MavenITmng0761MissingSnapshotDistRepoTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG761()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0761" );
+    public void testitMNG761() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0761");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng0761" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng0761");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/repo/org/apache/maven/its/mng0761/test/1.0-SNAPSHOT/test-1.0-*.jar" );
+        verifier.verifyFilePresent("target/repo/org/apache/maven/its/mng0761/test/1.0-SNAPSHOT/test-1.0-*.jar");
     }
-
 }

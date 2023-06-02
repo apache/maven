@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author jdcasey
  */
-public class MavenITmng3680InvalidDependencyPOMTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3680InvalidDependencyPOMTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3680InvalidDependencyPOMTest()
-    {
-        super( "(2.0.9,)" );
+    public MavenITmng3680InvalidDependencyPOMTest() {
+        super("(2.0.9,)");
     }
 
     /**
@@ -47,25 +42,22 @@ public class MavenITmng3680InvalidDependencyPOMTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3680 ()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3680" );
+    public void testitMNG3680() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3680");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3680" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3680");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng3680:direct:jar:0.1" ) );
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng3680:transitive:jar:0.1" ) );
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng3680:direct:jar:0.1"));
+        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng3680:transitive:jar:0.1"));
     }
-
 }

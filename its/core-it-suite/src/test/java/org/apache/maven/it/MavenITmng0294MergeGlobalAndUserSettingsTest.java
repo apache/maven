@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author John Casey
  *
  */
-public class MavenITmng0294MergeGlobalAndUserSettingsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng0294MergeGlobalAndUserSettingsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0294MergeGlobalAndUserSettingsTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng0294MergeGlobalAndUserSettingsTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -47,24 +42,21 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG294()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0294" );
+    public void testitMNG294() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0294");
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "user-settings.xml" );
+        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("user-settings.xml");
         // dedicated CLI option only available since MNG-3914
-        verifier.addCliArgument( "--global-settings" );
-        verifier.addCliArgument( "global-settings.xml" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.addCliArgument("--global-settings");
+        verifier.addCliArgument("global-settings.xml");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-touch:touch");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/test.txt" );
+        verifier.verifyFilePresent("target/test.txt");
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4464PlatformIndependentFileSeparatorTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4464PlatformIndependentFileSeparatorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4464PlatformIndependentFileSeparatorTest()
-    {
-        super( "[3.0-alpha-7,)" );
+    public MavenITmng4464PlatformIndependentFileSeparatorTest() {
+        super("[3.0-alpha-7,)");
     }
 
     /**
@@ -48,34 +43,30 @@ public class MavenITmng4464PlatformIndependentFileSeparatorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4464" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4464");
 
-        Verifier verifier = newVerifier( new File( testDir, "aggregator" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "../sub/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4464" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "aggregator").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("../sub/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4464");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "../sub/target/path.properties" );
-        Properties props = verifier.loadProperties( "../sub/target/path.properties" );
-        assertPath( props, "project.build.resources.0.directory", "src/main/res" );
-        assertPath( props, "project.build.testResources.0.directory", "src/test/res" );
-        assertPath( props, "project.build.sourceDirectory", "src/main/j" );
-        assertPath( props, "project.build.testSourceDirectory", "src/test/j" );
-        assertPath( props, "project.build.directory", "target/it" );
-        assertPath( props, "project.build.outputDirectory", "target/it/classes" );
-        assertPath( props, "project.build.testOutputDirectory", "target/it/test-classes" );
+        verifier.verifyFilePresent("../sub/target/path.properties");
+        Properties props = verifier.loadProperties("../sub/target/path.properties");
+        assertPath(props, "project.build.resources.0.directory", "src/main/res");
+        assertPath(props, "project.build.testResources.0.directory", "src/test/res");
+        assertPath(props, "project.build.sourceDirectory", "src/main/j");
+        assertPath(props, "project.build.testSourceDirectory", "src/test/j");
+        assertPath(props, "project.build.directory", "target/it");
+        assertPath(props, "project.build.outputDirectory", "target/it/classes");
+        assertPath(props, "project.build.testOutputDirectory", "target/it/test-classes");
     }
 
-    private void assertPath( Properties props, String key, String path )
-    {
-        String actual = props.getProperty( key, "" );
-        assertTrue( actual, actual.endsWith( path.replace( '/', File.separatorChar ) ) );
+    private void assertPath(Properties props, String key, String path) {
+        String actual = props.getProperty(key, "");
+        assertTrue(actual, actual.endsWith(path.replace('/', File.separatorChar)));
     }
-
 }

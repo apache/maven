@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4087PercentEncodedFileUrlTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4087PercentEncodedFileUrlTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4087PercentEncodedFileUrlTest()
-    {
-        super( "[2.1.0,)" );
+    public MavenITmng4087PercentEncodedFileUrlTest() {
+        super("[2.1.0,)");
     }
 
     /**
@@ -46,22 +41,19 @@ public class MavenITmng4087PercentEncodedFileUrlTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4087" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4087");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4087" );
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4087");
+        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/%72%65%70%6F" );
-        verifier.verifyFilePresent( "target/repo" );
+        verifier.verifyFileNotPresent("target/%72%65%70%6F");
+        verifier.verifyFilePresent("target/repo");
     }
-
 }

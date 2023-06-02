@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.net.InetAddress;
 import java.util.Map;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
@@ -42,9 +40,7 @@ import org.junit.jupiter.api.Test;
  * @author Brett Porter
  *
  */
-public class MavenITmng2387InactiveProxyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTestCase {
     private Server server;
 
     private int port;
@@ -55,61 +51,52 @@ public class MavenITmng2387InactiveProxyTest
 
     private File testDir;
 
-    public MavenITmng2387InactiveProxyTest()
-    {
-        super( "[2.0.11,2.1.0-M1),[2.1.0,)" ); // 2.0.11+, 2.1.0+
+    public MavenITmng2387InactiveProxyTest() {
+        super("[2.0.11,2.1.0-M1),[2.1.0,)"); // 2.0.11+, 2.1.0+
     }
 
     @BeforeEach
-    protected void setUp()
-        throws Exception
-    {
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2387" );
+    protected void setUp() throws Exception {
+        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2387");
 
         ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase( new File( testDir, "repo" ).getAbsolutePath() );
+        resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
 
         HandlerList handlers = new HandlerList();
-        handlers.setHandlers( new Handler[] { resourceHandler, new DefaultHandler() } );
+        handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
 
-        server = new Server( 0 );
-        server.setHandler( handlers );
+        server = new Server(0);
+        server.setHandler(handlers);
         server.start();
-        if ( server.isFailed() )
-        {
-            fail( "Couldn't bind the server socket to a free port!" );
+        if (server.isFailed()) {
+            fail("Couldn't bind the server socket to a free port!");
         }
-        port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-        System.out.println( "Bound server socket to the HTTP port " + port );
+        port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
+        System.out.println("Bound server socket to the HTTP port " + port);
 
         resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase( new File( testDir, "proxy" ).getAbsolutePath() );
+        resourceHandler.setResourceBase(new File(testDir, "proxy").getAbsolutePath());
 
         handlers = new HandlerList();
-        handlers.setHandlers( new Handler[] { resourceHandler, new DefaultHandler() } );
+        handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
 
-        proxyServer = new Server( 0 );
-        proxyServer.setHandler( handlers );
+        proxyServer = new Server(0);
+        proxyServer.setHandler(handlers);
         proxyServer.start();
-        if ( proxyServer.isFailed() )
-        {
-            fail( "Couldn't bind the server socket to a free port!" );
+        if (proxyServer.isFailed()) {
+            fail("Couldn't bind the server socket to a free port!");
         }
-        proxyPort = ( (NetworkConnector) proxyServer.getConnectors()[0] ).getLocalPort();
-        System.out.println( "Bound server socket to the HTTPS port " + port );
+        proxyPort = ((NetworkConnector) proxyServer.getConnectors()[0]).getLocalPort();
+        System.out.println("Bound server socket to the HTTPS port " + port);
     }
 
     @AfterEach
-    protected void tearDown()
-        throws Exception
-    {
-        if ( server != null )
-        {
+    protected void tearDown() throws Exception {
+        if (server != null) {
             server.stop();
             server.join();
         }
-        if ( proxyServer != null )
-        {
+        if (proxyServer != null) {
             proxyServer.stop();
             proxyServer.join();
         }
@@ -121,25 +108,23 @@ public class MavenITmng2387InactiveProxyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+    public void testit() throws Exception {
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         Map<String, String> properties = verifier.newDefaultFilterMap();
-        properties.put( "@host@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
-        properties.put( "@port@", Integer.toString( port ) );
-        properties.put( "@proxyPort@", Integer.toString( proxyPort ) );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
+        properties.put("@host@", InetAddress.getLoopbackAddress().getCanonicalHostName());
+        properties.put("@port@", Integer.toString(port));
+        properties.put("@proxyPort@", Integer.toString(proxyPort));
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", properties);
 
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2387" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng2387");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng2387", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng2387", "a", "0.1", "jar");
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng2054PluginExecutionInheritanceTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2054PluginExecutionInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2054PluginExecutionInheritanceTest()
-    {
-        super( "(2.0.3,)" );
+    public MavenITmng2054PluginExecutionInheritanceTest() {
+        super("(2.0.3,)");
     }
 
     /**
@@ -48,21 +43,18 @@ public class MavenITmng2054PluginExecutionInheritanceTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG2054()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2054" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "project/project-level2/project-level3/project-jar/target" );
-        verifier.addCliArgument( "validate" );
+    public void testitMNG2054() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2054");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("project/project-level2/project-level3/project-jar/target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> executions =
-            verifier.loadLines( "project/project-level2/project-level3/project-jar/target/exec.log", "UTF-8" );
-        List<String> expected = Arrays.asList( new String[] { "once" } );
-        assertEquals( expected, executions );
+                verifier.loadLines("project/project-level2/project-level3/project-jar/target/exec.log", "UTF-8");
+        List<String> expected = Arrays.asList(new String[] {"once"});
+        assertEquals(expected, executions);
     }
-
 }

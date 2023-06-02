@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,15 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,13 +32,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4387QuietLoggingTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4387QuietLoggingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4387QuietLoggingTest()
-    {
-        super( "[2.0.5,)" );
+    public MavenITmng4387QuietLoggingTest() {
+        super("[2.0.5,)");
     }
 
     /**
@@ -49,31 +44,26 @@ public class MavenITmng4387QuietLoggingTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4387" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4387");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "-q" );
-        verifier.setLogFileName( "log.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("-q");
+        verifier.setLogFileName("log.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines( "log.txt", "UTF-8" );
+        List<String> lines = verifier.loadLines("log.txt", "UTF-8");
 
-        for ( Iterator<String> it = lines.iterator(); it.hasNext(); )
-        {
+        for (Iterator<String> it = lines.iterator(); it.hasNext(); ) {
             String line = it.next();
-            if ( line.startsWith( "+" ) || line.startsWith( "EMMA" ) )
-            {
+            if (line.startsWith("+") || line.startsWith("EMMA")) {
                 it.remove();
             }
         }
 
-        assertEquals( Collections.EMPTY_LIST, lines );
+        assertEquals(Collections.EMPTY_LIST, lines);
     }
-
 }

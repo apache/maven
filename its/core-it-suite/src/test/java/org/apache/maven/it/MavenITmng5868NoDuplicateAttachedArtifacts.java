@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,8 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -45,9 +42,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Olivier Lamy
  */
-public class MavenITmng5868NoDuplicateAttachedArtifacts
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenIntegrationTestCase {
 
     private File testDir;
 
@@ -57,86 +52,71 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts
 
     private int deployedJarArtifactNumber = 0;
 
-    public MavenITmng5868NoDuplicateAttachedArtifacts()
-    {
-        super( "[3.8.2,)" );
+    public MavenITmng5868NoDuplicateAttachedArtifacts() {
+        super("[3.8.2,)");
     }
 
     @BeforeEach
-    protected void setUp()
-        throws Exception
-    {
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5868" );
+    protected void setUp() throws Exception {
+        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5868");
 
-        Handler repoHandler = new AbstractHandler()
-        {
+        Handler repoHandler = new AbstractHandler() {
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request,
-                                HttpServletResponse response )
-            {
-                System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
+            public void handle(
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
 
-                if ( "PUT".equalsIgnoreCase( request.getMethod() ) )
-                {
+                if ("PUT".equalsIgnoreCase(request.getMethod())) {
                     String uri = request.getRequestURI();
-                    if (uri.startsWith( "/repo/org/apache/maven/its/mng5868/mng5868/1.0-SNAPSHOT/mng5868-1.0" ) && uri.endsWith( "-run.jar" ))
-                    {
+                    if (uri.startsWith("/repo/org/apache/maven/its/mng5868/mng5868/1.0-SNAPSHOT/mng5868-1.0")
+                            && uri.endsWith("-run.jar")) {
                         deployedJarArtifactNumber++;
                     }
-                    response.setStatus( HttpServletResponse.SC_OK );
-                }
-                else
-                {
-                    response.setStatus( HttpServletResponse.SC_NOT_FOUND );
+                    response.setStatus(HttpServletResponse.SC_OK);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 }
 
-                ( (Request) request ).setHandled( true );
+                ((Request) request).setHandled(true);
             }
         };
 
-        server = new Server( 0 );
+        server = new Server(0);
 
         HandlerList handlerList = new HandlerList();
-        handlerList.addHandler( repoHandler );
+        handlerList.addHandler(repoHandler);
 
-        server.setHandler( handlerList );
+        server.setHandler(handlerList);
         server.start();
-        if ( server.isFailed() )
-        {
-            fail( "Couldn't bind the server socket to a free port!" );
+        if (server.isFailed()) {
+            fail("Couldn't bind the server socket to a free port!");
         }
-        port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-        System.out.println( "Bound server socket to the port " + port );
+        port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
+        System.out.println("Bound server socket to the port " + port);
     }
 
     @AfterEach
-    protected void tearDown()
-        throws Exception
-    {
-        if ( server != null )
-        {
+    protected void tearDown() throws Exception {
+        if (server != null) {
             server.stop();
             server.join();
         }
     }
 
     @Test
-    public void testNoDeployNotDuplicate()
-        throws Exception
-    {
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        Path tmp = Files.createTempFile( testDir.toPath(), "FOO", "txt");
+    public void testNoDeployNotDuplicate() throws Exception {
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path tmp = Files.createTempFile(testDir.toPath(), "FOO", "txt");
 
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng5868" );
-        verifier.addCliArgument( "-Dartifact.attachedFile=" + tmp.toFile().getCanonicalPath() );
-        verifier.addCliArgument( "-DdeploymentPort=" + port );
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5868");
+        verifier.addCliArgument("-Dartifact.attachedFile=" + tmp.toFile().getCanonicalPath());
+        verifier.addCliArgument("-DdeploymentPort=" + port);
         verifier.displayStreamBuffers();
-        verifier.addCliArguments( "org.apache.maven.its.plugins:maven-it-plugin-artifact:2.1-SNAPSHOT:attach", "deploy" );
+        verifier.addCliArguments("org.apache.maven.its.plugins:maven-it-plugin-artifact:2.1-SNAPSHOT:attach", "deploy");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        assertEquals("deployedJarArtifactNumber: " + deployedJarArtifactNumber, 1, deployedJarArtifactNumber );
+        assertEquals("deployedJarArtifactNumber: " + deployedJarArtifactNumber, 1, deployedJarArtifactNumber);
     }
-
 }

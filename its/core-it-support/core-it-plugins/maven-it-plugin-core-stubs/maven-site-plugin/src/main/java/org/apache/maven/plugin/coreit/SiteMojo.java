@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,10 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
+import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -27,25 +29,20 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
  * Creates a text file in the project base directory.
  *
-  *
+ *
  * @author Benjamin Bentmann
  *
  */
-@Mojo( name = "site", defaultPhase = LifecyclePhase.SITE )
-public class SiteMojo
-    extends AbstractMojo
-{
+@Mojo(name = "site", defaultPhase = LifecyclePhase.SITE)
+public class SiteMojo extends AbstractMojo {
 
     /**
      * The current Maven project.
      */
-    @Parameter( defaultValue = "${project}", required = true, readonly = true )
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
     /**
@@ -61,35 +58,27 @@ public class SiteMojo
      * @throws MojoExecutionException If the output file could not be created.
      * @throws MojoFailureException If the output file has not been set.
      */
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        getLog().info( "[MAVEN-CORE-IT-LOG] Using output file path: " + pathname );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        getLog().info("[MAVEN-CORE-IT-LOG] Using output file path: " + pathname);
 
-        if ( pathname == null || pathname.length() <= 0 )
-        {
-            throw new MojoFailureException( "Path name for output file has not been specified" );
+        if (pathname == null || pathname.length() <= 0) {
+            throw new MojoFailureException("Path name for output file has not been specified");
         }
 
-        File outputFile = new File( pathname );
-        if ( !outputFile.isAbsolute() )
-        {
-            outputFile = new File( project.getBasedir(), pathname ).getAbsoluteFile();
+        File outputFile = new File(pathname);
+        if (!outputFile.isAbsolute()) {
+            outputFile = new File(project.getBasedir(), pathname).getAbsoluteFile();
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
 
-        try
-        {
-             outputFile.getParentFile().mkdirs();
-             outputFile.createNewFile();
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Output file could not be created: " + pathname, e );
+        try {
+            outputFile.getParentFile().mkdirs();
+            outputFile.createNewFile();
+        } catch (IOException e) {
+            throw new MojoExecutionException("Output file could not be created: " + pathname, e);
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Created output file: " + outputFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Created output file: " + outputFile);
     }
-
 }

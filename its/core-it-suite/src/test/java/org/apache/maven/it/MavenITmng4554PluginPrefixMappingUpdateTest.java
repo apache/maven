@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.shared.utils.io.FileUtils;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -47,13 +45,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4554PluginPrefixMappingUpdateTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4554PluginPrefixMappingUpdateTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-alpha-7,)" );
+    public MavenITmng4554PluginPrefixMappingUpdateTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-alpha-7,)");
     }
 
     /**
@@ -63,82 +58,73 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCached()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4554" );
+    public void testitCached() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4554");
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
+        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<String>());
 
-        AbstractHandler logHandler = new AbstractHandler()
-        {
+        AbstractHandler logHandler = new AbstractHandler() {
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request,
-                                HttpServletResponse response )
-            {
-                requestedUris.add( request.getRequestURI() );
+            public void handle(
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+                requestedUris.add(request.getRequestURI());
             }
         };
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase( testDir.getAbsolutePath() );
+        repoHandler.setResourceBase(testDir.getAbsolutePath());
 
         HandlerList handlerList = new HandlerList();
-        handlerList.addHandler( logHandler );
-        handlerList.addHandler( repoHandler );
-        handlerList.addHandler( new DefaultHandler() );
+        handlerList.addHandler(logHandler);
+        handlerList.addHandler(repoHandler);
+        handlerList.addHandler(new DefaultHandler());
 
-        Server server = new Server( 0 );
-        server.setHandler( handlerList );
+        Server server = new Server(0);
+        server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        try
-        {
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        try {
+            if (server.isFailed()) {
+                fail("Couldn't bind the server socket to a free port!");
             }
-            verifier.setAutoclean( false );
-            verifier.deleteDirectory( "target" );
-            try
-            {
-                verifier.deleteArtifacts( "org.apache.maven.its.mng4554" );
-            }
-            catch ( IOException e )
-            {
+            verifier.setAutoclean(false);
+            verifier.deleteDirectory("target");
+            try {
+                verifier.deleteArtifacts("org.apache.maven.its.mng4554");
+            } catch (IOException e) {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
-                assertFalse( new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml" ) ).exists() );
+                assertFalse(new File(verifier.getArtifactMetadataPath(
+                                "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml"))
+                        .exists());
             }
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
-            filterProps.put( "@port@", Integer.toString( connector.getLocalPort() ) );
-            filterProps.put( "@repo@", "repo-1" );
-            verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliArgument( "-s" );
-            verifier.addCliArgument( "settings.xml" );
+            filterProps.put("@port@", Integer.toString(connector.getLocalPort()));
+            filterProps.put("@repo@", "repo-1");
+            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.addCliArgument("-s");
+            verifier.addCliArgument("settings.xml");
 
-            verifier.setLogFileName( "log-cached-1.txt" );
-            verifier.addCliArgument( "a:touch" );
+            verifier.setLogFileName("log-cached-1.txt");
+            verifier.addCliArgument("a:touch");
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            verifier.verifyFilePresent( "target/touch.txt" );
-            assertTrue( requestedUris.toString(), requestedUris.contains( metadataUri ) );
+            verifier.verifyFilePresent("target/touch.txt");
+            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
 
             requestedUris.clear();
 
-            verifier.setLogFileName( "log-cached-2.txt" );
-            verifier.addCliArgument( "a:touch" );
+            verifier.setLogFileName("log-cached-2.txt");
+            verifier.addCliArgument("a:touch");
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            assertFalse( requestedUris.toString(), requestedUris.contains( metadataUri ) );
-        }
-        finally
-        {
+            assertFalse(requestedUris.toString(), requestedUris.contains(metadataUri));
+        } finally {
             server.stop();
             server.join();
         }
@@ -151,83 +137,74 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitForcedUpdate()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4554" );
+    public void testitForcedUpdate() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4554");
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
+        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<String>());
 
-        AbstractHandler logHandler = new AbstractHandler()
-        {
+        AbstractHandler logHandler = new AbstractHandler() {
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request,
-                                HttpServletResponse response )
-            {
-                requestedUris.add( request.getRequestURI() );
+            public void handle(
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+                requestedUris.add(request.getRequestURI());
             }
         };
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase( testDir.getAbsolutePath() );
+        repoHandler.setResourceBase(testDir.getAbsolutePath());
 
         HandlerList handlerList = new HandlerList();
-        handlerList.addHandler( logHandler );
-        handlerList.addHandler( repoHandler );
-        handlerList.addHandler( new DefaultHandler() );
+        handlerList.addHandler(logHandler);
+        handlerList.addHandler(repoHandler);
+        handlerList.addHandler(new DefaultHandler());
 
-        Server server = new Server( 0 );
-        server.setHandler( handlerList );
+        Server server = new Server(0);
+        server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        try
-        {
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        try {
+            if (server.isFailed()) {
+                fail("Couldn't bind the server socket to a free port!");
             }
-            verifier.setAutoclean( false );
-            verifier.deleteDirectory( "target" );
-            try
-            {
-                verifier.deleteArtifacts( "org.apache.maven.its.mng4554" );
-            }
-            catch ( IOException e )
-            {
+            verifier.setAutoclean(false);
+            verifier.deleteDirectory("target");
+            try {
+                verifier.deleteArtifacts("org.apache.maven.its.mng4554");
+            } catch (IOException e) {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
-                assertFalse( new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml" ) ).exists() );
+                assertFalse(new File(verifier.getArtifactMetadataPath(
+                                "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml"))
+                        .exists());
             }
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
-            filterProps.put( "@port@", Integer.toString( connector.getLocalPort() ) );
-            filterProps.put( "@repo@", "repo-1" );
-            verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliArgument( "-U" );
-            verifier.addCliArgument( "-s" );
-            verifier.addCliArgument( "settings.xml" );
+            filterProps.put("@port@", Integer.toString(connector.getLocalPort()));
+            filterProps.put("@repo@", "repo-1");
+            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.addCliArgument("-U");
+            verifier.addCliArgument("-s");
+            verifier.addCliArgument("settings.xml");
 
-            verifier.setLogFileName( "log-forced-1.txt" );
-            verifier.addCliArgument( "a:touch" );
+            verifier.setLogFileName("log-forced-1.txt");
+            verifier.addCliArgument("a:touch");
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            verifier.verifyFilePresent( "target/touch.txt" );
-            assertTrue( requestedUris.toString(), requestedUris.contains( metadataUri ) );
+            verifier.verifyFilePresent("target/touch.txt");
+            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
 
             requestedUris.clear();
 
-            verifier.setLogFileName( "log-forced-2.txt" );
-            verifier.addCliArgument( "a:touch" );
+            verifier.setLogFileName("log-forced-2.txt");
+            verifier.addCliArgument("a:touch");
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            assertTrue( requestedUris.toString(), requestedUris.contains( metadataUri ) );
-        }
-        finally
-        {
+            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
+        } finally {
             server.stop();
             server.join();
         }
@@ -240,89 +217,80 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitRefetched()
-        throws Exception
-    {
-        requiresMavenVersion( "[3.0-alpha-3,)" );
+    public void testitRefetched() throws Exception {
+        requiresMavenVersion("[3.0-alpha-3,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4554" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4554");
 
         String metadataUri = "/repo-it/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
+        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<String>());
 
-        AbstractHandler logHandler = new AbstractHandler()
-        {
+        AbstractHandler logHandler = new AbstractHandler() {
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request,
-                                HttpServletResponse response )
-            {
-                requestedUris.add( request.getRequestURI() );
+            public void handle(
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+                requestedUris.add(request.getRequestURI());
             }
         };
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase( testDir.getAbsolutePath() );
+        repoHandler.setResourceBase(testDir.getAbsolutePath());
 
         HandlerList handlerList = new HandlerList();
-        handlerList.addHandler( logHandler );
-        handlerList.addHandler( repoHandler );
-        handlerList.addHandler( new DefaultHandler() );
+        handlerList.addHandler(logHandler);
+        handlerList.addHandler(repoHandler);
+        handlerList.addHandler(new DefaultHandler());
 
-        Server server = new Server( 0 );
-        server.setHandler( handlerList );
+        Server server = new Server(0);
+        server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        try
-        {
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        try {
+            if (server.isFailed()) {
+                fail("Couldn't bind the server socket to a free port!");
             }
-            verifier.setAutoclean( false );
-            verifier.deleteDirectory( "target" );
-            try
-            {
-                verifier.deleteArtifacts( "org.apache.maven.its.mng4554" );
-            }
-            catch ( IOException e )
-            {
+            verifier.setAutoclean(false);
+            verifier.deleteDirectory("target");
+            try {
+                verifier.deleteArtifacts("org.apache.maven.its.mng4554");
+            } catch (IOException e) {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
-                assertFalse( new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml" ) ).exists() );
+                assertFalse(new File(verifier.getArtifactMetadataPath(
+                                "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml"))
+                        .exists());
             }
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
-            filterProps.put( "@port@", Integer.toString( connector.getLocalPort() ) );
-            filterProps.put( "@repo@", "repo-it" );
-            verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliArgument( "-s" );
-            verifier.addCliArgument( "settings.xml" );
+            filterProps.put("@port@", Integer.toString(connector.getLocalPort()));
+            filterProps.put("@repo@", "repo-it");
+            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.addCliArgument("-s");
+            verifier.addCliArgument("settings.xml");
 
-            FileUtils.copyDirectoryStructure( new File( testDir, "repo-1" ), new File( testDir, "repo-it" ) );
+            FileUtils.copyDirectoryStructure(new File(testDir, "repo-1"), new File(testDir, "repo-it"));
 
-            verifier.setLogFileName( "log-refetched-1.txt" );
-            verifier.addCliArgument( "a:touch" );
+            verifier.setLogFileName("log-refetched-1.txt");
+            verifier.addCliArgument("a:touch");
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            verifier.verifyFilePresent( "target/touch.txt" );
-            assertTrue( requestedUris.toString(), requestedUris.contains( metadataUri ) );
+            verifier.verifyFilePresent("target/touch.txt");
+            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
 
             requestedUris.clear();
 
             // simulate deployment of new plugin which updates the prefix mapping in the remote repo
-            FileUtils.copyDirectoryStructure( new File( testDir, "repo-2" ), new File( testDir, "repo-it" ) );
+            FileUtils.copyDirectoryStructure(new File(testDir, "repo-2"), new File(testDir, "repo-it"));
 
-            verifier.setLogFileName( "log-refetched-2.txt" );
-            verifier.addCliArgument( "b:touch" );
+            verifier.setLogFileName("log-refetched-2.txt");
+            verifier.addCliArgument("b:touch");
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            assertTrue( requestedUris.toString(), requestedUris.contains( metadataUri ) );
-        }
-        finally
-        {
+            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
+        } finally {
             server.stop();
             server.join();
         }

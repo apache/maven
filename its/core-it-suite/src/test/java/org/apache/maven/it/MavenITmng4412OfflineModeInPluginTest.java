@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4412OfflineModeInPluginTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4412OfflineModeInPluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4412OfflineModeInPluginTest()
-    {
-        super( "[2.0,3.0-alpha-1),[3.0-alpha-4,)" );
+    public MavenITmng4412OfflineModeInPluginTest() {
+        super("[2.0,3.0-alpha-1),[3.0-alpha-4,)");
     }
 
     /**
@@ -48,30 +43,25 @@ public class MavenITmng4412OfflineModeInPluginTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitResolver()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4412" );
+    public void testitResolver() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4412");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4412" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "-Presolver" );
-        verifier.addCliArgument( "--offline" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.setLogFileName( "log-resolver.txt" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4412");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("-Presolver");
+        verifier.addCliArgument("--offline");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.setLogFileName("log-resolver.txt");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Plugin could resolve artifact from remote repository despite Maven being offline" );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Plugin could resolve artifact from remote repository despite Maven being offline");
+        } catch (VerificationException e) {
             // expected
         }
     }
@@ -83,26 +73,23 @@ public class MavenITmng4412OfflineModeInPluginTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCollector()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4412" );
+    public void testitCollector() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4412");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4412" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "-Pcollector" );
-        verifier.addCliArgument( "--offline" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.setLogFileName( "log-collector.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4412");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("-Pcollector");
+        verifier.addCliArgument("--offline");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.setLogFileName("log-collector.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng4412", "dep", "0.1", "pom" );
+        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4412", "dep", "0.1", "pom");
     }
-
 }

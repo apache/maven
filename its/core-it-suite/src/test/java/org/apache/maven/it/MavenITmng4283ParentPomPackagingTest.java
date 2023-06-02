@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4283ParentPomPackagingTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4283ParentPomPackagingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4283ParentPomPackagingTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4283ParentPomPackagingTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -47,24 +42,18 @@ public class MavenITmng4283ParentPomPackagingTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4283" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4283");
 
-        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        verifier.setAutoclean(false);
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Invalid packaging of parent POM did not fail the build." );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Invalid packaging of parent POM did not fail the build.");
+        } catch (VerificationException e) {
             // expected
         }
     }
-
 }

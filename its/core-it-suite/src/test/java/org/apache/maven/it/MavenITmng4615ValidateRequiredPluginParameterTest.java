@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4615ValidateRequiredPluginParameterTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4615ValidateRequiredPluginParameterTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-2,)" );
+    public MavenITmng4615ValidateRequiredPluginParameterTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
     }
 
     /**
@@ -49,21 +44,19 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitAllSet()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4615/test-0" );
+    public void testitAllSet() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-0");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "one", props.get( "requiredParam" ) );
-        assertEquals( "two", props.get( "requiredParamWithDefault" ) );
+        Properties props = verifier.loadProperties("target/config.properties");
+        assertEquals("one", props.get("requiredParam"));
+        assertEquals("two", props.get("requiredParamWithDefault"));
     }
 
     /**
@@ -73,27 +66,21 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitExprMissing()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4615/test-1" );
+    public void testitExprMissing() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-1");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log-a.txt" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log-a.txt");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Build did not fail despite required plugin parameter missing" );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Build did not fail despite required plugin parameter missing");
+        } catch (VerificationException e) {
             // expected
         }
-
     }
 
     /**
@@ -103,23 +90,21 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitExprSet()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4615/test-1" );
+    public void testitExprSet() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-1");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-Dconfig.requiredParam=CLI" );
-        verifier.setLogFileName( "log-b.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-Dconfig.requiredParam=CLI");
+        verifier.setLogFileName("log-b.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "CLI", props.get( "requiredParam" ) );
-        assertEquals( "two", props.get( "requiredParamWithDefault" ) );
+        Properties props = verifier.loadProperties("target/config.properties");
+        assertEquals("CLI", props.get("requiredParam"));
+        assertEquals("two", props.get("requiredParamWithDefault"));
     }
 
     /**
@@ -129,29 +114,23 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitPomValMissing()
-        throws Exception
-    {
+    public void testitPomValMissing() throws Exception {
         // cf. MNG-4764
-        requiresMavenVersion( "[3.0-beta-2,)" );
+        requiresMavenVersion("[3.0-beta-2,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4615/test-2a" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-2a");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Build did not fail despite required plugin parameter missing" );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Build did not fail despite required plugin parameter missing");
+        } catch (VerificationException e) {
             // expected
         }
-
     }
 
     /**
@@ -161,21 +140,18 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitPomValSet()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4615/test-2b" );
+    public void testitPomValSet() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-2b");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "one", props.get( "requiredParam" ) );
-        assertEquals( "http://foo.bar/", props.get( "requiredParamWithDefault" ) );
+        Properties props = verifier.loadProperties("target/config.properties");
+        assertEquals("one", props.get("requiredParam"));
+        assertEquals("http://foo.bar/", props.get("requiredParamWithDefault"));
     }
-
 }

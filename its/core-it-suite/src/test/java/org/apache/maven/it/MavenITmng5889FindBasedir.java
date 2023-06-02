@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,25 +16,22 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5889">MNG-5889</a>:
  * check that extensions in <code>.mvn/</code> are found when Maven is run with <code>-f path/to/pom.xml</code>.
  */
-public class MavenITmng5889FindBasedir
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng5889FindBasedir()
-    {
-        super( "[3.5.0,3.5.1)" );
+public class MavenITmng5889FindBasedir extends AbstractMavenIntegrationTestCase {
+    public MavenITmng5889FindBasedir() {
+        super("[3.5.0,3.5.1)");
     }
 
     /**
@@ -45,10 +40,8 @@ public class MavenITmng5889FindBasedir
      * @throws Exception in case of failure
      */
     @Test
-    public void testMvnFileLongOption()
-        throws Exception
-    {
-        runCoreExtensionWithOption( "--file", null );
+    public void testMvnFileLongOption() throws Exception {
+        runCoreExtensionWithOption("--file", null);
     }
 
     /**
@@ -57,10 +50,8 @@ public class MavenITmng5889FindBasedir
      * @throws Exception in case of failure
      */
     @Test
-    public void testMvnFileShortOption()
-        throws Exception
-    {
-        runCoreExtensionWithOption( "-f", null );
+    public void testMvnFileShortOption() throws Exception {
+        runCoreExtensionWithOption("-f", null);
     }
 
     /**
@@ -69,10 +60,8 @@ public class MavenITmng5889FindBasedir
      * @throws Exception in case of failure
      */
     @Test
-    public void testMvnFileLongOptionModule()
-        throws Exception
-    {
-        runCoreExtensionWithOption( "--file", "module" );
+    public void testMvnFileLongOptionModule() throws Exception {
+        runCoreExtensionWithOption("--file", "module");
     }
 
     /**
@@ -81,44 +70,39 @@ public class MavenITmng5889FindBasedir
      * @throws Exception in case of failure
      */
     @Test
-    public void testMvnFileShortOptionModule()
-        throws Exception
-    {
-        runCoreExtensionWithOption( "-f", "module" );
+    public void testMvnFileShortOptionModule() throws Exception {
+        runCoreExtensionWithOption("-f", "module");
     }
 
-    private void runCoreExtensionWithOption( String option, String subdir )
-        throws Exception
-    {
-        runCoreExtensionWithOption( option, subdir, true );
+    private void runCoreExtensionWithOption(String option, String subdir) throws Exception {
+        runCoreExtensionWithOption(option, subdir, true);
     }
 
-    protected void runCoreExtensionWithOption( String option, String subdir, boolean pom )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5889-find.mvn" );
+    protected void runCoreExtensionWithOption(String option, String subdir, boolean pom) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5889-find.mvn");
 
-        File basedir = new File( testDir, "../mng-" + ( pom ? "5889" : "6223" ) + "-find.mvn" + option + ( pom ? "Pom" : "Dir" ) );
+        File basedir =
+                new File(testDir, "../mng-" + (pom ? "5889" : "6223") + "-find.mvn" + option + (pom ? "Pom" : "Dir"));
         basedir.mkdir();
 
-        if ( subdir != null )
-        {
-            testDir = new File( testDir, subdir );
-            basedir = new File( basedir, subdir );
+        if (subdir != null) {
+            testDir = new File(testDir, subdir);
+            basedir = new File(basedir, subdir);
             basedir.mkdirs();
         }
 
-        Verifier verifier = newVerifier( basedir.getAbsolutePath() );
-        verifier.addCliArgument( "-Dexpression.outputFile=" + new File( basedir, "expression.properties" ).getAbsolutePath() );
-        verifier.addCliArgument( option ); // -f/--file client/pom.xml
-        verifier.addCliArgument( ( pom ? new File( testDir, "pom.xml" ) : testDir ).getAbsolutePath() );
-        verifier.setForkJvm( true ); // force forked JVM since we need the shell script to detect .mvn/ location
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(basedir.getAbsolutePath());
+        verifier.addCliArgument(
+                "-Dexpression.outputFile=" + new File(basedir, "expression.properties").getAbsolutePath());
+        verifier.addCliArgument(option); // -f/--file client/pom.xml
+        verifier.addCliArgument((pom ? new File(testDir, "pom.xml") : testDir).getAbsolutePath());
+        verifier.setForkJvm(true); // force forked JVM since we need the shell script to detect .mvn/ location
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "expression.properties" );
-        assertEquals( "ok", props.getProperty( "project.properties.jvm-config" ) );
-        assertEquals( "ok", props.getProperty( "project.properties.maven-config" ) );
+        Properties props = verifier.loadProperties("expression.properties");
+        assertEquals("ok", props.getProperty("project.properties.jvm-config"));
+        assertEquals("ok", props.getProperty("project.properties.maven-config"));
     }
 }

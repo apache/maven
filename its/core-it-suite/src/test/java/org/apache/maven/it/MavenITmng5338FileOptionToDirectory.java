@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,41 +30,31 @@ import org.junit.jupiter.api.Test;
  *
  * @author Olivier Lamy
  */
-public class MavenITmng5338FileOptionToDirectory
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5338FileOptionToDirectory extends AbstractMavenIntegrationTestCase {
 
     private File testDir;
 
-    public MavenITmng5338FileOptionToDirectory()
-    {
-        super( "[3.1-A,)" );
+    public MavenITmng5338FileOptionToDirectory() {
+        super("[3.1-A,)");
     }
 
     @BeforeEach
-    public void setUp()
-        throws Exception
-    {
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5338" );
-
+    public void setUp() throws Exception {
+        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5338");
     }
 
     @Test
-    public void testFileOptionToADirectory()
-        throws Exception
-    {
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+    public void testFileOptionToADirectory() throws Exception {
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng5338" );
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5338");
 
-        verifier.addCliArgument( "-f" );
-        verifier.addCliArgument( "project" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-f");
+        verifier.addCliArgument("project");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +28,9 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -48,9 +46,7 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng4343MissingReleaseUpdatePolicyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenIntegrationTestCase {
     private Server server;
 
     private Deque<String> requestedUris;
@@ -59,80 +55,63 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
 
     private int port;
 
-    public MavenITmng4343MissingReleaseUpdatePolicyTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng4343MissingReleaseUpdatePolicyTest() {
+        super("[3.0-alpha-3,)");
     }
 
     @BeforeEach
-    protected void setUp()
-        throws Exception
-    {
-        Handler repoHandler = new AbstractHandler()
-        {
+    protected void setUp() throws Exception {
+        Handler repoHandler = new AbstractHandler() {
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request,
-                                HttpServletResponse response )
-                throws IOException
-            {
-                System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
+            public void handle(
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+                    throws IOException {
+                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
 
-                if ( request.getRequestURI().startsWith( "/org/apache/maven/its/mng4343" ) )
-                {
-                    requestedUris.add( request.getRequestURI().substring( 29 ) );
+                if (request.getRequestURI().startsWith("/org/apache/maven/its/mng4343")) {
+                    requestedUris.add(request.getRequestURI().substring(29));
                 }
 
-                if ( blockAccess )
-                {
-                    response.setStatus( HttpServletResponse.SC_NOT_FOUND );
-                }
-                else
-                {
+                if (blockAccess) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                } else {
                     PrintWriter writer = response.getWriter();
 
-                    response.setStatus( HttpServletResponse.SC_OK );
+                    response.setStatus(HttpServletResponse.SC_OK);
 
-                    if ( request.getRequestURI().endsWith( ".pom" ) )
-                    {
-                        writer.println( "<project>" );
-                        writer.println( "  <modelVersion>4.0.0</modelVersion>" );
-                        writer.println( "  <groupId>org.apache.maven.its.mng4343</groupId>" );
-                        writer.println( "  <artifactId>dep</artifactId>" );
-                        writer.println( "  <version>0.1</version>" );
-                        writer.println( "</project>" );
-                    }
-                    else if ( request.getRequestURI().endsWith( ".jar" ) )
-                    {
-                        writer.println( "empty" );
-                    }
-                    else if ( request.getRequestURI().endsWith( ".md5" ) || request.getRequestURI().endsWith( ".sha1" ) )
-                    {
-                        response.setStatus( HttpServletResponse.SC_NOT_FOUND );
+                    if (request.getRequestURI().endsWith(".pom")) {
+                        writer.println("<project>");
+                        writer.println("  <modelVersion>4.0.0</modelVersion>");
+                        writer.println("  <groupId>org.apache.maven.its.mng4343</groupId>");
+                        writer.println("  <artifactId>dep</artifactId>");
+                        writer.println("  <version>0.1</version>");
+                        writer.println("</project>");
+                    } else if (request.getRequestURI().endsWith(".jar")) {
+                        writer.println("empty");
+                    } else if (request.getRequestURI().endsWith(".md5")
+                            || request.getRequestURI().endsWith(".sha1")) {
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     }
                 }
 
-                ( (Request) request ).setHandled( true );
+                ((Request) request).setHandled(true);
             }
         };
 
-        server = new Server( 0 );
-        server.setHandler( repoHandler );
+        server = new Server(0);
+        server.setHandler(repoHandler);
         server.start();
-        if ( server.isFailed() )
-        {
-            fail( "Couldn't bind the server socket to a free port!" );
+        if (server.isFailed()) {
+            fail("Couldn't bind the server socket to a free port!");
         }
-        port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-        System.out.println( "Bound server socket to the port " + port );
+        port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
+        System.out.println("Bound server socket to the port " + port);
         requestedUris = new ConcurrentLinkedDeque<>();
     }
 
     @AfterEach
-    protected void tearDown()
-        throws Exception
-    {
-        if ( server != null )
-        {
+    protected void tearDown() throws Exception {
+        if (server != null) {
             server.stop();
             server.join();
         }
@@ -145,53 +124,48 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitAlways()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4343" );
+    public void testitAlways() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4343");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4343" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4343");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
 
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
-        filterProps.put( "@updates@", "always" );
-        filterProps.put( "@port@", Integer.toString( port ) );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        filterProps.put("@updates@", "always");
+        filterProps.put("@port@", Integer.toString(port));
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
 
         blockAccess = true;
 
-        verifier.setLogFileName( "log-always-1.txt" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        verifier.setLogFileName("log-always-1.txt");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Build succeeded despite missing dependency" );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Build succeeded despite missing dependency");
+        } catch (VerificationException e) {
             // expected
         }
 
-        assertTrue( requestedUris.toString(),
-            requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) || requestedUris.contains( "/dep/0.1/dep-0.1.pom" ) );
+        assertTrue(
+                requestedUris.toString(),
+                requestedUris.contains("/dep/0.1/dep-0.1.jar") || requestedUris.contains("/dep/0.1/dep-0.1.pom"));
         requestedUris.clear();
 
         blockAccess = false;
 
-        verifier.setLogFileName( "log-always-2.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.setLogFileName("log-always-2.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        assertTrue( requestedUris.toString(), requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) );
-        assertTrue( requestedUris.toString(), requestedUris.contains( "/dep/0.1/dep-0.1.pom" ) );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
-
+        assertTrue(requestedUris.toString(), requestedUris.contains("/dep/0.1/dep-0.1.jar"));
+        assertTrue(requestedUris.toString(), requestedUris.contains("/dep/0.1/dep-0.1.pom"));
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "pom");
     }
 
     /**
@@ -201,83 +175,74 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitNever()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4343" );
+    public void testitNever() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4343");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4343" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4343");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
 
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
-        filterProps.put( "@updates@", "never" );
-        filterProps.put( "@port@", Integer.toString( port ) );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        filterProps.put("@updates@", "never");
+        filterProps.put("@port@", Integer.toString(port));
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
 
         blockAccess = true;
 
-        verifier.setLogFileName( "log-never-1.txt" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        verifier.setLogFileName("log-never-1.txt");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Build succeeded despite missing dependency" );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Build succeeded despite missing dependency");
+        } catch (VerificationException e) {
             // expected
         }
 
-        assertTrue( requestedUris.toString(),
-            requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) || requestedUris.contains( "/dep/0.1/dep-0.1.pom" ) );
+        assertTrue(
+                requestedUris.toString(),
+                requestedUris.contains("/dep/0.1/dep-0.1.jar") || requestedUris.contains("/dep/0.1/dep-0.1.pom"));
         requestedUris.clear();
 
         blockAccess = false;
 
-        verifier.setLogFileName( "log-never-2.txt" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        verifier.setLogFileName("log-never-2.txt");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Remote repository was accessed despite updatePolicy=never" );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Remote repository was accessed despite updatePolicy=never");
+        } catch (VerificationException e) {
             // expected
         }
 
         //noinspection unchecked
-        assertTrue( requestedUris.isEmpty() );
-        verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
-        verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
+        assertTrue(requestedUris.isEmpty());
+        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4343", "dep", "0.1", "jar");
+        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4343", "dep", "0.1", "pom");
 
-        verifier.setLogFileName( "log-never-3.txt" );
-        verifier.addCliArgument( "-U" );
-        verifier.addCliArgument( "validate" );
+        verifier.setLogFileName("log-never-3.txt");
+        verifier.addCliArgument("-U");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        assertTrue( requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) );
-        assertTrue( requestedUris.contains( "/dep/0.1/dep-0.1.pom" ) );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
+        assertTrue(requestedUris.contains("/dep/0.1/dep-0.1.jar"));
+        assertTrue(requestedUris.contains("/dep/0.1/dep-0.1.pom"));
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "pom");
 
         requestedUris.clear();
 
-        verifier.setLogFileName( "log-never-4.txt" );
-        verifier.addCliArgument( "-U" );
-        verifier.addCliArgument( "validate" );
+        verifier.setLogFileName("log-never-4.txt");
+        verifier.addCliArgument("-U");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         //noinspection unchecked
-        assertTrue( requestedUris.isEmpty() );
-
+        assertTrue(requestedUris.isEmpty());
     }
-
 }

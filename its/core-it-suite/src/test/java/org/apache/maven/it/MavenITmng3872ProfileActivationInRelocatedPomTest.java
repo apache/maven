@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng3872ProfileActivationInRelocatedPomTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3872ProfileActivationInRelocatedPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3872ProfileActivationInRelocatedPomTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng3872ProfileActivationInRelocatedPomTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -47,26 +42,23 @@ public class MavenITmng3872ProfileActivationInRelocatedPomTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3872" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3872");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3872" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3872");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertTrue( compileClassPath.toString(), compileClassPath.contains( "a-0.1.jar" ) );
-        assertTrue( compileClassPath.toString(), compileClassPath.contains( "b-0.1.jar" ) );
-        assertFalse( compileClassPath.toString(), compileClassPath.contains( "c-0.1.jar" ) );
+        List<String> compileClassPath = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertTrue(compileClassPath.toString(), compileClassPath.contains("a-0.1.jar"));
+        assertTrue(compileClassPath.toString(), compileClassPath.contains("b-0.1.jar"));
+        assertFalse(compileClassPath.toString(), compileClassPath.contains("c-0.1.jar"));
     }
-
 }

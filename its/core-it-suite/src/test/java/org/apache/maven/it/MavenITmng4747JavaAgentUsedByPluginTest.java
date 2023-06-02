@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4747JavaAgentUsedByPluginTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4747JavaAgentUsedByPluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4747JavaAgentUsedByPluginTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-2,)" );
+    public MavenITmng4747JavaAgentUsedByPluginTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
     }
 
     /**
@@ -48,25 +43,22 @@ public class MavenITmng4747JavaAgentUsedByPluginTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        requiresJavaVersion( "[1.5,)" );
+    public void testit() throws Exception {
+        requiresJavaVersion("[1.5,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4747" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4747");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setEnvironmentVariable( "MAVEN_OPTS", "-javaagent:agent.jar" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setEnvironmentVariable("MAVEN_OPTS", "-javaagent:agent.jar");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props1 = verifier.loadProperties( "target/agent.properties" );
-        Properties props2 = verifier.loadProperties( "target/plugin.properties" );
-        assertNotNull( props1.get( "Mng4747Agent" ) );
-        assertEquals( props1.get( "Mng4747Agent" ), props2.get( "Mng4747Agent" ) );
+        Properties props1 = verifier.loadProperties("target/agent.properties");
+        Properties props2 = verifier.loadProperties("target/plugin.properties");
+        assertNotNull(props1.get("Mng4747Agent"));
+        assertEquals(props1.get("Mng4747Agent"), props2.get("Mng4747Agent"));
     }
-
 }

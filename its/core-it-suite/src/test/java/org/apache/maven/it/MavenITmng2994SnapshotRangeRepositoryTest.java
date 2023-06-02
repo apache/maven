@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Mark Hobson
  *
  */
-public class MavenITmng2994SnapshotRangeRepositoryTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2994SnapshotRangeRepositoryTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2994SnapshotRangeRepositoryTest()
-    {
-        super( "[3.0-beta-1,)" );
+    public MavenITmng2994SnapshotRangeRepositoryTest() {
+        super("[3.0-beta-1,)");
     }
 
     /**
@@ -47,18 +42,15 @@ public class MavenITmng2994SnapshotRangeRepositoryTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2994" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2994" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2994");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.deleteArtifacts("org.apache.maven.its.mng2994");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

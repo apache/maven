@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,44 +16,42 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-7529">MNG-7529</a>.
  */
-public class MavenITmng7529VersionRangeRepositorySelection
-    extends AbstractMavenIntegrationTestCase {
+public class MavenITmng7529VersionRangeRepositorySelection extends AbstractMavenIntegrationTestCase {
 
-  public MavenITmng7529VersionRangeRepositorySelection() {
-    super("(3.8.6,)");
-  }
+    public MavenITmng7529VersionRangeRepositorySelection() {
+        super("(3.8.6,)");
+    }
 
-  /**
-   * Test dependency resolution from a version range using multiple remote repositories
-   * with snapshot or release enabled.
-   *
-   * @throws Exception in case of failure
-   */
-  @Test
-  public void testit()
-      throws Exception {
-    File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7529");
-    Verifier verifier = newVerifier(testDir.getAbsolutePath());
-    verifier.setAutoclean(false);
-    verifier.deleteDirectory("target");
-    verifier.deleteArtifacts("org.apache.maven.its.mng7529");
-    verifier.addCliArgument("--settings");
-    verifier.addCliArgument("settings.xml");
+    /**
+     * Test dependency resolution from a version range using multiple remote repositories
+     * with snapshot or release enabled.
+     *
+     * @throws Exception in case of failure
+     */
+    @Test
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7529");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng7529");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
 
-    verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
-    verifier.addCliArgument("validate");
-    verifier.execute();
-    verifier.verifyErrorFreeLog();
-  }
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+    }
 }

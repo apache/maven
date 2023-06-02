@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +27,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -46,64 +44,50 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng5175WagonHttpTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5175WagonHttpTest extends AbstractMavenIntegrationTestCase {
     private Server server;
 
     private int port;
 
-    public MavenITmng5175WagonHttpTest()
-    {
-        super( "[3.0.4,)" ); // 3.0.4+
+    public MavenITmng5175WagonHttpTest() {
+        super("[3.0.4,)"); // 3.0.4+
     }
 
     @BeforeEach
-    protected void setUp()
-        throws Exception
-    {
-        Handler handler = new AbstractHandler()
-        {
+    protected void setUp() throws Exception {
+        Handler handler = new AbstractHandler() {
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request,
-                                HttpServletResponse response )
-                throws IOException, ServletException
-            {
-                try
-                {
+            public void handle(
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+                    throws IOException, ServletException {
+                try {
                     // wait long enough for read timeout to happen in client
-                    Thread.sleep( 100 );
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new ServletException(e.getMessage());
                 }
-                catch ( InterruptedException e )
-                {
-                    throw new ServletException( e.getMessage() );
-                }
-                response.setContentType( "text/plain" );
-                response.setStatus( HttpServletResponse.SC_OK );
-                response.getWriter().println( "some content" );
+                response.setContentType("text/plain");
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().println("some content");
                 response.getWriter().println();
 
-                ( (Request) request ).setHandled( true );
+                ((Request) request).setHandled(true);
             }
         };
 
-        server = new Server( 0 );
-        server.setHandler( handler );
+        server = new Server(0);
+        server.setHandler(handler);
         server.start();
-        if ( server.isFailed() )
-        {
-            fail( "Couldn't bind the server socket to a free port!" );
+        if (server.isFailed()) {
+            fail("Couldn't bind the server socket to a free port!");
         }
-        port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-        System.out.println( "Bound server socket to the port " + port );
+        port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
+        System.out.println("Bound server socket to the port " + port);
     }
 
     @AfterEach
-    protected void tearDown()
-        throws Exception
-    {
-        if ( server != null )
-        {
+    protected void tearDown() throws Exception {
+        if (server != null) {
             server.stop();
             server.join();
         }
@@ -116,29 +100,27 @@ public class MavenITmng5175WagonHttpTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testmng5175_ReadTimeOutFromSettings()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5175" );
+    public void testmng5175_ReadTimeOutFromSettings() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5175");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         Map<String, String> filterProps = new HashMap<>();
-        filterProps.put( "@port@", Integer.toString( port ) );
+        filterProps.put("@port@", Integer.toString(port));
 
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
 
-        verifier.addCliArgument( "-U" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "--fail-never" );
-        verifier.addCliArgument( "--errors" );
-        verifier.addCliArgument( "-X" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-U");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("--fail-never");
+        verifier.addCliArgument("--errors");
+        verifier.addCliArgument("-X");
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyTextInLog(
-                "Could not transfer artifact org.apache.maven.its.mng5175:fake-dependency:pom:1.0-SNAPSHOT" );
-        verifier.verifyTextInLog( "Read timed out" );
+                "Could not transfer artifact org.apache.maven.its.mng5175:fake-dependency:pom:1.0-SNAPSHOT");
+        verifier.verifyTextInLog("Read timed out");
     }
 }

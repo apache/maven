@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-4,)" );
+    public MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-4,)");
     }
 
     /**
@@ -48,24 +43,21 @@ public class MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4795" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4795");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub/target" );
-        verifier.addCliArgument( "process-sources" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("sub/target");
+        verifier.addCliArgument("process-sources");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile0 = verifier.loadLines( "sub/target/compile-0.txt", "UTF-8" );
-        assertTrue( compile0.toString(), compile0.contains( "maven-core-it-support-1.0.jar" ) );
+        List<String> compile0 = verifier.loadLines("sub/target/compile-0.txt", "UTF-8");
+        assertTrue(compile0.toString(), compile0.contains("maven-core-it-support-1.0.jar"));
 
-        List<String> compile1 = verifier.loadLines( "sub/target/compile-1.txt", "UTF-8" );
-        assertTrue( compile1.toString(), compile1.contains( "maven-core-it-support-1.0.jar" ) );
+        List<String> compile1 = verifier.loadLines("sub/target/compile-1.txt", "UTF-8");
+        assertTrue(compile1.toString(), compile1.contains("maven-core-it-support-1.0.jar"));
     }
-
 }

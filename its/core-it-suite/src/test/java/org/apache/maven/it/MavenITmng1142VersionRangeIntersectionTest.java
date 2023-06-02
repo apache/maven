@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng1142VersionRangeIntersectionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng1142VersionRangeIntersectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1142VersionRangeIntersectionTest()
-    {
-        super( "[2.0.7,3.0-alpha-1),[3.0,)" );
+    public MavenITmng1142VersionRangeIntersectionTest() {
+        super("[2.0.7,3.0-alpha-1),[3.0,)");
     }
 
     /**
@@ -48,10 +43,8 @@ public class MavenITmng1142VersionRangeIntersectionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitAB()
-        throws Exception
-    {
-        testit( "test-ab" );
+    public void testitAB() throws Exception {
+        testit("test-ab");
     }
 
     /**
@@ -61,33 +54,28 @@ public class MavenITmng1142VersionRangeIntersectionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitBA()
-        throws Exception
-    {
-        testit( "test-ba" );
+    public void testitBA() throws Exception {
+        testit("test-ba");
     }
 
-    private void testit( String project )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1142" );
+    private void testit(String project) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1142");
 
-        Verifier verifier = newVerifier( new File( testDir, project ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng1142" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng1142");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
 
-        assertFalse( classpath.toString(), classpath.contains( "a-1.1.2.jar" ) );
-        assertTrue( classpath.toString(), classpath.contains( "a-1.1.1.jar" ) );
-        assertTrue( classpath.toString(), classpath.contains( "b-0.1.jar" ) );
+        assertFalse(classpath.toString(), classpath.contains("a-1.1.2.jar"));
+        assertTrue(classpath.toString(), classpath.contains("a-1.1.1.jar"));
+        assertTrue(classpath.toString(), classpath.contains("b-0.1.jar"));
     }
-
 }

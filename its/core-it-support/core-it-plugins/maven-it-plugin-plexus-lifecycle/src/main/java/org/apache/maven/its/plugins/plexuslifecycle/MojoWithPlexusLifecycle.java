@@ -1,5 +1,3 @@
-package org.apache.maven.its.plugins.plexuslifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.its.plugins.plexuslifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.its.plugins.plexuslifecycle;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -33,33 +32,23 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 /**
  * @author Olivier Lamy
  */
-@Mojo( name = "do-nothing", defaultPhase = LifecyclePhase.VALIDATE )
-public class MojoWithPlexusLifecycle
-    extends AbstractMojo
-    implements Contextualizable, Disposable
-{
+@Mojo(name = "do-nothing", defaultPhase = LifecyclePhase.VALIDATE)
+public class MojoWithPlexusLifecycle extends AbstractMojo implements Contextualizable, Disposable {
     /**
      */
     @Component
     private FakeComponent fakeComponent;
 
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        getLog().info( "execute MojoWithPlexusLifecycle" );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        getLog().info("execute MojoWithPlexusLifecycle");
         fakeComponent.doNothing();
     }
 
-    public void dispose()
-    {
-        getLog().info( "MojoWithPlexusLifecycle :: dispose" );
+    public void dispose() {
+        getLog().info("MojoWithPlexusLifecycle :: dispose");
     }
 
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        getLog().info( "MojoWithPlexusLifecycle :: contextualize" );
+    public void contextualize(Context context) throws ContextException {
+        getLog().info("MojoWithPlexusLifecycle :: contextualize");
     }
-
-
 }

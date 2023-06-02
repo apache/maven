@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest()
-    {
-        super( "[3.0-beta-1,)" );
+    public MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest() {
+        super("[3.0-beta-1,)");
     }
 
     /**
@@ -49,28 +44,25 @@ public class MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4580" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4580");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub/target" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-class-loader:load" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("sub/target");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-class-loader:load");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties pclProps;
 
-        pclProps = verifier.loadProperties( "target/pcl.properties" );
-        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );
-        assertNotNull( pclProps.getProperty( "org/apache/maven/plugin/coreit/a.properties" ) );
+        pclProps = verifier.loadProperties("target/pcl.properties");
+        assertNotNull(pclProps.getProperty("org.apache.maven.plugin.coreit.ClassA"));
+        assertNotNull(pclProps.getProperty("org/apache/maven/plugin/coreit/a.properties"));
 
-        pclProps = verifier.loadProperties( "sub/target/pcl.properties" );
-        assertNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );
-        assertNull( pclProps.getProperty( "org/apache/maven/plugin/coreit/a.properties" ) );
+        pclProps = verifier.loadProperties("sub/target/pcl.properties");
+        assertNull(pclProps.getProperty("org.apache.maven.plugin.coreit.ClassA"));
+        assertNull(pclProps.getProperty("org/apache/maven/plugin/coreit/a.properties"));
     }
-
 }

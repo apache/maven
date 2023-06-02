@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,20 +16,17 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenIT0064MojoConfigViaSettersTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenIT0064MojoConfigViaSettersTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenIT0064MojoConfigViaSettersTest extends AbstractMavenIntegrationTestCase {
+    public MavenIT0064MojoConfigViaSettersTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -41,19 +36,17 @@ public class MavenIT0064MojoConfigViaSettersTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit0064()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0064" );
+    public void testit0064() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0064");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-setter:setter-touch" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-setter:setter-touch");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/fooValue" );
-        verifier.verifyFilePresent( "target/barValue.baz" );
+        verifier.verifyFilePresent("target/fooValue");
+        verifier.verifyFilePresent("target/barValue.baz");
     }
 }

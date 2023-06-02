@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,57 +16,52 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng7349RelocationWarningTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng7349RelocationWarningTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7349RelocationWarningTest()
-    {
-        super( "[3.8.5,)" );
+    public MavenITmng7349RelocationWarningTest() {
+        super("[3.8.5,)");
     }
 
     @Test
-    public void testit()
-            throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                    "/mng-7349-relocation-warning" );
-        File artifactsDir = new File( testDir, "artifacts" );
-        File projectDir = new File( testDir, "project" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7349-relocation-warning");
+        File artifactsDir = new File(testDir, "artifacts");
+        File projectDir = new File(testDir, "project");
 
         Verifier verifier;
 
-        verifier = newVerifier( artifactsDir.getAbsolutePath() );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(artifactsDir.getAbsolutePath());
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.addCliArgument( "verify" );
+        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
+        List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
         List<String> relocated = new ArrayList<>();
         for (String line : lines) {
             if (line.contains("has been relocated")) {
                 relocated.add(line);
             }
         }
-        assertEquals("Expected 2 relocations, but found multiple",
-                     2, relocated.size());
-        assertTrue("Expected the relocation messages to be logged",
-                    relocated.get(0).contains("Test relocation reason for old-plugin"));
-        assertTrue("Expected the relocation messages to be logged",
-                    relocated.get(1).contains("Test relocation reason for old-dep"));
+        assertEquals("Expected 2 relocations, but found multiple", 2, relocated.size());
+        assertTrue(
+                "Expected the relocation messages to be logged",
+                relocated.get(0).contains("Test relocation reason for old-plugin"));
+        assertTrue(
+                "Expected the relocation messages to be logged",
+                relocated.get(1).contains("Test relocation reason for old-dep"));
     }
 }

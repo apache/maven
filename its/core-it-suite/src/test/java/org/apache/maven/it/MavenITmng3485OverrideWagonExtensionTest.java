@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,29 +29,23 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng3485OverrideWagonExtensionTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3485OverrideWagonExtensionTest()
-    {
-        super( "(2.0.8,3.0-alpha-1),[3.0-alpha-7,)" );
+public class MavenITmng3485OverrideWagonExtensionTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3485OverrideWagonExtensionTest() {
+        super("(2.0.8,3.0-alpha-1),[3.0-alpha-7,)");
     }
 
     @Test
-    public void testitMNG3485 ()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3485" );
+    public void testitMNG3485() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3485");
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
+        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
 
-        verifier.addCliArgument( "deploy" );
+        verifier.addCliArgument("deploy");
         verifier.execute();
 
-        verifier.verifyFilePresent( "target/wagon.properties" );
+        verifier.verifyFilePresent("target/wagon.properties");
         verifier.verifyErrorFreeLog();
-
     }
 }

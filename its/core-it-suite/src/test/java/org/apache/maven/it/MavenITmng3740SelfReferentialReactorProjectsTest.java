@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,33 +35,27 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  *
  */
-public class MavenITmng3740SelfReferentialReactorProjectsTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3740SelfReferentialReactorProjectsTest()
-    {
-        super( "(2.0.8,)" ); // only test in 2.0.9+
+public class MavenITmng3740SelfReferentialReactorProjectsTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3740SelfReferentialReactorProjectsTest() {
+        super("(2.0.8,)"); // only test in 2.0.9+
     }
 
     @Test
-    public void testitMNG3740 ()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3740" );
-        File v1 = new File( testDir, "projects.v1" );
-        File v2 = new File( testDir, "projects.v2" );
+    public void testitMNG3740() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3740");
+        File v1 = new File(testDir, "projects.v1");
+        File v2 = new File(testDir, "projects.v2");
 
         Verifier verifier;
 
-        verifier = newVerifier( v1.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(v1.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( v2.getAbsolutePath() );
-        verifier.addCliArgument( "package" );
+        verifier = newVerifier(v2.getAbsolutePath());
+        verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-
     }
 }

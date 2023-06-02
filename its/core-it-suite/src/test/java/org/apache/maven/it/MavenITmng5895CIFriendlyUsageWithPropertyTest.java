@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,15 +33,12 @@ import org.junit.jupiter.api.Test;
  *
  * @author Karl Heinz Marbaise khmarbaise@apache.org
  */
-public class MavenITmng5895CIFriendlyUsageWithPropertyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5895CIFriendlyUsageWithPropertyTest()
-    {
+    public MavenITmng5895CIFriendlyUsageWithPropertyTest() {
         // The first version which contains the fix for the MNG-issue.
         // TODO: Think about it!
-        super( "[3.5.0-alpha-2,)" );
+        super("[3.5.0-alpha-2,)");
     }
 
     /**
@@ -54,43 +49,38 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitShouldResolveTheDependenciesWithoutBuildConsumer()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5895-ci-friendly-usage-with-property" );
+    public void testitShouldResolveTheDependenciesWithoutBuildConsumer() throws Exception {
+        File testDir =
+                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5895-ci-friendly-usage-with-property");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        verifier.setAutoclean(false);
 
-        //verifier.setLogFileName( "log-only.txt" );
-        verifier.addCliArgument( "-Drevision=1.2" );
-        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=false" );
-        verifier.addCliArgument( "clean" );
+        // verifier.setLogFileName( "log-only.txt" );
+        verifier.addCliArgument("-Drevision=1.2");
+        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=false");
+        verifier.addCliArgument("clean");
         verifier.execute();
-        verifier.addCliArgument( "package" );
+        verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-
     }
 
     @Test
-    public void testitShouldResolveTheDependenciesWithBuildConsumer()
-                    throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5895-ci-friendly-usage-with-property" );
+    public void testitShouldResolveTheDependenciesWithBuildConsumer() throws Exception {
+        File testDir =
+                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5895-ci-friendly-usage-with-property");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        verifier.setAutoclean(false);
 
-        verifier.setLogFileName( "log-bc.txt" );
-        verifier.addCliArgument( "-Drevision=1.2" );
-        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=true" );
-        verifier.addCliArgument( "clean" );
+        verifier.setLogFileName("log-bc.txt");
+        verifier.addCliArgument("-Drevision=1.2");
+        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=true");
+        verifier.addCliArgument("clean");
         verifier.execute();
-        verifier.addCliArgument( "package" );
+        verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-
     }
-
 }

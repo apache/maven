@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,37 +29,31 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng3268MultipleHyphenPCommandLineTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3268MultipleHyphenPCommandLineTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3268MultipleHyphenPCommandLineTest()
-    {
-        super( "(2.0.9,)" );
+    public MavenITmng3268MultipleHyphenPCommandLineTest() {
+        super("(2.0.9,)");
     }
 
     @Test
-    public void testMultipleProfileParams()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3268" );
+    public void testMultipleProfileParams() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3268");
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
+        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
 
-        verifier.addCliArgument( "-Pprofile1,profile2" );
-        verifier.addCliArgument( "-Pprofile3" );
-        verifier.addCliArgument( "-P" );
-        verifier.addCliArgument( "profile4" );
-        verifier.addCliArgument( "package" );
+        verifier.addCliArgument("-Pprofile1,profile2");
+        verifier.addCliArgument("-Pprofile3");
+        verifier.addCliArgument("-P");
+        verifier.addCliArgument("profile4");
+        verifier.addCliArgument("package");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
-        verifier.verifyFilePresent( "target/profile1/touch.txt" );
-        verifier.verifyFilePresent( "target/profile2/touch.txt" );
-        verifier.verifyFilePresent( "target/profile3/touch.txt" );
-        verifier.verifyFilePresent( "target/profile4/touch.txt" );
+        verifier.verifyFilePresent("target/profile1/touch.txt");
+        verifier.verifyFilePresent("target/profile2/touch.txt");
+        verifier.verifyFilePresent("target/profile3/touch.txt");
+        verifier.verifyFilePresent("target/profile4/touch.txt");
     }
-
 }

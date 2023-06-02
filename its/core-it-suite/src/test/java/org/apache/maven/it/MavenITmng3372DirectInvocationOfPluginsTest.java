@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
-import java.util.Arrays;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,59 +29,52 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng3372DirectInvocationOfPluginsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3372DirectInvocationOfPluginsTest()
-    {
-        super( "(2.0.5,)" );
+    public MavenITmng3372DirectInvocationOfPluginsTest() {
+        super("(2.0.5,)");
     }
 
     @Test
-    public void testitMNG3372()
-        throws Exception
-    {
+    public void testitMNG3372() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testBaseDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3372/direct-using-prefix" );
-        File plugin = new File( testBaseDir, "plugin" );
-        File project = new File( testBaseDir, "project" );
-        File settingsFile = new File( testBaseDir, "settings.xml" );
+        File testBaseDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3372/direct-using-prefix");
+        File plugin = new File(testBaseDir, "plugin");
+        File project = new File(testBaseDir, "project");
+        File settingsFile = new File(testBaseDir, "settings.xml");
 
-        Verifier verifier = newVerifier( plugin.getAbsolutePath(), "remote" );
+        Verifier verifier = newVerifier(plugin.getAbsolutePath(), "remote");
 
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3372" );
+        verifier.deleteArtifacts("org.apache.maven.its.mng3372");
 
-        verifier.getSystemProperties().setProperty( "updateReleaseInfo", "true" );
+        verifier.getSystemProperties().setProperty("updateReleaseInfo", "true");
 
-        verifier.addCliArguments( "clean", "install" );
+        verifier.addCliArguments("clean", "install");
         verifier.execute();
 
-        verifier = newVerifier( project.getAbsolutePath() );
+        verifier = newVerifier(project.getAbsolutePath());
 
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "\"" + settingsFile.getAbsolutePath() + "\"" );
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("\"" + settingsFile.getAbsolutePath() + "\"");
 
-        verifier.addCliArgument( "mng3372:test" );
+        verifier.addCliArgument("mng3372:test");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }
 
     @Test
-    public void testDependencyTreeInvocation()
-        throws Exception
-    {
+    public void testDependencyTreeInvocation() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testBaseDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3372/dependency-tree" );
+        File testBaseDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3372/dependency-tree");
 
-        Verifier verifier = newVerifier( testBaseDir.getAbsolutePath(), "remote" );
+        Verifier verifier = newVerifier(testBaseDir.getAbsolutePath(), "remote");
 
-        verifier.addCliArgument( "-U" );
+        verifier.addCliArgument("-U");
 
-        verifier.addCliArgument( "dependency:tree" );
+        verifier.addCliArgument("dependency:tree");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();

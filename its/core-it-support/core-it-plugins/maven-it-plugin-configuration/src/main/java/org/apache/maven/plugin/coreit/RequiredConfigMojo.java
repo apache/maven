@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 import java.util.Properties;
@@ -31,36 +30,34 @@ import org.apache.maven.plugins.annotations.Parameter;
 /**
  * Dumps this mojo's configuration into a properties file.
  *
-  *
+ *
  * @author Benjamin Bentmann
  */
-@Mojo( name = "required-config", defaultPhase = LifecyclePhase.VALIDATE )
-public class RequiredConfigMojo
-    extends AbstractMojo
-{
+@Mojo(name = "required-config", defaultPhase = LifecyclePhase.VALIDATE)
+public class RequiredConfigMojo extends AbstractMojo {
 
     /**
      * The current project's base directory, used for path alignment.
      */
-    @Parameter( defaultValue = "${basedir}", readonly = true )
+    @Parameter(defaultValue = "${basedir}", readonly = true)
     private File basedir;
 
     /**
      * The path to the properties file into which to save the mojo configuration.
      */
-    @Parameter( property = "config.propertiesFile" )
+    @Parameter(property = "config.propertiesFile")
     private File propertiesFile;
 
     /**
      * A required parameter to be set via plugin configuration in POM or system property from CLI.
      */
-    @Parameter( property = "config.requiredParam", required = true )
+    @Parameter(property = "config.requiredParam", required = true)
     private String requiredParam;
 
     /**
      * A required parameter that defaults to a non-mandatory value from the POM.
      */
-    @Parameter( defaultValue = "${project.url}", required = true )
+    @Parameter(defaultValue = "${project.url}", required = true)
     private String requiredParamWithDefault;
 
     /**
@@ -68,30 +65,26 @@ public class RequiredConfigMojo
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
-        getLog().info( "[MAVEN-CORE-IT-LOG] Using output file path: " + propertiesFile );
+    public void execute() throws MojoExecutionException {
+        getLog().info("[MAVEN-CORE-IT-LOG] Using output file path: " + propertiesFile);
 
-        if ( propertiesFile == null )
-        {
-            throw new MojoExecutionException( "Path name for output file has not been specified" );
+        if (propertiesFile == null) {
+            throw new MojoExecutionException("Path name for output file has not been specified");
         }
 
-        if ( !propertiesFile.isAbsolute() )
-        {
-            propertiesFile = new File( basedir, propertiesFile.getPath() ).getAbsoluteFile();
+        if (!propertiesFile.isAbsolute()) {
+            propertiesFile = new File(basedir, propertiesFile.getPath()).getAbsoluteFile();
         }
 
         Properties configProps = new Properties();
 
-        dumpConfiguration( configProps );
+        dumpConfiguration(configProps);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file: " + propertiesFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + propertiesFile);
 
-        PropertiesUtil.write( propertiesFile, configProps );
+        PropertiesUtil.write(propertiesFile, configProps);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Created output file: " + propertiesFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Created output file: " + propertiesFile);
     }
 
     /**
@@ -99,10 +92,8 @@ public class RequiredConfigMojo
      *
      * @param props The properties to dump the configuration into, must not be <code>null</code>.
      */
-    private void dumpConfiguration( Properties props )
-    {
-        PropertiesUtil.serialize( props, "requiredParam", requiredParam );
-        PropertiesUtil.serialize( props, "requiredParamWithDefault", requiredParamWithDefault );
+    private void dumpConfiguration(Properties props) {
+        PropertiesUtil.serialize(props, "requiredParam", requiredParam);
+        PropertiesUtil.serialize(props, "requiredParamWithDefault", requiredParamWithDefault);
     }
-
 }

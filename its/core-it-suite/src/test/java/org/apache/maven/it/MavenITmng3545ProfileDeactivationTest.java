@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  * it tests activation and deactivation of profiles.
  *
  */
-public class MavenITmng3545ProfileDeactivationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3545ProfileDeactivationTest()
-    {
-        super( "(2.0.9,)" );
+    public MavenITmng3545ProfileDeactivationTest() {
+        super("(2.0.9,)");
     }
 
     /**
@@ -46,26 +41,24 @@ public class MavenITmng3545ProfileDeactivationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testBasicBuildWithDefaultProfiles()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
+    public void testBasicBuildWithDefaultProfiles() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3545");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log1.txt" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log1.txt");
 
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
         // profile 1 and 2 are active by default
-        verifier.verifyFilePresent( "target/profile1/touch.txt" );
-        verifier.verifyFilePresent( "target/profile2/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile4/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
+        verifier.verifyFilePresent("target/profile1/touch.txt");
+        verifier.verifyFilePresent("target/profile2/touch.txt");
+        verifier.verifyFileNotPresent("target/profile3/touch.txt");
+        verifier.verifyFileNotPresent("target/profile4/touch.txt");
+        verifier.verifyFileNotPresent("target/profile5/touch.txt");
     }
 
     /**
@@ -74,51 +67,47 @@ public class MavenITmng3545ProfileDeactivationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testDeactivateDefaultProfilesHyphen()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
+    public void testDeactivateDefaultProfilesHyphen() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3545");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log2.txt" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log2.txt");
 
         // Deactivate active by default profiles
-        verifier.addCliArgument( "-P-profile1" );
-        verifier.addCliArgument( "-P" );
-        verifier.addCliArgument( "-profile2" );
+        verifier.addCliArgument("-P-profile1");
+        verifier.addCliArgument("-P");
+        verifier.addCliArgument("-profile2");
 
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
-        verifier.verifyFileNotPresent( "target/profile1/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile2/touch.txt" );
+        verifier.verifyFileNotPresent("target/profile1/touch.txt");
+        verifier.verifyFileNotPresent("target/profile2/touch.txt");
     }
 
     @Test
-    public void testDeactivateDefaultProfilesExclamation()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
+    public void testDeactivateDefaultProfilesExclamation() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3545");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log3.txt" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log3.txt");
 
         // Deactivate active by default profiles
-        verifier.addCliArgument( "-P!profile1" );
-        verifier.addCliArgument( "-P" );
-        verifier.addCliArgument( "!profile2" );
+        verifier.addCliArgument("-P!profile1");
+        verifier.addCliArgument("-P");
+        verifier.addCliArgument("!profile2");
 
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
-        verifier.verifyFileNotPresent( "target/profile1/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile2/touch.txt" );
+        verifier.verifyFileNotPresent("target/profile1/touch.txt");
+        verifier.verifyFileNotPresent("target/profile2/touch.txt");
     }
 
     /**
@@ -128,29 +117,27 @@ public class MavenITmng3545ProfileDeactivationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testDeactivateActivatedByProp()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
+    public void testDeactivateActivatedByProp() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3545");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log4.txt" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log4.txt");
 
         // Activate with a prop, then deactivate
-        verifier.addCliArgument( "-Dprofile3-active-by-property=true" );
-        verifier.addCliArgument( "-P-profile3" );
+        verifier.addCliArgument("-Dprofile3-active-by-property=true");
+        verifier.addCliArgument("-P-profile3");
 
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
-        verifier.verifyFilePresent( "target/profile1/touch.txt" );
-        verifier.verifyFilePresent( "target/profile2/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile4/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
+        verifier.verifyFilePresent("target/profile1/touch.txt");
+        verifier.verifyFilePresent("target/profile2/touch.txt");
+        verifier.verifyFileNotPresent("target/profile3/touch.txt");
+        verifier.verifyFileNotPresent("target/profile4/touch.txt");
+        verifier.verifyFileNotPresent("target/profile5/touch.txt");
     }
 
     /**
@@ -160,29 +147,27 @@ public class MavenITmng3545ProfileDeactivationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testActivateThenDeactivate()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
+    public void testActivateThenDeactivate() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3545");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log5.txt" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log5.txt");
 
         // Activate then deactivate
-        verifier.addCliArgument( "-Pprofile4" );
-        verifier.addCliArgument( "-P-profile4" );
+        verifier.addCliArgument("-Pprofile4");
+        verifier.addCliArgument("-P-profile4");
 
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
-        verifier.verifyFilePresent( "target/profile1/touch.txt" );
-        verifier.verifyFilePresent( "target/profile2/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile4/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
+        verifier.verifyFilePresent("target/profile1/touch.txt");
+        verifier.verifyFilePresent("target/profile2/touch.txt");
+        verifier.verifyFileNotPresent("target/profile3/touch.txt");
+        verifier.verifyFileNotPresent("target/profile4/touch.txt");
+        verifier.verifyFileNotPresent("target/profile5/touch.txt");
     }
 
     /**
@@ -192,28 +177,25 @@ public class MavenITmng3545ProfileDeactivationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testDefaultProfileAutoDeactivation()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
+    public void testDefaultProfileAutoDeactivation() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3545");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log6.txt" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log6.txt");
 
         // Activate
-        verifier.addCliArgument( "-Pprofile4" );
+        verifier.addCliArgument("-Pprofile4");
 
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
-        verifier.verifyFileNotPresent( "target/profile1/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile2/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
-        verifier.verifyFilePresent( "target/profile4/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
+        verifier.verifyFileNotPresent("target/profile1/touch.txt");
+        verifier.verifyFileNotPresent("target/profile2/touch.txt");
+        verifier.verifyFileNotPresent("target/profile3/touch.txt");
+        verifier.verifyFilePresent("target/profile4/touch.txt");
+        verifier.verifyFileNotPresent("target/profile5/touch.txt");
     }
-
 }

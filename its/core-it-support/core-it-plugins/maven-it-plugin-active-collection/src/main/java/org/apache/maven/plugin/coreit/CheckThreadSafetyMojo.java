@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,20 +27,25 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
 /**
  * Checks the thread-safe retrieval of components from active component collections.
  *
  * @author Benjamin Bentmann
-  */
-@Mojo( name = "check-thread-safety", defaultPhase = LifecyclePhase.VALIDATE )
-public class CheckThreadSafetyMojo
-    extends AbstractMojo
-{
+ */
+@Mojo(name = "check-thread-safety", defaultPhase = LifecyclePhase.VALIDATE)
+public class CheckThreadSafetyMojo extends AbstractMojo {
 
     /**
      * Project base directory used for manual path alignment.
      */
-    @Parameter( defaultValue = "${basedir}", readonly = true )
+    @Parameter(defaultValue = "${basedir}", readonly = true)
     private File basedir;
 
     /**
@@ -66,7 +63,7 @@ public class CheckThreadSafetyMojo
     /**
      * The path to the properties file to create.
      */
-    @Parameter( property = "collections.outputFile" )
+    @Parameter(property = "collections.outputFile")
     private File outputFile;
 
     /**
@@ -74,12 +71,10 @@ public class CheckThreadSafetyMojo
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
+    public void execute() throws MojoExecutionException {
         Properties componentProperties = new Properties();
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Testing concurrent component access" );
+        getLog().info("[MAVEN-CORE-IT-LOG] Testing concurrent component access");
 
         ClassLoader pluginRealm = getClass().getClassLoader();
         ClassLoader coreRealm = MojoExecutionException.class.getClassLoader();
@@ -90,39 +85,29 @@ public class CheckThreadSafetyMojo
         final List exceptions = new Vector();
 
         Thread[] threads = new Thread[2];
-        for ( int i = 0; i < threads.length; i++ )
-        {
+        for (int i = 0; i < threads.length; i++) {
             // NOTE: The threads need to use different realms to trigger changes of the collections
-            final ClassLoader cl = ( i % 2 ) == 0 ? pluginRealm : coreRealm;
-            threads[i] = new Thread()
-            {
+            final ClassLoader cl = (i % 2) == 0 ? pluginRealm : coreRealm;
+            threads[i] = new Thread() {
                 private final ClassLoader tccl = cl;
 
-                public void run()
-                {
-                    getLog().info( "[MAVEN-CORE-IT-LOG] Thread " + this + " uses " + tccl );
-                    Thread.currentThread().setContextClassLoader( tccl );
-                    while ( go.isEmpty() )
-                    {
+                public void run() {
+                    getLog().info("[MAVEN-CORE-IT-LOG] Thread " + this + " uses " + tccl);
+                    Thread.currentThread().setContextClassLoader(tccl);
+                    while (go.isEmpty()) {
                         // wait for start
                     }
-                    for ( int j = 0; j < 10 * 1000; j++ )
-                    {
-                        try
-                        {
-                            for ( Object o : map.values() )
-                            {
+                    for (int j = 0; j < 10 * 1000; j++) {
+                        try {
+                            for (Object o : map.values()) {
                                 o.toString();
                             }
-                            for ( Object aList : list )
-                            {
+                            for (Object aList : list) {
                                 aList.toString();
                             }
-                        }
-                        catch ( Exception e )
-                        {
-                            getLog().warn( "[MAVEN-CORE-IT-LOG] Thread " + this + " encountered concurrency issue", e );
-                            exceptions.add( e );
+                        } catch (Exception e) {
+                            getLog().warn("[MAVEN-CORE-IT-LOG] Thread " + this + " encountered concurrency issue", e);
+                            exceptions.add(e);
                         }
                     }
                 }
@@ -130,56 +115,41 @@ public class CheckThreadSafetyMojo
             threads[i].start();
         }
 
-        go.add( null );
-        for ( Thread thread : threads )
-        {
-            try
-            {
+        go.add(null);
+        for (Thread thread : threads) {
+            try {
                 thread.join();
-            }
-            catch ( InterruptedException e )
-            {
-                getLog().warn( "[MAVEN-CORE-IT-LOG] Interrupted while joining " + thread );
+            } catch (InterruptedException e) {
+                getLog().warn("[MAVEN-CORE-IT-LOG] Interrupted while joining " + thread);
             }
         }
 
-        componentProperties.setProperty( "components", Integer.toString( componentList.size() ) );
-        componentProperties.setProperty( "exceptions", Integer.toString( exceptions.size() ) );
+        componentProperties.setProperty("components", Integer.toString(componentList.size()));
+        componentProperties.setProperty("exceptions", Integer.toString(exceptions.size()));
 
-        if ( !outputFile.isAbsolute() )
-        {
-            outputFile = new File( basedir, outputFile.getPath() );
+        if (!outputFile.isAbsolute()) {
+            outputFile = new File(basedir, outputFile.getPath());
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file " + outputFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file " + outputFile);
 
         OutputStream out = null;
-        try
-        {
+        try {
             outputFile.getParentFile().mkdirs();
-            out = new FileOutputStream( outputFile );
-            componentProperties.store( out, "MAVEN-CORE-IT-LOG" );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Output file could not be created: " + outputFile, e );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                try
-                {
+            out = new FileOutputStream(outputFile);
+            componentProperties.store(out, "MAVEN-CORE-IT-LOG");
+        } catch (IOException e) {
+            throw new MojoExecutionException("Output file could not be created: " + outputFile, e);
+        } finally {
+            if (out != null) {
+                try {
                     out.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // just ignore
                 }
             }
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Created output file " + outputFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Created output file " + outputFile);
     }
-
 }

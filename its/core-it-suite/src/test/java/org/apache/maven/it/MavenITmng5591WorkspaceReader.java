@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,26 +16,21 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng5591WorkspaceReader
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng5591WorkspaceReader()
-    {
-        super( "[3.1.0,)" );
+public class MavenITmng5591WorkspaceReader extends AbstractMavenIntegrationTestCase {
+    public MavenITmng5591WorkspaceReader() {
+        super("[3.1.0,)");
     }
 
     @Test
-    public void testWorkspaceReader()
-        throws Exception
-    {
+    public void testWorkspaceReader() throws Exception {
         /*
          * The point of this test is to validate that ide WorkspaceReader, like one used by m2e, does not interfere with
          * reactor dependency resolution. The test comes in two parts. mng-5591-workspace-reader/extension is noop
@@ -46,25 +39,24 @@ public class MavenITmng5591WorkspaceReader
          * line argument. The multi-module build fails unless reactor resolution works properly.
          */
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5591-workspace-reader" );
-        File extensionDir = new File( testDir, "extension" );
-        File projectDir = new File( testDir, "basic" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5591-workspace-reader");
+        File extensionDir = new File(testDir, "extension");
+        File projectDir = new File(testDir, "basic");
 
         Verifier verifier;
 
         // install the test extension
-        verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // compile the test project
-        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "-Dmaven.ext.class.path="
-            + new File( extensionDir, "target/mng-5591-workspace-reader-extension-0.1.jar" ).getCanonicalPath() );
-        verifier.addCliArgument( "compile" );
+        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("-Dmaven.ext.class.path="
+                + new File(extensionDir, "target/mng-5591-workspace-reader-extension-0.1.jar").getCanonicalPath());
+        verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

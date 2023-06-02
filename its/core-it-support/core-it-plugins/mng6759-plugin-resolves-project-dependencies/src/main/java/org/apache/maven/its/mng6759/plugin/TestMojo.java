@@ -1,5 +1,3 @@
-package org.apache.maven.its.mng6759.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,8 +16,10 @@ package org.apache.maven.its.mng6759.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.its.mng6759.plugin;
 
 import java.util.Arrays;
+
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -35,32 +35,24 @@ import org.apache.maven.project.MavenProject;
 /**
  * Resolves the project dependency tree
  */
-@Mojo( name = "resolve", defaultPhase = LifecyclePhase.GENERATE_RESOURCES, threadSafe = true )
-public class TestMojo
-    extends AbstractMojo
-{
+@Mojo(name = "resolve", defaultPhase = LifecyclePhase.GENERATE_RESOURCES, threadSafe = true)
+public class TestMojo extends AbstractMojo {
 
-    @Parameter( defaultValue = "${project}", readonly = true, required = true )
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
-    @Parameter( defaultValue = "${session}", readonly = true, required = true )
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
     private MavenSession mavenSession;
 
-    @Component( hint = "default" )
+    @Component(hint = "default")
     protected ProjectDependenciesResolver dependencyResolver;
 
-    public void execute()
-        throws MojoExecutionException
-    {
+    public void execute() throws MojoExecutionException {
 
-        try
-        {
-            dependencyResolver.resolve( project, Arrays.asList( "test" ), mavenSession );
+        try {
+            dependencyResolver.resolve(project, Arrays.asList("test"), mavenSession);
+        } catch (ArtifactResolutionException | ArtifactNotFoundException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
         }
-        catch ( ArtifactResolutionException | ArtifactNotFoundException e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
-
     }
 }

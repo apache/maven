@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,55 +30,40 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng3775ConflictResolutionBacktrackingTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3775ConflictResolutionBacktrackingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3775ConflictResolutionBacktrackingTest()
-    {
-        super( "[3.0,)" );
+    public MavenITmng3775ConflictResolutionBacktrackingTest() {
+        super("[3.0,)");
     }
 
     @Test
-    public void testitABC()
-        throws Exception
-    {
-        testit( "test-abc" );
+    public void testitABC() throws Exception {
+        testit("test-abc");
     }
 
     @Test
-    public void testitACB()
-        throws Exception
-    {
-        testit( "test-acb" );
+    public void testitACB() throws Exception {
+        testit("test-acb");
     }
 
     @Test
-    public void testitBAC()
-        throws Exception
-    {
-        testit( "test-bac" );
+    public void testitBAC() throws Exception {
+        testit("test-bac");
     }
 
     @Test
-    public void testitBCA()
-        throws Exception
-    {
-        testit( "test-bca" );
+    public void testitBCA() throws Exception {
+        testit("test-bca");
     }
 
     @Test
-    public void testitCAB()
-        throws Exception
-    {
-        testit( "test-cab" );
+    public void testitCAB() throws Exception {
+        testit("test-cab");
     }
 
     @Test
-    public void testitCBA()
-        throws Exception
-    {
-        testit( "test-cba" );
+    public void testitCBA() throws Exception {
+        testit("test-cba");
     }
 
     /**
@@ -88,28 +71,25 @@ public class MavenITmng3775ConflictResolutionBacktrackingTest
      * In other words, when a subtree gets disabled, all previously selected winners among the children need to
      * be revised.
      */
-    private void testit( String project )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3775" );
+    private void testit(String project) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3775");
 
-        Verifier verifier = newVerifier( new File( testDir, project ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3775" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3775");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
+        List<String> test = verifier.loadLines("target/test.txt", "UTF-8");
 
-        assertTrue( project + " > " + test.toString(), test.contains( "a-0.1.jar" ) );
-        assertTrue( project + " > " + test.toString(), test.contains( "b-0.1.jar" ) );
-        assertTrue( project + " > " + test.toString(), test.contains( "x-0.1.jar" ) );
-        assertTrue( project + " > " + test.toString(), test.contains( "c-0.1.jar" ) );
+        assertTrue(project + " > " + test.toString(), test.contains("a-0.1.jar"));
+        assertTrue(project + " > " + test.toString(), test.contains("b-0.1.jar"));
+        assertTrue(project + " > " + test.toString(), test.contains("x-0.1.jar"));
+        assertTrue(project + " > " + test.toString(), test.contains("c-0.1.jar"));
     }
-
 }

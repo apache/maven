@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,60 +35,46 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  *
  */
-public class MavenITmng3748BadSettingsXmlTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3748BadSettingsXmlTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3748BadSettingsXmlTest()
-    {
-        super( "(2.0.8,)" ); // only test in 2.0.9+
+    public MavenITmng3748BadSettingsXmlTest() {
+        super("(2.0.8,)"); // only test in 2.0.9+
     }
 
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3748" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3748");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
 
         // Maven 3.x will only print warnings (see MNG-4390)
-        if ( matchesVersionRange( "(,3.0-alpha-3)" ) )
-        {
-            try
-            {
-                verifier.addCliArgument( "validate" );
+        if (matchesVersionRange("(,3.0-alpha-3)")) {
+            try {
+                verifier.addCliArgument("validate");
                 verifier.execute();
                 verifier.verifyErrorFreeLog();
 
-                fail( "build should fail if settings.xml contains unrecognized elements." );
-            }
-            catch ( VerificationException e )
-            {
+                fail("build should fail if settings.xml contains unrecognized elements.");
+            } catch (VerificationException e) {
                 // expected
             }
-        }
-        else
-        {
-            verifier.addCliArgument( "validate" );
+        } else {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            List<String> lines = verifier.loadLines( verifier.getLogFileName(), null );
+            List<String> lines = verifier.loadLines(verifier.getLogFileName(), null);
             boolean foundWarning = false;
-            for ( String line : lines )
-            {
-                if ( line.matches( "(?i)\\[WARNING\\].*unrecognised tag.+repositories.+2.*" ) )
-                {
+            for (String line : lines) {
+                if (line.matches("(?i)\\[WARNING\\].*unrecognised tag.+repositories.+2.*")) {
                     foundWarning = true;
                     break;
                 }
             }
-            assertTrue( foundWarning );
+            assertTrue(foundWarning);
         }
     }
-
 }

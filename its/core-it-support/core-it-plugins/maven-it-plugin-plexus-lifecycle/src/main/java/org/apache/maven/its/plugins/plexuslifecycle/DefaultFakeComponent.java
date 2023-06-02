@@ -1,5 +1,3 @@
-package org.apache.maven.its.plugins.plexuslifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.its.plugins.plexuslifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.its.plugins.plexuslifecycle;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.context.Context;
@@ -30,30 +29,23 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 /**
  * @author Olivier Lamy
  */
-@Component ( role = org.apache.maven.its.plugins.plexuslifecycle.FakeComponent.class )
-public class DefaultFakeComponent
-    implements FakeComponent, Contextualizable, Disposable, LogEnabled
-{
+@Component(role = org.apache.maven.its.plugins.plexuslifecycle.FakeComponent.class)
+public class DefaultFakeComponent implements FakeComponent, Contextualizable, Disposable, LogEnabled {
     private Logger logger;
 
-    public void enableLogging( Logger logger )
-    {
+    public void enableLogging(Logger logger) {
         this.logger = logger;
     }
 
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        logger.info( "DefaultFakeComponent :: contextualize" );
+    public void contextualize(Context context) throws ContextException {
+        logger.info("DefaultFakeComponent :: contextualize");
     }
 
-    public void dispose()
-    {
-        logger.info( "DefaultFakeComponent :: dispose" );
+    public void dispose() {
+        logger.info("DefaultFakeComponent :: dispose");
     }
 
-    public void doNothing()
-    {
-        logger.info( "doNothing DefaultFakeComponent" );
+    public void doNothing() {
+        logger.info("doNothing DefaultFakeComponent");
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4005UniqueDependencyKeyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4005UniqueDependencyKeyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4005UniqueDependencyKeyTest()
-    {
-        super( "[3.0-beta-1,)" );
+    public MavenITmng4005UniqueDependencyKeyTest() {
+        super("[3.0-beta-1,)");
     }
 
     /**
@@ -48,10 +43,8 @@ public class MavenITmng4005UniqueDependencyKeyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitDependency()
-        throws Exception
-    {
-        test( "dep" );
+    public void testitDependency() throws Exception {
+        test("dep");
     }
 
     /**
@@ -60,10 +53,8 @@ public class MavenITmng4005UniqueDependencyKeyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitManagedDependency()
-        throws Exception
-    {
-        test( "man-dep" );
+    public void testitManagedDependency() throws Exception {
+        test("man-dep");
     }
 
     /**
@@ -72,10 +63,8 @@ public class MavenITmng4005UniqueDependencyKeyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitProfileDependency()
-        throws Exception
-    {
-        test( "profile-dep" );
+    public void testitProfileDependency() throws Exception {
+        test("profile-dep");
     }
 
     /**
@@ -84,50 +73,38 @@ public class MavenITmng4005UniqueDependencyKeyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitProfileManagedDependency()
-        throws Exception
-    {
-        test( "profile-man-dep" );
+    public void testitProfileManagedDependency() throws Exception {
+        test("profile-man-dep");
     }
 
-    private void test( String project )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4005/" + project );
+    private void test(String project) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4005/" + project);
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
         try {
-            verifier.addCliArgument( "validate" );
+            verifier.addCliArgument("validate");
             verifier.execute();
-        }
-        catch ( VerificationException e )
-        {
+        } catch (VerificationException e) {
             // expected with Maven 4+
         }
 
         String logLevel;
-        if ( matchesVersionRange( "(,4.0.0-alpha-1)" ) )
-        {
+        if (matchesVersionRange("(,4.0.0-alpha-1)")) {
             logLevel = "WARNING";
-        }
-        else
-        {
+        } else {
             logLevel = "ERROR";
         }
 
-        List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
+        List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
         boolean foundMessage = false;
-        for ( String line : lines )
-        {
-            if ( line.startsWith( "[" + logLevel + "]" ) && line.indexOf( "must be unique: junit:junit:jar" ) > 0 )
-            {
+        for (String line : lines) {
+            if (line.startsWith("[" + logLevel + "]") && line.indexOf("must be unique: junit:junit:jar") > 0) {
                 foundMessage = true;
             }
         }
 
-        assertTrue( "Duplicate dependency message wasn't generated.", foundMessage );
+        assertTrue("Duplicate dependency message wasn't generated.", foundMessage);
     }
-
 }

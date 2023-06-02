@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,16 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -38,27 +36,20 @@ import org.junit.jupiter.api.Test;
  *
  * @author hboutemy
  */
-public class MavenITmng5482AetherNotFoundTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5482AetherNotFoundTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5482AetherNotFoundTest()
-    {
-        super( "[3.1-A,)" );
+    public MavenITmng5482AetherNotFoundTest() {
+        super("[3.1-A,)");
     }
 
     @Test
-    public void testPluginDependency()
-        throws IOException, VerificationException
-    {
-        check( "plugin-dependency" );
+    public void testPluginDependency() throws IOException, VerificationException {
+        check("plugin-dependency");
     }
 
     @Test
-    public void testPluginSite()
-        throws IOException, VerificationException
-    {
-        check( "plugin-site" );
+    public void testPluginSite() throws IOException, VerificationException {
+        check("plugin-site");
     }
 
     /*public void testReportMpir()
@@ -67,50 +58,41 @@ public class MavenITmng5482AetherNotFoundTest
         check( "report-mpir" );
     }*/
 
-    public void check( String dir )
-        throws IOException, VerificationException
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5482/" + dir );
+    public void check(String dir) throws IOException, VerificationException {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5482/" + dir);
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier.setAutoclean(false);
 
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
 
-            fail( "should throw an error during execution." );
-        }
-        catch ( VerificationException e )
-        {
+            fail("should throw an error during execution.");
+        } catch (VerificationException e) {
             // expected...it'd be nice if we could get the specifics of the exception right here...
         }
 
-        List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 
-        int msg = indexOf( lines, "Caused by: java.lang.ClassNotFoundException: org.sonatype.aether.+" );
-        assertTrue( "ClassNotFoundException message was not found in output.", msg >= 0 );
+        int msg = indexOf(lines, "Caused by: java.lang.ClassNotFoundException: org.sonatype.aether.+");
+        assertTrue("ClassNotFoundException message was not found in output.", msg >= 0);
 
-        int url = indexOf( lines, ".*http://cwiki.apache.org/confluence/display/MAVEN/AetherClassNotFound.*" );
-        assertTrue( "Url to ClassNotFoundAether was not found in output.", url >= 0 );
+        int url = indexOf(lines, ".*http://cwiki.apache.org/confluence/display/MAVEN/AetherClassNotFound.*");
+        assertTrue("Url to ClassNotFoundAether was not found in output.", url >= 0);
     }
 
-    private int indexOf( List<String> logLines, String regex )
-    {
-        Pattern pattern = Pattern.compile( regex );
+    private int indexOf(List<String> logLines, String regex) {
+        Pattern pattern = Pattern.compile(regex);
 
-        for ( int i = 0; i < logLines.size(); i++ )
-        {
-            String logLine = logLines.get( i );
+        for (int i = 0; i < logLines.size(); i++) {
+            String logLine = logLines.get(i);
 
-            if ( pattern.matcher( logLine ).matches() )
-            {
+            if (pattern.matcher(logLine).matches()) {
                 return i;
             }
         }
 
         return -1;
     }
-
 }

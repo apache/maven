@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng2135PluginBuildInReactorTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2135PluginBuildInReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2135PluginBuildInReactorTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng2135PluginBuildInReactorTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -46,21 +41,18 @@ public class MavenITmng2135PluginBuildInReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2135" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2135");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "plugin/target" );
-        verifier.deleteDirectory( "project/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2135" );
-        verifier.addCliArgument( "package" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("plugin/target");
+        verifier.deleteDirectory("project/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2135");
+        verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "project/target/touch.txt" );
+        verifier.verifyFilePresent("project/target/touch.txt");
     }
-
 }

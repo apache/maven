@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4361ForceDependencySnapshotUpdateTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4361ForceDependencySnapshotUpdateTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4361ForceDependencySnapshotUpdateTest()
-    {
-        super( "[2.0,3.0-alpha-1),[3.0-alpha-4,)" );
+    public MavenITmng4361ForceDependencySnapshotUpdateTest() {
+        super("[2.0,3.0-alpha-1),[3.0-alpha-4,)");
     }
 
     /**
@@ -49,47 +44,42 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4361" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4361");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4361" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4361");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
 
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
 
-        filterProps.put( "@repo@", "repo-1" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-force-1.txt" );
-        verifier.addCliArgument( "validate" );
+        filterProps.put("@repo@", "repo-1");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-force-1.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        assertNull( verifier.loadProperties( "target/checksum.properties" ).getProperty( "b-0.1-SNAPSHOT.jar" ) );
+        assertNull(verifier.loadProperties("target/checksum.properties").getProperty("b-0.1-SNAPSHOT.jar"));
 
-        filterProps.put( "@repo@", "repo-2" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-force-2.txt" );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-U" );
-        verifier.addCliArgument( "validate" );
+        filterProps.put("@repo@", "repo-2");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-force-2.txt");
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-U");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-
-        Properties checksums = verifier.loadProperties( "target/checksum.properties" );
-        assertChecksum( "2a22eeca91211193e927ea3b2ecdf56481585064", "a-0.1-SNAPSHOT.jar", checksums );
-        assertChecksum( "ae352eb0047059b2e47fae397eb8ae6bd5b1c8ea", "b-0.1-SNAPSHOT.jar", checksums );
-        assertChecksum( "6e6ef8590f166bcf610965c74c165128776214b9", "c-0.1-SNAPSHOT.jar", checksums );
+        Properties checksums = verifier.loadProperties("target/checksum.properties");
+        assertChecksum("2a22eeca91211193e927ea3b2ecdf56481585064", "a-0.1-SNAPSHOT.jar", checksums);
+        assertChecksum("ae352eb0047059b2e47fae397eb8ae6bd5b1c8ea", "b-0.1-SNAPSHOT.jar", checksums);
+        assertChecksum("6e6ef8590f166bcf610965c74c165128776214b9", "c-0.1-SNAPSHOT.jar", checksums);
     }
 
-    private void assertChecksum( String checksum, String jar, Properties checksums )
-    {
-        assertEquals( checksum, checksums.getProperty( jar, "" ).toLowerCase( java.util.Locale.ENGLISH ) );
+    private void assertChecksum(String checksum, String jar, Properties checksums) {
+        assertEquals(checksum, checksums.getProperty(jar, "").toLowerCase(java.util.Locale.ENGLISH));
     }
-
 }

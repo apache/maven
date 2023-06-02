@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 
@@ -31,10 +30,8 @@ import org.apache.maven.project.MavenProject;
 /**
  *
  */
-@Mojo( name = "check-plugin", defaultPhase = LifecyclePhase.VALIDATE )
-public class PluginParamInterpolationMojo
-    extends AbstractMojo
-{
+@Mojo(name = "check-plugin", defaultPhase = LifecyclePhase.VALIDATE)
+public class PluginParamInterpolationMojo extends AbstractMojo {
     /**
      * myDirectory
      */
@@ -44,25 +41,22 @@ public class PluginParamInterpolationMojo
     /**
      * The current Maven project.
      */
-    @Parameter( defaultValue = "${project}" )
+    @Parameter(defaultValue = "${project}")
     private MavenProject project;
 
-    public void execute()
-        throws MojoExecutionException
-    {
-        myDirectory = normalize( myDirectory );
-        String value = normalize( new File( project.getBuild().getDirectory(), "foo" ).getAbsolutePath() );
+    public void execute() throws MojoExecutionException {
+        myDirectory = normalize(myDirectory);
+        String value = normalize(new File(project.getBuild().getDirectory(), "foo").getAbsolutePath());
 
-        if ( !myDirectory.equals( value ) )
-        {
-            throw new MojoExecutionException( "Directory supplied: " + myDirectory
-                + " is not the same as the project build directory: " + project.getBuild().getDirectory()
-                + " + '/foo'" );
+        if (!myDirectory.equals(value)) {
+            throw new MojoExecutionException("Directory supplied: " + myDirectory
+                    + " is not the same as the project build directory: "
+                    + project.getBuild().getDirectory()
+                    + " + '/foo'");
         }
     }
 
-    private String normalize( String src )
-    {
-        return src.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );
+    private String normalize(String src) {
+        return src.replace('/', File.separatorChar).replace('\\', File.separatorChar);
     }
 }

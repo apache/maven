@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3863AutoPluginGroupIdTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3863AutoPluginGroupIdTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3863AutoPluginGroupIdTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng3863AutoPluginGroupIdTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,25 +43,19 @@ public class MavenITmng3863AutoPluginGroupIdTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3853()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3863" );
+    public void testitMNG3853() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3863");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Validation step did not detect missing groupId for dependency" );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Validation step did not detect missing groupId for dependency");
+        } catch (VerificationException e) {
             // expected
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,12 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -32,32 +36,25 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Collects user-specified artifacts. This mimics in part the Maven Assembly Plugin.
  *
  * @author Benjamin Bentmann
  *
-  */
-@Mojo( name = "collect" )
-public class CollectMojo
-    extends AbstractMojo
-{
+ */
+@Mojo(name = "collect")
+public class CollectMojo extends AbstractMojo {
 
     /**
      * The local repository.
      */
-    @Parameter( defaultValue = "${localRepository}", readonly = true, required = true )
+    @Parameter(defaultValue = "${localRepository}", readonly = true, required = true)
     private ArtifactRepository localRepository;
 
     /**
      * The remote repositories of the current Maven project.
      */
-    @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
+    @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
     private List remoteRepositories;
 
     /**
@@ -93,39 +90,39 @@ public class CollectMojo
      *
      * @throws MojoFailureException If the artifact file has not been set.
      */
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        getLog().info( "[MAVEN-CORE-IT-LOG] Collecting artifacts" );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        getLog().info("[MAVEN-CORE-IT-LOG] Collecting artifacts");
 
-        try
-        {
-            Artifact origin = factory.createArtifact( "it", "it", "0.1", null, "pom" );
+        try {
+            Artifact origin = factory.createArtifact("it", "it", "0.1", null, "pom");
 
             Set artifacts = new LinkedHashSet();
 
-            if ( dependencies != null )
-            {
-                for ( Dependency dependency : dependencies )
-                {
-                    Artifact artifact =
-                        factory.createArtifactWithClassifier( dependency.getGroupId(), dependency.getArtifactId(),
-                                                              dependency.getVersion(), dependency.getType(),
-                                                              dependency.getClassifier() );
+            if (dependencies != null) {
+                for (Dependency dependency : dependencies) {
+                    Artifact artifact = factory.createArtifactWithClassifier(
+                            dependency.getGroupId(),
+                            dependency.getArtifactId(),
+                            dependency.getVersion(),
+                            dependency.getType(),
+                            dependency.getClassifier());
 
-                    artifacts.add( artifact );
+                    artifacts.add(artifact);
 
-                    getLog().info( "[MAVEN-CORE-IT-LOG] Collecting " + artifact.getId() );
+                    getLog().info("[MAVEN-CORE-IT-LOG] Collecting " + artifact.getId());
                 }
             }
 
-            collector.collect( artifacts, origin, localRepository, remoteRepositories, metadataSource, null,
-                               Collections.EMPTY_LIST );
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "Failed to collect artifacts: " + e.getMessage(), e );
+            collector.collect(
+                    artifacts,
+                    origin,
+                    localRepository,
+                    remoteRepositories,
+                    metadataSource,
+                    null,
+                    Collections.EMPTY_LIST);
+        } catch (Exception e) {
+            throw new MojoExecutionException("Failed to collect artifacts: " + e.getMessage(), e);
         }
     }
-
 }

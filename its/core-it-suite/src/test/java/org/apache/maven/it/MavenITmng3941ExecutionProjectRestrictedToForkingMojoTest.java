@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -49,20 +44,17 @@ public class MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3941" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3941");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "initialize" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/fork.properties" );
-        assertEquals( "test-0.1", props.getProperty( "executedProject.build.finalName" ) );
+        Properties props = verifier.loadProperties("target/fork.properties");
+        assertEquals("test-0.1", props.getProperty("executedProject.build.finalName"));
     }
-
 }

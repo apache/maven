@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
@@ -31,31 +30,26 @@ import org.apache.maven.project.MavenProject;
 /**
  * Marks the project's artifact as a release.
  *
-  *
+ *
  * @author Benjamin Bentmann
  *
  */
-@Mojo( name = "release", defaultPhase = LifecyclePhase.PACKAGE )
-public class ReleaseMojo
-    extends AbstractMojo
-{
+@Mojo(name = "release", defaultPhase = LifecyclePhase.PACKAGE)
+public class ReleaseMojo extends AbstractMojo {
 
     /**
      * The current Maven project.
      */
-    @Parameter( defaultValue = "${project}", readonly = true, required = true )
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
     /**
      * Runs this mojo.
      */
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         Artifact artifact = project.getArtifact();
-        artifact.setRelease( true );
+        artifact.setRelease(true);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Marked artifact as release" );
+        getLog().info("[MAVEN-CORE-IT-LOG] Marked artifact as release");
     }
-
 }

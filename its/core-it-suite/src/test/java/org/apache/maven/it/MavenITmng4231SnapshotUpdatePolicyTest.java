@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4231SnapshotUpdatePolicyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4231SnapshotUpdatePolicyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4231SnapshotUpdatePolicyTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4231SnapshotUpdatePolicyTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,39 +43,36 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitAlways()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4231" );
+    public void testitAlways() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4231");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4231" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4231");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
 
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
-        filterProps.put( "@updates@", "always" );
+        filterProps.put("@updates@", "always");
 
-        filterProps.put( "@repo@", "repo-1" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-always-1.txt" );
-        verifier.addCliArgument( "validate" );
+        filterProps.put("@repo@", "repo-1");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-always-1.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        filterProps.put( "@repo@", "repo-2" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-always-2.txt" );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        filterProps.put("@repo@", "repo-2");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-always-2.txt");
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-
-        Properties checksums = verifier.loadProperties( "target/checksum.properties" );
-        assertChecksum( "db3f17644e813af768ae6e82a6d0a2f29aef8988", "a-0.1-SNAPSHOT.jar", checksums );
-        assertChecksum( "5e3265f3ed55e8b217ff9db444fd8d888962a990", "b-0.1-SNAPSHOT.jar", checksums );
+        Properties checksums = verifier.loadProperties("target/checksum.properties");
+        assertChecksum("db3f17644e813af768ae6e82a6d0a2f29aef8988", "a-0.1-SNAPSHOT.jar", checksums);
+        assertChecksum("5e3265f3ed55e8b217ff9db444fd8d888962a990", "b-0.1-SNAPSHOT.jar", checksums);
     }
 
     /**
@@ -89,44 +81,39 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitNever()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4231" );
+    public void testitNever() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4231");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4231" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4231");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
 
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
-        filterProps.put( "@updates@", "never" );
+        filterProps.put("@updates@", "never");
 
-        filterProps.put( "@repo@", "repo-1" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-never-1.txt" );
-        verifier.addCliArgument( "validate" );
+        filterProps.put("@repo@", "repo-1");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-never-1.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        filterProps.put( "@repo@", "repo-2" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-never-2.txt" );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        filterProps.put("@repo@", "repo-2");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-never-2.txt");
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-
-        Properties checksums = verifier.loadProperties( "target/checksum.properties" );
-        assertChecksum( "ec6c9ea65766cc272df0ee26076240d6a93047d5", "a-0.1-SNAPSHOT.jar", checksums );
-        assertChecksum( "", "b-0.1-SNAPSHOT.jar", checksums );
+        Properties checksums = verifier.loadProperties("target/checksum.properties");
+        assertChecksum("ec6c9ea65766cc272df0ee26076240d6a93047d5", "a-0.1-SNAPSHOT.jar", checksums);
+        assertChecksum("", "b-0.1-SNAPSHOT.jar", checksums);
     }
 
-    private void assertChecksum( String checksum, String jar, Properties checksums )
-    {
-        assertEquals( checksum, checksums.getProperty( jar, "" ).toLowerCase( java.util.Locale.ENGLISH ) );
+    private void assertChecksum(String checksum, String jar, Properties checksums) {
+        assertEquals(checksum, checksums.getProperty(jar, "").toLowerCase(java.util.Locale.ENGLISH));
     }
-
 }

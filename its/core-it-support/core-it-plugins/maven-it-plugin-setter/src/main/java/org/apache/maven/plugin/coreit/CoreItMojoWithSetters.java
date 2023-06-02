@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,29 +16,28 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 /**
  * Mojo to check that attribute injection through setter method (instead of direct parameter injection) works.
  */
-@Mojo( name = "setter-touch" )
-public class CoreItMojoWithSetters
-    extends AbstractMojo
-{
-    @Parameter( defaultValue = "${project.build.directory}", required = true )
+@Mojo(name = "setter-touch")
+public class CoreItMojoWithSetters extends AbstractMojo {
+    @Parameter(defaultValue = "${project.build.directory}", required = true)
     private String outputDirectoryValue;
 
     /**
      */
-    @Parameter( name = "foo" )
+    @Parameter(name = "foo")
     private String fooValue;
 
     /**
@@ -52,17 +49,15 @@ public class CoreItMojoWithSetters
     // Setters
     // ----------------------------------------------------------------------
 
-    public void setOutputDirectory( String outputDirectory )
-    {
+    public void setOutputDirectory(String outputDirectory) {
         this.outputDirectoryValue = outputDirectory;
     }
 
     boolean setFooSetterExecuted;
 
-    public void setFoo( String fooValue )
-    {
+    public void setFoo(String fooValue) {
 
-        getLog().info( "setFoo: " + fooValue );
+        getLog().info("setFoo: " + fooValue);
 
         this.fooValue = fooValue;
 
@@ -71,10 +66,9 @@ public class CoreItMojoWithSetters
 
     boolean setBarSetterExecuted;
 
-    public void setBar( String barValue )
-    {
+    public void setBar(String barValue) {
 
-        getLog().info( "setBar: " + barValue );
+        getLog().info("setBar: " + barValue);
 
         this.bar = barValue + ".baz";
 
@@ -85,56 +79,45 @@ public class CoreItMojoWithSetters
     //
     // ----------------------------------------------------------------------
 
+    public void execute() throws MojoExecutionException {
+        touch(new File(outputDirectoryValue), "touch.txt");
 
-    public void execute()
-        throws MojoExecutionException
-    {
-        touch( new File( outputDirectoryValue ), "touch.txt" );
-
-        File outDir = new File( outputDirectoryValue );
+        File outDir = new File(outputDirectoryValue);
 
         // Test parameter setting
-        if ( fooValue != null && setFooSetterExecuted )
-        {
+        if (fooValue != null && setFooSetterExecuted) {
 
-            getLog().info( "fooValue != null && setFooSetterExecuted" );
+            getLog().info("fooValue != null && setFooSetterExecuted");
 
-            touch( outDir, fooValue );
+            touch(outDir, fooValue);
         }
 
-        if ( bar != null && setBarSetterExecuted )
-        {
+        if (bar != null && setBarSetterExecuted) {
 
-            getLog().info( "bar != null && setBarSetterExecuted" );
+            getLog().info("bar != null && setBarSetterExecuted");
 
-            touch( outDir, bar );
+            touch(outDir, bar);
         }
     }
 
-    private void touch( File dir, String file )
-        throws MojoExecutionException
-    {
+    private void touch(File dir, String file) throws MojoExecutionException {
 
-        getLog().info( "touch: " + dir.getPath() + ":" + file );
+        getLog().info("touch: " + dir.getPath() + ":" + file);
 
-        try
-        {
-             if ( !dir.exists() )
-             {
-                 dir.mkdirs();
-             }
+        try {
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
 
-             File touch = new File( dir, file );
+            File touch = new File(dir, file);
 
-             FileWriter w = new FileWriter( touch );
+            FileWriter w = new FileWriter(touch);
 
-             w.write( file );
+            w.write(file);
 
-             w.close();
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Error touching file", e );
+            w.close();
+        } catch (IOException e) {
+            throw new MojoExecutionException("Error touching file", e);
         }
     }
 }

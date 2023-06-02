@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,13 +32,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng5000ChildPathAwareUrlInheritanceTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5000ChildPathAwareUrlInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5000ChildPathAwareUrlInheritanceTest()
-    {
-        super( "[2.0.11,2.0.99),[2.2.0,3.0-alpha-1),[3.0.3,)" );
+    public MavenITmng5000ChildPathAwareUrlInheritanceTest() {
+        super("[2.0.11,2.0.99),[2.2.0,3.0-alpha-1),[3.0.3,)");
     }
 
     /**
@@ -50,24 +45,21 @@ public class MavenITmng5000ChildPathAwareUrlInheritanceTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5000" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5000");
 
-        Verifier verifier = newVerifier( new File( testDir, "different-from-artifactId" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "different-from-artifactId").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "http://project.url/child", props.getProperty( "project.url" ) );
-        assertEquals( "http://viewvc.project.url/child", props.getProperty( "project.scm.url" ) );
-        assertEquals( "http://scm.project.url/child", props.getProperty( "project.scm.connection" ) );
-        assertEquals( "https://scm.project.url/child", props.getProperty( "project.scm.developerConnection" ) );
-        assertEquals( "http://site.project.url/child", props.getProperty( "project.distributionManagement.site.url" ) );
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("http://project.url/child", props.getProperty("project.url"));
+        assertEquals("http://viewvc.project.url/child", props.getProperty("project.scm.url"));
+        assertEquals("http://scm.project.url/child", props.getProperty("project.scm.connection"));
+        assertEquals("https://scm.project.url/child", props.getProperty("project.scm.developerConnection"));
+        assertEquals("http://site.project.url/child", props.getProperty("project.distributionManagement.site.url"));
     }
-
 }

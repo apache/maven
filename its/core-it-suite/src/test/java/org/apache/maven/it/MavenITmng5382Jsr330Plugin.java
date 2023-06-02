@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,49 +30,41 @@ import org.junit.jupiter.api.Test;
  *
  * @author Jason van Zyl
  */
-public class MavenITmng5382Jsr330Plugin
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5382Jsr330Plugin extends AbstractMavenIntegrationTestCase {
 
     private File testDir;
 
-    public MavenITmng5382Jsr330Plugin()
-    {
-        super( "[3.1-alpha,)" );
+    public MavenITmng5382Jsr330Plugin() {
+        super("[3.1-alpha,)");
     }
 
     @BeforeEach
-    public void setUp()
-        throws Exception
-    {
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5382" );
+    public void setUp() throws Exception {
+        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5382");
     }
 
     @Test
-    public void testJsr330PluginExecution()
-        throws Exception
-    {
+    public void testJsr330PluginExecution() throws Exception {
         //
         // Build a plugin that uses a JSR330 plugin
         //
-        Verifier v0 = newVerifier( testDir.getAbsolutePath(), "remote" );
-        v0.setAutoclean( false );
-        v0.deleteDirectory( "target" );
-        v0.deleteArtifacts( "org.apache.maven.its.mng5382" );
-        v0.addCliArgument( "install" );
+        Verifier v0 = newVerifier(testDir.getAbsolutePath(), "remote");
+        v0.setAutoclean(false);
+        v0.deleteDirectory("target");
+        v0.deleteArtifacts("org.apache.maven.its.mng5382");
+        v0.addCliArgument("install");
         v0.execute();
         v0.verifyErrorFreeLog();
 
         //
         // Execute the JSR330 plugin
         //
-        Verifier v1 = newVerifier( testDir.getAbsolutePath(), "remote" );
-        v1.setAutoclean( false );
-        v1.addCliArgument( "org.apache.maven.its.mng5382:jsr330-maven-plugin:0.0.1-SNAPSHOT:hello" );
+        Verifier v1 = newVerifier(testDir.getAbsolutePath(), "remote");
+        v1.setAutoclean(false);
+        v1.addCliArgument("org.apache.maven.its.mng5382:jsr330-maven-plugin:0.0.1-SNAPSHOT:hello");
         v1.execute();
         v1.verifyErrorFreeLog();
-        v1.verifyTextInLog( "Hello! I am a component that is being used via constructor injection! That's right, I'm a JSR330 badass." );
-
+        v1.verifyTextInLog(
+                "Hello! I am a component that is being used via constructor injection! That's right, I'm a JSR330 badass.");
     }
-
 }

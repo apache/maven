@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng4023ParentProfileOneTimeInjectionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4023ParentProfileOneTimeInjectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4023ParentProfileOneTimeInjectionTest()
-    {
-        super( "[2.0.11,2.1.0-M1),[2.1.0-M2,)" );
+    public MavenITmng4023ParentProfileOneTimeInjectionTest() {
+        super("[2.0.11,2.1.0-M1),[2.1.0-M2,)");
     }
 
     /**
@@ -50,22 +45,19 @@ public class MavenITmng4023ParentProfileOneTimeInjectionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG4023()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4023" );
+    public void testitMNG4023() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4023");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "sub/target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("sub/target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "sub/target/config.properties" );
-        assertEquals( "1", props.getProperty( "stringParams" ) );
-        assertEquals( "test", props.getProperty( "stringParams.0" ) );
-        assertNull( props.getProperty( "stringParams.1" ) );
+        Properties props = verifier.loadProperties("sub/target/config.properties");
+        assertEquals("1", props.getProperty("stringParams"));
+        assertEquals("test", props.getProperty("stringParams.0"));
+        assertNull(props.getProperty("stringParams.1"));
     }
-
 }

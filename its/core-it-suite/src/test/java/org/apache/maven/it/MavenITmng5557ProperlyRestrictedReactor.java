@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -38,36 +36,29 @@ import org.junit.jupiter.api.Test;
  * @author jvanzyl
  */
 @Tag("disabled")
-public class MavenITmng5557ProperlyRestrictedReactor
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng5557ProperlyRestrictedReactor()
-    {
-        super( "[3.1.2,)" );
+public class MavenITmng5557ProperlyRestrictedReactor extends AbstractMavenIntegrationTestCase {
+    public MavenITmng5557ProperlyRestrictedReactor() {
+        super("[3.1.2,)");
     }
 
     @Test
-    public void testRunningRestrictedReactor()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5557-properly-restricted-reactor" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+    public void testRunningRestrictedReactor() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5557-properly-restricted-reactor");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         //
         // Remove everything related to this project from the local repository as we want this to be resolution purely
         // from the reactor.
         //
-        verifier.deleteArtifacts( "org.apache.maven.its.mng5557" );
-        verifier.addCliArgument( "--projects" );
-        verifier.addCliArgument( "project-0,project-1" );
-        try
-        {
-            verifier.addCliArgument( "package" );
+        verifier.deleteArtifacts("org.apache.maven.its.mng5557");
+        verifier.addCliArgument("--projects");
+        verifier.addCliArgument("project-0,project-1");
+        try {
+            verifier.addCliArgument("package");
             verifier.execute();
-        }
-        catch ( VerificationException e )
-        {
+        } catch (VerificationException e) {
             // the execution should fail due to a resolution error.
         }
-        verifier.verifyTextInLog( "Could not resolve dependencies for project org.apache.maven.its.mng5557:project-0:jar:1.0: Could not find artifact org.apache.maven.its.mng5557:project-4:jar:1.0" );
+        verifier.verifyTextInLog(
+                "Could not resolve dependencies for project org.apache.maven.its.mng5557:project-0:jar:1.0: Could not find artifact org.apache.maven.its.mng5557:project-4:jar:1.0");
     }
 }

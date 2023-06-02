@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -36,16 +35,15 @@ import java.util.Map;
  * @author Benjamin Bentmann
  *
  */
-class ExpressionUtil
-{
+class ExpressionUtil {
 
     private static final Object[] NO_ARGS = {};
 
     private static final Class[] NO_PARAMS = {};
 
-    private static final Class[] OBJECT_PARAM = { Object.class };
+    private static final Class[] OBJECT_PARAM = {Object.class};
 
-    private static final Class[] STRING_PARAM = { String.class };
+    private static final Class[] STRING_PARAM = {String.class};
 
     /**
      * Evaluates the specified expression. Expressions are composed of segments which are separated by a forward slash
@@ -61,14 +59,12 @@ class ExpressionUtil
      * @return The values of the evaluation, indexed by expression, or an empty map if the segments could not be
      * evaluated.
      */
-    public static Map evaluate( String expression, Object context )
-    {
+    public static Map evaluate(String expression, Object context) {
         Map values = Collections.EMPTY_MAP;
 
-        if ( expression != null && expression.length() > 0 )
-        {
-            List segments = Arrays.asList( expression.split( "/", 0 ) );
-            values = evaluate( "", segments, context );
+        if (expression != null && expression.length() > 0) {
+            List segments = Arrays.asList(expression.split("/", 0));
+            values = evaluate("", segments, context);
         }
 
         return values;
@@ -83,80 +79,56 @@ class ExpressionUtil
      * @return The values of the evaluation, indexed by expression, or an empty map if the segments could not be
      * evaluated.
      */
-    private static Map evaluate( String prefix, List segments, Object context )
-    {
+    private static Map evaluate(String prefix, List segments, Object context) {
         Map values = Collections.EMPTY_MAP;
 
-        if ( segments.isEmpty() )
-        {
-            values = Collections.singletonMap( prefix, context );
-        }
-        else if ( context != null )
-        {
+        if (segments.isEmpty()) {
+            values = Collections.singletonMap(prefix, context);
+        } else if (context != null) {
             Map targets = Collections.EMPTY_MAP;
-            String segment = (String) segments.get( 0 );
-            if ( context.getClass().isArray() && Character.isDigit( segment.charAt( 0 ) ) )
-            {
-                try
-                {
-                    int index = Integer.parseInt( segment );
-                    targets = Collections.singletonMap( segment, Array.get( context, index ) );
-                }
-                catch ( RuntimeException e )
-                {
+            String segment = (String) segments.get(0);
+            if (context.getClass().isArray() && Character.isDigit(segment.charAt(0))) {
+                try {
+                    int index = Integer.parseInt(segment);
+                    targets = Collections.singletonMap(segment, Array.get(context, index));
+                } catch (RuntimeException e) {
                     // invalid index, just ignore
                 }
-            }
-            else if ( ( context instanceof List ) && Character.isDigit( segment.charAt( 0 ) ) )
-            {
-                try
-                {
-                    int index = Integer.parseInt( segment );
-                    targets = Collections.singletonMap( segment, ( (List) context ).get( index ) );
-                }
-                catch ( RuntimeException e )
-                {
+            } else if ((context instanceof List) && Character.isDigit(segment.charAt(0))) {
+                try {
+                    int index = Integer.parseInt(segment);
+                    targets = Collections.singletonMap(segment, ((List) context).get(index));
+                } catch (RuntimeException e) {
                     // invalid index, just ignore
                 }
-            }
-            else if ( ( context instanceof Collection ) && "*".equals( segment ) )
-            {
+            } else if ((context instanceof Collection) && "*".equals(segment)) {
                 targets = new LinkedHashMap();
                 int index = 0;
-                for ( Iterator it = ( (Collection) context ).iterator(); it.hasNext(); index++ )
-                {
-                    targets.put( Integer.toString( index ), it.next() );
+                for (Iterator it = ((Collection) context).iterator(); it.hasNext(); index++) {
+                    targets.put(Integer.toString(index), it.next());
                 }
-            }
-            else if ( context.getClass().isArray() && "*".equals( segment ) )
-            {
+            } else if (context.getClass().isArray() && "*".equals(segment)) {
                 targets = new LinkedHashMap();
-                for ( int index = 0, n = Array.getLength( context ); index < n; index++ )
-                {
-                    targets.put( Integer.toString( index ), Array.get( context, index ) );
+                for (int index = 0, n = Array.getLength(context); index < n; index++) {
+                    targets.put(Integer.toString(index), Array.get(context, index));
                 }
-            }
-            else
-            {
-                targets = Collections.singletonMap( segment, getProperty( context, segment ) );
+            } else {
+                targets = Collections.singletonMap(segment, getProperty(context, segment));
             }
 
             values = new LinkedHashMap();
-            for ( Object key : targets.keySet() )
-            {
-                Object target = targets.get( key );
+            for (Object key : targets.keySet()) {
+                Object target = targets.get(key);
                 values.putAll(
-                    evaluate( concat( prefix, String.valueOf( key ) ), segments.subList( 1, segments.size() ),
-                              target ) );
+                        evaluate(concat(prefix, String.valueOf(key)), segments.subList(1, segments.size()), target));
             }
         }
 
         return values;
     }
 
-    private static String concat( String prefix, String segment )
-    {
-        return ( prefix == null || prefix.length() <= 0 ) ? segment : ( prefix + '/' + segment );
+    private static String concat(String prefix, String segment) {
+        return (prefix == null || prefix.length() <= 0) ? segment : (prefix + '/' + segment);
     }
 
     /**
@@ -166,78 +138,52 @@ class ExpressionUtil
      * @param property The name of the bean property, must not be <code>null</code>.
      * @return The value of the bean property or <code>null</code> if the property does not exist.
      */
-    static Object getProperty( Object context, String property )
-    {
+    static Object getProperty(Object context, String property) {
         Object value;
 
         Class type = context.getClass();
-        if ( context instanceof Collection )
-        {
+        if (context instanceof Collection) {
             type = Collection.class;
-        }
-        else if ( context instanceof Map )
-        {
+        } else if (context instanceof Map) {
             type = Map.class;
         }
 
-        try
-        {
-            try
-            {
-                Method method = type.getMethod( property, NO_PARAMS );
-                method.setAccessible( true );
-                value = method.invoke( context, NO_ARGS );
-            }
-            catch ( NoSuchMethodException e )
-            {
-                try
-                {
-                    String name = "get" + Character.toUpperCase( property.charAt( 0 ) ) + property.substring( 1 );
-                    Method method = type.getMethod( name, NO_PARAMS );
-                    method.setAccessible( true );
-                    value = method.invoke( context, NO_ARGS );
-                }
-                catch ( NoSuchMethodException e1 )
-                {
-                    try
-                    {
-                        String name = "is" + Character.toUpperCase( property.charAt( 0 ) ) + property.substring( 1 );
-                        Method method = type.getMethod( name, NO_PARAMS );
-                        method.setAccessible( true );
-                        value = method.invoke( context, NO_ARGS );
-                    }
-                    catch ( NoSuchMethodException e2 )
-                    {
-                        try
-                        {
+        try {
+            try {
+                Method method = type.getMethod(property, NO_PARAMS);
+                method.setAccessible(true);
+                value = method.invoke(context, NO_ARGS);
+            } catch (NoSuchMethodException e) {
+                try {
+                    String name = "get" + Character.toUpperCase(property.charAt(0)) + property.substring(1);
+                    Method method = type.getMethod(name, NO_PARAMS);
+                    method.setAccessible(true);
+                    value = method.invoke(context, NO_ARGS);
+                } catch (NoSuchMethodException e1) {
+                    try {
+                        String name = "is" + Character.toUpperCase(property.charAt(0)) + property.substring(1);
+                        Method method = type.getMethod(name, NO_PARAMS);
+                        method.setAccessible(true);
+                        value = method.invoke(context, NO_ARGS);
+                    } catch (NoSuchMethodException e2) {
+                        try {
                             Method method;
-                            try
-                            {
-                                method = type.getMethod( "get", STRING_PARAM );
+                            try {
+                                method = type.getMethod("get", STRING_PARAM);
+                            } catch (NoSuchMethodException e3) {
+                                method = type.getMethod("get", OBJECT_PARAM);
                             }
-                            catch ( NoSuchMethodException e3 )
-                            {
-                                method = type.getMethod( "get", OBJECT_PARAM );
-                            }
-                            method.setAccessible( true );
-                            value = method.invoke( context, new Object[]{ property } );
-                        }
-                        catch ( NoSuchMethodException e3 )
-                        {
-                            try
-                            {
-                                Field field = type.getField( property );
-                                field.setAccessible( true );
-                                value = field.get( context );
-                            }
-                            catch ( NoSuchFieldException e4 )
-                            {
-                                if ( "length".equals( property ) && type.isArray() )
-                                {
-                                    value = Array.getLength( context );
-                                }
-                                else
-                                {
+                            method.setAccessible(true);
+                            value = method.invoke(context, new Object[] {property});
+                        } catch (NoSuchMethodException e3) {
+                            try {
+                                Field field = type.getField(property);
+                                field.setAccessible(true);
+                                value = field.get(context);
+                            } catch (NoSuchFieldException e4) {
+                                if ("length".equals(property) && type.isArray()) {
+                                    value = Array.getLength(context);
+                                } else {
                                     throw e4;
                                 }
                             }
@@ -245,12 +191,9 @@ class ExpressionUtil
                     }
                 }
             }
-        }
-        catch ( Exception e )
-        {
+        } catch (Exception e) {
             value = null;
         }
         return value;
     }
-
 }

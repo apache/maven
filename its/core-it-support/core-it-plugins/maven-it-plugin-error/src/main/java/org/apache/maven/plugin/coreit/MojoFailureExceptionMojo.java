@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
@@ -26,39 +25,32 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  */
-@Mojo( name = "mojo-failure-exception", requiresProject = false )
-public class MojoFailureExceptionMojo
-    extends AbstractMojo
-{
+@Mojo(name = "mojo-failure-exception", requiresProject = false)
+public class MojoFailureExceptionMojo extends AbstractMojo {
     /**
      * Message used in {@link MojoFailureException#MojoFailureException(String)}, unless longMessage
      * is supplied; then, this becomes the short message in
      * {@link MojoFailureException#MojoFailureException(Object, String, String)}.
      */
-    @Parameter( property = "error.message", defaultValue = "Planned MojoExecutionException.", required = true )
+    @Parameter(property = "error.message", defaultValue = "Planned MojoExecutionException.", required = true)
     private String message;
 
     /**
      * If supplied, The form {@link MojoFailureException#MojoFailureException(Object, String, String)} will be used.
      */
-    @Parameter( property = "error.longMessage", required = true )
+    @Parameter(property = "error.longMessage", required = true)
     private String longMessage;
 
     /**
      */
-    @Parameter( property = "error.source" )
+    @Parameter(property = "error.source")
     private String source;
 
-    public void execute()
-        throws MojoFailureException
-    {
-        if ( longMessage != null )
-        {
-            throw new MojoFailureException( source, message, longMessage );
-        }
-        else
-        {
-            throw new MojoFailureException( message );
+    public void execute() throws MojoFailureException {
+        if (longMessage != null) {
+            throw new MojoFailureException(source, message, longMessage);
+        } else {
+            throw new MojoFailureException(message);
         }
     }
 }

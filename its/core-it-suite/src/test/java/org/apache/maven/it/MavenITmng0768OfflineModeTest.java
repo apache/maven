@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +29,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -47,13 +45,10 @@ import org.junit.jupiter.api.Test;
  * @author John Casey
  *
  */
-public class MavenITmng0768OfflineModeTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0768OfflineModeTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng0768OfflineModeTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -62,77 +57,68 @@ public class MavenITmng0768OfflineModeTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG768()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0768" );
+    public void testitMNG768() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0768");
 
-        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
+        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<String>());
 
-        Handler repoHandler = new AbstractHandler()
-        {
-            public void handle( String target, Request baseRequest, HttpServletRequest request,
-                                HttpServletResponse response )
-                throws IOException
-            {
-                System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
+        Handler repoHandler = new AbstractHandler() {
+            public void handle(
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+                    throws IOException {
+                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
 
-                requestedUris.add( request.getRequestURI() );
+                requestedUris.add(request.getRequestURI());
 
                 PrintWriter writer = response.getWriter();
 
-                response.setStatus( HttpServletResponse.SC_OK );
+                response.setStatus(HttpServletResponse.SC_OK);
 
-                if ( request.getRequestURI().endsWith( ".pom" ) )
-                {
-                    writer.println( "<project>" );
-                    writer.println( "  <modelVersion>4.0.0</modelVersion>" );
-                    writer.println( "  <groupId>org.apache.maven.its.mng0768</groupId>" );
-                    writer.println( "  <artifactId>dep</artifactId>" );
-                    writer.println( "  <version>0.1</version>" );
-                    writer.println( "</project>" );
-                }
-                else if ( request.getRequestURI().endsWith( ".jar" ) )
-                {
-                    writer.println( "empty" );
-                }
-                else if ( request.getRequestURI().endsWith( ".md5" ) || request.getRequestURI().endsWith( ".sha1" ) )
-                {
-                    response.setStatus( HttpServletResponse.SC_NOT_FOUND );
+                if (request.getRequestURI().endsWith(".pom")) {
+                    writer.println("<project>");
+                    writer.println("  <modelVersion>4.0.0</modelVersion>");
+                    writer.println("  <groupId>org.apache.maven.its.mng0768</groupId>");
+                    writer.println("  <artifactId>dep</artifactId>");
+                    writer.println("  <version>0.1</version>");
+                    writer.println("</project>");
+                } else if (request.getRequestURI().endsWith(".jar")) {
+                    writer.println("empty");
+                } else if (request.getRequestURI().endsWith(".md5")
+                        || request.getRequestURI().endsWith(".sha1")) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 }
 
-                ( (Request) request ).setHandled( true );
+                ((Request) request).setHandled(true);
             }
         };
 
-        Server server = new Server( 0 );
-        server.setHandler( repoHandler );
+        Server server = new Server(0);
+        server.setHandler(repoHandler);
 
-        try
-        {
+        try {
             server.start();
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
+            if (server.isFailed()) {
+                fail("Couldn't bind the server socket to a free port!");
             }
 
-            int port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
+            int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
 
             {
                 // phase 1: run build in online mode to fill local repo
-                Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-                verifier.setAutoclean( false );
-                verifier.deleteDirectory( "target" );
-                verifier.deleteArtifacts( "org.apache.maven.its.mng0768" );
-                verifier.setLogFileName( "log1.txt" );
+                Verifier verifier = newVerifier(testDir.getAbsolutePath());
+                verifier.setAutoclean(false);
+                verifier.deleteDirectory("target");
+                verifier.deleteArtifacts("org.apache.maven.its.mng0768");
+                verifier.setLogFileName("log1.txt");
                 Properties props = new Properties();
-                props.put( "@port@", Integer.toString( port ) );
-                verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", props );
-                verifier.addCliArgument( "--settings" );
-                verifier.addCliArgument( "settings.xml" );
-                verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+                props.put("@port@", Integer.toString(port));
+                verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", props);
+                verifier.addCliArgument("--settings");
+                verifier.addCliArgument("settings.xml");
+                verifier.addCliArgument(
+                        "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile");
                 verifier.execute();
-                verifier.verifyFilePresent( "target/compile.txt" );
+                verifier.verifyFilePresent("target/compile.txt");
                 verifier.verifyErrorFreeLog();
             }
 
@@ -140,51 +126,48 @@ public class MavenITmng0768OfflineModeTest
 
             {
                 // phase 2: run build in offline mode to check it still passes, without network accesses
-                Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-                verifier.setAutoclean( false );
-                verifier.deleteDirectory( "target" );
-                verifier.addCliArgument( "-o" );
-                verifier.addCliArgument( "--settings" );
-                verifier.addCliArgument( "settings.xml" );
-                verifier.setLogFileName( "log2.txt" );
-                verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+                Verifier verifier = newVerifier(testDir.getAbsolutePath());
+                verifier.setAutoclean(false);
+                verifier.deleteDirectory("target");
+                verifier.addCliArgument("-o");
+                verifier.addCliArgument("--settings");
+                verifier.addCliArgument("settings.xml");
+                verifier.setLogFileName("log2.txt");
+                verifier.addCliArgument(
+                        "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile");
                 verifier.execute();
-                verifier.verifyFilePresent( "target/compile.txt" );
+                verifier.verifyFilePresent("target/compile.txt");
                 verifier.verifyErrorFreeLog();
             }
 
-            assertTrue( requestedUris.toString(), requestedUris.isEmpty() );
+            assertTrue(requestedUris.toString(), requestedUris.isEmpty());
 
             {
                 // phase 3: delete test artifact and run build in offline mode to check it fails now
                 // NOTE: Adding the settings again to offer Maven the bad choice of using the remote repo
-                Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-                verifier.setAutoclean( false );
-                verifier.deleteDirectory( "target" );
-                verifier.deleteArtifacts( "org.apache.maven.its.mng0768" );
-                verifier.addCliArgument( "-o" );
-                verifier.addCliArgument( "--settings" );
-                verifier.addCliArgument( "settings.xml" );
-                verifier.setLogFileName( "log3.txt" );
-                try
-                {
-                    verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+                Verifier verifier = newVerifier(testDir.getAbsolutePath());
+                verifier.setAutoclean(false);
+                verifier.deleteDirectory("target");
+                verifier.deleteArtifacts("org.apache.maven.its.mng0768");
+                verifier.addCliArgument("-o");
+                verifier.addCliArgument("--settings");
+                verifier.addCliArgument("settings.xml");
+                verifier.setLogFileName("log3.txt");
+                try {
+                    verifier.addCliArgument(
+                            "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile");
                     verifier.execute();
                     verifier.verifyErrorFreeLog();
-                    fail( "Build did not fail to resolve missing dependency although Maven ought to work offline!" );
-                }
-                catch( VerificationException e )
-                {
+                    fail("Build did not fail to resolve missing dependency although Maven ought to work offline!");
+                } catch (VerificationException e) {
                     // expected, should fail
                 }
             }
 
-            System.out.println( "Bound server socket to the port " + port );
+            System.out.println("Bound server socket to the port " + port);
 
-            assertTrue( requestedUris.toString(), requestedUris.isEmpty() );
-        }
-        finally
-        {
+            assertTrue(requestedUris.toString(), requestedUris.isEmpty());
+        } finally {
             server.stop();
             server.join();
         }

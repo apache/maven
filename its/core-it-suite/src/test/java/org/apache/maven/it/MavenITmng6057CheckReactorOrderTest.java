@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,15 +33,12 @@ import org.junit.jupiter.api.Test;
  *
  * @author Karl Heinz Marbaise khmarbaise@apache.org
  */
-public class MavenITmng6057CheckReactorOrderTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng6057CheckReactorOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6057CheckReactorOrderTest()
-    {
+    public MavenITmng6057CheckReactorOrderTest() {
         // The first version which contains the fix for the MNG-6057 issue.
         // TODO: Think about it!
-        super( "[3.5.0-alpha-2,)" );
+        super("[3.5.0-alpha-2,)");
     }
 
     /**
@@ -52,30 +47,28 @@ public class MavenITmng6057CheckReactorOrderTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitReactorShouldResultInExpectedOrder()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6057-check-reactor-order" );
+    public void testitReactorShouldResultInExpectedOrder() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6057-check-reactor-order");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        verifier.setAutoclean(false);
 
-        verifier.setLogFileName( "log-only.txt" );
-        verifier.addCliArgument( "-Drevision=1.3.0-SNAPSHOT" );
-        verifier.addCliArgument( "clean" );
+        verifier.setLogFileName("log-only.txt");
+        verifier.addCliArgument("-Drevision=1.3.0-SNAPSHOT");
+        verifier.addCliArgument("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> loadedLines = verifier.loadLines( "log-only.txt", "UTF-8" );
-        List<String> resultingLines = extractReactorBuildOrder( loadedLines );
+        List<String> loadedLines = verifier.loadLines("log-only.txt", "UTF-8");
+        List<String> resultingLines = extractReactorBuildOrder(loadedLines);
 
         // We're expecting exactly three lines as result.
-        assertEquals( 3, resultingLines.size() );
+        assertEquals(3, resultingLines.size());
 
         // We expect those lines in the following exact order.
-        assertTrue( resultingLines.get( 0 ).startsWith( "[INFO] base-project" ) );
-        assertTrue( resultingLines.get( 1 ).startsWith( "[INFO] module-1" ) );
-        assertTrue( resultingLines.get( 2 ).startsWith( "[INFO] module-2" ) );
+        assertTrue(resultingLines.get(0).startsWith("[INFO] base-project"));
+        assertTrue(resultingLines.get(1).startsWith("[INFO] module-1"));
+        assertTrue(resultingLines.get(2).startsWith("[INFO] module-2"));
     }
 
     /**
@@ -90,34 +83,22 @@ public class MavenITmng6057CheckReactorOrderTest
      * [INFO]
      * </pre>
      */
-    private List<String> extractReactorBuildOrder( List<String> loadedLines )
-    {
+    private List<String> extractReactorBuildOrder(List<String> loadedLines) {
         List<String> resultingLines = new LinkedList<String>();
         boolean start = false;
-        for ( String line : loadedLines )
-        {
-            if ( start )
-            {
-                if ( line.startsWith( "[INFO] -------------" ) )
-                {
+        for (String line : loadedLines) {
+            if (start) {
+                if (line.startsWith("[INFO] -------------")) {
                     start = false;
+                } else if (!line.endsWith("[INFO] ")) {
+                    resultingLines.add(line);
                 }
-                else if ( !line.endsWith( "[INFO] " ) )
-                {
-                    resultingLines.add( line );
-                }
-            }
-            else
-            {
-                if ( line.startsWith( "[INFO] Reactor Build Order:" ) )
-                {
+            } else {
+                if (line.startsWith("[INFO] Reactor Build Order:")) {
                     start = true;
                 }
-
             }
         }
         return resultingLines;
-
     }
-
 }

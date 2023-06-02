@@ -18,45 +18,38 @@
  */
 package org.apache.maven.it;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng7244IgnorePomPrefixInExpressions extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng7244IgnorePomPrefixInExpressions extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7244-ignore-pom-prefix-in-expressions";
 
-    public MavenITmng7244IgnorePomPrefixInExpressions()
-    {
-        super( "[4.0.0-alpha-1,)" );
+    public MavenITmng7244IgnorePomPrefixInExpressions() {
+        super("[4.0.0-alpha-1,)");
     }
 
     @Test
-    public void testIgnorePomPrefixInExpressions() throws IOException, VerificationException
-    {
-        final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
-        final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
+    public void testIgnorePomPrefixInExpressions() throws IOException, VerificationException {
+        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
 
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
 
-        verifyLogDoesNotContainUnexpectedWarning( verifier );
+        verifyLogDoesNotContainUnexpectedWarning(verifier);
     }
 
-    private void verifyLogDoesNotContainUnexpectedWarning( Verifier verifier ) throws IOException
-    {
-        List<String> loadedLines = verifier.loadLines( "log.txt", "UTF-8" );
-        for ( String line : loadedLines )
-        {
-            if ( line.startsWith( "[WARNING]" ) && line.contains( "The expression ${pom.version} is deprecated." ) )
-            {
-                fail( "Log contained unexpected deprecation warning" );
+    private void verifyLogDoesNotContainUnexpectedWarning(Verifier verifier) throws IOException {
+        List<String> loadedLines = verifier.loadLines("log.txt", "UTF-8");
+        for (String line : loadedLines) {
+            if (line.startsWith("[WARNING]") && line.contains("The expression ${pom.version} is deprecated.")) {
+                fail("Log contained unexpected deprecation warning");
             }
         }
     }

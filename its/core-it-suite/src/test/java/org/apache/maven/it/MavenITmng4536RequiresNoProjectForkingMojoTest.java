@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4536RequiresNoProjectForkingMojoTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4536RequiresNoProjectForkingMojoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4536RequiresNoProjectForkingMojoTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-alpha-7,)" );
+    public MavenITmng4536RequiresNoProjectForkingMojoTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-alpha-7,)");
     }
 
     /**
@@ -46,22 +41,19 @@ public class MavenITmng4536RequiresNoProjectForkingMojoTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4536" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4536");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "mod-a/target" );
-        verifier.deleteDirectory( "mod-b/target" );
-        verifier.addCliArgument( "generate-sources" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("mod-a/target");
+        verifier.deleteDirectory("mod-b/target");
+        verifier.addCliArgument("generate-sources");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        assertEquals( 2, verifier.loadLines( "mod-a/target/touch.log", "UTF-8" ).size() );
-        assertEquals( 2, verifier.loadLines( "mod-b/target/touch.log", "UTF-8" ).size() );
+        assertEquals(2, verifier.loadLines("mod-a/target/touch.log", "UTF-8").size());
+        assertEquals(2, verifier.loadLines("mod-b/target/touch.log", "UTF-8").size());
     }
-
 }

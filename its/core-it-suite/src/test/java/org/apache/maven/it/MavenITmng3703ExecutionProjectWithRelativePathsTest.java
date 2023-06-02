@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,61 +32,54 @@ import org.junit.jupiter.api.Test;
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
  */
-public class MavenITmng3703ExecutionProjectWithRelativePathsTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3703ExecutionProjectWithRelativePathsTest()
-    {
-        super( "[2.1.0-M1,)" ); // only test in 2.1.0+
+public class MavenITmng3703ExecutionProjectWithRelativePathsTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3703ExecutionProjectWithRelativePathsTest() {
+        super("[2.1.0-M1,)"); // only test in 2.1.0+
     }
 
     @Test
-    public void testForkFromMojo()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3703" );
-        File pluginDir = new File( testDir, "maven-mng3703-plugin" );
-        File projectDir = new File( testDir, "project" );
+    public void testForkFromMojo() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3703");
+        File pluginDir = new File(testDir, "maven-mng3703-plugin");
+        File projectDir = new File(testDir, "project");
 
         Verifier verifier;
 
-        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
 
-        verifier.addCliArgument( "install" );
+        verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.setLogFileName( "log-mojo.txt" );
+        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier.setLogFileName("log-mojo.txt");
 
-        verifier.addCliArgument( "package" );
+        verifier.addCliArgument("package");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }
 
     @Test
-    public void testForkFromReport()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3703" );
-        File pluginDir = new File( testDir, "maven-mng3703-plugin" );
-        File projectDir = new File( testDir, "project" );
+    public void testForkFromReport() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3703");
+        File pluginDir = new File(testDir, "maven-mng3703-plugin");
+        File projectDir = new File(testDir, "project");
 
         Verifier verifier;
 
-        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
 
-        verifier.addCliArgument( "install" );
+        verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.setLogFileName( "log-report.txt" );
+        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier.setLogFileName("log-report.txt");
 
-        verifier.addCliArgument( "site" );
+        verifier.addCliArgument("site");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();

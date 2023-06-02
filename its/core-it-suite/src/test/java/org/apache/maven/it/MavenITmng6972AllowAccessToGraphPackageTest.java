@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,33 +16,29 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
  * This is a test for <a href="https://issues.apache.org/jira/browse/MNG-6972">MNG-6972</a>.
  */
-public class MavenITmng6972AllowAccessToGraphPackageTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng6972AllowAccessToGraphPackageTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6972AllowAccessToGraphPackageTest()
-    {
-        super( "[3.9.0,)" );
+    public MavenITmng6972AllowAccessToGraphPackageTest() {
+        super("[3.9.0,)");
     }
 
     @Test
-    public void testit()
-        throws Exception
-    {
+    public void testit() throws Exception {
 
         // The testdir is computed from the location of this file.
-        final File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6972-allow-access-to-graph-package" );
+        final File testDir =
+                ResourceExtractor.simpleExtractResources(getClass(), "/mng-6972-allow-access-to-graph-package");
 
         Verifier verifier;
 
@@ -55,19 +49,19 @@ public class MavenITmng6972AllowAccessToGraphPackageTest
          * unstable test results. Fortunately, the verifier
          * makes it easy to do this.
          */
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "mng-6972-allow-access-to-graph-package", "build-plugin", "1.0", "jar" );
-        verifier.deleteArtifact( "mng-6972-allow-access-to-graph-package", "using-module", "1.0", "jar" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.deleteArtifact("mng-6972-allow-access-to-graph-package", "build-plugin", "1.0", "jar");
+        verifier.deleteArtifact("mng-6972-allow-access-to-graph-package", "using-module", "1.0", "jar");
 
-        verifier = newVerifier( new File( testDir.getAbsolutePath(), "build-plugin" ).getAbsolutePath() );
-        verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", testDir.getAbsolutePath() );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(new File(testDir.getAbsolutePath(), "build-plugin").getAbsolutePath());
+        verifier.getSystemProperties().put("maven.multiModuleProjectDirectory", testDir.getAbsolutePath());
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( new File( testDir.getAbsolutePath(), "using-module" ).getAbsolutePath() );
-        verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", testDir.getAbsolutePath() );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(new File(testDir.getAbsolutePath(), "using-module").getAbsolutePath());
+        verifier.getSystemProperties().put("maven.multiModuleProjectDirectory", testDir.getAbsolutePath());
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }

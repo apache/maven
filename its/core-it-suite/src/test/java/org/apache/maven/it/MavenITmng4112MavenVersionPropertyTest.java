@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,22 +16,19 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng4112MavenVersionPropertyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4112MavenVersionPropertyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4112MavenVersionPropertyTest()
-    {
-        super( "(3.0.3,)" );
+    public MavenITmng4112MavenVersionPropertyTest() {
+        super("(3.0.3,)");
     }
 
     /**
@@ -42,27 +37,24 @@ public class MavenITmng4112MavenVersionPropertyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4112" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4112");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
+        Properties props = verifier.loadProperties("target/pom.properties");
 
-        String testMavenVersion = props.getProperty( "project.properties.simpleVersion", "" );
-        assertFalse( testMavenVersion, testMavenVersion.contains( "$" ) );
-        assertTrue( testMavenVersion, testMavenVersion.matches( "[0-9]+\\.[0-9]+.*" ) );
+        String testMavenVersion = props.getProperty("project.properties.simpleVersion", "");
+        assertFalse(testMavenVersion, testMavenVersion.contains("$"));
+        assertTrue(testMavenVersion, testMavenVersion.matches("[0-9]+\\.[0-9]+.*"));
 
-        String testMavenBuildVersion = props.getProperty( "project.properties.fullVersion", "" );
-        assertTrue( testMavenBuildVersion, testMavenBuildVersion.contains( testMavenVersion ) );
+        String testMavenBuildVersion = props.getProperty("project.properties.fullVersion", "");
+        assertTrue(testMavenBuildVersion, testMavenBuildVersion.contains(testMavenVersion));
 
         verifier.verifyErrorFreeLog();
     }
-
 }

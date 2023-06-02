@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3852PluginConfigWithHeterogeneousListTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3852PluginConfigWithHeterogeneousListTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3852PluginConfigWithHeterogeneousListTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng3852PluginConfigWithHeterogeneousListTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -49,26 +44,25 @@ public class MavenITmng3852PluginConfigWithHeterogeneousListTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3852()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3852" );
+    public void testitMNG3852() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3852");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/plugin-config.properties" );
+        Properties props = verifier.loadProperties("target/plugin-config.properties");
 
-        assertEquals( "5", props.getProperty( "listParam" ) );
-        assertEquals( "one", props.getProperty( "listParam.0" ) );
-        assertEquals( "two", props.getProperty( "listParam.1" ) );
-        assertEquals( "three", props.getProperty( "listParam.3" ) );
-        assertEquals( "four", props.getProperty( "listParam.4" ) );
-        assertEquals( "org.apache.maven.plugin.coreit.Bean", props.getProperty( "listParam.2" ).substring( 0, 35 )  );
+        assertEquals("5", props.getProperty("listParam"));
+        assertEquals("one", props.getProperty("listParam.0"));
+        assertEquals("two", props.getProperty("listParam.1"));
+        assertEquals("three", props.getProperty("listParam.3"));
+        assertEquals("four", props.getProperty("listParam.4"));
+        assertEquals(
+                "org.apache.maven.plugin.coreit.Bean",
+                props.getProperty("listParam.2").substring(0, 35));
     }
-
 }

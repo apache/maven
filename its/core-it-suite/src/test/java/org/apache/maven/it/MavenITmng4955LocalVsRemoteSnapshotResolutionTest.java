@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4955LocalVsRemoteSnapshotResolutionTest()
-    {
-        super( "[2.0.10,2.0.99),[2.1.0,3.0-alpha-1),[3.0.2,)" );
+    public MavenITmng4955LocalVsRemoteSnapshotResolutionTest() {
+        super("[2.0.10,2.0.99),[2.1.0,3.0-alpha-1),[3.0.2,)");
     }
 
     /**
@@ -48,33 +43,30 @@ public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4955" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4955");
 
-        Verifier verifier = newVerifier( new File( testDir, "dep" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4955" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "dep").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4955");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "validate" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
 
-        File jarFile = new File( classpath.get( 1 ).toString() );
-        assertEquals( "eeff09b1b80e823eeb2a615b1d4b09e003e86fd3", ItUtils.calcHash( jarFile, "SHA-1" ) );
+        File jarFile = new File(classpath.get(1).toString());
+        assertEquals("eeff09b1b80e823eeb2a615b1d4b09e003e86fd3", ItUtils.calcHash(jarFile, "SHA-1"));
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.it;
 
 import java.io.File;
 
@@ -30,14 +29,11 @@ import org.junit.jupiter.api.Test;
  * Executing single mojo without POM should not NPE.
  *
  */
-class MavenITmng7679SingleMojoNoPomTest
-    extends AbstractMavenIntegrationTestCase
-{
+class MavenITmng7679SingleMojoNoPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7679SingleMojoNoPomTest()
-    {
+    public MavenITmng7679SingleMojoNoPomTest() {
         // affected Maven versions: 3.8.7, 3.9.0, 4.0.0-alpha-4
-        super( "(,3.8.7)(3.8.7,3.9.0),(3.9.0,4.0.0-alpha-4),(4.0.0-alpha-4,)" );
+        super("(,3.8.7)(3.8.7,3.9.0),(3.9.0,4.0.0-alpha-4),(4.0.0-alpha-4,)");
     }
 
     /**
@@ -46,20 +42,17 @@ class MavenITmng7679SingleMojoNoPomTest
      * @throws Exception in case of failure
      */
     @Test
-    void testSingleMojoNoPom()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7679" );
+    void testSingleMojoNoPom() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7679");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "install:install-file" );
-        verifier.addCliArgument( "-Dfile=mng-7679.txt" );
-        verifier.addCliArgument( "-DgroupId=org.apache.maven.it.mng7679" );
-        verifier.addCliArgument( "-DartifactId=artifact" );
-        verifier.addCliArgument( "-Dversion=1.0.0" );
-        verifier.addCliArgument( "-Dpackaging=jar" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("install:install-file");
+        verifier.addCliArgument("-Dfile=mng-7679.txt");
+        verifier.addCliArgument("-DgroupId=org.apache.maven.it.mng7679");
+        verifier.addCliArgument("-DartifactId=artifact");
+        verifier.addCliArgument("-Dversion=1.0.0");
+        verifier.addCliArgument("-Dpackaging=jar");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 import java.util.List;
@@ -33,61 +32,59 @@ import org.apache.maven.plugins.annotations.Parameter;
 /**
  * Dumps this mojo's configuration into a properties file.
  *
-  *
+ *
  * @author Benjamin Bentmann
  *
  */
-@Mojo( name = "cli-config", defaultPhase = LifecyclePhase.VALIDATE )
-public class CliConfigMojo
-    extends AbstractMojo
-{
+@Mojo(name = "cli-config", defaultPhase = LifecyclePhase.VALIDATE)
+public class CliConfigMojo extends AbstractMojo {
 
     /**
      * The current project's base directory, used for path alignment.
      */
-    @Parameter( defaultValue = "${basedir}", readonly = true )
+    @Parameter(defaultValue = "${basedir}", readonly = true)
     private File basedir;
 
     /**
      * The path to the properties file into which to save the mojo configuration.
      */
-    @Parameter( property = "config.propertiesFile" )
+    @Parameter(property = "config.propertiesFile")
     private File propertiesFile;
 
     /**
      * A simple parameter of type {@link java.lang.String}.
      */
-    @Parameter( property = "config.stringParam" )
+    @Parameter(property = "config.stringParam")
     private String stringParam;
 
     /**
      * A simple parameter of type {@link java.io.File}.
      */
-    @Parameter( property = "config.fileParam" )
+    @Parameter(property = "config.fileParam")
     private File fileParam;
 
     /**
      * An array parameter of component type {@link java.lang.String}.
      */
-    @Parameter( property = "config.stringParams" )
+    @Parameter(property = "config.stringParams")
     private String[] stringParams;
 
     /**
      * An array parameter of component type {@link java.io.File}.
      */
-    @Parameter( property = "config.fileParams" )
+    @Parameter(property = "config.fileParams")
     private File[] fileParams;
 
     /**
      * A collection parameter of type {@link java.util.List}.
      */
-    @Parameter( property = "config.listParam" )
+    @Parameter(property = "config.listParam")
     private List listParam;
 
     /**
      * A collection parameter of type {@link java.util.Set}.
      */
-    @Parameter( property = "config.setParam" )
+    @Parameter(property = "config.setParam")
     private Set setParam;
 
     /**
@@ -95,30 +92,26 @@ public class CliConfigMojo
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
-        getLog().info( "[MAVEN-CORE-IT-LOG] Using output file path: " + propertiesFile );
+    public void execute() throws MojoExecutionException {
+        getLog().info("[MAVEN-CORE-IT-LOG] Using output file path: " + propertiesFile);
 
-        if ( propertiesFile == null )
-        {
-            throw new MojoExecutionException( "Path name for output file has not been specified" );
+        if (propertiesFile == null) {
+            throw new MojoExecutionException("Path name for output file has not been specified");
         }
 
-        if ( !propertiesFile.isAbsolute() )
-        {
-            propertiesFile = new File( basedir, propertiesFile.getPath() ).getAbsoluteFile();
+        if (!propertiesFile.isAbsolute()) {
+            propertiesFile = new File(basedir, propertiesFile.getPath()).getAbsoluteFile();
         }
 
         Properties configProps = new Properties();
 
-        dumpConfiguration( configProps );
+        dumpConfiguration(configProps);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file: " + propertiesFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + propertiesFile);
 
-        PropertiesUtil.write( propertiesFile, configProps );
+        PropertiesUtil.write(propertiesFile, configProps);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Created output file: " + propertiesFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Created output file: " + propertiesFile);
     }
 
     /**
@@ -126,19 +119,17 @@ public class CliConfigMojo
      *
      * @param props The properties to dump the configuration into, must not be <code>null</code>.
      */
-    private void dumpConfiguration( Properties props )
-    {
+    private void dumpConfiguration(Properties props) {
         /*
          * NOTE: This intentionally does not dump the absolute path of a file to check the actual value that was
          * injected by Maven.
          */
-        PropertiesUtil.serialize( props, "propertiesFile", propertiesFile );
-        PropertiesUtil.serialize( props, "stringParam", stringParam );
-        PropertiesUtil.serialize( props, "fileParam", fileParam );
-        PropertiesUtil.serialize( props, "stringParams", stringParams );
-        PropertiesUtil.serialize( props, "fileParams", fileParams );
-        PropertiesUtil.serialize( props, "listParam", listParam );
-        PropertiesUtil.serialize( props, "setParam", setParam );
+        PropertiesUtil.serialize(props, "propertiesFile", propertiesFile);
+        PropertiesUtil.serialize(props, "stringParam", stringParam);
+        PropertiesUtil.serialize(props, "fileParam", fileParam);
+        PropertiesUtil.serialize(props, "stringParams", stringParams);
+        PropertiesUtil.serialize(props, "fileParams", fileParams);
+        PropertiesUtil.serialize(props, "listParam", listParam);
+        PropertiesUtil.serialize(props, "setParam", setParam);
     }
-
 }

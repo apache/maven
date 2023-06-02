@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,8 +39,7 @@ import java.util.Properties;
  * @author Benjamin Bentmann
  *
  */
-class PropertyUtil
-{
+class PropertyUtil {
 
     private static final Object[] NO_ARGS = {};
 
@@ -55,9 +53,8 @@ class PropertyUtil
      * @param key   The key to use for serialization of the object data, must not be <code>null</code>.
      * @param obj   The object to serialize, may be <code>null</code>.
      */
-    public static void store( Properties props, String key, Object obj )
-    {
-        store( props, key, obj, new HashSet() );
+    public static void store(Properties props, String key, Object obj) {
+        store(props, key, obj, new HashSet());
     }
 
     /**
@@ -70,115 +67,93 @@ class PropertyUtil
      * @param visited The set/stack of already visited objects, used to detect back references in the object graph, must
      *                not be <code>null</code>.
      */
-    private static void store( Properties props, String key, Object obj, Collection visited )
-    {
-        if ( obj != null && !visited.contains( obj ) )
-        {
-            visited.add( obj );
-            if ( ( obj instanceof String ) || ( obj instanceof Number ) || ( obj instanceof Boolean )
-                || ( obj instanceof File ) || ( obj instanceof Path ) )
-            {
-                props.put( key, obj.toString() );
-            }
-            else if ( obj instanceof Collection )
-            {
+    private static void store(Properties props, String key, Object obj, Collection visited) {
+        if (obj != null && !visited.contains(obj)) {
+            visited.add(obj);
+            if ((obj instanceof String)
+                    || (obj instanceof Number)
+                    || (obj instanceof Boolean)
+                    || (obj instanceof File)
+                    || (obj instanceof Path)) {
+                props.put(key, obj.toString());
+            } else if (obj instanceof Collection) {
                 Collection coll = (Collection) obj;
-                props.put( key, Integer.toString( coll.size() ) );
+                props.put(key, Integer.toString(coll.size()));
                 int index = 0;
-                for ( Iterator it = coll.iterator(); it.hasNext(); index++ )
-                {
+                for (Iterator it = coll.iterator(); it.hasNext(); index++) {
                     Object elem = it.next();
-                    store( props, key + "." + index, elem, visited );
+                    store(props, key + "." + index, elem, visited);
                 }
-            }
-            else if ( obj instanceof Map )
-            {
+            } else if (obj instanceof Map) {
                 Map map = (Map) obj;
-                props.put( key, Integer.toString( map.size() ) );
+                props.put(key, Integer.toString(map.size()));
                 int index = 0;
-                for ( Iterator it = map.entrySet().iterator(); it.hasNext(); index++ )
-                {
+                for (Iterator it = map.entrySet().iterator(); it.hasNext(); index++) {
                     Map.Entry entry = (Map.Entry) it.next();
-                    store( props, key + "." + entry.getKey(), entry.getValue(), visited );
+                    store(props, key + "." + entry.getKey(), entry.getValue(), visited);
                 }
-            }
-            else if ( obj.getClass().isArray() )
-            {
-                int length = Array.getLength( obj );
-                props.put( key, Integer.toString( length ) );
-                for ( int index = 0; index < length; index++ )
-                {
-                    Object elem = Array.get( obj, index );
-                    store( props, key + "." + index, elem, visited );
+            } else if (obj.getClass().isArray()) {
+                int length = Array.getLength(obj);
+                props.put(key, Integer.toString(length));
+                for (int index = 0; index < length; index++) {
+                    Object elem = Array.get(obj, index);
+                    store(props, key + "." + index, elem, visited);
                 }
-            }
-            else if ( obj.getClass().getName().endsWith( "Xpp3Dom" ) )
-            {
+            } else if (obj.getClass().getName().endsWith("Xpp3Dom")) {
                 Class type = obj.getClass();
-                try
-                {
-                    Method getValue = type.getMethod( "getValue", NO_PARAMS );
-                    String value = (String) getValue.invoke( obj, NO_ARGS );
+                try {
+                    Method getValue = type.getMethod("getValue", NO_PARAMS);
+                    String value = (String) getValue.invoke(obj, NO_ARGS);
 
-                    if ( value != null )
-                    {
-                        props.put( key + ".value", value );
+                    if (value != null) {
+                        props.put(key + ".value", value);
                     }
 
-                    Method getName = type.getMethod( "getName", NO_PARAMS );
+                    Method getName = type.getMethod("getName", NO_PARAMS);
 
-                    Method getChildren = type.getMethod( "getChildren", NO_PARAMS );
-                    Object[] children = (Object[]) getChildren.invoke( obj, NO_ARGS );
+                    Method getChildren = type.getMethod("getChildren", NO_PARAMS);
+                    Object[] children = (Object[]) getChildren.invoke(obj, NO_ARGS);
 
-                    props.put( key + ".children", Integer.toString( children.length ) );
+                    props.put(key + ".children", Integer.toString(children.length));
 
                     Map indices = new HashMap();
-                    for ( Object child : children )
-                    {
-                        String name = (String) getName.invoke( child, NO_ARGS );
+                    for (Object child : children) {
+                        String name = (String) getName.invoke(child, NO_ARGS);
 
-                        Integer index = (Integer) indices.get( name );
-                        if ( index == null )
-                        {
+                        Integer index = (Integer) indices.get(name);
+                        if (index == null) {
                             index = 0;
                         }
 
-                        store( props, key + ".children." + name + "." + index, child, visited );
+                        store(props, key + ".children." + name + "." + index, child, visited);
 
-                        indices.put( name, index + 1 );
+                        indices.put(name, index + 1);
                     }
-                }
-                catch ( Exception e )
-                {
+                } catch (Exception e) {
                     // can't happen
                 }
-            }
-            else
-            {
+            } else {
                 Class type = obj.getClass();
                 Method[] methods = type.getMethods();
-                for ( Method method : methods )
-                {
-                    if ( Modifier.isStatic( method.getModifiers() ) || method.getParameterTypes().length > 0
-                        || !method.getName().matches( "(get|is)\\p{Lu}.*" ) || method.getName().endsWith( "AsMap" )
-                        || Class.class.isAssignableFrom( method.getReturnType() ) || Object.class.equals(
-                        method.getReturnType() ) )
-                    {
+                for (Method method : methods) {
+                    if (Modifier.isStatic(method.getModifiers())
+                            || method.getParameterTypes().length > 0
+                            || !method.getName().matches("(get|is)\\p{Lu}.*")
+                            || method.getName().endsWith("AsMap")
+                            || Class.class.isAssignableFrom(method.getReturnType())
+                            || Object.class.equals(method.getReturnType())) {
                         continue;
                     }
 
-                    try
-                    {
-                        Object value = method.invoke( obj, NO_ARGS );
-                        store( props, key + "." + getPropertyName( method.getName() ), value, visited );
-                    }
-                    catch ( Exception e )
-                    {
+                    try {
+                        Object value = method.invoke(obj, NO_ARGS);
+                        store(props, key + "." + getPropertyName(method.getName()), value, visited);
+                    } catch (Exception e) {
                         // just ignore
                     }
                 }
             }
-            visited.remove( obj );
+            visited.remove(obj);
         }
     }
 
@@ -188,16 +163,12 @@ class PropertyUtil
      * @param methodName The method name of the property's getter, must not be <code>null</code>.
      * @return The property name, never <code>null</code>.
      */
-    static String getPropertyName( String methodName )
-    {
+    static String getPropertyName(String methodName) {
         String propertyName = methodName;
-        if ( methodName.startsWith( "get" ) && methodName.length() > 3 )
-        {
-            propertyName = Character.toLowerCase( methodName.charAt( 3 ) ) + methodName.substring( 4 );
-        }
-        else if ( methodName.startsWith( "is" ) && methodName.length() > 2 )
-        {
-            propertyName = Character.toLowerCase( methodName.charAt( 2 ) ) + methodName.substring( 3 );
+        if (methodName.startsWith("get") && methodName.length() > 3) {
+            propertyName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
+        } else if (methodName.startsWith("is") && methodName.length() > 2) {
+            propertyName = Character.toLowerCase(methodName.charAt(2)) + methodName.substring(3);
         }
         return propertyName;
     }
@@ -209,30 +180,20 @@ class PropertyUtil
      * @param file  The output file for the properties, must not be <code>null</code>.
      * @throws IOException If the properties could not be written to the file.
      */
-    public static void write( Properties props, File file )
-        throws IOException
-    {
+    public static void write(Properties props, File file) throws IOException {
         OutputStream out = null;
-        try
-        {
+        try {
             file.getParentFile().mkdirs();
-            out = new FileOutputStream( file );
-            props.store( out, "MAVEN-CORE-IT-LOG" );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                try
-                {
+            out = new FileOutputStream(file);
+            props.store(out, "MAVEN-CORE-IT-LOG");
+        } finally {
+            if (out != null) {
+                try {
                     out.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // just ignore
                 }
             }
         }
     }
-
 }

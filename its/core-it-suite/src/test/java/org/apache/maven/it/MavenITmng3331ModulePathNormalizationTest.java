@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,26 +30,21 @@ import org.junit.jupiter.api.Test;
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  *
  */
-public class MavenITmng3331ModulePathNormalizationTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3331ModulePathNormalizationTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenITmng3331ModulePathNormalizationTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3331ModulePathNormalizationTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     @Test
-    public void testitMNG3331a ()
-        throws Exception
-    {
-        //testMNG3331ModuleWithSpaces
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3331/with-spaces" );
+    public void testitMNG3331a() throws Exception {
+        // testMNG3331ModuleWithSpaces
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3331/with-spaces");
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.addCliArgument( "initialize" );
+        verifier.addCliArgument("initialize");
         verifier.execute();
 
         /*
@@ -67,17 +60,15 @@ public class MavenITmng3331ModulePathNormalizationTest
     }
 
     @Test
-    public void testitMNG3331b ()
-        throws Exception
-    {
-        //testMNG3331ModuleWithRelativeParentDirRef
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3331/with-relative-parentDir-ref" );
+    public void testitMNG3331b() throws Exception {
+        // testMNG3331ModuleWithRelativeParentDirRef
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3331/with-relative-parentDir-ref");
 
         Verifier verifier;
 
-        verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
+        verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
 
-        verifier.addCliArgument( "initialize" );
+        verifier.addCliArgument("initialize");
         verifier.execute();
 
         /*
@@ -91,5 +82,4 @@ public class MavenITmng3331ModulePathNormalizationTest
          */
         verifier.verifyErrorFreeLog();
     }
-
 }

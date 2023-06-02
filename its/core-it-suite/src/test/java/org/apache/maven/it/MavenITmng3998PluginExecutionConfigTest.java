@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,15 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,13 +33,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3998PluginExecutionConfigTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3998PluginExecutionConfigTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3998PluginExecutionConfigTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng3998PluginExecutionConfigTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -50,23 +45,20 @@ public class MavenITmng3998PluginExecutionConfigTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3998()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3998" );
+    public void testitMNG3998() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3998");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );
+        List<String> executions = verifier.loadLines("target/exec.log", "UTF-8");
         // NOTE: Ordering of executions is another issue (MNG-3887), so ignore/normalize order
-        Collections.sort( executions );
-        List<String> expected = Arrays.asList( new String[] { "exec-1", "exec-2" } );
-        assertEquals( expected, executions );
+        Collections.sort(executions);
+        List<String> expected = Arrays.asList(new String[] {"exec-1", "exec-2"});
+        assertEquals(expected, executions);
     }
-
 }

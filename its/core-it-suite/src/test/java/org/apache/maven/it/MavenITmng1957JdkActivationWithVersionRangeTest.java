@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng1957JdkActivationWithVersionRangeTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng1957JdkActivationWithVersionRangeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1957JdkActivationWithVersionRangeTest()
-    {
-        super( "[2.1.0,3.0-alpha-1),[3.0-alpha-6,)" );
+    public MavenITmng1957JdkActivationWithVersionRangeTest() {
+        super("[2.1.0,3.0-alpha-1),[3.0-alpha-6,)");
     }
 
     /**
@@ -48,25 +43,22 @@ public class MavenITmng1957JdkActivationWithVersionRangeTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG1957()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1957" );
+    public void testitMNG1957() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1957");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/jdk.properties" );
-        assertEquals( "PASSED", props.getProperty( "project.properties.jdkProperty1" ) );
-        assertEquals( "PASSED", props.getProperty( "project.properties.jdkProperty2" ) );
-        assertEquals( "PASSED", props.getProperty( "project.properties.jdkProperty3" ) );
-        assertNull( props.getProperty( "project.properties.jdkProperty4" ) );
-        assertNull( props.getProperty( "project.properties.jdkProperty5" ) );
-        assertEquals( "PASSED", props.getProperty( "project.properties.jdkProperty6" ) );
+        Properties props = verifier.loadProperties("target/jdk.properties");
+        assertEquals("PASSED", props.getProperty("project.properties.jdkProperty1"));
+        assertEquals("PASSED", props.getProperty("project.properties.jdkProperty2"));
+        assertEquals("PASSED", props.getProperty("project.properties.jdkProperty3"));
+        assertNull(props.getProperty("project.properties.jdkProperty4"));
+        assertNull(props.getProperty("project.properties.jdkProperty5"));
+        assertEquals("PASSED", props.getProperty("project.properties.jdkProperty6"));
     }
-
 }

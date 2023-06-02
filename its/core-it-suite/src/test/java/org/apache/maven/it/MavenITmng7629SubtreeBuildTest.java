@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,25 +16,23 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.it;
+
+import java.io.File;
 
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-7629">MNG-7629</a>.
  * It checks that building a subtree that consumes an attached artifact works
  *
  */
-class MavenITmng7629SubtreeBuildTest
-    extends AbstractMavenIntegrationTestCase
-{
+class MavenITmng7629SubtreeBuildTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7629SubtreeBuildTest()
-    {
-        super( "[4.0.0-alpha-4,)" );
+    public MavenITmng7629SubtreeBuildTest() {
+        super("[4.0.0-alpha-4,)");
     }
 
     /**
@@ -45,22 +41,19 @@ class MavenITmng7629SubtreeBuildTest
      * @throws Exception in case of failure
      */
     @Test
-    void testBuildSubtree()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7629" );
+    void testBuildSubtree() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7629");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( true );
-        verifier.addCliArgument( "verify" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(true);
+        verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( true );
-        verifier.addCliArguments( "-f", "child-2", "verify" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(true);
+        verifier.addCliArguments("-f", "child-2", "verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2741PluginMetadataResolutionErrorMessageTest()
-    {
-        super( "[2.1.0,3.0-alpha-1),[3.0-beta-1,)" );
+    public MavenITmng2741PluginMetadataResolutionErrorMessageTest() {
+        super("[2.1.0,3.0-alpha-1),[3.0-beta-1,)");
     }
 
     /**
@@ -48,10 +43,8 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitPrefix()
-        throws Exception
-    {
-        testit( "prefix", "foo:bar" );
+    public void testitPrefix() throws Exception {
+        testit("prefix", "foo:bar");
     }
 
     /**
@@ -60,54 +53,42 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitVersion()
-        throws Exception
-    {
-        testit( "version", "org.apache.maven.its.mng2741:maven-it-plugin:foo" );
+    public void testitVersion() throws Exception {
+        testit("version", "org.apache.maven.its.mng2741:maven-it-plugin:foo");
     }
 
-    private void testit( String test, String goal )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2741" );
+    private void testit(String test, String goal) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2741");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.setLogFileName( "log-" + test + ".txt" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        try
-        {
-            verifier.addCliArgument( goal );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.setLogFileName("log-" + test + ".txt");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        try {
+            verifier.addCliArgument(goal);
             verifier.execute();
-            fail( "Build should have failed to resolve plugin prefix" );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Build should have failed to resolve plugin prefix");
+        } catch (VerificationException e) {
             boolean foundCause = false;
-            StringBuilder sb = new StringBuilder(  );
-            List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
-            for ( String line : lines )
-            {
-                sb.append( line ).append( System.lineSeparator() );
-                if ( line.matches( ".*Connection refused.*" ) )
-                {
+            StringBuilder sb = new StringBuilder();
+            List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+            for (String line : lines) {
+                sb.append(line).append(System.lineSeparator());
+                if (line.matches(".*Connection refused.*")) {
                     foundCause = true;
                     break;
                 }
-                if ( line.matches( ".*Connection to http://localhost:54312 refused.*" ) )
-                {
+                if (line.matches(".*Connection to http://localhost:54312 refused.*")) {
                     foundCause = true;
                     break;
                 }
-                if ( line.matches( ".*[Tt]ransfer failed for http://localhost:54312/repo/.*/maven-metadata.xml.*" ) )
-                {
+                if (line.matches(".*[Tt]ransfer failed for http://localhost:54312/repo/.*/maven-metadata.xml.*")) {
                     foundCause = true;
                     break;
                 }
             }
-            assertTrue( "Transfer error cause was not found: " +  sb, foundCause );
+            assertTrue("Transfer error cause was not found: " + sb, foundCause);
         }
     }
-
 }

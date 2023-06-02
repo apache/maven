@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3831PomInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3831PomInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3831PomInterpolationTest()
-    {
-        super( "(,2.0.2),(2.0.2,4.0.0-alpha-1)" );
+    public MavenITmng3831PomInterpolationTest() {
+        super("(,2.0.2),(2.0.2,4.0.0-alpha-1)");
     }
 
     /**
@@ -48,54 +43,50 @@ public class MavenITmng3831PomInterpolationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3831()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3831" );
-        File child = new File( testDir, "child" );
+    public void testitMNG3831() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3831");
+        File child = new File(testDir, "child");
 
-        Verifier verifier = newVerifier( child.getAbsolutePath() );
-        verifier.addCliArgument( "initialize" );
+        Verifier verifier = newVerifier(child.getAbsolutePath());
+        verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/interpolated.properties" );
+        Properties props = verifier.loadProperties("target/interpolated.properties");
         String prefix = "project.properties.";
 
-        assertEquals( child.getCanonicalFile(), new File( props.getProperty( prefix + "projectDir" ) ).getCanonicalFile() );
+        assertEquals(child.getCanonicalFile(), new File(props.getProperty(prefix + "projectDir")).getCanonicalFile());
 
-        assertEquals( "org.apache.maven.its.mng3831.child", props.getProperty( prefix + "projectGroupId" ) );
-        assertEquals( "child", props.getProperty( prefix + "projectArtifactId" ) );
-        assertEquals( "2.0-alpha-1", props.getProperty( prefix + "projectVersion" ) );
-        assertEquals( "jar", props.getProperty( prefix + "projectPackaging" ) );
+        assertEquals("org.apache.maven.its.mng3831.child", props.getProperty(prefix + "projectGroupId"));
+        assertEquals("child", props.getProperty(prefix + "projectArtifactId"));
+        assertEquals("2.0-alpha-1", props.getProperty(prefix + "projectVersion"));
+        assertEquals("jar", props.getProperty(prefix + "projectPackaging"));
 
-        assertEquals( "child-name", props.getProperty( prefix + "projectName" ) );
-        assertEquals( "child-desc", props.getProperty( prefix + "projectDesc" ) );
-        assertEquals( "http://child.org/", props.getProperty( prefix + "projectUrl" ) );
-        assertEquals( "2008", props.getProperty( prefix + "projectYear" ) );
-        assertEquals( "child-org-name", props.getProperty( prefix + "projectOrgName" ) );
+        assertEquals("child-name", props.getProperty(prefix + "projectName"));
+        assertEquals("child-desc", props.getProperty(prefix + "projectDesc"));
+        assertEquals("http://child.org/", props.getProperty(prefix + "projectUrl"));
+        assertEquals("2008", props.getProperty(prefix + "projectYear"));
+        assertEquals("child-org-name", props.getProperty(prefix + "projectOrgName"));
 
-        assertEquals( "2.0.0", props.getProperty( prefix + "projectPrereqMvn" ) );
-        assertEquals( "http://scm.org/", props.getProperty( prefix + "projectScmUrl" ) );
-        assertEquals( "http://issue.org/", props.getProperty( prefix + "projectIssueUrl" ) );
-        assertEquals( "http://ci.org/", props.getProperty( prefix + "projectCiUrl" ) );
-        assertEquals( "child-dist-repo", props.getProperty( prefix + "projectDistRepoName" ) );
-        assertEquals( "http://dist.org/", props.getProperty( prefix + "projectDistRepoUrl" ) );
-        assertEquals( "http://site.org/", props.getProperty( prefix + "projectDistSiteUrl" ) );
+        assertEquals("2.0.0", props.getProperty(prefix + "projectPrereqMvn"));
+        assertEquals("http://scm.org/", props.getProperty(prefix + "projectScmUrl"));
+        assertEquals("http://issue.org/", props.getProperty(prefix + "projectIssueUrl"));
+        assertEquals("http://ci.org/", props.getProperty(prefix + "projectCiUrl"));
+        assertEquals("child-dist-repo", props.getProperty(prefix + "projectDistRepoName"));
+        assertEquals("http://dist.org/", props.getProperty(prefix + "projectDistRepoUrl"));
+        assertEquals("http://site.org/", props.getProperty(prefix + "projectDistSiteUrl"));
 
-        assertEquals( "org.apache.maven.its.mng3831", props.getProperty( prefix + "parentGroupId" ) );
-        assertEquals( "parent", props.getProperty( prefix + "parentArtifactId" ) );
-        assertEquals( "1.0", props.getProperty( prefix + "parentVersion" ) );
+        assertEquals("org.apache.maven.its.mng3831", props.getProperty(prefix + "parentGroupId"));
+        assertEquals("parent", props.getProperty(prefix + "parentArtifactId"));
+        assertEquals("1.0", props.getProperty(prefix + "parentVersion"));
 
         /*
          * NOTE: We intentionally do not check whether the build paths have been basedir aligned, that's another
          * story...
          */
-        if ( matchesVersionRange( "(2.0.8,)" ) )
-        {
-            assertTrue( props.getProperty( prefix + "projectBuildOut" ).endsWith( "bin" ) );
+        if (matchesVersionRange("(2.0.8,)")) {
+            assertTrue(props.getProperty(prefix + "projectBuildOut").endsWith("bin"));
         }
-        assertTrue( props.getProperty( prefix + "projectSiteOut" ).endsWith( "doc" ) );
+        assertTrue(props.getProperty(prefix + "projectSiteOut").endsWith("doc"));
     }
-
 }

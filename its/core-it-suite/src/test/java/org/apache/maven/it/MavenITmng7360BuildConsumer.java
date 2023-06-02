@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,39 +16,35 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
- * This test suite tests whether the consumer pom feature can load a project with a {@code parent} tag 
+ * This test suite tests whether the consumer pom feature can load a project with a {@code parent} tag
  * inside the plugin configuration.
  * Related JIRA issue: <a href="https://issues.apache.org/jira/browse/MNG-7360">MNG-7360</a>.
  *
  * @author Guillaume Nodet
  */
-public class MavenITmng7360BuildConsumer extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng7360BuildConsumer extends AbstractMavenIntegrationTestCase {
 
     private static final String PROJECT_PATH = "/mng-7360-build-consumer";
 
-    public MavenITmng7360BuildConsumer()
-    {
-        super( "[4.0.0-alpha-1,)" );
+    public MavenITmng7360BuildConsumer() {
+        super("[4.0.0-alpha-1,)");
     }
 
     @Test
-    public void testSelectModuleByCoordinate() throws Exception
-    {
-        final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
-        final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.addCliArgument( "validate" );
+    public void testSelectModuleByCoordinate() throws Exception {
+        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

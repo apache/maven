@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,23 +16,20 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng7128BlockExternalHttpReactorTest
-        extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng7128BlockExternalHttpReactorTest extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7128-block-external-http-reactor";
 
-    public MavenITmng7128BlockExternalHttpReactorTest()
-    {
-        super( "[3.8.1,)" );
+    public MavenITmng7128BlockExternalHttpReactorTest() {
+        super("[3.8.1,)");
     }
 
     /**
@@ -43,26 +38,25 @@ public class MavenITmng7128BlockExternalHttpReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testBlockedHttpRepositoryInPom() throws Exception
-    {
-        final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
-        final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
+    public void testBlockedHttpRepositoryInPom() throws Exception {
+        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
         // ITs override global settings that provide blocked mirror: need to define the mirror in dedicated settings
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
 
-        try
-        {
-            verifier.addCliArgument( "compiler:compile" );
+        try {
+            verifier.addCliArgument("compiler:compile");
             verifier.execute();
-            fail( "HTTP repository defined in pom.xml should have failed the build but did not." );
-        }
-        catch ( VerificationException ve )
-        {
+            fail("HTTP repository defined in pom.xml should have failed the build but did not.");
+        } catch (VerificationException ve) {
             // Inspect the reason why the build broke.
-            verifier.verifyTextInLog( "[ERROR] Failed to execute goal on project http-repository-in-pom: " ); // project failed
-            verifier.verifyTextInLog( "Could not transfer artifact junit:junit:pom:1.3 from/to maven-default-http-blocker (http://0.0.0.0/): " ); // mirror introduced in MNG-7118
-            verifier.verifyTextInLog( "Blocked mirror for repositories: [insecure-http-repo (http://repo.maven.apache.org/, default, releases+snapshots)]" ); // blocked mirror text present
+            verifier.verifyTextInLog(
+                    "[ERROR] Failed to execute goal on project http-repository-in-pom: "); // project failed
+            verifier.verifyTextInLog(
+                    "Could not transfer artifact junit:junit:pom:1.3 from/to maven-default-http-blocker (http://0.0.0.0/): "); // mirror introduced in MNG-7118
+            verifier.verifyTextInLog(
+                    "Blocked mirror for repositories: [insecure-http-repo (http://repo.maven.apache.org/, default, releases+snapshots)]"); // blocked mirror text present
         }
     }
 }

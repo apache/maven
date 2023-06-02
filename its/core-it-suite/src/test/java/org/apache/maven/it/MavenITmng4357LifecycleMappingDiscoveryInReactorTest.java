@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4357LifecycleMappingDiscoveryInReactorTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4357LifecycleMappingDiscoveryInReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4357LifecycleMappingDiscoveryInReactorTest()
-    {
-        super( "[2.1.0,)" );
+    public MavenITmng4357LifecycleMappingDiscoveryInReactorTest() {
+        super("[2.1.0,)");
     }
 
     /**
@@ -47,29 +42,26 @@ public class MavenITmng4357LifecycleMappingDiscoveryInReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4357" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4357");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "mod-a/target" );
-        verifier.deleteDirectory( "mod-b/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4357" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("mod-a/target");
+        verifier.deleteDirectory("mod-b/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4357");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "mod-a/target/old.txt" );
-        verifier.verifyFileNotPresent( "mod-a/target/new.txt" );
+        verifier.verifyFilePresent("mod-a/target/old.txt");
+        verifier.verifyFileNotPresent("mod-a/target/new.txt");
 
-        verifier.verifyFileNotPresent( "mod-b/target/old.txt" );
-        verifier.verifyFilePresent( "mod-b/target/new.txt" );
+        verifier.verifyFileNotPresent("mod-b/target/old.txt");
+        verifier.verifyFilePresent("mod-b/target/new.txt");
     }
-
 }

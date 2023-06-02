@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,30 +29,24 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng2668UsePluginDependenciesForSortingTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2668UsePluginDependenciesForSortingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2668UsePluginDependenciesForSortingTest()
-    {
-        super( "(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" ); // 2.1.0-M2+
+    public MavenITmng2668UsePluginDependenciesForSortingTest() {
+        super("(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)"); // 2.1.0-M2+
     }
 
     @Test
-    public void testitMNG2668()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2668" );
+    public void testitMNG2668() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2668");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2668" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng2668");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng2668", "project", "1.0-SNAPSHOT", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng2668", "tools", "1.0-SNAPSHOT", "jar" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng2668", "project", "1.0-SNAPSHOT", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng2668", "tools", "1.0-SNAPSHOT", "jar");
     }
-
 }

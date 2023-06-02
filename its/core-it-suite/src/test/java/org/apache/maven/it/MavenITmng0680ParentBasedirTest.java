@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,12 +31,9 @@ import org.junit.jupiter.api.Test;
  * @author Brett Porter
  *
  */
-public class MavenITmng0680ParentBasedirTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng0680ParentBasedirTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenITmng0680ParentBasedirTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng0680ParentBasedirTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -47,25 +42,22 @@ public class MavenITmng0680ParentBasedirTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG680()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0680" );
+    public void testitMNG680() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0680");
 
         testDir = testDir.getCanonicalFile();
 
-        File subDir = new File( testDir, "subproject" );
+        File subDir = new File(testDir, "subproject");
 
-        Verifier verifier = newVerifier( subDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(subDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/basedir.properties" );
-        assertEquals( subDir, new File( props.getProperty( "project.basedir" ) ) );
-        assertEquals( testDir, new File( props.getProperty( "project.parent.basedir" ) ) );
+        Properties props = verifier.loadProperties("target/basedir.properties");
+        assertEquals(subDir, new File(props.getProperty("project.basedir")));
+        assertEquals(testDir, new File(props.getProperty("project.parent.basedir")));
     }
-
 }

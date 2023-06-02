@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng2892HideCorePlexusUtilsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2892HideCorePlexusUtilsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2892HideCorePlexusUtilsTest()
-    {
-        super( "(2.0.8,)" );
+    public MavenITmng2892HideCorePlexusUtilsTest() {
+        super("(2.0.8,)");
     }
 
     /**
@@ -49,27 +44,24 @@ public class MavenITmng2892HideCorePlexusUtilsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG2892()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2892" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "jar" );
-        verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "pom" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+    public void testitMNG2892() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2892");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "jar");
+        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "pom");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
-        assertEquals( "methodStub", pclProps.getProperty( "org.codehaus.plexus.util.StringUtils.methods" ) );
+        Properties pclProps = verifier.loadProperties("target/pcl.properties");
+        assertEquals("methodStub", pclProps.getProperty("org.codehaus.plexus.util.StringUtils.methods"));
 
-        Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
-        assertEquals( pclProps, tcclProps );
+        Properties tcclProps = verifier.loadProperties("target/tccl.properties");
+        assertEquals(pclProps, tcclProps);
     }
-
 }

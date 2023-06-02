@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  */
-public class MavenITmng3099SettingsProfilesWithNoPomTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3099SettingsProfilesWithNoPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3099SettingsProfilesWithNoPomTest()
-    {
-        super( "(2.0.8,)" ); // 2.0.9+
+    public MavenITmng3099SettingsProfilesWithNoPomTest() {
+        super("(2.0.8,)"); // 2.0.9+
     }
 
     /**
@@ -48,24 +43,21 @@ public class MavenITmng3099SettingsProfilesWithNoPomTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3099" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3099");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3099" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "org.apache.maven.its.mng3099:maven-mng3099-plugin:0.1:touch" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3099");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("org.apache.maven.its.mng3099:maven-mng3099-plugin:0.1:touch");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/PASSED.txt" );
-        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFilePresent("target/PASSED.txt");
+        verifier.verifyFileNotPresent("target/touch.txt");
     }
-
 }

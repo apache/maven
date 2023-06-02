@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng0449PluginVersionResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0449PluginVersionResolutionTest()
-    {
-        super( "[2.0,)" );
+    public MavenITmng0449PluginVersionResolutionTest() {
+        super("[2.0,)");
     }
 
     /**
@@ -48,42 +43,34 @@ public class MavenITmng0449PluginVersionResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitLifecycleInvocation()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0449" );
-        testDir = new File( testDir, "lifecycle" );
+    public void testitLifecycleInvocation() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0449");
+        testDir = new File(testDir, "lifecycle");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        try
-        {
-            verifier.deleteArtifacts( "org.apache.maven.its.mng0449" );
-        }
-        catch ( Exception e )
-        {
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        try {
+            verifier.deleteArtifacts("org.apache.maven.its.mng0449");
+        } catch (Exception e) {
             // when we run Maven embedded, the plugin class realm locks the artifacts so we can't delete them
         }
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // Maven 3.x prefers RELEASE over LATEST (see MNG-4206)
-        if ( matchesVersionRange( "(,3.0-alpha-3)" ) )
-        {
-            verifier.verifyFileNotPresent( "target/touch-release.txt" );
-            verifier.verifyFilePresent( "target/touch-snapshot.txt" );
+        if (matchesVersionRange("(,3.0-alpha-3)")) {
+            verifier.verifyFileNotPresent("target/touch-release.txt");
+            verifier.verifyFilePresent("target/touch-snapshot.txt");
+        } else {
+            verifier.verifyFilePresent("target/touch-release.txt");
+            verifier.verifyFileNotPresent("target/touch-snapshot.txt");
         }
-        else
-        {
-            verifier.verifyFilePresent( "target/touch-release.txt" );
-            verifier.verifyFileNotPresent( "target/touch-snapshot.txt" );
-        }
-        verifier.verifyFilePresent( "target/package.txt" );
+        verifier.verifyFilePresent("target/package.txt");
     }
 
     /**
@@ -93,41 +80,32 @@ public class MavenITmng0449PluginVersionResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCliInvocation()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0449" );
-        testDir = new File( testDir, "direct" );
+    public void testitCliInvocation() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0449");
+        testDir = new File(testDir, "direct");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        try
-        {
-            verifier.deleteArtifacts( "org.apache.maven.its.mng0449" );
-        }
-        catch ( Exception e )
-        {
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        try {
+            verifier.deleteArtifacts("org.apache.maven.its.mng0449");
+        } catch (Exception e) {
             // when we run Maven embedded, the plugin class realm locks the artifacts so we can't delete them
         }
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "org.apache.maven.its.mng0449:maven-it-plugin-a:touch" );
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("org.apache.maven.its.mng0449:maven-it-plugin-a:touch");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // Maven 3.x prefers RELEASE over LATEST (see MNG-4206)
-        if ( matchesVersionRange( "(,3.0-alpha-3)" ) )
-        {
-            verifier.verifyFileNotPresent( "target/touch-release.txt" );
-            verifier.verifyFilePresent( "target/touch-snapshot.txt" );
-        }
-        else
-        {
-            verifier.verifyFilePresent( "target/touch-release.txt" );
-            verifier.verifyFileNotPresent( "target/touch-snapshot.txt" );
+        if (matchesVersionRange("(,3.0-alpha-3)")) {
+            verifier.verifyFileNotPresent("target/touch-release.txt");
+            verifier.verifyFilePresent("target/touch-snapshot.txt");
+        } else {
+            verifier.verifyFilePresent("target/touch-release.txt");
+            verifier.verifyFileNotPresent("target/touch-snapshot.txt");
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.its.mng5958;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.its.mng5958;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.its.mng5958;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,40 +28,34 @@ import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 /**
  * @author Anton Tanasenko
  */
-public abstract class AbstractLifecycleMapping implements LifecycleMapping
-{
+public abstract class AbstractLifecycleMapping implements LifecycleMapping {
 
     private Map<String, Lifecycle> lifecycleMap;
 
-    public Map<String, Lifecycle> getLifecycles()
-    {
-        if ( lifecycleMap != null )
-        {
+    public Map<String, Lifecycle> getLifecycles() {
+        if (lifecycleMap != null) {
             return lifecycleMap;
         }
 
         lifecycleMap = new LinkedHashMap<>();
         Lifecycle lifecycle = new Lifecycle();
 
-        lifecycle.setId( "default" );
-        lifecycle.setPhases( initPhases() );
+        lifecycle.setId("default");
+        lifecycle.setPhases(initPhases());
 
-        lifecycleMap.put( "default", lifecycle );
+        lifecycleMap.put("default", lifecycle);
         return lifecycleMap;
     }
 
-    public Map<String, String> getPhases( String lifecycle )
-    {
-        Lifecycle lifecycleMapping = getLifecycles().get( lifecycle );
-        if ( lifecycleMapping != null )
-        {
+    public Map<String, String> getPhases(String lifecycle) {
+        Lifecycle lifecycleMapping = getLifecycles().get(lifecycle);
+        if (lifecycleMapping != null) {
             return lifecycleMapping.getPhases();
         }
         return null;
     }
 
-    public List<String> getOptionalMojos( String lifecycle )
-    {
+    public List<String> getOptionalMojos(String lifecycle) {
         return null;
     }
 

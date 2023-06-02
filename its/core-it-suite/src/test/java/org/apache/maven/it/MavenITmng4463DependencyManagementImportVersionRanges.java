@@ -18,14 +18,13 @@
  */
 package org.apache.maven.it;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
-
 import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,83 +32,68 @@ import org.junit.jupiter.api.Test;
  *
  * @author Christian Schulte
  */
-public class MavenITmng4463DependencyManagementImportVersionRanges
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4463DependencyManagementImportVersionRanges extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4463DependencyManagementImportVersionRanges()
-    {
-        super( "[4.0.0-alpha-1,)" );
+    public MavenITmng4463DependencyManagementImportVersionRanges() {
+        super("[4.0.0-alpha-1,)");
     }
 
     @Test
-    public void testInclusiveUpperBoundResolvesToHighestVersion()
-        throws Exception
-    {
-        final File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4463/inclusive-upper-bound" );
-        final Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+    public void testInclusiveUpperBoundResolvesToHighestVersion() throws Exception {
+        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4463/inclusive-upper-bound");
+        final Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        final List<String> artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven:maven-plugin-api:jar:3.0" ) );
+        final List<String> artifacts = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"));
     }
 
     @Test
-    public void testExclusiveUpperBoundResolvesToHighestVersion()
-        throws Exception
-    {
-        final File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4463/exclusive-upper-bound" );
-        final Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+    public void testExclusiveUpperBoundResolvesToHighestVersion() throws Exception {
+        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4463/exclusive-upper-bound");
+        final Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven:maven-plugin-api:jar:3.0" ) );
+        List<String> artifacts = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"));
     }
 
     @Test
-    public void testFailureWithoutUpperBound()
-        throws Exception
-    {
-        final File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4463/no-upper-bound" );
-        final Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
+    public void testFailureWithoutUpperBound() throws Exception {
+        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4463/no-upper-bound");
+        final Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
 
-        try
-        {
-            verifier.setAutoclean( false );
-            verifier.deleteDirectory( "target" );
-            verifier.addCliArgument( "validate" );
+        try {
+            verifier.setAutoclean(false);
+            verifier.deleteDirectory("target");
+            verifier.addCliArgument("validate");
             verifier.execute();
-            fail( "Expected 'VerificationException' not thrown." );
-        }
-        catch ( final VerificationException e )
-        {
-            final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
-            assertTrue( "Expected error message not found.",
-                        indexOf( lines, ".*dependency version range.*does not specify an upper bound.*" ) >= 0 );
+            fail("Expected 'VerificationException' not thrown.");
+        } catch (final VerificationException e) {
+            final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
+            assertTrue(
+                    "Expected error message not found.",
+                    indexOf(lines, ".*dependency version range.*does not specify an upper bound.*") >= 0);
         }
     }
 
-    private static int indexOf( final List<String> logLines, final String regex )
-    {
-        final Pattern pattern = Pattern.compile( regex );
+    private static int indexOf(final List<String> logLines, final String regex) {
+        final Pattern pattern = Pattern.compile(regex);
 
-        for ( int i = 0, l0 = logLines.size(); i < l0; i++ )
-        {
-            if ( pattern.matcher( logLines.get( i ) ).matches() )
-            {
+        for (int i = 0, l0 = logLines.size(); i < l0; i++) {
+            if (pattern.matcher(logLines.get(i)).matches()) {
                 return i;
             }
         }
 
         return -1;
     }
-
 }

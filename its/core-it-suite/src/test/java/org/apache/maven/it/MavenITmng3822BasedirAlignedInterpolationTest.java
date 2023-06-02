@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3822BasedirAlignedInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3822BasedirAlignedInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3822BasedirAlignedInterpolationTest()
-    {
-        super( "[2.1.0-M1,)");
+    public MavenITmng3822BasedirAlignedInterpolationTest() {
+        super("[2.1.0-M1,)");
     }
 
     /**
@@ -48,36 +43,31 @@ public class MavenITmng3822BasedirAlignedInterpolationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3822()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3822" );
+    public void testitMNG3822() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3822");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "initialize" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties pomProps = verifier.loadProperties( "target/interpolated.properties" );
-        assertEquals( testDir, "src/main/java", pomProps.getProperty( "project.properties.buildMainSrc" ) );
-        assertEquals( testDir, "src/test/java", pomProps.getProperty( "project.properties.buildTestSrc" ) );
-        assertEquals( testDir, "src/main/scripts", pomProps.getProperty( "project.properties.buildScriptSrc" ) );
-        assertEquals( testDir, "target", pomProps.getProperty( "project.properties.buildOut" ) );
-        assertEquals( testDir, "target/classes", pomProps.getProperty( "project.properties.buildMainOut" ) );
-        assertEquals( testDir, "target/test-classes", pomProps.getProperty( "project.properties.buildTestOut" ) );
-        assertEquals( testDir, "target/site", pomProps.getProperty( "project.properties.siteOut" ) );
+        Properties pomProps = verifier.loadProperties("target/interpolated.properties");
+        assertEquals(testDir, "src/main/java", pomProps.getProperty("project.properties.buildMainSrc"));
+        assertEquals(testDir, "src/test/java", pomProps.getProperty("project.properties.buildTestSrc"));
+        assertEquals(testDir, "src/main/scripts", pomProps.getProperty("project.properties.buildScriptSrc"));
+        assertEquals(testDir, "target", pomProps.getProperty("project.properties.buildOut"));
+        assertEquals(testDir, "target/classes", pomProps.getProperty("project.properties.buildMainOut"));
+        assertEquals(testDir, "target/test-classes", pomProps.getProperty("project.properties.buildTestOut"));
+        assertEquals(testDir, "target/site", pomProps.getProperty("project.properties.siteOut"));
     }
 
-    private void assertEquals( File testDir, String buildDir, String interpolatedPath )
-        throws Exception
-    {
-        File actual = new File( interpolatedPath );
-        File expected = new File( testDir, buildDir );
+    private void assertEquals(File testDir, String buildDir, String interpolatedPath) throws Exception {
+        File actual = new File(interpolatedPath);
+        File expected = new File(testDir, buildDir);
 
-        assertTrue( actual.isAbsolute() );
-        assertEquals( expected.getCanonicalFile(), actual.getCanonicalFile() );
+        assertTrue(actual.isAbsolute());
+        assertEquals(expected.getCanonicalFile(), actual.getCanonicalFile());
     }
-
 }

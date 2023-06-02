@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4677DisabledPluginConfigInheritanceTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4677DisabledPluginConfigInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4677DisabledPluginConfigInheritanceTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-2,)" );
+    public MavenITmng4677DisabledPluginConfigInheritanceTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
     }
 
     /**
@@ -48,28 +43,25 @@ public class MavenITmng4677DisabledPluginConfigInheritanceTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4677" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4677");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "child-1/target" );
-        verifier.deleteDirectory( "child-2/target" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-log-file:2.1-SNAPSHOT:log-string" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("child-1/target");
+        verifier.deleteDirectory("child-2/target");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-log-file:2.1-SNAPSHOT:log-string");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> log = verifier.loadLines( "target/log.txt", "UTF-8" );
-        assertEquals( Arrays.asList( new String[] { "parent-only" } ), log );
+        List<String> log = verifier.loadLines("target/log.txt", "UTF-8");
+        assertEquals(Arrays.asList(new String[] {"parent-only"}), log);
 
-        log = verifier.loadLines( "child-1/target/log.txt", "UTF-8" );
-        assertEquals( Arrays.asList( new String[] { "managed" } ), log );
+        log = verifier.loadLines("child-1/target/log.txt", "UTF-8");
+        assertEquals(Arrays.asList(new String[] {"managed"}), log);
 
-        log = verifier.loadLines( "child-2/target/log.txt", "UTF-8" );
-        assertEquals( Arrays.asList( new String[] { "managed" } ), log );
+        log = verifier.loadLines("child-2/target/log.txt", "UTF-8");
+        assertEquals(Arrays.asList(new String[] {"managed"}), log);
     }
-
 }

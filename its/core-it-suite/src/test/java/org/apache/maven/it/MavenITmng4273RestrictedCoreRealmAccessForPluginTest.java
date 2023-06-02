@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4273RestrictedCoreRealmAccessForPluginTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4273RestrictedCoreRealmAccessForPluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4273RestrictedCoreRealmAccessForPluginTest()
-    {
-        super( "[2.0.6,)" );
+    public MavenITmng4273RestrictedCoreRealmAccessForPluginTest() {
+        super("[2.0.6,)");
     }
 
     /**
@@ -50,31 +45,25 @@ public class MavenITmng4273RestrictedCoreRealmAccessForPluginTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4273" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4273");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/class.properties" );
+        Properties props = verifier.loadProperties("target/class.properties");
 
-        assertNull( props.getProperty( "org.codehaus.plexus.util.FileUtils$FilterWrapper" ) );
+        assertNull(props.getProperty("org.codehaus.plexus.util.FileUtils$FilterWrapper"));
 
-        try
-        {
+        try {
             // some IBM JRE's ship with Xerces (xml.jar) so a plugin can load this class from the bootstrap loader
-            ClassLoader.getSystemClassLoader().loadClass( "org.apache.xerces.util.ParserConfigurationSettings" );
-        }
-        catch ( ClassNotFoundException e )
-        {
+            ClassLoader.getSystemClassLoader().loadClass("org.apache.xerces.util.ParserConfigurationSettings");
+        } catch (ClassNotFoundException e) {
             // not provided by JRE, and must not be provided by Maven's core realm either
-            assertNull( props.getProperty( "org.apache.xerces.util.ParserConfigurationSettings" ) );
+            assertNull(props.getProperty("org.apache.xerces.util.ParserConfigurationSettings"));
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,13 +33,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3475BaseAlignedDirTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3475BaseAlignedDirTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3475BaseAlignedDirTest()
-    {
-        super( "(2.0.1,2.0.3),(2.0.3,)");
+    public MavenITmng3475BaseAlignedDirTest() {
+        super("(2.0.1,2.0.3),(2.0.3,)");
     }
 
     /**
@@ -50,49 +45,43 @@ public class MavenITmng3475BaseAlignedDirTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3475()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3475" );
+    public void testitMNG3475() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3475");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties configProps = verifier.loadProperties( "target/config.properties" );
+        Properties configProps = verifier.loadProperties("target/config.properties");
 
-        assertPathEquals( testDir, "target", configProps.getProperty( "mapParam.buildDirectory" ) );
+        assertPathEquals(testDir, "target", configProps.getProperty("mapParam.buildDirectory"));
 
-        assertPathEquals( testDir, "target/classes", configProps.getProperty( "mapParam.buildOutputDirectory" ) );
+        assertPathEquals(testDir, "target/classes", configProps.getProperty("mapParam.buildOutputDirectory"));
 
-        assertPathEquals( testDir, "target/test-classes", configProps.getProperty( "mapParam.buildTestOutputDirectory" ) );
+        assertPathEquals(testDir, "target/test-classes", configProps.getProperty("mapParam.buildTestOutputDirectory"));
 
-        assertPathEquals( testDir, "src/main/java", configProps.getProperty( "mapParam.buildSourceDirectory" ) );
+        assertPathEquals(testDir, "src/main/java", configProps.getProperty("mapParam.buildSourceDirectory"));
 
-        assertPathEquals( testDir, "src/test/java", configProps.getProperty( "mapParam.buildTestSourceDirectory" ) );
+        assertPathEquals(testDir, "src/test/java", configProps.getProperty("mapParam.buildTestSourceDirectory"));
 
-        if ( matchesVersionRange( "[2.1.0-M1,)" ) )
-        {
-            assertPathEquals( testDir, "target/site", configProps.getProperty( "mapParam.reportingOutputDirectory" ) );
+        if (matchesVersionRange("[2.1.0-M1,)")) {
+            assertPathEquals(testDir, "target/site", configProps.getProperty("mapParam.reportingOutputDirectory"));
         }
 
         // show that using relative paths is aligned for File configuration properties regardless
-        assertPathEquals( testDir, "target/site", configProps.getProperty( "fileParam" ) );
+        assertPathEquals(testDir, "target/site", configProps.getProperty("fileParam"));
 
         /*
          * NOTE: The script source directory is deliberately excluded from the checks due to MNG-3741.
          */
     }
 
-    private void assertPathEquals( File basedir, String expected, String actual )
-        throws IOException
-    {
-        File actualFile = new File( actual );
-        assertTrue( "path not absolute: " + actualFile, actualFile.isAbsolute() );
-        assertCanonicalFileEquals( new File( basedir, expected ), actualFile );
+    private void assertPathEquals(File basedir, String expected, String actual) throws IOException {
+        File actualFile = new File(actual);
+        assertTrue("path not absolute: " + actualFile, actualFile.isAbsolute());
+        assertCanonicalFileEquals(new File(basedir, expected), actualFile);
     }
-
 }

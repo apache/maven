@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenIT0132PomLifecycleTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenIT0132PomLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0132PomLifecycleTest()
-    {
-        super( "[2.0.0,)" );
+    public MavenIT0132PomLifecycleTest() {
+        super("[2.0.0,)");
     }
 
     /**
@@ -46,23 +41,19 @@ public class MavenIT0132PomLifecycleTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit0132()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0132" );
+    public void testit0132() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0132");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteDirectory( "target" );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "deploy" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.deleteDirectory("target");
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("deploy");
         verifier.execute();
-        if ( matchesVersionRange( "(2.0.1,3.0-alpha-1)" ) )
-        {
-            verifier.verifyFilePresent( "target/site-attach-descriptor.txt" );
+        if (matchesVersionRange("(2.0.1,3.0-alpha-1)")) {
+            verifier.verifyFilePresent("target/site-attach-descriptor.txt");
         }
-        verifier.verifyFilePresent( "target/install-install.txt" );
-        verifier.verifyFilePresent( "target/deploy-deploy.txt" );
+        verifier.verifyFilePresent("target/install-install.txt");
+        verifier.verifyFilePresent("target/deploy-deploy.txt");
         verifier.verifyErrorFreeLog();
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4453PluginVersionFromLifecycleMappingTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4453PluginVersionFromLifecycleMappingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4453PluginVersionFromLifecycleMappingTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-1,)" );
+    public MavenITmng4453PluginVersionFromLifecycleMappingTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-1,)");
     }
 
     /**
@@ -47,19 +42,16 @@ public class MavenITmng4453PluginVersionFromLifecycleMappingTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4453" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4453");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "process-resources" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("process-resources");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/resources-resources.txt" );
+        verifier.verifyFilePresent("target/resources-resources.txt");
     }
-
 }

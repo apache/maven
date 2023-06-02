@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4036ParentResolutionFromSettingsRepoTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4036ParentResolutionFromSettingsRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4036ParentResolutionFromSettingsRepoTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4036ParentResolutionFromSettingsRepoTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -46,22 +41,19 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitDefaultLayout()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4036/default" );
+    public void testitDefaultLayout() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4036/default");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.filterFile( "settings.xml", "settings.xml", "UTF-8" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4036" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.filterFile("settings.xml", "settings.xml", "UTF-8");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4036");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4036", "parent", "0.2", "pom" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4036", "parent", "0.2", "pom");
     }
-
 }

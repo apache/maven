@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,25 +35,20 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  *
  */
-public class MavenITmng3671PluginLevelDepInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3671PluginLevelDepInterpolationTest()
-    {
-        super( "(2.0.8,)" ); // only test in 2.0.9+
+public class MavenITmng3671PluginLevelDepInterpolationTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3671PluginLevelDepInterpolationTest() {
+        super("(2.0.8,)"); // only test in 2.0.9+
     }
 
     @Test
-    public void testitMNG3671 ()
-        throws Exception
-    {
+    public void testitMNG3671() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3671" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3671");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.addCliArgument( "compile" );
+        verifier.addCliArgument("compile");
         verifier.execute();
 
         /*

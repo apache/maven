@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4350LifecycleMappingExecutionOrderTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4350LifecycleMappingExecutionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4350LifecycleMappingExecutionOrderTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4350LifecycleMappingExecutionOrderTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -50,20 +45,17 @@ public class MavenITmng4350LifecycleMappingExecutionOrderTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4350" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4350");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "process-resources" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("process-resources");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines( "target/log.txt", "UTF-8" );
-        assertEquals( Arrays.asList( new String[] { "first", "second" } ), lines );
+        List<String> lines = verifier.loadLines("target/log.txt", "UTF-8");
+        assertEquals(Arrays.asList(new String[] {"first", "second"}), lines);
     }
-
 }

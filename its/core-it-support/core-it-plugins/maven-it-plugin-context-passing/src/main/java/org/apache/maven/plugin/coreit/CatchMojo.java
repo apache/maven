@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,81 +16,65 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
 /**
  * "Catch" a parameter "thrown" by the ThrowMojo through the plugin context, and
  * write a file based on it's value to the build output directory.
  *
  */
-@Mojo( name = "catch" )
-public class CatchMojo
-    extends AbstractMojo
-{
+@Mojo(name = "catch")
+public class CatchMojo extends AbstractMojo {
 
     /**
      */
-    @Parameter( defaultValue = "${project.build.directory}", readonly = true, required = true )
+    @Parameter(defaultValue = "${project.build.directory}", readonly = true, required = true)
     private File outDir;
 
-    public File getOutDir()
-    {
+    public File getOutDir() {
         return outDir;
     }
 
-    public void setOutDir( File outDir )
-    {
+    public void setOutDir(File outDir) {
         this.outDir = outDir;
     }
 
-    public void execute()
-        throws MojoExecutionException
-    {
-        String value = (String) getPluginContext().get( ThrowMojo.THROWN_PARAMETER );
+    public void execute() throws MojoExecutionException {
+        String value = (String) getPluginContext().get(ThrowMojo.THROWN_PARAMETER);
 
-        if ( !outDir.exists() )
-        {
+        if (!outDir.exists()) {
             outDir.mkdirs();
         }
 
-        File outfile = new File( outDir, value );
+        File outfile = new File(outDir, value);
 
         Writer writer = null;
-        try
-        {
-            writer = new FileWriter( outfile );
+        try {
+            writer = new FileWriter(outfile);
 
-            writer.write( value );
+            writer.write(value);
 
             writer.flush();
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Cannot write output file: " + outfile, e );
-        }
-        finally
-        {
-            if ( writer != null )
-            {
-                try
-                {
+        } catch (IOException e) {
+            throw new MojoExecutionException("Cannot write output file: " + outfile, e);
+        } finally {
+            if (writer != null) {
+                try {
                     writer.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // ignore
                 }
             }
         }
     }
-
 }

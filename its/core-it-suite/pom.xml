@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,9 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -77,8 +74,8 @@ under the License.
     <proxy.host>localhost</proxy.host>
     <proxy.port>80</proxy.port>
     <proxy.type>none</proxy.type>
-    <proxy.user></proxy.user>
-    <proxy.pass></proxy.pass>
+    <proxy.user />
+    <proxy.pass />
     <proxy.nonProxyHosts>localhost</proxy.nonProxyHosts>
     <slf4jVersion>1.6.1</slf4jVersion>
     <jetty9Version>9.4.50.v20221201</jetty9Version>
@@ -486,8 +483,8 @@ under the License.
         <directory>src/test/resources</directory>
       </testResource>
       <testResource>
-        <directory>src/test/resources-filtered</directory>
         <filtering>true</filtering>
+        <directory>src/test/resources-filtered</directory>
       </testResource>
     </testResources>
     <plugins>
@@ -542,17 +539,6 @@ under the License.
     </profile>
     <profile>
       <id>run-its</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skip>false</skip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
       <dependencies>
         <!-- not really used but will force download in the local repo used -->
         <dependency>
@@ -574,6 +560,17 @@ under the License.
           <scope>test</scope>
         </dependency>
       </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>false</skip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>maven-repo-local</id>
@@ -625,7 +622,7 @@ under the License.
         <jdk>(,1.8)</jdk>
       </activation>
       <properties>
-         <surefireMemory>-Xmx384m -XX:MaxPermSize=192m</surefireMemory>
+        <surefireMemory>-Xmx384m -XX:MaxPermSize=192m</surefireMemory>
       </properties>
     </profile>
     <profile>
@@ -676,10 +673,10 @@ under the License.
             <executions>
               <execution>
                 <id>download-maven-distro</id>
-                <phase>process-test-resources</phase>
                 <goals>
                   <goal>copy</goal>
                 </goals>
+                <phase>process-test-resources</phase>
                 <configuration>
                   <artifactItems>
                     <artifactItem>
@@ -702,20 +699,17 @@ under the License.
             <executions>
               <execution>
                 <id>unpack-maven-distro</id>
-                <phase>process-test-resources</phase>
                 <goals>
                   <goal>run</goal>
                 </goals>
+                <phase>process-test-resources</phase>
                 <configuration>
                   <target>
                     <delete dir="${mavenHome}" />
-                    <unzip src="${project.build.directory}/maven-bin.zip"
-                      dest="${mavenHome}">
-                      <globmapper from="apache-maven-${mavenVersion}/*"
-                        to="*" handledirsep="true" />
+                    <unzip dest="${mavenHome}" src="${project.build.directory}/maven-bin.zip">
+                      <globmapper from="apache-maven-${mavenVersion}/*" handledirsep="true" to="*" />
                     </unzip>
-                    <chmod dir="${mavenHome}/bin" perm="ugo+rx"
-                      includes="mvn,mvnDebug" />
+                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug" perm="ugo+rx" />
                   </target>
                 </configuration>
               </execution>
@@ -748,19 +742,17 @@ under the License.
             <executions>
               <execution>
                 <id>unpack-maven-distro</id>
-                <phase>process-test-resources</phase>
                 <goals>
                   <goal>run</goal>
                 </goals>
+                <phase>process-test-resources</phase>
                 <configuration>
                   <target>
                     <delete dir="${mavenHome}" />
-                    <unzip src="${mavenDistro}" dest="${mavenHome}">
-                      <regexpmapper from="^([^/]+)/(.*)$"
-                        to="\2" handledirsep="true" />
+                    <unzip dest="${mavenHome}" src="${mavenDistro}">
+                      <regexpmapper from="^([^/]+)/(.*)$" handledirsep="true" to="\2" />
                     </unzip>
-                    <chmod dir="${mavenHome}/bin" perm="ugo+rx"
-                      includes="mvn,mvnDebug" />
+                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug" perm="ugo+rx" />
                   </target>
                 </configuration>
               </execution>
@@ -789,18 +781,17 @@ under the License.
             <executions>
               <execution>
                 <id>copy-maven-distro</id>
-                <phase>process-test-classes</phase>
                 <goals>
                   <goal>run</goal>
                 </goals>
+                <phase>process-test-classes</phase>
                 <configuration>
                   <target>
                     <delete dir="${preparedMavenHome}" />
-                    <copy todir="${preparedMavenHome}" overwrite="true">
+                    <copy overwrite="true" todir="${preparedMavenHome}">
                       <fileset dir="${mavenHome}" />
                     </copy>
-                    <chmod dir="${preparedMavenHome}/bin" perm="ugo+rx"
-                      includes="mvn,mvnDebug" />
+                    <chmod dir="${preparedMavenHome}/bin" includes="mvn,mvnDebug" perm="ugo+rx" />
                   </target>
                 </configuration>
               </execution>
@@ -812,10 +803,10 @@ under the License.
             <executions>
               <execution>
                 <id>inject-emma-into-core-realm</id>
-                <phase>process-test-classes</phase>
                 <goals>
                   <goal>copy</goal>
                 </goals>
+                <phase>process-test-classes</phase>
                 <configuration>
                   <artifactItems>
                     <artifactItem>
@@ -853,17 +844,17 @@ under the License.
             <executions>
               <execution>
                 <id>instrument</id>
-                <phase>process-test-classes</phase>
                 <goals>
                   <goal>instrument</goal>
                 </goals>
+                <phase>process-test-classes</phase>
               </execution>
               <execution>
                 <id>report</id>
-                <phase>test</phase>
                 <goals>
                   <goal>report</goal>
                 </goals>
+                <phase>test</phase>
               </execution>
             </executions>
           </plugin>

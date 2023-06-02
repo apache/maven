@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -38,13 +35,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Karl Heinz Marbaise khmarbaise@apache.org
  */
-public class MavenITmng6391PrintVersionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6391PrintVersionTest()
-    {
-        super( "[3.6.0,)" );
+    public MavenITmng6391PrintVersionTest() {
+        super("[3.6.0,)");
     }
 
     /**
@@ -56,40 +50,37 @@ public class MavenITmng6391PrintVersionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitShouldPrintVersionAtTopAndAtBottom()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6391-print-version" );
+    public void testitShouldPrintVersionAtTopAndAtBottom() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6391-print-version");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        verifier.setAutoclean(false);
 
-        verifier.setLogFileName( "version-log.txt" );
-        verifier.addCliArgument( "clean" );
+        verifier.setLogFileName("version-log.txt");
+        verifier.addCliArgument("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> loadedLines = verifier.loadLines( "version-log.txt", "UTF-8" );
-        List<String> resultingLines = extractReactorBuildOrder( loadedLines );
+        List<String> loadedLines = verifier.loadLines("version-log.txt", "UTF-8");
+        List<String> resultingLines = extractReactorBuildOrder(loadedLines);
 
         // We're expecting exactly four lines as result.
-        assertEquals( 5, resultingLines.size() );
+        assertEquals(5, resultingLines.size());
 
         // We expect those lines in the following exact order.
         // Maven 4.0.x has some code new code which takes care of the terminal width to adjust the output.
         // The number of dots can thus vary when running the tests.
-        assertTrue( resultingLines.get( 0 ).startsWith( "[INFO] Reactor Summary for base-project 1.3.0-SNAPSHOT:" ) );
-        assertTrue( resultingLines.get( 1 ).matches( "\\Q[INFO] base-project ............\\E\\.+\\Q SUCCESS [\\E.*" ) );
-        assertTrue( resultingLines.get( 2 ).matches( "\\Q[INFO] module-1 ................\\E\\.+\\Q SUCCESS [\\E.*" ) );
-        assertTrue( resultingLines.get( 3 ).matches( "\\Q[INFO] module-2 ................\\E\\.+\\Q SUCCESS [\\E.*" ) );
-        assertTrue( resultingLines.get( 4 ).matches( "\\Q[INFO] module-3 ................\\E\\.+\\Q SUCCESS [\\E.*" ) );
+        assertTrue(resultingLines.get(0).startsWith("[INFO] Reactor Summary for base-project 1.3.0-SNAPSHOT:"));
+        assertTrue(resultingLines.get(1).matches("\\Q[INFO] base-project ............\\E\\.+\\Q SUCCESS [\\E.*"));
+        assertTrue(resultingLines.get(2).matches("\\Q[INFO] module-1 ................\\E\\.+\\Q SUCCESS [\\E.*"));
+        assertTrue(resultingLines.get(3).matches("\\Q[INFO] module-2 ................\\E\\.+\\Q SUCCESS [\\E.*"));
+        assertTrue(resultingLines.get(4).matches("\\Q[INFO] module-3 ................\\E\\.+\\Q SUCCESS [\\E.*"));
 
         // We expect that line 1..4 have the same length
-        int line1Length = resultingLines.get( 1 ).length();
-        assertEquals( line1Length, resultingLines.get( 2 ).length() );
-        assertEquals( line1Length, resultingLines.get( 3 ).length() );
-        assertEquals( line1Length, resultingLines.get( 4 ).length() );
-
+        int line1Length = resultingLines.get(1).length();
+        assertEquals(line1Length, resultingLines.get(2).length());
+        assertEquals(line1Length, resultingLines.get(3).length());
+        assertEquals(line1Length, resultingLines.get(4).length());
     }
 
     /**
@@ -100,40 +91,45 @@ public class MavenITmng6391PrintVersionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitShouldPrintVersionInAllLines()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6391-print-version-aggregator" );
+    public void testitShouldPrintVersionInAllLines() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6391-print-version-aggregator");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        verifier.setAutoclean(false);
 
-        verifier.setLogFileName( "version-log.txt" );
-        verifier.addCliArguments( "clean" );
+        verifier.setLogFileName("version-log.txt");
+        verifier.addCliArguments("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> loadedLines = verifier.loadLines( "version-log.txt", "UTF-8" );
-        List<String> resultingLines = extractReactorBuildOrder( loadedLines );
+        List<String> loadedLines = verifier.loadLines("version-log.txt", "UTF-8");
+        List<String> resultingLines = extractReactorBuildOrder(loadedLines);
 
         // We're expecting exactly four lines as result.
-        assertEquals( 5, resultingLines.size() );
+        assertEquals(5, resultingLines.size());
 
         // We expect those lines in the following exact order.
         // Maven 4.0.x has some code new code which takes care of the terminal width to adjust the output.
         // The number of dots can thus vary when running the tests.
-        assertTrue( resultingLines.get( 0 ).startsWith( "[INFO] Reactor Summary:" ) );
-        assertTrue( resultingLines.get( 1 ).matches( "\\Q[INFO] module-1 1.2.7.43.RELEASE ...............\\E\\.+\\Q SUCCESS [ \\E.*" ) );
-        assertTrue( resultingLines.get( 2 ).matches( "\\Q[INFO] module-2 7.5-SNAPSHOT ...................\\E\\.+\\Q SUCCESS [ \\E.*" ) );
-        assertTrue( resultingLines.get( 3 ).matches( "\\Q[INFO] module-3 1-RC1 ..........................\\E\\.+\\Q SUCCESS [ \\E.*" ) );
-        assertTrue( resultingLines.get( 4 ).matches( "\\Q[INFO] base-project 1.0.0-SNAPSHOT .............\\E\\.+\\Q SUCCESS [ \\E.*" ) );
+        assertTrue(resultingLines.get(0).startsWith("[INFO] Reactor Summary:"));
+        assertTrue(resultingLines
+                .get(1)
+                .matches("\\Q[INFO] module-1 1.2.7.43.RELEASE ...............\\E\\.+\\Q SUCCESS [ \\E.*"));
+        assertTrue(resultingLines
+                .get(2)
+                .matches("\\Q[INFO] module-2 7.5-SNAPSHOT ...................\\E\\.+\\Q SUCCESS [ \\E.*"));
+        assertTrue(resultingLines
+                .get(3)
+                .matches("\\Q[INFO] module-3 1-RC1 ..........................\\E\\.+\\Q SUCCESS [ \\E.*"));
+        assertTrue(resultingLines
+                .get(4)
+                .matches("\\Q[INFO] base-project 1.0.0-SNAPSHOT .............\\E\\.+\\Q SUCCESS [ \\E.*"));
 
         // We expect that line 1..4 have the same length
-        int line1Length = resultingLines.get( 1 ).length();
-        assertEquals( line1Length, resultingLines.get( 2 ).length() );
-        assertEquals( line1Length, resultingLines.get( 3 ).length() );
-        assertEquals( line1Length, resultingLines.get( 4 ).length() );
-
+        int line1Length = resultingLines.get(1).length();
+        assertEquals(line1Length, resultingLines.get(2).length());
+        assertEquals(line1Length, resultingLines.get(3).length());
+        assertEquals(line1Length, resultingLines.get(4).length());
     }
 
     /**
@@ -147,35 +143,23 @@ public class MavenITmng6391PrintVersionTest
      * [INFO] ...SUCCESS [  0.035 s]
      * </pre>
      */
-    private List<String> extractReactorBuildOrder( List<String> loadedLines )
-    {
+    private List<String> extractReactorBuildOrder(List<String> loadedLines) {
         List<String> resultingLines = new LinkedList<String>();
         boolean start = false;
-        for ( String line : loadedLines )
-        {
-            if ( start )
-            {
-                if ( line.startsWith( "[INFO] -------------" ) )
-                {
+        for (String line : loadedLines) {
+            if (start) {
+                if (line.startsWith("[INFO] -------------")) {
                     start = false;
+                } else if (!line.endsWith("[INFO] ")) {
+                    resultingLines.add(line);
                 }
-                else if ( !line.endsWith( "[INFO] " ) )
-                {
-                    resultingLines.add( line );
-                }
-            }
-            else
-            {
-                if ( line.startsWith( "[INFO] Reactor Summary" ) )
-                {
+            } else {
+                if (line.startsWith("[INFO] Reactor Summary")) {
                     start = true;
-                    resultingLines.add( line );
+                    resultingLines.add(line);
                 }
-
             }
         }
         return resultingLines;
-
     }
-
 }

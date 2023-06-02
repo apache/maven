@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenIT0137EarLifecycleTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenIT0137EarLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0137EarLifecycleTest()
-    {
-        super( "[2.0.0,)" );
+    public MavenIT0137EarLifecycleTest() {
+        super("[2.0.0,)");
     }
 
     /**
@@ -46,22 +41,19 @@ public class MavenIT0137EarLifecycleTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit0137()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0137" );
+    public void testit0137() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0137");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteDirectory( "target" );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "deploy" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.deleteDirectory("target");
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("deploy");
         verifier.execute();
-        verifier.verifyFilePresent( "target/ear-generate-application-xml.txt" );
-        verifier.verifyFilePresent( "target/resources-resources.txt" );
-        verifier.verifyFilePresent( "target/ear-ear.txt" );
-        verifier.verifyFilePresent( "target/install-install.txt" );
-        verifier.verifyFilePresent( "target/deploy-deploy.txt" );
+        verifier.verifyFilePresent("target/ear-generate-application-xml.txt");
+        verifier.verifyFilePresent("target/resources-resources.txt");
+        verifier.verifyFilePresent("target/ear-ear.txt");
+        verifier.verifyFilePresent("target/install-install.txt");
+        verifier.verifyFilePresent("target/deploy-deploy.txt");
         verifier.verifyErrorFreeLog();
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,29 +29,23 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng3355TranslatedPathInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3355TranslatedPathInterpolationTest()
-    {
-        super( "(2.0.8,)" ); // 2.0.9+
+public class MavenITmng3355TranslatedPathInterpolationTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3355TranslatedPathInterpolationTest() {
+        super("(2.0.8,)"); // 2.0.9+
     }
 
     @Test
-    public void testitMNG3355()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3355" );
+    public void testitMNG3355() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3355");
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.addCliArgument( "-Dversion=foo" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-Dversion=foo");
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }
-
 }

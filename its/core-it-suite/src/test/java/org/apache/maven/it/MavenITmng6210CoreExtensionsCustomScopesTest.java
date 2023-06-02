@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,29 +30,24 @@ import org.junit.jupiter.api.Test;
  * {@code @MojoExecutionScoped} components contributed by <code>.mvn/extensions.xml</code> are
  * available to regular plugins.
  */
-public class MavenITmng6210CoreExtensionsCustomScopesTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng6210CoreExtensionsCustomScopesTest()
-    {
-        super( "(3.5.0,)" );
+public class MavenITmng6210CoreExtensionsCustomScopesTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng6210CoreExtensionsCustomScopesTest() {
+        super("(3.5.0,)");
     }
 
     @Test
-    public void testCoreExtensionCustomScopes()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6210-core-extensions-scopes" );
+    public void testCoreExtensionCustomScopes() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6210-core-extensions-scopes");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
 
-        verifier = newVerifier( new File( testDir, "client" ).getAbsolutePath() );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions-custom-scopes" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( new File( testDir, "settings.xml" ).getAbsolutePath() );
-        verifier.addCliArgument( "validate" );
+        verifier = newVerifier(new File(testDir, "client").getAbsolutePath());
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions-custom-scopes");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }

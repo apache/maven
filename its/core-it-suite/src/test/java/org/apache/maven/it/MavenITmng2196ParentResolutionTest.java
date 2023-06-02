@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,25 +16,22 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2196">MNG-2196</a>.
  */
-public class MavenITmng2196ParentResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2196ParentResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2196ParentResolutionTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng2196ParentResolutionTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -47,35 +42,26 @@ public class MavenITmng2196ParentResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG2196()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2196" );
+    public void testitMNG2196() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2196");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2196" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng2196");
 
-        if ( matchesVersionRange( "(,3.0-alpha-1)" ) )
-        {
-            verifier.addCliArgument( "validate" );
+        if (matchesVersionRange("(,3.0-alpha-1)")) {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-        }
-        else
-        {
-            try
-            {
-                verifier.addCliArgument( "validate" );
+        } else {
+            try {
+                verifier.addCliArgument("validate");
                 verifier.execute();
                 verifier.verifyErrorFreeLog();
-                fail( "Build should have failed due to bad relativePath" );
-            }
-            catch ( VerificationException e )
-            {
+                fail("Build should have failed due to bad relativePath");
+            } catch (VerificationException e) {
                 // expected
             }
         }
     }
-
 }

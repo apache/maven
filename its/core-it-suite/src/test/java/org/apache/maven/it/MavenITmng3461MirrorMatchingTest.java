@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -42,13 +40,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3461MirrorMatchingTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3461MirrorMatchingTest()
-    {
-        super( "(2.0.8,)" );
+    public MavenITmng3461MirrorMatchingTest() {
+        super("(2.0.8,)");
     }
 
     /**
@@ -58,22 +53,20 @@ public class MavenITmng3461MirrorMatchingTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitExactMatchDominatesWildcard()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3461/test-1" );
+    public void testitExactMatchDominatesWildcard() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3461/test-1");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3461" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng3461");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "a", "0.1", "jar");
     }
 
     /**
@@ -83,80 +76,67 @@ public class MavenITmng3461MirrorMatchingTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitExternalWildcard()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3461/test-2" );
+    public void testitExternalWildcard() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3461/test-2");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        Handler repoHandler = new AbstractHandler()
-        {
+        Handler repoHandler = new AbstractHandler() {
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request,
-                                HttpServletResponse response )
-                throws IOException
-            {
-                System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
+            public void handle(
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+                    throws IOException {
+                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
 
-                if ( request.getRequestURI().endsWith( "/b-0.1.jar" ) )
-                {
-                    response.setStatus( HttpServletResponse.SC_OK );
-                    response.getWriter().println( request.getRequestURI() );
-                }
-                else if ( request.getRequestURI().endsWith( "/b-0.1.pom" ) )
-                {
-                    response.setStatus( HttpServletResponse.SC_OK );
-                    response.getWriter().println( "<project>" );
-                    response.getWriter().println( "  <modelVersion>4.0.0</modelVersion>" );
-                    response.getWriter().println( "  <groupId>org.apache.maven.its.mng3461</groupId>" );
-                    response.getWriter().println( "  <artifactId>b</artifactId>" );
-                    response.getWriter().println( "  <version>0.1</version>" );
-                    response.getWriter().println( "</project>" );
-                }
-                else
-                {
-                    response.setStatus( HttpServletResponse.SC_NOT_FOUND );
+                if (request.getRequestURI().endsWith("/b-0.1.jar")) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().println(request.getRequestURI());
+                } else if (request.getRequestURI().endsWith("/b-0.1.pom")) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().println("<project>");
+                    response.getWriter().println("  <modelVersion>4.0.0</modelVersion>");
+                    response.getWriter().println("  <groupId>org.apache.maven.its.mng3461</groupId>");
+                    response.getWriter().println("  <artifactId>b</artifactId>");
+                    response.getWriter().println("  <version>0.1</version>");
+                    response.getWriter().println("</project>");
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 }
 
-                ( (Request) request ).setHandled( true );
+                ((Request) request).setHandled(true);
             }
         };
 
-        Server server = new Server( 0 );
-        server.setHandler( repoHandler );
+        Server server = new Server(0);
+        server.setHandler(repoHandler);
 
-        try
-        {
+        try {
             server.start();
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
+            if (server.isFailed()) {
+                fail("Couldn't bind the server socket to a free port!");
             }
 
-            int port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-            System.out.println( "Bound server socket to the port " + port );
+            int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
+            System.out.println("Bound server socket to the port " + port);
 
-            verifier.setAutoclean( false );
-            verifier.deleteArtifacts( "org.apache.maven.its.mng3461" );
+            verifier.setAutoclean(false);
+            verifier.deleteArtifacts("org.apache.maven.its.mng3461");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
-            filterProps.put( "@test.port@", Integer.toString( port ) );
-            verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliArgument( "--settings" );
-            verifier.addCliArgument( "settings.xml" );
-            verifier.addCliArgument( "validate" );
+            filterProps.put("@test.port@", Integer.toString(port));
+            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.addCliArgument("--settings");
+            verifier.addCliArgument("settings.xml");
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-        }
-        finally
-        {
+        } finally {
             server.stop();
             server.join();
         }
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "b", "0.1", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "c", "0.1", "jar" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "a", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "b", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "c", "0.1", "jar");
     }
 
     /**
@@ -166,21 +146,19 @@ public class MavenITmng3461MirrorMatchingTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitNonGreedyWildcard()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3461/test-3" );
+    public void testitNonGreedyWildcard() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3461/test-3");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3461" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng3461");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "a", "0.1", "jar");
     }
 }

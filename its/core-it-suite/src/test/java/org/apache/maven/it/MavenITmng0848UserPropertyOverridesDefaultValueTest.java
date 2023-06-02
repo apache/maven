@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng0848UserPropertyOverridesDefaultValueTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng0848UserPropertyOverridesDefaultValueTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0848UserPropertyOverridesDefaultValueTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng0848UserPropertyOverridesDefaultValueTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,22 +43,19 @@ public class MavenITmng0848UserPropertyOverridesDefaultValueTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG848()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0848" );
+    public void testitMNG848() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0848");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-Dconfig.aliasDefaultExpressionParam=PASSED" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-Dconfig.aliasDefaultExpressionParam=PASSED");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties configProps = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "maven-core-it", configProps.getProperty( "defaultParam" ) );
-        assertEquals( "PASSED", configProps.getProperty( "aliasDefaultExpressionParam" ) );
+        Properties configProps = verifier.loadProperties("target/config.properties");
+        assertEquals("maven-core-it", configProps.getProperty("defaultParam"));
+        assertEquals("PASSED", configProps.getProperty("aliasDefaultExpressionParam"));
     }
-
 }

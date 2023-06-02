@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,20 +29,15 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4262MakeLikeReactorDottedPath370Test
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4262MakeLikeReactorDottedPath370Test extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4262MakeLikeReactorDottedPath370Test()
-    {
-        super( "[4.0.0-alpha-1,)" );
+    public MavenITmng4262MakeLikeReactorDottedPath370Test() {
+        super("[4.0.0-alpha-1,)");
     }
 
-    private void clean( Verifier verifier )
-        throws Exception
-    {
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "../sub-a/target" );
+    private void clean(Verifier verifier) throws Exception {
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("../sub-a/target");
     }
 
     /**
@@ -53,23 +46,21 @@ public class MavenITmng4262MakeLikeReactorDottedPath370Test
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMakeRoot()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4262" );
+    public void testitMakeRoot() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4262");
 
-        Verifier verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        clean( verifier );
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "." );
-        verifier.setLogFileName( "log-root.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
+        verifier.setAutoclean(false);
+        clean(verifier);
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument(".");
+        verifier.setLogFileName("log-root.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/touch.txt" );
-        verifier.verifyFilePresent( "../sub-a/target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
+        verifier.verifyFilePresent("../sub-a/target/touch.txt");
     }
 
     /**
@@ -78,23 +69,20 @@ public class MavenITmng4262MakeLikeReactorDottedPath370Test
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMakeModule()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4262" );
+    public void testitMakeModule() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4262");
 
-        Verifier verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        clean( verifier );
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "../sub-a" );
-        verifier.setLogFileName( "log-module.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
+        verifier.setAutoclean(false);
+        clean(verifier);
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("../sub-a");
+        verifier.setLogFileName("log-module.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/touch.txt" );
-        verifier.verifyFilePresent( "../sub-a/target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
+        verifier.verifyFilePresent("../sub-a/target/touch.txt");
     }
-
 }

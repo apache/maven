@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,42 +26,34 @@ import java.security.MessageDigest;
 /**
  * @author Benjamin Bentmann
  */
-class ItUtils
-{
+class ItUtils {
 
-    public static String calcHash( File file, String algo )
-        throws Exception
-    {
-        MessageDigest digester = MessageDigest.getInstance( algo );
+    public static String calcHash(File file, String algo) throws Exception {
+        MessageDigest digester = MessageDigest.getInstance(algo);
 
         DigestInputStream dis;
-        try ( FileInputStream is = new FileInputStream( file ) )
-        {
-            dis = new DigestInputStream( is, digester );
+        try (FileInputStream is = new FileInputStream(file)) {
+            dis = new DigestInputStream(is, digester);
 
-            for ( byte[] buffer = new byte[1024 * 4]; dis.read( buffer ) >= 0; )
-            {
+            for (byte[] buffer = new byte[1024 * 4]; dis.read(buffer) >= 0; ) {
                 // just read it
             }
         }
 
         byte[] digest = digester.digest();
 
-        StringBuilder hash = new StringBuilder( digest.length * 2 );
+        StringBuilder hash = new StringBuilder(digest.length * 2);
 
-        for ( byte aDigest : digest )
-        {
+        for (byte aDigest : digest) {
             int b = aDigest & 0xFF;
 
-            if ( b < 0x10 )
-            {
-                hash.append( '0' );
+            if (b < 0x10) {
+                hash.append('0');
             }
 
-            hash.append( Integer.toHexString( b ) );
+            hash.append(Integer.toHexString(b));
         }
 
         return hash.toString();
     }
-
 }

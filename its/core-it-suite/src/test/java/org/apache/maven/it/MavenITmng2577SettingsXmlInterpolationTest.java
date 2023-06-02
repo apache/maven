@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng2577SettingsXmlInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2577SettingsXmlInterpolationTest()
-    {
-        super( "[2.0.3,)" );
+    public MavenITmng2577SettingsXmlInterpolationTest() {
+        super("[2.0.3,)");
     }
 
     /**
@@ -47,24 +42,22 @@ public class MavenITmng2577SettingsXmlInterpolationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitEnvVars()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2577" );
+    public void testitEnvVars() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2577");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings-env.xml" );
-        verifier.setEnvironmentVariable( "MNGIT", "env-var-test" );
-        verifier.setLogFileName( "log-env.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings-env.xml");
+        verifier.setEnvironmentVariable("MNGIT", "env-var-test");
+        verifier.setLogFileName("log-env.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/settings.properties" );
-        assertEquals( "env-var-test", props.getProperty( "settings.servers.0.username" ) );
+        Properties props = verifier.loadProperties("target/settings.properties");
+        assertEquals("env-var-test", props.getProperty("settings.servers.0.username"));
     }
 
     /**
@@ -73,27 +66,24 @@ public class MavenITmng2577SettingsXmlInterpolationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitSystemProps()
-        throws Exception
-    {
-        requiresMavenVersion( "[3.0-alpha-1,)" );
+    public void testitSystemProps() throws Exception {
+        requiresMavenVersion("[3.0-alpha-1,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2577" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2577");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings-sys.xml" );
-        verifier.addCliArgument( "-Dusr.MNGIT=usr-prop-test" );
-        verifier.setLogFileName( "log-sys.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings-sys.xml");
+        verifier.addCliArgument("-Dusr.MNGIT=usr-prop-test");
+        verifier.setLogFileName("log-sys.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/settings.properties" );
-        assertEquals( "usr-prop-test", props.getProperty( "settings.servers.0.username" ) );
-        assertEquals( File.separator, props.getProperty( "settings.servers.0.password" ) );
+        Properties props = verifier.loadProperties("target/settings.properties");
+        assertEquals("usr-prop-test", props.getProperty("settings.servers.0.username"));
+        assertEquals(File.separator, props.getProperty("settings.servers.0.password"));
     }
-
 }

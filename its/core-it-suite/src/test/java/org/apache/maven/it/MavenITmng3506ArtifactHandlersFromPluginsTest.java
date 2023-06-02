@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,9 +32,7 @@ import org.junit.jupiter.api.Test;
  * @author John Casey
  *
  */
-public class MavenITmng3506ArtifactHandlersFromPluginsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3506ArtifactHandlersFromPluginsTest extends AbstractMavenIntegrationTestCase {
 
     private static final String GID = "org.apache.maven.its.mng3506";
     private static final String AID = "mng-3506";
@@ -45,57 +41,56 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest
     private static final String BAD_TYPE1 = "coreit-1";
     private static final String BAD_TYPE2 = "coreit-2";
 
-    public MavenITmng3506ArtifactHandlersFromPluginsTest()
-    {
-        super( "(2.2.0,)" );
+    public MavenITmng3506ArtifactHandlersFromPluginsTest() {
+        super("(2.2.0,)");
     }
 
     @Test
-    public void testProjectPackagingUsage()
-        throws IOException, VerificationException
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/" + AID );
+    public void testProjectPackagingUsage() throws IOException, VerificationException {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/" + AID);
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
 
-        verifier.deleteArtifacts( GID );
+        verifier.deleteArtifacts(GID);
 
-        verifier.addCliArgument( "install" );
+        verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        // Now, if everything worked, we have .pom and a .jar in the local repo for each child, and a pom for the parent.
-        // IF IT DIDN'T, we have a .pom and a .coreit-1 for child 1 AND/OR .pom and .coreit-2 for child 2 in the local repo...
+        // Now, if everything worked, we have .pom and a .jar in the local repo for each child, and a pom for the
+        // parent.
+        // IF IT DIDN'T, we have a .pom and a .coreit-1 for child 1 AND/OR .pom and .coreit-2 for child 2 in the local
+        // repo...
 
         // Parent POM
-        String path = verifier.getArtifactPath( GID, AID, VERSION, "pom" );
-        assertTrue( path + " should have been installed.", new File( path ).exists() );
+        String path = verifier.getArtifactPath(GID, AID, VERSION, "pom");
+        assertTrue(path + " should have been installed.", new File(path).exists());
 
         // Child 1
-        path = verifier.getArtifactPath( GID, AID + ".1", VERSION, TYPE );
-        assertTrue( path + " should have been installed.", new File( path ).exists() );
+        path = verifier.getArtifactPath(GID, AID + ".1", VERSION, TYPE);
+        assertTrue(path + " should have been installed.", new File(path).exists());
 
-        path = verifier.getArtifactPath( GID, AID + ".1", VERSION, "pom" );
-        assertTrue( path + " should have been installed.", new File( path ).exists() );
+        path = verifier.getArtifactPath(GID, AID + ".1", VERSION, "pom");
+        assertTrue(path + " should have been installed.", new File(path).exists());
 
-        path = verifier.getArtifactPath( GID, AID + ".1", VERSION, BAD_TYPE1 );
-        assertFalse( path + " should NOT have been installed.", new File( path ).exists() );
+        path = verifier.getArtifactPath(GID, AID + ".1", VERSION, BAD_TYPE1);
+        assertFalse(path + " should NOT have been installed.", new File(path).exists());
 
-        path = verifier.getArtifactPath( GID, AID + ".1", VERSION, BAD_TYPE2 );
-        assertFalse( path + " should _NEVER_ be installed!!!", new File( path ).exists() );
+        path = verifier.getArtifactPath(GID, AID + ".1", VERSION, BAD_TYPE2);
+        assertFalse(path + " should _NEVER_ be installed!!!", new File(path).exists());
 
         // Child 2
-        path = verifier.getArtifactPath( GID, AID + ".2", VERSION, TYPE );
-        assertTrue( path + " should have been installed.", new File( path ).exists() );
+        path = verifier.getArtifactPath(GID, AID + ".2", VERSION, TYPE);
+        assertTrue(path + " should have been installed.", new File(path).exists());
 
-        path = verifier.getArtifactPath( GID, AID + ".2", VERSION, "pom" );
-        assertTrue( path + " should have been installed.", new File( path ).exists() );
+        path = verifier.getArtifactPath(GID, AID + ".2", VERSION, "pom");
+        assertTrue(path + " should have been installed.", new File(path).exists());
 
-        path = verifier.getArtifactPath( GID, AID + ".2", VERSION, BAD_TYPE1 );
-        assertFalse( path + " should _NEVER_ be installed!!!", new File( path ).exists() );
+        path = verifier.getArtifactPath(GID, AID + ".2", VERSION, BAD_TYPE1);
+        assertFalse(path + " should _NEVER_ be installed!!!", new File(path).exists());
 
-        path = verifier.getArtifactPath( GID, AID + ".2", VERSION, BAD_TYPE2 );
-        assertFalse( path + " should NOT have been installed.", new File( path ).exists() );
+        path = verifier.getArtifactPath(GID, AID + ".2", VERSION, BAD_TYPE2);
+        assertFalse(path + " should NOT have been installed.", new File(path).exists());
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng1803PomValidationErrorIncludesLineNumberTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng1803PomValidationErrorIncludesLineNumberTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1803PomValidationErrorIncludesLineNumberTest()
-    {
-        super( "[3.0-beta-2,)" );
+    public MavenITmng1803PomValidationErrorIncludesLineNumberTest() {
+        super("[3.0-beta-2,)");
     }
 
     /**
@@ -47,38 +42,30 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1803" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1803");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
-        }
-        catch ( Exception e )
-        {
+        } catch (Exception e) {
             // expected
         }
 
         boolean foundError = false;
 
-        List<String> lines = verifier.loadLines( verifier.getLogFileName(), null );
-        for ( String line : lines )
-        {
-            if ( line.contains( ":bad/id:" ) )
-            {
-                assertTrue( "Line number not found in: " + line, line.indexOf( "38" ) > 0 );
-                assertTrue( "Column number not found in: " + line, line.indexOf( "19" ) > 0 );
+        List<String> lines = verifier.loadLines(verifier.getLogFileName(), null);
+        for (String line : lines) {
+            if (line.contains(":bad/id:")) {
+                assertTrue("Line number not found in: " + line, line.indexOf("38") > 0);
+                assertTrue("Column number not found in: " + line, line.indexOf("19") > 0);
                 foundError = true;
                 break;
             }
         }
 
-        assertTrue( "Build output did not mention validation error!", foundError );
+        assertTrue("Build output did not mention validation error!", foundError);
     }
-
 }

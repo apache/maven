@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,37 +33,29 @@ import org.junit.jupiter.api.Test;
  * that dependencies are successfully resolved for this setup.
  *
  */
-public class MavenITmng5663NestedImportScopePomResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5663NestedImportScopePomResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5663NestedImportScopePomResolutionTest()
-    {
-        super( "[3.0.4,3.2.2),(3.2.2,)" );
+    public MavenITmng5663NestedImportScopePomResolutionTest() {
+        super("[3.0.4,3.2.2),(3.2.2,)");
     }
 
     @Test
-    public void testitMNG5639()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5663-nested-import-scope-pom-resolution");
+    public void testitMNG5639() throws Exception {
+        File testDir =
+                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5663-nested-import-scope-pom-resolution");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng5663" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.deleteArtifacts("org.apache.maven.its.mng5663");
 
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
+        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
 
-        verifier.addCliArgument( "install" );
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng5663", "c", "0.1", "jar" );
-
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng5663", "c", "0.1", "jar");
     }
-
-
-
 }

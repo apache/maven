@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,31 +30,24 @@ import org.junit.jupiter.api.Test;
  *
  * @author Robert Scholte
  */
-public class MavenITmng6330RelativePath
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng6330RelativePath()
-    {
-        super( "(,3.5.0),(3.5.2,)" );
+public class MavenITmng6330RelativePath extends AbstractMavenIntegrationTestCase {
+    public MavenITmng6330RelativePath() {
+        super("(,3.5.0),(3.5.2,)");
     }
 
     @Test
-    public void testRelativePath() throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6330-relative-path" );
+    public void testRelativePath() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6330-relative-path");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setForkJvm( true );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setForkJvm(true);
 
-        try
-        {
-            verifier.addCliArgument( "validate");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
-            fail( "Should fail due to non-resolvable parent" );
-        }
-        catch ( VerificationException e )
-        {
-            assertTrue( e.getMessage().contains( "Non-resolvable parent POM" ) );
+            fail("Should fail due to non-resolvable parent");
+        } catch (VerificationException e) {
+            assertTrue(e.getMessage().contains("Non-resolvable parent POM"));
         }
     }
 }

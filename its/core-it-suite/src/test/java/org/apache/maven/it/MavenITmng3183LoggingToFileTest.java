@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,15 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,13 +32,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng3183LoggingToFileTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3183LoggingToFileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3183LoggingToFileTest()
-    {
-        super( "[3.0-alpha-1,)" );
+    public MavenITmng3183LoggingToFileTest() {
+        super("[3.0-alpha-1,)");
     }
 
     /**
@@ -49,46 +44,40 @@ public class MavenITmng3183LoggingToFileTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3183" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3183");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "-l" );
-        verifier.addCliArgument( "maven.log" );
-        verifier.setLogFileName( "stdout.txt" );
-        new File( testDir, "stdout.txt" ).delete();
-        new File( testDir, "maven.log" ).delete();
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("-l");
+        verifier.addCliArgument("maven.log");
+        verifier.setLogFileName("stdout.txt");
+        new File(testDir, "stdout.txt").delete();
+        new File(testDir, "maven.log").delete();
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> stdout = verifier.loadLines( "stdout.txt", "UTF-8" );
+        List<String> stdout = verifier.loadLines("stdout.txt", "UTF-8");
 
-        for ( Iterator<String> it = stdout.iterator(); it.hasNext(); )
-        {
+        for (Iterator<String> it = stdout.iterator(); it.hasNext(); ) {
             String line = it.next();
-            if ( line.startsWith( "+" ) || line.startsWith( "EMMA" ) )
-            {
+            if (line.startsWith("+") || line.startsWith("EMMA")) {
                 it.remove();
             }
         }
 
-        if ( getMavenVersion().getMajorVersion() < 4 )
-        {
+        if (getMavenVersion().getMajorVersion() < 4) {
             assertEquals(Collections.EMPTY_LIST, stdout);
-        }
-        else
-        {
-            assertEquals( 1, stdout.size() );
-            assertEquals( "Unable to find the root directory. Create a .mvn directory in the root directory or add the root=\"true\" attribute on the root project's model to identify it.", stdout.iterator().next() );
+        } else {
+            assertEquals(1, stdout.size());
+            assertEquals(
+                    "Unable to find the root directory. Create a .mvn directory in the root directory or add the root=\"true\" attribute on the root project's model to identify it.",
+                    stdout.iterator().next());
         }
 
-        List<String> log = verifier.loadLines( "maven.log", "UTF-8" );
+        List<String> log = verifier.loadLines("maven.log", "UTF-8");
 
-        assertFalse( log.isEmpty() );
+        assertFalse(log.isEmpty());
     }
-
 }

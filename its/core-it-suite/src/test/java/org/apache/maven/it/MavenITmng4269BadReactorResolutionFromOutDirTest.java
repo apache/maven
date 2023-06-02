@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  */
-public class MavenITmng4269BadReactorResolutionFromOutDirTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4269BadReactorResolutionFromOutDirTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4269BadReactorResolutionFromOutDirTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4269BadReactorResolutionFromOutDirTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -50,25 +45,22 @@ public class MavenITmng4269BadReactorResolutionFromOutDirTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4269" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4269");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
         // NOTE: It's a crucial prerequisite to create the output directory, i.e. the bad choice
-        new File( testDir, "target/classes" ).mkdirs();
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4269" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        new File(testDir, "target/classes").mkdirs();
+        verifier.deleteArtifacts("org.apache.maven.its.mng4269");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
         // This should use the previous installation/deployment from the repo, not the invalid output directory
-        verifier.addCliArgument( "org.apache.maven.its.mng4269:maven-mng4269-plugin:0.1:touch" );
+        verifier.addCliArgument("org.apache.maven.its.mng4269:maven-mng4269-plugin:0.1:touch");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
     }
-
 }

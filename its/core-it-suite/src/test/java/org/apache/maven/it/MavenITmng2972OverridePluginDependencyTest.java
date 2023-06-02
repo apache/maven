@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng2972OverridePluginDependencyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2972OverridePluginDependencyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2972OverridePluginDependencyTest()
-    {
-        super( "(2.0.8,)" );
+    public MavenITmng2972OverridePluginDependencyTest() {
+        super("(2.0.8,)");
     }
 
     /**
@@ -48,23 +43,21 @@ public class MavenITmng2972OverridePluginDependencyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitLifecycleInvocation()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2972/test1" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifact( "org.apache.maven.its.plugins.class-loader", "dep-b", "0.2-mng-2972", "jar" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+    public void testitLifecycleInvocation() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2972/test1");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifact("org.apache.maven.its.plugins.class-loader", "dep-b", "0.2-mng-2972", "jar");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
-        verify( pclProps );
+        Properties pclProps = verifier.loadProperties("target/pcl.properties");
+        verify(pclProps);
     }
 
     /**
@@ -80,34 +73,29 @@ public class MavenITmng2972OverridePluginDependencyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCommandLineInvocation()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2972/test2" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifact( "org.apache.maven.its.plugins.class-loader", "dep-b", "9.9-MNG-2972", "jar" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-class-loader:2.1-SNAPSHOT:load" );
+    public void testitCommandLineInvocation() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2972/test2");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifact("org.apache.maven.its.plugins.class-loader", "dep-b", "9.9-MNG-2972", "jar");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-class-loader:2.1-SNAPSHOT:load");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
-        verify( pclProps );
+        Properties pclProps = verifier.loadProperties("target/pcl.properties");
+        verify(pclProps);
     }
 
-    private void verify( Properties pclProps )
-        throws Exception
-    {
-        assertNotNull( pclProps.getProperty( "org.apache.maven.its.mng2972.MNG2972" ) );
-        assertNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );
-        assertNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassB" ) );
-        assertEquals( "1", pclProps.getProperty( "org/apache/maven/its/mng2972/mng-2972.properties.count" ) );
-        assertEquals( "0", pclProps.getProperty( "org/apache/maven/plugin/coreit/a.properties.count" ) );
-        assertEquals( "0", pclProps.getProperty( "org/apache/maven/plugin/coreit/b.properties.count" ) );
+    private void verify(Properties pclProps) throws Exception {
+        assertNotNull(pclProps.getProperty("org.apache.maven.its.mng2972.MNG2972"));
+        assertNull(pclProps.getProperty("org.apache.maven.plugin.coreit.ClassA"));
+        assertNull(pclProps.getProperty("org.apache.maven.plugin.coreit.ClassB"));
+        assertEquals("1", pclProps.getProperty("org/apache/maven/its/mng2972/mng-2972.properties.count"));
+        assertEquals("0", pclProps.getProperty("org/apache/maven/plugin/coreit/a.properties.count"));
+        assertEquals("0", pclProps.getProperty("org/apache/maven/plugin/coreit/b.properties.count"));
     }
-
 }

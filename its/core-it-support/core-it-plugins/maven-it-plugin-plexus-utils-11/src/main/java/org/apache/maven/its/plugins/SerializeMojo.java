@@ -1,5 +1,3 @@
-package org.apache.maven.its.plugins;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.its.plugins;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.its.plugins;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,39 +36,30 @@ import org.codehaus.plexus.util.xml.pull.MXSerializer;
 import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 
 /**
-  */
-@Mojo( name = "serialize", defaultPhase = LifecyclePhase.VALIDATE )
-public class SerializeMojo
-    extends AbstractMojo
-{
+ */
+@Mojo(name = "serialize", defaultPhase = LifecyclePhase.VALIDATE)
+public class SerializeMojo extends AbstractMojo {
 
     /**
      */
-    @Parameter( defaultValue = "${project.build.directory}/serialized.xml" )
+    @Parameter(defaultValue = "${project.build.directory}/serialized.xml")
     private File file;
 
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         Writer writer = null;
         XmlSerializer s = new MXSerializer();
-        try
-        {
+        try {
             file.getParentFile().mkdirs();
-            writer = new OutputStreamWriter( new FileOutputStream( file ), "UTF-8" );
-            s.setOutput( writer );
+            writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+            s.setOutput(writer);
 
-            Xpp3Dom dom = new Xpp3Dom( "root" );
+            Xpp3Dom dom = new Xpp3Dom("root");
 
-            dom.writeToSerializer( "", s );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
-        finally
-        {
-            IOUtil.close( writer );
+            dom.writeToSerializer("", s);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        } finally {
+            IOUtil.close(writer);
         }
     }
 }

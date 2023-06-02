@@ -18,42 +18,38 @@
  */
 package org.apache.maven.it;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
-
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng7487DeadlockTest extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng7487DeadlockTest extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7487-deadlock";
 
-    public MavenITmng7487DeadlockTest()
-    {
-        super( "(,3.8.4],[3.8.6,)" );
+    public MavenITmng7487DeadlockTest() {
+        super("(,3.8.4],[3.8.6,)");
     }
 
     @Test
-    public void testDeadlock() throws IOException, VerificationException
-    {
-        final File rootDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
+    public void testDeadlock() throws IOException, VerificationException {
+        final File rootDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
 
-        final File pluginDir = new File( rootDir, "plugin" );
-        final Verifier pluginVerifier = newVerifier( pluginDir.getAbsolutePath() );
-        pluginVerifier.addCliArgument( "install" );
+        final File pluginDir = new File(rootDir, "plugin");
+        final Verifier pluginVerifier = newVerifier(pluginDir.getAbsolutePath());
+        pluginVerifier.addCliArgument("install");
         pluginVerifier.execute();
 
-        final File consumerDir = new File( rootDir, "consumer" );
-        final Verifier consumerVerifier = newVerifier( consumerDir.getAbsolutePath() );
-        consumerVerifier.setForkJvm( true );;
-        consumerVerifier.addCliArgument( "-T2" );
-        consumerVerifier.addCliArgument( "package" );
+        final File consumerDir = new File(rootDir, "consumer");
+        final Verifier consumerVerifier = newVerifier(consumerDir.getAbsolutePath());
+        consumerVerifier.setForkJvm(true);
+        ;
+        consumerVerifier.addCliArgument("-T2");
+        consumerVerifier.addCliArgument("package");
         consumerVerifier.execute();
         consumerVerifier.verifyErrorFreeLog();
-        consumerVerifier.verifyTextInLog( "BUILD SUCCESS" );
+        consumerVerifier.verifyTextInLog("BUILD SUCCESS");
     }
-
 }

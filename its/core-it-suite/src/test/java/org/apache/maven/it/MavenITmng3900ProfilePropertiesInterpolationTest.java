@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3900ProfilePropertiesInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3900ProfilePropertiesInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3900ProfilePropertiesInterpolationTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng3900ProfilePropertiesInterpolationTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,23 +43,20 @@ public class MavenITmng3900ProfilePropertiesInterpolationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3900()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3900" );
+    public void testitMNG3900() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3900");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-Pinterpolation-profile" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-Pinterpolation-profile");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "PASSED", props.getProperty( "project.properties.test" ) );
-        assertEquals( "PASSED", props.getProperty( "project.properties.property" ) );
-        assertEquals( "http://maven.apache.org/PASSED", props.getProperty( "project.url" ) );
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("PASSED", props.getProperty("project.properties.test"));
+        assertEquals("PASSED", props.getProperty("project.properties.property"));
+        assertEquals("http://maven.apache.org/PASSED", props.getProperty("project.url"));
     }
-
 }

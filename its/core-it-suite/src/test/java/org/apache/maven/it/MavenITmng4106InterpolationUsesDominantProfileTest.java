@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng4106InterpolationUsesDominantProfileTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4106InterpolationUsesDominantProfileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4106InterpolationUsesDominantProfileTest()
-    {
-        super( "[2.0.5,)" );
+    public MavenITmng4106InterpolationUsesDominantProfileTest() {
+        super("[2.0.5,)");
     }
 
     /**
@@ -50,41 +45,34 @@ public class MavenITmng4106InterpolationUsesDominantProfileTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG4106()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4106" );
+    public void testitMNG4106() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4106");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        if ( matchesVersionRange( "[4.0.0-alpha-1,)" ) )
-        {
-            verifier.addCliArgument( "-Ppom-a,pom-b,settings-a,settings-b" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
+            verifier.addCliArgument("-Ppom-a,pom-b,settings-a,settings-b");
+        } else {
+            verifier.addCliArgument("-Ppom-a,pom-b,profiles-a,profiles-b,settings-a,settings-b");
         }
-        else
-        {
-            verifier.addCliArgument( "-Ppom-a,pom-b,profiles-a,profiles-b,settings-a,settings-b" );
-        }
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
+        Properties props = verifier.loadProperties("target/pom.properties");
 
-        assertEquals( "b", props.getProperty( "project.properties.pomProperty" ) );
-        assertEquals( "b", props.getProperty( "project.properties.pom" ) );
+        assertEquals("b", props.getProperty("project.properties.pomProperty"));
+        assertEquals("b", props.getProperty("project.properties.pom"));
 
-        assertEquals( "b", props.getProperty( "project.properties.settingsProperty" ) );
-        assertEquals( "b", props.getProperty( "project.properties.settings" ) );
+        assertEquals("b", props.getProperty("project.properties.settingsProperty"));
+        assertEquals("b", props.getProperty("project.properties.settings"));
 
-        if ( matchesVersionRange( "(,3.0-alpha-1)" ) )
-        {
+        if (matchesVersionRange("(,3.0-alpha-1)")) {
             // MNG-4060, profiles.xml support dropped
-            assertEquals( "b", props.getProperty( "project.properties.profilesProperty" ) );
-            assertEquals( "b", props.getProperty( "project.properties.profiles" ) );
+            assertEquals("b", props.getProperty("project.properties.profilesProperty"));
+            assertEquals("b", props.getProperty("project.properties.profiles"));
         }
     }
-
 }

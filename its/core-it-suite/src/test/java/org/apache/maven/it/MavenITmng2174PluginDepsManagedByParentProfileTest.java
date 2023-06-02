@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng2174PluginDepsManagedByParentProfileTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2174PluginDepsManagedByParentProfileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2174PluginDepsManagedByParentProfileTest()
-    {
-        super( "[2.0.9,3.0-alpha-1),[3.0-alpha-3,)" );
+    public MavenITmng2174PluginDepsManagedByParentProfileTest() {
+        super("[2.0.9,3.0-alpha-1),[3.0-alpha-3,)");
     }
 
     /**
@@ -49,25 +44,22 @@ public class MavenITmng2174PluginDepsManagedByParentProfileTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG2174()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2174" );
+    public void testitMNG2174() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2174");
 
-        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2174" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2174");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pcl.properties" );
-        assertEquals( "1", props.getProperty( "mng-2174.properties.count" ) );
-        assertNotNull( props.getProperty( "mng-2174.properties" ) );
+        Properties props = verifier.loadProperties("target/pcl.properties");
+        assertEquals("1", props.getProperty("mng-2174.properties.count"));
+        assertNotNull(props.getProperty("mng-2174.properties"));
     }
-
 }

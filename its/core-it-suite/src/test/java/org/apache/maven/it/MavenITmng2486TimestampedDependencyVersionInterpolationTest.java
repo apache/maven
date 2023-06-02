@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng2486TimestampedDependencyVersionInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2486TimestampedDependencyVersionInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2486TimestampedDependencyVersionInterpolationTest()
-    {
-        super( "[2.0.5,)" );
+    public MavenITmng2486TimestampedDependencyVersionInterpolationTest() {
+        super("[2.0.5,)");
     }
 
     /**
@@ -49,49 +44,46 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2486" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2486");
 
         Verifier verifier;
 
-        verifier = newVerifier( new File( testDir, "dep-a" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2486" );
-        verifier.addCliArgument( "validate" );
+        verifier = newVerifier(new File(testDir, "dep-a").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2486");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( new File( testDir, "dep-b" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        verifier = newVerifier(new File(testDir, "dep-b").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( new File( testDir, "test" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
+        verifier = newVerifier(new File(testDir, "test").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
         // enforce remote resolution
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2486" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        verifier.deleteArtifacts("org.apache.maven.its.mng2486");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> files = verifier.loadLines( "target/classpath.txt", "UTF-8" );
-        assertTrue( files.toString(), files.contains( "dep-a-0.1-SNAPSHOT.jar" ) );
+        List<String> files = verifier.loadLines("target/classpath.txt", "UTF-8");
+        assertTrue(files.toString(), files.contains("dep-a-0.1-SNAPSHOT.jar"));
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4423SessionDataFromPluginParameterExpressionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4423SessionDataFromPluginParameterExpressionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4423SessionDataFromPluginParameterExpressionTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng4423SessionDataFromPluginParameterExpressionTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -47,22 +42,19 @@ public class MavenITmng4423SessionDataFromPluginParameterExpressionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4423" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4423");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.getSystemProperties().setProperty( "mng4423", "PASSED" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.getSystemProperties().setProperty("mng4423", "PASSED");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "PASSED", props.getProperty( "propertiesParam.mng4423" ) );
-        assertNotNull( props.getProperty( "propertiesParam.java.home" ) );
+        Properties props = verifier.loadProperties("target/config.properties");
+        assertEquals("PASSED", props.getProperty("propertiesParam.mng4423"));
+        assertNotNull(props.getProperty("propertiesParam.java.home"));
     }
-
 }

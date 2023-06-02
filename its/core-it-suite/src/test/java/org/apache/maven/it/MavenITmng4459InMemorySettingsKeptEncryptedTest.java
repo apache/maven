@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4459InMemorySettingsKeptEncryptedTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4459InMemorySettingsKeptEncryptedTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4459InMemorySettingsKeptEncryptedTest()
-    {
-        super( "[2.1.0,3.0-alpha-1),[3.0-alpha-5,)" );
+    public MavenITmng4459InMemorySettingsKeptEncryptedTest() {
+        super("[2.1.0,3.0-alpha-1),[3.0-alpha-5,)");
     }
 
     /**
@@ -48,25 +43,22 @@ public class MavenITmng4459InMemorySettingsKeptEncryptedTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4459" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4459");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.getSystemProperties().setProperty( "settings.security",
-            new File( testDir, "settings-security.xml" ).getAbsolutePath() );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.getSystemProperties()
+                .setProperty("settings.security", new File(testDir, "settings-security.xml").getAbsolutePath());
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/settings.properties" );
-        assertEquals( "{BteqUEnqHecHM7MZfnj9FwLcYbdInWxou1C929Txa0A=}",
-            props.getProperty( "settings.servers.0.password", "" ) );
+        Properties props = verifier.loadProperties("target/settings.properties");
+        assertEquals(
+                "{BteqUEnqHecHM7MZfnj9FwLcYbdInWxou1C929Txa0A=}", props.getProperty("settings.servers.0.password", ""));
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,38 +16,33 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2339">MNG-2339</a>.
  */
-public class MavenITmng2339BadProjectInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng2339BadProjectInterpolationTest()
-    {
-        super( "(2.0.8,)" ); // 2.0.9+
+public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng2339BadProjectInterpolationTest() {
+        super("(2.0.8,)"); // 2.0.9+
     }
 
     @Test
-    public void testitMNG2339a()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2339/a" );
+    public void testitMNG2339a() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2339/a");
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        verifier.addCliArgument( "-Dversion=foo" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-Dversion=foo");
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
@@ -57,40 +50,39 @@ public class MavenITmng2339BadProjectInterpolationTest
 
     // test that -Dversion=1.0 is still available for interpolation.
     @Test
-    public void testitMNG2339b()
-        throws Exception
-    {
-        requiresMavenVersion( "(2.0.8,4.0.0-alpha-1)" );
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2339/b" );
+    public void testitMNG2339b() throws Exception {
+        requiresMavenVersion("(2.0.8,4.0.0-alpha-1)");
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2339/b");
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
 
-        verifier.setLogFileName( "log-pom-specified.txt" );
-        verifier.addCliArgument( "initialize" );
+        verifier.setLogFileName("log-pom-specified.txt");
+        verifier.addCliArgument("initialize");
         verifier.execute();
 
-        assertTrue( "Touchfile using ${project.version} for ${version} does not exist.",
-                    new File( testDir, "target/touch-1.txt" ).exists() );
+        assertTrue(
+                "Touchfile using ${project.version} for ${version} does not exist.",
+                new File(testDir, "target/touch-1.txt").exists());
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
 
-        verifier.addCliArgument( "-Dversion=2" );
-        verifier.setLogFileName( "log-cli-specified.txt" );
-        verifier.addCliArgument( "initialize" );
+        verifier.addCliArgument("-Dversion=2");
+        verifier.setLogFileName("log-cli-specified.txt");
+        verifier.addCliArgument("initialize");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        assertTrue( "Touchfile using CLI-specified ${version} does not exist.",
-                    new File( testDir, "target/touch-2.txt" ).exists() );
+        assertTrue(
+                "Touchfile using CLI-specified ${version} does not exist.",
+                new File(testDir, "target/touch-2.txt").exists());
     }
-
 }

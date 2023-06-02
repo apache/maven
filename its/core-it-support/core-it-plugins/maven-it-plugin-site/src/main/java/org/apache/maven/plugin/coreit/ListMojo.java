@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,29 +25,34 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
 /**
  * Lists the available/configured reports in a properties file.
  *
  * @author Benjamin Bentmann
  *
  */
-@Mojo( name = "list", defaultPhase = LifecyclePhase.INITIALIZE, requiresReports = true )
-public class ListMojo
-    extends AbstractMojo
-{
+@Mojo(name = "list", defaultPhase = LifecyclePhase.INITIALIZE, requiresReports = true)
+public class ListMojo extends AbstractMojo {
 
     /**
      * The path to the properties file used to list the available reports. The properties file will have a key named
      * <code>reports</code> that gives the total count of reports. The keys <code>reports.0</code>,
      * <code>reports.1</code> etc. will be used to denote the qualified class names of the reports.
      */
-    @Parameter( property = "site.properties", defaultValue = "target/reports.properties" )
+    @Parameter(property = "site.properties", defaultValue = "target/reports.properties")
     private File reportsFile;
 
     /**
      * The reports configured for the current build.
      */
-    @Parameter( defaultValue = "${reports}", required = true, readonly = true )
+    @Parameter(defaultValue = "${reports}", required = true, readonly = true)
     private List<?> reports;
 
     /**
@@ -63,49 +60,36 @@ public class ListMojo
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         Properties reportProperties = new Properties();
 
-        reportProperties.setProperty( "reports", "" + reports.size() );
+        reportProperties.setProperty("reports", "" + reports.size());
 
-        for ( int i = 0; i < reports.size(); i++ )
-        {
-            Object report = reports.get( i );
-            getLog().info( "[MAVEN-CORE-IT-LOG] Listing report " + report );
-            reportProperties.setProperty( "reports." + i, report.getClass().getName() );
+        for (int i = 0; i < reports.size(); i++) {
+            Object report = reports.get(i);
+            getLog().info("[MAVEN-CORE-IT-LOG] Listing report " + report);
+            reportProperties.setProperty("reports." + i, report.getClass().getName());
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file " + reportsFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file " + reportsFile);
 
         OutputStream out = null;
-        try
-        {
+        try {
             reportsFile.getParentFile().mkdirs();
-            out = new FileOutputStream( reportsFile );
-            reportProperties.store( out, "MAVEN-CORE-IT-LOG" );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Output file could not be created: " + reportsFile, e );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                try
-                {
+            out = new FileOutputStream(reportsFile);
+            reportProperties.store(out, "MAVEN-CORE-IT-LOG");
+        } catch (IOException e) {
+            throw new MojoExecutionException("Output file could not be created: " + reportsFile, e);
+        } finally {
+            if (out != null) {
+                try {
                     out.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // just ignore
                 }
             }
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Created output file " + reportsFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Created output file " + reportsFile);
     }
-
 }

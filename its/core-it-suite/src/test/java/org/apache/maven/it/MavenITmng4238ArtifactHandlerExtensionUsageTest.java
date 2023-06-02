@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,9 +32,7 @@ import org.junit.jupiter.api.Test;
  * @author John Casey
  *
  */
-public class MavenITmng4238ArtifactHandlerExtensionUsageTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4238ArtifactHandlerExtensionUsageTest extends AbstractMavenIntegrationTestCase {
 
     private static final String GID = "org.apache.maven.its.mng4238";
     private static final String AID = "mng-4238";
@@ -44,22 +40,19 @@ public class MavenITmng4238ArtifactHandlerExtensionUsageTest
     private static final String TYPE = "jar";
     private static final String BAD_TYPE = "coreit";
 
-    public MavenITmng4238ArtifactHandlerExtensionUsageTest()
-    {
-        super( "(2.2.0,)" );
+    public MavenITmng4238ArtifactHandlerExtensionUsageTest() {
+        super("(2.2.0,)");
     }
 
     @Test
-    public void testProjectPackagingUsage()
-        throws IOException, VerificationException
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4238" );
+    public void testProjectPackagingUsage() throws IOException, VerificationException {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4238");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
 
-        verifier.deleteArtifacts( GID );
+        verifier.deleteArtifacts(GID);
 
-        verifier.addCliArgument( "install" );
+        verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
@@ -67,13 +60,13 @@ public class MavenITmng4238ArtifactHandlerExtensionUsageTest
         // Now, if everything worked, we have a .pom and a .jar in the local repo.
         // IF IT DIDN'T, we have a .pom and a .coreit in the local repo...
 
-        String path = verifier.getArtifactPath( GID, AID, VERSION, TYPE );
-        assertTrue( path + " should have been installed.", new File( path ).exists() );
+        String path = verifier.getArtifactPath(GID, AID, VERSION, TYPE);
+        assertTrue(path + " should have been installed.", new File(path).exists());
 
-        path = verifier.getArtifactPath( GID, AID, VERSION, "pom" );
-        assertTrue( path + " should have been installed.", new File( path ).exists() );
+        path = verifier.getArtifactPath(GID, AID, VERSION, "pom");
+        assertTrue(path + " should have been installed.", new File(path).exists());
 
-        path = verifier.getArtifactPath( GID, AID, VERSION, BAD_TYPE );
-        assertFalse( path + " should NOT have been installed.", new File( path ).exists() );
+        path = verifier.getArtifactPath(GID, AID, VERSION, BAD_TYPE);
+        assertFalse(path + " should NOT have been installed.", new File(path).exists());
     }
 }

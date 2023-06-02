@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -29,30 +28,28 @@ import org.apache.maven.plugins.annotations.Parameter;
  *
  * @author Slawomir Jaranowski
  */
-@Mojo( name = "read-only-config", defaultPhase = LifecyclePhase.VALIDATE )
-public class ReadOnlyConfigMojo extends AbstractMojo
-{
+@Mojo(name = "read-only-config", defaultPhase = LifecyclePhase.VALIDATE)
+public class ReadOnlyConfigMojo extends AbstractMojo {
     /**
      * Only such has sense ...
      */
-    @Parameter( defaultValue = "${project.version}", readonly = true )
+    @Parameter(defaultValue = "${project.version}", readonly = true)
     String readOnlyWithDefault;
 
     /**
      * strange definition ... but possible
      */
-    @Parameter( readonly = true )
+    @Parameter(readonly = true)
     private String readOnlyWithOutDefaults;
 
-    @Parameter( property = "project.version", readonly = true )
+    @Parameter(property = "project.version", readonly = true)
     String readOnlyWithProperty;
 
-    @Parameter( property = "user.property", readonly = true )
+    @Parameter(property = "user.property", readonly = true)
     String readOnlyWithUserProperty;
 
     @Override
-    public void execute()
-    {
-        getLog().info( "[MAVEN-CORE-IT-LOG]" );
+    public void execute() {
+        getLog().info("[MAVEN-CORE-IT-LOG]");
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +28,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.shared.utils.io.FileUtils;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -42,17 +40,14 @@ import org.junit.jupiter.api.Test;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3415">MNG-3415</a>.
  */
-public class MavenITmng3415JunkRepositoryMetadataTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenIntegrationTestCase {
     private static final String RESOURCE_BASE = "/mng-3415";
 
-    public MavenITmng3415JunkRepositoryMetadataTest()
-    {
+    public MavenITmng3415JunkRepositoryMetadataTest() {
         // we're going to control the test execution according to the maven version present within each test method.
         // all methods should execute as long as we're using maven 2.0.9+, but the specific tests may vary a little
         // depending on which version we're using above 2.0.8.
-        super( "(2.0.8,)" ); // only test in 2.0.9+
+        super("(2.0.8,)"); // only test in 2.0.9+
     }
 
     /**
@@ -81,51 +76,48 @@ public class MavenITmng3415JunkRepositoryMetadataTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitTransferFailed()
-        throws Exception
-    {
+    public void testitTransferFailed() throws Exception {
         String methodName = getMethodName();
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_BASE );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_BASE);
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3415" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng3415");
 
-        setupDummyDependency( verifier, testDir, true );
+        setupDummyDependency(verifier, testDir, true);
 
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
-        filterProps.put( "@protocol@", "invalid" );
-        filterProps.put( "@port@", "0" );
-        File settings = verifier.filterFile( "settings-template.xml", "settings-a.xml", "UTF-8", filterProps );
+        filterProps.put("@protocol@", "invalid");
+        filterProps.put("@port@", "0");
+        File settings = verifier.filterFile("settings-template.xml", "settings-a.xml", "UTF-8", filterProps);
 
-        verifier.addCliArgument( "-X" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( settings.getName() );
+        verifier.addCliArgument("-X");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument(settings.getName());
 
-        verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.setLogFileName("log-" + methodName + "-firstBuild.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        assertMetadataMissing( verifier );
+        assertMetadataMissing(verifier);
 
-        setupDummyDependency( verifier, testDir, true );
+        setupDummyDependency(verifier, testDir, true);
 
-        verifier.setLogFileName( "log-" + methodName + "-secondBuild.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.setLogFileName("log-" + methodName + "-secondBuild.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        assertMetadataMissing( verifier );
+        assertMetadataMissing(verifier);
     }
 
-    private String getMethodName()
-    {
+    private String getMethodName() {
         return new Throwable().getStackTrace()[1].getMethodName();
     }
 
@@ -155,157 +147,145 @@ public class MavenITmng3415JunkRepositoryMetadataTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testShouldNotRepeatedlyUpdateOnResourceNotFoundException()
-        throws Exception
-    {
+    public void testShouldNotRepeatedlyUpdateOnResourceNotFoundException() throws Exception {
         String methodName = getMethodName();
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_BASE );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_BASE);
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3415" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng3415");
 
         final Deque<String> requestUris = new ConcurrentLinkedDeque<>();
 
-        Handler repoHandler = new AbstractHandler()
-        {
+        Handler repoHandler = new AbstractHandler() {
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
-            {
-                System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
+            public void handle(
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
 
-                requestUris.add( request.getRequestURI() );
+                requestUris.add(request.getRequestURI());
 
-                response.setStatus( HttpServletResponse.SC_NOT_FOUND );
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
-                ( (Request) request ).setHandled( true );
+                ((Request) request).setHandled(true);
             }
         };
 
-        Server server = new Server( 0 );
-        server.setHandler( repoHandler );
+        Server server = new Server(0);
+        server.setHandler(repoHandler);
 
-        try
-        {
+        try {
             server.start();
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
+            if (server.isFailed()) {
+                fail("Couldn't bind the server socket to a free port!");
             }
 
-            int port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-            System.out.println( "Bound server socket to the port " + port );
+            int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
+            System.out.println("Bound server socket to the port " + port);
 
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
-            filterProps.put( "@protocol@", "http" );
-            filterProps.put( "@port@", Integer.toString( port ) );
-            File settings = verifier.filterFile( "settings-template.xml", "settings-b.xml", "UTF-8", filterProps );
+            filterProps.put("@protocol@", "http");
+            filterProps.put("@port@", Integer.toString(port));
+            File settings = verifier.filterFile("settings-template.xml", "settings-b.xml", "UTF-8", filterProps);
 
-            verifier.addCliArgument( "-X" );
-            verifier.addCliArgument( "-s" );
-            verifier.addCliArgument( settings.getName() );
+            verifier.addCliArgument("-X");
+            verifier.addCliArgument("-s");
+            verifier.addCliArgument(settings.getName());
 
-            setupDummyDependency( verifier, testDir, true );
+            setupDummyDependency(verifier, testDir, true);
 
-            verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
-            verifier.addCliArgument( "validate" );
+            verifier.setLogFileName("log-" + methodName + "-firstBuild.txt");
+            verifier.addCliArgument("validate");
             verifier.execute();
 
             verifier.verifyErrorFreeLog();
 
-            assertTrue( requestUris.toString(), requestUris.contains(
-                "/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml" ) );
+            assertTrue(
+                    requestUris.toString(),
+                    requestUris.contains("/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml"));
 
             requestUris.clear();
 
-            File updateCheckFile = getUpdateCheckFile( verifier );
+            File updateCheckFile = getUpdateCheckFile(verifier);
             long firstLastMod = updateCheckFile.lastModified();
 
-            setupDummyDependency( verifier, testDir, false );
+            setupDummyDependency(verifier, testDir, false);
 
-            verifier.setLogFileName( "log-" + methodName + "-secondBuild.txt" );
-            verifier.addCliArgument( "validate" );
+            verifier.setLogFileName("log-" + methodName + "-secondBuild.txt");
+            verifier.addCliArgument("validate");
             verifier.execute();
 
             verifier.verifyErrorFreeLog();
 
-            assertFalse( requestUris.toString(), requestUris.contains(
-                "/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml" ) );
+            assertFalse(
+                    requestUris.toString(),
+                    requestUris.contains("/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml"));
 
             assertEquals(
-                "Last-modified time should be unchanged from first build through second build for the file we use for"
-                    + " updateInterval checks.",
-                firstLastMod, updateCheckFile.lastModified() );
-        }
-        finally
-        {
+                    "Last-modified time should be unchanged from first build through second build for the file we use for"
+                            + " updateInterval checks.",
+                    firstLastMod,
+                    updateCheckFile.lastModified());
+        } finally {
             server.stop();
             server.join();
         }
     }
 
-    private void assertMetadataMissing( Verifier verifier )
-    {
-        File metadata = getMetadataFile( verifier );
+    private void assertMetadataMissing(Verifier verifier) {
+        File metadata = getMetadataFile(verifier);
 
-        assertFalse( "Metadata file should NOT be present in local repository: " + metadata.getAbsolutePath(),
-                     metadata.exists() );
+        assertFalse(
+                "Metadata file should NOT be present in local repository: " + metadata.getAbsolutePath(),
+                metadata.exists());
     }
 
-    private void setupDummyDependency( Verifier verifier, File testDir, boolean resetUpdateInterval )
-        throws IOException
-    {
+    private void setupDummyDependency(Verifier verifier, File testDir, boolean resetUpdateInterval) throws IOException {
         String gid = "org.apache.maven.its.mng3415";
         String aid = "missing";
         String version = "1.0-SNAPSHOT";
 
-        if ( resetUpdateInterval )
-        {
-            verifier.deleteArtifacts( gid );
+        if (resetUpdateInterval) {
+            verifier.deleteArtifacts(gid);
         }
 
-        File pom = new File( verifier.getArtifactPath( gid, aid, version, "pom" ) );
+        File pom = new File(verifier.getArtifactPath(gid, aid, version, "pom"));
 
-        File pomSrc = new File( testDir, "dependency-pom.xml" );
+        File pomSrc = new File(testDir, "dependency-pom.xml");
 
-        System.out.println( "Copying dependency POM\nfrom: " + pomSrc + "\nto: " + pom );
-        FileUtils.copyFile( pomSrc, pom );
+        System.out.println("Copying dependency POM\nfrom: " + pomSrc + "\nto: " + pom);
+        FileUtils.copyFile(pomSrc, pom);
     }
 
-    private File getMetadataFile( Verifier verifier )
-    {
+    private File getMetadataFile(Verifier verifier) {
         String gid = "org.apache.maven.its.mng3415";
         String aid = "missing";
         String version = "1.0-SNAPSHOT";
         String name = "maven-metadata-testing-repo.xml";
 
-        return new File( verifier.getArtifactMetadataPath( gid, aid, version, name ) );
+        return new File(verifier.getArtifactMetadataPath(gid, aid, version, name));
     }
 
     /**
      * If the current maven version is < 3.0, we'll use the metadata file itself (old maven-artifact code)...
      * otherwise, use the new resolver-status.properties file (new artifact code).
      */
-    private File getUpdateCheckFile( Verifier verifier )
-    {
+    private File getUpdateCheckFile(Verifier verifier) {
         String gid = "org.apache.maven.its.mng3415";
         String aid = "missing";
         String version = "1.0-SNAPSHOT";
         String name;
 
         // < 3.0 (including snapshots)
-        if ( matchesVersionRange( "(2.0.8,3.0-alpha-1)" ) )
-        {
+        if (matchesVersionRange("(2.0.8,3.0-alpha-1)")) {
             name = "maven-metadata-testing-repo.xml";
-        }
-        else
-        {
+        } else {
             name = "resolver-status.properties";
         }
 
-        return new File( verifier.getArtifactMetadataPath( gid, aid, version, name ) );
+        return new File(verifier.getArtifactMetadataPath(gid, aid, version, name));
     }
 }

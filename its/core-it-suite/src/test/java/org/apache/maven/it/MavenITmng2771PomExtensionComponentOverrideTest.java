@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -34,12 +32,9 @@ import org.junit.jupiter.api.Test;
  *
  */
 @Disabled
-public class MavenITmng2771PomExtensionComponentOverrideTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng2771PomExtensionComponentOverrideTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenITmng2771PomExtensionComponentOverrideTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng2771PomExtensionComponentOverrideTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,24 +43,22 @@ public class MavenITmng2771PomExtensionComponentOverrideTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG2771()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2771/extension" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "install" );
+    public void testitMNG2771() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2771/extension");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2771/plugin" );
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "install" );
+        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2771/plugin");
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2771/project" );
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "verify" );
+        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2771/project");
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }

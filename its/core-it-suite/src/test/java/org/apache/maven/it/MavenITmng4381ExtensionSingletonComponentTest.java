@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4381ExtensionSingletonComponentTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4381ExtensionSingletonComponentTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4381ExtensionSingletonComponentTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng4381ExtensionSingletonComponentTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -48,23 +43,20 @@ public class MavenITmng4381ExtensionSingletonComponentTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4381" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4381");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "sub-a/target" );
-        verifier.deleteDirectory( "sub-b/target" );
-        verifier.addCliArgument( "initialize" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("sub-a/target");
+        verifier.deleteDirectory("sub-b/target");
+        verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "sub-b/target/singleton.properties" );
-        assertEquals( "called", props.getProperty( "sub-a-provider" ) );
-        assertEquals( "called", props.getProperty( "sub-a-consumer" ) );
-        assertEquals( "called", props.getProperty( "sub-b-provider" ) );
+        Properties props = verifier.loadProperties("sub-b/target/singleton.properties");
+        assertEquals("called", props.getProperty("sub-a-provider"));
+        assertEquals("called", props.getProperty("sub-a-consumer"));
+        assertEquals("called", props.getProperty("sub-b-provider"));
     }
-
 }

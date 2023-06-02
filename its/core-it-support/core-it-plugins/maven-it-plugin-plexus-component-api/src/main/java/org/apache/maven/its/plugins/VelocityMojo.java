@@ -1,5 +1,3 @@
-package org.apache.maven.its.plugins;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.its.plugins;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.its.plugins;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -28,24 +27,19 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.codehaus.plexus.velocity.VelocityComponent;
 
 /**
-  */
-@Mojo( name = "velocity", defaultPhase = LifecyclePhase.VALIDATE )
-public class VelocityMojo
-    extends AbstractMojo
-{
+ */
+@Mojo(name = "velocity", defaultPhase = LifecyclePhase.VALIDATE)
+public class VelocityMojo extends AbstractMojo {
     /**
      */
     @Component
     protected VelocityComponent velocityComponent;
 
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         // velocityComponent should not be null
         velocityComponent.getEngine();
 
-        try
-        {
+        try {
             // velocityComponent engine should not be null
             // this is the real test to check that we got the right Initializable interface in both Plexus and the
             // component
@@ -53,11 +47,9 @@ public class VelocityMojo
              * NOTE: There's a bug in the plexus-velocity:1.1.7 component that fails to transform "/template.vm" into
              * a proper resource name before searching the context class loader so we avoid the leading slash here.
              */
-            velocityComponent.getEngine().getTemplate( "template.vm" );
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
+            velocityComponent.getEngine().getTemplate("template.vm");
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getMessage(), e);
         }
     }
 }

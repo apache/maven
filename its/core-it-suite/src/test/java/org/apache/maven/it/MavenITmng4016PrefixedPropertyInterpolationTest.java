@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng4016PrefixedPropertyInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4016PrefixedPropertyInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4016PrefixedPropertyInterpolationTest()
-    {
-        super( "(2.1.0-M1,)" );
+    public MavenITmng4016PrefixedPropertyInterpolationTest() {
+        super("(2.1.0-M1,)");
     }
 
     /**
@@ -49,23 +44,20 @@ public class MavenITmng4016PrefixedPropertyInterpolationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG4016()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4016" );
+    public void testitMNG4016() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4016");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/model.properties" );
-        Properties props = verifier.loadProperties( "target/model.properties" );
-        assertEquals( "PASSED-1", props.getProperty( "project.properties.projectProperty" ) );
-        assertEquals( "PASSED-2", props.getProperty( "project.properties.pomProperty" ) );
-        assertEquals( "PASSED-3", props.getProperty( "project.properties.envProperty" ) );
+        verifier.verifyFilePresent("target/model.properties");
+        Properties props = verifier.loadProperties("target/model.properties");
+        assertEquals("PASSED-1", props.getProperty("project.properties.projectProperty"));
+        assertEquals("PASSED-2", props.getProperty("project.properties.pomProperty"));
+        assertEquals("PASSED-3", props.getProperty("project.properties.envProperty"));
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +31,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.it.utils.DeployedResource;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -62,9 +60,7 @@ import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng4235HttpAuthDeploymentChecksumsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMavenIntegrationTestCase {
     private File testDir;
 
     private Server server;
@@ -73,60 +69,53 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
 
     private final RepoHandler repoHandler = new RepoHandler();
 
-    public MavenITmng4235HttpAuthDeploymentChecksumsTest()
-    {
-        super( "[2.0.5,2.2.0),(2.2.0,)" );
+    public MavenITmng4235HttpAuthDeploymentChecksumsTest() {
+        super("[2.0.5,2.2.0),(2.2.0,)");
     }
 
     @BeforeEach
-    protected void setUp()
-        throws Exception
-    {
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4235" );
+    protected void setUp() throws Exception {
+        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4235");
 
-        repoHandler.setResourceBase( testDir.getAbsolutePath() );
+        repoHandler.setResourceBase(testDir.getAbsolutePath());
 
         Constraint constraint = new Constraint();
-        constraint.setName( Constraint.__BASIC_AUTH );
-        constraint.setRoles( new String[]{ "deployer" } );
-        constraint.setAuthenticate( true );
+        constraint.setName(Constraint.__BASIC_AUTH);
+        constraint.setRoles(new String[] {"deployer"});
+        constraint.setAuthenticate(true);
 
         ConstraintMapping constraintMapping = new ConstraintMapping();
-        constraintMapping.setConstraint( constraint );
-        constraintMapping.setPathSpec( "/*" );
+        constraintMapping.setConstraint(constraint);
+        constraintMapping.setPathSpec("/*");
 
-        HashLoginService userRealm = new HashLoginService( "TestRealm" );
+        HashLoginService userRealm = new HashLoginService("TestRealm");
         UserStore userStore = new UserStore();
-        userStore.addUser( "testuser", new Password( "testpass" ), new String[] { "deployer" } );
-        userRealm.setUserStore( userStore );
+        userStore.addUser("testuser", new Password("testpass"), new String[] {"deployer"});
+        userRealm.setUserStore(userStore);
 
         ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-        securityHandler.setLoginService( userRealm );
-        securityHandler.setAuthMethod( __BASIC_AUTH );
-        securityHandler.setConstraintMappings( new ConstraintMapping[] { constraintMapping } );
+        securityHandler.setLoginService(userRealm);
+        securityHandler.setAuthMethod(__BASIC_AUTH);
+        securityHandler.setConstraintMappings(new ConstraintMapping[] {constraintMapping});
 
         HandlerList handlerList = new HandlerList();
-        handlerList.addHandler( securityHandler );
-        handlerList.addHandler( repoHandler );
-        handlerList.addHandler( new DefaultHandler() );
+        handlerList.addHandler(securityHandler);
+        handlerList.addHandler(repoHandler);
+        handlerList.addHandler(new DefaultHandler());
 
-        server = new Server( 0 );
-        server.setHandler( handlerList );
+        server = new Server(0);
+        server.setHandler(handlerList);
         server.start();
-        if ( server.isFailed() )
-        {
-            fail( "Couldn't bind the server socket to a free port!" );
+        if (server.isFailed()) {
+            fail("Couldn't bind the server socket to a free port!");
         }
-        port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-        System.out.println( "Bound server socket to the port " + port );
+        port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
+        System.out.println("Bound server socket to the port " + port);
     }
 
     @AfterEach
-    protected void tearDown()
-        throws Exception
-    {
-        if ( server != null )
-        {
+    protected void tearDown() throws Exception {
+        if (server != null) {
             server.stop();
             server.join();
         }
@@ -141,93 +130,80 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
+    public void testit() throws Exception {
         Map<String, String> filterProps = new HashMap<>();
-        filterProps.put( "@port@", Integer.toString( port ) );
+        filterProps.put("@port@", Integer.toString(port));
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", filterProps );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4235" );
-        verifier.deleteDirectory( "repo" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8", filterProps);
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4235");
+        verifier.deleteDirectory("repo");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/0.1/test-0.1.jar", ".sha1", "SHA-1" );
-        assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/0.1/test-0.1.jar", ".md5", "MD5" );
+        assertHash(verifier, "repo/org/apache/maven/its/mng4235/test/0.1/test-0.1.jar", ".sha1", "SHA-1");
+        assertHash(verifier, "repo/org/apache/maven/its/mng4235/test/0.1/test-0.1.jar", ".md5", "MD5");
 
-        assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/0.1/test-0.1.pom", ".sha1", "SHA-1" );
-        assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/0.1/test-0.1.pom", ".md5", "MD5" );
+        assertHash(verifier, "repo/org/apache/maven/its/mng4235/test/0.1/test-0.1.pom", ".sha1", "SHA-1");
+        assertHash(verifier, "repo/org/apache/maven/its/mng4235/test/0.1/test-0.1.pom", ".md5", "MD5");
 
-        assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/maven-metadata.xml", ".sha1", "SHA-1" );
-        assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/maven-metadata.xml", ".md5", "MD5" );
+        assertHash(verifier, "repo/org/apache/maven/its/mng4235/test/maven-metadata.xml", ".sha1", "SHA-1");
+        assertHash(verifier, "repo/org/apache/maven/its/mng4235/test/maven-metadata.xml", ".md5", "MD5");
 
-        for ( DeployedResource deployedResource : repoHandler.deployedResources )
-        {
-            if ( StringUtils.equalsIgnoreCase( "chunked", deployedResource.transferEncoding ) )
-            {
-                fail( "deployedResource " + deployedResource
-                          + " use chunked transfert encoding some http server doesn't support that" );
+        for (DeployedResource deployedResource : repoHandler.deployedResources) {
+            if (StringUtils.equalsIgnoreCase("chunked", deployedResource.transferEncoding)) {
+                fail("deployedResource " + deployedResource
+                        + " use chunked transfert encoding some http server doesn't support that");
             }
         }
     }
 
-    private void assertHash( Verifier verifier, String dataFile, String hashExt, String algo )
-        throws Exception
-    {
-        String actualHash = ItUtils.calcHash( new File( verifier.getBasedir(), dataFile ), algo );
+    private void assertHash(Verifier verifier, String dataFile, String hashExt, String algo) throws Exception {
+        String actualHash = ItUtils.calcHash(new File(verifier.getBasedir(), dataFile), algo);
 
-        String expectedHash = verifier.loadLines( dataFile + hashExt, "UTF-8" ).get( 0 ).trim();
+        String expectedHash =
+                verifier.loadLines(dataFile + hashExt, "UTF-8").get(0).trim();
 
-        assertTrue( "expected=" + expectedHash + ", actual=" + actualHash,
-                    expectedHash.equalsIgnoreCase( actualHash ) );
+        assertTrue("expected=" + expectedHash + ", actual=" + actualHash, expectedHash.equalsIgnoreCase(actualHash));
     }
 
-    private static class RepoHandler
-            extends ResourceHandler
-    {
+    private static class RepoHandler extends ResourceHandler {
         private final Deque<DeployedResource> deployedResources = new ConcurrentLinkedDeque<>();
 
         @Override
         public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException
-        {
-            System.out.println( request.getMethod() + " " + request.getRequestURI() );
+                throws IOException, ServletException {
+            System.out.println(request.getMethod() + " " + request.getRequestURI());
 
-            if ( "PUT".equals( request.getMethod() ) )
-            {
-                Resource resource = getResource( request.getPathInfo() );
+            if ("PUT".equals(request.getMethod())) {
+                Resource resource = getResource(request.getPathInfo());
 
                 // NOTE: This can get called concurrently but File.mkdirs() isn't thread-safe in all JREs
                 File dir = resource.getFile().getParentFile();
-                for ( int i = 0; i < 10 && !dir.exists(); i++ )
-                {
+                for (int i = 0; i < 10 && !dir.exists(); i++) {
                     dir.mkdirs();
                 }
 
-                Files.copy( request.getInputStream(), resource.getFile().toPath(), REPLACE_EXISTING );
+                Files.copy(request.getInputStream(), resource.getFile().toPath(), REPLACE_EXISTING);
 
                 DeployedResource deployedResource = new DeployedResource();
 
                 deployedResource.httpMethod = request.getMethod();
                 deployedResource.requestUri = request.getRequestURI();
-                deployedResource.transferEncoding = request.getHeader( "Transfer-Encoding" );
-                deployedResource.contentLength = request.getHeader( "Content-Length" );
+                deployedResource.transferEncoding = request.getHeader("Transfer-Encoding");
+                deployedResource.contentLength = request.getHeader("Content-Length");
 
-                deployedResources.add( deployedResource );
+                deployedResources.add(deployedResource);
 
-                response.setStatus( HttpServletResponse.SC_NO_CONTENT );
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 
-                ( (Request) request ).setHandled( true );
-            }
-            else
-            {
-                super.handle( target, baseRequest, request, response );
+                ((Request) request).setHandled(true);
+            } else {
+                super.handle(target, baseRequest, request, response);
             }
         }
     }

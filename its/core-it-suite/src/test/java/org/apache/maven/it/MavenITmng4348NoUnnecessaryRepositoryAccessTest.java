@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +27,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -44,13 +42,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng4348NoUnnecessaryRepositoryAccessTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4348NoUnnecessaryRepositoryAccessTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4348NoUnnecessaryRepositoryAccessTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4348NoUnnecessaryRepositoryAccessTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -60,66 +55,57 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4348" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4348");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
+        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<String>());
 
-        Handler repoHandler = new AbstractHandler()
-        {
+        Handler repoHandler = new AbstractHandler() {
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request,
-                                HttpServletResponse response )
-            {
-                System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
+            public void handle(
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
 
                 // NOTE: Old Maven versions use the test repo also to check for plugin updates so we need to filter
-                if ( request.getRequestURI().startsWith( "/org/apache/maven/its/mng4348" ) )
-                {
-                    requestedUris.add( request.getRequestURI() );
+                if (request.getRequestURI().startsWith("/org/apache/maven/its/mng4348")) {
+                    requestedUris.add(request.getRequestURI());
                 }
 
-                response.setStatus( HttpServletResponse.SC_NOT_FOUND );
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
-                ( (Request) request ).setHandled( true );
+                ((Request) request).setHandled(true);
             }
         };
 
-        Server server = new Server( 0 );
-        server.setHandler( repoHandler );
+        Server server = new Server(0);
+        server.setHandler(repoHandler);
 
-        try
-        {
+        try {
             server.start();
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
+            if (server.isFailed()) {
+                fail("Couldn't bind the server socket to a free port!");
             }
-            int port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-            System.out.println( "Bound server socket to the port " + port );
-            verifier.setAutoclean( false );
-            verifier.deleteArtifacts( "org.apache.maven.its.mng4348" );
-            verifier.deleteDirectory( "target" );
+            int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
+            System.out.println("Bound server socket to the port " + port);
+            verifier.setAutoclean(false);
+            verifier.deleteArtifacts("org.apache.maven.its.mng4348");
+            verifier.deleteDirectory("target");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
-            filterProps.put( "@port@", Integer.toString( port ) );
-            verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliArgument( "--settings" );
-            verifier.addCliArgument( "settings.xml" );
-            verifier.addCliArgument( "validate" );
+            filterProps.put("@port@", Integer.toString(port));
+            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.addCliArgument("--settings");
+            verifier.addCliArgument("settings.xml");
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-        }
-        finally
-        {
+        } finally {
             server.stop();
             server.join();
         }
 
-        verifier.verifyFilePresent( "target/touch.txt" );
-        assertEquals( new ArrayList<String>(), requestedUris );
+        verifier.verifyFilePresent("target/touch.txt");
+        assertEquals(new ArrayList<String>(), requestedUris);
     }
 }

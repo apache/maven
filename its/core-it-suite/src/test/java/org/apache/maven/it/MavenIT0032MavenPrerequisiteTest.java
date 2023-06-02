@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,20 +16,17 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenIT0032MavenPrerequisiteTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenIT0032MavenPrerequisiteTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenIT0032MavenPrerequisiteTest extends AbstractMavenIntegrationTestCase {
+    public MavenIT0032MavenPrerequisiteTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -40,16 +35,13 @@ public class MavenIT0032MavenPrerequisiteTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit0032()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0032" );
+    public void testit0032() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0032");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "initialize" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

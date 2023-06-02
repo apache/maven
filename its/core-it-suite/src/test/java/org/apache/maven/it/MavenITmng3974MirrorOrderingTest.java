@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3974MirrorOrderingTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3974MirrorOrderingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3974MirrorOrderingTest()
-    {
-        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),(3.0-alpha-1,)" );
+    public MavenITmng3974MirrorOrderingTest() {
+        super("(2.0.9,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),(3.0-alpha-1,)");
     }
 
     /**
@@ -48,23 +43,20 @@ public class MavenITmng3974MirrorOrderingTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitFirstMatchWins()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3974" );
+    public void testitFirstMatchWins() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3974");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3974" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng3974");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3974", "a", "0.1", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3974", "b", "0.1", "jar" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3974", "a", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3974", "b", "0.1", "jar");
     }
-
 }

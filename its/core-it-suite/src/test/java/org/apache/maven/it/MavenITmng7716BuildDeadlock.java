@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -33,13 +32,10 @@ import org.junit.jupiter.api.Timeout;
  * Executing the project should not deadlock
  *
  */
-class MavenITmng7716BuildDeadlock
-    extends AbstractMavenIntegrationTestCase
-{
+class MavenITmng7716BuildDeadlock extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7716BuildDeadlock()
-    {
-        super( "[3.8.8,3.9.0),[3.9.1,4.0.0-alpha-1),[4.0.0-alpha-5,)" );
+    public MavenITmng7716BuildDeadlock() {
+        super("[3.8.8,3.9.0),[3.9.1,4.0.0-alpha-1),[4.0.0-alpha-5,)");
     }
 
     /**
@@ -48,26 +44,23 @@ class MavenITmng7716BuildDeadlock
      * @throws Exception in case of failure
      */
     @Test
-    @Timeout( value = 120, unit = TimeUnit.SECONDS )
-    void testNoDeadlockAtVersionUpdate()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7716" );
+    @Timeout(value = 120, unit = TimeUnit.SECONDS)
+    void testNoDeadlockAtVersionUpdate() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7716");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "-f" );
-        verifier.addCliArgument( "settings" );
-        verifier.addCliArgument( "install" );
-        verifier.setLogFileName( "log-settings.txt" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("-f");
+        verifier.addCliArgument("settings");
+        verifier.addCliArgument("install");
+        verifier.setLogFileName("log-settings.txt");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "-T1C" );
-        verifier.addCliArgument( "org.codehaus.mojo:versions-maven-plugin:2.15.0:set" );
-        verifier.addCliArgument( "-DnewVersion=1.2.3" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("-T1C");
+        verifier.addCliArgument("org.codehaus.mojo:versions-maven-plugin:2.15.0:set");
+        verifier.addCliArgument("-DnewVersion=1.2.3");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

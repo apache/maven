@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,45 +16,40 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng5389LifecycleParticipantAfterSessionEnd
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng5389LifecycleParticipantAfterSessionEnd()
-    {
-        super( "[3.2.1,)" );
+public class MavenITmng5389LifecycleParticipantAfterSessionEnd extends AbstractMavenIntegrationTestCase {
+    public MavenITmng5389LifecycleParticipantAfterSessionEnd() {
+        super("[3.2.1,)");
     }
 
     @Test
-    public void testit()
-        throws Exception
-    {
+    public void testit() throws Exception {
         File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-5389-lifecycleParticipant-afterSession" );
-        File extensionDir = new File( testDir, "extension" );
-        File projectDir = new File( testDir, "basic" );
+                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5389-lifecycleParticipant-afterSession");
+        File extensionDir = new File(testDir, "extension");
+        File projectDir = new File(testDir, "basic");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "package" );
+        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/afterSessionEnd.txt" );
+        verifier.verifyFilePresent("target/afterSessionEnd.txt");
     }
 }

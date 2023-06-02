@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,12 +32,9 @@ import org.junit.jupiter.api.Test;
  * @author Brett Porter
  *
  */
-public class MavenITmng3714ToolchainsCliOptionTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3714ToolchainsCliOptionTest()
-    {
-        super( "[2.3.0,)" );
+public class MavenITmng3714ToolchainsCliOptionTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3714ToolchainsCliOptionTest() {
+        super("[2.3.0,)");
     }
 
     /**
@@ -48,44 +43,40 @@ public class MavenITmng3714ToolchainsCliOptionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3714()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3714" );
+    public void testitMNG3714() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3714");
 
-        File javaHome = new File( testDir, "javaHome" );
+        File javaHome = new File(testDir, "javaHome");
         javaHome.mkdirs();
-        new File( javaHome, "bin" ).mkdirs();
-        new File( javaHome, "bin/javac").createNewFile();
-        new File( javaHome, "bin/javac.exe").createNewFile();
+        new File(javaHome, "bin").mkdirs();
+        new File(javaHome, "bin/javac").createNewFile();
+        new File(javaHome, "bin/javac.exe").createNewFile();
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         Map<String, String> properties = verifier.newDefaultFilterMap();
-        properties.put( "@javaHome@", javaHome.getAbsolutePath() );
+        properties.put("@javaHome@", javaHome.getAbsolutePath());
 
-        verifier.filterFile( "toolchains.xml", "toolchains.xml", "UTF-8", properties );
+        verifier.filterFile("toolchains.xml", "toolchains.xml", "UTF-8", properties);
 
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "--toolchains" );
-        verifier.addCliArgument( "toolchains.xml" );
-        verifier.addCliArgument( "initialize" );
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("--toolchains");
+        verifier.addCliArgument("toolchains.xml");
+        verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/toolchains.properties" );
-        Properties results = verifier.loadProperties( "target/toolchains.properties" );
-        String tool = results.getProperty( "tool.1", "" );
-        if ( tool.endsWith( ".exe" ) )
-        {
-            tool = tool.substring( 0, tool.length() - 4 );
+        verifier.verifyFilePresent("target/toolchains.properties");
+        Properties results = verifier.loadProperties("target/toolchains.properties");
+        String tool = results.getProperty("tool.1", "");
+        if (tool.endsWith(".exe")) {
+            tool = tool.substring(0, tool.length() - 4);
         }
-        assertEquals( new File( javaHome, "bin/javac" ).getAbsolutePath(), tool );
+        assertEquals(new File(javaHome, "bin/javac").getAbsolutePath(), tool);
 
-        verifier.verifyFilePresent( "target/tool.properties" );
-        Properties toolProps = verifier.loadProperties( "target/tool.properties" );
-        String path = toolProps.getProperty( "tool.javac", "" );
-        assertEquals( results.getProperty( "tool.1", "" ), path );
+        verifier.verifyFilePresent("target/tool.properties");
+        Properties toolProps = verifier.loadProperties("target/tool.properties");
+        String path = toolProps.getProperty("tool.javac", "");
+        assertEquals(results.getProperty("tool.1", ""), path);
     }
-
 }

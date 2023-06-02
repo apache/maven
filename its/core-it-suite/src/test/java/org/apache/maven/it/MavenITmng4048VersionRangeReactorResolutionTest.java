@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4048VersionRangeReactorResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4048VersionRangeReactorResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4048VersionRangeReactorResolutionTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng4048VersionRangeReactorResolutionTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -47,21 +42,18 @@ public class MavenITmng4048VersionRangeReactorResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4048" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4048");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "sub-2/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4048" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("sub-2/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4048");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines( "sub-2/target/compile.txt", "UTF-8" );
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4048:sub-1:jar:1.1-SNAPSHOT" ) );
+        List<String> artifacts = verifier.loadLines("sub-2/target/compile.txt", "UTF-8");
+        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4048:sub-1:jar:1.1-SNAPSHOT"));
     }
-
 }

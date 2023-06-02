@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,9 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
@@ -29,31 +30,27 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
-import java.io.File;
-
 /**
  * Attaches a POM to the main artifact.
  *
-  *
+ *
  * @author Benjamin Bentmann
  *
  */
-@Mojo( name = "attach-pom", defaultPhase = LifecyclePhase.PACKAGE )
-public class AttachPomMojo
-    extends AbstractMojo
-{
+@Mojo(name = "attach-pom", defaultPhase = LifecyclePhase.PACKAGE)
+public class AttachPomMojo extends AbstractMojo {
 
     /**
      * The current Maven project.
      */
-    @Parameter( defaultValue = "${project}", required = true, readonly = true )
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
     /**
      * The path to the POM file to attach to the main artifact, relative to the project base directory. The plugin will
      * not validate this path.
      */
-    @Parameter( property = "artifact.pomFile", defaultValue = "${project.file.path}", required = true )
+    @Parameter(property = "artifact.pomFile", defaultValue = "${project.file.path}", required = true)
     private String pomFile;
 
     /**
@@ -61,29 +58,24 @@ public class AttachPomMojo
      *
      * @throws MojoFailureException If the artifact file has not been set.
      */
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        getLog().info( "[MAVEN-CORE-IT-LOG] Attaching POM to main artifact: " + pomFile );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        getLog().info("[MAVEN-CORE-IT-LOG] Attaching POM to main artifact: " + pomFile);
 
-        if ( pomFile == null || pomFile.length() <= 0 )
-        {
-            throw new MojoFailureException( "Path name for POM file has not been specified" );
+        if (pomFile == null || pomFile.length() <= 0) {
+            throw new MojoFailureException("Path name for POM file has not been specified");
         }
 
         /*
          * NOTE: We do not want to test path translation here, so resolve relative paths manually.
          */
-        File metadataFile = new File( pomFile );
-        if ( !metadataFile.isAbsolute() )
-        {
-            metadataFile = new File( project.getBasedir(), pomFile );
+        File metadataFile = new File(pomFile);
+        if (!metadataFile.isAbsolute()) {
+            metadataFile = new File(project.getBasedir(), pomFile);
         }
 
         Artifact artifact = project.getArtifact();
-        artifact.addMetadata( new ProjectArtifactMetadata( artifact, metadataFile ) );
+        artifact.addMetadata(new ProjectArtifactMetadata(artifact, metadataFile));
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Attached POM to main artifact: " + metadataFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Attached POM to main artifact: " + metadataFile);
     }
-
 }

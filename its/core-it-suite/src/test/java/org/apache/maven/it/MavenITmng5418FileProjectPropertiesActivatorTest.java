@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Olivier Lamy
  */
 @Tag("disabled")
-public class MavenITmng5418FileProjectPropertiesActivatorTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5418FileProjectPropertiesActivatorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5418FileProjectPropertiesActivatorTest()
-    {
-        super( "[3.1,)" );
+    public MavenITmng5418FileProjectPropertiesActivatorTest() {
+        super("[3.1,)");
     }
 
     /**
@@ -48,23 +43,19 @@ public class MavenITmng5418FileProjectPropertiesActivatorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5418" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5418");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/path1.txt" );
-        verifier.verifyFilePresent( "target/file1.txt" );
-        verifier.verifyFilePresent( "target/missing1.txt" );
-        verifier.verifyFileNotPresent( "target/missing2.txt" );
-
+        verifier.verifyFilePresent("target/path1.txt");
+        verifier.verifyFilePresent("target/file1.txt");
+        verifier.verifyFilePresent("target/missing1.txt");
+        verifier.verifyFileNotPresent("target/missing2.txt");
     }
-
 }

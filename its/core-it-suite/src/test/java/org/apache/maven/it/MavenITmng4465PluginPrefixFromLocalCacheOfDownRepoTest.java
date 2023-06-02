@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Collections;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest()
-    {
-        super( "[2.1.0,3.0-alpha-1),[3.0-alpha-6,)" );
+    public MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest() {
+        super("[2.1.0,3.0-alpha-1),[3.0-alpha-6,)");
     }
 
     /**
@@ -48,42 +43,42 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4465" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4465");
 
         // phase 1: get the metadata into the local repo
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4465" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.setLogFileName( "log1.txt" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "mng4465:touch" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4465");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.setLogFileName("log1.txt");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("mng4465:touch");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/touch.properties" );
+        verifier.verifyFilePresent("target/touch.properties");
 
         // phase 2: re-try with the remote repo being inaccessible (due to bad URL)
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8",
-            Collections.singletonMap( "@baseurl@", "bad://localhost:63412" ) );
-        verifier.setLogFileName( "log2.txt" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "mng4465:touch" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.filterFile(
+                "settings-template.xml",
+                "settings.xml",
+                "UTF-8",
+                Collections.singletonMap("@baseurl@", "bad://localhost:63412"));
+        verifier.setLogFileName("log2.txt");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("mng4465:touch");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/touch.properties" );
+        verifier.verifyFilePresent("target/touch.properties");
     }
-
 }

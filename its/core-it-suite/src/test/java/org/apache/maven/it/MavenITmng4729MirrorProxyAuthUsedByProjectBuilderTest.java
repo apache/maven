@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -46,13 +44,10 @@ import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-2,)" );
+    public MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
     }
 
     /**
@@ -62,68 +57,62 @@ public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4729" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4729");
 
         Constraint constraint = new Constraint();
-        constraint.setName( Constraint.__BASIC_AUTH );
-        constraint.setRoles( new String[] { "user" } );
-        constraint.setAuthenticate( true );
+        constraint.setName(Constraint.__BASIC_AUTH);
+        constraint.setRoles(new String[] {"user"});
+        constraint.setAuthenticate(true);
 
         ConstraintMapping constraintMapping = new ConstraintMapping();
-        constraintMapping.setConstraint( constraint );
-        constraintMapping.setPathSpec( "/*" );
+        constraintMapping.setConstraint(constraint);
+        constraintMapping.setPathSpec("/*");
 
-        HashLoginService userRealm = new HashLoginService( "TestRealm" );
+        HashLoginService userRealm = new HashLoginService("TestRealm");
         UserStore userStore = new UserStore();
-        userStore.addUser( "testuser", new Password( "testtest" ), new String[] { "user" } );
-        userRealm.setUserStore( userStore );
+        userStore.addUser("testuser", new Password("testtest"), new String[] {"user"});
+        userRealm.setUserStore(userStore);
 
-        Server server = new Server( 0 );
+        Server server = new Server(0);
         ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-        securityHandler.setLoginService( userRealm );
-        securityHandler.setAuthMethod( __BASIC_AUTH );
-        securityHandler.setConstraintMappings( new ConstraintMapping[] { constraintMapping } );
+        securityHandler.setLoginService(userRealm);
+        securityHandler.setAuthMethod(__BASIC_AUTH);
+        securityHandler.setConstraintMappings(new ConstraintMapping[] {constraintMapping});
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase( testDir.getAbsolutePath() );
+        repoHandler.setResourceBase(testDir.getAbsolutePath());
 
         HandlerList handlerList = new HandlerList();
-        handlerList.addHandler( securityHandler );
-        handlerList.addHandler( repoHandler );
-        handlerList.addHandler( new DefaultHandler() );
+        handlerList.addHandler(securityHandler);
+        handlerList.addHandler(repoHandler);
+        handlerList.addHandler(new DefaultHandler());
 
-        server.setHandler( handlerList );
+        server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        try
-        {
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        try {
+            if (server.isFailed()) {
+                fail("Couldn't bind the server socket to a free port!");
             }
-            int port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-            System.out.println( "Bound server socket to the port " + port );
-            verifier.setAutoclean( false );
-            verifier.deleteDirectory( "target" );
-            verifier.deleteArtifacts( "org.apache.maven.its.mng4729" );
+            int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
+            System.out.println("Bound server socket to the port " + port);
+            verifier.setAutoclean(false);
+            verifier.deleteDirectory("target");
+            verifier.deleteArtifacts("org.apache.maven.its.mng4729");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
-            filterProps.put( "@port@", Integer.toString( port ) );
-            verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliArgument( "-s" );
-            verifier.addCliArgument( "settings.xml" );
-            verifier.addCliArgument( "validate" );
+            filterProps.put("@port@", Integer.toString(port));
+            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.addCliArgument("-s");
+            verifier.addCliArgument("settings.xml");
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            Properties props = verifier.loadProperties( "target/pom.properties" );
-            assertEquals( "PASSED", props.get( "org.apache.maven.its.mng4729:a:jar:0.1.project.name" ) );
-        }
-        finally
-        {
+            Properties props = verifier.loadProperties("target/pom.properties");
+            assertEquals("PASSED", props.get("org.apache.maven.its.mng4729:a:jar:0.1.project.name"));
+        } finally {
             server.stop();
             server.join();
         }

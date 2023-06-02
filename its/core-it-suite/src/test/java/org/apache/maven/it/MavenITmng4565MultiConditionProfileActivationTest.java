@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -34,12 +32,9 @@ import org.junit.jupiter.api.Test;
  * conditions must be satisfied in order for the profile to be activated.
  */
 @Tag("disabled")
-public class MavenITmng4565MultiConditionProfileActivationTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng4565MultiConditionProfileActivationTest()
-    {
-        super( "(3.2.2,)" );
+public class MavenITmng4565MultiConditionProfileActivationTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng4565MultiConditionProfileActivationTest() {
+        super("(3.2.2,)");
     }
 
     /**
@@ -50,27 +45,26 @@ public class MavenITmng4565MultiConditionProfileActivationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testProfilesWithMultipleActivators()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4565-multi-condition-profile-activation" );
+    public void testProfilesWithMultipleActivators() throws Exception {
+        File testDir =
+                ResourceExtractor.simpleExtractResources(getClass(), "/mng-4565-multi-condition-profile-activation");
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-Dprofile1.on=true" );
-        verifier.addCliArgument( "validate" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-Dprofile1.on=true");
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         //
-        // The property profile1.on = true so only profile1 should be activated. The profile2.on property is not true so profile2
+        // The property profile1.on = true so only profile1 should be activated. The profile2.on property is not true so
+        // profile2
         // should not be activated. Only the profile1/touch.txt file should be generated.
         //
         verifier.verifyErrorFreeLog();
-        verifier.verifyFilePresent( "target/profile1/touch.txt" );
-        verifier.verifyFileNotPresent( "target/profile2/touch.txt" );
+        verifier.verifyFilePresent("target/profile1/touch.txt");
+        verifier.verifyFileNotPresent("target/profile2/touch.txt");
     }
-
 }

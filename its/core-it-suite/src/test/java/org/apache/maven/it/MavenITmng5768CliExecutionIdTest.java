@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,36 +16,31 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng5768CliExecutionIdTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng5768CliExecutionIdTest()
-    {
-        super( "(3.2.5,)" );
+public class MavenITmng5768CliExecutionIdTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng5768CliExecutionIdTest() {
+        super("(3.2.5,)");
     }
 
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5768-cli-execution-id" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5768-cli-execution-id");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-configuration:config@test-execution-id" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-configuration:config@test-execution-id");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "CONFIGURED", props.getProperty( "beanParam.fieldParam" ) );
+        Properties props = verifier.loadProperties("target/config.properties");
+        assertEquals("CONFIGURED", props.getProperty("beanParam.fieldParam"));
     }
 }

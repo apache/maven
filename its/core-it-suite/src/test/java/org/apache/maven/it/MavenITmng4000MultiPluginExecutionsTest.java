@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,13 +32,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng4000MultiPluginExecutionsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4000MultiPluginExecutionsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4000MultiPluginExecutionsTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4000MultiPluginExecutionsTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -50,21 +45,19 @@ public class MavenITmng4000MultiPluginExecutionsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithoutPluginMngt()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4000/test-1" );
+    public void testitWithoutPluginMngt() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4000/test-1");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );
-        List<String> expected = Arrays.asList( new String[] { "exec", "exec" } );
-        assertEquals( expected, executions );
+        List<String> executions = verifier.loadLines("target/exec.log", "UTF-8");
+        List<String> expected = Arrays.asList(new String[] {"exec", "exec"});
+        assertEquals(expected, executions);
     }
 
     /**
@@ -74,21 +67,18 @@ public class MavenITmng4000MultiPluginExecutionsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithPluginMngt()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4000/test-2" );
+    public void testitWithPluginMngt() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4000/test-2");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );
-        List<String> expected = Arrays.asList( new String[] { "exec", "exec" } );
-        assertEquals( expected, executions );
+        List<String> executions = verifier.loadLines("target/exec.log", "UTF-8");
+        List<String> expected = Arrays.asList(new String[] {"exec", "exec"});
+        assertEquals(expected, executions);
     }
-
 }

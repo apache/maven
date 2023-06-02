@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3845LimitedPomInheritanceTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3845LimitedPomInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3845LimitedPomInheritanceTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng3845LimitedPomInheritanceTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,37 +43,38 @@ public class MavenITmng3845LimitedPomInheritanceTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3845()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3845" );
+    public void testitMNG3845() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3845");
 
-        Verifier verifier = newVerifier( new File( testDir, "child" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "child-org", props.getProperty( "project.organization.name", "" ) );
-        assertEquals( "", props.getProperty( "project.organization.url", "" ) );
-        assertEquals( "http://child.url/issues", props.getProperty( "project.issueManagement.url", "" ) );
-        assertEquals( "", props.getProperty( "project.issueManagement.system", "" ) );
-        assertEquals( "0", props.getProperty( "project.ciManagement.notifiers", "0" ) );
-        assertEquals( "child-distros", props.getProperty( "project.distributionManagement.repository.id", "" ) );
-        assertEquals( "ssh://child.url/distros", props.getProperty( "project.distributionManagement.repository.url", "" ) );
-        assertEquals( "", props.getProperty( "project.distributionManagement.repository.name", "" ) );
-        assertEquals( "true", props.getProperty( "project.distributionManagement.repository.uniqueVersion", "true" ) );
-        assertEquals( "default", props.getProperty( "project.distributionManagement.repository.layout", "default" ) );
-        assertEquals( "child-snaps", props.getProperty( "project.distributionManagement.snapshotRepository.id", "" ) );
-        assertEquals( "ssh://child.url/snaps", props.getProperty( "project.distributionManagement.snapshotRepository.url", "" ) );
-        assertEquals( "", props.getProperty( "project.distributionManagement.snapshotRepository.name", "" ) );
-        assertEquals( "true", props.getProperty( "project.distributionManagement.snapshotRepository.uniqueVersion", "true" ) );
-        assertEquals( "default", props.getProperty( "project.distributionManagement.snapshotRepository.layout", "default" ) );
-        assertEquals( "child-site", props.getProperty( "project.distributionManagement.site.id", "" ) );
-        assertEquals( "scp://child.url/site", props.getProperty( "project.distributionManagement.site.url", "" ) );
-        assertEquals( "", props.getProperty( "project.distributionManagement.site.name", "" ) );
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("child-org", props.getProperty("project.organization.name", ""));
+        assertEquals("", props.getProperty("project.organization.url", ""));
+        assertEquals("http://child.url/issues", props.getProperty("project.issueManagement.url", ""));
+        assertEquals("", props.getProperty("project.issueManagement.system", ""));
+        assertEquals("0", props.getProperty("project.ciManagement.notifiers", "0"));
+        assertEquals("child-distros", props.getProperty("project.distributionManagement.repository.id", ""));
+        assertEquals("ssh://child.url/distros", props.getProperty("project.distributionManagement.repository.url", ""));
+        assertEquals("", props.getProperty("project.distributionManagement.repository.name", ""));
+        assertEquals("true", props.getProperty("project.distributionManagement.repository.uniqueVersion", "true"));
+        assertEquals("default", props.getProperty("project.distributionManagement.repository.layout", "default"));
+        assertEquals("child-snaps", props.getProperty("project.distributionManagement.snapshotRepository.id", ""));
+        assertEquals(
+                "ssh://child.url/snaps",
+                props.getProperty("project.distributionManagement.snapshotRepository.url", ""));
+        assertEquals("", props.getProperty("project.distributionManagement.snapshotRepository.name", ""));
+        assertEquals(
+                "true", props.getProperty("project.distributionManagement.snapshotRepository.uniqueVersion", "true"));
+        assertEquals(
+                "default", props.getProperty("project.distributionManagement.snapshotRepository.layout", "default"));
+        assertEquals("child-site", props.getProperty("project.distributionManagement.site.id", ""));
+        assertEquals("scp://child.url/site", props.getProperty("project.distributionManagement.site.url", ""));
+        assertEquals("", props.getProperty("project.distributionManagement.site.name", ""));
     }
-
 }

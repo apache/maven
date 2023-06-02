@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,12 +32,9 @@ import org.junit.jupiter.api.Test;
  * @author Brett Porter
  *
  */
-public class MavenITmng0818WarDepsNotTransitiveTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng0818WarDepsNotTransitiveTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenITmng0818WarDepsNotTransitiveTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng0818WarDepsNotTransitiveTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,24 +43,21 @@ public class MavenITmng0818WarDepsNotTransitiveTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG0818()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0818" );
+    public void testitMNG0818() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0818");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.it0080" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.it0080");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Collection<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
-        assertEquals( Collections.singletonList( "org.apache.maven.its.it0080:war:war:0.1" ), artifacts );
+        Collection<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        assertEquals(Collections.singletonList("org.apache.maven.its.it0080:war:war:0.1"), artifacts);
     }
-
 }

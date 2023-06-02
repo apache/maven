@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,18 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng5214DontMapWsdlToJar
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng5214DontMapWsdlToJar()
-    {
-        super( "[3.1,)" );
+public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTestCase {
+    public MavenITmng5214DontMapWsdlToJar() {
+        super("[3.1,)");
     }
 
     /**
@@ -42,40 +37,36 @@ public class MavenITmng5214DontMapWsdlToJar
      * @throws Exception in case of failure
      */
     @Test
-    public void testitTestPhase()
-        throws Exception
-    {
-        File setupDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5214/dependency" );
+    public void testitTestPhase() throws Exception {
+        File setupDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5214/dependency");
 
-        Verifier setupVerifier = newVerifier( setupDir.getAbsolutePath() );
-        setupVerifier.setAutoclean( false );
-        setupVerifier.addCliArgument( "-X" );
-        setupVerifier.deleteDirectory( "target" );
-        setupVerifier.deleteArtifacts( "org.apache.maven.its.mng5214" );
-        setupVerifier.setLogFileName( "log-setup.txt" );
-        setupVerifier.addCliArgument( "-PcreateWsdl" );
-        setupVerifier.addCliArgument( "generate-resources" );
+        Verifier setupVerifier = newVerifier(setupDir.getAbsolutePath());
+        setupVerifier.setAutoclean(false);
+        setupVerifier.addCliArgument("-X");
+        setupVerifier.deleteDirectory("target");
+        setupVerifier.deleteArtifacts("org.apache.maven.its.mng5214");
+        setupVerifier.setLogFileName("log-setup.txt");
+        setupVerifier.addCliArgument("-PcreateWsdl");
+        setupVerifier.addCliArgument("generate-resources");
         setupVerifier.execute();
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5214" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5214");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "consumer/target" );
-        verifier.deleteDirectory( "dependency/target" );
-        verifier.setLogFileName( "log-test.txt" );
-        verifier.addCliArgument( "test" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("consumer/target");
+        verifier.deleteDirectory("dependency/target");
+        verifier.setLogFileName("log-test.txt");
+        verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        List<String> lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
+        List<String> lines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
         // RESOLVE-ONE-DEPENDENCY org.apache.maven.its.mng5214:dependency:wsdl:1.0-SNAPSHOT $ /tmp/it
         // .repo/org/apache/maven/its/mng5214/dependency/1.0-SNAPSHOT/dependency-1.0-SNAPSHOT.wsdl
-        for ( String line : lines )
-        {
-            if ( line.contains( "RESOLVE-ONE-DEPENDENCY org.apache.maven.its.mng5214:dependency:wsdl:1.0-SNAPSHOT" ) )
-            {
-                assertFalse( line.contains( "classes-main" ) );
-                assertTrue( line.endsWith( ".wsdl" ) );
+        for (String line : lines) {
+            if (line.contains("RESOLVE-ONE-DEPENDENCY org.apache.maven.its.mng5214:dependency:wsdl:1.0-SNAPSHOT")) {
+                assertFalse(line.contains("classes-main"));
+                assertTrue(line.endsWith(".wsdl"));
             }
         }
     }

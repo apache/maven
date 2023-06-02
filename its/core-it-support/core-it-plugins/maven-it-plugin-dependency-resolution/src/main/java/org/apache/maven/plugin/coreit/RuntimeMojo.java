@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -33,10 +32,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * @author Benjamin Bentmann
  *
  */
-@Mojo( name = "runtime", requiresDependencyResolution = ResolutionScope.RUNTIME )
-public class RuntimeMojo
-    extends AbstractDependencyMojo
-{
+@Mojo(name = "runtime", requiresDependencyResolution = ResolutionScope.RUNTIME)
+public class RuntimeMojo extends AbstractDependencyMojo {
 
     /**
      * The path to the output file for the project artifacts, relative to the project base directory. Each line of this
@@ -44,7 +41,7 @@ public class RuntimeMojo
      * disk. Unlike the runtime artifacts, the collection of project artifacts additionally contains those artifacts
      * that do not contribute to the class path.
      */
-    @Parameter( property = "depres.projectArtifacts" )
+    @Parameter(property = "depres.projectArtifacts")
     private String projectArtifacts;
 
     /**
@@ -52,7 +49,7 @@ public class RuntimeMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk.
      */
-    @Parameter( property = "depres.runtimeArtifacts" )
+    @Parameter(property = "depres.runtimeArtifacts")
     private String runtimeArtifacts;
 
     /**
@@ -60,7 +57,7 @@ public class RuntimeMojo
      * this UTF-8 encoded file specifies the absolute path to a class path element. If not specified, the class path
      * will not be written to disk.
      */
-    @Parameter( property = "depres.runtimeClassPath" )
+    @Parameter(property = "depres.runtimeClassPath")
     private String runtimeClassPath;
 
     /**
@@ -68,7 +65,7 @@ public class RuntimeMojo
      * base directory. The (trimmed) path to a JAR is used as the property key, the property value is the SHA-1 hash of
      * the JAR. If not specified, the class path checksums will not be calculated.
      */
-    @Parameter( property = "depres.runtimeClassPathChecksums" )
+    @Parameter(property = "depres.runtimeClassPathChecksums")
     private String runtimeClassPathChecksums;
 
     /**
@@ -76,20 +73,14 @@ public class RuntimeMojo
      *
      * @throws MojoExecutionException If the output file could not be created or any dependency could not be resolved.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
-        try
-        {
-            writeArtifacts( projectArtifacts, project.getArtifacts() );
-            writeArtifacts( runtimeArtifacts, project.getRuntimeArtifacts() );
-            writeClassPath( runtimeClassPath, project.getRuntimeClasspathElements() );
-            writeClassPathChecksums( runtimeClassPathChecksums, project.getRuntimeClasspathElements() );
-        }
-        catch ( DependencyResolutionRequiredException e )
-        {
-            throw new MojoExecutionException( "Failed to resolve dependencies", e );
+    public void execute() throws MojoExecutionException {
+        try {
+            writeArtifacts(projectArtifacts, project.getArtifacts());
+            writeArtifacts(runtimeArtifacts, project.getRuntimeArtifacts());
+            writeClassPath(runtimeClassPath, project.getRuntimeClasspathElements());
+            writeClassPathChecksums(runtimeClassPathChecksums, project.getRuntimeClasspathElements());
+        } catch (DependencyResolutionRequiredException e) {
+            throw new MojoExecutionException("Failed to resolve dependencies", e);
         }
     }
-
 }

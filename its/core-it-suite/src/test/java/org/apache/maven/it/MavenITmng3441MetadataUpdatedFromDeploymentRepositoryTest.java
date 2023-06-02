@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,15 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.maven.shared.utils.io.FileUtils;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -37,53 +35,48 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest()
-    {
-        super( "(2.0.8,)" );
+public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest() {
+        super("(2.0.8,)");
     }
 
     @Test
-    public void testitMNG3441()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3441" );
+    public void testitMNG3441() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3441");
 
-        File targetRepository = new File( testDir, "target-repo" );
-        FileUtils.deleteDirectory( targetRepository );
-        FileUtils.copyDirectoryStructure( new File( testDir, "deploy-repo" ), targetRepository );
+        File targetRepository = new File(testDir, "target-repo");
+        FileUtils.deleteDirectory(targetRepository);
+        FileUtils.copyDirectoryStructure(new File(testDir, "deploy-repo"), targetRepository);
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
+        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
 
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "deploy" );
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("deploy");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        Xpp3Dom dom = readDom( new File( targetRepository,
-                                         "org/apache/maven/its/mng3441/test-artifact/1.0-SNAPSHOT/maven-metadata.xml"
-        ) );
-        assertEquals( "2", dom.getChild( "versioning" ).getChild( "snapshot" ).getChild( "buildNumber" ).getValue() );
+        Xpp3Dom dom = readDom(new File(
+                targetRepository, "org/apache/maven/its/mng3441/test-artifact/1.0-SNAPSHOT/maven-metadata.xml"));
+        assertEquals(
+                "2",
+                dom.getChild("versioning")
+                        .getChild("snapshot")
+                        .getChild("buildNumber")
+                        .getValue());
 
-        dom = readDom( new File( targetRepository, "org/apache/maven/its/mng3441/maven-metadata.xml" ) );
-        Xpp3Dom[] plugins = dom.getChild( "plugins" ).getChildren();
-        assertEquals( "other-plugin", plugins[0].getChild( "prefix" ).getValue() );
-        assertEquals( "test-artifact", plugins[1].getChild( "prefix" ).getValue() );
-
+        dom = readDom(new File(targetRepository, "org/apache/maven/its/mng3441/maven-metadata.xml"));
+        Xpp3Dom[] plugins = dom.getChild("plugins").getChildren();
+        assertEquals("other-plugin", plugins[0].getChild("prefix").getValue());
+        assertEquals("test-artifact", plugins[1].getChild("prefix").getValue());
     }
 
-    private Xpp3Dom readDom( File file )
-        throws XmlPullParserException, IOException
-    {
-        try ( FileReader reader = new FileReader( file ) )
-        {
-            return Xpp3DomBuilder.build( reader );
+    private Xpp3Dom readDom(File file) throws XmlPullParserException, IOException {
+        try (FileReader reader = new FileReader(file)) {
+            return Xpp3DomBuilder.build(reader);
         }
     }
 }

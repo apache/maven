@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
 import org.apache.maven.shared.utils.io.FileUtils;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,44 +34,38 @@ import org.junit.jupiter.api.Test;
  *
  * @author jdcasey
  */
-public class MavenITmng3693PomFileBasedirChangeTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3693PomFileBasedirChangeTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenITmng3693PomFileBasedirChangeTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3693PomFileBasedirChangeTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     @Test
-    public void testitMNG3693 ()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3693" );
+    public void testitMNG3693() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3693");
 
-        File pluginDir = new File( testDir, "maven-mng3693-plugin" );
-        File projectsDir = new File( testDir, "projects" );
+        File pluginDir = new File(testDir, "maven-mng3693-plugin");
+        File projectsDir = new File(testDir, "projects");
 
-        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        Verifier verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
 
-        verifier.addCliArgument( "install" );
+        verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        String depPath = verifier.getArtifactPath( "org.apache.maven.its.mng3693", "dep", "1", "pom" );
+        String depPath = verifier.getArtifactPath("org.apache.maven.its.mng3693", "dep", "1", "pom");
 
-        File dep = new File( depPath );
+        File dep = new File(depPath);
         dep = dep.getParentFile().getParentFile();
 
         // remove the dependency from the local repository.
-        FileUtils.deleteDirectory( dep );
+        FileUtils.deleteDirectory(dep);
 
-        verifier = newVerifier( projectsDir.getAbsolutePath() );
+        verifier = newVerifier(projectsDir.getAbsolutePath());
 
-        verifier.addCliArgument( "package" );
+        verifier.addCliArgument("package");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
-
     }
 }

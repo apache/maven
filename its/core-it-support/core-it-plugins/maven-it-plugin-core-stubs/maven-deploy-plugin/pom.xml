@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -34,10 +32,8 @@ under the License.
   <packaging>maven-plugin</packaging>
 
   <name>Maven IT Deploy Plugin Stub</name>
-  <description>
-    A test plugin that has the same coordinates and goals as the Maven Deploy Plugin. Its goals only create marker
-    files to check the principle invocation of the goals via the build lifecycle binding.
-  </description>
+  <description>A test plugin that has the same coordinates and goals as the Maven Deploy Plugin. Its goals only create marker
+    files to check the principle invocation of the goals via the build lifecycle binding.</description>
   <inceptionYear>2008</inceptionYear>
 
   <properties>

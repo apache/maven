@@ -1,5 +1,3 @@
-package org.apache.maven.its.mng5958;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.its.mng5958;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.its.mng5958;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,16 +24,14 @@ import java.util.Map;
 /**
  * @author Anton Tanasenko
  */
-public class GoodLifecycleMapping extends AbstractLifecycleMapping
-{
+public class GoodLifecycleMapping extends AbstractLifecycleMapping {
 
     @Override
-    protected Map<String, String> initPhases()
-    {
+    protected Map<String, String> initPhases() {
         Map<String, String> phases = new LinkedHashMap<>();
-        phases.put( "validate",
-                "org.apache.maven.its.plugins:mng-5805-pkg-type-mojo-configuration-plugin:2.1-SNAPSHOT:test" );
+        phases.put(
+                "validate",
+                "org.apache.maven.its.plugins:mng-5805-pkg-type-mojo-configuration-plugin:2.1-SNAPSHOT:test");
         return phases;
     }
-
 }

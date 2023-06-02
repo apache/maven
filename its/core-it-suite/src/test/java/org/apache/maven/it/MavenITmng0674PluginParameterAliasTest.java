@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,13 +32,10 @@ import org.junit.jupiter.api.Test;
  * @author John Casey
  *
  */
-public class MavenITmng0674PluginParameterAliasTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng0674PluginParameterAliasTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0674PluginParameterAliasTest()
-    {
-        super( "[3.0,)" );
+    public MavenITmng0674PluginParameterAliasTest() {
+        super("[3.0,)");
     }
 
     /**
@@ -49,23 +44,21 @@ public class MavenITmng0674PluginParameterAliasTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitLifecycle()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0674" );
+    public void testitLifecycle() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0674");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log-lifecycle.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log-lifecycle.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "MNG-674-1", props.getProperty( "aliasParam" ) );
-        assertEquals( "MNG-674-2", props.getProperty( "aliasDefaultExpressionParam" ) );
-        assertEquals( "MNG-4997", props.getProperty( "aliasStringParams.0" ) );
+        Properties props = verifier.loadProperties("target/config.properties");
+        assertEquals("MNG-674-1", props.getProperty("aliasParam"));
+        assertEquals("MNG-674-2", props.getProperty("aliasDefaultExpressionParam"));
+        assertEquals("MNG-4997", props.getProperty("aliasStringParams.0"));
     }
 
     /**
@@ -74,23 +67,20 @@ public class MavenITmng0674PluginParameterAliasTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCli()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0674" );
+    public void testitCli() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0674");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log-cli.txt" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-configuration:config" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log-cli.txt");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-configuration:config");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "MNG-674-1", props.getProperty( "aliasParam" ) );
-        assertEquals( "MNG-674-2", props.getProperty( "aliasDefaultExpressionParam" ) );
-        assertEquals( "MNG-4997", props.getProperty( "aliasStringParams.0" ) );
+        Properties props = verifier.loadProperties("target/config.properties");
+        assertEquals("MNG-674-1", props.getProperty("aliasParam"));
+        assertEquals("MNG-674-2", props.getProperty("aliasDefaultExpressionParam"));
+        assertEquals("MNG-4997", props.getProperty("aliasStringParams.0"));
     }
-
 }

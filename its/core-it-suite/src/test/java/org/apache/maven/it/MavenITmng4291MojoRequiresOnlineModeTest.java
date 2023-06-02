@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4291MojoRequiresOnlineModeTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4291MojoRequiresOnlineModeTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4291MojoRequiresOnlineModeTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,25 +43,20 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitDirectInvocation()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4291" );
+    public void testitDirectInvocation() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4291");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log-direct.txt" );
-        verifier.addCliArgument( "--offline" );
-        try
-        {
-            verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-online:2.1-SNAPSHOT:touch" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log-direct.txt");
+        verifier.addCliArgument("--offline");
+        try {
+            verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-online:2.1-SNAPSHOT:touch");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Request to execute online mojo during offline mode did not fail the build." );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Request to execute online mojo during offline mode did not fail the build.");
+        } catch (VerificationException e) {
             // expected
         }
     }
@@ -78,21 +68,18 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitLifecycleInvocation()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4291" );
+    public void testitLifecycleInvocation() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4291");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log-lifecycle.txt" );
-        verifier.addCliArgument( "--offline" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log-lifecycle.txt");
+        verifier.addCliArgument("--offline");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
     }
-
 }

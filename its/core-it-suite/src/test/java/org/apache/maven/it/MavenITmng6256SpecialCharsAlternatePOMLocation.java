@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,12 +29,9 @@ import org.junit.jupiter.api.Test;
  * passed via <code>-f/--file</code> containing special characters do not break the script. E.g
  * <code>-f "directoryWithClosing)Bracket/pom.xml"</code>.
  */
-public class MavenITmng6256SpecialCharsAlternatePOMLocation
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng6256SpecialCharsAlternatePOMLocation()
-    {
-        super( "(3.6.0,)" );
+public class MavenITmng6256SpecialCharsAlternatePOMLocation extends AbstractMavenIntegrationTestCase {
+    public MavenITmng6256SpecialCharsAlternatePOMLocation() {
+        super("(3.6.0,)");
     }
 
     /**
@@ -45,11 +40,9 @@ public class MavenITmng6256SpecialCharsAlternatePOMLocation
      * @throws Exception in case of failure
      */
     @Test
-    public void testDirectoryWithSpace()
-        throws Exception
-    {
-        runWithMvnFileLongOption( "directory-with- -space" );
-        runWithMvnFileShortOption( "directory-with- -space" );
+    public void testDirectoryWithSpace() throws Exception {
+        runWithMvnFileLongOption("directory-with- -space");
+        runWithMvnFileShortOption("directory-with- -space");
     }
 
     /**
@@ -58,38 +51,30 @@ public class MavenITmng6256SpecialCharsAlternatePOMLocation
      * @throws Exception in case of failure
      */
     @Test
-    public void testDirectoryWithClosingBracket()
-        throws Exception
-    {
-        runWithMvnFileLongOption( "directory-with-)-closing-bracket" );
-        runWithMvnFileShortOption( "directory-with-)-closing-bracket" );
+    public void testDirectoryWithClosingBracket() throws Exception {
+        runWithMvnFileLongOption("directory-with-)-closing-bracket");
+        runWithMvnFileShortOption("directory-with-)-closing-bracket");
     }
 
-    private void runWithMvnFileLongOption( String subDir )
-        throws Exception
-    {
-        runCoreExtensionWithOption( "--file", subDir );
+    private void runWithMvnFileLongOption(String subDir) throws Exception {
+        runCoreExtensionWithOption("--file", subDir);
     }
 
-    private void runWithMvnFileShortOption( String subDir )
-        throws Exception
-    {
-        runCoreExtensionWithOption( "-f", subDir );
+    private void runWithMvnFileShortOption(String subDir) throws Exception {
+        runCoreExtensionWithOption("-f", subDir);
     }
 
-    private void runCoreExtensionWithOption( String option, String subDir )
-        throws Exception
-    {
+    private void runCoreExtensionWithOption(String option, String subDir) throws Exception {
         File resourceDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-6256-special-chars-alternate-pom-location" );
+                ResourceExtractor.simpleExtractResources(getClass(), "/mng-6256-special-chars-alternate-pom-location");
 
-        File testDir = new File( resourceDir, "../mng-6256-" + subDir );
+        File testDir = new File(resourceDir, "../mng-6256-" + subDir);
         testDir.mkdir();
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( option ); // -f/--file
-        verifier.addCliArgument( "\"" + new File( resourceDir, subDir ).getAbsolutePath() + "\"" ); // "<path>"
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument(option); // -f/--file
+        verifier.addCliArgument("\"" + new File(resourceDir, subDir).getAbsolutePath() + "\""); // "<path>"
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }

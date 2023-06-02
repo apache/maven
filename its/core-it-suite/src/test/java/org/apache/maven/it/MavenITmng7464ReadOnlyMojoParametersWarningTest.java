@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,15 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,108 +33,109 @@ import org.junit.jupiter.api.Test;
  *
  * @author Slawomir Jaranowski
  */
-public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng7464ReadOnlyMojoParametersWarningTest()
-    {
-        super( "[3.9.0,)" );
+public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng7464ReadOnlyMojoParametersWarningTest() {
+        super("[3.9.0,)");
     }
 
     /**
      * Test that ensures that warning is not printed for empty and default value
      */
     @Test
-    public void testEmptyConfiguration() throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7464-mojo-read-only-params" );
+    public void testEmptyConfiguration() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7464-mojo-read-only-params");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log-empty-configuration.txt" );
-        verifier.addCliArgument( "-Dmaven.plugin.validation=verbose" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log-empty-configuration.txt");
+        verifier.addCliArgument("-Dmaven.plugin.validation=verbose");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        List<String> warnLines = findReadOnlyWarning( logLines );
+        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> warnLines = findReadOnlyWarning(logLines);
 
-        assertTrue( "Unwanted warnings: " + warnLines, warnLines.isEmpty() );
+        assertTrue("Unwanted warnings: " + warnLines, warnLines.isEmpty());
     }
 
     /**
      * Test that ensures that warning is printed for read-only parameter set by property
      */
     @Test
-    public void testReadOnlyProperty()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7464-mojo-read-only-params" );
+    public void testReadOnlyProperty() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7464-mojo-read-only-params");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "-Duser.property=value" );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log-read-only-property.txt" );
-        verifier.addCliArgument( "-Dmaven.plugin.validation=verbose" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("-Duser.property=value");
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log-read-only-property.txt");
+        verifier.addCliArgument("-Dmaven.plugin.validation=verbose");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        List<String> warnLines = findReadOnlyWarning( logLines );
+        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> warnLines = findReadOnlyWarning(logLines);
 
-        assertTrue( warnLines.stream().anyMatch( s -> s.contains(
-            "Parameter 'readOnlyWithUserProperty' (user property 'user.property') is read-only, must not be used in configuration" ) ) );
+        assertTrue(
+                warnLines.stream()
+                        .anyMatch(
+                                s -> s.contains(
+                                        "Parameter 'readOnlyWithUserProperty' (user property 'user.property') is read-only, must not be used in configuration")));
     }
 
     /**
      * Test that ensures that warning is printed for read-only parameter set by plugin configuration.
      */
     @Test
-    public void testReadOnlyConfig() throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7464-mojo-read-only-params" );
+    public void testReadOnlyConfig() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7464-mojo-read-only-params");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setLogFileName( "log-read-only-configuration.txt" );
-        verifier.addCliArgument( "-Pconfig-values" );
-        verifier.addCliArgument( "-Dmaven.plugin.validation=verbose" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setLogFileName("log-read-only-configuration.txt");
+        verifier.addCliArgument("-Pconfig-values");
+        verifier.addCliArgument("-Dmaven.plugin.validation=verbose");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        List<String> warnLines = findReadOnlyWarning( logLines );
+        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> warnLines = findReadOnlyWarning(logLines);
 
-        assertTrue( warnLines.stream().anyMatch( s -> s.contains(
-            "Parameter 'readOnlyWithDefault' is read-only, must not be used in configuration" ) ) );
+        assertTrue(warnLines.stream()
+                .anyMatch(s ->
+                        s.contains("Parameter 'readOnlyWithDefault' is read-only, must not be used in configuration")));
 
-        assertTrue( warnLines.stream().anyMatch( s -> s.contains(
-            "Parameter 'readOnlyWithOutDefaults' is read-only, must not be used in configuration" ) ) );
+        assertTrue(warnLines.stream()
+                .anyMatch(s -> s.contains(
+                        "Parameter 'readOnlyWithOutDefaults' is read-only, must not be used in configuration")));
 
-        assertTrue( warnLines.stream().anyMatch( s -> s.contains(
-            "Parameter 'readOnlyWithProperty' (user property 'project.version') is read-only, must not be used in configuration" ) ) );
+        assertTrue(
+                warnLines.stream()
+                        .anyMatch(
+                                s -> s.contains(
+                                        "Parameter 'readOnlyWithProperty' (user property 'project.version') is read-only, must not be used in configuration")));
 
-        assertTrue( warnLines.stream().anyMatch( s -> s.contains(
-            "Parameter 'readOnlyWithUserProperty' (user property 'user.property') is read-only, must not be used in configuration" ) ) );
+        assertTrue(
+                warnLines.stream()
+                        .anyMatch(
+                                s -> s.contains(
+                                        "Parameter 'readOnlyWithUserProperty' (user property 'user.property') is read-only, must not be used in configuration")));
     }
 
-    private List<String> findReadOnlyWarning( List<String> logLines )
-    {
-        Pattern pattern = Pattern.compile( ".* Parameter .* is read-only.*" );
+    private List<String> findReadOnlyWarning(List<String> logLines) {
+        Pattern pattern = Pattern.compile(".* Parameter .* is read-only.*");
         List<String> result = new ArrayList<>();
-        for ( String line : logLines )
-        {
-            if ( pattern.matcher( line ).matches() )
-            {
-                result.add( line );
+        for (String line : logLines) {
+            if (pattern.matcher(line).matches()) {
+                result.add(line);
             }
         }
         return result;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,13 +34,10 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  *
  */
-public class MavenITmng2068ReactorRelativeParentsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2068ReactorRelativeParentsTest()
-    {
-        super( "(2.0.6,)" ); // only test in 2.0.7+
+    public MavenITmng2068ReactorRelativeParentsTest() {
+        super("(2.0.6,)"); // only test in 2.0.7+
     }
 
     /**
@@ -51,16 +46,14 @@ public class MavenITmng2068ReactorRelativeParentsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitInheritedIdFields()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068/test-1" );
-        File projectDir = new File( testDir, "parent" );
+    public void testitInheritedIdFields() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2068/test-1");
+        File projectDir = new File(testDir, "parent");
 
-        Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng2068");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
@@ -71,16 +64,14 @@ public class MavenITmng2068ReactorRelativeParentsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitExplicitIdFields()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068/test-2" );
-        File projectDir = new File( testDir, "parent" );
+    public void testitExplicitIdFields() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2068/test-2");
+        File projectDir = new File(testDir, "parent");
 
-        Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng2068");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
@@ -91,18 +82,15 @@ public class MavenITmng2068ReactorRelativeParentsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitComplex()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068/test-3" );
+    public void testitComplex() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2068/test-3");
         File projectDir = testDir;
 
-        Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng2068");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
 
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest()
-    {
-        super( "[3.0-beta-1,)" );
+    public MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest() {
+        super("[3.0-beta-1,)");
     }
 
     /**
@@ -49,36 +44,30 @@ public class MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4625" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4625");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
 
         // http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6468220
         // A lot of bugs related to Windows arguments and quoting
         // Directly called from commandline succeeds, indirect often fails
-        if( Os.isFamily( Os.FAMILY_WINDOWS ) && !System.getProperties().contains( "CLASSWORLDS_LAUNCHER" ) )
-        {
-            verifier.addCliArgument( "-Dtest.prop=\"&x=y<>\"" );
-            verifier.setForkJvm( true ); // force forked JVM, since the workaround expects forked run
-        }
-        else
-        {
-            verifier.addCliArgument( "-Dtest.prop=&x=y<>" );
+        if (Os.isFamily(Os.FAMILY_WINDOWS) && !System.getProperties().contains("CLASSWORLDS_LAUNCHER")) {
+            verifier.addCliArgument("-Dtest.prop=\"&x=y<>\"");
+            verifier.setForkJvm(true); // force forked JVM, since the workaround expects forked run
+        } else {
+            verifier.addCliArgument("-Dtest.prop=&x=y<>");
         }
 
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "&x=y<>", props.getProperty( "project.properties.jdbcUrl" ) );
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("&x=y<>", props.getProperty("project.properties.jdbcUrl"));
     }
-
 }

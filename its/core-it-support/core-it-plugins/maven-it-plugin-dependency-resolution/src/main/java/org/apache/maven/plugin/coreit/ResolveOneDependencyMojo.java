@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,11 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -35,42 +38,36 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Attempts to resolve a single artifact from dependencies, and logs the results for the Verifier to look at.
  *
  * @author bimargulies
  */
-@Mojo( name = "resolve-one-dependency", requiresDependencyResolution = ResolutionScope.RUNTIME )
-public class ResolveOneDependencyMojo
-    extends AbstractDependencyMojo
-{
+@Mojo(name = "resolve-one-dependency", requiresDependencyResolution = ResolutionScope.RUNTIME)
+public class ResolveOneDependencyMojo extends AbstractDependencyMojo {
 
     /**
      * Group ID of the artifact to resolve.
      */
-    @Parameter( required = true )
+    @Parameter(required = true)
     private String groupId;
 
     /**
      * Artifact ID of the artifact to resolve.
      */
-    @Parameter( required = true )
+    @Parameter(required = true)
     private String artifactId;
 
     /**
      * Version  of the artifact to resolve.
      */
-    @Parameter( required = true )
+    @Parameter(required = true)
     private String version;
 
     /**
      * Type of the artifact to resolve.
      */
-    @Parameter( required = true )
+    @Parameter(required = true)
     private String type;
 
     /**
@@ -82,12 +79,12 @@ public class ResolveOneDependencyMojo
     /**
      * The scope to resolve for.
      */
-    @Parameter( required = true )
+    @Parameter(required = true)
     private String scope;
 
     /**
      */
-    @Parameter( defaultValue = "${project}", required = true )
+    @Parameter(defaultValue = "${project}", required = true)
     MavenProject project;
 
     /**
@@ -103,7 +100,7 @@ public class ResolveOneDependencyMojo
     /**
      * The Maven session.
      */
-    @Parameter( defaultValue = "${session}", required = true, readonly = true )
+    @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession session;
 
     /**
@@ -117,69 +114,57 @@ public class ResolveOneDependencyMojo
      *
      * @throws MojoExecutionException If the output file could not be created or any dependency could not be resolved.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
+    public void execute() throws MojoExecutionException {
 
         Artifact projectArtifact = project.getArtifact();
-        if ( projectArtifact == null )
-        {
-            projectArtifact = artifactFactory.createProjectArtifact( project.getGroupId(), project.getArtifactId(),
-                                                                     project.getVersion() );
+        if (projectArtifact == null) {
+            projectArtifact = artifactFactory.createProjectArtifact(
+                    project.getGroupId(), project.getArtifactId(), project.getVersion());
         }
 
         Set depArtifacts = new HashSet();
         Artifact artifact =
-            artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
-        depArtifacts.add( artifact );
+                artifactFactory.createArtifactWithClassifier(groupId, artifactId, version, type, classifier);
+        depArtifacts.add(artifact);
 
-        ScopeArtifactFilter scopeFilter = new ScopeArtifactFilter( scope );
+        ScopeArtifactFilter scopeFilter = new ScopeArtifactFilter(scope);
 
         ArtifactResolutionResult result;
-        try
-        {
-            result = resolver.resolveTransitively( depArtifacts, projectArtifact, project.getManagedVersionMap(),
-                                                   session.getLocalRepository(),
-                                                   project.getRemoteArtifactRepositories(), metadataSource,
-                                                   scopeFilter );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new MojoExecutionException( "RESOLVE-ONE-DEPENDENCY ArtifactResolutionException exception ", e );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new MojoExecutionException( "RESOLVE-ONE-DEPENDENCY ArtifactNotFoundException exception ", e );
+        try {
+            result = resolver.resolveTransitively(
+                    depArtifacts,
+                    projectArtifact,
+                    project.getManagedVersionMap(),
+                    session.getLocalRepository(),
+                    project.getRemoteArtifactRepositories(),
+                    metadataSource,
+                    scopeFilter);
+        } catch (ArtifactResolutionException e) {
+            throw new MojoExecutionException("RESOLVE-ONE-DEPENDENCY ArtifactResolutionException exception ", e);
+        } catch (ArtifactNotFoundException e) {
+            throw new MojoExecutionException("RESOLVE-ONE-DEPENDENCY ArtifactNotFoundException exception ", e);
         }
 
-        if ( result == null )
-        {
-            getLog().info( "RESOLVE-ONE-DEPENDENCY null result" );
-        }
-        else
-        {
+        if (result == null) {
+            getLog().info("RESOLVE-ONE-DEPENDENCY null result");
+        } else {
             Set resolvedArtifacts = result.getArtifacts();
             /*
              * Assume that the user of this is not interested in transitive deps and such, just report the one.
              */
-            for ( Object resolvedArtifact : resolvedArtifacts )
-            {
+            for (Object resolvedArtifact : resolvedArtifacts) {
                 Artifact a = (Artifact) resolvedArtifact;
-                if ( a.equals( artifact ) )
-                {
+                if (a.equals(artifact)) {
                     File file = a.getFile();
-                    if ( file == null )
-                    {
-                        getLog().info( " RESOLVE-ONE-DEPENDENCY " + a.toString() + " $ NO-FILE" );
-                    }
-                    else
-                    {
-                        getLog().info( " RESOLVE-ONE-DEPENDENCY " + a.toString() + " $ " + file.getAbsolutePath() );
+                    if (file == null) {
+                        getLog().info(" RESOLVE-ONE-DEPENDENCY " + a.toString() + " $ NO-FILE");
+                    } else {
+                        getLog().info(" RESOLVE-ONE-DEPENDENCY " + a.toString() + " $ " + file.getAbsolutePath());
                     }
                     return;
                 }
             }
-            getLog().info( " RESOLVE-ONE-DEPENDENCY " + artifact.toString() + " $ NOT-RESOLVED" );
+            getLog().info(" RESOLVE-ONE-DEPENDENCY " + artifact.toString() + " $ NOT-RESOLVED");
         }
     }
 }

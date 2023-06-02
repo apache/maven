@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng1895ScopeConflictResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1895ScopeConflictResolutionTest()
-    {
-        super( "[2.0.3,)" );
+    public MavenITmng1895ScopeConflictResolutionTest() {
+        super("[2.0.3,)");
     }
 
     /**
@@ -49,39 +44,37 @@ public class MavenITmng1895ScopeConflictResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitDirectVsIndirect()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1895/direct-vs-indirect" );
+    public void testitDirectVsIndirect() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1895/direct-vs-indirect");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng1895" );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng1895");
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertTrue( compile.toString(), compile.contains( "a-0.1.jar" ) );
-        assertFalse( compile.toString(), compile.contains( "b-0.1.jar" ) );
-        assertFalse( compile.toString(), compile.contains( "c-0.1.jar" ) );
-        assertTrue( compile.toString(), compile.contains( "d-0.1.jar" ) );
+        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertTrue(compile.toString(), compile.contains("a-0.1.jar"));
+        assertFalse(compile.toString(), compile.contains("b-0.1.jar"));
+        assertFalse(compile.toString(), compile.contains("c-0.1.jar"));
+        assertTrue(compile.toString(), compile.contains("d-0.1.jar"));
 
-        List<String> runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
-        assertFalse( runtime.toString(), runtime.contains( "a-0.1.jar" ) );
-        assertTrue( runtime.toString(), runtime.contains( "b-0.1.jar" ) );
-        assertFalse( runtime.toString(), runtime.contains( "c-0.1.jar" ) );
-        assertTrue( runtime.toString(), runtime.contains( "d-0.1.jar" ) );
+        List<String> runtime = verifier.loadLines("target/runtime.txt", "UTF-8");
+        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
+        assertTrue(runtime.toString(), runtime.contains("b-0.1.jar"));
+        assertFalse(runtime.toString(), runtime.contains("c-0.1.jar"));
+        assertTrue(runtime.toString(), runtime.contains("d-0.1.jar"));
 
-        List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
-        assertTrue( test.toString(), test.contains( "a-0.1.jar" ) );
-        assertTrue( test.toString(), test.contains( "b-0.1.jar" ) );
-        assertTrue( test.toString(), test.contains( "c-0.1.jar" ) );
-        assertTrue( test.toString(), test.contains( "d-0.1.jar" ) );
+        List<String> test = verifier.loadLines("target/test.txt", "UTF-8");
+        assertTrue(test.toString(), test.contains("a-0.1.jar"));
+        assertTrue(test.toString(), test.contains("b-0.1.jar"));
+        assertTrue(test.toString(), test.contains("c-0.1.jar"));
+        assertTrue(test.toString(), test.contains("d-0.1.jar"));
     }
 
     /**
@@ -90,22 +83,20 @@ public class MavenITmng1895ScopeConflictResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCompileVsRuntime()
-        throws Exception
-    {
-        Verifier verifier = run( "compile", "runtime" );
+    public void testitCompileVsRuntime() throws Exception {
+        Verifier verifier = run("compile", "runtime");
 
-        List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertTrue( compile.toString(), compile.contains( "x-0.1.jar" ) );
-        assertFalse( compile.toString(), compile.contains( "a-0.1.jar" ) );
+        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertTrue(compile.toString(), compile.contains("x-0.1.jar"));
+        assertFalse(compile.toString(), compile.contains("a-0.1.jar"));
 
-        List<String> runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
-        assertTrue( runtime.toString(), runtime.contains( "x-0.1.jar" ) );
-        assertTrue( runtime.toString(), runtime.contains( "a-0.1.jar" ) );
+        List<String> runtime = verifier.loadLines("target/runtime.txt", "UTF-8");
+        assertTrue(runtime.toString(), runtime.contains("x-0.1.jar"));
+        assertTrue(runtime.toString(), runtime.contains("a-0.1.jar"));
 
-        List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
-        assertTrue( test.toString(), test.contains( "x-0.1.jar" ) );
-        assertTrue( test.toString(), test.contains( "a-0.1.jar" ) );
+        List<String> test = verifier.loadLines("target/test.txt", "UTF-8");
+        assertTrue(test.toString(), test.contains("x-0.1.jar"));
+        assertTrue(test.toString(), test.contains("a-0.1.jar"));
     }
 
     /**
@@ -114,22 +105,20 @@ public class MavenITmng1895ScopeConflictResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCompileVsTest()
-        throws Exception
-    {
-        Verifier verifier = run( "compile", "test" );
+    public void testitCompileVsTest() throws Exception {
+        Verifier verifier = run("compile", "test");
 
-        List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertTrue( compile.toString(), compile.contains( "x-0.1.jar" ) );
-        assertFalse( compile.toString(), compile.contains( "a-0.1.jar" ) );
+        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertTrue(compile.toString(), compile.contains("x-0.1.jar"));
+        assertFalse(compile.toString(), compile.contains("a-0.1.jar"));
 
-        List<String> runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
-        assertTrue( runtime.toString(), runtime.contains( "x-0.1.jar" ) );
-        assertFalse( runtime.toString(), runtime.contains( "a-0.1.jar" ) );
+        List<String> runtime = verifier.loadLines("target/runtime.txt", "UTF-8");
+        assertTrue(runtime.toString(), runtime.contains("x-0.1.jar"));
+        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
 
-        List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
-        assertTrue( test.toString(), test.contains( "x-0.1.jar" ) );
-        assertTrue( test.toString(), test.contains( "a-0.1.jar" ) );
+        List<String> test = verifier.loadLines("target/test.txt", "UTF-8");
+        assertTrue(test.toString(), test.contains("x-0.1.jar"));
+        assertTrue(test.toString(), test.contains("a-0.1.jar"));
     }
 
     /**
@@ -138,22 +127,20 @@ public class MavenITmng1895ScopeConflictResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCompileVsProvided()
-        throws Exception
-    {
-        Verifier verifier = run( "compile", "provided" );
+    public void testitCompileVsProvided() throws Exception {
+        Verifier verifier = run("compile", "provided");
 
-        List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertTrue( compile.toString(), compile.contains( "x-0.1.jar" ) );
-        assertTrue( compile.toString(), compile.contains( "a-0.1.jar" ) );
+        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertTrue(compile.toString(), compile.contains("x-0.1.jar"));
+        assertTrue(compile.toString(), compile.contains("a-0.1.jar"));
 
-        List<String> runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
-        assertTrue( runtime.toString(), runtime.contains( "x-0.1.jar" ) );
-        assertFalse( runtime.toString(), runtime.contains( "a-0.1.jar" ) );
+        List<String> runtime = verifier.loadLines("target/runtime.txt", "UTF-8");
+        assertTrue(runtime.toString(), runtime.contains("x-0.1.jar"));
+        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
 
-        List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
-        assertTrue( test.toString(), test.contains( "x-0.1.jar" ) );
-        assertTrue( test.toString(), test.contains( "a-0.1.jar" ) );
+        List<String> test = verifier.loadLines("target/test.txt", "UTF-8");
+        assertTrue(test.toString(), test.contains("x-0.1.jar"));
+        assertTrue(test.toString(), test.contains("a-0.1.jar"));
     }
 
     /**
@@ -162,22 +149,20 @@ public class MavenITmng1895ScopeConflictResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitRuntimeVsTest()
-        throws Exception
-    {
-        Verifier verifier = run( "runtime", "test" );
+    public void testitRuntimeVsTest() throws Exception {
+        Verifier verifier = run("runtime", "test");
 
-        List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertFalse( compile.toString(), compile.contains( "x-0.1.jar" ) );
-        assertFalse( compile.toString(), compile.contains( "a-0.1.jar" ) );
+        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertFalse(compile.toString(), compile.contains("x-0.1.jar"));
+        assertFalse(compile.toString(), compile.contains("a-0.1.jar"));
 
-        List<String> runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
-        assertTrue( runtime.toString(), runtime.contains( "x-0.1.jar" ) );
-        assertFalse( runtime.toString(), runtime.contains( "a-0.1.jar" ) );
+        List<String> runtime = verifier.loadLines("target/runtime.txt", "UTF-8");
+        assertTrue(runtime.toString(), runtime.contains("x-0.1.jar"));
+        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
 
-        List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
-        assertTrue( test.toString(), test.contains( "x-0.1.jar" ) );
-        assertTrue( test.toString(), test.contains( "a-0.1.jar" ) );
+        List<String> test = verifier.loadLines("target/test.txt", "UTF-8");
+        assertTrue(test.toString(), test.contains("x-0.1.jar"));
+        assertTrue(test.toString(), test.contains("a-0.1.jar"));
     }
 
     /**
@@ -186,22 +171,20 @@ public class MavenITmng1895ScopeConflictResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitRuntimeVsProvided()
-        throws Exception
-    {
-        Verifier verifier = run( "runtime", "provided" );
+    public void testitRuntimeVsProvided() throws Exception {
+        Verifier verifier = run("runtime", "provided");
 
-        List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertFalse( compile.toString(), compile.contains( "x-0.1.jar" ) );
-        assertTrue( compile.toString(), compile.contains( "a-0.1.jar" ) );
+        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertFalse(compile.toString(), compile.contains("x-0.1.jar"));
+        assertTrue(compile.toString(), compile.contains("a-0.1.jar"));
 
-        List<String> runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
-        assertTrue( runtime.toString(), runtime.contains( "x-0.1.jar" ) );
-        assertFalse( runtime.toString(), runtime.contains( "a-0.1.jar" ) );
+        List<String> runtime = verifier.loadLines("target/runtime.txt", "UTF-8");
+        assertTrue(runtime.toString(), runtime.contains("x-0.1.jar"));
+        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
 
-        List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
-        assertTrue( test.toString(), test.contains( "x-0.1.jar" ) );
-        assertTrue( test.toString(), test.contains( "a-0.1.jar" ) );
+        List<String> test = verifier.loadLines("target/test.txt", "UTF-8");
+        assertTrue(test.toString(), test.contains("x-0.1.jar"));
+        assertTrue(test.toString(), test.contains("a-0.1.jar"));
     }
 
     /**
@@ -210,48 +193,43 @@ public class MavenITmng1895ScopeConflictResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitProvidedVsTest()
-        throws Exception
-    {
-        requiresMavenVersion( "[3.0-beta-3,)" ); // MNG-2686
+    public void testitProvidedVsTest() throws Exception {
+        requiresMavenVersion("[3.0-beta-3,)"); // MNG-2686
 
-        Verifier verifier = run( "provided", "test" );
+        Verifier verifier = run("provided", "test");
 
-        List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertTrue( compile.toString(), compile.contains( "x-0.1.jar" ) );
-        assertFalse( compile.toString(), compile.contains( "a-0.1.jar" ) );
+        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertTrue(compile.toString(), compile.contains("x-0.1.jar"));
+        assertFalse(compile.toString(), compile.contains("a-0.1.jar"));
 
-        List<String> runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
-        assertFalse( runtime.toString(), runtime.contains( "x-0.1.jar" ) );
-        assertFalse( runtime.toString(), runtime.contains( "a-0.1.jar" ) );
+        List<String> runtime = verifier.loadLines("target/runtime.txt", "UTF-8");
+        assertFalse(runtime.toString(), runtime.contains("x-0.1.jar"));
+        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
 
-        List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
-        assertTrue( test.toString(), test.contains( "x-0.1.jar" ) );
-        assertTrue( test.toString(), test.contains( "a-0.1.jar" ) );
+        List<String> test = verifier.loadLines("target/test.txt", "UTF-8");
+        assertTrue(test.toString(), test.contains("x-0.1.jar"));
+        assertTrue(test.toString(), test.contains("a-0.1.jar"));
     }
 
-    private Verifier run( String scopeB, String scopeA )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1895/strong-vs-weak" );
+    private Verifier run(String scopeB, String scopeA) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1895/strong-vs-weak");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng1895" );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng1895");
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
         Map<String, String> props = verifier.newDefaultFilterMap();
-        props.put( "@scope.a@", scopeA );
-        props.put( "@scope.b@", scopeB );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", props );
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", props );
-        verifier.setLogFileName( "log-" + scopeB + "-vs-" + scopeA + ".txt" );
-        verifier.addCliArgument( "validate" );
+        props.put("@scope.a@", scopeA);
+        props.put("@scope.b@", scopeB);
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", props);
+        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8", props);
+        verifier.setLogFileName("log-" + scopeB + "-vs-" + scopeA + ".txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         return verifier;
     }
-
 }

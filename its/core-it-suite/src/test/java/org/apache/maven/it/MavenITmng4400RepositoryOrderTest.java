@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4400RepositoryOrderTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4400RepositoryOrderTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4400RepositoryOrderTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -47,23 +42,21 @@ public class MavenITmng4400RepositoryOrderTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitSettingsRepos()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4400" );
+    public void testitSettingsRepos() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4400");
 
-        Verifier verifier = newVerifier( new File( testDir, "settings" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4400" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "settings").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4400");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties checksums = verifier.loadProperties( "target/checksum.properties" );
-        assertChecksum( "d0a4998ff37a55f8de1dffccdff826eca365400f", checksums );
+        Properties checksums = verifier.loadProperties("target/checksum.properties");
+        assertChecksum("d0a4998ff37a55f8de1dffccdff826eca365400f", checksums);
     }
 
     /**
@@ -72,28 +65,24 @@ public class MavenITmng4400RepositoryOrderTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitPomRepos()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4400" );
+    public void testitPomRepos() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4400");
 
-        Verifier verifier = newVerifier( new File( testDir, "pom" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4400" );
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "pom").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4400");
+        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties checksums = verifier.loadProperties( "target/checksum.properties" );
-        assertChecksum( "d0a4998ff37a55f8de1dffccdff826eca365400f", checksums );
+        Properties checksums = verifier.loadProperties("target/checksum.properties");
+        assertChecksum("d0a4998ff37a55f8de1dffccdff826eca365400f", checksums);
     }
 
-    private void assertChecksum( String checksum, Properties checksums )
-    {
-        assertEquals( checksum, checksums.getProperty( "dep-0.1.jar" ).toLowerCase( java.util.Locale.ENGLISH ) );
+    private void assertChecksum(String checksum, Properties checksums) {
+        assertEquals(checksum, checksums.getProperty("dep-0.1.jar").toLowerCase(java.util.Locale.ENGLISH));
     }
-
 }

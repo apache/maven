@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,12 +30,9 @@ import org.junit.jupiter.api.Test;
  * @author John Casey
  *
  */
-public class MavenITmng0781PluginConfigVsExecConfigTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng0781PluginConfigVsExecConfigTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenITmng0781PluginConfigVsExecConfigTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng0781PluginConfigVsExecConfigTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -47,20 +42,17 @@ public class MavenITmng0781PluginConfigVsExecConfigTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG0781()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0781" );
+    public void testitMNG0781() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0781");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "process-resources" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("process-resources");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/exec-level.txt" );
-        verifier.verifyFilePresent( "target/resources-resources.txt" );
+        verifier.verifyFilePresent("target/exec-level.txt");
+        verifier.verifyFilePresent("target/resources-resources.txt");
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4644StrictPomParsingRejectsMisplacedTextTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4644StrictPomParsingRejectsMisplacedTextTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4644StrictPomParsingRejectsMisplacedTextTest()
-    {
-        super( "[3.0-alpha-7,)" );
+    public MavenITmng4644StrictPomParsingRejectsMisplacedTextTest() {
+        super("[3.0-alpha-7,)");
     }
 
     /**
@@ -47,25 +42,19 @@ public class MavenITmng4644StrictPomParsingRejectsMisplacedTextTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4644" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4644");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            fail( "Should fail to validate the POM syntax due to misplaced text in <project> element." );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Should fail to validate the POM syntax due to misplaced text in <project> element.");
+        } catch (VerificationException e) {
             // expected
         }
     }
-
 }

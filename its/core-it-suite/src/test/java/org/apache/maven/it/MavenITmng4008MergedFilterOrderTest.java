@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng4008MergedFilterOrderTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4008MergedFilterOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4008MergedFilterOrderTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4008MergedFilterOrderTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,29 +43,26 @@ public class MavenITmng4008MergedFilterOrderTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG4008()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4008" );
+    public void testitMNG4008() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4008");
 
-        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties modelProps = verifier.loadProperties( "target/model.properties" );
+        Properties modelProps = verifier.loadProperties("target/model.properties");
 
-        assertEquals( "7", modelProps.getProperty( "project.build.filters" ) );
+        assertEquals("7", modelProps.getProperty("project.build.filters"));
 
-        assertTrue( modelProps.getProperty( "project.build.filters.0" ).endsWith( "child-a.properties" ) );
-        assertTrue( modelProps.getProperty( "project.build.filters.1" ).endsWith( "child-c.properties" ) );
-        assertTrue( modelProps.getProperty( "project.build.filters.2" ).endsWith( "child-b.properties" ) );
-        assertTrue( modelProps.getProperty( "project.build.filters.3" ).endsWith( "child-d.properties" ) );
-        assertTrue( modelProps.getProperty( "project.build.filters.4" ).endsWith( "parent-c.properties" ) );
-        assertTrue( modelProps.getProperty( "project.build.filters.5" ).endsWith( "parent-b.properties" ) );
-        assertTrue( modelProps.getProperty( "project.build.filters.6" ).endsWith( "parent-d.properties" ) );
+        assertTrue(modelProps.getProperty("project.build.filters.0").endsWith("child-a.properties"));
+        assertTrue(modelProps.getProperty("project.build.filters.1").endsWith("child-c.properties"));
+        assertTrue(modelProps.getProperty("project.build.filters.2").endsWith("child-b.properties"));
+        assertTrue(modelProps.getProperty("project.build.filters.3").endsWith("child-d.properties"));
+        assertTrue(modelProps.getProperty("project.build.filters.4").endsWith("parent-c.properties"));
+        assertTrue(modelProps.getProperty("project.build.filters.5").endsWith("parent-b.properties"));
+        assertTrue(modelProps.getProperty("project.build.filters.6").endsWith("parent-d.properties"));
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0199CyclicImportScopeTest extends AbstractMavenIntegrationTestCase {
@@ -36,7 +34,8 @@ public class MavenIT0199CyclicImportScopeTest extends AbstractMavenIntegrationTe
     public void testit0199() throws Exception {
         // v1: parent not using BOM; explicit dep from componentB → componentA
         // v2: BOM introduced; componentB → componentA picks up implicit version 1 from main@v1
-        // v3: components now inheriting indirectly from an older version of the BOM that includes them; componentB → componentA version overridden
+        // v3: components now inheriting indirectly from an older version of the BOM that includes them; componentB →
+        // componentA version overridden
         for (int i = 1; i <= 3; i++) {
             build("v" + i + "/parent", null);
             build("v" + i + "/componentA", "target/componentA-" + i + ".jar");
@@ -57,5 +56,4 @@ public class MavenIT0199CyclicImportScopeTest extends AbstractMavenIntegrationTe
         }
         verifier.verifyErrorFreeLog();
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.its.bootstrap;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.its.bootstrap;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.its.bootstrap;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.its.bootstrap;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,10 +47,8 @@ import org.eclipse.aether.resolution.DependencyRequest;
  * Boostrap plugin to download all required dependencies (provided in file) or to collect lifecycle bound build plugin
  * versions.
  */
-@Mojo( name = "download" )
-public class DownloadMojo
-        extends AbstractMojo
-{
+@Mojo(name = "download")
+public class DownloadMojo extends AbstractMojo {
 
     /**
      * A list of artifacts coordinates.
@@ -74,90 +71,70 @@ public class DownloadMojo
     @Component
     private RepositorySystem repositorySystem;
 
-    @Parameter( defaultValue = "${session}", readonly = true )
+    @Parameter(defaultValue = "${session}", readonly = true)
     private MavenSession session;
 
     @Override
-    public void execute() throws MojoFailureException
-    {
+    public void execute() throws MojoFailureException {
         // this or that: either resolver file listed artifacts or collect lifecycle packaging plugins
-        if ( file != null && file.exists() )
-        {
-            System.out.println( "Collecting artifacts from file: " + file );
-            try ( BufferedReader reader = new BufferedReader( new FileReader( file ) ) )
-            {
+        if (file != null && file.exists()) {
+            System.out.println("Collecting artifacts from file: " + file);
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                 reader.lines()
-                        .map( String::trim )
-                        .filter( s ->  !s.isEmpty() && !s.startsWith( "#" ) )
-                        .forEach( artifacts::add );
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty() && !s.startsWith("#"))
+                        .forEach(artifacts::add);
+            } catch (IOException e) {
+                throw new MojoFailureException("Unable to read dependencies: " + file, e);
             }
-            catch ( IOException e )
-            {
-                throw new MojoFailureException( "Unable to read dependencies: " + file, e );
-            }
-        }
-        else
-        {
+        } else {
             MavenProject project = session.getCurrentProject();
-            System.out.println( "Collecting build plugins from packaging: " + project.getPackaging() );
-            for ( Plugin plugin : project.getBuildPlugins() )
-            {
-                artifacts.add( plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() );
+            System.out.println("Collecting build plugins from packaging: " + project.getPackaging());
+            for (Plugin plugin : project.getBuildPlugins()) {
+                artifacts.add(plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion());
             }
         }
 
-        for ( String artifact : artifacts )
-        {
-            if ( artifact != null )
-            {
-                dependencies.add( toDependency( artifact ) );
+        for (String artifact : artifacts) {
+            if (artifact != null) {
+                dependencies.add(toDependency(artifact));
             }
         }
 
         ProjectBuildingRequest projectBuildingRequest = session.getProjectBuildingRequest();
         RepositorySystemSession repositorySystemSession = projectBuildingRequest.getRepositorySession();
-        List<RemoteRepository> repos = RepositoryUtils.toRepos( projectBuildingRequest.getRemoteRepositories() );
+        List<RemoteRepository> repos = RepositoryUtils.toRepos(projectBuildingRequest.getRemoteRepositories());
 
-        for ( Dependency dependency : dependencies )
-        {
-            try
-            {
-                org.eclipse.aether.graph.Dependency root = RepositoryUtils.toDependency(
-                        dependency, repositorySystemSession.getArtifactTypeRegistry() );
-                CollectRequest collectRequest = new CollectRequest( root, null, repos );
-                collectRequest.setRequestContext( "bootstrap" );
-                DependencyRequest request = new DependencyRequest( collectRequest, null ) ;
-                System.out.println( "Resolving: " + root.getArtifact() );
-                repositorySystem.resolveDependencies( repositorySystemSession, request );
-            }
-            catch ( Exception e )
-            {
-                throw new MojoFailureException( "Unable to resolve dependency: " + dependency, e );
+        for (Dependency dependency : dependencies) {
+            try {
+                org.eclipse.aether.graph.Dependency root =
+                        RepositoryUtils.toDependency(dependency, repositorySystemSession.getArtifactTypeRegistry());
+                CollectRequest collectRequest = new CollectRequest(root, null, repos);
+                collectRequest.setRequestContext("bootstrap");
+                DependencyRequest request = new DependencyRequest(collectRequest, null);
+                System.out.println("Resolving: " + root.getArtifact());
+                repositorySystem.resolveDependencies(repositorySystemSession, request);
+            } catch (Exception e) {
+                throw new MojoFailureException("Unable to resolve dependency: " + dependency, e);
             }
         }
     }
 
-
-    static Dependency toDependency( String artifact )
-            throws MojoFailureException
-    {
+    static Dependency toDependency(String artifact) throws MojoFailureException {
         Dependency coordinate = new Dependency();
-        String[] tokens = artifact.split( ":" );
-        if ( tokens.length < 3 || tokens.length > 5 )
-        {
-            throw new MojoFailureException( "Invalid artifact, you must specify "
-                    + "groupId:artifactId:version[:packaging[:classifier]] " + artifact );
+        String[] tokens = artifact.split(":");
+        if (tokens.length < 3 || tokens.length > 5) {
+            throw new MojoFailureException("Invalid artifact, you must specify "
+                    + "groupId:artifactId:version[:packaging[:classifier]] " + artifact);
         }
-        coordinate.setGroupId( tokens[0] );
-        coordinate.setArtifactId( tokens[1] );
-        coordinate.setVersion( tokens[2] );
-        if ( tokens.length >= 4 )
-        {
-            coordinate.setType( tokens[3] );
+        coordinate.setGroupId(tokens[0]);
+        coordinate.setArtifactId(tokens[1]);
+        coordinate.setVersion(tokens[2]);
+        if (tokens.length >= 4) {
+            coordinate.setType(tokens[3]);
         }
-        if ( tokens.length == 5 )
-        {
-            coordinate.setClassifier( tokens[4] );
+        if (tokens.length == 5) {
+            coordinate.setClassifier(tokens[4]);
         }
         return coordinate;
     }

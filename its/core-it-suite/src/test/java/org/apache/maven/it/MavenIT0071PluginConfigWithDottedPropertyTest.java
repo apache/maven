@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,12 +30,9 @@ import org.junit.jupiter.api.Test;
  * @author John Casey
  *
  */
-public class MavenIT0071PluginConfigWithDottedPropertyTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenIT0071PluginConfigWithDottedPropertyTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenIT0071PluginConfigWithDottedPropertyTest extends AbstractMavenIntegrationTestCase {
+    public MavenIT0071PluginConfigWithDottedPropertyTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -47,19 +42,16 @@ public class MavenIT0071PluginConfigWithDottedPropertyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit0071()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0071" );
+    public void testit0071() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0071");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-touch:touch");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/foo2" );
+        verifier.verifyFilePresent("target/foo2");
     }
-
 }

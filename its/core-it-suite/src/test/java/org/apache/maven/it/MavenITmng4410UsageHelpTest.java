@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4410UsageHelpTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4410UsageHelpTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4410UsageHelpTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4410UsageHelpTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -46,20 +41,17 @@ public class MavenITmng4410UsageHelpTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4410" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4410");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "--help" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("--help");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyTextInLog( "--version" );
-        verifier.verifyTextInLog( "--debug" );
-        verifier.verifyTextInLog( "--batch-mode" );
+        verifier.verifyTextInLog("--version");
+        verifier.verifyTextInLog("--debug");
+        verifier.verifyTextInLog("--batch-mode");
     }
-
 }

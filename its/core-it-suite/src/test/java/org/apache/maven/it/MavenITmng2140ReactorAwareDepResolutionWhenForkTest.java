@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng2140ReactorAwareDepResolutionWhenForkTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2140ReactorAwareDepResolutionWhenForkTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2140ReactorAwareDepResolutionWhenForkTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng2140ReactorAwareDepResolutionWhenForkTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -47,20 +42,17 @@ public class MavenITmng2140ReactorAwareDepResolutionWhenForkTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2140" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2140");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines( "project/target/test.txt", "UTF-8" );
-        assertTrue( artifacts.toString(), artifacts.contains( "dependency/pom.xml" ) );
+        List<String> artifacts = verifier.loadLines("project/target/test.txt", "UTF-8");
+        assertTrue(artifacts.toString(), artifacts.contains("dependency/pom.xml"));
     }
-
 }

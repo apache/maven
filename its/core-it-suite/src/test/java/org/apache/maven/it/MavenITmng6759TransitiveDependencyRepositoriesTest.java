@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.net.URI;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,7 +33,7 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
     private final String projectBaseDir = "/mng-6759-transitive-dependency-repositories";
 
     public MavenITmng6759TransitiveDependencyRepositoriesTest() {
-        super( "(,3.6.2),(3.6.2,)" );
+        super("(,3.6.2),(3.6.2,)");
     }
 
     /**
@@ -47,32 +45,29 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
     @Test
     public void testTransitiveDependenciesAccountForRepositoriesListedByDependencyTrailPredecessor() throws Exception {
         installDependencyCInCustomRepo();
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), projectBaseDir );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), projectBaseDir);
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.addCliArgument( "package"  );
+        verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 
     private void installDependencyCInCustomRepo() throws Exception {
-        File dependencyCProjectDir = ResourceExtractor.simpleExtractResources( getClass(), projectBaseDir + "/dependency-in-custom-repo" );
-        URI customRepoUri = new File(new File(dependencyCProjectDir, "target" ), "repo" ).toURI();
-        Verifier verifier = newVerifier( dependencyCProjectDir.getAbsolutePath() );
+        File dependencyCProjectDir =
+                ResourceExtractor.simpleExtractResources(getClass(), projectBaseDir + "/dependency-in-custom-repo");
+        URI customRepoUri = new File(new File(dependencyCProjectDir, "target"), "repo").toURI();
+        Verifier verifier = newVerifier(dependencyCProjectDir.getAbsolutePath());
 
-        verifier.deleteDirectory( "target" );
-        if ( getMavenVersion().getMajorVersion() <= 3 )
-        {
-            verifier.addCliArgument( "-DaltDeploymentRepository=customRepo::default::" + customRepoUri );
+        verifier.deleteDirectory("target");
+        if (getMavenVersion().getMajorVersion() <= 3) {
+            verifier.addCliArgument("-DaltDeploymentRepository=customRepo::default::" + customRepoUri);
+        } else {
+            verifier.addCliArgument("-DaltDeploymentRepository=customRepo::" + customRepoUri);
         }
-        else
-        {
-            verifier.addCliArgument( "-DaltDeploymentRepository=customRepo::" + customRepoUri );
-        }
-        verifier.addCliArgument( "deploy" );
+        verifier.addCliArgument("deploy");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

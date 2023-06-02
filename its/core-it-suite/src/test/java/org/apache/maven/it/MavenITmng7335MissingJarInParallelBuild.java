@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,33 +16,29 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng7335MissingJarInParallelBuild
-        extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng7335MissingJarInParallelBuild extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7335-missing-jar-in-parallel-build";
 
-    public MavenITmng7335MissingJarInParallelBuild()
-    {
-        super( "[3.8.1,)" );
+    public MavenITmng7335MissingJarInParallelBuild() {
+        super("[3.8.1,)");
     }
 
     @Test
-    public void testMissingJarInParallelBuild() throws IOException, VerificationException
-    {
-        final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
-        final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.addCliArgument( "-T1C" );
-        verifier.addCliArguments( "clean", "package" );
+    public void testMissingJarInParallelBuild() throws IOException, VerificationException {
+        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier.addCliArgument("-T1C");
+        verifier.addCliArguments("clean", "package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }

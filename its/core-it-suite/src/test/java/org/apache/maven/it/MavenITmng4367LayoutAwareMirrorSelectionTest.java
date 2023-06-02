@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Map;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4367LayoutAwareMirrorSelectionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4367LayoutAwareMirrorSelectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4367LayoutAwareMirrorSelectionTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng4367LayoutAwareMirrorSelectionTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -48,29 +43,27 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitNoLayout()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4367" );
+    public void testitNoLayout() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4367");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4367" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4367");
 
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
-        filterProps.put( "@repourl@", filterProps.get( "@baseurl@" ) + "/void" );
-        filterProps.put( "@mirrorurl@", filterProps.get( "@baseurl@" ) + "/repo" );
-        filterProps.put( "@layouts@", "" );
+        filterProps.put("@repourl@", filterProps.get("@baseurl@") + "/void");
+        filterProps.put("@mirrorurl@", filterProps.get("@baseurl@") + "/repo");
+        filterProps.put("@layouts@", "");
 
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings-a.xml" );
-        verifier.filterFile( "settings-template.xml", "settings-a.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-a.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings-a.xml");
+        verifier.filterFile("settings-template.xml", "settings-a.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-a.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4367", "dep", "0.1", "jar");
     }
 
     /**
@@ -79,29 +72,27 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitSpecificLayouts()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4367" );
+    public void testitSpecificLayouts() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4367");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4367" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4367");
 
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
-        filterProps.put( "@repourl@", filterProps.get( "@baseurl@" ) + "/void" );
-        filterProps.put( "@mirrorurl@", filterProps.get( "@baseurl@" ) + "/repo" );
-        filterProps.put( "@layouts@", "default,legacy" );
+        filterProps.put("@repourl@", filterProps.get("@baseurl@") + "/void");
+        filterProps.put("@mirrorurl@", filterProps.get("@baseurl@") + "/repo");
+        filterProps.put("@layouts@", "default,legacy");
 
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings-b.xml" );
-        verifier.filterFile( "settings-template.xml", "settings-b.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-b.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings-b.xml");
+        verifier.filterFile("settings-template.xml", "settings-b.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-b.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4367", "dep", "0.1", "jar");
     }
 
     /**
@@ -110,29 +101,26 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitNonMatchingLayout()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4367" );
+    public void testitNonMatchingLayout() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4367");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4367" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4367");
 
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
-        filterProps.put( "@repourl@", filterProps.get( "@baseurl@" ) + "/repo" );
-        filterProps.put( "@mirrorurl@", filterProps.get( "@baseurl@" ) + "/void" );
-        filterProps.put( "@layouts@", "foo" );
+        filterProps.put("@repourl@", filterProps.get("@baseurl@") + "/repo");
+        filterProps.put("@mirrorurl@", filterProps.get("@baseurl@") + "/void");
+        filterProps.put("@layouts@", "foo");
 
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings-c.xml" );
-        verifier.filterFile( "settings-template.xml", "settings-c.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-c.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings-c.xml");
+        verifier.filterFile("settings-template.xml", "settings-c.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-c.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4367", "dep", "0.1", "jar");
     }
-
 }

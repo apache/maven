@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4936EventSpyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4936EventSpyTest()
-    {
-        super( "[3.0.2,)" );
+    public MavenITmng4936EventSpyTest() {
+        super("[3.0.2,)");
     }
 
     /**
@@ -47,34 +42,31 @@ public class MavenITmng4936EventSpyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4936" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4936");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setForkJvm( true );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-Dmaven.ext.class.path=spy-0.1.jar" );
-        verifier.addCliArgument( "-X" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setForkJvm(true);
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-Dmaven.ext.class.path=spy-0.1.jar");
+        verifier.addCliArgument("-X");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines( "target/spy.log", "UTF-8" );
-        assertTrue( lines.toString(), lines.get( 0 ).toString().startsWith( "init" ) );
-        assertTrue( lines.toString(), lines.get( lines.size() - 1 ).toString().startsWith( "close" ) );
-        assertTrue( lines.toString(),
-            lines.contains( "event: org.apache.maven.settings.building.DefaultSettingsBuildingRequest" ) );
-        assertTrue( lines.toString(),
-            lines.contains( "event: org.apache.maven.settings.building.DefaultSettingsBuildingResult" ) );
-        assertTrue( lines.toString(),
-            lines.contains( "event: org.apache.maven.execution.DefaultMavenExecutionRequest" ) );
-        assertTrue( lines.toString(),
-            lines.contains( "event: org.apache.maven.execution.DefaultMavenExecutionResult" ) );
-        assertTrue( lines.toString(),
-            lines.contains( "event: org.apache.maven.lifecycle.internal.DefaultExecutionEvent" ) );
+        List<String> lines = verifier.loadLines("target/spy.log", "UTF-8");
+        assertTrue(lines.toString(), lines.get(0).toString().startsWith("init"));
+        assertTrue(lines.toString(), lines.get(lines.size() - 1).toString().startsWith("close"));
+        assertTrue(
+                lines.toString(),
+                lines.contains("event: org.apache.maven.settings.building.DefaultSettingsBuildingRequest"));
+        assertTrue(
+                lines.toString(),
+                lines.contains("event: org.apache.maven.settings.building.DefaultSettingsBuildingResult"));
+        assertTrue(lines.toString(), lines.contains("event: org.apache.maven.execution.DefaultMavenExecutionRequest"));
+        assertTrue(lines.toString(), lines.contains("event: org.apache.maven.execution.DefaultMavenExecutionResult"));
+        assertTrue(
+                lines.toString(), lines.contains("event: org.apache.maven.lifecycle.internal.DefaultExecutionEvent"));
     }
-
 }

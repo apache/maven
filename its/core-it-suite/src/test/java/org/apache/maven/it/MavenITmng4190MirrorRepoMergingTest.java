@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,13 +33,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4190MirrorRepoMergingTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4190MirrorRepoMergingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4190MirrorRepoMergingTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng4190MirrorRepoMergingTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -52,41 +47,38 @@ public class MavenITmng4190MirrorRepoMergingTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4190" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4190");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4190" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4190");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
-        Collections.sort( artifacts );
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        Collections.sort(artifacts);
 
         List<String> expected = new ArrayList<>();
-        expected.add( "org.apache.maven.its.mng4190:a:jar:0.1" );
-        expected.add( "org.apache.maven.its.mng4190:b:jar:0.1-SNAPSHOT" );
+        expected.add("org.apache.maven.its.mng4190:a:jar:0.1");
+        expected.add("org.apache.maven.its.mng4190:b:jar:0.1-SNAPSHOT");
 
-        assertEquals( expected, artifacts );
+        assertEquals(expected, artifacts);
 
-        Properties props = verifier.loadProperties( "target/repo.properties" );
-        assertEquals( "1", props.getProperty( "project.remoteArtifactRepositories" ) );
+        Properties props = verifier.loadProperties("target/repo.properties");
+        assertEquals("1", props.getProperty("project.remoteArtifactRepositories"));
 
-        assertEquals( "true", props.getProperty( "project.remoteArtifactRepositories.0.releases.enabled" ) );
-        assertEquals( "ignore", props.getProperty( "project.remoteArtifactRepositories.0.releases.checksumPolicy" ) );
-        assertEquals( "daily", props.getProperty( "project.remoteArtifactRepositories.0.releases.updatePolicy" ) );
+        assertEquals("true", props.getProperty("project.remoteArtifactRepositories.0.releases.enabled"));
+        assertEquals("ignore", props.getProperty("project.remoteArtifactRepositories.0.releases.checksumPolicy"));
+        assertEquals("daily", props.getProperty("project.remoteArtifactRepositories.0.releases.updatePolicy"));
 
-        assertEquals( "true", props.getProperty( "project.remoteArtifactRepositories.0.snapshots.enabled" ) );
-        assertEquals( "ignore", props.getProperty( "project.remoteArtifactRepositories.0.snapshots.checksumPolicy" ) );
-        assertEquals( "always", props.getProperty( "project.remoteArtifactRepositories.0.snapshots.updatePolicy" ) );
+        assertEquals("true", props.getProperty("project.remoteArtifactRepositories.0.snapshots.enabled"));
+        assertEquals("ignore", props.getProperty("project.remoteArtifactRepositories.0.snapshots.checksumPolicy"));
+        assertEquals("always", props.getProperty("project.remoteArtifactRepositories.0.snapshots.updatePolicy"));
     }
-
 }

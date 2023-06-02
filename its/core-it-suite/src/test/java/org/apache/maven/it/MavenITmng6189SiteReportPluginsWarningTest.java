@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,27 +30,21 @@ import org.junit.jupiter.api.Test;
  *
  * @author Hervé Boutemy
  */
-public class MavenITmng6189SiteReportPluginsWarningTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng6189SiteReportPluginsWarningTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6189SiteReportPluginsWarningTest()
-    {
-        super( "(3.5-alpha-1,4.0.0-alpha-2]" );
+    public MavenITmng6189SiteReportPluginsWarningTest() {
+        super("(3.5-alpha-1,4.0.0-alpha-2]");
     }
 
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6189-site-reportPlugins-warning" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6189-site-reportPlugins-warning");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
-        verifier.verifyTextInLog( "[WARNING] Reporting configuration should be done in <reporting> section" );
+        verifier.verifyTextInLog("[WARNING] Reporting configuration should be done in <reporting> section");
     }
-
 }

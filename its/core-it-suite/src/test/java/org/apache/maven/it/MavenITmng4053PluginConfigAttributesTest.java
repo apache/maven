@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4053PluginConfigAttributesTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4053PluginConfigAttributesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4053PluginConfigAttributesTest()
-    {
-        super( "[2.0.3,)" );
+    public MavenITmng4053PluginConfigAttributesTest() {
+        super("[2.0.3,)");
     }
 
     /**
@@ -48,10 +43,8 @@ public class MavenITmng4053PluginConfigAttributesTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithoutPluginMngt()
-        throws Exception
-    {
-        testit( "test-1" );
+    public void testitWithoutPluginMngt() throws Exception {
+        testit("test-1");
     }
 
     /**
@@ -61,10 +54,8 @@ public class MavenITmng4053PluginConfigAttributesTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithPluginMngt()
-        throws Exception
-    {
-        testit( "test-2" );
+    public void testitWithPluginMngt() throws Exception {
+        testit("test-2");
     }
 
     /**
@@ -74,34 +65,29 @@ public class MavenITmng4053PluginConfigAttributesTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithPluginMngtAndProfile()
-        throws Exception
-    {
-        testit( "test-3" );
+    public void testitWithPluginMngtAndProfile() throws Exception {
+        testit("test-3");
     }
 
-    private void testit( String test )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4053/" + test );
+    private void testit(String test) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4053/" + test);
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
+        Properties props = verifier.loadProperties("target/config.properties");
 
-        assertEquals( "src", props.getProperty( "domParam.children.copy.0.attributes.todir" ) );
-        assertEquals( "true", props.getProperty( "domParam.children.copy.0.attributes.overwrite" ) );
-        assertEquals( "2", props.getProperty( "domParam.children.copy.0.attributes" ) );
+        assertEquals("src", props.getProperty("domParam.children.copy.0.attributes.todir"));
+        assertEquals("true", props.getProperty("domParam.children.copy.0.attributes.overwrite"));
+        assertEquals("2", props.getProperty("domParam.children.copy.0.attributes"));
 
-        assertEquals( "target", props.getProperty( "domParam.children.copy.0.children.fileset.0.attributes.dir" ) );
-        assertNull( props.getProperty( "domParam.children.copy.0.children.fileset.0.attributes.todir" ) );
-        assertNull( props.getProperty( "domParam.children.copy.0.children.fileset.0.attributes.overwrite" ) );
-        assertEquals( "1", props.getProperty( "domParam.children.copy.0.children.fileset.0.attributes" ) );
+        assertEquals("target", props.getProperty("domParam.children.copy.0.children.fileset.0.attributes.dir"));
+        assertNull(props.getProperty("domParam.children.copy.0.children.fileset.0.attributes.todir"));
+        assertNull(props.getProperty("domParam.children.copy.0.children.fileset.0.attributes.overwrite"));
+        assertEquals("1", props.getProperty("domParam.children.copy.0.children.fileset.0.attributes"));
     }
-
 }

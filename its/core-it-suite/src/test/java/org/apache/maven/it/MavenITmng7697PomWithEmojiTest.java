@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.it;
 
 import java.io.File;
 
@@ -29,14 +28,11 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-7697">MNG-7697</a>.
  * Verifies if pom with emoji in comments are parsed.
  */
-class MavenITmng7697PomWithEmojiTest
-    extends AbstractMavenIntegrationTestCase
-{
+class MavenITmng7697PomWithEmojiTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7697PomWithEmojiTest()
-    {
+    public MavenITmng7697PomWithEmojiTest() {
         // affected Maven versions: 3.9.0, 4.0.0-alpha-4
-        super( "(,3.9.0),(3.9.0,4.0.0-alpha-4),(4.0.0-alpha-4,)" );
+        super("(,3.9.0),(3.9.0,4.0.0-alpha-4),(4.0.0-alpha-4,)");
     }
 
     /**
@@ -45,14 +41,12 @@ class MavenITmng7697PomWithEmojiTest
      * @throws Exception in case of failure
      */
     @Test
-    void testPomRead()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7697-emoji" );
+    void testPomRead() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7697-emoji");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "verify" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }

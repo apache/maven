@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng3208ProfileAwareReactorSortingTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3208ProfileAwareReactorSortingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3208ProfileAwareReactorSortingTest()
-    {
-        super( "[2.0.3,)" );
+    public MavenITmng3208ProfileAwareReactorSortingTest() {
+        super("[2.0.3,)");
     }
 
     /**
@@ -48,21 +43,18 @@ public class MavenITmng3208ProfileAwareReactorSortingTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3208" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3208");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-Pmng3208" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-Pmng3208");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> order = verifier.loadLines( "target/order.txt", "UTF-8" );
-        assertEquals( Arrays.asList( new String[] { "mod-b", "mod-a" } ), order );
+        List<String> order = verifier.loadLines("target/order.txt", "UTF-8");
+        assertEquals(Arrays.asList(new String[] {"mod-b", "mod-a"}), order);
     }
-
 }

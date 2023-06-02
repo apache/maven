@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng0870ReactorAwarePluginDiscoveryTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng0870ReactorAwarePluginDiscoveryTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0870ReactorAwarePluginDiscoveryTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng0870ReactorAwarePluginDiscoveryTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,23 +43,20 @@ public class MavenITmng0870ReactorAwarePluginDiscoveryTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG0870()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0870" );
+    public void testitMNG0870() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0870");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "project/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng0870" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "initialize" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("project/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng0870");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "project/target/touch.txt" );
+        verifier.verifyFilePresent("project/target/touch.txt");
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,14 +29,11 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng3581PluginUsesWagonDependencyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3581PluginUsesWagonDependencyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3581PluginUsesWagonDependencyTest()
-    {
+    public MavenITmng3581PluginUsesWagonDependencyTest() {
         // Not 2.0.9
-        super( "(2.0.4,2.0.9),(2.0.9,)" );
+        super("(2.0.4,2.0.9),(2.0.9,)");
     }
 
     /**
@@ -47,17 +42,14 @@ public class MavenITmng3581PluginUsesWagonDependencyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3581" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3581");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "initialize" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("initialize");
         verifier.execute();
-        verifier.addCliArgument( "-B" );
+        verifier.addCliArgument("-B");
         verifier.verifyErrorFreeLog();
     }
-
 }

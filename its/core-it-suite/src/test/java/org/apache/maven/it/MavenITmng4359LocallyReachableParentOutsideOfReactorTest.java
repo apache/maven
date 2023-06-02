@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4359LocallyReachableParentOutsideOfReactorTest()
-    {
-        super( "[2.0.7,)" );
+    public MavenITmng4359LocallyReachableParentOutsideOfReactorTest() {
+        super("[2.0.7,)");
     }
 
     /**
@@ -48,23 +43,20 @@ public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4359" );
-        testDir = new File( testDir, "reactor-parent" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4359");
+        testDir = new File(testDir, "reactor-parent");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "mod-c/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4359" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("mod-c/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4359");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> cp = verifier.loadLines( "mod-c/target/classpath.txt", "UTF-8" );
-        assertTrue( cp.toString(), cp.contains( "mod-b/pom.xml" ) );
-        assertTrue( cp.toString(), cp.contains( "mod-a/pom.xml" ) );
+        List<String> cp = verifier.loadLines("mod-c/target/classpath.txt", "UTF-8");
+        assertTrue(cp.toString(), cp.contains("mod-b/pom.xml"));
+        assertTrue(cp.toString(), cp.contains("mod-a/pom.xml"));
     }
-
 }

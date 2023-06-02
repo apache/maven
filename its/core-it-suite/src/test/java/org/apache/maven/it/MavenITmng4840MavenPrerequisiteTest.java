@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4840MavenPrerequisiteTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4840MavenPrerequisiteTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4840MavenPrerequisiteTest()
-    {
-        super( "[2.1.0,3.0-alpha-1),[3.0.2,)" );
+    public MavenITmng4840MavenPrerequisiteTest() {
+        super("[2.1.0,3.0-alpha-1),[3.0.2,)");
     }
 
     /**
@@ -46,27 +41,22 @@ public class MavenITmng4840MavenPrerequisiteTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMojoExecution()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4840" );
+    public void testitMojoExecution() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4840");
 
-        Verifier verifier = newVerifier( new File( testDir, "test-1" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4840" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "test-1").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4840");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Build did not fail despite unsatisfied prerequisite of plugin on Maven version." );
-        }
-        catch ( Exception e )
-        {
+            fail("Build did not fail despite unsatisfied prerequisite of plugin on Maven version.");
+        } catch (Exception e) {
             // expected, unsolvable version conflict
         }
     }
@@ -78,24 +68,21 @@ public class MavenITmng4840MavenPrerequisiteTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitPluginVersionResolution()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4840" );
+    public void testitPluginVersionResolution() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4840");
 
-        Verifier verifier = newVerifier( new File( testDir, "test-2" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4840" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "org.apache.maven.its.mng4840:maven-mng4840-plugin:touch" );
+        Verifier verifier = newVerifier(new File(testDir, "test-2").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4840");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("org.apache.maven.its.mng4840:maven-mng4840-plugin:touch");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/touch-1.txt" );
-        verifier.verifyFileNotPresent( "target/touch-2.txt" );
+        verifier.verifyFilePresent("target/touch-1.txt");
+        verifier.verifyFileNotPresent("target/touch-2.txt");
     }
-
 }

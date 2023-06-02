@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,56 +29,44 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng3535SelfReferentialPropertiesTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3535SelfReferentialPropertiesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3535SelfReferentialPropertiesTest()
-    {
-        super( "[2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" );
+    public MavenITmng3535SelfReferentialPropertiesTest() {
+        super("[2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)");
     }
 
     @Test
-    public void testitMNG3535_ShouldSucceed()
-        throws Exception
-    {
-        File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3535/success" );
+    public void testitMNG3535_ShouldSucceed() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3535/success");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.addCliArgument( "-X" );
+        verifier.addCliArgument("-X");
 
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "verify" );
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("verify");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }
 
     @Test
-    public void testitMNG3535_ShouldFail()
-        throws Exception
-    {
-        File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3535/failure" );
+    public void testitMNG3535_ShouldFail() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3535/failure");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.addCliArgument( "-X" );
+        verifier.addCliArgument("-X");
 
-        verifier.setAutoclean( false );
+        verifier.setAutoclean(false);
 
-        try
-        {
-            verifier.addCliArgument( "verify" );
+        try {
+            verifier.addCliArgument("verify");
             verifier.execute();
 
             verifier.verifyErrorFreeLog();
-            fail( "There is a self-referential property in this build; it should fail." );
-        }
-        catch ( Exception e )
-        {
+            fail("There is a self-referential property in this build; it should fail.");
+        } catch (Exception e) {
             // should fail this verification, because there truly is a self-referential property.
         }
     }

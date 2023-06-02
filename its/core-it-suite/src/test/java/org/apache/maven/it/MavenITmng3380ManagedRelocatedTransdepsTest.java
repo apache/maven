@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -39,13 +37,10 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng3380ManagedRelocatedTransdepsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3380ManagedRelocatedTransdepsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3380ManagedRelocatedTransdepsTest()
-    {
-        super( "(2.0.9,)" );
+    public MavenITmng3380ManagedRelocatedTransdepsTest() {
+        super("(2.0.9,)");
     }
 
     /**
@@ -54,35 +49,32 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3380()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3380" );
+    public void testitMNG3380() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3380");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3380" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3380");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
-        assertEquals( 4, artifacts.size() );
-        assertEquals( "org.apache.maven.its.mng3380:direct:jar:1", artifacts.get( 0 ) );
-        assertEquals( "org.apache.maven.its.mng3380.new:transitive:jar:2", artifacts.get( 1 ) );
-        assertEquals( "org.apache.maven.its.mng3380.other:a:jar:1", artifacts.get( 2 ) );
-        assertEquals( "org.apache.maven.its.mng3380.other:b:jar:1", artifacts.get( 3 ) );
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        assertEquals(4, artifacts.size());
+        assertEquals("org.apache.maven.its.mng3380:direct:jar:1", artifacts.get(0));
+        assertEquals("org.apache.maven.its.mng3380.new:transitive:jar:2", artifacts.get(1));
+        assertEquals("org.apache.maven.its.mng3380.other:a:jar:1", artifacts.get(2));
+        assertEquals("org.apache.maven.its.mng3380.other:b:jar:1", artifacts.get(3));
 
-        List<String> paths = verifier.loadLines( "target/test.txt", "UTF-8" );
-        assertEquals( 6, paths.size() );
-        assertEquals( "direct-1.jar", paths.get( 2 ) );
-        assertEquals( "transitive-2.jar", paths.get( 3 ) );
-        assertEquals( "a-1.jar", paths.get( 4 ) );
-        assertEquals( "b-1.jar", paths.get( 5 ) );
+        List<String> paths = verifier.loadLines("target/test.txt", "UTF-8");
+        assertEquals(6, paths.size());
+        assertEquals("direct-1.jar", paths.get(2));
+        assertEquals("transitive-2.jar", paths.get(3));
+        assertEquals("a-1.jar", paths.get(4));
+        assertEquals("b-1.jar", paths.get(5));
     }
-
 }

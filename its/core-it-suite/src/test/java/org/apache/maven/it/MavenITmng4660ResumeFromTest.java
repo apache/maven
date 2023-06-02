@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,9 +32,8 @@ import org.junit.jupiter.api.Test;
  * @author Martin Kanters
  */
 public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng4660ResumeFromTest()
-    {
-        super( "[4.0.0-alpha-1,)" );
+    public MavenITmng4660ResumeFromTest() {
+        super("[4.0.0-alpha-1,)");
     }
 
     /**
@@ -48,30 +45,26 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
      * @throws Exception in case of failure
      */
     @Test
-    public void testShouldResolveOutputDirectoryFromEarlierBuild() throws Exception
-    {
-        final File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4660-resume-from" );
+    public void testShouldResolveOutputDirectoryFromEarlierBuild() throws Exception {
+        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4660-resume-from");
 
-        final Verifier verifier1 = newVerifier( testDir.getAbsolutePath() );
-        verifier1.deleteDirectory( "target" );
-        verifier1.deleteArtifacts( "org.apache.maven.its.mng4660" );
+        final Verifier verifier1 = newVerifier(testDir.getAbsolutePath());
+        verifier1.deleteDirectory("target");
+        verifier1.deleteArtifacts("org.apache.maven.its.mng4660");
 
-        try
-        {
-            verifier1.addCliArgument( "test" ); // The test goal will not create a packaged artifact
+        try {
+            verifier1.addCliArgument("test"); // The test goal will not create a packaged artifact
             verifier1.execute();
-            fail( "Expected this invocation to fail" ); // See TestCase.java
-        }
-        catch ( final VerificationException ve )
-        {
-            verifier1.verifyTextInLog( "Deliberately fail test case" );
+            fail("Expected this invocation to fail"); // See TestCase.java
+        } catch (final VerificationException ve) {
+            verifier1.verifyTextInLog("Deliberately fail test case");
         }
 
-        final Verifier verifier2 = newVerifier( testDir.getAbsolutePath() );
-        verifier2.setAutoclean( false );
-        verifier2.addCliArgument( "--resume-from" );
-        verifier2.addCliArgument( ":module-b" );
-        verifier2.addCliArgument( "compile" );
+        final Verifier verifier2 = newVerifier(testDir.getAbsolutePath());
+        verifier2.setAutoclean(false);
+        verifier2.addCliArgument("--resume-from");
+        verifier2.addCliArgument(":module-b");
+        verifier2.addCliArgument("compile");
         verifier2.execute(); // to prevent the unit test from failing (again)
 
         verifier2.verifyErrorFreeLog();
@@ -85,30 +78,26 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
      * @throws Exception in case of failure
      */
     @Test
-    public void testShouldResolvePackagedArtifactFromEarlierBuild() throws Exception
-    {
-        final File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4660-resume-from" );
+    public void testShouldResolvePackagedArtifactFromEarlierBuild() throws Exception {
+        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4660-resume-from");
 
-        final Verifier verifier1 = newVerifier( testDir.getAbsolutePath() );
-        verifier1.deleteDirectory( "target" );
-        verifier1.deleteArtifacts( "org.apache.maven.its.mng4660" );
+        final Verifier verifier1 = newVerifier(testDir.getAbsolutePath());
+        verifier1.deleteDirectory("target");
+        verifier1.deleteArtifacts("org.apache.maven.its.mng4660");
 
-        try
-        {
-            verifier1.addCliArgument( "verify" ); // The verify goal will create a packaged artifact
+        try {
+            verifier1.addCliArgument("verify"); // The verify goal will create a packaged artifact
             verifier1.execute();
-            fail( "Expected this invocation to fail" ); // See TestCase.java
-        }
-        catch ( final VerificationException ve )
-        {
-            verifier1.verifyTextInLog( "Deliberately fail test case" );
+            fail("Expected this invocation to fail"); // See TestCase.java
+        } catch (final VerificationException ve) {
+            verifier1.verifyTextInLog("Deliberately fail test case");
         }
 
-        final Verifier verifier2 = newVerifier( testDir.getAbsolutePath() );
-        verifier2.setAutoclean( false );
-        verifier2.addCliArgument( "--resume-from" );
-        verifier2.addCliArgument( ":module-b" );
-        verifier2.addCliArgument( "compile" ); // to prevent the unit test from failing (again)
+        final Verifier verifier2 = newVerifier(testDir.getAbsolutePath());
+        verifier2.setAutoclean(false);
+        verifier2.addCliArgument("--resume-from");
+        verifier2.addCliArgument(":module-b");
+        verifier2.addCliArgument("compile"); // to prevent the unit test from failing (again)
         verifier2.execute();
 
         verifier2.verifyErrorFreeLog();

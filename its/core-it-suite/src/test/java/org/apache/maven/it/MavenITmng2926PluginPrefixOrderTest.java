@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Brian Fox
  *
  */
-public class MavenITmng2926PluginPrefixOrderTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2926PluginPrefixOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2926PluginPrefixOrderTest()
-    {
-        super( "(2.0.6,)" );
+    public MavenITmng2926PluginPrefixOrderTest() {
+        super("(2.0.6,)");
     }
 
     /**
@@ -48,43 +43,45 @@ public class MavenITmng2926PluginPrefixOrderTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG2926()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2926" );
+    public void testitMNG2926() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2926");
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2926" );
-        verifier.deleteArtifacts( "org.apache.maven.plugins", "mng-2926", "0.1" );
-        verifier.deleteArtifacts( "org.apache.maven.plugins", "mng-2926", "0.1" );
-        new File( verifier.getArtifactMetadataPath( "org.apache.maven.plugins", null, null, "maven-metadata-maven-core-it.xml" ) ).delete();
-        new File( verifier.getArtifactMetadataPath( "org.apache.maven.plugins", null, null, "resolver-status.properties" ) ).delete();
-        verifier.deleteArtifacts( "org.codehaus.mojo", "mng-2926", "0.1" );
-        verifier.deleteArtifacts( "org.codehaus.mojo", "mng-2926", "0.1" );
-        new File( verifier.getArtifactMetadataPath( "org.codehaus.mojo", null, null, "maven-metadata-maven-core-it.xml" ) ).delete();
-        new File( verifier.getArtifactMetadataPath( "org.codehaus.mojo", null, null, "resolver-status.properties" ) ).delete();
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.deleteArtifacts("org.apache.maven.its.mng2926");
+        verifier.deleteArtifacts("org.apache.maven.plugins", "mng-2926", "0.1");
+        verifier.deleteArtifacts("org.apache.maven.plugins", "mng-2926", "0.1");
+        new File(verifier.getArtifactMetadataPath(
+                        "org.apache.maven.plugins", null, null, "maven-metadata-maven-core-it.xml"))
+                .delete();
+        new File(verifier.getArtifactMetadataPath("org.apache.maven.plugins", null, null, "resolver-status.properties"))
+                .delete();
+        verifier.deleteArtifacts("org.codehaus.mojo", "mng-2926", "0.1");
+        verifier.deleteArtifacts("org.codehaus.mojo", "mng-2926", "0.1");
+        new File(verifier.getArtifactMetadataPath("org.codehaus.mojo", null, null, "maven-metadata-maven-core-it.xml"))
+                .delete();
+        new File(verifier.getArtifactMetadataPath("org.codehaus.mojo", null, null, "resolver-status.properties"))
+                .delete();
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.setLogFileName( "log-default.txt" );
-        verifier.filterFile( "settings-default-template.xml", "settings-default.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings-default.xml" );
-        verifier.addCliArgument( "mng-2926:apache" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.setLogFileName("log-default.txt");
+        verifier.filterFile("settings-default-template.xml", "settings-default.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings-default.xml");
+        verifier.addCliArgument("mng-2926:apache");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.setLogFileName( "log-custom.txt" );
-        verifier.filterFile( "settings-custom-template.xml", "settings-custom.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings-custom.xml" );
-        verifier.addCliArgument( "mng-2926:custom" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.setLogFileName("log-custom.txt");
+        verifier.filterFile("settings-custom-template.xml", "settings-custom.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings-custom.xml");
+        verifier.addCliArgument("mng-2926:custom");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

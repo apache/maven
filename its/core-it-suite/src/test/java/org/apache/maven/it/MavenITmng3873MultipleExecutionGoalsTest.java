@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3873MultipleExecutionGoalsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3873MultipleExecutionGoalsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3873MultipleExecutionGoalsTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng3873MultipleExecutionGoalsTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -49,10 +44,8 @@ public class MavenITmng3873MultipleExecutionGoalsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithoutPluginMngt()
-        throws Exception
-    {
-        testitMNG3873( "test-1" );
+    public void testitWithoutPluginMngt() throws Exception {
+        testitMNG3873("test-1");
     }
 
     /**
@@ -62,30 +55,25 @@ public class MavenITmng3873MultipleExecutionGoalsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithPluginMngt()
-        throws Exception
-    {
-        testitMNG3873( "test-2" );
+    public void testitWithPluginMngt() throws Exception {
+        testitMNG3873("test-2");
     }
 
-    private void testitMNG3873( String project )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3873" );
+    private void testitMNG3873(String project) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3873");
 
-        Verifier verifier = newVerifier( new File( testDir, project ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         /*
          * NOTE: We deliberately don't check the exact order here, that's another issue.
          */
-        List<String> lines = verifier.loadLines( "target/it.log", "UTF-8" );
-        assertTrue( lines.toString(), lines.contains( "test" ) );
-        assertTrue( lines.toString(), lines.contains( "----" ) );
+        List<String> lines = verifier.loadLines("target/it.log", "UTF-8");
+        assertTrue(lines.toString(), lines.contains("test"));
+        assertTrue(lines.toString(), lines.contains("----"));
     }
-
 }

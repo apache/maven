@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,12 +31,9 @@ import org.junit.jupiter.api.Test;
  * @author Dan Fabulich
  *
  */
-public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3004ReactorFailureBehaviorMultithreadedTest()
-    {
-        super( "(3.0-alpha-3,)" );
+public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3004ReactorFailureBehaviorMultithreadedTest() {
+        super("(3.0-alpha-3,)");
     }
 
     /**
@@ -48,36 +43,31 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitFailFastSingleThread()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
+    public void testitFailFastSingleThread() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "subproject1/target" );
-        verifier.deleteDirectory( "subproject2/target" );
-        verifier.deleteDirectory( "subproject3/target" );
-        verifier.addCliArgument( "--fail-fast" );
-        verifier.setLogFileName( "log-ff-mt1.txt" );
-        verifier.addCliArgument( "-Dmaven.threads.experimental=1" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("subproject1/target");
+        verifier.deleteDirectory("subproject2/target");
+        verifier.deleteDirectory("subproject3/target");
+        verifier.addCliArgument("--fail-fast");
+        verifier.setLogFileName("log-ff-mt1.txt");
+        verifier.addCliArgument("-Dmaven.threads.experimental=1");
 
-        try
-        {
-            verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        try {
+            verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-touch:touch");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-        }
-        catch ( VerificationException e )
-        {
+        } catch (VerificationException e) {
             // expected
         }
 
-        verifier.verifyFilePresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.verifyFileNotPresent( "subproject2/target/touch.txt" );
-        verifier.verifyFileNotPresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
+        verifier.verifyFileNotPresent("subproject1/target/touch.txt");
+        verifier.verifyFileNotPresent("subproject2/target/touch.txt");
+        verifier.verifyFileNotPresent("subproject3/target/touch.txt");
     }
 
     /**
@@ -87,27 +77,25 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitFailNeverSingleThread()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
+    public void testitFailNeverSingleThread() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "subproject1/target" );
-        verifier.deleteDirectory( "subproject2/target" );
-        verifier.deleteDirectory( "subproject3/target" );
-        verifier.addCliArgument( "--fail-never" );
-        verifier.setLogFileName( "log-fn-mt1.txt" );
-        verifier.addCliArgument( "-Dmaven.threads.experimental=1" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("subproject1/target");
+        verifier.deleteDirectory("subproject2/target");
+        verifier.deleteDirectory("subproject3/target");
+        verifier.addCliArgument("--fail-never");
+        verifier.setLogFileName("log-fn-mt1.txt");
+        verifier.addCliArgument("-Dmaven.threads.experimental=1");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-touch:touch");
         verifier.execute();
 
-        verifier.verifyFilePresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.verifyFilePresent( "subproject2/target/touch.txt" );
-        verifier.verifyFilePresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
+        verifier.verifyFileNotPresent("subproject1/target/touch.txt");
+        verifier.verifyFilePresent("subproject2/target/touch.txt");
+        verifier.verifyFilePresent("subproject3/target/touch.txt");
     }
 
     /**
@@ -118,35 +106,30 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitFailAtEndSingleThread()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
+    public void testitFailAtEndSingleThread() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "subproject1/target" );
-        verifier.deleteDirectory( "subproject2/target" );
-        verifier.deleteDirectory( "subproject3/target" );
-        verifier.addCliArgument( "--fail-at-end" );
-        verifier.setLogFileName( "log-fae-mt1.txt" );
-        verifier.addCliArgument( "-Dmaven.threads.experimental=1" );
-        try
-        {
-            verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("subproject1/target");
+        verifier.deleteDirectory("subproject2/target");
+        verifier.deleteDirectory("subproject3/target");
+        verifier.addCliArgument("--fail-at-end");
+        verifier.setLogFileName("log-fae-mt1.txt");
+        verifier.addCliArgument("-Dmaven.threads.experimental=1");
+        try {
+            verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-touch:touch");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-        }
-        catch ( VerificationException e )
-        {
+        } catch (VerificationException e) {
             // expected
         }
 
-        verifier.verifyFilePresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.verifyFilePresent( "subproject2/target/touch.txt" );
-        verifier.verifyFileNotPresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
+        verifier.verifyFileNotPresent("subproject1/target/touch.txt");
+        verifier.verifyFilePresent("subproject2/target/touch.txt");
+        verifier.verifyFileNotPresent("subproject3/target/touch.txt");
     }
 
     /**
@@ -156,27 +139,25 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitFailNeverTwoThreads()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
+    public void testitFailNeverTwoThreads() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "subproject1/target" );
-        verifier.deleteDirectory( "subproject2/target" );
-        verifier.deleteDirectory( "subproject3/target" );
-        verifier.addCliArgument( "--fail-never" );
-        verifier.setLogFileName( "log-fn-mt2.txt" );
-        verifier.addCliArgument( "-Dmaven.threads.experimental=2" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("subproject1/target");
+        verifier.deleteDirectory("subproject2/target");
+        verifier.deleteDirectory("subproject3/target");
+        verifier.addCliArgument("--fail-never");
+        verifier.setLogFileName("log-fn-mt2.txt");
+        verifier.addCliArgument("-Dmaven.threads.experimental=2");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-touch:touch");
         verifier.execute();
 
-        verifier.verifyFilePresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.verifyFilePresent( "subproject2/target/touch.txt" );
-        verifier.verifyFilePresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
+        verifier.verifyFileNotPresent("subproject1/target/touch.txt");
+        verifier.verifyFilePresent("subproject2/target/touch.txt");
+        verifier.verifyFilePresent("subproject3/target/touch.txt");
     }
 
     /**
@@ -187,35 +168,30 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitFailAtEndTwoThreads()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
+    public void testitFailAtEndTwoThreads() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "subproject1/target" );
-        verifier.deleteDirectory( "subproject2/target" );
-        verifier.deleteDirectory( "subproject3/target" );
-        verifier.addCliArgument( "--fail-at-end" );
-        verifier.setLogFileName( "log-fae-mt2.txt" );
-        verifier.addCliArgument( "-Dmaven.threads.experimental=2" );
-        try
-        {
-            verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("subproject1/target");
+        verifier.deleteDirectory("subproject2/target");
+        verifier.deleteDirectory("subproject3/target");
+        verifier.addCliArgument("--fail-at-end");
+        verifier.setLogFileName("log-fae-mt2.txt");
+        verifier.addCliArgument("-Dmaven.threads.experimental=2");
+        try {
+            verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-touch:touch");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-        }
-        catch ( VerificationException e )
-        {
+        } catch (VerificationException e) {
             // expected
         }
 
-        verifier.verifyFilePresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.verifyFilePresent( "subproject2/target/touch.txt" );
-        verifier.verifyFileNotPresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
+        verifier.verifyFileNotPresent("subproject1/target/touch.txt");
+        verifier.verifyFilePresent("subproject2/target/touch.txt");
+        verifier.verifyFileNotPresent("subproject3/target/touch.txt");
     }
 
     // DGF not testing fail fast with multiple real threads since that's a "best effort" attempt to halt the build

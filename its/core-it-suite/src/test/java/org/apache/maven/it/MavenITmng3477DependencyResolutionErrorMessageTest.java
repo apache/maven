@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,26 +16,23 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3477">MNG-3477</a>.
  */
-public class MavenITmng3477DependencyResolutionErrorMessageTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3477DependencyResolutionErrorMessageTest()
-    {
-        super( "[2.1.0,3.0-alpha-1),[3.0-beta-1,)" );
+    public MavenITmng3477DependencyResolutionErrorMessageTest() {
+        super("[2.1.0,3.0-alpha-1),[3.0-beta-1,)");
     }
 
     /**
@@ -46,36 +41,28 @@ public class MavenITmng3477DependencyResolutionErrorMessageTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3477" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3477");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3477" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng3477");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
-            fail( "Build should have failed to resolve dependency" );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Build should have failed to resolve dependency");
+        } catch (VerificationException e) {
             boolean foundCause = false;
-            List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
-            for ( String line : lines )
-            {
-                if ( line.matches( ".*org.apache.maven.its.mng3477:dep:jar:1.0.*Connection.*refused.*" ) )
-                {
+            List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+            for (String line : lines) {
+                if (line.matches(".*org.apache.maven.its.mng3477:dep:jar:1.0.*Connection.*refused.*")) {
                     foundCause = true;
                     break;
                 }
             }
-            assertTrue( "Transfer error cause was not found", foundCause );
+            assertTrue("Transfer error cause was not found", foundCause);
         }
     }
-
 }

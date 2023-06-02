@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Collections;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest()
-    {
-        super( "[2.0.11,2.1.0-M1),[2.1.0,)" );
+    public MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest() {
+        super("[2.0.11,2.1.0-M1),[2.1.0,)");
     }
 
     /**
@@ -48,38 +43,38 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3139()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3139" );
+    public void testitMNG3139() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3139");
 
         // phase 1: get the metadata into the local repo
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3139" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng3139");
 
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.setLogFileName( "log1.txt" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.setLogFileName("log1.txt");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // phase 2: trigger blacklisting of repo (by invalid URL) and check previously downloaded metadata is still used
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8",
-            Collections.singletonMap( "@baseurl@", "http://localhost:63412" ) );
-        verifier.setLogFileName( "log2.txt" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        verifier.filterFile(
+                "settings-template.xml",
+                "settings.xml",
+                "UTF-8",
+                Collections.singletonMap("@baseurl@", "http://localhost:63412"));
+        verifier.setLogFileName("log2.txt");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

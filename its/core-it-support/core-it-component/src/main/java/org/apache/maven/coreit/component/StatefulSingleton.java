@@ -1,5 +1,3 @@
-package org.apache.maven.coreit.component;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.coreit.component;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.coreit.component;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.coreit.component;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,14 +24,11 @@ import java.io.IOException;
 /**
  *
  */
-public interface StatefulSingleton
-{
+public interface StatefulSingleton {
 
-    void setProperty( String key, String value );
+    void setProperty(String key, String value);
 
-    String getProperty( String key );
+    String getProperty(String key);
 
-    void saveProperties( File propertiesFile )
-        throws IOException;
-
+    void saveProperties(File propertiesFile) throws IOException;
 }

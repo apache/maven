@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,44 +16,37 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng6506PackageAnnotationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng6506PackageAnnotationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6506PackageAnnotationTest()
-    {
-        super( "[3.6.1,)" );
+    public MavenITmng6506PackageAnnotationTest() {
+        super("[3.6.1,)");
     }
 
     @Test
-    public void testGetPackageAnnotation()
-            throws Exception
-    {
-        File testDir =
-                ResourceExtractor.simpleExtractResources( getClass(),
-                                                          "/mng-6506-package-annotation" );
-        File pluginDir = new File( testDir, "plugin" );
-        File projectDir = new File( testDir, "project" );
+    public void testGetPackageAnnotation() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6506-package-annotation");
+        File pluginDir = new File(testDir, "plugin");
+        File projectDir = new File(testDir, "project");
 
         Verifier verifier;
 
-        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "verify" );
+        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        verifier.verifyTextInLog( "MNG-6506 check succeeded" );
+        verifier.verifyTextInLog("MNG-6506 check succeeded");
     }
 }

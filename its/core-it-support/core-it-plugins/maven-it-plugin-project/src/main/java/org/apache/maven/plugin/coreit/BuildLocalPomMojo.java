@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
+import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,29 +27,24 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-import java.io.File;
-import java.util.Properties;
-
 /**
  * Builds the local POMs.
  *
  * @author Benjamin Bentmann
-  */
-@Mojo( name = "local-pom" )
-public class BuildLocalPomMojo
-    extends AbstractPomMojo
-{
+ */
+@Mojo(name = "local-pom")
+public class BuildLocalPomMojo extends AbstractPomMojo {
 
     /**
      * The properties file to dump the POM info to.
      */
-    @Parameter( defaultValue = "target/pom.properties" )
+    @Parameter(defaultValue = "target/pom.properties")
     private File propertiesFile;
 
     /**
      * The local repository.
      */
-    @Parameter( defaultValue = "${localRepository}", readonly = true, required = true )
+    @Parameter(defaultValue = "${localRepository}", readonly = true, required = true)
     private ArtifactRepository localRepository;
 
     /**
@@ -62,33 +59,25 @@ public class BuildLocalPomMojo
      *
      * @throws MojoExecutionException If the artifact file has not been set.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
+    public void execute() throws MojoExecutionException {
         Properties props = new Properties();
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Building local POMs" );
+        getLog().info("[MAVEN-CORE-IT-LOG] Building local POMs");
 
-        if ( files != null )
-        {
-            for ( File file : files )
-            {
-                getLog().info( "[MAVEN-CORE-IT-LOG] Building " + file );
+        if (files != null) {
+            for (File file : files) {
+                getLog().info("[MAVEN-CORE-IT-LOG] Building " + file);
 
-                try
-                {
-                    MavenProject project = builder.build( file, localRepository, null );
+                try {
+                    MavenProject project = builder.build(file, localRepository, null);
 
-                    dump( props, file.getName() + ".", project );
-                }
-                catch ( Exception e )
-                {
-                    getLog().warn( "Failed to build local POM for " + file, e );
+                    dump(props, file.getName() + ".", project);
+                } catch (Exception e) {
+                    getLog().warn("Failed to build local POM for " + file, e);
                 }
             }
         }
 
-        store( props, propertiesFile );
+        store(props, propertiesFile);
     }
-
 }

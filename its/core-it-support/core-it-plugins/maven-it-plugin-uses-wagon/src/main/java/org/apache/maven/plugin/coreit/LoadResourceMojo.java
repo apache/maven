@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,16 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.AbstractMojo;
@@ -29,25 +37,14 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.wagon.repository.Repository;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-
 /**
  * Loads resources from a class loader used to load a wagon provider. The wagon is merely used to access the extension
  * class loader it came from which is otherwise not accessible to a plugin.
  *
  * @author Benjamin Bentmann
  */
-@Mojo( name = "load-resource", defaultPhase = LifecyclePhase.VALIDATE )
-public class LoadResourceMojo
-    extends AbstractMojo
-{
+@Mojo(name = "load-resource", defaultPhase = LifecyclePhase.VALIDATE)
+public class LoadResourceMojo extends AbstractMojo {
 
     /**
      * The Wagon manager used to retrieve wagon providers.
@@ -58,20 +55,20 @@ public class LoadResourceMojo
     /**
      * The path to the properties file used to track the results of the resource loading via the wagon's class loader.
      */
-    @Parameter( property = "wagon.wagonClassLoaderOutput" )
+    @Parameter(property = "wagon.wagonClassLoaderOutput")
     private File wagonClassLoaderOutput;
 
     /**
      * The role hint for the wagon provider to load. The class loader of this provider will be used to load the
      * resources.
      */
-    @Parameter( property = "wagon.wagonProtocol" )
+    @Parameter(property = "wagon.wagonProtocol")
     private String wagonProtocol;
 
     /**
      * The repository to load the wagon for, if applicable.
      */
-    @Parameter( property = "wagon.repositoryId" )
+    @Parameter(property = "wagon.repositoryId")
     private String repositoryId;
 
     /**
@@ -88,93 +85,68 @@ public class LoadResourceMojo
      *
      * @throws MojoFailureException If the attached file has not been set.
      */
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        getLog().info( "[MAVEN-CORE-IT-LOG] Looking up wagon for protocol " + wagonProtocol );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        getLog().info("[MAVEN-CORE-IT-LOG] Looking up wagon for protocol " + wagonProtocol);
 
         Object wagon;
-        try
-        {
-            if ( repositoryId != null )
-            {
-                wagon = wagonManager.getWagon( new Repository( repositoryId, wagonProtocol + "://host/path" ) );
+        try {
+            if (repositoryId != null) {
+                wagon = wagonManager.getWagon(new Repository(repositoryId, wagonProtocol + "://host/path"));
+            } else {
+                wagon = wagonManager.getWagon(wagonProtocol);
             }
-            else
-            {
-                wagon = wagonManager.getWagon( wagonProtocol );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "Failed to load wagon for protocol " + wagonProtocol, e );
+        } catch (Exception e) {
+            throw new MojoExecutionException("Failed to load wagon for protocol " + wagonProtocol, e);
         }
 
         ClassLoader classLoader = wagon.getClass().getClassLoader();
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Using class loader " + classLoader );
+        getLog().info("[MAVEN-CORE-IT-LOG] Using class loader " + classLoader);
 
         Properties loaderProperties = new Properties();
-        loaderProperties.setProperty( "wagon.class", wagon.getClass().getName() );
+        loaderProperties.setProperty("wagon.class", wagon.getClass().getName());
 
-        if ( resourcePaths != null )
-        {
-            for ( String path : resourcePaths )
-            {
-                getLog().info( "[MAVEN-CORE-IT-LOG] Loading resource " + path );
+        if (resourcePaths != null) {
+            for (String path : resourcePaths) {
+                getLog().info("[MAVEN-CORE-IT-LOG] Loading resource " + path);
 
-                URL url = classLoader.getResource( path );
-                getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded resource from " + url );
-                if ( url != null )
-                {
-                    loaderProperties.setProperty( path, url.toString() );
+                URL url = classLoader.getResource(path);
+                getLog().info("[MAVEN-CORE-IT-LOG]   Loaded resource from " + url);
+                if (url != null) {
+                    loaderProperties.setProperty(path, url.toString());
                 }
 
-                try
-                {
-                    List urls = Collections.list( classLoader.getResources( path ) );
-                    loaderProperties.setProperty( path + ".count", "" + urls.size() );
-                    for ( int j = 0; j < urls.size(); j++ )
-                    {
-                        loaderProperties.setProperty( path + "." + j, urls.get( j ).toString() );
+                try {
+                    List urls = Collections.list(classLoader.getResources(path));
+                    loaderProperties.setProperty(path + ".count", "" + urls.size());
+                    for (int j = 0; j < urls.size(); j++) {
+                        loaderProperties.setProperty(path + "." + j, urls.get(j).toString());
                     }
-                }
-                catch ( IOException e )
-                {
-                    throw new MojoExecutionException( "Resources could not be enumerated: " + path, e );
+                } catch (IOException e) {
+                    throw new MojoExecutionException("Resources could not be enumerated: " + path, e);
                 }
             }
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file " + wagonClassLoaderOutput );
+        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file " + wagonClassLoaderOutput);
 
         OutputStream out = null;
-        try
-        {
+        try {
             wagonClassLoaderOutput.getParentFile().mkdirs();
-            out = new FileOutputStream( wagonClassLoaderOutput );
-            loaderProperties.store( out, "MAVEN-CORE-IT-LOG" );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Output file could not be created: " + wagonClassLoaderOutput, e );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                try
-                {
+            out = new FileOutputStream(wagonClassLoaderOutput);
+            loaderProperties.store(out, "MAVEN-CORE-IT-LOG");
+        } catch (IOException e) {
+            throw new MojoExecutionException("Output file could not be created: " + wagonClassLoaderOutput, e);
+        } finally {
+            if (out != null) {
+                try {
                     out.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // just ignore
                 }
             }
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Created output file " + wagonClassLoaderOutput );
+        getLog().info("[MAVEN-CORE-IT-LOG] Created output file " + wagonClassLoaderOutput);
     }
-
 }

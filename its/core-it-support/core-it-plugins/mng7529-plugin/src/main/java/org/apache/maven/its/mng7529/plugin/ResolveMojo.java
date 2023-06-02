@@ -1,5 +1,3 @@
-package org.apache.maven.its.mng7529.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.its.mng7529.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.its.mng7529.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.its.mng7529.plugin;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -37,41 +36,33 @@ import org.apache.maven.project.ProjectDependenciesResolver;
  * Attempts to resolve a single artifact from dependencies with the project dependency resolver,
  * and logs the results for the Verifier to look at.
  */
-@Mojo( name = "resolve", requiresDependencyResolution = ResolutionScope.NONE )
-public class ResolveMojo
-    extends AbstractMojo
-{
-    @Parameter( defaultValue = "${project}", readonly = true, required = true )
+@Mojo(name = "resolve", requiresDependencyResolution = ResolutionScope.NONE)
+public class ResolveMojo extends AbstractMojo {
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
-    @Parameter( defaultValue = "${session}", readonly = true, required = true )
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
     private MavenSession mavenSession;
 
     @Component
     private ProjectDependenciesResolver dependencyResolver;
 
-    public void execute()
-        throws MojoExecutionException
-    {
+    public void execute() throws MojoExecutionException {
 
-        try
-        {
-            DefaultProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(
-                mavenSession.getProjectBuildingRequest() );
-            buildingRequest.setRemoteRepositories( project.getRemoteArtifactRepositories() );
+        try {
+            DefaultProjectBuildingRequest buildingRequest =
+                    new DefaultProjectBuildingRequest(mavenSession.getProjectBuildingRequest());
+            buildingRequest.setRemoteRepositories(project.getRemoteArtifactRepositories());
 
             DependencyResolutionRequest request = new DefaultDependencyResolutionRequest();
-            request.setMavenProject( project );
-            request.setRepositorySession( buildingRequest.getRepositorySession() );
+            request.setMavenProject(project);
+            request.setRepositorySession(buildingRequest.getRepositorySession());
 
-            DependencyResolutionResult result = dependencyResolver.resolve( request );
+            DependencyResolutionResult result = dependencyResolver.resolve(request);
 
-            getLog().info( "Resolution successful, resolved ok" );
-        }
-        catch ( Exception e )
-        {
-            getLog().error( "Resolution failed, could not resolve ranged dependency"
-                + " (you hit MNG-7529)" );
+            getLog().info("Resolution successful, resolved ok");
+        } catch (Exception e) {
+            getLog().error("Resolution failed, could not resolve ranged dependency" + " (you hit MNG-7529)");
         }
     }
 }

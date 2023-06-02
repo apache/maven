@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 /**
  * A test class that is <em>not</em> unique to this artifact. Other artifacts will deliberately contain an equally named
@@ -26,12 +25,9 @@ package org.apache.maven.plugin.coreit;
  * @author Benjamin Bentmann
  *
  */
-public class SomeClass
-{
+public class SomeClass {
 
-    public static String methodA()
-    {
+    public static String methodA() {
         return "A";
     }
-
 }

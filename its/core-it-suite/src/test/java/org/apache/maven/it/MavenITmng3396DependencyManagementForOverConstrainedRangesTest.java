@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,51 +29,46 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest extends AbstractMavenIntegrationTestCase {
     private static final String GROUP_ID = "org.apache.maven.its.mng3396";
 
-    public MavenITmng3396DependencyManagementForOverConstrainedRangesTest()
-    {
-        super( "(2.0.8,)" ); // 2.0.9+
+    public MavenITmng3396DependencyManagementForOverConstrainedRangesTest() {
+        super("(2.0.8,)"); // 2.0.9+
     }
 
     @Test
-    public void testitMNG3396()
-        throws Exception
-    {
+    public void testitMNG3396() throws Exception {
         String baseDir = "/mng-3396";
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), baseDir + "/dependencies" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), baseDir + "/dependencies");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.deleteArtifact( GROUP_ID, "A", "1.0", "pom" );
-        verifier.deleteArtifact( GROUP_ID, "A", "1.0", "jar" );
-        verifier.deleteArtifact( GROUP_ID, "B", "1.0", "pom" );
-        verifier.deleteArtifact( GROUP_ID, "B", "1.0", "jar" );
-        verifier.addCliArgument( "install" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier.deleteArtifact(GROUP_ID, "A", "1.0", "pom");
+        verifier.deleteArtifact(GROUP_ID, "A", "1.0", "jar");
+        verifier.deleteArtifact(GROUP_ID, "B", "1.0", "pom");
+        verifier.deleteArtifact(GROUP_ID, "B", "1.0", "jar");
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), baseDir + "/plugin" );
+        testDir = ResourceExtractor.simpleExtractResources(getClass(), baseDir + "/plugin");
 
-        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.deleteArtifact( GROUP_ID, "A", "1.0", "pom" );
-        verifier.deleteArtifact( GROUP_ID, "A", "1.0", "jar" );
-        verifier.deleteArtifact( GROUP_ID, "A", "3.0", "pom" );
-        verifier.deleteArtifact( GROUP_ID, "A", "3.0", "jar" );
-        verifier.deleteArtifact( GROUP_ID, "plugin", "1.0", "pom" );
-        verifier.deleteArtifact( GROUP_ID, "plugin", "1.0", "jar" );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier.deleteArtifact(GROUP_ID, "A", "1.0", "pom");
+        verifier.deleteArtifact(GROUP_ID, "A", "1.0", "jar");
+        verifier.deleteArtifact(GROUP_ID, "A", "3.0", "pom");
+        verifier.deleteArtifact(GROUP_ID, "A", "3.0", "jar");
+        verifier.deleteArtifact(GROUP_ID, "plugin", "1.0", "pom");
+        verifier.deleteArtifact(GROUP_ID, "plugin", "1.0", "jar");
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), baseDir + "/pluginuser" );
+        testDir = ResourceExtractor.simpleExtractResources(getClass(), baseDir + "/pluginuser");
 
-        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.deleteArtifact( GROUP_ID, "pluginuser", "1.0", "pom" );
-        verifier.deleteArtifact( GROUP_ID, "pluginuser", "1.0", "jar" );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier.deleteArtifact(GROUP_ID, "pluginuser", "1.0", "pom");
+        verifier.deleteArtifact(GROUP_ID, "pluginuser", "1.0", "jar");
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author John Casey
  */
-public class MavenITmng4347ImportScopeWithSettingsProfilesTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4347ImportScopeWithSettingsProfilesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4347ImportScopeWithSettingsProfilesTest()
-    {
-        super( "(2.2.1,]" );
+    public MavenITmng4347ImportScopeWithSettingsProfilesTest() {
+        super("(2.2.1,]");
     }
 
     /**
@@ -48,27 +43,24 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4347" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4347");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4347" );
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4347");
 
-        verifier.setAutoclean( false );
+        verifier.setAutoclean(false);
 
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
 
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
 
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }
-
 }

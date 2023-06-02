@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Brett Porter
  *
  */
-public class MavenITmng3811ReportingPluginConfigurationInheritanceTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3811ReportingPluginConfigurationInheritanceTest()
-    {
+public class MavenITmng3811ReportingPluginConfigurationInheritanceTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3811ReportingPluginConfigurationInheritanceTest() {
         // TODO: fix for 3.0+
-        super( "[2.0.11,2.1.0-M1),[2.1.0,)" );
+        super("[2.0.11,2.1.0-M1),[2.1.0,)");
     }
 
     /**
@@ -48,25 +43,22 @@ public class MavenITmng3811ReportingPluginConfigurationInheritanceTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3811()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3811" );
+    public void testitMNG3811() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3811");
 
-        Verifier verifier = newVerifier( new File( testDir, "child" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
+        Properties props = verifier.loadProperties("target/config.properties");
         String p = "project.reporting.plugins.0.configuration.children.";
 
-        assertEquals( "2", props.getProperty( p + "stringParams.0.children" ) );
-        assertEquals( "parentParam", props.getProperty( p + "stringParams.0.children.stringParam.0.value" ) );
-        assertEquals( "childParam", props.getProperty( p + "stringParams.0.children.stringParam.1.value" ) );
-        assertEquals( "true", props.getProperty( p + "booleanParam.0.value" ) );
+        assertEquals("2", props.getProperty(p + "stringParams.0.children"));
+        assertEquals("parentParam", props.getProperty(p + "stringParams.0.children.stringParam.0.value"));
+        assertEquals("childParam", props.getProperty(p + "stringParams.0.children.stringParam.1.value"));
+        assertEquals("true", props.getProperty(p + "booleanParam.0.value"));
     }
-
 }

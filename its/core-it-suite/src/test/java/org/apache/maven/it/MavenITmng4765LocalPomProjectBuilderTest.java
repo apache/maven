@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4765LocalPomProjectBuilderTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4765LocalPomProjectBuilderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4765LocalPomProjectBuilderTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-3,)" );
+    public MavenITmng4765LocalPomProjectBuilderTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-3,)");
     }
 
     /**
@@ -47,21 +42,18 @@ public class MavenITmng4765LocalPomProjectBuilderTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4765" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4765");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-Duser.prop=OK" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-Duser.prop=OK");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "PASSED - OK", props.get( "test.xml.project.name" ) );
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("PASSED - OK", props.get("test.xml.project.name"));
     }
-
 }

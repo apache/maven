@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,13 +33,10 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  *
  */
-public class MavenITmng3023ReactorDependencyResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3023ReactorDependencyResolutionTest()
-    {
-        super( "(2.1.0-M1,)" );
+    public MavenITmng3023ReactorDependencyResolutionTest() {
+        super("(2.1.0-M1,)");
     }
 
     /**
@@ -55,26 +50,22 @@ public class MavenITmng3023ReactorDependencyResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3023A() throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3023" );
+    public void testitMNG3023A() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3023");
 
         // First pass. Make sure the dependency cannot be resolved.
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.setLogFileName( "log-a.txt" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.setLogFileName("log-a.txt");
 
-        verifier.deleteDirectory( "dependency/dependency-classes" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
+        verifier.deleteDirectory("dependency/dependency-classes");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3023");
 
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
-            fail( "Expected failure to resolve dependency artifact without at least calling 'compile' phase." );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Expected failure to resolve dependency artifact without at least calling 'compile' phase.");
+        } catch (VerificationException e) {
             // expected.
         }
     }
@@ -90,26 +81,24 @@ public class MavenITmng3023ReactorDependencyResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3023B()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3023" );
+    public void testitMNG3023B() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3023");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.setLogFileName( "log-b.txt" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.setLogFileName("log-b.txt");
         // The IT doesn't actually run the compiler but merely mimics its effect, i.e. the creation of the output dir
-        new File( testDir, "dependency/dependency-classes" ).mkdirs();
-        verifier.deleteDirectory( "consumer/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
+        new File(testDir, "dependency/dependency-classes").mkdirs();
+        verifier.deleteDirectory("consumer/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3023");
 
-        verifier.addCliArgument( "initialize" );
+        verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
-        assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
-        assertFalse( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
+        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath", "UTF-8");
+        assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
+        assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
     }
 
     /**
@@ -127,36 +116,33 @@ public class MavenITmng3023ReactorDependencyResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3023C()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3023" );
+    public void testitMNG3023C() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3023");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
+        verifier.deleteArtifacts("org.apache.maven.its.mng3023");
 
-        verifier.deleteDirectory( "consumer/target" );
-        verifier.setLogFileName( "log-c-1.txt" );
-        verifier.addCliArgument( "generate-sources" );
+        verifier.deleteDirectory("consumer/target");
+        verifier.setLogFileName("log-c-1.txt");
+        verifier.addCliArgument("generate-sources");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
-        assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
-        assertFalse( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
+        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath", "UTF-8");
+        assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
+        assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
 
-        verifier.deleteDirectory( "dependency/dependency-classes" );
-        verifier.deleteDirectory( "consumer/target" );
-        verifier.setLogFileName( "log-c-2.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.deleteDirectory("dependency/dependency-classes");
+        verifier.deleteDirectory("consumer/target");
+        verifier.setLogFileName("log-c-2.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
-        assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
-        assertFalse( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
+        compileClassPath = verifier.loadLines("consumer/target/compile.classpath", "UTF-8");
+        assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
+        assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
     }
-
 }

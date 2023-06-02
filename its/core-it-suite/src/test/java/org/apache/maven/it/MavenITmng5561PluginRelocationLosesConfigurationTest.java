@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,50 +16,44 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng5561PluginRelocationLosesConfigurationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5561PluginRelocationLosesConfigurationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5561PluginRelocationLosesConfigurationTest()
-    {
-        super( "[3.8.5,)" );
+    public MavenITmng5561PluginRelocationLosesConfigurationTest() {
+        super("[3.8.5,)");
     }
 
     @Test
-    public void testit()
-            throws Exception
-    {
+    public void testit() throws Exception {
         File testDir =
-                ResourceExtractor.simpleExtractResources( getClass(),
-                                                          "/mng-5561-plugin-relocation-loses-configuration" );
-        File oldPluginWithRelocationDir = new File( testDir, "old-plugin-with-relocation" );
-        File newPluginDir = new File( testDir, "new-plugin" );
-        File projectDir = new File( testDir, "project" );
+                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5561-plugin-relocation-loses-configuration");
+        File oldPluginWithRelocationDir = new File(testDir, "old-plugin-with-relocation");
+        File newPluginDir = new File(testDir, "new-plugin");
+        File projectDir = new File(testDir, "project");
 
         Verifier verifier;
 
-        verifier = newVerifier( oldPluginWithRelocationDir.getAbsolutePath() );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(oldPluginWithRelocationDir.getAbsolutePath());
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( newPluginDir.getAbsolutePath() );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(newPluginDir.getAbsolutePath());
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.addCliArgument( "verify" );
+        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        verifier.verifyTextInLog( "[WARNING] Hello from Maven!" );
+        verifier.verifyTextInLog("[WARNING] Hello from Maven!");
     }
 }

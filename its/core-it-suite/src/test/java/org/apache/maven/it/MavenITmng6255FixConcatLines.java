@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
@@ -28,6 +24,8 @@ import java.util.Properties;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,12 +33,9 @@ import org.junit.jupiter.api.Test;
  * Check that the <code>.mvn/jvm.config</code> file contents are concatenated properly, no matter
  * what line endings are used.
  */
-public class MavenITmng6255FixConcatLines
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng6255FixConcatLines()
-    {
-        super( "[3.5.3,)" );
+public class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
+    public MavenITmng6255FixConcatLines() {
+        super("[3.5.3,)");
     }
 
     /**
@@ -50,10 +45,8 @@ public class MavenITmng6255FixConcatLines
      *
      * @throws Exception in case of failure
      */
-    public void disabledJvmConfigFileCR()
-        throws Exception
-    {
-        runWithLineEndings( "\r" );
+    public void disabledJvmConfigFileCR() throws Exception {
+        runWithLineEndings("\r");
     }
 
     /**
@@ -62,10 +55,8 @@ public class MavenITmng6255FixConcatLines
      * @throws Exception in case of failure
      */
     @Test
-    public void testJvmConfigFileLF()
-        throws Exception
-    {
-        runWithLineEndings( "\n" );
+    public void testJvmConfigFileLF() throws Exception {
+        runWithLineEndings("\n");
     }
 
     /**
@@ -74,36 +65,31 @@ public class MavenITmng6255FixConcatLines
      * @throws Exception in case of failure
      */
     @Test
-    public void testJvmConfigFileCRLF()
-        throws Exception
-    {
-        runWithLineEndings( "\r\n" );
+    public void testJvmConfigFileCRLF() throws Exception {
+        runWithLineEndings("\r\n");
     }
 
-    protected void runWithLineEndings( String lineEndings )
-        throws Exception
-    {
-        File baseDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6255" );
-        File mvnDir = new File( baseDir, ".mvn" );
+    protected void runWithLineEndings(String lineEndings) throws Exception {
+        File baseDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6255");
+        File mvnDir = new File(baseDir, ".mvn");
 
-        File jvmConfig = new File( mvnDir, "jvm.config" );
-        createJvmConfigFile( jvmConfig, lineEndings, "-Djvm.config=ok", "-Xms256m", "-Xmx512m" );
+        File jvmConfig = new File(mvnDir, "jvm.config");
+        createJvmConfigFile(jvmConfig, lineEndings, "-Djvm.config=ok", "-Xms256m", "-Xmx512m");
 
-        Verifier verifier = newVerifier( baseDir.getAbsolutePath() );
-        verifier.addCliArgument( "-Dexpression.outputFile=" + new File( baseDir, "expression.properties" ).getAbsolutePath() );
-        verifier.setForkJvm( true );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(baseDir.getAbsolutePath());
+        verifier.addCliArgument(
+                "-Dexpression.outputFile=" + new File(baseDir, "expression.properties").getAbsolutePath());
+        verifier.setForkJvm(true);
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "expression.properties" );
-        assertEquals( "ok", props.getProperty( "project.properties.jvm-config" ) );
+        Properties props = verifier.loadProperties("expression.properties");
+        assertEquals("ok", props.getProperty("project.properties.jvm-config"));
     }
 
-    protected void createJvmConfigFile( File jvmConfig, String lineEndings, String...lines )
-        throws Exception
-    {
+    protected void createJvmConfigFile(File jvmConfig, String lineEndings, String... lines) throws Exception {
         String content = Joiner.on(lineEndings).join(lines);
-        Files.write( content, jvmConfig, Charsets.UTF_8 );
+        Files.write(content, jvmConfig, Charsets.UTF_8);
     }
 }

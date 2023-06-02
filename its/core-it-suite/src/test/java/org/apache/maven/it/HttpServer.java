@@ -1,4 +1,34 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.maven.it;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.Collections;
 
 import com.google.common.io.ByteStreams;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -20,17 +50,6 @@ import org.eclipse.jetty.util.security.Password;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.Collections;
-
 /**
  * An HTTP server that handles all requests on a given port from a specified source, optionally secured using BASIC auth
  * by providing a username and password. The source can either be a URL or a directory. When a request is made the
@@ -38,14 +57,12 @@ import java.util.Collections;
  *
  * @author Jason van Zyl
  */
-public class HttpServer
-{
+public class HttpServer {
     static {
         Log.initialized();
         Logger rootLogger = Log.getRootLogger();
-        if ( rootLogger instanceof StdErrLog )
-        {
-            ( (StdErrLog) rootLogger ).setLevel( StdErrLog.LEVEL_WARN );
+        if (rootLogger instanceof StdErrLog) {
+            ((StdErrLog) rootLogger).setLevel(StdErrLog.LEVEL_WARN);
         }
     }
 
@@ -57,96 +74,81 @@ public class HttpServer
 
     private final String password;
 
-    public HttpServer( int port, String username, String password, StreamSource source )
-    {
+    public HttpServer(int port, String username, String password, StreamSource source) {
         this.username = username;
         this.password = password;
         this.source = source;
-        this.server = server( port );
+        this.server = server(port);
     }
 
-    public void start()
-        throws Exception
-    {
+    public void start() throws Exception {
         server.start();
         // server.join();
     }
 
-	public boolean isFailed()
-    {
+    public boolean isFailed() {
         return server.isFailed();
     }
 
-    public void stop()
-        throws Exception
-    {
+    public void stop() throws Exception {
         server.stop();
     }
 
-    public void join()
-        throws Exception
-    {
+    public void join() throws Exception {
         server.join();
     }
 
-    public int port()
-    {
-        return ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
+    public int port() {
+        return ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
     }
 
-    private Server server( int port )
-    {
+    private Server server(int port) {
         QueuedThreadPool threadPool = new QueuedThreadPool();
-        threadPool.setMaxThreads( 500 );
-        Server server = new Server( threadPool );
-        server.setConnectors( new Connector[]{ new ServerConnector( server ) } );
-        server.addBean( new ScheduledExecutorScheduler() );
+        threadPool.setMaxThreads(500);
+        Server server = new Server(threadPool);
+        server.setConnectors(new Connector[] {new ServerConnector(server)});
+        server.addBean(new ScheduledExecutorScheduler());
 
         ServerConnector connector = (ServerConnector) server.getConnectors()[0];
-        connector.setIdleTimeout( 30_000L );
-        connector.setPort( port );
+        connector.setIdleTimeout(30_000L);
+        connector.setPort(port);
 
-        StreamSourceHandler handler = new StreamSourceHandler( source );
+        StreamSourceHandler handler = new StreamSourceHandler(source);
 
-        if ( username != null && password != null )
-        {
-            HashLoginService loginService = new HashLoginService( "Test Server" );
+        if (username != null && password != null) {
+            HashLoginService loginService = new HashLoginService("Test Server");
             UserStore userStore = new UserStore();
-            userStore.addUser( username, new Password( password ), new String[] { "user" } );
-            loginService.setUserStore( userStore );
-            server.addBean( loginService );
+            userStore.addUser(username, new Password(password), new String[] {"user"});
+            loginService.setUserStore(userStore);
+            server.addBean(loginService);
 
             ConstraintSecurityHandler security = new ConstraintSecurityHandler();
-            server.setHandler( security );
+            server.setHandler(security);
 
             Constraint constraint = new Constraint();
-            constraint.setName( "auth" );
-            constraint.setAuthenticate( true );
-            constraint.setRoles( new String[]{ "user", "admin" } );
+            constraint.setName("auth");
+            constraint.setAuthenticate(true);
+            constraint.setRoles(new String[] {"user", "admin"});
 
             ConstraintMapping mapping = new ConstraintMapping();
-            mapping.setPathSpec( "/*" );
-            mapping.setConstraint( constraint );
+            mapping.setPathSpec("/*");
+            mapping.setConstraint(constraint);
 
-            security.setConstraintMappings( Collections.singletonList( mapping ) );
-            security.setAuthenticator( new BasicAuthenticator() );
-            security.setLoginService( loginService );
-            security.setHandler( handler );
-        }
-        else
-        {
-            server.setHandler( handler );
+            security.setConstraintMappings(Collections.singletonList(mapping));
+            security.setAuthenticator(new BasicAuthenticator());
+            security.setLoginService(loginService);
+            security.setHandler(handler);
+        } else {
+            server.setHandler(handler);
         }
         return server;
     }
 
-    public static HttpServerBuilder builder()
-    {
+    public static HttpServerBuilder builder() {
         return new HttpServerBuilder();
     }
 
-    public static class HttpServerBuilder
-    {
+    public static class HttpServerBuilder {
 
         private int port;
 
@@ -156,100 +158,78 @@ public class HttpServer
 
         private StreamSource source;
 
-        public HttpServerBuilder port( int port )
-        {
+        public HttpServerBuilder port(int port) {
             this.port = port;
             return this;
         }
 
-        public HttpServerBuilder username( String username )
-        {
+        public HttpServerBuilder username(String username) {
             this.username = username;
             return this;
         }
 
-        public HttpServerBuilder password( String password )
-        {
+        public HttpServerBuilder password(String password) {
             this.password = password;
             return this;
         }
 
-        public HttpServerBuilder source( final String source )
-        {
-            this.source = new StreamSource()
-            {
+        public HttpServerBuilder source(final String source) {
+            this.source = new StreamSource() {
                 @Override
-                public InputStream stream( String path )
-                    throws IOException
-                {
-                    return new URL( String.format( "%s/%s", source, path ) ).openStream();
+                public InputStream stream(String path) throws IOException {
+                    return new URL(String.format("%s/%s", source, path)).openStream();
                 }
             };
             return this;
         }
 
-        public HttpServerBuilder source( final File source )
-        {
-            this.source = new StreamSource()
-            {
+        public HttpServerBuilder source(final File source) {
+            this.source = new StreamSource() {
                 @Override
-                public InputStream stream( String path )
-                    throws IOException
-                {
-                    return new FileInputStream( new File( source, path ) );
+                public InputStream stream(String path) throws IOException {
+                    return new FileInputStream(new File(source, path));
                 }
             };
             return this;
         }
 
-        public HttpServer build()
-        {
-            return new HttpServer( port, username, password, source );
+        public HttpServer build() {
+            return new HttpServer(port, username, password, source);
         }
     }
 
-    public interface StreamSource
-    {
-        InputStream stream( String path )
-            throws IOException;
+    public interface StreamSource {
+        InputStream stream(String path) throws IOException;
     }
 
-    public static class StreamSourceHandler
-        extends AbstractHandler
-    {
+    public static class StreamSourceHandler extends AbstractHandler {
 
         private final StreamSource source;
 
-        public StreamSourceHandler( StreamSource source )
-        {
+        public StreamSourceHandler(StreamSource source) {
             this.source = source;
         }
 
         @Override
-        public void handle( String target, Request baseRequest, HttpServletRequest request,
-                            HttpServletResponse response )
-            throws IOException, ServletException
-        {
-            response.setContentType( "application/octet-stream" );
-            response.setStatus( HttpServletResponse.SC_OK );
-            try ( InputStream in = source.stream(
-                target.substring( 1 ) ); OutputStream out = response.getOutputStream() )
-            {
-                ByteStreams.copy( in, out );
+        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+                throws IOException, ServletException {
+            response.setContentType("application/octet-stream");
+            response.setStatus(HttpServletResponse.SC_OK);
+            try (InputStream in = source.stream(target.substring(1));
+                    OutputStream out = response.getOutputStream()) {
+                ByteStreams.copy(in, out);
             }
-            baseRequest.setHandled( true );
+            baseRequest.setHandled(true);
         }
     }
 
-    public static void main( String[] args )
-        throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         HttpServer server = HttpServer.builder() //
-            .port( 0 ) //
-            .username( "maven" ) //
-            .password( "secret" ) //
-            .source( new File( "/tmp/repo" ) ) //
-            .build();
+                .port(0) //
+                .username("maven") //
+                .password("secret") //
+                .source(new File("/tmp/repo")) //
+                .build();
         server.start();
     }
 }

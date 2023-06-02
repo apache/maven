@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4684DistMgmtOverriddenByProfileTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4684DistMgmtOverriddenByProfileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4684DistMgmtOverriddenByProfileTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-2,)" );
+    public MavenITmng4684DistMgmtOverriddenByProfileTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
     }
 
     /**
@@ -47,36 +42,33 @@ public class MavenITmng4684DistMgmtOverriddenByProfileTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4684" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4684");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-Pmng4684" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-Pmng4684");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
+        Properties props = verifier.loadProperties("target/pom.properties");
 
-        assertEquals( "pr", props.getProperty( "project.distributionManagement.repository.id" ) );
-        assertEquals( "http://localhost/r", props.getProperty( "project.distributionManagement.repository.url" ) );
-        assertEquals( "", props.getProperty( "project.distributionManagement.repository.name", "" ) );
-        assertEquals( "default", props.getProperty( "project.distributionManagement.repository.layout" ) );
-        assertEquals( "true", props.getProperty( "project.distributionManagement.repository.uniqueVersion" ) );
+        assertEquals("pr", props.getProperty("project.distributionManagement.repository.id"));
+        assertEquals("http://localhost/r", props.getProperty("project.distributionManagement.repository.url"));
+        assertEquals("", props.getProperty("project.distributionManagement.repository.name", ""));
+        assertEquals("default", props.getProperty("project.distributionManagement.repository.layout"));
+        assertEquals("true", props.getProperty("project.distributionManagement.repository.uniqueVersion"));
 
-        assertEquals( "psr", props.getProperty( "project.distributionManagement.snapshotRepository.id" ) );
-        assertEquals( "http://localhost/sr", props.getProperty( "project.distributionManagement.snapshotRepository.url" ) );
-        assertEquals( "", props.getProperty( "project.distributionManagement.snapshotRepository.name", "" ) );
-        assertEquals( "default", props.getProperty( "project.distributionManagement.snapshotRepository.layout" ) );
-        assertEquals( "true", props.getProperty( "project.distributionManagement.snapshotRepository.uniqueVersion" ) );
+        assertEquals("psr", props.getProperty("project.distributionManagement.snapshotRepository.id"));
+        assertEquals("http://localhost/sr", props.getProperty("project.distributionManagement.snapshotRepository.url"));
+        assertEquals("", props.getProperty("project.distributionManagement.snapshotRepository.name", ""));
+        assertEquals("default", props.getProperty("project.distributionManagement.snapshotRepository.layout"));
+        assertEquals("true", props.getProperty("project.distributionManagement.snapshotRepository.uniqueVersion"));
 
-        assertEquals( "ps", props.getProperty( "project.distributionManagement.site.id" ) );
-        assertEquals( "http://localhost/s", props.getProperty( "project.distributionManagement.site.url" ) );
-        assertEquals( "passed", props.getProperty( "project.distributionManagement.site.name" ) );
+        assertEquals("ps", props.getProperty("project.distributionManagement.site.id"));
+        assertEquals("http://localhost/s", props.getProperty("project.distributionManagement.site.url"));
+        assertEquals("passed", props.getProperty("project.distributionManagement.site.name"));
     }
-
 }

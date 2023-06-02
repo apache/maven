@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,37 +16,32 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1493">MNG-1493</a>.
  */
-public class MavenITmng1493NonStandardModulePomNamesTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng1493NonStandardModulePomNamesTest()
-    {
-        super( "(2.0.8,)" ); // 2.0.9+ (including snapshots)
+public class MavenITmng1493NonStandardModulePomNamesTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng1493NonStandardModulePomNamesTest() {
+        super("(2.0.8,)"); // 2.0.9+ (including snapshots)
     }
 
     @Test
-    public void testitMNG1493 ()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1493" );
+    public void testitMNG1493() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1493");
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        verifier.addCliArgument( "initialize" );
+        verifier.addCliArgument("initialize");
         verifier.execute();
 
         /*

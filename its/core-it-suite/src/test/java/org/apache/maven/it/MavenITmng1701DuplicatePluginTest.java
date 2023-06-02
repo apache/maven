@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng1701DuplicatePluginTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng1701DuplicatePluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1701DuplicatePluginTest()
-    {
-        super( "[3.0-beta-1,)" );
+    public MavenITmng1701DuplicatePluginTest() {
+        super("[3.0-beta-1,)");
     }
 
     /**
@@ -48,44 +43,36 @@ public class MavenITmng1701DuplicatePluginTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1701" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1701");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
         try {
-            verifier.addCliArgument( "validate" );
+            verifier.addCliArgument("validate");
             verifier.execute();
-        }
-        catch ( VerificationException e )
-        {
+        } catch (VerificationException e) {
             // expected with Maven 4+
         }
 
         String logLevel;
-        if ( matchesVersionRange( "(,4.0.0-alpha-1)" ) )
-        {
+        if (matchesVersionRange("(,4.0.0-alpha-1)")) {
             logLevel = "WARNING";
-        }
-        else
-        {
+        } else {
             logLevel = "ERROR";
         }
 
-        List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
+        List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
         boolean foundMessage = false;
-        for ( String line : lines )
-        {
-            if ( line.startsWith(  "[" + logLevel + "]" )
-                && line.indexOf( "duplicate declaration of plugin org.apache.maven.its.plugins:maven-it-plugin-expression" ) > 0 )
-            {
+        for (String line : lines) {
+            if (line.startsWith("[" + logLevel + "]")
+                    && line.indexOf(
+                                    "duplicate declaration of plugin org.apache.maven.its.plugins:maven-it-plugin-expression")
+                            > 0) {
                 foundMessage = true;
             }
         }
 
-        assertTrue( "Duplicate plugin message wasn't generated.", foundMessage );
+        assertTrue("Duplicate plugin message wasn't generated.", foundMessage);
     }
-
 }

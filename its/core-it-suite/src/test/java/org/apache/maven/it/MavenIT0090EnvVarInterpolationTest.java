@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,18 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenIT0090EnvVarInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenIT0090EnvVarInterpolationTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenIT0090EnvVarInterpolationTest extends AbstractMavenIntegrationTestCase {
+    public MavenIT0090EnvVarInterpolationTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -42,21 +37,18 @@ public class MavenIT0090EnvVarInterpolationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit0090()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0090" );
+    public void testit0090() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0090");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.setEnvironmentVariable( "MAVEN_TEST_ENVAR", "MAVEN_TEST_ENVAR_VALUE" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.setEnvironmentVariable("MAVEN_TEST_ENVAR", "MAVEN_TEST_ENVAR_VALUE");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/env.properties" );
-        assertEquals( "MAVEN_TEST_ENVAR_VALUE", props.getProperty( "stringParam" ) );
+        Properties props = verifier.loadProperties("target/env.properties");
+        assertEquals("MAVEN_TEST_ENVAR_VALUE", props.getProperty("stringParam"));
     }
-
 }

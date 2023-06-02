@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,13 +32,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3938MergePluginExecutionsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3938MergePluginExecutionsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3938MergePluginExecutionsTest()
-    {
-        super( "(2.0.4,)" );
+    public MavenITmng3938MergePluginExecutionsTest() {
+        super("(2.0.4,)");
     }
 
     /**
@@ -51,10 +46,8 @@ public class MavenITmng3938MergePluginExecutionsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithoutPluginMngt()
-        throws Exception
-    {
-        testitMNG3938( "test-1" );
+    public void testitWithoutPluginMngt() throws Exception {
+        testitMNG3938("test-1");
     }
 
     /**
@@ -65,31 +58,26 @@ public class MavenITmng3938MergePluginExecutionsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithPluginMngt()
-        throws Exception
-    {
-        testitMNG3938( "test-2" );
+    public void testitWithPluginMngt() throws Exception {
+        testitMNG3938("test-2");
     }
 
-    private void testitMNG3938( String project )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3938/" + project );
+    private void testitMNG3938(String project) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3938/" + project);
 
-        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines( "target/default.log", "UTF-8" );
-        assertEquals( Arrays.asList( new String[] { "child" } ), lines );
+        List<String> lines = verifier.loadLines("target/default.log", "UTF-8");
+        assertEquals(Arrays.asList(new String[] {"child"}), lines);
 
-        lines = verifier.loadLines( "target/non-default.log", "UTF-8" );
-        assertEquals( Arrays.asList( new String[] { "child" } ), lines );
+        lines = verifier.loadLines("target/non-default.log", "UTF-8");
+        assertEquals(Arrays.asList(new String[] {"child"}), lines);
 
-        verifier.verifyFileNotPresent( "target/parent.log" );
+        verifier.verifyFileNotPresent("target/parent.log");
     }
-
 }

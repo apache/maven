@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng3133UrlNormalizationNotBeforeInterpolationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3133UrlNormalizationNotBeforeInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3133UrlNormalizationNotBeforeInterpolationTest()
-    {
-        super( "[3.0-beta-1,)" );
+    public MavenITmng3133UrlNormalizationNotBeforeInterpolationTest() {
+        super("[3.0-beta-1,)");
     }
 
     /**
@@ -49,41 +44,38 @@ public class MavenITmng3133UrlNormalizationNotBeforeInterpolationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3133" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3133");
 
-        Verifier verifier = newVerifier( new File( testDir, "child" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/url.properties" );
+        Properties props = verifier.loadProperties("target/url.properties");
         String url;
 
-        url = props.getProperty( "project.url" );
-        assertEquals( "http://server.org/child", url );
-        url = props.getProperty( "project.scm.url" );
-        assertEquals( "scm:svn:https://svn.org/child", url );
-        url = props.getProperty( "project.scm.connection" );
-        assertEquals( "scm:svn:https://svn.org/child", url );
-        url = props.getProperty( "project.scm.developerConnection" );
-        assertEquals( "scm:svn:https://svn.org/child", url );
-        url = props.getProperty( "project.distributionManagement.site.url" );
-        assertEquals( "dav://server.org/child", url );
+        url = props.getProperty("project.url");
+        assertEquals("http://server.org/child", url);
+        url = props.getProperty("project.scm.url");
+        assertEquals("scm:svn:https://svn.org/child", url);
+        url = props.getProperty("project.scm.connection");
+        assertEquals("scm:svn:https://svn.org/child", url);
+        url = props.getProperty("project.scm.developerConnection");
+        assertEquals("scm:svn:https://svn.org/child", url);
+        url = props.getProperty("project.distributionManagement.site.url");
+        assertEquals("dav://server.org/child", url);
 
-        url = props.getProperty( "project.properties.projectUrl" );
-        assertEquals( "http://server.org/child/it", url );
-        url = props.getProperty( "project.properties.projectScmUrl" );
-        assertEquals( "scm:svn:https://svn.org/child/it", url );
-        url = props.getProperty( "project.properties.projectScmConn" );
-        assertEquals( "scm:svn:https://svn.org/child/it", url );
-        url = props.getProperty( "project.properties.projectScmDevConn" );
-        assertEquals( "scm:svn:https://svn.org/child/it", url );
-        url = props.getProperty( "project.properties.projectDistSiteUrl" );
-        assertEquals( "dav://server.org/child/it", url );
+        url = props.getProperty("project.properties.projectUrl");
+        assertEquals("http://server.org/child/it", url);
+        url = props.getProperty("project.properties.projectScmUrl");
+        assertEquals("scm:svn:https://svn.org/child/it", url);
+        url = props.getProperty("project.properties.projectScmConn");
+        assertEquals("scm:svn:https://svn.org/child/it", url);
+        url = props.getProperty("project.properties.projectScmDevConn");
+        assertEquals("scm:svn:https://svn.org/child/it", url);
+        url = props.getProperty("project.properties.projectDistSiteUrl");
+        assertEquals("dav://server.org/child/it", url);
     }
-
 }

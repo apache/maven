@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -35,46 +33,40 @@ import org.junit.jupiter.api.Test;
  * @author Joakim Erdfelt
  *
  */
-@Disabled( "cannot reproduce" )
-public class MavenITmng3038TransitiveDepManVersionTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3038TransitiveDepManVersionTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+@Disabled("cannot reproduce")
+public class MavenITmng3038TransitiveDepManVersionTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3038TransitiveDepManVersionTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     @Test
-    public void testitMNG3038()
-        throws Exception
-    {
-        File testDirBase = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3038" );
+    public void testitMNG3038() throws Exception {
+        File testDirBase = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3038");
 
-        compileDDep( testDirBase, "D1", "1.0" );
-        compileDDep( testDirBase, "D2", "2.0" );
+        compileDDep(testDirBase, "D1", "1.0");
+        compileDDep(testDirBase, "D2", "2.0");
 
-        File testProjectDir = new File( testDirBase, "test-project" );
+        File testProjectDir = new File(testDirBase, "test-project");
 
-        Verifier verifier = newVerifier( testProjectDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0121", "A", "1.0", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0121", "A", "1.0", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0121", "B", "1.0", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0121", "B", "1.0", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0121", "C", "1.0", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0121", "D", "1.0", "jar" );
-        verifier.addCliArgument( "install" );
+        Verifier verifier = newVerifier(testProjectDir.getAbsolutePath());
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "A", "1.0", "pom");
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "A", "1.0", "jar");
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "B", "1.0", "pom");
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "B", "1.0", "jar");
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "C", "1.0", "pom");
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "D", "1.0", "jar");
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 
-    private void compileDDep( File testDirBase, String projectDDepDir, String version )
-        throws VerificationException, IOException
-    {
-        File testOtherDepDir = new File( testDirBase, "test-other-deps/" + projectDDepDir );
-        Verifier verifierOtherDep = newVerifier( testOtherDepDir.getAbsolutePath() );
-        verifierOtherDep.deleteArtifact( "org.apache.maven.its.it0121", "D", version, "jar" );
-        verifierOtherDep.deleteArtifact( "org.apache.maven.its.it0121", "D", version, "pom" );
-        verifierOtherDep.addCliArgument( "install" );
+    private void compileDDep(File testDirBase, String projectDDepDir, String version)
+            throws VerificationException, IOException {
+        File testOtherDepDir = new File(testDirBase, "test-other-deps/" + projectDDepDir);
+        Verifier verifierOtherDep = newVerifier(testOtherDepDir.getAbsolutePath());
+        verifierOtherDep.deleteArtifact("org.apache.maven.its.it0121", "D", version, "jar");
+        verifierOtherDep.deleteArtifact("org.apache.maven.its.it0121", "D", version, "pom");
+        verifierOtherDep.addCliArgument("install");
         verifierOtherDep.execute();
         verifierOtherDep.verifyErrorFreeLog();
     }

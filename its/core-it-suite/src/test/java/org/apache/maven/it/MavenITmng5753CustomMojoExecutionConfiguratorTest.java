@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,37 +16,33 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
 import org.apache.maven.shared.utils.io.FileUtils;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng5753CustomMojoExecutionConfiguratorTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5753CustomMojoExecutionConfiguratorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5753CustomMojoExecutionConfiguratorTest()
-    {
-        super( "[3.3.0-alpha,)" );
+    public MavenITmng5753CustomMojoExecutionConfiguratorTest() {
+        super("[3.3.0-alpha,)");
     }
 
     @Test
-    public void testCustomMojoExecutionConfigurator()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5753-custom-mojo-execution-configurator" );
-        File pluginDir = new File( testDir, "plugin" );
-        File projectDir = new File( testDir, "project" );
+    public void testCustomMojoExecutionConfigurator() throws Exception {
+        File testDir =
+                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5753-custom-mojo-execution-configurator");
+        File pluginDir = new File(testDir, "plugin");
+        File projectDir = new File(testDir, "project");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -56,17 +50,17 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest
         configurationFile.delete();
 
         // build the test project
-        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "validate" );
+        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( configurationFile.getCanonicalPath() );
+        verifier.verifyFilePresent(configurationFile.getCanonicalPath());
         //
         // The <name/> element in the original configuration is "ORIGINAL". We want to assert that our
         // custom MojoExecutionConfigurator made the transformation of the element from "ORIGINAL" to "TRANSFORMED"
         //
-        String actual = FileUtils.fileRead( configurationFile );
-        assertEquals( "TRANSFORMED", actual );
+        String actual = FileUtils.fileRead(configurationFile);
+        assertEquals("TRANSFORMED", actual);
     }
 }

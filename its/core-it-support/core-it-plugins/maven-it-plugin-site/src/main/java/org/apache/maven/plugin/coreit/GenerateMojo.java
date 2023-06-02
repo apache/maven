@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,14 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.List;
+import java.util.Locale;
 
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.AbstractMojo;
@@ -28,45 +34,36 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.reporting.MavenReport;
 
-import java.io.File;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.List;
-import java.util.Locale;
-
 /**
  * Generates the available/configured reports.
  *
  * @author Benjamin Bentmann
  */
-@Mojo( name = "generate", defaultPhase = LifecyclePhase.SITE, requiresReports = true )
-public class GenerateMojo
-    extends AbstractMojo
-{
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.SITE, requiresReports = true)
+public class GenerateMojo extends AbstractMojo {
 
     /**
      * The path to the output directory of the site.
      */
-    @Parameter( defaultValue = "${project.reporting.outputDirectory}" )
+    @Parameter(defaultValue = "${project.reporting.outputDirectory}")
     private File outputDirectory;
 
     /**
      * The language for the reports.
      */
-    @Parameter( defaultValue = "en" )
+    @Parameter(defaultValue = "en")
     private String language = "en";
 
     /**
      * A flag whether to ignore errors from reports and continue the generation.
      */
-    @Parameter( defaultValue = "false" )
+    @Parameter(defaultValue = "false")
     private boolean ignoreErrors;
 
     /**
      * The reports configured for the current build.
      */
-    @Parameter( defaultValue = "${reports}", required = true, readonly = true )
+    @Parameter(defaultValue = "${reports}", required = true, readonly = true)
     private List reports;
 
     /**
@@ -74,52 +71,37 @@ public class GenerateMojo
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        getLog().info( "[MAVEN-CORE-IT-LOG] Using output directory " + outputDirectory );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        getLog().info("[MAVEN-CORE-IT-LOG] Using output directory " + outputDirectory);
 
-        Locale locale = new Locale( language );
-        getLog().info( "[MAVEN-CORE-IT-LOG] Using locale " + locale );
+        Locale locale = new Locale(language);
+        getLog().info("[MAVEN-CORE-IT-LOG] Using locale " + locale);
 
-        InvocationHandler handler = new InvocationHandler()
-        {
+        InvocationHandler handler = new InvocationHandler() {
 
-            public Object invoke( Object proxy, Method method, Object[] args )
-                throws Throwable
-            {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 return null;
             }
-
         };
-        Sink sink = (Sink) Proxy.newProxyInstance( getClass().getClassLoader(), new Class[]{ Sink.class }, handler );
+        Sink sink = (Sink) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] {Sink.class}, handler);
 
-        for ( Object report1 : reports )
-        {
+        for (Object report1 : reports) {
             MavenReport report = (MavenReport) report1;
 
-            if ( report.canGenerateReport() )
-            {
-                getLog().info( "[MAVEN-CORE-IT-LOG] Generating report " + report );
-                try
-                {
-                    report.setReportOutputDirectory( outputDirectory );
-                    report.generate( sink, locale );
-                }
-                catch ( Throwable e )
-                {
-                    getLog().warn( "[MAVEN-CORE-IT-LOG]   " + e, e );
-                    if ( !ignoreErrors )
-                    {
-                        throw new MojoExecutionException( "Failed to generate report " + report, e );
+            if (report.canGenerateReport()) {
+                getLog().info("[MAVEN-CORE-IT-LOG] Generating report " + report);
+                try {
+                    report.setReportOutputDirectory(outputDirectory);
+                    report.generate(sink, locale);
+                } catch (Throwable e) {
+                    getLog().warn("[MAVEN-CORE-IT-LOG]   " + e, e);
+                    if (!ignoreErrors) {
+                        throw new MojoExecutionException("Failed to generate report " + report, e);
                     }
                 }
-            }
-            else
-            {
-                getLog().info( "[MAVEN-CORE-IT-LOG] Skipping report " + report );
+            } else {
+                getLog().info("[MAVEN-CORE-IT-LOG] Skipping report " + report);
             }
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,16 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -39,150 +37,121 @@ import org.junit.jupiter.api.Test;
  *
  * @author jdcasey
  */
-public class MavenITmng2690MojoLoadingErrorsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2690MojoLoadingErrorsTest()
-    {
-        super( "(2.1.0-M1,)" );
+    public MavenITmng2690MojoLoadingErrorsTest() {
+        super("(2.1.0-M1,)");
     }
 
     @Test
-    public void testNoClassDefFromMojoLoad()
-        throws IOException, VerificationException
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2690/noclassdef-mojo" );
+    public void testNoClassDefFromMojoLoad() throws IOException, VerificationException {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2690/noclassdef-mojo");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
 
-            fail( "should throw an error during execution." );
-        }
-        catch ( VerificationException e )
-        {
+            fail("should throw an error during execution.");
+        } catch (VerificationException e) {
             // expected...it'd be nice if we could get the specifics of the exception right here...
         }
 
-        List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 
-        int msg = indexOf( lines, "(?i).*required class is missing.*" );
-        assertTrue( "User-friendly message was not found in output.", msg >= 0 );
+        int msg = indexOf(lines, "(?i).*required class is missing.*");
+        assertTrue("User-friendly message was not found in output.", msg >= 0);
 
-        int cls = lines.get( msg ).toString().replace( '/', '.' ).indexOf( "junit.framework.TestCase" );
-        assertTrue( "Missing class name was not found in output.", cls >= 0 );
+        int cls = lines.get(msg).toString().replace('/', '.').indexOf("junit.framework.TestCase");
+        assertTrue("Missing class name was not found in output.", cls >= 0);
     }
 
     @Test
-    public void testNoClassDefFromMojoConfiguration()
-        throws IOException, VerificationException
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2690/noclassdef-param" );
+    public void testNoClassDefFromMojoConfiguration() throws IOException, VerificationException {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2690/noclassdef-param");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
 
-            fail( "should throw an error during execution." );
-        }
-        catch ( VerificationException e )
-        {
+            fail("should throw an error during execution.");
+        } catch (VerificationException e) {
             // expected...it'd be nice if we could get the specifics of the exception right here...
         }
 
-        List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 
-        int msg = indexOf( lines, "(?i).*required class (i|wa)s missing( during (mojo )?configuration)?.*" );
-        assertTrue( "User-friendly message was not found in output.", msg >= 0 );
+        int msg = indexOf(lines, "(?i).*required class (i|wa)s missing( during (mojo )?configuration)?.*");
+        assertTrue("User-friendly message was not found in output.", msg >= 0);
 
-        int cls = lines.get( msg ).toString().replace( '/', '.' ).indexOf( "junit.framework.TestCase" );
-        assertTrue( "Missing class name was not found in output.", cls >= 0 );
+        int cls = lines.get(msg).toString().replace('/', '.').indexOf("junit.framework.TestCase");
+        assertTrue("Missing class name was not found in output.", cls >= 0);
     }
 
     @Test
-    public void testMojoComponentLookupException()
-        throws IOException, VerificationException
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2690/mojo-complookup" );
+    public void testMojoComponentLookupException() throws IOException, VerificationException {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2690/mojo-complookup");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
 
-            fail( "should throw an error during execution." );
-        }
-        catch ( VerificationException e )
-        {
+            fail("should throw an error during execution.");
+        } catch (VerificationException e) {
             // expected...it'd be nice if we could get the specifics of the exception right here...
         }
 
-        List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 
-        String compLookupMsg =
-            "(?i).*unable to .* mojo 'mojo-component-lookup-exception' .* plugin "
+        String compLookupMsg = "(?i).*unable to .* mojo 'mojo-component-lookup-exception' .* plugin "
                 + "'org\\.apache\\.maven\\.its\\.plugins:maven-it-plugin-error.*";
 
-        assertTrue( "User-friendly message was not found in output.", indexOf( lines, compLookupMsg ) > 0 );
+        assertTrue("User-friendly message was not found in output.", indexOf(lines, compLookupMsg) > 0);
     }
 
     @Test
-    public void testMojoRequirementComponentLookupException()
-        throws IOException, VerificationException
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2690/requirement-complookup" );
+    public void testMojoRequirementComponentLookupException() throws IOException, VerificationException {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2690/requirement-complookup");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
 
-            fail( "should throw an error during execution." );
-        }
-        catch ( VerificationException e )
-        {
+            fail("should throw an error during execution.");
+        } catch (VerificationException e) {
             // expected...it'd be nice if we could get the specifics of the exception right here...
         }
 
-        List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 
-        String compLookupMsg =
-            "(?i).*unable to .* mojo 'requirement-component-lookup-exception' .* plugin "
+        String compLookupMsg = "(?i).*unable to .* mojo 'requirement-component-lookup-exception' .* plugin "
                 + "'org\\.apache\\.maven\\.its\\.plugins:maven-it-plugin-error.*";
 
-        assertTrue( "User-friendly message was not found in output.", indexOf( lines, compLookupMsg ) > 0 );
+        assertTrue("User-friendly message was not found in output.", indexOf(lines, compLookupMsg) > 0);
     }
 
-    private int indexOf( List<String> logLines, String regex )
-    {
-        Pattern pattern = Pattern.compile( regex );
+    private int indexOf(List<String> logLines, String regex) {
+        Pattern pattern = Pattern.compile(regex);
 
-        for ( int i = 0; i < logLines.size(); i++ )
-        {
-            String logLine = logLines.get( i );
+        for (int i = 0; i < logLines.size(); i++) {
+            String logLine = logLines.get(i);
 
-            if ( pattern.matcher( logLine ).matches() )
-            {
+            if (pattern.matcher(logLine).matches()) {
                 return i;
             }
         }
 
         return -1;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4960MakeLikeReactorResumeTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4960MakeLikeReactorResumeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4960MakeLikeReactorResumeTest()
-    {
-        super( "[2.1.0,3.0-alpha-1),[3.0.2,)" );
+    public MavenITmng4960MakeLikeReactorResumeTest() {
+        super("[2.1.0,3.0-alpha-1),[3.0.2,)");
     }
 
     /**
@@ -47,29 +42,27 @@ public class MavenITmng4960MakeLikeReactorResumeTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitFromUpstream()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4960" );
+    public void testitFromUpstream() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4960");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "mod-a/target" );
-        verifier.deleteDirectory( "mod-b/target" );
-        verifier.addCliArgument( "--projects" );
-        verifier.addCliArgument( "mod-b" );
-        verifier.addCliArgument( "--also-make" );
-        verifier.addCliArgument( "--resume-from" );
-        verifier.addCliArgument( "mod-a" );
-        verifier.setLogFileName( "log-up.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("mod-a/target");
+        verifier.deleteDirectory("mod-b/target");
+        verifier.addCliArgument("--projects");
+        verifier.addCliArgument("mod-b");
+        verifier.addCliArgument("--also-make");
+        verifier.addCliArgument("--resume-from");
+        verifier.addCliArgument("mod-a");
+        verifier.setLogFileName("log-up.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "mod-a/target/touch.txt" );
-        verifier.verifyFilePresent( "mod-b/target/touch.txt" );
-        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFilePresent("mod-a/target/touch.txt");
+        verifier.verifyFilePresent("mod-b/target/touch.txt");
+        verifier.verifyFileNotPresent("target/touch.txt");
     }
 
     /**
@@ -79,29 +72,26 @@ public class MavenITmng4960MakeLikeReactorResumeTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitFromDownstream()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4960" );
+    public void testitFromDownstream() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4960");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "mod-a/target" );
-        verifier.deleteDirectory( "mod-b/target" );
-        verifier.addCliArgument( "--projects" );
-        verifier.addCliArgument( "mod-a" );
-        verifier.addCliArgument( "--also-make-dependents" );
-        verifier.addCliArgument( "--resume-from" );
-        verifier.addCliArgument( "mod-b" );
-        verifier.setLogFileName( "log-down.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("mod-a/target");
+        verifier.deleteDirectory("mod-b/target");
+        verifier.addCliArgument("--projects");
+        verifier.addCliArgument("mod-a");
+        verifier.addCliArgument("--also-make-dependents");
+        verifier.addCliArgument("--resume-from");
+        verifier.addCliArgument("mod-b");
+        verifier.setLogFileName("log-down.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "mod-a/target/touch.txt" );
-        verifier.verifyFilePresent( "mod-b/target/touch.txt" );
-        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent("mod-a/target/touch.txt");
+        verifier.verifyFilePresent("mod-b/target/touch.txt");
+        verifier.verifyFileNotPresent("target/touch.txt");
     }
-
 }

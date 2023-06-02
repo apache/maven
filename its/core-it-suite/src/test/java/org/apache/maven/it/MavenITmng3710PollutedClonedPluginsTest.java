@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,66 +33,58 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  *
  */
-public class MavenITmng3710PollutedClonedPluginsTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3710PollutedClonedPluginsTest()
-    {
-        super( "(2.0.8,)" ); // only test in 2.0.9+
+public class MavenITmng3710PollutedClonedPluginsTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3710PollutedClonedPluginsTest() {
+        super("(2.0.8,)"); // only test in 2.0.9+
     }
 
     @Test
-    public void testitMNG3710_POMInheritance()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3710/pom-inheritance" );
-        File pluginDir = new File( testDir, "maven-mng3710-pomInheritance-plugin" );
-        File projectsDir = new File( testDir, "projects" );
+    public void testitMNG3710_POMInheritance() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3710/pom-inheritance");
+        File pluginDir = new File(testDir, "maven-mng3710-pomInheritance-plugin");
+        File projectsDir = new File(testDir, "projects");
 
         Verifier verifier;
 
-        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( projectsDir.getAbsolutePath() );
-        verifier.addCliArgument( "validate" );
+        verifier = newVerifier(projectsDir.getAbsolutePath());
+        verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        File topLevelTouchFile = new File( projectsDir, "target/touch.txt" );
-        assertFalse( "Top-level touch file should NOT be created in projects tree.", topLevelTouchFile.exists() );
+        File topLevelTouchFile = new File(projectsDir, "target/touch.txt");
+        assertFalse("Top-level touch file should NOT be created in projects tree.", topLevelTouchFile.exists());
 
-        File midLevelTouchFile = new File( projectsDir, "middle/target/touch.txt" );
-        assertTrue( "Mid-level touch file should have been created in projects tree.", midLevelTouchFile.exists() );
+        File midLevelTouchFile = new File(projectsDir, "middle/target/touch.txt");
+        assertTrue("Mid-level touch file should have been created in projects tree.", midLevelTouchFile.exists());
 
-        File childLevelTouchFile = new File( projectsDir, "middle/child/target/touch.txt" );
-        assertTrue( "Child-level touch file should have been created in projects tree.", childLevelTouchFile.exists() );
-
+        File childLevelTouchFile = new File(projectsDir, "middle/child/target/touch.txt");
+        assertTrue("Child-level touch file should have been created in projects tree.", childLevelTouchFile.exists());
     }
 
     @Test
-    public void testitMNG3710_OriginalModel()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3710/original-model" );
-        File pluginsDir = new File( testDir, "plugins" );
-        File projectDir = new File( testDir, "project" );
+    public void testitMNG3710_OriginalModel() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3710/original-model");
+        File pluginsDir = new File(testDir, "plugins");
+        File projectDir = new File(testDir, "project");
 
         Verifier verifier;
 
-        verifier = newVerifier( pluginsDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "install" );
+        verifier = newVerifier(pluginsDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier(projectDir.getAbsolutePath());
 
-        verifier.addCliArguments( "org.apache.maven.its.mng3710:mavenit-mng3710-directInvoke-plugin:1:run", "validate" );
+        verifier.addCliArguments("org.apache.maven.its.mng3710:mavenit-mng3710-directInvoke-plugin:1:run", "validate");
 
         verifier.execute();
 

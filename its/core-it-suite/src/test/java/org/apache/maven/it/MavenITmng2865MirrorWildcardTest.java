@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng2865MirrorWildcardTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2865MirrorWildcardTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2865MirrorWildcardTest()
-    {
-        super( "(2.0.4,)" );
+    public MavenITmng2865MirrorWildcardTest() {
+        super("(2.0.4,)");
     }
 
     /**
@@ -47,10 +42,8 @@ public class MavenITmng2865MirrorWildcardTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitFileRepo()
-        throws Exception
-    {
-        testit( "file" );
+    public void testitFileRepo() throws Exception {
+        testit("file");
     }
 
     /**
@@ -59,10 +52,8 @@ public class MavenITmng2865MirrorWildcardTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitLocalhostRepo()
-        throws Exception
-    {
-        testit( "localhost" );
+    public void testitLocalhostRepo() throws Exception {
+        testit("localhost");
     }
 
     /**
@@ -71,10 +62,8 @@ public class MavenITmng2865MirrorWildcardTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitExternalRepo()
-        throws Exception
-    {
-        testit( "external" );
+    public void testitExternalRepo() throws Exception {
+        testit("external");
     }
 
     /**
@@ -83,28 +72,23 @@ public class MavenITmng2865MirrorWildcardTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCentralRepo()
-        throws Exception
-    {
-        testit( "central" );
+    public void testitCentralRepo() throws Exception {
+        testit("central");
     }
 
-    private void testit( String project )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2865" );
+    private void testit(String project) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2865");
 
-        Verifier verifier = newVerifier( new File( testDir, project ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2865" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng2865");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng2865", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng2865", "a", "0.1", "jar");
     }
-
 }

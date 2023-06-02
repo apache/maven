@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -36,21 +38,18 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
-import java.io.File;
-import java.util.List;
-
 /**
  * @author Olivier Lamy
  */
-@Mojo( name = "install-artifacts", requiresDependencyResolution = ResolutionScope.RUNTIME,
-       defaultPhase = LifecyclePhase.PACKAGE )
-public class InstallArtifactsMojo
-    extends AbstractMojo
-{
+@Mojo(
+        name = "install-artifacts",
+        requiresDependencyResolution = ResolutionScope.RUNTIME,
+        defaultPhase = LifecyclePhase.PACKAGE)
+public class InstallArtifactsMojo extends AbstractMojo {
 
     /**
      */
-    @Parameter( defaultValue = "${project.runtimeArtifacts}", readonly = true )
+    @Parameter(defaultValue = "${project.runtimeArtifacts}", readonly = true)
     private List<Artifact> artifacts;
 
     /**
@@ -67,105 +66,90 @@ public class InstallArtifactsMojo
      * The directory that will be used to assemble the artifacts in
      * and place the bin scripts.
      */
-    @Parameter( property = "assembleDirectory", defaultValue = "${project.build.directory}/appassembler" )
+    @Parameter(property = "assembleDirectory", defaultValue = "${project.build.directory}/appassembler")
     private File assembleDirectory;
 
     /**
      * Path (relative to assembleDirectory) of the desired output repository.
      */
-    @Parameter( defaultValue = "repo" )
+    @Parameter(defaultValue = "repo")
     private String repositoryName;
 
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
 
         ArtifactRepositoryLayout artifactRepositoryLayout = new FlatRepositoryLayout();
 
         // The repo where the jar files will be installed
-        ArtifactRepository artifactRepository =
-            artifactRepositoryFactory.createDeploymentArtifactRepository( "appassembler", "file://"
-                + assembleDirectory.getAbsolutePath() + "/" + repositoryName, artifactRepositoryLayout, false );
-        for ( Artifact artifact : artifacts )
-        {
-            installArtifact( artifactRepository, artifact );
+        ArtifactRepository artifactRepository = artifactRepositoryFactory.createDeploymentArtifactRepository(
+                "appassembler",
+                "file://" + assembleDirectory.getAbsolutePath() + "/" + repositoryName,
+                artifactRepositoryLayout,
+                false);
+        for (Artifact artifact : artifacts) {
+            installArtifact(artifactRepository, artifact);
         }
     }
 
-    private void installArtifact( ArtifactRepository artifactRepository, Artifact artifact )
-        throws MojoExecutionException
-    {
-        try
-        {
+    private void installArtifact(ArtifactRepository artifactRepository, Artifact artifact)
+            throws MojoExecutionException {
+        try {
 
             artifact.isSnapshot();
 
-            if ( artifact.getFile() != null )
-            {
-                artifactInstaller.install( artifact.getFile(), artifact, artifactRepository );
+            if (artifact.getFile() != null) {
+                artifactInstaller.install(artifact.getFile(), artifact, artifactRepository);
             }
-        }
-        catch ( ArtifactInstallationException e )
-        {
-            throw new MojoExecutionException( "Failed to copy artifact.", e );
+        } catch (ArtifactInstallationException e) {
+            throw new MojoExecutionException("Failed to copy artifact.", e);
         }
     }
 
     /**
      *
      */
-    public static class FlatRepositoryLayout
-        implements ArtifactRepositoryLayout
-    {
+    public static class FlatRepositoryLayout implements ArtifactRepositoryLayout {
         private static final char ARTIFACT_SEPARATOR = '-';
 
         private static final char GROUP_SEPARATOR = '.';
 
         @Override
-        public String getId()
-        {
+        public String getId() {
             return "id";
         }
 
-        public String pathOf( Artifact artifact )
-        {
+        public String pathOf(Artifact artifact) {
             ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
             StringBuilder path = new StringBuilder();
 
-            path.append( artifact.getArtifactId() ).append( ARTIFACT_SEPARATOR ).append( artifact.getVersion() );
+            path.append(artifact.getArtifactId()).append(ARTIFACT_SEPARATOR).append(artifact.getVersion());
 
-            if ( artifact.hasClassifier() )
-            {
-                path.append( ARTIFACT_SEPARATOR ).append( artifact.getClassifier() );
+            if (artifact.hasClassifier()) {
+                path.append(ARTIFACT_SEPARATOR).append(artifact.getClassifier());
             }
 
-            if ( artifactHandler.getExtension() != null && artifactHandler.getExtension().length() > 0 )
-            {
-                path.append( GROUP_SEPARATOR ).append( artifactHandler.getExtension() );
+            if (artifactHandler.getExtension() != null
+                    && artifactHandler.getExtension().length() > 0) {
+                path.append(GROUP_SEPARATOR).append(artifactHandler.getExtension());
             }
 
             return path.toString();
         }
 
-        public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
-        {
-            return pathOfRepositoryMetadata( metadata.getLocalFilename( repository ) );
+        public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
+            return pathOfRepositoryMetadata(metadata.getLocalFilename(repository));
         }
 
-        private String pathOfRepositoryMetadata( String filename )
-        {
+        private String pathOfRepositoryMetadata(String filename) {
             StringBuilder path = new StringBuilder();
 
-            path.append( filename );
+            path.append(filename);
 
             return path.toString();
         }
 
-        public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
-        {
-            return pathOfRepositoryMetadata( metadata.getRemoteFilename() );
+        public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
+            return pathOfRepositoryMetadata(metadata.getRemoteFilename());
         }
     }
-
 }

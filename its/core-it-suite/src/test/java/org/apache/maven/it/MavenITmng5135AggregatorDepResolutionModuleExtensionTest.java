@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng5135AggregatorDepResolutionModuleExtensionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5135AggregatorDepResolutionModuleExtensionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5135AggregatorDepResolutionModuleExtensionTest()
-    {
-        super( "[2.0.9,3.0-alpha-1),[3.0.4,)" );
+    public MavenITmng5135AggregatorDepResolutionModuleExtensionTest() {
+        super("[2.0.9,3.0-alpha-1),[3.0.4,)");
     }
 
     /**
@@ -47,25 +42,22 @@ public class MavenITmng5135AggregatorDepResolutionModuleExtensionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5135" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5135");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng5135" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:aggregate-test" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5135");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:aggregate-test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines( "target/module.txt", "UTF-8" );
+        List<String> compile = verifier.loadLines("target/module.txt", "UTF-8");
 
-        assertTrue( compile.toString(), compile.contains( "dep-0.1-it.jar" ) );
+        assertTrue(compile.toString(), compile.contains("dep-0.1-it.jar"));
     }
-
 }

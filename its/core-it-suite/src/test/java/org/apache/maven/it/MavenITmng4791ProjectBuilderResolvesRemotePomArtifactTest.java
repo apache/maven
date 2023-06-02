@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-4,)" );
+    public MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-4,)");
     }
 
     /**
@@ -48,28 +43,25 @@ public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4791" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4791");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4791" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4791");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
+        Properties props = verifier.loadProperties("target/pom.properties");
 
-        assertEquals( "0.1-20100902.190819-1",
-            props.getProperty( "org.apache.maven.its.mng4791:a:pom:0.1-SNAPSHOT.version" ) );
-        String path = props.getProperty( "org.apache.maven.its.mng4791:a:pom:0.1-SNAPSHOT.file" );
-        assertTrue( path, path.endsWith( ".pom" ) );
+        assertEquals(
+                "0.1-20100902.190819-1", props.getProperty("org.apache.maven.its.mng4791:a:pom:0.1-SNAPSHOT.version"));
+        String path = props.getProperty("org.apache.maven.its.mng4791:a:pom:0.1-SNAPSHOT.file");
+        assertTrue(path, path.endsWith(".pom"));
     }
-
 }

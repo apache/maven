@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng0947OptionalDependencyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng0947OptionalDependencyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0947OptionalDependencyTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng0947OptionalDependencyTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,40 +43,37 @@ public class MavenITmng0947OptionalDependencyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        failingMavenVersions( "(,3.1.0-alpha-1)" );
+    public void testit() throws Exception {
+        failingMavenVersions("(,3.1.0-alpha-1)");
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0947" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0947");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng0947" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng0947");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertTrue( compile.toString(), compile.contains( "org.apache.maven.its.mng0947:d:jar:0.1 (optional)" ) );
-        assertTrue( compile.toString(), compile.contains( "org.apache.maven.its.mng0947:e:jar:0.1 (optional)" ) );
-        assertEquals( 2, compile.size() );
+        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        assertTrue(compile.toString(), compile.contains("org.apache.maven.its.mng0947:d:jar:0.1 (optional)"));
+        assertTrue(compile.toString(), compile.contains("org.apache.maven.its.mng0947:e:jar:0.1 (optional)"));
+        assertEquals(2, compile.size());
 
-        List<String> runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
-        assertTrue( runtime.toString(), runtime.contains( "org.apache.maven.its.mng0947:c:jar:0.1" ) );
-        assertTrue( runtime.toString(), runtime.contains( "org.apache.maven.its.mng0947:d:jar:0.1 (optional)" ) );
-        assertTrue( runtime.toString(), runtime.contains( "org.apache.maven.its.mng0947:e:jar:0.1 (optional)" ) );
-        assertEquals( 3, runtime.size() );
+        List<String> runtime = verifier.loadLines("target/runtime.txt", "UTF-8");
+        assertTrue(runtime.toString(), runtime.contains("org.apache.maven.its.mng0947:c:jar:0.1"));
+        assertTrue(runtime.toString(), runtime.contains("org.apache.maven.its.mng0947:d:jar:0.1 (optional)"));
+        assertTrue(runtime.toString(), runtime.contains("org.apache.maven.its.mng0947:e:jar:0.1 (optional)"));
+        assertEquals(3, runtime.size());
 
-        List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
-        assertTrue( test.toString(), test.contains( "org.apache.maven.its.mng0947:c:jar:0.1" ) );
-        assertTrue( test.toString(), test.contains( "org.apache.maven.its.mng0947:d:jar:0.1 (optional)" ) );
-        assertTrue( test.toString(), test.contains( "org.apache.maven.its.mng0947:e:jar:0.1 (optional)" ) );
-        assertEquals( 3, test.size() );
+        List<String> test = verifier.loadLines("target/test.txt", "UTF-8");
+        assertTrue(test.toString(), test.contains("org.apache.maven.its.mng0947:c:jar:0.1"));
+        assertTrue(test.toString(), test.contains("org.apache.maven.its.mng0947:d:jar:0.1 (optional)"));
+        assertTrue(test.toString(), test.contains("org.apache.maven.its.mng0947:e:jar:0.1 (optional)"));
+        assertEquals(3, test.size());
     }
-
 }

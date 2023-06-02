@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,12 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,17 +29,10 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
-
 /**
  * @author Benjamin Bentmann
  */
-public abstract class AbstractPomMojo
-    extends AbstractMojo
-{
+public abstract class AbstractPomMojo extends AbstractMojo {
 
     /**
      * The project builder.
@@ -43,41 +40,30 @@ public abstract class AbstractPomMojo
     @Component
     protected MavenProjectBuilder builder;
 
-    protected void dump( Properties props, String key, MavenProject project )
-    {
-        put( props, key + "project.id", project.getId() );
-        put( props, key + "project.name", project.getName() );
-        put( props, key + "project.description", project.getDescription() );
-        if ( project.getArtifact() != null )
-        {
-            put( props, key + "artifact.id", project.getArtifact().getId() );
+    protected void dump(Properties props, String key, MavenProject project) {
+        put(props, key + "project.id", project.getId());
+        put(props, key + "project.name", project.getName());
+        put(props, key + "project.description", project.getDescription());
+        if (project.getArtifact() != null) {
+            put(props, key + "artifact.id", project.getArtifact().getId());
         }
     }
 
-    protected void put( Properties props, String key, Object value )
-    {
-        if ( value != null )
-        {
-            props.setProperty( key, value.toString() );
+    protected void put(Properties props, String key, Object value) {
+        if (value != null) {
+            props.setProperty(key, value.toString());
         }
     }
 
-    protected void store( Properties props, File file )
-        throws MojoExecutionException
-    {
-        try
-        {
+    protected void store(Properties props, File file) throws MojoExecutionException {
+        try {
             file.getParentFile().mkdirs();
 
-            try ( FileOutputStream os = new FileOutputStream( file ) )
-            {
-                props.store( os, "[MAVEN-CORE-IT-LOG]" );
+            try (FileOutputStream os = new FileOutputStream(file)) {
+                props.store(os, "[MAVEN-CORE-IT-LOG]");
             }
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Failed to dump POMs: " + e.getMessage(), e );
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to dump POMs: " + e.getMessage(), e);
         }
     }
-
 }

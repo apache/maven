@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4890MakeLikeReactorConsidersVersionsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4890MakeLikeReactorConsidersVersionsTest()
-    {
-        super( "[3.0,)" );
+    public MavenITmng4890MakeLikeReactorConsidersVersionsTest() {
+        super("[3.0,)");
     }
 
     /**
@@ -47,27 +42,25 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitAM()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4890" );
+    public void testitAM() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4890");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "mod-a/target" );
-        verifier.deleteDirectory( "mod-b/target" );
-        verifier.addCliArgument( "--projects" );
-        verifier.addCliArgument( "mod-b" );
-        verifier.addCliArgument( "--also-make" );
-        verifier.setLogFileName( "log-am.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("mod-a/target");
+        verifier.deleteDirectory("mod-b/target");
+        verifier.addCliArgument("--projects");
+        verifier.addCliArgument("mod-b");
+        verifier.addCliArgument("--also-make");
+        verifier.setLogFileName("log-am.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "mod-b/target/touch.txt" );
-        verifier.verifyFileNotPresent( "mod-a/target/touch.txt" );
-        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFilePresent("mod-b/target/touch.txt");
+        verifier.verifyFileNotPresent("mod-a/target/touch.txt");
+        verifier.verifyFileNotPresent("target/touch.txt");
     }
 
     /**
@@ -77,27 +70,24 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitAMD()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4890" );
+    public void testitAMD() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4890");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "mod-a/target" );
-        verifier.deleteDirectory( "mod-b/target" );
-        verifier.addCliArgument( "--projects" );
-        verifier.addCliArgument( "mod-a" );
-        verifier.addCliArgument( "--also-make-dependents" );
-        verifier.setLogFileName( "log-amd.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("mod-a/target");
+        verifier.deleteDirectory("mod-b/target");
+        verifier.addCliArgument("--projects");
+        verifier.addCliArgument("mod-a");
+        verifier.addCliArgument("--also-make-dependents");
+        verifier.setLogFileName("log-amd.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "mod-a/target/touch.txt" );
-        verifier.verifyFileNotPresent( "mod-b/target/touch.txt" );
-        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFilePresent("mod-a/target/touch.txt");
+        verifier.verifyFileNotPresent("mod-b/target/touch.txt");
+        verifier.verifyFileNotPresent("target/touch.txt");
     }
-
 }

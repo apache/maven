@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,13 +34,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng3732ActiveProfilesTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3732ActiveProfilesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3732ActiveProfilesTest()
-    {
-        super( "[2.0,)" );
+    public MavenITmng3732ActiveProfilesTest() {
+        super("[2.0,)");
     }
 
     /**
@@ -51,62 +46,53 @@ public class MavenITmng3732ActiveProfilesTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3732()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3732" );
+    public void testitMNG3732() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3732");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        if ( matchesVersionRange( "[4.0.0-alpha-1,)" ) )
-        {
-            verifier.addCliArgument( "-Ppom,settings" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
+            verifier.addCliArgument("-Ppom,settings");
+        } else {
+            verifier.addCliArgument("-Ppom,profiles,settings");
         }
-        else
-        {
-            verifier.addCliArgument( "-Ppom,profiles,settings" );
-        }
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/profile.properties" );
+        Properties props = verifier.loadProperties("target/profile.properties");
         List<String> ids = new ArrayList<>();
 
         // support for profiles.xml removed from 3.x (see MNG-4060)
-        if ( matchesVersionRange( "[2.0,3.0-alpha-1)" ) )
-        {
-            ids.add( props.getProperty( "project.activeProfiles.0.id", "" ) );
-            ids.add( props.getProperty( "project.activeProfiles.1.id", "" ) );
-            ids.add( props.getProperty( "project.activeProfiles.2.id", "" ) );
-            ids.add( props.getProperty( "project.activeProfiles.3.id", "" ) );
-            ids.remove( "it-defaults" );
-            Collections.sort( ids );
+        if (matchesVersionRange("[2.0,3.0-alpha-1)")) {
+            ids.add(props.getProperty("project.activeProfiles.0.id", ""));
+            ids.add(props.getProperty("project.activeProfiles.1.id", ""));
+            ids.add(props.getProperty("project.activeProfiles.2.id", ""));
+            ids.add(props.getProperty("project.activeProfiles.3.id", ""));
+            ids.remove("it-defaults");
+            Collections.sort(ids);
 
-            assertEquals( Arrays.asList( new String[]{ "pom", "profiles", "settings" } ), ids );
-            assertEquals( "4", props.getProperty( "project.activeProfiles" ) );
+            assertEquals(Arrays.asList(new String[] {"pom", "profiles", "settings"}), ids);
+            assertEquals("4", props.getProperty("project.activeProfiles"));
 
-            assertEquals( "PASSED-1", props.getProperty( "project.properties.pomProperty" ) );
-            assertEquals( "PASSED-2", props.getProperty( "project.properties.settingsProperty" ) );
-            assertEquals( "PASSED-3", props.getProperty( "project.properties.profilesProperty" ) );
-        }
-        else
-        {
-            ids.add( props.getProperty( "project.activeProfiles.0.id", "" ) );
-            ids.add( props.getProperty( "project.activeProfiles.1.id", "" ) );
-            ids.add( props.getProperty( "project.activeProfiles.2.id", "" ) );
-            ids.remove( "it-defaults" );
-            Collections.sort( ids );
+            assertEquals("PASSED-1", props.getProperty("project.properties.pomProperty"));
+            assertEquals("PASSED-2", props.getProperty("project.properties.settingsProperty"));
+            assertEquals("PASSED-3", props.getProperty("project.properties.profilesProperty"));
+        } else {
+            ids.add(props.getProperty("project.activeProfiles.0.id", ""));
+            ids.add(props.getProperty("project.activeProfiles.1.id", ""));
+            ids.add(props.getProperty("project.activeProfiles.2.id", ""));
+            ids.remove("it-defaults");
+            Collections.sort(ids);
 
-            assertEquals( Arrays.asList( new String[]{ "pom", "settings" } ), ids );
-            assertEquals( "3", props.getProperty( "project.activeProfiles" ) );
+            assertEquals(Arrays.asList(new String[] {"pom", "settings"}), ids);
+            assertEquals("3", props.getProperty("project.activeProfiles"));
 
-            assertEquals( "PASSED-1", props.getProperty( "project.properties.pomProperty" ) );
-            assertEquals( "PASSED-2", props.getProperty( "project.properties.settingsProperty" ) );
+            assertEquals("PASSED-1", props.getProperty("project.properties.pomProperty"));
+            assertEquals("PASSED-2", props.getProperty("project.properties.settingsProperty"));
         }
     }
-
 }

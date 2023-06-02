@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,13 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,12 +30,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Creates a properties file with the effective values of some user-defined expressions. Unlike Maven's built-in
@@ -58,16 +57,14 @@ import java.util.Properties;
  *
  * @author Benjamin Bentmann
  *
-  */
-@Mojo( name = "eval", defaultPhase = LifecyclePhase.INITIALIZE )
-public class EvalMojo
-    extends AbstractMojo
-{
+ */
+@Mojo(name = "eval", defaultPhase = LifecyclePhase.INITIALIZE)
+public class EvalMojo extends AbstractMojo {
 
     /**
      * The project's base directory, used for manual path translation.
      */
-    @Parameter( defaultValue = "${basedir", readonly = true )
+    @Parameter(defaultValue = "${basedir", readonly = true)
     private File basedir;
 
     /**
@@ -75,7 +72,7 @@ public class EvalMojo
      * parameter {@link #expressions}, a similar named properties key will be used to save the expression value. If an
      * expression evaluated to <code>null</code>, there will be no corresponding key in the properties file.
      */
-    @Parameter( property = "expression.outputFile" )
+    @Parameter(property = "expression.outputFile")
     private File outputFile;
 
     /**
@@ -87,37 +84,37 @@ public class EvalMojo
     /**
      * The comma separated set of expressions to evaluate.
      */
-    @Parameter( property = "expression.expressions" )
+    @Parameter(property = "expression.expressions")
     private String expressionList;
 
     /**
      * The current Maven project against which expressions are evaluated.
      */
-    @Parameter( defaultValue = "${project}", readonly = true )
+    @Parameter(defaultValue = "${project}", readonly = true)
     private Object project;
 
     /**
      * The forked Maven project against which expressions are evaluated.
      */
-    @Parameter( defaultValue = "${executedProject}", readonly = true )
+    @Parameter(defaultValue = "${executedProject}", readonly = true)
     private Object executedProject;
 
     /**
      * The merged user/global settings of the current build against which expressions are evaluated.
      */
-    @Parameter( defaultValue = "${settings}", readonly = true )
+    @Parameter(defaultValue = "${settings}", readonly = true)
     private Object settings;
 
     /**
      * The session context of the current build against which expressions are evaluated.
      */
-    @Parameter( defaultValue = "${session}", readonly = true )
+    @Parameter(defaultValue = "${session}", readonly = true)
     private Object session;
 
     /**
      * The local repository of the current build against which expressions are evaluated.
      */
-    @Parameter( defaultValue = "${session.request.localRepositoryPath}", readonly = true )
+    @Parameter(defaultValue = "${session.request.localRepositoryPath}", readonly = true)
     private Object localRepositoryBasedir;
 
     /**
@@ -126,66 +123,53 @@ public class EvalMojo
      * @throws MojoExecutionException If the output file could not be created.
      * @throws MojoFailureException   If the output file has not been set.
      */
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        if ( outputFile == null )
-        {
-            throw new MojoFailureException( "Path name for output file has not been specified" );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (outputFile == null) {
+            throw new MojoFailureException("Path name for output file has not been specified");
         }
 
         /*
          * NOTE: We don't want to test path translation here.
          */
-        if ( !outputFile.isAbsolute() )
-        {
-            outputFile = new File( basedir, outputFile.getPath() ).getAbsoluteFile();
+        if (!outputFile.isAbsolute()) {
+            outputFile = new File(basedir, outputFile.getPath()).getAbsoluteFile();
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
 
         Properties expressionProperties = new Properties();
 
-        if ( expressionList != null && expressionList.length() > 0 )
-        {
-            expressions = expressionList.split( "," );
+        if (expressionList != null && expressionList.length() > 0) {
+            expressions = expressionList.split(",");
         }
-        if ( expressions != null && expressions.length > 0 )
-        {
+        if (expressions != null && expressions.length > 0) {
             Map contexts = new HashMap();
-            contexts.put( "project", project );
-            contexts.put( "executedProject", executedProject );
-            contexts.put( "pom", project );
-            contexts.put( "settings", settings );
-            contexts.put( "session", session );
-            contexts.put( "localRepositoryBasedir", localRepositoryBasedir );
+            contexts.put("project", project);
+            contexts.put("executedProject", executedProject);
+            contexts.put("pom", project);
+            contexts.put("settings", settings);
+            contexts.put("session", session);
+            contexts.put("localRepositoryBasedir", localRepositoryBasedir);
 
-            for ( String expression : expressions )
-            {
-                Map values = ExpressionUtil.evaluate( expression, contexts );
-                for ( Object key : values.keySet() )
-                {
-                    Object value = values.get( key );
-                    PropertyUtil.store( expressionProperties, key.toString().replace( '/', '.' ), value );
+            for (String expression : expressions) {
+                Map values = ExpressionUtil.evaluate(expression, contexts);
+                for (Object key : values.keySet()) {
+                    Object value = values.get(key);
+                    PropertyUtil.store(expressionProperties, key.toString().replace('/', '.'), value);
                 }
             }
         }
 
-        try
-        {
-            PropertyUtil.write( expressionProperties, outputFile );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Output file could not be created: " + outputFile, e );
+        try {
+            PropertyUtil.write(expressionProperties, outputFile);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Output file could not be created: " + outputFile, e);
         }
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Created output file: " + outputFile );
+        getLog().info("[MAVEN-CORE-IT-LOG] Created output file: " + outputFile);
     }
 
-    public void setOutputFile( File outputFile )
-    {
+    public void setOutputFile(File outputFile) {
         this.outputFile = outputFile;
     }
 }
-

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng5137ReactorResolutionInForkedBuildTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5137ReactorResolutionInForkedBuildTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5137ReactorResolutionInForkedBuildTest()
-    {
-        super( "[3.0.4,)" );
+    public MavenITmng5137ReactorResolutionInForkedBuildTest() {
+        super("[3.0.4,)");
     }
 
     /**
@@ -49,25 +44,22 @@ public class MavenITmng5137ReactorResolutionInForkedBuildTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5137" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5137");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "producer/target" );
-        verifier.deleteDirectory( "consumer/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng5137" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("producer/target");
+        verifier.deleteDirectory("consumer/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5137");
         verifier.addCliArgument(
-                "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator" );
+                "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
+        List<String> compile = verifier.loadLines("consumer/target/compile.txt", "UTF-8");
 
-        assertTrue( compile.toString(), compile.contains( "producer/pom.xml" ) );
+        assertTrue(compile.toString(), compile.contains("producer/pom.xml"));
     }
-
 }

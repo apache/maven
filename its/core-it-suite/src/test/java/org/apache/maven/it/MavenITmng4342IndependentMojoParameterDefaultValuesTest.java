@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4342IndependentMojoParameterDefaultValuesTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4342IndependentMojoParameterDefaultValuesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4342IndependentMojoParameterDefaultValuesTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4342IndependentMojoParameterDefaultValuesTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,23 +43,20 @@ public class MavenITmng4342IndependentMojoParameterDefaultValuesTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4342" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4342");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props1 = verifier.loadProperties( "target/config1.properties" );
-        assertEquals( "maven-core-it", props1.getProperty( "defaultParam" ) );
+        Properties props1 = verifier.loadProperties("target/config1.properties");
+        assertEquals("maven-core-it", props1.getProperty("defaultParam"));
 
-        Properties props2 = verifier.loadProperties( "target/config2.properties" );
-        assertEquals( "test", props2.getProperty( "defaultParam" ) );
+        Properties props2 = verifier.loadProperties("target/config2.properties");
+        assertEquals("test", props2.getProperty("defaultParam"));
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4829ChecksumFailureWarningTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4829ChecksumFailureWarningTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4829ChecksumFailureWarningTest()
-    {
-        super( "[2.0.3,3.0-alpha-1)[3.0,)" );
+    public MavenITmng4829ChecksumFailureWarningTest() {
+        super("[2.0.3,3.0-alpha-1)[3.0,)");
     }
 
     /**
@@ -47,40 +42,34 @@ public class MavenITmng4829ChecksumFailureWarningTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4829" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4829");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4829" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4829");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
+        List<String> lines = verifier.loadFile(new File(testDir, verifier.getLogFileName()), false);
 
         boolean foundWarningJar = false, foundWarningPom = false;
 
-        for ( String line : lines )
-        {
-            if ( line.matches( "(?i)\\[WARNING\\].*Checksum.*failed.*fa23720355eead3906fdf4ffd2a1a5f5.*" ) )
-            {
+        for (String line : lines) {
+            if (line.matches("(?i)\\[WARNING\\].*Checksum.*failed.*fa23720355eead3906fdf4ffd2a1a5f5.*")) {
                 foundWarningPom = true;
-            }
-            else if ( line.matches( "(?i)\\[WARNING\\].*Checksum.*failed.*d912aa49cba88e7e9c578e042953f7ce307daac5.*" ) )
-            {
+            } else if (line.matches(
+                    "(?i)\\[WARNING\\].*Checksum.*failed.*d912aa49cba88e7e9c578e042953f7ce307daac5.*")) {
                 foundWarningJar = true;
             }
         }
 
-        assertTrue( "Checksum warning for corrupt.pom has not been logged.", foundWarningPom );
-        assertTrue( "Checksum warning for corrupt.jar has not been logged.", foundWarningJar );
+        assertTrue("Checksum warning for corrupt.pom has not been logged.", foundWarningPom);
+        assertTrue("Checksum warning for corrupt.jar has not been logged.", foundWarningJar);
     }
-
 }

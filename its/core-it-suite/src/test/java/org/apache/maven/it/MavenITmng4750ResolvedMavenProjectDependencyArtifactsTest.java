@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0,)" );
+    public MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0,)");
     }
 
     /**
@@ -49,30 +44,27 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4750" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4750");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4750" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "initialize" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4750");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/artifact.properties" );
-        assertEquals( "1", props.getProperty( "project.dependencyArtifacts.size" ) );
+        Properties props = verifier.loadProperties("target/artifact.properties");
+        assertEquals("1", props.getProperty("project.dependencyArtifacts.size"));
 
-        String path = props.getProperty( "project.dependencyArtifacts.0.file" );
-        assertNotNull( path );
-        assertTrue( path, new File( path ).isFile() );
+        String path = props.getProperty("project.dependencyArtifacts.0.file");
+        assertNotNull(path);
+        assertTrue(path, new File(path).isFile());
 
-        String version = props.getProperty( "project.dependencyArtifacts.0.version" );
-        assertEquals( "0.1", version );
+        String version = props.getProperty("project.dependencyArtifacts.0.version");
+        assertEquals("0.1", version);
     }
-
 }

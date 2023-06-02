@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
@@ -33,16 +32,14 @@ import org.apache.maven.plugins.annotations.Parameter;
  *
  * @author Benjamin Bentmann
  *
-  */
-@Mojo( name = "deploy", defaultPhase = LifecyclePhase.DEPLOY )
-public class DeployMojo
-    extends AbstractRepoMojo
-{
+ */
+@Mojo(name = "deploy", defaultPhase = LifecyclePhase.DEPLOY)
+public class DeployMojo extends AbstractRepoMojo {
 
     /**
      * The distribution repository.
      */
-    @Parameter( defaultValue = "${project.distributionManagementArtifactRepository}", readonly = true, required = true )
+    @Parameter(defaultValue = "${project.distributionManagementArtifactRepository}", readonly = true, required = true)
     private ArtifactRepository deploymentRepository;
 
     /**
@@ -57,35 +54,24 @@ public class DeployMojo
      *
      * @throws MojoExecutionException If any artifact could not be installed.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
-        getLog().info( "[MAVEN-CORE-IT-LOG] Deploying project artifacts" );
+    public void execute() throws MojoExecutionException {
+        getLog().info("[MAVEN-CORE-IT-LOG] Deploying project artifacts");
 
-        try
-        {
-            if ( isPomArtifact() )
-            {
-                deployer.deploy( pomFile, mainArtifact, deploymentRepository, localRepository );
-            }
-            else
-            {
-                deployer.deploy( mainArtifact.getFile(), mainArtifact, deploymentRepository, localRepository );
+        try {
+            if (isPomArtifact()) {
+                deployer.deploy(pomFile, mainArtifact, deploymentRepository, localRepository);
+            } else {
+                deployer.deploy(mainArtifact.getFile(), mainArtifact, deploymentRepository, localRepository);
             }
 
-            if ( attachedArtifacts != null )
-            {
-                for ( Artifact attachedArtifact : attachedArtifacts )
-                {
-                    deployer.deploy( attachedArtifact.getFile(), attachedArtifact, deploymentRepository,
-                                     localRepository );
+            if (attachedArtifacts != null) {
+                for (Artifact attachedArtifact : attachedArtifacts) {
+                    deployer.deploy(
+                            attachedArtifact.getFile(), attachedArtifact, deploymentRepository, localRepository);
                 }
             }
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "Failed to deploy artifacts: " + e.getMessage(), e );
+        } catch (Exception e) {
+            throw new MojoExecutionException("Failed to deploy artifacts: " + e.getMessage(), e);
         }
     }
-
 }

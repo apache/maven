@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4654ArtifactHandlerForMainArtifactTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4654ArtifactHandlerForMainArtifactTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4654ArtifactHandlerForMainArtifactTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng4654ArtifactHandlerForMainArtifactTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -47,24 +42,21 @@ public class MavenITmng4654ArtifactHandlerForMainArtifactTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4654" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4654");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4654" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4654");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/repo/org/apache/maven/its/mng4654/test/1.0/test-1.0.mng4654" );
-        verifier.verifyFilePresent( "target/repo/org/apache/maven/its/mng4654/test/1.0/test-1.0.jar" );
+        verifier.verifyFileNotPresent("target/repo/org/apache/maven/its/mng4654/test/1.0/test-1.0.mng4654");
+        verifier.verifyFilePresent("target/repo/org/apache/maven/its/mng4654/test/1.0/test-1.0.jar");
     }
-
 }

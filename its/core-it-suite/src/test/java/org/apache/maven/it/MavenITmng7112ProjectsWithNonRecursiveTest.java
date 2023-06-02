@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,73 +16,66 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng7112ProjectsWithNonRecursiveTest
-        extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng7112ProjectsWithNonRecursiveTest extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7112-projects-with-non-recursive";
 
-    public MavenITmng7112ProjectsWithNonRecursiveTest()
-    {
-        super( "[4.0.0-alpha-1,)" );
+    public MavenITmng7112ProjectsWithNonRecursiveTest() {
+        super("[4.0.0-alpha-1,)");
     }
 
     @Test
-    public void testAggregatesCanBeBuiltNonRecursively()
-            throws IOException, VerificationException
-    {
-        final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
-        Verifier cleaner = newVerifier( projectDir.getAbsolutePath() );
-        cleaner.addCliArgument( "clean" );
+    public void testAggregatesCanBeBuiltNonRecursively() throws IOException, VerificationException {
+        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        Verifier cleaner = newVerifier(projectDir.getAbsolutePath());
+        cleaner.addCliArgument("clean");
         cleaner.execute();
 
-        final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
+        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
 
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( ":aggregator-a,:aggregator-b" );
-        verifier.addCliArgument( "-N" );
-        verifier.setLogFileName( "selected-non-recursive.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument(":aggregator-a,:aggregator-b");
+        verifier.addCliArgument("-N");
+        verifier.setLogFileName("selected-non-recursive.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
 
-        verifier.verifyFileNotPresent( "target/touch.txt" );
-        verifier.verifyFilePresent( "aggregator-a/target/touch.txt" );
-        verifier.verifyFileNotPresent( "aggregator-a/module-a/target/touch.txt" );
-        verifier.verifyFilePresent( "aggregator-b/target/touch.txt" );
-        verifier.verifyFileNotPresent( "aggregator-b/module-b/target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
+        verifier.verifyFilePresent("aggregator-a/target/touch.txt");
+        verifier.verifyFileNotPresent("aggregator-a/module-a/target/touch.txt");
+        verifier.verifyFilePresent("aggregator-b/target/touch.txt");
+        verifier.verifyFileNotPresent("aggregator-b/module-b/target/touch.txt");
     }
 
     @Test
-    public void testAggregatesCanBeDeselectedNonRecursively()
-            throws IOException, VerificationException
-    {
-        final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
-        Verifier cleaner = newVerifier( projectDir.getAbsolutePath() );
-        cleaner.addCliArgument( "clean" );
+    public void testAggregatesCanBeDeselectedNonRecursively() throws IOException, VerificationException {
+        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        Verifier cleaner = newVerifier(projectDir.getAbsolutePath());
+        cleaner.addCliArgument("clean");
         cleaner.execute();
 
-        final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
+        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
 
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "!:aggregator-a,!:aggregator-b" );
-        verifier.addCliArgument( "-N" );
-        verifier.setLogFileName( "excluded-non-recursive.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("!:aggregator-a,!:aggregator-b");
+        verifier.addCliArgument("-N");
+        verifier.setLogFileName("excluded-non-recursive.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
 
-        verifier.verifyFilePresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "aggregator-a/target/touch.txt" );
-        verifier.verifyFilePresent( "aggregator-a/module-a/target/touch.txt" );
-        verifier.verifyFileNotPresent( "aggregator-b/target/touch.txt" );
-        verifier.verifyFilePresent( "aggregator-b/module-b/target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
+        verifier.verifyFileNotPresent("aggregator-a/target/touch.txt");
+        verifier.verifyFilePresent("aggregator-a/module-a/target/touch.txt");
+        verifier.verifyFileNotPresent("aggregator-b/target/touch.txt");
+        verifier.verifyFilePresent("aggregator-b/module-b/target/touch.txt");
     }
 }

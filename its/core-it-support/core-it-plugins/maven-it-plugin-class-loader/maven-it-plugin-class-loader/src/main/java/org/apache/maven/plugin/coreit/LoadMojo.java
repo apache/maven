@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,38 +16,37 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.io.File;
-
 /**
  * Loads classes and/or resources from the plugin class path and records the results in a properties file.
  *
-  *
+ *
  * @author Benjamin Bentmann
  *
  */
-@Mojo( name = "load", defaultPhase = LifecyclePhase.INITIALIZE )
-public class LoadMojo
-    extends AbstractLoadMojo
-{
+@Mojo(name = "load", defaultPhase = LifecyclePhase.INITIALIZE)
+public class LoadMojo extends AbstractLoadMojo {
 
     /**
      * The path to the properties file used to track the results of the class/resource loading via the plugin class
      * loader.
      */
-    @Parameter( property = "clsldr.pluginClassLoaderOutput" )
+    @Parameter(property = "clsldr.pluginClassLoaderOutput")
     private File pluginClassLoaderOutput;
 
     /**
      * The path to the properties file used to track the results of the class/resource loading via the thread's context
      * class loader.
      */
-    @Parameter( property = "clsldr.contextClassLoaderOutput" )
+    @Parameter(property = "clsldr.contextClassLoaderOutput")
     private File contextClassLoaderOutput;
 
     /**
@@ -57,17 +54,12 @@ public class LoadMojo
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
-        if ( pluginClassLoaderOutput != null )
-        {
-            execute( pluginClassLoaderOutput, getClass().getClassLoader() );
+    public void execute() throws MojoExecutionException {
+        if (pluginClassLoaderOutput != null) {
+            execute(pluginClassLoaderOutput, getClass().getClassLoader());
         }
-        if ( contextClassLoaderOutput != null )
-        {
-            execute( contextClassLoaderOutput, Thread.currentThread().getContextClassLoader() );
+        if (contextClassLoaderOutput != null) {
+            execute(contextClassLoaderOutput, Thread.currentThread().getContextClassLoader());
         }
     }
-
 }

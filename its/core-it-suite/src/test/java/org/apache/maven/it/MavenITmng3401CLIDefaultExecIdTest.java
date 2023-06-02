@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.it;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
  */
-public class MavenITmng3401CLIDefaultExecIdTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3401CLIDefaultExecIdTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3401CLIDefaultExecIdTest()
-    {
-        super( "[2.2.0,)" );
+    public MavenITmng3401CLIDefaultExecIdTest() {
+        super("[2.2.0,)");
     }
 
     /**
@@ -49,10 +44,8 @@ public class MavenITmng3401CLIDefaultExecIdTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithoutPluginManagement()
-        throws Exception
-    {
-        testit( "without-mgmt" );
+    public void testitWithoutPluginManagement() throws Exception {
+        testit("without-mgmt");
     }
 
     /**
@@ -62,35 +55,30 @@ public class MavenITmng3401CLIDefaultExecIdTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithPluginManagement()
-        throws Exception
-    {
-        testit( "with-mgmt" );
+    public void testitWithPluginManagement() throws Exception {
+        testit("with-mgmt");
     }
 
-    private void testit( String project )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3401/" + project );
+    private void testit(String project) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3401/" + project);
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
+        Properties props = verifier.loadProperties("target/config.properties");
 
-        assertEquals( "PASSED", props.getProperty( "stringParam" ) );
+        assertEquals("PASSED", props.getProperty("stringParam"));
 
-        assertEquals( "4", props.getProperty( "stringParams" ) );
-        assertEquals( "a", props.getProperty( "stringParams.0" ) );
-        assertEquals( "c", props.getProperty( "stringParams.1" ) );
-        assertEquals( "b", props.getProperty( "stringParams.2" ) );
-        assertEquals( "d", props.getProperty( "stringParams.3" ) );
+        assertEquals("4", props.getProperty("stringParams"));
+        assertEquals("a", props.getProperty("stringParams.0"));
+        assertEquals("c", props.getProperty("stringParams.1"));
+        assertEquals("b", props.getProperty("stringParams.2"));
+        assertEquals("d", props.getProperty("stringParams.3"));
 
-        assertEquals( "maven-core-it", props.getProperty( "defaultParam" ) );
+        assertEquals("maven-core-it", props.getProperty("defaultParam"));
     }
-
 }

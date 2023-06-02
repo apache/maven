@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4408NonExistentSettingsFileTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4408NonExistentSettingsFileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4408NonExistentSettingsFileTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng4408NonExistentSettingsFileTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -47,25 +42,20 @@ public class MavenITmng4408NonExistentSettingsFileTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitUserSettings()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4408" );
+    public void testitUserSettings() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4408");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.setLogFileName( "log-user.txt" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "non-existing-settings.xml" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.setLogFileName("log-user.txt");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("non-existing-settings.xml");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Missing settings file did not cause build error" );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Missing settings file did not cause build error");
+        } catch (VerificationException e) {
             // expected
         }
     }
@@ -76,27 +66,21 @@ public class MavenITmng4408NonExistentSettingsFileTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitGlobalSettings()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4408" );
+    public void testitGlobalSettings() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4408");
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.setLogFileName( "log-global.txt" );
-        verifier.addCliArgument( "--global-settings" );
-        verifier.addCliArgument( "non-existing-settings.xml" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.setLogFileName("log-global.txt");
+        verifier.addCliArgument("--global-settings");
+        verifier.addCliArgument("non-existing-settings.xml");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Missing settings file did not cause build error" );
-        }
-        catch ( VerificationException e )
-        {
+            fail("Missing settings file did not cause build error");
+        } catch (VerificationException e) {
             // expected
         }
     }
-
 }

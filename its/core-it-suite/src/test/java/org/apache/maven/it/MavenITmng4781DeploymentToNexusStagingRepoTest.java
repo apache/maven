@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +25,8 @@ import java.io.File;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -44,9 +42,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4781DeploymentToNexusStagingRepoTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4781DeploymentToNexusStagingRepoTest extends AbstractMavenIntegrationTestCase {
     private Server server;
 
     private int port;
@@ -55,64 +51,51 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
 
     private final Deque<String> deployedUris = new ConcurrentLinkedDeque<>();
 
-    public MavenITmng4781DeploymentToNexusStagingRepoTest()
-    {
-        super( "[2.0.3,)" );
+    public MavenITmng4781DeploymentToNexusStagingRepoTest() {
+        super("[2.0.3,)");
     }
 
     @BeforeEach
-    public void setUp()
-        throws Exception
-    {
-        Handler repoHandler = new AbstractHandler()
-        {
+    public void setUp() throws Exception {
+        Handler repoHandler = new AbstractHandler() {
             private volatile boolean putSeen;
 
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
-            {
-                System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
+            public void handle(
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
 
-                if ( "PUT".equalsIgnoreCase( request.getMethod() ) )
-                {
-                    response.setStatus( HttpServletResponse.SC_CREATED );
-                    deployedUris.add( request.getRequestURI() );
+                if ("PUT".equalsIgnoreCase(request.getMethod())) {
+                    response.setStatus(HttpServletResponse.SC_CREATED);
+                    deployedUris.add(request.getRequestURI());
                     putSeen = true;
-                }
-                else if ( !putSeen )
-                {
-                    response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
-                }
-                else
-                {
-                    response.setStatus( HttpServletResponse.SC_NOT_FOUND );
-                    requestedUris.add( request.getRequestURI() );
+                } else if (!putSeen) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    requestedUris.add(request.getRequestURI());
                 }
 
-                ( (Request) request ).setHandled( true );
+                ((Request) request).setHandled(true);
             }
         };
 
         HandlerList handlerList = new HandlerList();
-        handlerList.addHandler( repoHandler );
+        handlerList.addHandler(repoHandler);
 
-        server = new Server( 0 );
-        server.setHandler( handlerList );
+        server = new Server(0);
+        server.setHandler(handlerList);
         server.start();
-        if ( server.isFailed() )
-        {
-            fail( "Couldn't bind the server socket to a free port!" );
+        if (server.isFailed()) {
+            fail("Couldn't bind the server socket to a free port!");
         }
-        port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-        System.out.println( "Bound server socket to the port " + port );
+        port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
+        System.out.println("Bound server socket to the port " + port);
     }
 
     @AfterEach
-    protected void tearDown()
-        throws Exception
-    {
-        if ( server != null )
-        {
+    protected void tearDown() throws Exception {
+        if (server != null) {
             server.stop();
             server.join();
         }
@@ -130,21 +113,19 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4781" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4781");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "-DdeploymentPort=" + port );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("-DdeploymentPort=" + port);
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        assertTrue( deployedUris.contains( "/repo/org/apache/maven/its/mng4781/release/1.0/release-1.0.jar" ) );
-        assertTrue( deployedUris.contains( "/repo/org/apache/maven/its/mng4781/release/1.0/release-1.0.pom" ) );
-        assertTrue( deployedUris.contains( "/repo/org/apache/maven/its/mng4781/release/maven-metadata.xml" ) );
-        assertTrue( requestedUris.contains( "/repo/org/apache/maven/its/mng4781/release/maven-metadata.xml" ) );
+        assertTrue(deployedUris.contains("/repo/org/apache/maven/its/mng4781/release/1.0/release-1.0.jar"));
+        assertTrue(deployedUris.contains("/repo/org/apache/maven/its/mng4781/release/1.0/release-1.0.pom"));
+        assertTrue(deployedUris.contains("/repo/org/apache/maven/its/mng4781/release/maven-metadata.xml"));
+        assertTrue(requestedUris.contains("/repo/org/apache/maven/its/mng4781/release/maven-metadata.xml"));
     }
 }

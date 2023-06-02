@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
+package org.apache.maven.plugin.coreit;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,20 +30,24 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+
 /**
  * Provides common services for all mojos of this plugin.
  *
  * @author Benjamin Bentmann
  *
  */
-public abstract class AbstractDependencyMojo
-    extends AbstractMojo
-{
+public abstract class AbstractDependencyMojo extends AbstractMojo {
 
     /**
      * The current Maven project.
      */
-    @Parameter( defaultValue = "${project}", required = true, readonly = true )
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     protected MavenProject project;
 
     /**
@@ -60,7 +57,7 @@ public abstract class AbstractDependencyMojo
      * as directory separator. For non-positive values, the full/absolute path is returned, using the platform-specific
      * separator.
      */
-    @Parameter( property = "depres.significantPathLevels" )
+    @Parameter(property = "depres.significantPathLevels")
     private int significantPathLevels;
 
     /**
@@ -71,65 +68,49 @@ public abstract class AbstractDependencyMojo
      * @param artifacts The list of artifacts to write to the file, may be <code>null</code>.
      * @throws MojoExecutionException If the output file could not be written.
      */
-    protected void writeArtifacts( String pathname, Collection artifacts )
-        throws MojoExecutionException
-    {
-        if ( pathname == null || pathname.length() <= 0 )
-        {
+    protected void writeArtifacts(String pathname, Collection artifacts) throws MojoExecutionException {
+        if (pathname == null || pathname.length() <= 0) {
             return;
         }
 
-        File file = resolveFile( pathname );
+        File file = resolveFile(pathname);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Dumping artifact list: " + file );
+        getLog().info("[MAVEN-CORE-IT-LOG] Dumping artifact list: " + file);
 
         BufferedWriter writer = null;
-        try
-        {
+        try {
             file.getParentFile().mkdirs();
 
-            writer = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), "UTF-8" ) );
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 
-            if ( artifacts != null )
-            {
-                for ( Object artifact1 : artifacts )
-                {
+            if (artifacts != null) {
+                for (Object artifact1 : artifacts) {
                     Artifact artifact = (Artifact) artifact1;
-                    String id = getId( artifact );
-                    writer.write( id );
+                    String id = getId(artifact);
+                    writer.write(id);
                     String optional = "";
-                    if ( artifact.isOptional() )
-                    {
+                    if (artifact.isOptional()) {
                         optional = " (optional)";
-                        writer.write( optional );
+                        writer.write(optional);
                     }
                     writer.newLine();
-                    getLog().info( "[MAVEN-CORE-IT-LOG]   " + id + optional );
+                    getLog().info("[MAVEN-CORE-IT-LOG]   " + id + optional);
                 }
             }
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Failed to write artifact list", e );
-        }
-        finally
-        {
-            if ( writer != null )
-            {
-                try
-                {
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to write artifact list", e);
+        } finally {
+            if (writer != null) {
+                try {
                     writer.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // just ignore
                 }
             }
         }
     }
 
-    private String getId( Artifact artifact )
-    {
+    private String getId(Artifact artifact) {
         artifact.isSnapshot(); // decouple from MNG-2961
         return artifact.getId();
     }
@@ -142,231 +123,179 @@ public abstract class AbstractDependencyMojo
      * @param classPath The list of class path elements to write to the file, may be <code>null</code>.
      * @throws MojoExecutionException If the output file could not be written.
      */
-    protected void writeClassPath( String pathname, Collection classPath )
-        throws MojoExecutionException
-    {
-        if ( pathname == null || pathname.length() <= 0 )
-        {
+    protected void writeClassPath(String pathname, Collection classPath) throws MojoExecutionException {
+        if (pathname == null || pathname.length() <= 0) {
             return;
         }
 
-        File file = resolveFile( pathname );
+        File file = resolveFile(pathname);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Dumping class path: " + file );
+        getLog().info("[MAVEN-CORE-IT-LOG] Dumping class path: " + file);
 
         BufferedWriter writer = null;
-        try
-        {
+        try {
             file.getParentFile().mkdirs();
 
-            writer = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), "UTF-8" ) );
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 
-            if ( classPath != null )
-            {
-                for ( Object aClassPath : classPath )
-                {
+            if (classPath != null) {
+                for (Object aClassPath : classPath) {
                     String element = aClassPath.toString();
-                    writer.write( stripLeadingDirs( element, significantPathLevels ) );
+                    writer.write(stripLeadingDirs(element, significantPathLevels));
                     writer.newLine();
-                    getLog().info( "[MAVEN-CORE-IT-LOG]   " + element );
+                    getLog().info("[MAVEN-CORE-IT-LOG]   " + element);
                 }
             }
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Failed to write class path list", e );
-        }
-        finally
-        {
-            if ( writer != null )
-            {
-                try
-                {
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to write class path list", e);
+        } finally {
+            if (writer != null) {
+                try {
                     writer.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // just ignore
                 }
             }
         }
     }
 
-    protected void writeClassPathChecksums( String pathname, Collection classPath )
-        throws MojoExecutionException
-    {
-        if ( pathname == null || pathname.length() <= 0 )
-        {
+    protected void writeClassPathChecksums(String pathname, Collection classPath) throws MojoExecutionException {
+        if (pathname == null || pathname.length() <= 0) {
             return;
         }
 
-        File file = resolveFile( pathname );
+        File file = resolveFile(pathname);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Dumping class path checksums: " + file );
+        getLog().info("[MAVEN-CORE-IT-LOG] Dumping class path checksums: " + file);
 
         Properties checksums = new Properties();
 
-        if ( classPath != null )
-        {
-            for ( Object aClassPath : classPath )
-            {
+        if (classPath != null) {
+            for (Object aClassPath : classPath) {
                 String element = aClassPath.toString();
 
-                File jarFile = new File( element );
+                File jarFile = new File(element);
 
-                if ( !jarFile.isFile() )
-                {
-                    getLog().info( "[MAVEN-CORE-IT-LOG]   ( no file )                              < " + element );
+                if (!jarFile.isFile()) {
+                    getLog().info("[MAVEN-CORE-IT-LOG]   ( no file )                              < " + element);
                     continue;
                 }
 
-                String key = stripLeadingDirs( element, significantPathLevels );
+                String key = stripLeadingDirs(element, significantPathLevels);
 
                 String hash;
-                try
-                {
-                    hash = calcChecksum( jarFile );
-                }
-                catch ( NoSuchAlgorithmException e )
-                {
-                    throw new MojoExecutionException( "Failed to lookup message digest", e );
-                }
-                catch ( IOException e )
-                {
-                    throw new MojoExecutionException( "Failed to calculate checksum for " + jarFile, e );
+                try {
+                    hash = calcChecksum(jarFile);
+                } catch (NoSuchAlgorithmException e) {
+                    throw new MojoExecutionException("Failed to lookup message digest", e);
+                } catch (IOException e) {
+                    throw new MojoExecutionException("Failed to calculate checksum for " + jarFile, e);
                 }
 
-                checksums.setProperty( key, hash );
+                checksums.setProperty(key, hash);
 
-                getLog().info( "[MAVEN-CORE-IT-LOG]   " + hash + " < " + element );
+                getLog().info("[MAVEN-CORE-IT-LOG]   " + hash + " < " + element);
             }
         }
 
         FileOutputStream os = null;
-        try
-        {
+        try {
             file.getParentFile().mkdirs();
 
-            os = new FileOutputStream( file );
+            os = new FileOutputStream(file);
 
-            checksums.store( os, "MAVEN-CORE-IT" );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Failed to write class path checksums", e );
-        }
-        finally
-        {
-            if ( os != null )
-            {
-                try
-                {
+            checksums.store(os, "MAVEN-CORE-IT");
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to write class path checksums", e);
+        } finally {
+            if (os != null) {
+                try {
                     os.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // just ignore
                 }
             }
         }
     }
 
-    private String calcChecksum( File jarFile )
-        throws IOException, NoSuchAlgorithmException
-    {
-        MessageDigest digester = MessageDigest.getInstance( "SHA-1" );
+    private String calcChecksum(File jarFile) throws IOException, NoSuchAlgorithmException {
+        MessageDigest digester = MessageDigest.getInstance("SHA-1");
 
-        try ( FileInputStream is = new FileInputStream( jarFile ) )
-        {
-            DigestInputStream dis = new DigestInputStream( is, digester );
+        try (FileInputStream is = new FileInputStream(jarFile)) {
+            DigestInputStream dis = new DigestInputStream(is, digester);
 
-            for ( byte[] buffer = new byte[1024 * 4]; dis.read( buffer ) >= 0; )
-            {
+            for (byte[] buffer = new byte[1024 * 4]; dis.read(buffer) >= 0; ) {
                 // just read it
             }
         }
 
         byte[] digest = digester.digest();
 
-        StringBuilder hash = new StringBuilder( digest.length * 2 );
+        StringBuilder hash = new StringBuilder(digest.length * 2);
 
-        for ( byte aDigest : digest )
-        {
-            @SuppressWarnings( "checkstyle:magicnumber" ) int b = aDigest & 0xFF;
+        for (byte aDigest : digest) {
+            @SuppressWarnings("checkstyle:magicnumber")
+            int b = aDigest & 0xFF;
 
-            if ( b < 0x10 )
-            {
-                hash.append( '0' );
+            if (b < 0x10) {
+                hash.append('0');
             }
 
-            hash.append( Integer.toHexString( b ) );
+            hash.append(Integer.toHexString(b));
         }
 
         return hash.toString();
     }
 
-    private String stripLeadingDirs( String path, int significantPathLevels )
-    {
+    private String stripLeadingDirs(String path, int significantPathLevels) {
         String result;
-        if ( significantPathLevels > 0 )
-        {
+        if (significantPathLevels > 0) {
             result = "";
-            File file = new File( path );
-            for ( int i = 0; i < significantPathLevels && file != null; i++ )
-            {
-                if ( result.length() > 0 )
-                {
+            File file = new File(path);
+            for (int i = 0; i < significantPathLevels && file != null; i++) {
+                if (result.length() > 0) {
                     // NOTE: Always use forward slash here to ease platform-independent testing
                     result = '/' + result;
                 }
                 result = file.getName() + result;
                 file = file.getParentFile();
             }
-        }
-        else
-        {
+        } else {
             result = path;
         }
         return result;
     }
 
     // NOTE: We don't want to test path translation here so resolve relative path manually for robustness
-    private File resolveFile( String pathname )
-    {
+    private File resolveFile(String pathname) {
         File file = null;
 
-        if ( pathname != null )
-        {
-            if ( pathname.contains( "@idx@" ) )
-            {
+        if (pathname != null) {
+            if (pathname.contains("@idx@")) {
                 // helps to distinguished forked executions of the same mojo
-                pathname = pathname.replaceAll( "@idx@", String.valueOf( nextCounter() ) );
+                pathname = pathname.replaceAll("@idx@", String.valueOf(nextCounter()));
             }
 
-            file = new File( pathname );
+            file = new File(pathname);
 
-            if ( !file.isAbsolute() )
-            {
-                file = new File( project.getBasedir(), pathname );
+            if (!file.isAbsolute()) {
+                file = new File(project.getBasedir(), pathname);
             }
         }
 
         return file;
     }
 
-    private int nextCounter()
-    {
+    private int nextCounter() {
         int counter = 0;
 
         String key = getClass().getName();
 
-        synchronized ( System.class )
-        {
-            counter = Integer.getInteger( key, 0 );
-            System.setProperty( key, Integer.toString( counter + 1 ) );
+        synchronized (System.class) {
+            counter = Integer.getInteger(key, 0);
+            System.setProperty(key, Integer.toString(counter + 1));
         }
 
         return counter;
     }
-
 }

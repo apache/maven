@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,18 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
-public class MavenIT0051ReleaseProfileTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenIT0051ReleaseProfileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0051ReleaseProfileTest()
-    {
-        super( "(2.0.2,4.0.0-alpha-1)" );
+    public MavenIT0051ReleaseProfileTest() {
+        super("(2.0.2,4.0.0-alpha-1)");
     }
 
     /**
@@ -41,21 +36,18 @@ public class MavenIT0051ReleaseProfileTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit0051()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0051" );
+    public void testit0051() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0051");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-DperformRelease=true" );
-        verifier.addCliArgument( "package" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-DperformRelease=true");
+        verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/source-jar.txt" );
-        verifier.verifyFilePresent( "target/javadoc-jar.txt" );
+        verifier.verifyFilePresent("target/source-jar.txt");
+        verifier.verifyFilePresent("target/javadoc-jar.txt");
     }
-
 }

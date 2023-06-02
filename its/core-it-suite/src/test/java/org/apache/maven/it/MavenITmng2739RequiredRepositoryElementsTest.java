@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,91 +33,70 @@ import org.junit.jupiter.api.Test;
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
  */
-public class MavenITmng2739RequiredRepositoryElementsTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng2739RequiredRepositoryElementsTest()
-    {
-        super( "(2.0.9,)" ); // only test in 2.0.9+
+public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng2739RequiredRepositoryElementsTest() {
+        super("(2.0.9,)"); // only test in 2.0.9+
     }
 
     @Test
-    public void testitMNG2739_RepositoryId()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2739/repo-id" );
+    public void testitMNG2739_RepositoryId() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2739/repo-id");
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
 
-            fail(
-                "POM should NOT validate: repository <id/> element is missing in: " + new File( testDir, "pom.xml" ) );
-        }
-        catch ( VerificationException e )
-        {
+            fail("POM should NOT validate: repository <id/> element is missing in: " + new File(testDir, "pom.xml"));
+        } catch (VerificationException e) {
             // expected
         }
 
-
-        List<String> listing = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> listing = verifier.loadFile(new File(testDir, "log.txt"), false);
         boolean foundNpe = false;
-        for ( String line : listing )
-        {
-            if ( line.contains( "NullPointerException" ) )
-            {
+        for (String line : listing) {
+            if (line.contains("NullPointerException")) {
                 foundNpe = true;
                 break;
             }
         }
 
-        assertFalse( "Missing repository-id should not result in a NullPointerException.", foundNpe );
+        assertFalse("Missing repository-id should not result in a NullPointerException.", foundNpe);
     }
 
     @Test
-    public void testitMNG2739_RepositoryUrl()
-        throws Exception
-    {
+    public void testitMNG2739_RepositoryUrl() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2739/repo-url" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2739/repo-url");
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
 
-            fail(
-                "POM should NOT validate: repository <url/> element is missing in: " + new File( testDir, "pom.xml" ) );
-        }
-        catch ( VerificationException e )
-        {
+            fail("POM should NOT validate: repository <url/> element is missing in: " + new File(testDir, "pom.xml"));
+        } catch (VerificationException e) {
             // expected
         }
 
-
-        List<String> listing = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> listing = verifier.loadFile(new File(testDir, "log.txt"), false);
         boolean foundNpe = false;
-        for ( String line : listing )
-        {
-            if ( line.contains( "NullPointerException" ) )
-            {
+        for (String line : listing) {
+            if (line.contains("NullPointerException")) {
                 foundNpe = true;
                 break;
             }
         }
 
-        assertFalse( "Missing repository-url should not result in a NullPointerException.", foundNpe );
+        assertFalse("Missing repository-url should not result in a NullPointerException.", foundNpe);
     }
 }

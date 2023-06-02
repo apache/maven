@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,12 +31,9 @@ import org.junit.jupiter.api.Test;
  *
  * @author Jason van Zyl
  */
-public class MavenITmng5576CdFriendlyVersions
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng5576CdFriendlyVersions()
-    {
-        super( "[3.2,)" );
+public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTestCase {
+    public MavenITmng5576CdFriendlyVersions() {
+        super("[3.2,)");
     }
 
     /**
@@ -48,27 +43,24 @@ public class MavenITmng5576CdFriendlyVersions
      * @throws Exception in case of failure
      */
     @Test
-    public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithoutBuildConsumer()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5576-cd-friendly-versions" );
+    public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithoutBuildConsumer() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5576-cd-friendly-versions");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-Dchangelist=changelist" );
-        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=false" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-Dchangelist=changelist");
+        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=false");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "1.0.0.changelist", props.getProperty( "project.version" ) );
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("1.0.0.changelist", props.getProperty("project.version"));
 
-        List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
-        for( String line : lines )
-        {
-            assertFalse( line, line.contains( "WARNING" ) );
+        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
+        for (String line : lines) {
+            assertFalse(line, line.contains("WARNING"));
         }
     }
 
@@ -79,29 +71,25 @@ public class MavenITmng5576CdFriendlyVersions
      * @throws Exception in case of failure
      */
     @Test
-    public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithBuildConsumer()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5576-cd-friendly-versions" );
+    public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithBuildConsumer() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5576-cd-friendly-versions");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setLogFileName( "log-bc.txt" );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-Dchangelist=changelist" );
-        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=true" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setLogFileName("log-bc.txt");
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-Dchangelist=changelist");
+        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=true");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "1.0.0.changelist", props.getProperty( "project.version" ) );
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("1.0.0.changelist", props.getProperty("project.version"));
 
-        List<String> lines = verifier.loadFile( new File( testDir, "log-bc.txt" ), false );
-        for( String line : lines )
-        {
-            assertFalse( line, line.contains( "WARNING" ) );
+        List<String> lines = verifier.loadFile(new File(testDir, "log-bc.txt"), false);
+        for (String line : lines) {
+            assertFalse(line, line.contains("WARNING"));
         }
     }
-
 }

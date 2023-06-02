@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.installer.ArtifactInstaller;
@@ -31,11 +30,9 @@ import org.apache.maven.plugins.annotations.Mojo;
  *
  * @author Benjamin Bentmann
  *
-  */
-@Mojo( name = "install", defaultPhase = LifecyclePhase.INSTALL )
-public class InstallMojo
-    extends AbstractRepoMojo
-{
+ */
+@Mojo(name = "install", defaultPhase = LifecyclePhase.INSTALL)
+public class InstallMojo extends AbstractRepoMojo {
 
     /**
      * The artifact installer.
@@ -48,34 +45,23 @@ public class InstallMojo
      *
      * @throws MojoExecutionException If any artifact could not be installed.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
-        getLog().info( "[MAVEN-CORE-IT-LOG] Installing project artifacts" );
+    public void execute() throws MojoExecutionException {
+        getLog().info("[MAVEN-CORE-IT-LOG] Installing project artifacts");
 
-        try
-        {
-            if ( isPomArtifact() )
-            {
-                installer.install( pomFile, mainArtifact, localRepository );
-            }
-            else
-            {
-                installer.install( mainArtifact.getFile(), mainArtifact, localRepository );
+        try {
+            if (isPomArtifact()) {
+                installer.install(pomFile, mainArtifact, localRepository);
+            } else {
+                installer.install(mainArtifact.getFile(), mainArtifact, localRepository);
             }
 
-            if ( attachedArtifacts != null )
-            {
-                for ( Artifact attachedArtifact : attachedArtifacts )
-                {
-                    installer.install( attachedArtifact.getFile(), attachedArtifact, localRepository );
+            if (attachedArtifacts != null) {
+                for (Artifact attachedArtifact : attachedArtifacts) {
+                    installer.install(attachedArtifact.getFile(), attachedArtifact, localRepository);
                 }
             }
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "Failed to install artifacts", e );
+        } catch (Exception e) {
+            throw new MojoExecutionException("Failed to install artifacts", e);
         }
     }
-
 }

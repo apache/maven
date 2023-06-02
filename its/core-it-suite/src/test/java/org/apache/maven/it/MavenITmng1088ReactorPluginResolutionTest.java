@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Brett Porter
  *
  */
-public class MavenITmng1088ReactorPluginResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1088ReactorPluginResolutionTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng1088ReactorPluginResolutionTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -49,24 +44,21 @@ public class MavenITmng1088ReactorPluginResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG1088()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1088" );
+    public void testitMNG1088() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1088");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "client/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng1088" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("client/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng1088");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
         // NOTE: It's essential part of the test to invoke a phase before "compile"
-        verifier.addCliArgument( "initialize" );
+        verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "client/target/touch.txt" );
+        verifier.verifyFilePresent("client/target/touch.txt");
     }
-
 }

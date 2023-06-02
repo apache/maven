@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3839PomParsingCoalesceTextTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3839PomParsingCoalesceTextTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3839PomParsingCoalesceTextTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng3839PomParsingCoalesceTextTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,22 +43,24 @@ public class MavenITmng3839PomParsingCoalesceTextTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3839()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3839" );
+    public void testitMNG3839() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3839");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/xml.properties" );
-        assertEquals( "A  Test  Project Property", props.getProperty( "project.properties.prop0" ) );
-        assertEquals( "That's a test!", props.getProperty( "project.properties.prop1" ) );
-        assertEquals( 32 * 1024, props.getProperty( "project.properties.prop2" ).trim().replaceAll( "[\n\r]", "" ).length() );
+        Properties props = verifier.loadProperties("target/xml.properties");
+        assertEquals("A  Test  Project Property", props.getProperty("project.properties.prop0"));
+        assertEquals("That's a test!", props.getProperty("project.properties.prop1"));
+        assertEquals(
+                32 * 1024,
+                props.getProperty("project.properties.prop2")
+                        .trim()
+                        .replaceAll("[\n\r]", "")
+                        .length());
     }
-
 }

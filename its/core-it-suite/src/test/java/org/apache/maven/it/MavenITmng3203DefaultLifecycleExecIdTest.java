@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.it;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,26 +33,21 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  *
  */
-public class MavenITmng3203DefaultLifecycleExecIdTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3203DefaultLifecycleExecIdTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3203DefaultLifecycleExecIdTest()
-    {
-        super( "[2.2.0,)" );
+    public MavenITmng3203DefaultLifecycleExecIdTest() {
+        super("[2.2.0,)");
     }
 
     @Test
-    public void testitMNG3203 ()
-        throws Exception
-    {
+    public void testitMNG3203() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3203" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3203");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.addCliArgument( "compile" );
+        verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }

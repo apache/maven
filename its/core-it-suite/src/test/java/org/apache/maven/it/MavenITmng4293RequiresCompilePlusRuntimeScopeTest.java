@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,17 +30,14 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest extends AbstractMavenIntegrationTestCase {
 
     /*
      * NOTE: Class path ordering is another issue (MNG-1412), so we merely check set containment here.
      */
 
-    public MavenITmng4293RequiresCompilePlusRuntimeScopeTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng4293RequiresCompilePlusRuntimeScopeTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -51,33 +46,30 @@ public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4293" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4293");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4293" );
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4293");
+        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines( "target/compile-cp.txt", "UTF-8" );
-        assertTrue( compileClassPath.toString(), compileClassPath.contains( "system-0.1.jar" ) );
-        assertTrue( compileClassPath.toString(), compileClassPath.contains( "provided-0.1.jar" ) );
-        assertTrue( compileClassPath.toString(), compileClassPath.contains( "compile-0.1.jar" ) );
-        assertFalse( compileClassPath.toString(), compileClassPath.contains( "test-0.1.jar" ) );
+        List<String> compileClassPath = verifier.loadLines("target/compile-cp.txt", "UTF-8");
+        assertTrue(compileClassPath.toString(), compileClassPath.contains("system-0.1.jar"));
+        assertTrue(compileClassPath.toString(), compileClassPath.contains("provided-0.1.jar"));
+        assertTrue(compileClassPath.toString(), compileClassPath.contains("compile-0.1.jar"));
+        assertFalse(compileClassPath.toString(), compileClassPath.contains("test-0.1.jar"));
 
-        List<String> runtimeClassPath = verifier.loadLines( "target/runtime-cp.txt", "UTF-8" );
-        assertTrue( runtimeClassPath.toString(), runtimeClassPath.contains( "compile-0.1.jar" ) );
-        assertTrue( runtimeClassPath.toString(), runtimeClassPath.contains( "runtime-0.1.jar" ) );
-        assertFalse( runtimeClassPath.toString(), runtimeClassPath.contains( "test-0.1.jar" ) );
+        List<String> runtimeClassPath = verifier.loadLines("target/runtime-cp.txt", "UTF-8");
+        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("compile-0.1.jar"));
+        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("runtime-0.1.jar"));
+        assertFalse(runtimeClassPath.toString(), runtimeClassPath.contains("test-0.1.jar"));
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4281PreferLocalSnapshotTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4281PreferLocalSnapshotTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4281PreferLocalSnapshotTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4281PreferLocalSnapshotTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -47,40 +42,36 @@ public class MavenITmng4281PreferLocalSnapshotTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
+    public void testit() throws Exception {
         // NOTE: It's crucial to build the two projects in isolation to disable reactor resolution
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4281" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4281");
 
-        Verifier verifier = newVerifier( new File( testDir, "dependency" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4281" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "dependency").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4281");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "jar" );
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "pom" );
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "pom");
 
-        verifier = newVerifier( new File( testDir, "project" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "validate" );
+        verifier = newVerifier(new File(testDir, "project").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties checksums = verifier.loadProperties( "target/checksum.properties" );
-        assertChecksum( "7c564b3fbeda6db61b62c35e58a8ef672e712400", checksums );
+        Properties checksums = verifier.loadProperties("target/checksum.properties");
+        assertChecksum("7c564b3fbeda6db61b62c35e58a8ef672e712400", checksums);
     }
 
-    private void assertChecksum( String checksum, Properties checksums )
-    {
-        String actual = checksums.getProperty( "dependency-0.1-SNAPSHOT.jar" );
-        assertEquals( checksum, actual.toLowerCase( java.util.Locale.ENGLISH ) );
+    private void assertChecksum(String checksum, Properties checksums) {
+        String actual = checksums.getProperty("dependency-0.1-SNAPSHOT.jar");
+        assertEquals(checksum, actual.toLowerCase(java.util.Locale.ENGLISH));
     }
-
 }

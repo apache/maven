@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,14 +31,11 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng4026ReactorDependenciesOrderTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4026ReactorDependenciesOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4026ReactorDependenciesOrderTest()
-    {
+    public MavenITmng4026ReactorDependenciesOrderTest() {
         // This feature depends on MNG-1412
-        super( "(2.0.8,)" );
+        super("(2.0.8,)");
     }
 
     /**
@@ -50,28 +45,25 @@ public class MavenITmng4026ReactorDependenciesOrderTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG4026()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4026" );
+    public void testitMNG4026() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4026");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "consumer/target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("consumer/target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath1 = verifier.loadLines( "consumer/target/classpath-1.txt", "UTF-8" );
-        assertEquals( 5, classpath1.size() );
-        assertEquals( "consumer/classes", classpath1.get( 0 ) );
-        assertEquals( "dep-1/pom.xml", classpath1.get( 1 ) );
-        assertEquals( "dep-3/pom.xml", classpath1.get( 2 ) );
-        assertEquals( "dep-2/pom.xml", classpath1.get( 3 ) );
-        assertEquals( "dep-4/pom.xml", classpath1.get( 4 ) );
+        List<String> classpath1 = verifier.loadLines("consumer/target/classpath-1.txt", "UTF-8");
+        assertEquals(5, classpath1.size());
+        assertEquals("consumer/classes", classpath1.get(0));
+        assertEquals("dep-1/pom.xml", classpath1.get(1));
+        assertEquals("dep-3/pom.xml", classpath1.get(2));
+        assertEquals("dep-2/pom.xml", classpath1.get(3));
+        assertEquals("dep-4/pom.xml", classpath1.get(4));
 
-        List<String> classpath2 = verifier.loadLines( "consumer/target/classpath-2.txt", "UTF-8" );
-        assertEquals( classpath1, classpath2 );
+        List<String> classpath2 = verifier.loadLines("consumer/target/classpath-2.txt", "UTF-8");
+        assertEquals(classpath1, classpath2);
     }
-
 }

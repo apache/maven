@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,13 +34,10 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  *
  */
-public class MavenITmng3645POMSyntaxErrorTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3645POMSyntaxErrorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3645POMSyntaxErrorTest()
-    {
-        super( "[2.0.10,2.1.0-M1),[2.1.0,3.0-alpha-1),[3.0-alpha-3,)" );
+    public MavenITmng3645POMSyntaxErrorTest() {
+        super("[2.0.10,2.1.0-M1),[2.1.0,3.0-alpha-1),[3.0-alpha-3,)");
     }
 
     /**
@@ -51,26 +46,21 @@ public class MavenITmng3645POMSyntaxErrorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3645" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3645");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            fail( "Should fail to validate the POM syntax due to missing dependency element inside dependencyManagement section." );
-        }
-        catch ( VerificationException e )
-        {
+            fail(
+                    "Should fail to validate the POM syntax due to missing dependency element inside dependencyManagement section.");
+        } catch (VerificationException e) {
             // expect this.
         }
     }
-
 }

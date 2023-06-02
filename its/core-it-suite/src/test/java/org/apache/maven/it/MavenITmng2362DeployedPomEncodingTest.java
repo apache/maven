@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
 import org.apache.maven.shared.utils.io.FileUtils;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng2362DeployedPomEncodingTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2362DeployedPomEncodingTest()
-    {
-        super( "[2.0.5,)" );
+    public MavenITmng2362DeployedPomEncodingTest() {
+        super("[2.0.5,)");
     }
 
     /**
@@ -48,58 +43,50 @@ public class MavenITmng2362DeployedPomEncodingTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2362" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2362");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "utf-8/target" );
-        verifier.deleteDirectory( "latin-1/target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2362" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("utf-8/target");
+        verifier.deleteDirectory("latin-1/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2362");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File pomFile;
 
-        pomFile = new File( verifier.getArtifactPath( "org.apache.maven.its.mng2362", "utf-8", "0.1", "pom" ) );
-        assertPomUtf8( pomFile );
+        pomFile = new File(verifier.getArtifactPath("org.apache.maven.its.mng2362", "utf-8", "0.1", "pom"));
+        assertPomUtf8(pomFile);
 
-        pomFile = new File( testDir, "utf-8/target/repo/org/apache/maven/its/mng2362/utf-8/0.1/utf-8-0.1.pom" );
-        assertPomUtf8( pomFile );
+        pomFile = new File(testDir, "utf-8/target/repo/org/apache/maven/its/mng2362/utf-8/0.1/utf-8-0.1.pom");
+        assertPomUtf8(pomFile);
 
-        pomFile = new File( verifier.getArtifactPath( "org.apache.maven.its.mng2362", "latin-1", "0.1", "pom" ) );
-        assertPomLatin1( pomFile );
+        pomFile = new File(verifier.getArtifactPath("org.apache.maven.its.mng2362", "latin-1", "0.1", "pom"));
+        assertPomLatin1(pomFile);
 
-        pomFile = new File( testDir, "latin-1/target/repo/org/apache/maven/its/mng2362/latin-1/0.1/latin-1-0.1.pom" );
-        assertPomLatin1( pomFile );
+        pomFile = new File(testDir, "latin-1/target/repo/org/apache/maven/its/mng2362/latin-1/0.1/latin-1-0.1.pom");
+        assertPomLatin1(pomFile);
     }
 
-    private void assertPomUtf8( File pomFile )
-        throws Exception
-    {
-        String pom = FileUtils.fileRead( pomFile, "UTF-8" );
+    private void assertPomUtf8(File pomFile) throws Exception {
+        String pom = FileUtils.fileRead(pomFile, "UTF-8");
         String chars = "\u00DF\u0131\u03A3\u042F\u05D0\u20AC";
-        assertPom( pomFile, pom, chars );
+        assertPom(pomFile, pom, chars);
     }
 
-    private void assertPomLatin1( File pomFile )
-        throws Exception
-    {
-        String pom = FileUtils.fileRead( pomFile, "ISO-8859-1" );
+    private void assertPomLatin1(File pomFile) throws Exception {
+        String pom = FileUtils.fileRead(pomFile, "ISO-8859-1");
         String chars = "\u00C4\u00D6\u00DC\u00E4\u00F6\u00FC\u00DF";
-        assertPom( pomFile, pom, chars );
+        assertPom(pomFile, pom, chars);
     }
 
-    private void assertPom( File pomFile, String pom, String chars )
-        throws Exception
-    {
+    private void assertPom(File pomFile, String pom, String chars) throws Exception {
         String prefix = "TEST-CHARS: ";
-        int pos = pom.indexOf( prefix );
-        assertTrue( "Corrupt data " + pom.substring( pos, pos + prefix.length() + chars.length() ) + " in " + pomFile,
-                    pom.contains( prefix + chars ) );
+        int pos = pom.indexOf(prefix);
+        assertTrue(
+                "Corrupt data " + pom.substring(pos, pos + prefix.length() + chars.length()) + " in " + pomFile,
+                pom.contains(prefix + chars));
     }
-
 }

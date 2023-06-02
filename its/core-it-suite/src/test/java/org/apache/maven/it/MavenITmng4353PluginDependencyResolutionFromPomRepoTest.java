@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4353PluginDependencyResolutionFromPomRepoTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4353PluginDependencyResolutionFromPomRepoTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,29 +43,28 @@ public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4353" ).getCanonicalFile();
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4353")
+                .getCanonicalFile();
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4353" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4353");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.filterFile( "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/template.pom",
-                             "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/maven-mng4353-plugin-0.1"
-                                 + ".pom",
-                             "UTF-8", filterProps );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile(
+                "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/template.pom",
+                "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/maven-mng4353-plugin-0.1" + ".pom",
+                "UTF-8",
+                filterProps);
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/touch.properties" );
-        assertEquals( "passed", props.getProperty( "test" ) );
+        Properties props = verifier.loadProperties("target/touch.properties");
+        assertEquals("passed", props.getProperty("test"));
     }
-
 }

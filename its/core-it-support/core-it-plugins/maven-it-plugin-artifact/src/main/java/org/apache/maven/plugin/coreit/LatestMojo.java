@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
@@ -31,34 +30,29 @@ import org.apache.maven.plugins.annotations.Parameter;
 /**
  * Marks the project's artifact as the latest version.
  *
-  *
+ *
  * @author Benjamin Bentmann
  */
-@Mojo( name = "latest", defaultPhase = LifecyclePhase.PACKAGE )
-public class LatestMojo
-    extends AbstractMojo
-{
+@Mojo(name = "latest", defaultPhase = LifecyclePhase.PACKAGE)
+public class LatestMojo extends AbstractMojo {
 
     /**
      * The main project artifact.
      */
-    @Parameter( defaultValue = "${project.artifact}", readonly = true, required = true )
+    @Parameter(defaultValue = "${project.artifact}", readonly = true, required = true)
     private Artifact projectArtifact;
 
     /**
      * Runs this mojo.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
+    public void execute() throws MojoExecutionException {
         Versioning versioning = new Versioning();
-        versioning.setLatest( projectArtifact.getVersion() );
+        versioning.setLatest(projectArtifact.getVersion());
         versioning.updateTimestamp();
 
-        ArtifactRepositoryMetadata metadata = new ArtifactRepositoryMetadata( projectArtifact, versioning );
-        projectArtifact.addMetadata( metadata );
+        ArtifactRepositoryMetadata metadata = new ArtifactRepositoryMetadata(projectArtifact, versioning);
+        projectArtifact.addMetadata(metadata);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Marked artifact as latest" );
+        getLog().info("[MAVEN-CORE-IT-LOG] Marked artifact as latest");
     }
-
 }

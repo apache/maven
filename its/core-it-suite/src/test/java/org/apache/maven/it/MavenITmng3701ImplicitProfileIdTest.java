@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3701ImplicitProfileIdTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3701ImplicitProfileIdTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3701ImplicitProfileIdTest()
-    {
-        super( "[2.0.11,)" );
+    public MavenITmng3701ImplicitProfileIdTest() {
+        super("[2.0.11,)");
     }
 
     /**
@@ -48,18 +43,15 @@ public class MavenITmng3701ImplicitProfileIdTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3701()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3701" );
+    public void testitMNG3701() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3701");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

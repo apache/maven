@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenIT0134WarLifecycleTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenIT0134WarLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0134WarLifecycleTest()
-    {
-        super( "[2.0.0,)" );
+    public MavenIT0134WarLifecycleTest() {
+        super("[2.0.0,)");
     }
 
     /**
@@ -46,25 +41,22 @@ public class MavenIT0134WarLifecycleTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit0134()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0134" );
+    public void testit0134() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0134");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteDirectory( "target" );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "deploy" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.deleteDirectory("target");
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("deploy");
         verifier.execute();
-        verifier.verifyFilePresent( "target/resources-resources.txt" );
-        verifier.verifyFilePresent( "target/compiler-compile.txt" );
-        verifier.verifyFilePresent( "target/resources-test-resources.txt" );
-        verifier.verifyFilePresent( "target/compiler-test-compile.txt" );
-        verifier.verifyFilePresent( "target/surefire-test.txt" );
-        verifier.verifyFilePresent( "target/war-war.txt" );
-        verifier.verifyFilePresent( "target/install-install.txt" );
-        verifier.verifyFilePresent( "target/deploy-deploy.txt" );
+        verifier.verifyFilePresent("target/resources-resources.txt");
+        verifier.verifyFilePresent("target/compiler-compile.txt");
+        verifier.verifyFilePresent("target/resources-test-resources.txt");
+        verifier.verifyFilePresent("target/compiler-test-compile.txt");
+        verifier.verifyFilePresent("target/surefire-test.txt");
+        verifier.verifyFilePresent("target/war-war.txt");
+        verifier.verifyFilePresent("target/install-install.txt");
+        verifier.verifyFilePresent("target/deploy-deploy.txt");
         verifier.verifyErrorFreeLog();
     }
-
 }

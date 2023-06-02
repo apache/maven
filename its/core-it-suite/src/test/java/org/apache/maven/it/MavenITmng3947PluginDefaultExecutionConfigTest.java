@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3947PluginDefaultExecutionConfigTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3947PluginDefaultExecutionConfigTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3947PluginDefaultExecutionConfigTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng3947PluginDefaultExecutionConfigTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,20 +43,17 @@ public class MavenITmng3947PluginDefaultExecutionConfigTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG3947()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3947" );
+    public void testitMNG3947() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3947");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "org.apache.maven.plugins:maven-resources-plugin:resources" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("org.apache.maven.plugins:maven-resources-plugin:resources");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/failed.txt" );
-        verifier.verifyFilePresent( "target/resources-resources.txt" );
+        verifier.verifyFileNotPresent("target/failed.txt");
+        verifier.verifyFilePresent("target/resources-resources.txt");
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4891RobustSnapshotResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4891RobustSnapshotResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4891RobustSnapshotResolutionTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0.1,)" );
+    public MavenITmng4891RobustSnapshotResolutionTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0.1,)");
     }
 
     /**
@@ -48,29 +43,26 @@ public class MavenITmng4891RobustSnapshotResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4891" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4891");
 
-        Verifier verifier = newVerifier( new File( testDir, "producer" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4891" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "producer").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4891");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( new File( testDir, "consumer" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        verifier = newVerifier(new File(testDir, "consumer").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
 
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4891:producer:jar:0.1-SNAPSHOT" ) );
+        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4891:producer:jar:0.1-SNAPSHOT"));
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3846PomInheritanceUrlAdjustmentTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3846PomInheritanceUrlAdjustmentTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3846PomInheritanceUrlAdjustmentTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng3846PomInheritanceUrlAdjustmentTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,31 +43,30 @@ public class MavenITmng3846PomInheritanceUrlAdjustmentTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitOneParent()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3846" );
+    public void testitOneParent() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3846");
 
-        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "http://parent.url/child", props.getProperty( "project.url" ) );
-        assertEquals( "http://parent.url/org/", props.getProperty( "project.organization.url" ) );
-        assertEquals( "http://parent.url/license.txt", props.getProperty( "project.licenses.0.url" ) );
-        assertEquals( "http://parent.url/viewvc/child", props.getProperty( "project.scm.url" ) );
-        assertEquals( "http://parent.url/scm/child", props.getProperty( "project.scm.connection" ) );
-        assertEquals( "https://parent.url/scm/child", props.getProperty( "project.scm.developerConnection" ) );
-        assertEquals( "http://parent.url/issues", props.getProperty( "project.issueManagement.url" ) );
-        assertEquals( "http://parent.url/ci", props.getProperty( "project.ciManagement.url" ) );
-        assertEquals( "http://parent.url/dist", props.getProperty( "project.distributionManagement.repository.url" ) );
-        assertEquals( "http://parent.url/snaps", props.getProperty( "project.distributionManagement.snapshotRepository.url" ) );
-        assertEquals( "http://parent.url/site/child", props.getProperty( "project.distributionManagement.site.url" ) );
-        assertEquals( "http://parent.url/download", props.getProperty( "project.distributionManagement.downloadUrl" ) );
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("http://parent.url/child", props.getProperty("project.url"));
+        assertEquals("http://parent.url/org/", props.getProperty("project.organization.url"));
+        assertEquals("http://parent.url/license.txt", props.getProperty("project.licenses.0.url"));
+        assertEquals("http://parent.url/viewvc/child", props.getProperty("project.scm.url"));
+        assertEquals("http://parent.url/scm/child", props.getProperty("project.scm.connection"));
+        assertEquals("https://parent.url/scm/child", props.getProperty("project.scm.developerConnection"));
+        assertEquals("http://parent.url/issues", props.getProperty("project.issueManagement.url"));
+        assertEquals("http://parent.url/ci", props.getProperty("project.ciManagement.url"));
+        assertEquals("http://parent.url/dist", props.getProperty("project.distributionManagement.repository.url"));
+        assertEquals(
+                "http://parent.url/snaps", props.getProperty("project.distributionManagement.snapshotRepository.url"));
+        assertEquals("http://parent.url/site/child", props.getProperty("project.distributionManagement.site.url"));
+        assertEquals("http://parent.url/download", props.getProperty("project.distributionManagement.downloadUrl"));
     }
 
     /**
@@ -82,31 +76,29 @@ public class MavenITmng3846PomInheritanceUrlAdjustmentTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitTwoParents()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3846" );
+    public void testitTwoParents() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3846");
 
-        Verifier verifier = newVerifier( new File( testDir, "another-parent/sub" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "another-parent/sub").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "http://parent.url/ap/child", props.getProperty( "project.url" ) );
-        assertEquals( "http://parent.url/org/", props.getProperty( "project.organization.url" ) );
-        assertEquals( "http://parent.url/license.txt", props.getProperty( "project.licenses.0.url" ) );
-        assertEquals( "http://parent.url/viewvc/ap/child", props.getProperty( "project.scm.url" ) );
-        assertEquals( "http://parent.url/scm/ap/child", props.getProperty( "project.scm.connection" ) );
-        assertEquals( "https://parent.url/scm/ap/child", props.getProperty( "project.scm.developerConnection" ) );
-        assertEquals( "http://parent.url/issues", props.getProperty( "project.issueManagement.url" ) );
-        assertEquals( "http://parent.url/ci", props.getProperty( "project.ciManagement.url" ) );
-        assertEquals( "http://parent.url/dist", props.getProperty( "project.distributionManagement.repository.url" ) );
-        assertEquals( "http://parent.url/snaps", props.getProperty( "project.distributionManagement.snapshotRepository.url" ) );
-        assertEquals( "http://parent.url/site/ap/child", props.getProperty( "project.distributionManagement.site.url" ) );
-        assertEquals( "http://parent.url/download", props.getProperty( "project.distributionManagement.downloadUrl" ) );
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("http://parent.url/ap/child", props.getProperty("project.url"));
+        assertEquals("http://parent.url/org/", props.getProperty("project.organization.url"));
+        assertEquals("http://parent.url/license.txt", props.getProperty("project.licenses.0.url"));
+        assertEquals("http://parent.url/viewvc/ap/child", props.getProperty("project.scm.url"));
+        assertEquals("http://parent.url/scm/ap/child", props.getProperty("project.scm.connection"));
+        assertEquals("https://parent.url/scm/ap/child", props.getProperty("project.scm.developerConnection"));
+        assertEquals("http://parent.url/issues", props.getProperty("project.issueManagement.url"));
+        assertEquals("http://parent.url/ci", props.getProperty("project.ciManagement.url"));
+        assertEquals("http://parent.url/dist", props.getProperty("project.distributionManagement.repository.url"));
+        assertEquals(
+                "http://parent.url/snaps", props.getProperty("project.distributionManagement.snapshotRepository.url"));
+        assertEquals("http://parent.url/site/ap/child", props.getProperty("project.distributionManagement.site.url"));
+        assertEquals("http://parent.url/download", props.getProperty("project.distributionManagement.downloadUrl"));
     }
-
 }

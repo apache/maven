@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 /**
  * A bean to receive mojo configuration.
@@ -25,8 +24,7 @@ package org.apache.maven.plugin.coreit;
  * @author Benjamin Bentmann
  *
  */
-public class Bean
-{
+public class Bean {
 
     String fieldParam;
 
@@ -34,22 +32,18 @@ public class Bean
 
     boolean setterCalled;
 
-    public void set( String value )
-    {
+    public void set(String value) {
         fieldParam = value;
         setterCalled = true;
     }
 
-    public void setSetterParam( String value )
-    {
+    public void setSetterParam(String value) {
         setterParam = value;
         setterCalled = true;
     }
 
-    public String toString()
-    {
-        return getClass().getName() + "[fieldParam=" + fieldParam + ", setterParam=" + setterParam
-                + ", setterCalled=" + setterCalled + "]";
+    public String toString() {
+        return getClass().getName() + "[fieldParam=" + fieldParam + ", setterParam=" + setterParam + ", setterCalled="
+                + setterCalled + "]";
     }
-
 }

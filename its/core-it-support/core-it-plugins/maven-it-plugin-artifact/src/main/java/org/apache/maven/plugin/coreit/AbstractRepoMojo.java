@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,15 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
+
+import java.io.File;
+import java.util.Collection;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
-
-import java.io.File;
-import java.util.Collection;
 
 /**
  * Provides common code for the install and deploy mojos.
@@ -33,43 +32,39 @@ import java.util.Collection;
  * @author Benjamin Bentmann
  *
  */
-public abstract class AbstractRepoMojo
-    extends AbstractMojo
-{
+public abstract class AbstractRepoMojo extends AbstractMojo {
 
     /**
      * The project's main artifact.
      */
-    @Parameter( defaultValue = "${project.artifact}", required = true, readonly = true )
+    @Parameter(defaultValue = "${project.artifact}", required = true, readonly = true)
     protected Artifact mainArtifact;
 
     /**
      * The project's attached artifact.
      */
-    @Parameter( defaultValue = "${project.attachedArtifacts}", required = true, readonly = true )
+    @Parameter(defaultValue = "${project.attachedArtifacts}", required = true, readonly = true)
     protected Collection<Artifact> attachedArtifacts;
 
     /**
      * The packaging of the project.
      */
-    @Parameter( defaultValue = "${project.packaging}", required = true, readonly = true )
+    @Parameter(defaultValue = "${project.packaging}", required = true, readonly = true)
     protected String packaging;
 
     /**
      * The POM file of the project.
      */
-    @Parameter( defaultValue = "${project.file}", required = true, readonly = true )
+    @Parameter(defaultValue = "${project.file}", required = true, readonly = true)
     protected File pomFile;
 
     /**
      * The local repository.
      */
-    @Parameter( defaultValue = "${localRepository}", required = true, readonly = true )
+    @Parameter(defaultValue = "${localRepository}", required = true, readonly = true)
     protected ArtifactRepository localRepository;
 
-    protected boolean isPomArtifact()
-    {
-        return "pom".equals( packaging );
+    protected boolean isPomArtifact() {
+        return "pom".equals(packaging);
     }
-
 }

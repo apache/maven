@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,25 +16,22 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
  * Test case for <a href="https://issues.apache.org/jira/browse/MNG-6173">MNG-6173</a>.
  */
-public class MavenITmng6173GetProjectsAndDependencyGraphTest
-        extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng6173GetProjectsAndDependencyGraphTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6173GetProjectsAndDependencyGraphTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng6173GetProjectsAndDependencyGraphTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -46,30 +41,26 @@ public class MavenITmng6173GetProjectsAndDependencyGraphTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitShouldReturnProjectsAndProjectDependencyGraph()
-            throws Exception
-    {
+    public void testitShouldReturnProjectsAndProjectDependencyGraph() throws Exception {
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                "/mng-6173-get-projects-and-dependency-graph" );
+        File testDir =
+                ResourceExtractor.simpleExtractResources(getClass(), "/mng-6173-get-projects-and-dependency-graph");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "module-1/target" );
-        verifier.deleteDirectory( "module-2/target" );
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "module-1" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("module-1/target");
+        verifier.deleteDirectory("module-2/target");
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("module-1");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties properties = verifier.loadProperties( "module-1/target/session.properties" );
-        assertEquals( "1", properties.getProperty( "session.projects.size" ) );
-        assertEquals( "module-1", properties.getProperty( "session.projects.0.artifactId" ) );
-        assertEquals( "1", properties.getProperty("session.projectDependencyGraph.sortedProjects.size" ) );
-        assertEquals( "module-1", properties.getProperty(
-                "session.projectDependencyGraph.sortedProjects.0.artifactId" ) );
+        Properties properties = verifier.loadProperties("module-1/target/session.properties");
+        assertEquals("1", properties.getProperty("session.projects.size"));
+        assertEquals("module-1", properties.getProperty("session.projects.0.artifactId"));
+        assertEquals("1", properties.getProperty("session.projectDependencyGraph.sortedProjects.size"));
+        assertEquals("module-1", properties.getProperty("session.projectDependencyGraph.sortedProjects.0.artifactId"));
     }
-
 }

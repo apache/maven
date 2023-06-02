@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,23 +29,18 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng2576MakeLikeReactorTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2576MakeLikeReactorTest()
-    {
-        super( "[2.1.0,)" );
+    public MavenITmng2576MakeLikeReactorTest() {
+        super("[2.1.0,)");
     }
 
-    private void clean( Verifier verifier )
-        throws Exception
-    {
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub-a/target" );
-        verifier.deleteDirectory( "sub-b/target" );
-        verifier.deleteDirectory( "sub-c/target" );
-        verifier.deleteDirectory( "sub-d/target" );
+    private void clean(Verifier verifier) throws Exception {
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("sub-a/target");
+        verifier.deleteDirectory("sub-b/target");
+        verifier.deleteDirectory("sub-c/target");
+        verifier.deleteDirectory("sub-d/target");
     }
 
     /**
@@ -56,26 +49,24 @@ public class MavenITmng2576MakeLikeReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMakeOnlyList()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+    public void testitMakeOnlyList() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2576");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        clean( verifier );
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "sub-b" );
-        verifier.setLogFileName( "log-only.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        clean(verifier);
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("sub-b");
+        verifier.setLogFileName("log-only.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
+        verifier.verifyFileNotPresent("sub-a/target/touch.txt");
+        verifier.verifyFilePresent("sub-b/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-c/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-d/target/touch.txt");
     }
 
     /**
@@ -84,27 +75,25 @@ public class MavenITmng2576MakeLikeReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMakeUpstream()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+    public void testitMakeUpstream() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2576");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        clean( verifier );
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "sub-b" );
-        verifier.addCliArgument( "-am" );
-        verifier.setLogFileName( "log-upstream.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        clean(verifier);
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("sub-b");
+        verifier.addCliArgument("-am");
+        verifier.setLogFileName("log-upstream.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/touch.txt" );
-        verifier.verifyFilePresent( "sub-a/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
+        verifier.verifyFilePresent("sub-a/target/touch.txt");
+        verifier.verifyFilePresent("sub-b/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-c/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-d/target/touch.txt");
     }
 
     /**
@@ -113,27 +102,25 @@ public class MavenITmng2576MakeLikeReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMakeDownstream()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+    public void testitMakeDownstream() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2576");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        clean( verifier );
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "sub-b" );
-        verifier.addCliArgument( "-amd" );
-        verifier.setLogFileName( "log-downstream.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        clean(verifier);
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("sub-b");
+        verifier.addCliArgument("-amd");
+        verifier.setLogFileName("log-downstream.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-c/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
+        verifier.verifyFileNotPresent("sub-a/target/touch.txt");
+        verifier.verifyFilePresent("sub-b/target/touch.txt");
+        verifier.verifyFilePresent("sub-c/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-d/target/touch.txt");
     }
 
     /**
@@ -142,28 +129,26 @@ public class MavenITmng2576MakeLikeReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMakeBoth()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+    public void testitMakeBoth() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2576");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        clean( verifier );
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "sub-b" );
-        verifier.addCliArgument( "-am" );
-        verifier.addCliArgument( "-amd" );
-        verifier.setLogFileName( "log-both.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        clean(verifier);
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("sub-b");
+        verifier.addCliArgument("-am");
+        verifier.addCliArgument("-amd");
+        verifier.setLogFileName("log-both.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/touch.txt" );
-        verifier.verifyFilePresent( "sub-a/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-c/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
+        verifier.verifyFilePresent("sub-a/target/touch.txt");
+        verifier.verifyFilePresent("sub-b/target/touch.txt");
+        verifier.verifyFilePresent("sub-c/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-d/target/touch.txt");
     }
 
     /**
@@ -172,27 +157,25 @@ public class MavenITmng2576MakeLikeReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMatchesByBasedir()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+    public void testitMatchesByBasedir() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2576");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        clean( verifier );
-        verifier.verifyFileNotPresent( "sub-d/pom.xml" );
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "sub-d" );
-        verifier.setLogFileName( "log-basedir.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        clean(verifier);
+        verifier.verifyFileNotPresent("sub-d/pom.xml");
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("sub-d");
+        verifier.setLogFileName("log-basedir.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-b/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
+        verifier.verifyFileNotPresent("sub-a/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-b/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-c/target/touch.txt");
+        verifier.verifyFilePresent("sub-d/target/touch.txt");
     }
 
     /**
@@ -201,30 +184,28 @@ public class MavenITmng2576MakeLikeReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMatchesByBasedirPlus()
-        throws Exception
-    {
+    public void testitMatchesByBasedirPlus() throws Exception {
         // as per MNG-5230
-        requiresMavenVersion( "[3.2,)" );
+        requiresMavenVersion("[3.2,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2576");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        clean( verifier );
-        verifier.verifyFileNotPresent( "sub-d/pom.xml" );
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "+sub-d" );
-        verifier.setLogFileName( "log-basedir-plus.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        clean(verifier);
+        verifier.verifyFileNotPresent("sub-d/pom.xml");
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("+sub-d");
+        verifier.setLogFileName("log-basedir-plus.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-b/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
+        verifier.verifyFileNotPresent("sub-a/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-b/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-c/target/touch.txt");
+        verifier.verifyFilePresent("sub-d/target/touch.txt");
     }
     /**
      * Verify that the project list can also specify project ids.
@@ -232,26 +213,24 @@ public class MavenITmng2576MakeLikeReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMatchesById()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+    public void testitMatchesById() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2576");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        clean( verifier );
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "org.apache.maven.its.mng2576:sub-b" );
-        verifier.setLogFileName( "log-id.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        clean(verifier);
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("org.apache.maven.its.mng2576:sub-b");
+        verifier.setLogFileName("log-id.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
+        verifier.verifyFileNotPresent("sub-a/target/touch.txt");
+        verifier.verifyFilePresent("sub-b/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-c/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-d/target/touch.txt");
     }
 
     /**
@@ -260,29 +239,27 @@ public class MavenITmng2576MakeLikeReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMatchesByArtifactId()
-        throws Exception
-    {
+    public void testitMatchesByArtifactId() throws Exception {
         // as per MNG-4244
-        requiresMavenVersion( "[3.0-alpha-3,)" );
+        requiresMavenVersion("[3.0-alpha-3,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2576");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        clean( verifier );
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( ":sub-b" );
-        verifier.setLogFileName( "log-artifact-id.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        clean(verifier);
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument(":sub-b");
+        verifier.setLogFileName("log-artifact-id.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
+        verifier.verifyFileNotPresent("sub-a/target/touch.txt");
+        verifier.verifyFilePresent("sub-b/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-c/target/touch.txt");
+        verifier.verifyFileNotPresent("sub-d/target/touch.txt");
     }
 
     /**
@@ -291,25 +268,22 @@ public class MavenITmng2576MakeLikeReactorTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitResumeFrom()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+    public void testitResumeFrom() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2576");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        clean( verifier );
-        verifier.addCliArgument( "-rf" );
-        verifier.addCliArgument( "sub-b" );
-        verifier.setLogFileName( "log-resume.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        clean(verifier);
+        verifier.addCliArgument("-rf");
+        verifier.addCliArgument("sub-b");
+        verifier.setLogFileName("log-resume.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFileNotPresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
-        verifier.verifyFilePresent( "sub-c/target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
+        verifier.verifyFileNotPresent("sub-a/target/touch.txt");
+        verifier.verifyFilePresent("sub-b/target/touch.txt");
+        verifier.verifyFilePresent("sub-c/target/touch.txt");
     }
-
 }

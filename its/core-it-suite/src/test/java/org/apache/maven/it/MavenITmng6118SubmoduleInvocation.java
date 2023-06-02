@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,15 +38,13 @@ import org.junit.jupiter.api.Test;
  * @author Maarten Mulders
  * @author Martin Kanters
  */
-public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationTestCase {
     private static final String RESOURCE_PATH = "/mng-6118-submodule-invocation-full-reactor";
     private final File testDir;
 
-    public MavenITmng6118SubmoduleInvocation() throws IOException
-    {
-        super( "[4.0.0-alpha-1,)" );
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_PATH );
+    public MavenITmng6118SubmoduleInvocation() throws IOException {
+        super("[4.0.0-alpha-1,)");
+        testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_PATH);
     }
 
     /**
@@ -57,18 +53,17 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
      * @throws Exception in case of failure
      */
     @Test
-    public void testInSubModule() throws Exception
-    {
+    public void testInSubModule() throws Exception {
         // Compile the whole project first.
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "package" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("package");
         verifier.execute();
 
-        final File submoduleDirectory = new File( testDir, "app" );
-        verifier = newVerifier( submoduleDirectory.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.setLogFileName( "log-insubmodule.txt" );
-        verifier.addCliArgument( "compile" );
+        final File submoduleDirectory = new File(testDir, "app");
+        verifier = newVerifier(submoduleDirectory.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.setLogFileName("log-insubmodule.txt");
+        verifier.addCliArgument("compile");
         verifier.execute();
     }
 
@@ -78,19 +73,18 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
      * @throws Exception in case of failure
      */
     @Test
-    public void testWithFile() throws Exception
-    {
+    public void testWithFile() throws Exception {
         // Compile the whole project first.
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "package" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("package");
         verifier.execute();
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.setLogFileName( "log-withfile.txt" );
-        verifier.addCliArgument( "-f" );
-        verifier.addCliArgument( "app/pom.xml" );
-        verifier.addCliArgument( "compile" );
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.setLogFileName("log-withfile.txt");
+        verifier.addCliArgument("-f");
+        verifier.addCliArgument("app/pom.xml");
+        verifier.addCliArgument("compile");
         verifier.execute();
     }
 
@@ -100,16 +94,15 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
      * @throws Exception in case of failure
      */
     @Test
-    public void testWithFileAndAlsoMake() throws Exception
-    {
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "-am" );
-        verifier.addCliArgument( "-f" );
-        verifier.addCliArgument( "app/pom.xml" );
-        verifier.setLogFileName( "log-withfilealsomake.txt" );
-        verifier.addCliArgument( "compile" );
+    public void testWithFileAndAlsoMake() throws Exception {
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("-am");
+        verifier.addCliArgument("-f");
+        verifier.addCliArgument("app/pom.xml");
+        verifier.setLogFileName("log-withfilealsomake.txt");
+        verifier.addCliArgument("compile");
         verifier.execute();
-        verifier.verifyTextInLog( "Building Maven Integration Test :: MNG-6118 :: Library 1.0" );
+        verifier.verifyTextInLog("Building Maven Integration Test :: MNG-6118 :: Library 1.0");
     }
 
     /**
@@ -118,14 +111,13 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
      * @throws Exception in case of failure
      */
     @Test
-    public void testInSubModuleWithAlsoMake() throws Exception
-    {
-        File submoduleDirectory = new File( testDir, "app" );
-        Verifier verifier = newVerifier( submoduleDirectory.getAbsolutePath() );
-        verifier.addCliArgument( "-am" );
-        verifier.setLogFileName( "log-insubmodulealsomake.txt" );
-        verifier.addCliArgument( "compile" );
+    public void testInSubModuleWithAlsoMake() throws Exception {
+        File submoduleDirectory = new File(testDir, "app");
+        Verifier verifier = newVerifier(submoduleDirectory.getAbsolutePath());
+        verifier.addCliArgument("-am");
+        verifier.setLogFileName("log-insubmodulealsomake.txt");
+        verifier.addCliArgument("compile");
         verifier.execute();
-        verifier.verifyTextInLog( "Building Maven Integration Test :: MNG-6118 :: Library 1.0" );
+        verifier.verifyTextInLog("Building Maven Integration Test :: MNG-6118 :: Library 1.0");
     }
 }

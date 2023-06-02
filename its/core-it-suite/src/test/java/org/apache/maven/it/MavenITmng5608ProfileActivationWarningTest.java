@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,56 +31,47 @@ import org.junit.jupiter.api.Test;
  * Profile activation warning test when file specification contains <code>${project.basedir}</code>
  * instead of <code>${basedir}</code>
  */
-public class MavenITmng5608ProfileActivationWarningTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5608ProfileActivationWarningTest()
-    {
-        super( "(3.2.1,)" );
+    public MavenITmng5608ProfileActivationWarningTest() {
+        super("(3.2.1,)");
     }
 
     @Test
-    public void testitMNG5608()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5608-profile-activation-warning" );
+    public void testitMNG5608() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5608-profile-activation-warning");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // check expected profiles activated, just for sanity (or build should have failed, given other profiles)
-        assertFileExists( testDir, "target/exists-basedir" );
-        assertFileExists( testDir, "target/mng-5608-missing-project.basedir" );
+        assertFileExists(testDir, "target/exists-basedir");
+        assertFileExists(testDir, "target/mng-5608-missing-project.basedir");
 
         // check that the 2 profiles using ${project.basedir} caused warnings
-        List<String> logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        assertNotNull( findWarning( logFile, "mng-5608-exists-project.basedir" ) );
-        assertNotNull( findWarning( logFile, "mng-5608-missing-project.basedir" ) );
+        List<String> logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        assertNotNull(findWarning(logFile, "mng-5608-exists-project.basedir"));
+        assertNotNull(findWarning(logFile, "mng-5608-missing-project.basedir"));
     }
 
-    private void assertFileExists( File dir, String filename )
-    {
-        File file = new File( dir, filename );
-        assertTrue( "expected file: " + file, file.exists() );
+    private void assertFileExists(File dir, String filename) {
+        File file = new File(dir, filename);
+        assertTrue("expected file: " + file, file.exists());
     }
 
-    private String findWarning( List<String> logLines, String profileId )
-    {
-        Pattern pattern = Pattern.compile(
-            "(?i).*Failed to interpolate file location ..project.basedir./pom.xml for profile " + profileId + ": .*" );
+    private String findWarning(List<String> logLines, String profileId) {
+        Pattern pattern =
+                Pattern.compile("(?i).*Failed to interpolate file location ..project.basedir./pom.xml for profile "
+                        + profileId + ": .*");
 
-        for ( String logLine : logLines )
-        {
-            if ( pattern.matcher( logLine ).matches() )
-            {
+        for (String logLine : logLines) {
+            if (pattern.matcher(logLine).matches()) {
                 return logLine;
             }
         }
 
         return null;
     }
-
 }

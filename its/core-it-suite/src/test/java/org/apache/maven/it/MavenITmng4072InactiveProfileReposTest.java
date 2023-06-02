@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4072InactiveProfileReposTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4072InactiveProfileReposTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4072InactiveProfileReposTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4072InactiveProfileReposTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -46,30 +41,24 @@ public class MavenITmng4072InactiveProfileReposTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4072" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4072");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4072" );
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8" );
-        verifier.filterFile( "profiles-template.xml", "profiles.xml", "UTF-8" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4072");
+        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
+        verifier.filterFile("profiles-template.xml", "profiles.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            fail( "Dependency resolution succeeded although all profiles are inactive" );
-        }
-        catch ( Exception e )
-        {
+            fail("Dependency resolution succeeded although all profiles are inactive");
+        } catch (Exception e) {
             // expected, all profiles are inactive, hence the repos inaccessible
         }
     }
-
 }

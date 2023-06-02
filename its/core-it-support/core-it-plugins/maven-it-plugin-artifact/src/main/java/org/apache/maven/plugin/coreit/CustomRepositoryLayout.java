@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -28,44 +27,36 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 /**
  * @author Benjamin Bentmann
  */
-public class CustomRepositoryLayout
-    implements ArtifactRepositoryLayout
-{
+public class CustomRepositoryLayout implements ArtifactRepositoryLayout {
     @Override
-    public String getId()
-    {
+    public String getId() {
         return "id";
     }
 
-    public String pathOf( Artifact artifact )
-    {
+    public String pathOf(Artifact artifact) {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
         StringBuilder path = new StringBuilder();
 
-        path.append( artifact.getArtifactId() ).append( '-' ).append( artifact.getVersion() );
+        path.append(artifact.getArtifactId()).append('-').append(artifact.getVersion());
 
-        if ( artifact.hasClassifier() )
-        {
-            path.append( '-' ).append( artifact.getClassifier() );
+        if (artifact.hasClassifier()) {
+            path.append('-').append(artifact.getClassifier());
         }
 
-        if ( artifactHandler.getExtension() != null && artifactHandler.getExtension().length() > 0 )
-        {
-            path.append( '.' ).append( artifactHandler.getExtension() );
+        if (artifactHandler.getExtension() != null
+                && artifactHandler.getExtension().length() > 0) {
+            path.append('.').append(artifactHandler.getExtension());
         }
 
         return path.toString();
     }
 
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
-    {
-        return metadata.getLocalFilename( repository );
+    public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
+        return metadata.getLocalFilename(repository);
     }
 
-    public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
-    {
+    public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
         return metadata.getRemoteFilename();
     }
-
 }

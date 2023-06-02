@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng2276ProfileActivationBySettingsPropertyTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2276ProfileActivationBySettingsPropertyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2276ProfileActivationBySettingsPropertyTest()
-    {
-        super( "[3.0-beta-1,)" );
+    public MavenITmng2276ProfileActivationBySettingsPropertyTest() {
+        super("[3.0-beta-1,)");
     }
 
     /**
@@ -47,24 +42,22 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitActivation()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2276" );
+    public void testitActivation() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2276");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.setLogFileName( "log-1.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.setLogFileName("log-1.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/profile.properties" );
-        assertEquals( "settings", props.getProperty( "project.properties.settingsProperty" ) );
-        assertEquals( "pom", props.getProperty( "project.properties.pomProperty" ) );
+        Properties props = verifier.loadProperties("target/profile.properties");
+        assertEquals("settings", props.getProperty("project.properties.settingsProperty"));
+        assertEquals("pom", props.getProperty("project.properties.pomProperty"));
     }
 
     /**
@@ -73,25 +66,22 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitCliWins()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2276" );
+    public void testitCliWins() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2276");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "-DsettingsProperty=cli" );
-        verifier.setLogFileName( "log-2.txt" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("-DsettingsProperty=cli");
+        verifier.setLogFileName("log-2.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/profile.properties" );
-        assertEquals( "settings", props.getProperty( "project.properties.settingsProperty" ) );
-        assertEquals( "", props.getProperty( "project.properties.pomProperty", "" ) );
+        Properties props = verifier.loadProperties("target/profile.properties");
+        assertEquals("settings", props.getProperty("project.properties.settingsProperty"));
+        assertEquals("", props.getProperty("project.properties.pomProperty", ""));
     }
-
 }

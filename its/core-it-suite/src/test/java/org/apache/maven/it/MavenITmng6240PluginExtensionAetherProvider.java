@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,12 +30,9 @@ import org.junit.jupiter.api.Test;
  *
  * @author gboue
  */
-public class MavenITmng6240PluginExtensionAetherProvider
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng6240PluginExtensionAetherProvider()
-    {
-        super( "[3.5.1,)" );
+public class MavenITmng6240PluginExtensionAetherProvider extends AbstractMavenIntegrationTestCase {
+    public MavenITmng6240PluginExtensionAetherProvider() {
+        super("[3.5.1,)");
     }
 
     /**
@@ -53,35 +48,29 @@ public class MavenITmng6240PluginExtensionAetherProvider
      * @throws Exception in case of failure
      */
     @Test
-    public void testPluginExtensionDependingOnMavenAetherProvider()
-        throws Exception
-    {
+    public void testPluginExtensionDependingOnMavenAetherProvider() throws Exception {
         File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-6240-plugin-extension-aether-provider" );
-        File pluginDir = new File( testDir, "plugin-extension" );
-        File projectDir = new File( testDir, "project" );
+                ResourceExtractor.simpleExtractResources(getClass(), "/mng-6240-plugin-extension-aether-provider");
+        File pluginDir = new File(testDir, "plugin-extension");
+        File projectDir = new File(testDir, "project");
 
-        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "install" );
+        Verifier verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.addCliArgument( "deploy" );
+        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("deploy");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
+        List<String> lines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
         int count = 0;
-        for ( String line : lines )
-        {
-            if ( line.endsWith( "/repo/org/apache/maven/its/mng6240/project/1.0-SNAPSHOT/maven-metadata.xml" ) )
-            {
+        for (String line : lines) {
+            if (line.endsWith("/repo/org/apache/maven/its/mng6240/project/1.0-SNAPSHOT/maven-metadata.xml")) {
                 count++;
             }
         }
-        assertEquals( 2, count ); // 1 from download, 1 from upload
-
+        assertEquals(2, count); // 1 from download, 1 from upload
     }
-
 }

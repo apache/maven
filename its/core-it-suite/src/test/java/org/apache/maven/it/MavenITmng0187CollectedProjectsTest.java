@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,13 +34,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng0187CollectedProjectsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng0187CollectedProjectsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0187CollectedProjectsTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng0187CollectedProjectsTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -52,51 +47,45 @@ public class MavenITmng0187CollectedProjectsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0187" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0187");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub-1/target" );
-        verifier.deleteDirectory( "sub-1/sub-2/target" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("sub-1/target");
+        verifier.deleteDirectory("sub-1/sub-2/target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props;
 
-        props = verifier.loadProperties( "target/project.properties" );
-        assertEquals( "2", props.getProperty( "project.collectedProjects.size" ) );
-        assertEquals( Arrays.asList( new String[]{ "sub-1", "sub-2" } ), getProjects( props ) );
+        props = verifier.loadProperties("target/project.properties");
+        assertEquals("2", props.getProperty("project.collectedProjects.size"));
+        assertEquals(Arrays.asList(new String[] {"sub-1", "sub-2"}), getProjects(props));
 
-        props = verifier.loadProperties( "sub-1/target/project.properties" );
-        assertEquals( "1", props.getProperty( "project.collectedProjects.size" ) );
-        assertEquals( Arrays.asList( new String[]{ "sub-2" } ), getProjects( props ) );
+        props = verifier.loadProperties("sub-1/target/project.properties");
+        assertEquals("1", props.getProperty("project.collectedProjects.size"));
+        assertEquals(Arrays.asList(new String[] {"sub-2"}), getProjects(props));
 
-        props = verifier.loadProperties( "sub-1/sub-2/target/project.properties" );
-        assertEquals( "0", props.getProperty( "project.collectedProjects.size" ) );
-        assertEquals( Arrays.asList( new String[]{} ), getProjects( props ) );
+        props = verifier.loadProperties("sub-1/sub-2/target/project.properties");
+        assertEquals("0", props.getProperty("project.collectedProjects.size"));
+        assertEquals(Arrays.asList(new String[] {}), getProjects(props));
     }
 
-    private List<String> getProjects( Properties props )
-    {
+    private List<String> getProjects(Properties props) {
         List<String> projects = new ArrayList<>();
 
-        for ( Object o : props.keySet() )
-        {
+        for (Object o : props.keySet()) {
             String key = o.toString();
-            if ( key.startsWith( "project.collectedProjects." ) && !key.endsWith( ".size" ) )
-            {
-                projects.add( props.getProperty( key ) );
+            if (key.startsWith("project.collectedProjects.") && !key.endsWith(".size")) {
+                projects.add(props.getProperty(key));
             }
         }
 
-        Collections.sort( projects );
+        Collections.sort(projects);
 
         return projects;
     }
-
 }

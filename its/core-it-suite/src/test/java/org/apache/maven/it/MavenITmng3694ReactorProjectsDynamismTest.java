@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,32 +31,27 @@ import org.junit.jupiter.api.Test;
  *
  * @author jdcasey
  */
-public class MavenITmng3694ReactorProjectsDynamismTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng3694ReactorProjectsDynamismTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenITmng3694ReactorProjectsDynamismTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng3694ReactorProjectsDynamismTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     @Test
-    public void testitMNG3694 ()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3694" );
+    public void testitMNG3694() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3694");
 
-        File pluginDir = new File( testDir, "maven-mng3694-plugin" );
-        File projectDir = new File( testDir, "projects" );
+        File pluginDir = new File(testDir, "maven-mng3694-plugin");
+        File projectDir = new File(testDir, "projects");
 
-        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        Verifier verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
 
-        verifier.addCliArgument( "install" );
+        verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier(projectDir.getAbsolutePath());
 
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }

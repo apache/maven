@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Map;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4679SnapshotUpdateInPluginTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4679SnapshotUpdateInPluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4679SnapshotUpdateInPluginTest()
-    {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-2,)" );
+    public MavenITmng4679SnapshotUpdateInPluginTest() {
+        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
     }
 
     /**
@@ -48,49 +43,43 @@ public class MavenITmng4679SnapshotUpdateInPluginTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4679" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4679");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4679" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4679");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
 
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
 
-        filterProps.put( "@repo@", "repo-1" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-force-1.txt" );
-        verifier.addCliArgument( "validate" );
+        filterProps.put("@repo@", "repo-1");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-force-1.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        assertChecksum( verifier, "jar", "2ea5c3d713bbaba7b87746449b91cd00e876703d" );
-        assertChecksum( verifier, "pom", "0b58dbbc61f81b85a70692ffdce88cf1892a8da4" );
+        assertChecksum(verifier, "jar", "2ea5c3d713bbaba7b87746449b91cd00e876703d");
+        assertChecksum(verifier, "pom", "0b58dbbc61f81b85a70692ffdce88cf1892a8da4");
 
-        filterProps.put( "@repo@", "repo-2" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-force-2.txt" );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-U" );
-        verifier.addCliArgument( "validate" );
+        filterProps.put("@repo@", "repo-2");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-force-2.txt");
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-U");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-
-        assertChecksum( verifier, "jar", "f3d46277c2ab45ff9bbd97605c942bed7fc27f97" );
-        assertChecksum( verifier, "pom", "127f0dc26035352bb54890315ad7d2ada067756a" );
+        assertChecksum(verifier, "jar", "f3d46277c2ab45ff9bbd97605c942bed7fc27f97");
+        assertChecksum(verifier, "pom", "127f0dc26035352bb54890315ad7d2ada067756a");
     }
 
-    private void assertChecksum( Verifier verifier, String ext, String checksum )
-        throws Exception
-    {
-        String path = verifier.getArtifactPath( "org.apache.maven.its.mng4679", "dep", "0.1-SNAPSHOT", ext );
-        String actual = ItUtils.calcHash( new File( path ), "SHA-1" );
-        assertEquals( checksum, actual );
+    private void assertChecksum(Verifier verifier, String ext, String checksum) throws Exception {
+        String path = verifier.getArtifactPath("org.apache.maven.its.mng4679", "dep", "0.1-SNAPSHOT", ext);
+        String actual = ItUtils.calcHash(new File(path), "SHA-1");
+        assertEquals(checksum, actual);
     }
-
 }

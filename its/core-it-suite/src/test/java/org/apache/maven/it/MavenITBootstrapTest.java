@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,12 +31,9 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITBootstrapTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITBootstrapTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenITBootstrapTest extends AbstractMavenIntegrationTestCase {
+    public MavenITBootstrapTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -47,22 +42,20 @@ public class MavenITBootstrapTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testBootstrap()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/bootstrap" );
+    public void testBootstrap() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/bootstrap");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.setAutoclean( false );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.addCliArgument( "-Dbootstrap=" + getClass().getResource( "/bootstrap.txt" ).toURI().getPath() );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("-Dbootstrap="
+                + getClass().getResource("/bootstrap.txt").toURI().getPath());
 
         // bootstrap plugin is bound to this phase, do not go further
         // important: maven-plugin packaging will fail at package phase, as there is no Mojo present!
-        verifier.addCliArgument( "process-resources" );
+        verifier.addCliArgument("process-resources");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng2591MergeInheritedPluginConfigTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng2591MergeInheritedPluginConfigTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2591MergeInheritedPluginConfigTest()
-    {
-        super( "(2.0.7,)" );
+    public MavenITmng2591MergeInheritedPluginConfigTest() {
+        super("(2.0.7,)");
     }
 
     /**
@@ -49,10 +44,8 @@ public class MavenITmng2591MergeInheritedPluginConfigTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitNoProfile()
-        throws Exception
-    {
-        testit( "no-profile" );
+    public void testitNoProfile() throws Exception {
+        testit("no-profile");
     }
 
     /**
@@ -62,44 +55,39 @@ public class MavenITmng2591MergeInheritedPluginConfigTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitWithProfile()
-        throws Exception
-    {
-        testit( "with-profile" );
+    public void testitWithProfile() throws Exception {
+        testit("with-profile");
     }
 
-    private void testit( String project )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2591/" + project );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "subproject/target" );
-        verifier.addCliArgument( "validate" );
+    private void testit(String project) throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2591/" + project);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("subproject/target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "subproject/target/config.properties" );
+        Properties props = verifier.loadProperties("subproject/target/config.properties");
 
-        assertEquals( "8", props.getProperty( "stringParams" ) );
-        assertEquals( "PARENT-1", props.getProperty( "stringParams.0" ) );
-        assertEquals( "PARENT-3", props.getProperty( "stringParams.1" ) );
-        assertEquals( "PARENT-2", props.getProperty( "stringParams.2" ) );
-        assertEquals( "PARENT-4", props.getProperty( "stringParams.3" ) );
-        assertEquals( "CHILD-1", props.getProperty( "stringParams.4" ) );
-        assertEquals( "CHILD-3", props.getProperty( "stringParams.5" ) );
-        assertEquals( "CHILD-2", props.getProperty( "stringParams.6" ) );
-        assertEquals( "CHILD-4", props.getProperty( "stringParams.7" ) );
+        assertEquals("8", props.getProperty("stringParams"));
+        assertEquals("PARENT-1", props.getProperty("stringParams.0"));
+        assertEquals("PARENT-3", props.getProperty("stringParams.1"));
+        assertEquals("PARENT-2", props.getProperty("stringParams.2"));
+        assertEquals("PARENT-4", props.getProperty("stringParams.3"));
+        assertEquals("CHILD-1", props.getProperty("stringParams.4"));
+        assertEquals("CHILD-3", props.getProperty("stringParams.5"));
+        assertEquals("CHILD-2", props.getProperty("stringParams.6"));
+        assertEquals("CHILD-4", props.getProperty("stringParams.7"));
 
-        assertEquals( "8", props.getProperty( "listParam" ) );
-        assertEquals( "PARENT-1", props.getProperty( "listParam.0" ) );
-        assertEquals( "PARENT-3", props.getProperty( "listParam.1" ) );
-        assertEquals( "PARENT-2", props.getProperty( "listParam.2" ) );
-        assertEquals( "PARENT-4", props.getProperty( "listParam.3" ) );
-        assertEquals( "CHILD-1", props.getProperty( "listParam.4" ) );
-        assertEquals( "CHILD-3", props.getProperty( "listParam.5" ) );
-        assertEquals( "CHILD-2", props.getProperty( "listParam.6" ) );
-        assertEquals( "CHILD-4", props.getProperty( "listParam.7" ) );
+        assertEquals("8", props.getProperty("listParam"));
+        assertEquals("PARENT-1", props.getProperty("listParam.0"));
+        assertEquals("PARENT-3", props.getProperty("listParam.1"));
+        assertEquals("PARENT-2", props.getProperty("listParam.2"));
+        assertEquals("PARENT-4", props.getProperty("listParam.3"));
+        assertEquals("CHILD-1", props.getProperty("listParam.4"));
+        assertEquals("CHILD-3", props.getProperty("listParam.5"));
+        assertEquals("CHILD-2", props.getProperty("listParam.6"));
+        assertEquals("CHILD-4", props.getProperty("listParam.7"));
     }
-
 }

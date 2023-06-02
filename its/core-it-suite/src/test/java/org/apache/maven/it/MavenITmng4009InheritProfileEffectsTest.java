@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng4009InheritProfileEffectsTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4009InheritProfileEffectsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4009InheritProfileEffectsTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng4009InheritProfileEffectsTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -48,22 +43,19 @@ public class MavenITmng4009InheritProfileEffectsTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG4009()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4009" );
+    public void testitMNG4009() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4009");
 
-        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-Pparent-profile" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-Pparent-profile");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/profile.properties" );
+        Properties props = verifier.loadProperties("target/profile.properties");
 
-        assertEquals( "PASSED", props.getProperty( "project.properties.parentProfileProperty" ) );
+        assertEquals("PASSED", props.getProperty("project.properties.parentProfileProperty"));
     }
-
 }

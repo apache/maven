@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,114 +32,103 @@ import org.junit.jupiter.api.Test;
  *
  * @author Martin Kanters
  */
-public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenIntegrationTestCase {
 
     private File moduleADir;
 
-    public MavenITmng7390SelectModuleOutsideCwdTest()
-    {
-        super( "[4.0.0-alpha-1,)" );
+    public MavenITmng7390SelectModuleOutsideCwdTest() {
+        super("[4.0.0-alpha-1,)");
     }
 
     @BeforeEach
-    protected void setUp() throws Exception
-    {
-        moduleADir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7390-pl-outside-cwd/module-a" );
+    protected void setUp() throws Exception {
+        moduleADir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7390-pl-outside-cwd/module-a");
 
         // Clean up target files from earlier runs (verifier.setAutoClean does not work, as we are reducing the reactor)
-        final Verifier verifier = newVerifier( moduleADir.getAbsolutePath() );
-        verifier.addCliArgument( "-f" );
-        verifier.addCliArgument( ".." );
-        verifier.addCliArgument( "clean" );
+        final Verifier verifier = newVerifier(moduleADir.getAbsolutePath());
+        verifier.addCliArgument("-f");
+        verifier.addCliArgument("..");
+        verifier.addCliArgument("clean");
         verifier.execute();
     }
 
     @Test
-    public void testSelectModuleByCoordinate() throws Exception
-    {
-        final Verifier verifier = newVerifier( moduleADir.getAbsolutePath() );
+    public void testSelectModuleByCoordinate() throws Exception {
+        final Verifier verifier = newVerifier(moduleADir.getAbsolutePath());
 
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( ":module-b" );
-        verifier.setLogFileName( "log-module-by-coordinate.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument(":module-b");
+        verifier.setLogFileName("log-module-by-coordinate.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
-        verifier.verifyFileNotPresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "../target/touch.txt" );
-        verifier.verifyFilePresent( "../module-b/target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
+        verifier.verifyFileNotPresent("../target/touch.txt");
+        verifier.verifyFilePresent("../module-b/target/touch.txt");
     }
 
     @Test
-    public void testSelectMultipleModulesByCoordinate() throws Exception
-    {
-        final Verifier verifier = newVerifier( moduleADir.getAbsolutePath() );
+    public void testSelectMultipleModulesByCoordinate() throws Exception {
+        final Verifier verifier = newVerifier(moduleADir.getAbsolutePath());
 
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( ":module-b,:module-a" );
-        verifier.setLogFileName( "log-modules-by-coordinate.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument(":module-b,:module-a");
+        verifier.setLogFileName("log-modules-by-coordinate.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
-        verifier.verifyFilePresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "../target/touch.txt" );
-        verifier.verifyFilePresent( "../module-b/target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
+        verifier.verifyFileNotPresent("../target/touch.txt");
+        verifier.verifyFilePresent("../module-b/target/touch.txt");
     }
 
     @Test
-    public void testSelectModuleByRelativePath() throws Exception
-    {
-        final Verifier verifier = newVerifier( moduleADir.getAbsolutePath() );
+    public void testSelectModuleByRelativePath() throws Exception {
+        final Verifier verifier = newVerifier(moduleADir.getAbsolutePath());
 
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "../module-b" );
-        verifier.setLogFileName( "log-module-by-relative-path.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("../module-b");
+        verifier.setLogFileName("log-module-by-relative-path.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
-        verifier.verifyFileNotPresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "../target/touch.txt" );
-        verifier.verifyFilePresent( "../module-b/target/touch.txt" );
+        verifier.verifyFileNotPresent("target/touch.txt");
+        verifier.verifyFileNotPresent("../target/touch.txt");
+        verifier.verifyFilePresent("../module-b/target/touch.txt");
     }
 
     @Test
-    public void testSelectModulesByRelativePath() throws Exception
-    {
-        final Verifier verifier = newVerifier( moduleADir.getAbsolutePath() );
+    public void testSelectModulesByRelativePath() throws Exception {
+        final Verifier verifier = newVerifier(moduleADir.getAbsolutePath());
 
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "../module-b,." );
-        verifier.setLogFileName( "log-modules-by-relative-path.txt" );
-        verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("../module-b,.");
+        verifier.setLogFileName("log-modules-by-relative-path.txt");
+        verifier.addCliArgument("validate");
         verifier.execute();
-        verifier.verifyFilePresent( "target/touch.txt" );
-        verifier.verifyFileNotPresent( "../target/touch.txt" );
-        verifier.verifyFilePresent( "../module-b/target/touch.txt" );
+        verifier.verifyFilePresent("target/touch.txt");
+        verifier.verifyFileNotPresent("../target/touch.txt");
+        verifier.verifyFilePresent("../module-b/target/touch.txt");
     }
 
     /**
-     Maven determines whether the target module is in a multi-module project based on the presence of a .mvn directory in root.
-     This test verifies that when that directory is missing, the module cannot be found.
+     * Maven determines whether the target module is in a multi-module project based on the presence of a .mvn directory in root.
+     * This test verifies that when that directory is missing, the module cannot be found.
      */
     @Test
-    public void testSelectModulesOutsideCwdDoesNotWorkWhenDotMvnIsNotPresent() throws Exception
-    {
+    public void testSelectModulesOutsideCwdDoesNotWorkWhenDotMvnIsNotPresent() throws Exception {
         final String noDotMvnPath = "/mng-7390-pl-outside-cwd-no-dotmvn/module-a";
-        final File noDotMvnDir = ResourceExtractor.simpleExtractResources( getClass(), noDotMvnPath );
-        final Verifier verifier = newVerifier( noDotMvnDir.getAbsolutePath() );
+        final File noDotMvnDir = ResourceExtractor.simpleExtractResources(getClass(), noDotMvnPath);
+        final Verifier verifier = newVerifier(noDotMvnDir.getAbsolutePath());
 
-        verifier.addCliArgument( "-pl" );
-        verifier.addCliArgument( "../module-b" );
-        verifier.setLogFileName( "log-modules-by-relative-path-no-dotmvn.txt" );
-        try
-        {
-            verifier.addCliArgument( "validate" );
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument("../module-b");
+        verifier.setLogFileName("log-modules-by-relative-path-no-dotmvn.txt");
+        try {
+            verifier.addCliArgument("validate");
             verifier.execute();
-            fail( "Expected goal to fail" );
-        }
-        catch ( VerificationException e )
-        {
-            verifier.verifyFileNotPresent( "target/touch.txt" );
-            verifier.verifyFileNotPresent( "../target/touch.txt" );
-            verifier.verifyFileNotPresent( "../module-b/target/touch.txt" );
+            fail("Expected goal to fail");
+        } catch (VerificationException e) {
+            verifier.verifyFileNotPresent("target/touch.txt");
+            verifier.verifyFileNotPresent("../target/touch.txt");
+            verifier.verifyFileNotPresent("../module-b/target/touch.txt");
         }
     }
 }

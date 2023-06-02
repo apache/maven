@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,12 +31,9 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng0836PluginParentResolutionTest
-    extends AbstractMavenIntegrationTestCase
-{
-    public MavenITmng0836PluginParentResolutionTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+public class MavenITmng0836PluginParentResolutionTest extends AbstractMavenIntegrationTestCase {
+    public MavenITmng0836PluginParentResolutionTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     /**
@@ -49,39 +44,30 @@ public class MavenITmng0836PluginParentResolutionTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG836()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0836" );
+    public void testitMNG836() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0836");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng836" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng836");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
         // Maven 3.x aims to separate plugins and project dependencies (MNG-4191)
-        if ( matchesVersionRange( "(,3.0-alpha-1),(3.0-alpha-1,3.0-alpha-7)" ) )
-        {
-            verifier.addCliArgument( "validate" );
+        if (matchesVersionRange("(,3.0-alpha-1),(3.0-alpha-1,3.0-alpha-7)")) {
+            verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-        }
-        else
-        {
-            try
-            {
-                verifier.addCliArgument( "validate" );
+        } else {
+            try {
+                verifier.addCliArgument("validate");
                 verifier.execute();
                 verifier.verifyErrorFreeLog();
-                fail( "Plugin parent POM was erroneously resolved from non-plugin repository." );
-            }
-            catch ( VerificationException e )
-            {
+                fail("Plugin parent POM was erroneously resolved from non-plugin repository.");
+            } catch (VerificationException e) {
                 // expected
             }
         }
     }
-
 }

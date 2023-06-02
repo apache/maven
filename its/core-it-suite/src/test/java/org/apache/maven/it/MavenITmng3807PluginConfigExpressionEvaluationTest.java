@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng3807PluginConfigExpressionEvaluationTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng3807PluginConfigExpressionEvaluationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3807PluginConfigExpressionEvaluationTest()
-    {
-        super( "[3.0-alpha-3,)" );
+    public MavenITmng3807PluginConfigExpressionEvaluationTest() {
+        super("[3.0-alpha-3,)");
     }
 
     /**
@@ -48,37 +43,33 @@ public class MavenITmng3807PluginConfigExpressionEvaluationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3807" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3807");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties( "target/config.properties" );
+        Properties props = verifier.loadProperties("target/config.properties");
 
-        assertEvaluated( props.getProperty( "stringParams.0" ) );
-        assertEvaluated( props.getProperty( "stringParams.1" ) );
+        assertEvaluated(props.getProperty("stringParams.0"));
+        assertEvaluated(props.getProperty("stringParams.1"));
 
-        assertEvaluated( props.getProperty( "listParam.0" ) );
-        assertEvaluated( props.getProperty( "listParam.1" ) );
+        assertEvaluated(props.getProperty("listParam.0"));
+        assertEvaluated(props.getProperty("listParam.1"));
 
-        assertEvaluated( props.getProperty( "mapParam.test0" ) );
-        assertEvaluated( props.getProperty( "mapParam.test1" ) );
+        assertEvaluated(props.getProperty("mapParam.test0"));
+        assertEvaluated(props.getProperty("mapParam.test1"));
 
-        assertEvaluated( props.getProperty( "propertiesParam.test0" ) );
-        assertEvaluated( props.getProperty( "propertiesParam.test1" ) );
+        assertEvaluated(props.getProperty("propertiesParam.test0"));
+        assertEvaluated(props.getProperty("propertiesParam.test1"));
     }
 
-    private void assertEvaluated( String value )
-    {
-        assertNotNull( value );
-        assertTrue( value.length() > 0 );
-        assertFalse( value, value.contains( "${" ) );
+    private void assertEvaluated(String value) {
+        assertNotNull(value);
+        assertTrue(value.length() > 0);
+        assertFalse(value, value.contains("${"));
     }
-
 }

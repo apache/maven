@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
+package org.apache.maven.plugin.coreit;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,20 +25,24 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Collection;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+
 /**
  * Provides common services for all mojos of this plugin.
  *
  * @author Benjamin Bentmann
  *
  */
-public abstract class AbstractDependencyMojo
-    extends AbstractMojo
-{
+public abstract class AbstractDependencyMojo extends AbstractMojo {
 
     /**
      * The current Maven project.
      */
-    @Parameter( defaultValue = "${project}", required = true, readonly = true )
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     protected MavenProject project;
 
     /**
@@ -56,56 +53,41 @@ public abstract class AbstractDependencyMojo
      * @param artifacts The list of artifacts to write to the file, may be <code>null</code>.
      * @throws MojoExecutionException If the output file could not be written.
      */
-    protected void writeArtifacts( String pathname, Collection artifacts )
-        throws MojoExecutionException
-    {
-        if ( pathname == null || pathname.length() <= 0 )
-        {
+    protected void writeArtifacts(String pathname, Collection artifacts) throws MojoExecutionException {
+        if (pathname == null || pathname.length() <= 0) {
             return;
         }
 
-        File file = resolveFile( pathname );
+        File file = resolveFile(pathname);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Dumping artifact list: " + file );
+        getLog().info("[MAVEN-CORE-IT-LOG] Dumping artifact list: " + file);
 
         BufferedWriter writer = null;
-        try
-        {
+        try {
             file.getParentFile().mkdirs();
 
-            writer = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), "UTF-8" ) );
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 
-            if ( artifacts != null )
-            {
-                for ( Object artifact1 : artifacts )
-                {
+            if (artifacts != null) {
+                for (Object artifact1 : artifacts) {
                     Artifact artifact = (Artifact) artifact1;
-                    writer.write( artifact.getId() );
+                    writer.write(artifact.getId());
                     String optional = "";
-                    if ( artifact.isOptional() )
-                    {
+                    if (artifact.isOptional()) {
                         optional = " (optional)";
-                        writer.write( optional );
+                        writer.write(optional);
                     }
                     writer.newLine();
-                    getLog().info( "[MAVEN-CORE-IT-LOG]   " + artifact.getId() + optional );
+                    getLog().info("[MAVEN-CORE-IT-LOG]   " + artifact.getId() + optional);
                 }
             }
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Failed to write artifact list", e );
-        }
-        finally
-        {
-            if ( writer != null )
-            {
-                try
-                {
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to write artifact list", e);
+        } finally {
+            if (writer != null) {
+                try {
                     writer.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // just ignore
                 }
             }
@@ -113,21 +95,17 @@ public abstract class AbstractDependencyMojo
     }
 
     // NOTE: We don't want to test path translation here so resolve relative path manually for robustness
-    private File resolveFile( String pathname )
-    {
+    private File resolveFile(String pathname) {
         File file = null;
 
-        if ( pathname != null )
-        {
-            file = new File( pathname );
+        if (pathname != null) {
+            file = new File(pathname);
 
-            if ( !file.isAbsolute() )
-            {
-                file = new File( project.getBasedir(), pathname );
+            if (!file.isAbsolute()) {
+                file = new File(project.getBasedir(), pathname);
             }
         }
 
         return file;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,37 +32,24 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Benjamin Bentmann
  *
  */
-class PropertiesUtil
-{
+class PropertiesUtil {
 
-    public static void write( File outputFile, Properties props )
-        throws MojoExecutionException
-    {
+    public static void write(File outputFile, Properties props) throws MojoExecutionException {
         OutputStream out = null;
-        try
-        {
+        try {
             outputFile.getParentFile().mkdirs();
-            out = new FileOutputStream( outputFile );
-            props.store( out, "MAVEN-CORE-IT-LOG" );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Output file could not be created: " + outputFile, e );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                try
-                {
+            out = new FileOutputStream(outputFile);
+            props.store(out, "MAVEN-CORE-IT-LOG");
+        } catch (IOException e) {
+            throw new MojoExecutionException("Output file could not be created: " + outputFile, e);
+        } finally {
+            if (out != null) {
+                try {
                     out.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // just ignore
                 }
             }
         }
     }
-
 }

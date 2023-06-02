@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Map;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,13 +30,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4433ForceParentSnapshotUpdateTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng4433ForceParentSnapshotUpdateTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4433ForceParentSnapshotUpdateTest()
-    {
-        super( "[2.0,3.0-alpha-1),[3.0-alpha-4,)" );
+    public MavenITmng4433ForceParentSnapshotUpdateTest() {
+        super("[2.0,3.0-alpha-1),[3.0-alpha-4,)");
     }
 
     /**
@@ -47,42 +42,38 @@ public class MavenITmng4433ForceParentSnapshotUpdateTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testit()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4433" );
+    public void testit() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4433");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4433" );
-        verifier.addCliArgument( "-s" );
-        verifier.addCliArgument( "settings.xml" );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4433");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
 
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
 
-        filterProps.put( "@repo@", "repo-1" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-force-1.txt" );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "validate" );
+        filterProps.put("@repo@", "repo-1");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-force-1.txt");
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent( "target/old.txt" );
-        verifier.verifyFileNotPresent( "target/new.txt" );
+        verifier.verifyFilePresent("target/old.txt");
+        verifier.verifyFileNotPresent("target/new.txt");
 
-        filterProps.put( "@repo@", "repo-2" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.setLogFileName( "log-force-2.txt" );
-        verifier.deleteDirectory( "target" );
-        verifier.addCliArgument( "-U" );
-        verifier.addCliArgument( "validate" );
+        filterProps.put("@repo@", "repo-2");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.setLogFileName("log-force-2.txt");
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("-U");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-
-        verifier.verifyFileNotPresent( "target/old.txt" );
-        verifier.verifyFilePresent( "target/new.txt" );
+        verifier.verifyFileNotPresent("target/old.txt");
+        verifier.verifyFilePresent("target/new.txt");
     }
-
 }

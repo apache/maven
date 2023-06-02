@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,11 +38,9 @@ import org.apache.maven.toolchain.ToolchainManager;
  * Finds a tool from a previously selected toolchain. This tests the public API just like toolchain-enabled plugins
  * would do.
  *
-  */
-@Mojo( name = "find-tool", defaultPhase = LifecyclePhase.VALIDATE )
-public class FindToolMojo
-    extends AbstractMojo
-{
+ */
+@Mojo(name = "find-tool", defaultPhase = LifecyclePhase.VALIDATE)
+public class FindToolMojo extends AbstractMojo {
 
     /**
      */
@@ -53,68 +50,55 @@ public class FindToolMojo
     /**
      * The current Maven session holding the selected toolchain.
      */
-    @Parameter( defaultValue = "${session}", required = true, readonly = true )
+    @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession session;
 
     /**
      * The path to the output file for the properties.
      */
-    @Parameter( property = "toolchain.outputFile", defaultValue = "${project.build.directory}/tool.properties" )
+    @Parameter(property = "toolchain.outputFile", defaultValue = "${project.build.directory}/tool.properties")
     private File outputFile;
 
     /**
      * The type identifier of the toolchain, e.g. "jdk".
      */
-    @Parameter( property = "toolchain.type" )
+    @Parameter(property = "toolchain.type")
     private String type;
 
     /**
      * The name of the tool, e.g. "javac".
      */
-    @Parameter( property = "toolchain.tool" )
+    @Parameter(property = "toolchain.tool")
     private String tool;
 
-    public void execute()
-        throws MojoExecutionException
-    {
-        Toolchain toolchain = toolchainManager.getToolchainFromBuildContext( type, session );
+    public void execute() throws MojoExecutionException {
+        Toolchain toolchain = toolchainManager.getToolchainFromBuildContext(type, session);
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Toolchain in session: " + toolchain );
+        getLog().info("[MAVEN-CORE-IT-LOG] Toolchain in session: " + toolchain);
 
         Properties properties = new Properties();
 
-        if ( toolchain != null )
-        {
-            properties.setProperty( "toolchain.type", toolchain.getType() );
+        if (toolchain != null) {
+            properties.setProperty("toolchain.type", toolchain.getType());
 
-            String path = toolchain.findTool( tool );
-            if ( path != null )
-            {
-                properties.setProperty( "tool." + tool, path );
+            String path = toolchain.findTool(tool);
+            if (path != null) {
+                properties.setProperty("tool." + tool, path);
             }
         }
 
         OutputStream out = null;
-        try
-        {
+        try {
             outputFile.getParentFile().mkdirs();
-            out = new FileOutputStream( outputFile );
-            properties.store( out, "MAVEN-CORE-IT-LOG" );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                try
-                {
+            out = new FileOutputStream(outputFile);
+            properties.store(out, "MAVEN-CORE-IT-LOG");
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        } finally {
+            if (out != null) {
+                try {
                     out.close();
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     // ignore
                 }
             }

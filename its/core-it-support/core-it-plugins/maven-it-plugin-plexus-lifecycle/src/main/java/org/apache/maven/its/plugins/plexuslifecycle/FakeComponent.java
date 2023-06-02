@@ -1,5 +1,3 @@
-package org.apache.maven.its.plugins.plexuslifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,11 @@ package org.apache.maven.its.plugins.plexuslifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.its.plugins.plexuslifecycle;
 
 /**
  * @author Olivier Lamy
  */
-public interface FakeComponent
-{
+public interface FakeComponent {
     void doNothing();
 }

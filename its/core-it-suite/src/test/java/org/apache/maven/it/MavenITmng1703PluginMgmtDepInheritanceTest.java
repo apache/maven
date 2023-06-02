@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,13 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng1703PluginMgmtDepInheritanceTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng1703PluginMgmtDepInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1703PluginMgmtDepInheritanceTest()
-    {
-        super( "(2.0.2,)" );
+    public MavenITmng1703PluginMgmtDepInheritanceTest() {
+        super("(2.0.2,)");
     }
 
     /**
@@ -49,31 +44,28 @@ public class MavenITmng1703PluginMgmtDepInheritanceTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG1703()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1703" );
+    public void testitMNG1703() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1703");
 
-        Verifier verifier = newVerifier( new File( testDir, "child" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
-        verifier.addCliArgument( "--settings" );
-        verifier.addCliArgument( "settings.xml" );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng1703" );
-        verifier.addCliArgument( "validate" );
+        Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng1703");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
-        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );
-        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassB" ) );
-        assertNotNull( pclProps.getProperty( "org.apache.maven.its.mng1703.MNG1703" ) );
-        assertNotNull( pclProps.getProperty( "src/main/java/org/apache/maven/its/mng1703/MNG1703.java" ) );
-        assertEquals( "1", pclProps.getProperty( "src/main/java/org/apache/maven/its/mng1703/MNG1703.java.count" ) );
+        Properties pclProps = verifier.loadProperties("target/pcl.properties");
+        assertNotNull(pclProps.getProperty("org.apache.maven.plugin.coreit.ClassA"));
+        assertNotNull(pclProps.getProperty("org.apache.maven.plugin.coreit.ClassB"));
+        assertNotNull(pclProps.getProperty("org.apache.maven.its.mng1703.MNG1703"));
+        assertNotNull(pclProps.getProperty("src/main/java/org/apache/maven/its/mng1703/MNG1703.java"));
+        assertEquals("1", pclProps.getProperty("src/main/java/org/apache/maven/its/mng1703/MNG1703.java.count"));
 
-        Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
-        assertEquals( pclProps, tcclProps );
+        Properties tcclProps = verifier.loadProperties("target/tccl.properties");
+        assertEquals(pclProps, tcclProps);
     }
-
 }

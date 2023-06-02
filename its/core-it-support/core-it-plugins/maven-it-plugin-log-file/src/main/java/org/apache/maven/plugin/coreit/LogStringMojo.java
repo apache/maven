@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.coreit;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.coreit;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -27,19 +26,17 @@ import org.apache.maven.plugins.annotations.Parameter;
 /**
  * Appends a string to the log file.
  *
-  *
+ *
  * @author Benjamin Bentmann
  *
  */
-@Mojo( name = "log-string", defaultPhase = LifecyclePhase.INITIALIZE )
-public class LogStringMojo
-    extends AbstractLogMojo
-{
+@Mojo(name = "log-string", defaultPhase = LifecyclePhase.INITIALIZE)
+public class LogStringMojo extends AbstractLogMojo {
 
     /**
      * The string to append to the log file.
      */
-    @Parameter( property = "log.string" )
+    @Parameter(property = "log.string")
     private String string;
 
     /**
@@ -47,10 +44,7 @@ public class LogStringMojo
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
-    public void execute()
-        throws MojoExecutionException
-    {
-        append( string );
+    public void execute() throws MojoExecutionException {
+        append(string);
     }
-
 }

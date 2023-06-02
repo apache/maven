@@ -1,5 +1,3 @@
-package org.apache.maven.it;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.it;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+package org.apache.maven.it;
 
 import java.io.File;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,37 +30,28 @@ import org.junit.jupiter.api.Test;
  *
  *
  */
-public class MavenITmng1491ReactorArtifactIdCollisionTest
-    extends AbstractMavenIntegrationTestCase
-{
+public class MavenITmng1491ReactorArtifactIdCollisionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1491ReactorArtifactIdCollisionTest()
-    {
-        super( ALL_MAVEN_VERSIONS );
+    public MavenITmng1491ReactorArtifactIdCollisionTest() {
+        super(ALL_MAVEN_VERSIONS);
     }
 
     @Test
-    public void testitMNG1491()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1491" );
+    public void testitMNG1491() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1491");
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
 
-        try
-        {
-            verifier.addCliArgument( "initialize" );
+        try {
+            verifier.addCliArgument("initialize");
             verifier.execute();
 
             verifier.verifyErrorFreeLog();
 
-            fail( "Build should fail due to duplicate artifactId's in the reactor." );
-        }
-        catch( VerificationException e )
-        {
+            fail("Build should fail due to duplicate artifactId's in the reactor.");
+        } catch (VerificationException e) {
             // expected.
         }
     }
-
 }
