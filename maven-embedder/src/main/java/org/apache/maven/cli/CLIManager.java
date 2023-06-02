@@ -66,11 +66,27 @@ public class CLIManager {
 
     public static final char NON_RECURSIVE = 'N';
 
-    public static final char UPDATE_SNAPSHOTS = 'U';
-
     public static final char ACTIVATE_PROFILES = 'P';
 
+    /**
+     * @deprecated use {@link #UPDATE_ALWAYS_POLICY} or {@link #UPDATE_POLICY}
+     */
+    @Deprecated
+    public static final char UPDATE_SNAPSHOTS = 'U';
+
+    /**
+     * @deprecated use {@link #UPDATE_NEVER_POLICY}
+     */
+    @Deprecated
     public static final String SUPPRESS_SNAPSHOT_UPDATES = "nsu";
+
+    public static final char UPDATE_ALWAYS_POLICY = 'U';
+
+    public static final String UPDATE_NEVER_POLICY = "un";
+
+    public static final String UPDATE_DAILY_POLICY = "ud";
+
+    public static final String UPDATE_POLICY = "up";
 
     public static final char CHECKSUM_FAILURE_POLICY = 'C';
 
@@ -165,10 +181,6 @@ public class CLIManager {
                 .desc(
                         "Do not recurse into sub-projects. When used together with -pl, do not recurse into sub-projects of selected aggregators")
                 .build());
-        options.addOption(Option.builder(Character.toString(UPDATE_SNAPSHOTS))
-                .longOpt("update-snapshots")
-                .desc("Forces a check for missing releases and updated snapshots on remote repositories")
-                .build());
         options.addOption(Option.builder(Character.toString(ACTIVATE_PROFILES))
                 .longOpt("activate-profiles")
                 .desc(
@@ -188,9 +200,22 @@ public class CLIManager {
                 .desc(
                         "Run in interactive mode. Overrides, if applicable, the CI environment variable and --non-interactive/--batch-mode options")
                 .build());
-        options.addOption(Option.builder(SUPPRESS_SNAPSHOT_UPDATES)
-                .longOpt("no-snapshot-updates")
-                .desc("Suppress SNAPSHOT updates")
+        options.addOption(Option.builder(Character.toString(UPDATE_ALWAYS_POLICY))
+                .longOpt("update-always")
+                .desc("Forces a check for missing releases and updated snapshots on remote repositories")
+                .build());
+        options.addOption(Option.builder(UPDATE_NEVER_POLICY)
+                .longOpt("update-never")
+                .desc("Never checks for missing releases and updated snapshots on remote repositories")
+                .build());
+        options.addOption(Option.builder(UPDATE_DAILY_POLICY)
+                .longOpt("update-daily")
+                .desc("Daily checks for missing releases and updated snapshots on remote repositories")
+                .build());
+        options.addOption(Option.builder(UPDATE_POLICY)
+                .longOpt("update-policy")
+                .hasArg()
+                .desc("Specifies the policy for missing releases and updated snapshots on remote repositories")
                 .build());
         options.addOption(Option.builder(Character.toString(CHECKSUM_FAILURE_POLICY))
                 .longOpt("strict-checksums")
@@ -313,6 +338,16 @@ public class CLIManager {
         options.addOption(Option.builder()
                 .longOpt(DEBUG)
                 .desc("Produce execution verbose output (deprecated; only kept for backward compatibility)")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt("update-snapshots")
+                .desc(
+                        "Forces a check for missing releases and updated snapshots on remote repositories (deprecated; only kept for backward compatibility; use --update-always)")
+                .build());
+        options.addOption(Option.builder(SUPPRESS_SNAPSHOT_UPDATES)
+                .longOpt("no-snapshot-updates")
+                .desc(
+                        "Suppress SNAPSHOT updates (deprecated; only kept for backward compatibility; use --update-never)")
                 .build());
     }
 

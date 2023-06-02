@@ -174,9 +174,11 @@ public class DefaultRepositorySystemSessionFactory {
         session.setOffline(request.isOffline());
         session.setChecksumPolicy(request.getGlobalChecksumPolicy());
         session.setUpdatePolicy(
-                request.isNoSnapshotUpdates()
-                        ? RepositoryPolicy.UPDATE_POLICY_NEVER
-                        : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null);
+                request.getGlobalUpdatePolicy() != null
+                        ? request.getGlobalUpdatePolicy()
+                        : request.isNoSnapshotUpdates()
+                                ? RepositoryPolicy.UPDATE_POLICY_NEVER
+                                : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null);
 
         int errorPolicy = 0;
         errorPolicy |= request.isCacheNotFound()

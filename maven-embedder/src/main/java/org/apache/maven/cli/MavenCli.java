@@ -108,6 +108,7 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositoryCache;
+import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
@@ -1249,12 +1250,13 @@ public class MavenCli {
         File baseDirectory = new File(workingDirectory, "").getAbsoluteFile();
 
         disableInteractiveModeIfNeeded(cliRequest, request);
-        enableOnPresentOption(commandLine, CLIManager.SUPPRESS_SNAPSHOT_UPDATES, request::setNoSnapshotUpdates);
         request.setGoals(commandLine.getArgList());
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(commandLine));
         disableOnPresentOption(commandLine, CLIManager.NON_RECURSIVE, request::setRecursive);
         enableOnPresentOption(commandLine, CLIManager.OFFLINE, request::setOffline);
-        enableOnPresentOption(commandLine, CLIManager.UPDATE_SNAPSHOTS, request::setUpdateSnapshots);
+        enableOnPresentOption(commandLine, CLIManager.SUPPRESS_SNAPSHOT_UPDATES, request::setNoSnapshotUpdates);
+        enableOnPresentOption(commandLine, CLIManager.UPDATE_ALWAYS_POLICY, request::setUpdateSnapshots);
+        request.setGlobalUpdatePolicy(determineGlobalUpdatePolicy(commandLine));
         request.setGlobalChecksumPolicy(determineGlobalCheckPolicy(commandLine));
         request.setBaseDirectory(baseDirectory);
         request.setSystemProperties(cliRequest.systemProperties);
@@ -1485,6 +1487,20 @@ public class MavenCli {
             return MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
         } else if (commandLine.hasOption(CLIManager.CHECKSUM_WARNING_POLICY)) {
             return MavenExecutionRequest.CHECKSUM_POLICY_WARN;
+        } else {
+            return null;
+        }
+    }
+
+    private String determineGlobalUpdatePolicy(final CommandLine commandLine) {
+        if (commandLine.hasOption(CLIManager.UPDATE_POLICY)) {
+            return commandLine.getOptionValue(CLIManager.UPDATE_POLICY);
+        } else if (commandLine.hasOption(CLIManager.UPDATE_ALWAYS_POLICY)) {
+            return RepositoryPolicy.UPDATE_POLICY_ALWAYS;
+        } else if (commandLine.hasOption(CLIManager.UPDATE_NEVER_POLICY)) {
+            return RepositoryPolicy.UPDATE_POLICY_NEVER;
+        } else if (commandLine.hasOption(CLIManager.UPDATE_DAILY_POLICY)) {
+            return RepositoryPolicy.UPDATE_POLICY_DAILY;
         } else {
             return null;
         }

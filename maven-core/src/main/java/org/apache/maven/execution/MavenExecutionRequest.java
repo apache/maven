@@ -244,13 +244,25 @@ public interface MavenExecutionRequest {
     int getLoggingLevel();
 
     // Update snapshots
+    /** @deprecated use {@link #setGlobalUpdatePolicy(String)} instead */
+    @Deprecated
     MavenExecutionRequest setUpdateSnapshots(boolean updateSnapshots);
 
+    /** @deprecated use {@link #getGlobalUpdatePolicy()} instead */
+    @Deprecated
     boolean isUpdateSnapshots();
 
+    /** @deprecated use {@link #setGlobalUpdatePolicy(String)} instead */
+    @Deprecated
     MavenExecutionRequest setNoSnapshotUpdates(boolean noSnapshotUpdates);
 
+    /** @deprecated use {@link #getGlobalUpdatePolicy()} instead */
+    @Deprecated
     boolean isNoSnapshotUpdates();
+
+    MavenExecutionRequest setGlobalUpdatePolicy(String globalUpdatePolicy);
+
+    String getGlobalUpdatePolicy();
 
     // Checksum policy
     MavenExecutionRequest setGlobalChecksumPolicy(String globalChecksumPolicy);
