@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.model;
+package ${package};
 
 import java.io.IOError;
 import java.io.IOException;

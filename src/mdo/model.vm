@@ -31,6 +31,8 @@
     #set ( $dummy = $allFields.addAll( $cl.getFields($version) ) )
   #end
   #set ( $className = "${class.name}" )
+#MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/ImmutableCollections.java
+#parse ( "java/ImmutableCollections.java" )
 #MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/${className}.java
   #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
     #set ( $types = { } )

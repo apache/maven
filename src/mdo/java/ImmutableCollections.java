@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.model;
+package ${package};
 
 import java.io.Serializable;
 import java.util.AbstractList;

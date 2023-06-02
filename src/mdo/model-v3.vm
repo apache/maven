@@ -33,6 +33,10 @@
     #set ( $dummy = $allFields.addAll( $cl.allFields ) )
   #end
   #set ( $className = "${class.name}" )
+#MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/WrapperList.java
+#parse ( "java/WrapperList.java" )
+#MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/WrapperProperties.java
+#parse ( "java/WrapperProperties.java" )
 #MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/${className}.java
   #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
     #set ( $types = { } )
