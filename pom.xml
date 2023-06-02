@@ -143,7 +143,6 @@ under the License.
     <cipherVersion>2.0</cipherVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <resolverVersion>1.9.10</resolverVersion>
-    <sisuVersion>0.9.0.M2</sisuVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
     <xmlunitVersion>2.9.1</xmlunitVersion>
     <powermockVersion>2.0.9</powermockVersion>
