@@ -299,8 +299,8 @@ under the License.
           <name>updatePolicy</name>
           <version>1.0.0</version>
           <description>
-            The frequency for downloading updates - can be "always", "daily" (default), "interval:XXX" (in minutes) or
-            "never" (only if it doesn't exist locally).
+            The frequency for downloading updates - can be "always", "daily", "interval:XXX" (in minutes) or
+            "never" (default, only if it doesn't exist locally).
           </description>
           <type>String</type>
         </field>
