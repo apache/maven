@@ -31,7 +31,7 @@ import java.util.Objects;
 
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.v4.SettingsXpp3Writer;
-import org.codehaus.plexus.util.WriterFactory;
+import org.codehaus.plexus.util.xml.XmlStreamWriter;
 
 /**
  * Handles serialization of settings into the default textual format.
@@ -49,7 +49,7 @@ public class DefaultSettingsWriter implements SettingsWriter {
 
         output.getParentFile().mkdirs();
 
-        write(WriterFactory.newXmlWriter(output), options, settings);
+        write(new XmlStreamWriter(output), options, settings);
     }
 
     @Override

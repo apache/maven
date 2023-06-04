@@ -108,7 +108,6 @@ under the License.
     <module>maven-model-transform</module>
     <module>api</module>
     <module>maven-xml-impl</module>
-    <module>plexus-utils</module>
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
@@ -157,8 +156,8 @@ under the License.
     <mockitoVersion>4.11.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
-    <plexusUtilsVersion>4.0.0-alpha-6-SNAPSHOT</plexusUtilsVersion>
-    <plexusUtilsVersionEmbedded>3.5.1</plexusUtilsVersionEmbedded>
+    <plexusUtilsVersion>4.0.0</plexusUtilsVersion>
+    <plexusXmlVersion>4.0.0</plexusXmlVersion>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>30.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
@@ -206,9 +205,14 @@ under the License.
       <!--bootstrap-end-comment-->
       <!--  Plexus -->
       <dependency>
-        <groupId>org.apache.maven</groupId>
+        <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
         <version>${plexusUtilsVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-xml</artifactId>
+        <version>${plexusXmlVersion}</version>
       </dependency>
       <dependency>
         <groupId>com.google.inject</groupId>

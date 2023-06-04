@@ -31,7 +31,6 @@ under the License.
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
-        <exclude>org.codehaus.plexus:plexus-utils</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

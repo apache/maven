@@ -42,8 +42,8 @@ under the License.
       <version>4.0.0-alpha-6-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
     </dependency>
   </dependencies>
 

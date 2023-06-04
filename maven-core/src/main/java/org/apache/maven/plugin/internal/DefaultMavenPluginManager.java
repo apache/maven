@@ -29,7 +29,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -101,7 +100,6 @@ import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -264,10 +262,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private PluginDescriptor parsePluginDescriptor(InputStream is, Plugin plugin, String descriptorLocation)
             throws PluginDescriptorParsingException {
         try {
-            Reader reader = ReaderFactory.newXmlReader(is);
-
-            return builder.build(reader, descriptorLocation);
-        } catch (IOException | PlexusConfigurationException e) {
+            return builder.build(is, descriptorLocation);
+        } catch (PlexusConfigurationException e) {
             throw new PluginDescriptorParsingException(plugin, descriptorLocation, e);
         }
     }

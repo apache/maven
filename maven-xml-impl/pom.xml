@@ -41,8 +41,8 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>${plexusUtilsVersionEmbedded}</version>
+      <artifactId>plexus-xml</artifactId>
+      <version>${plexusXmlVersion}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
