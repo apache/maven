@@ -27,9 +27,10 @@ under the License.
     Plugin descriptor, stored in <code>META-INF/maven/plugin.xml</code> in a plugin's jar artifact.
     This descriptor is generally generated from plugin sources, using
     <a href="/plugins/maven-plugin-plugin/">maven-plugin-plugin</a>.
-    <p><i>Notice:</i> this documentation is generated from a Modello model but the code executed is not generated
-    from this descriptor. Please report if you find anything wrong.</p>
-    <p>An XSD is available at:<a href="https://maven.apache.org/xsd/plugin-1.1.0.xsd">https://maven.apache.org/xsd/plugin-1.1.0.xsd</a></p>
+    <p><i>Notice:</i> this documentation is generated from a Modello model but the
+    <a href="apidocs/org/apache/maven/plugin/descriptor/PluginDescriptor.html"><code>PluginDescriptor</code></a>/<a href="apidocs/org/apache/maven/plugin/descriptor/MojoDescriptor.html"><code>MojoDescriptor</code></a>
+    code executed is not generated from this model. Please report if you find anything wrong this documentation.</p>
+    <p>An XSD is available at <a href="https://maven.apache.org/xsd/plugin-1.1.0.xsd">https://maven.apache.org/xsd/plugin-1.1.0.xsd</a></p>
   ]]></description>
   <defaults>
     <default>
