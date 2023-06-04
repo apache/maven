@@ -25,15 +25,21 @@
 
 Maven Plugin API
 
- The API for plugins - composed of goals implemented by Mojos - development.
+ The API for plugins - composed of goals implemented by Mojos - development:
+
+ * goal code extends {{{./apidocs/org/apache/maven/plugin/AbstractMojo.html}<<<AbstractMojo>>> base class}} that implements {{{./apidocs/org/apache/maven/plugin/Mojo.html}<<<Mojo>>> interface}},
+
+ * {{{./apidocs/org/apache/maven/plugin/logging/Log.html}<<<Log>>> interface}} provides easy logging for the goal.
+
+ []
 
  A plugin is described in a {{{./plugin.html}<<<META-INF/maven/plugin.xml>>> plugin descriptor}},
- generally generated from plugin sources using {{{/plugin-tools/maven-plugin-plugin/}maven-plugin-plugin}}.
+ generally generated from plugin sources using {{{/plugin-tools/maven-plugin-plugin/}maven-plugin-plugin}} (other tools may generate it, or it could eventually be hand-written).
 
 * See Also
 
  * {{{/developers/mojo-api-specification.html}Mojo API Specification}}
 
- * {{{/plugin-tools/}plugin-tools}}
+ * {{{/plugin-tools/}Plugin Tools}} that provide {{{/plugin-tools/maven-plugin-plugin/}maven-plugin-plugin}} to generate the {{{./plugin.html}<<<META-INF/maven/plugin.xml>>> plugin descriptor}}
 
- * {{{/plugin-testing/}plugin-testing}}
+ * {{{/plugin-testing/}Plugin Testing}} frameworks

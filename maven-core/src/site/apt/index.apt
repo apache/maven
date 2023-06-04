@@ -49,7 +49,24 @@ Maven Core
 
  * <<<ProjectBuilder>>> component ({{{./apidocs/org/apache/maven/project/ProjectBuilder.html}javadoc}}),
  with its <<<DefaultProjectBuilder>>> implementation
- ({{{./xref/org/apache/maven/project/DefaultProjectBuilder.html}source}}),
+ ({{{./xref/org/apache/maven/project/DefaultProjectBuilder.html}source}}), to prepare {{{./apidocs/org/apache/maven/project/MavenProject.html}<<<MavenProject>>> descriptor}} from POM files,
+
+ * <<<LifecycleExecutor>>> component ({{{./apidocs/org/apache/maven/lifecycle/LifecycleExecutor.html}javadoc}}),
+ with its <<<DefaultLifecycleExecutor>>> implementation({{{/xref/org/apache/maven/lifecycle/DefaultLifecycleExecutor.html}source}}), to plan or execute tasks.\
+   on plugin goals execution order:
+
+   * <<in a given phase, goals order is not expected to be guaranteed nor finely tuned>>:
+     it is just a consequence of the order obtained during {{{../maven-model-builder/}effective model building}},
+     which combines profile activation+injection and inheritance assembly from parents,
+
+   * known limitations are notably that:
+
+     1. plugin goal execution in a child is usually simply appended (at end): you can't try to insert in the middle of pre-existing inherited executions,
+
+     2. append happens at plugin level first, then goal level, independently from phases.
+        This means for example that adding pluginA:goal2 to pre-existing (pluginA:goal1, pluginB:goal) will lead to (pluginA:goal1, pluginA:goal2, pluginB:goal)
+
+   * see effective POM as shown by {{{/plugins/maven-help-plugin/effective-pom-mojo.html}<<<help:effective-pom>>>}} to see the effective plugins then goals order.
 
  * <<<MavenPluginManager>>> component ({{{./apidocs/org/apache/maven/plugin/MavenPluginManager.html}javadoc}}),
  with its <<<DefaultMavenPluginManager>>> implementation
