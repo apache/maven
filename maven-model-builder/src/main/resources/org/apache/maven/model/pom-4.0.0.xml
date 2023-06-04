@@ -127,7 +127,7 @@ under the License.
             <artifactId>maven-javadoc-plugin</artifactId>
             <executions>
               <execution>
-                <id>attach-javadocs</id>
+                <id>attach-Javadocs</id>
                 <goals>
                   <goal>jar</goal>
                 </goals>

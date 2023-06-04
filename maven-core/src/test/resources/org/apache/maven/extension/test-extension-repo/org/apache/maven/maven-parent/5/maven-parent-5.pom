@@ -445,7 +445,7 @@ under the License.
             <version>2.2</version>
             <executions>
               <execution>
-                <id>attach-javadocs</id>
+                <id>attach-Javadocs</id>
                 <goals>
                   <goal>jar</goal>
                 </goals>
