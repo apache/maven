@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -54,6 +55,55 @@ public class BufferingParser implements XmlPullParser {
         public String text;
         public Attribute[] attributes;
         public Namespace[] namespaces;
+        public int columnNumber;
+        public int lineNumber;
+
+        public String positionDescription() {
+            return " " + TYPES[event] + " @" + lineNumber + ":" + columnNumber;
+        }
+
+        @Override
+        public String toString() {
+            switch (event) {
+                case START_DOCUMENT:
+                case END_DOCUMENT:
+                    return "Event{event=" + TYPES[event] + "'}";
+                case PROCESSING_INSTRUCTION:
+                case TEXT:
+                case CDSECT:
+                case ENTITY_REF:
+                case COMMENT:
+                case IGNORABLE_WHITESPACE:
+                    return "Event{event=" + TYPES[event] + ", text='" + text + "'}";
+                case START_TAG:
+                    return "Event{" + "event=START_TAG"
+                            + ", name='"
+                            + name + '\'' + ", prefix='"
+                            + prefix + '\'' + ", namespace='"
+                            + namespace + '\'' + ", empty="
+                            + empty + ", attributes="
+                            + Arrays.toString(attributes) + ", namespaces="
+                            + Arrays.toString(namespaces) + '}';
+                case END_TAG:
+                    return "Event{" + "event=END_TAG"
+                            + ", name='"
+                            + name + '\'' + ", prefix='"
+                            + prefix + '\'' + ", namespace='"
+                            + namespace + '\'' + ", empty="
+                            + empty + ", namespaces="
+                            + Arrays.toString(namespaces) + '}';
+                default:
+                    return "Event{" + "event="
+                            + TYPES[event] + ", name='"
+                            + name + '\'' + ", prefix='"
+                            + prefix + '\'' + ", namespace='"
+                            + namespace + '\'' + ", empty="
+                            + empty + ", text='"
+                            + text + '\'' + ", attributes="
+                            + Arrays.toString(attributes) + ", namespaces="
+                            + Arrays.toString(namespaces) + '}';
+            }
+        }
     }
 
     @SuppressWarnings("checkstyle:VisibilityModifier")
@@ -149,7 +199,7 @@ public class BufferingParser implements XmlPullParser {
     @Override
     public String getPositionDescription() {
         if (current != null) {
-            throw new IllegalStateException("Not supported during events replay");
+            return current.positionDescription();
         }
         return xmlPullParser.getPositionDescription();
     }
@@ -157,7 +207,7 @@ public class BufferingParser implements XmlPullParser {
     @Override
     public int getLineNumber() {
         if (current != null) {
-            throw new IllegalStateException("Not supported during events replay");
+            return current.lineNumber;
         }
         return xmlPullParser.getLineNumber();
     }
@@ -165,7 +215,7 @@ public class BufferingParser implements XmlPullParser {
     @Override
     public int getColumnNumber() {
         if (current != null) {
-            throw new IllegalStateException("Not supported during events replay");
+            return current.columnNumber;
         }
         return xmlPullParser.getColumnNumber();
     }
@@ -385,6 +435,8 @@ public class BufferingParser implements XmlPullParser {
         Event event = new Event();
         XmlPullParser pp = xmlPullParser;
         event.event = xmlPullParser.getEventType();
+        event.columnNumber = xmlPullParser.getColumnNumber();
+        event.lineNumber = xmlPullParser.getLineNumber();
         switch (event.event) {
             case START_DOCUMENT:
             case END_DOCUMENT:
@@ -415,6 +467,8 @@ public class BufferingParser implements XmlPullParser {
             case TEXT:
             case COMMENT:
             case IGNORABLE_WHITESPACE:
+            case CDSECT:
+            case ENTITY_REF:
                 event.text = pp.getText();
                 break;
             default:
