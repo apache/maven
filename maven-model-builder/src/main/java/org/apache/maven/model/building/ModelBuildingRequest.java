@@ -53,14 +53,19 @@ public interface ModelBuildingRequest {
     int VALIDATION_LEVEL_MAVEN_3_0 = 30;
 
     /**
-     * Denotes validation as performed by Maven 3.1. This validation level is meant for new projects.
+     * Denotes validation as performed by Maven 3.1. This validation level is meant for existing projects.
      */
     int VALIDATION_LEVEL_MAVEN_3_1 = 31;
 
     /**
+     * Denotes validation as performed by Maven 4.0. This validation level is meant for new projects.
+     */
+    int VALIDATION_LEVEL_MAVEN_4_0 = 40;
+
+    /**
      * Denotes strict validation as recommended by the current Maven version.
      */
-    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_1;
+    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_4_0;
 
     /**
      * Gets the file model to build (with profile activation).
