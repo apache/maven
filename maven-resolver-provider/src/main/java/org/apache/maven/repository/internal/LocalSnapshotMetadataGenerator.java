@@ -40,13 +40,9 @@ class LocalSnapshotMetadataGenerator implements MetadataGenerator {
 
     private Map<Object, LocalSnapshotMetadata> snapshots;
 
-    private final boolean legacyFormat;
-
     private final Date timestamp;
 
     LocalSnapshotMetadataGenerator(RepositorySystemSession session, InstallRequest request) {
-        legacyFormat = ConfigUtils.getBoolean(session.getConfigProperties(), false, "maven.metadata.legacy");
-
         timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
 
         snapshots = new LinkedHashMap<>();
@@ -58,7 +54,7 @@ class LocalSnapshotMetadataGenerator implements MetadataGenerator {
                 Object key = LocalSnapshotMetadata.getKey(artifact);
                 LocalSnapshotMetadata snapshotMetadata = snapshots.get(key);
                 if (snapshotMetadata == null) {
-                    snapshotMetadata = new LocalSnapshotMetadata(artifact, legacyFormat, timestamp);
+                    snapshotMetadata = new LocalSnapshotMetadata(artifact, timestamp);
                     snapshots.put(key, snapshotMetadata);
                 }
                 snapshotMetadata.bind(artifact);

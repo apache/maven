@@ -40,13 +40,9 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
 
     private final Map<Object, RemoteSnapshotMetadata> snapshots;
 
-    private final boolean legacyFormat;
-
     private final Date timestamp;
 
     RemoteSnapshotMetadataGenerator(RepositorySystemSession session, DeployRequest request) {
-        legacyFormat = ConfigUtils.getBoolean(session, false, "maven.metadata.legacy");
-
         timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
 
         snapshots = new LinkedHashMap<>();
@@ -71,7 +67,7 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
                 Object key = RemoteSnapshotMetadata.getKey(artifact);
                 RemoteSnapshotMetadata snapshotMetadata = snapshots.get(key);
                 if (snapshotMetadata == null) {
-                    snapshotMetadata = new RemoteSnapshotMetadata(artifact, legacyFormat, timestamp);
+                    snapshotMetadata = new RemoteSnapshotMetadata(artifact, timestamp);
                     snapshots.put(key, snapshotMetadata);
                 }
                 snapshotMetadata.bind(artifact);
