@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.transformation;
 
+import javax.annotation.PreDestroy;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -29,6 +30,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.BiConsumer;
 
 import org.apache.maven.feature.Features;
@@ -61,6 +64,8 @@ public final class ConsumerPomArtifactTransformer {
 
     private static final String CONSUMER_POM_CLASSIFIER = "consumer";
 
+    private final Set<Path> toDelete = new CopyOnWriteArraySet<>();
+
     public void injectTransformedArtifacts(MavenProject project, RepositorySystemSession session) throws IOException {
         if (project.getFile() == null) {
             // If there is no build POM there is no reason to inject artifacts for the consumer POM.
@@ -77,10 +82,26 @@ public final class ConsumerPomArtifactTransformer {
                 Files.createDirectories(buildDir);
                 generatedFile = Files.createTempFile(buildDir, CONSUMER_POM_CLASSIFIER, "pom");
             }
+            deferDeleteFile(generatedFile);
             project.addAttachedArtifact(new ConsumerPomArtifact(project, generatedFile, session));
         } else if (project.getModel().isRoot()) {
             throw new IllegalStateException(
                     "The use of the root attribute on the model requires the buildconsumer feature to be active");
+        }
+    }
+
+    private void deferDeleteFile(Path generatedFile) {
+        toDelete.add(generatedFile.toAbsolutePath());
+    }
+
+    @PreDestroy
+    private void doDeleteFiles() {
+        for (Path file : toDelete) {
+            try {
+                Files.delete(file);
+            } catch (IOException e) {
+                // ignore, we did our best...
+            }
         }
     }
 
