@@ -90,9 +90,15 @@ under the License.
             <id>modello-site-docs</id>
             <goals>
               <goal>xdoc</goal>
-              <goal>xsd</goal>
             </goals>
             <phase>pre-site</phase>
+          </execution>
+          <execution>
+            <id>modello-schema</id>
+            <goals>
+              <goal>xsd</goal>
+            </goals>
+            <phase>generate-resources</phase>
           </execution>
           <execution>
             <id>model-v3</id>

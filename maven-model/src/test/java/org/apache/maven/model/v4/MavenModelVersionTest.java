@@ -19,8 +19,12 @@
 package org.apache.maven.model.v4;
 
 import java.io.InputStream;
+import java.util.Collections;
 
+import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginExecution;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -57,6 +61,15 @@ class MavenModelVersionTest {
     @Test
     void testV4ModelPreserveModelVersion() {
         Model m = model.withPreserveModelVersion(true);
+        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
+    }
+
+    @Test
+    void testV4V4ModelPriority() {
+        Model m = model.withBuild(Build.newInstance()
+                .withPlugins(Collections.singleton(Plugin.newInstance()
+                        .withExecutions(Collections.singleton(
+                                PluginExecution.newInstance().withPriority(5))))));
         assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
     }
 }
