@@ -120,6 +120,7 @@ public class TestSuiteOrdering implements ClassOrderer {
          * the tests are to finishing. Newer tests are also more likely to fail, so this is
          * a fail fast technique as well.
          */
+        suite.addTestSuite(MavenITmng7740ConsumerBuildShouldCleanUpOldFilesTest.class);
         suite.addTestSuite(MavenITmng7587Jsr330.class);
         suite.addTestSuite(MavenITmng7038RootdirTest.class);
         suite.addTestSuite(MavenITmng7697PomWithEmojiTest.class);
