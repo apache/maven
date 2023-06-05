@@ -67,8 +67,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 
 @Generated
-public class ${className}
-{
+public class ${className} {
+
       //--------------------------/
      //- Class/Member Variables -/
     //--------------------------/
@@ -97,20 +97,18 @@ public class ${className}
      *
      * @param fileComment a fileComment object.
      */
-    public void setFileComment( String fileComment )
-    {
+    public void setFileComment(String fileComment) {
         this.fileComment = fileComment;
-    } //-- void setFileComment( String )
+    } //-- void setFileComment(String)
 
     /**
      * Method setStringFormatter.
      *
      * @param stringFormatter
      */
-    public void setStringFormatter( InputLocation.StringFormatter stringFormatter )
-    {
+    public void setStringFormatter(InputLocation.StringFormatter stringFormatter) {
         this.stringFormatter = stringFormatter;
-    } //-- void setStringFormatter( InputLocation.StringFormatter )
+    } //-- void setStringFormatter(InputLocation.StringFormatter)
 
     /**
      * Method write.
@@ -119,17 +117,15 @@ public class ${className}
      * @param ${rootLcapName} a ${root.name} object
      * @throws java.io.IOException java.io.IOException if any
      */
-    public void write( Writer writer, ${root.name} ${rootLcapName} )
-        throws java.io.IOException
-    {
+    public void write(Writer writer, ${root.name} ${rootLcapName}) throws java.io.IOException {
         XmlSerializer serializer = new MXSerializer();
-        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
-        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
-        serializer.setOutput( writer );
-        serializer.startDocument( ${rootLcapName}.getModelEncoding(), null );
-        write${root.name}( "$rootTag", ${rootLcapName}, serializer );
+        serializer.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  ");
+        serializer.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n");
+        serializer.setOutput(writer);
+        serializer.startDocument(${rootLcapName}.getModelEncoding(), null);
+        write${root.name}("$rootTag", ${rootLcapName}, serializer);
         serializer.endDocument();
-    } //-- void write( Writer, ${root.name} )
+    } //-- void write(Writer, ${root.name})
 
     /**
      * Method write.
@@ -138,17 +134,15 @@ public class ${className}
      * @param ${rootLcapName} a ${root.name} object
      * @throws java.io.IOException java.io.IOException if any
      */
-    public void write( OutputStream stream, ${root.name} ${rootLcapName} )
-        throws java.io.IOException
-    {
+    public void write(OutputStream stream, ${root.name} ${rootLcapName}) throws java.io.IOException {
         XmlSerializer serializer = new MXSerializer();
-        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
-        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
-        serializer.setOutput( stream, ${rootLcapName}.getModelEncoding() );
-        serializer.startDocument( ${rootLcapName}.getModelEncoding(), null );
-        write${root.name}( "$rootTag", ${rootLcapName}, serializer );
+        serializer.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  ");
+        serializer.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n");
+        serializer.setOutput(stream, ${rootLcapName}.getModelEncoding());
+        serializer.startDocument(${rootLcapName}.getModelEncoding(), null);
+        write${root.name}("$rootTag", ${rootLcapName}, serializer);
         serializer.endDocument();
-    } //-- void write( OutputStream, ${root.name} )
+    } //-- void write(OutputStream, ${root.name})
 
     /**
      * Method writeDomToSerializer.
@@ -157,29 +151,21 @@ public class ${className}
      * @param serializer a serializer object.
      * @throws java.io.IOException java.io.IOException if any.
      */
-    protected void writeDomToSerializer( org.apache.maven.api.xml.XmlNode dom, XmlSerializer serializer )
-        throws java.io.IOException
-    {
-        serializer.startTag( NAMESPACE, dom.getName() );
-
-        for ( Map.Entry<String, String> attribute : dom.getAttributes().entrySet() )
-        {
-            serializer.attribute( NAMESPACE, attribute.getKey(), attribute.getValue() );
+    protected void writeDomToSerializer(org.apache.maven.api.xml.XmlNode dom, XmlSerializer serializer) throws java.io.IOException {
+        serializer.startTag(NAMESPACE, dom.getName());
+        for (Map.Entry<String, String> attribute : dom.getAttributes().entrySet()) {
+            serializer.attribute(NAMESPACE, attribute.getKey(), attribute.getValue());
         }
-        for ( XmlNode aChild : dom.getChildren() )
-        {
-            writeDomToSerializer( aChild, serializer );
+        for (XmlNode aChild : dom.getChildren()) {
+            writeDomToSerializer(aChild, serializer);
         }
-
         String value = dom.getValue();
-        if ( value != null )
-        {
-            serializer.text( value );
+        if (value != null) {
+            serializer.text(value);
         }
+        serializer.endTag(NAMESPACE, dom.getName());
 
-        serializer.endTag( NAMESPACE, dom.getName() );
-
-    } //-- void writeDomToSerializer( org.apache.maven.api.xml.XmlNode, XmlSerializer )
+    } //-- void writeDomToSerializer(org.apache.maven.api.xml.XmlNode, XmlSerializer)
 
 
 #foreach ( $class in $model.allClasses )
@@ -187,35 +173,32 @@ public class ${className}
   #set ( $classUcapName = $Helper.capitalise( $class.name ) )
   #set ( $classLcapName = $Helper.uncapitalise( $class.name ) )
   #set ( $allFields = $Helper.xmlFields( $class ) )
-    private void write${classUcapName}( String tagName, ${classUcapName} ${classLcapName}, XmlSerializer serializer )
-        throws IOException
-    {
-        if ( ${classLcapName} != null )
-        {
+    private void write${classUcapName}(String tagName, ${classUcapName} ${classLcapName}, XmlSerializer serializer)
+        throws IOException {
+        if (${classLcapName} != null) {
   #if ( $class == $root )
-            if ( this.fileComment != null )
-            {
+            if (this.fileComment != null) {
                 serializer.comment(this.fileComment);
             }
-            serializer.setPrefix( "", "http://maven.apache.org/POM/4.0.0" );
-            serializer.setPrefix( "xsi", "http://www.w3.org/2001/XMLSchema-instance" );
-            serializer.startTag( NAMESPACE, tagName );
-            serializer.attribute( "", "xsi:schemaLocation", "http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" );
+            serializer.setPrefix("", "http://maven.apache.org/POM/4.0.0");
+            serializer.setPrefix("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+            serializer.startTag(NAMESPACE, tagName);
+            serializer.attribute("", "xsi:schemaLocation", "http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd");
   #else
-            serializer.startTag( NAMESPACE, tagName );
+            serializer.startTag(NAMESPACE, tagName);
   #end
   #foreach ( $field in $allFields )
     #if ( $Helper.xmlFieldMetadata( $field ).attribute )
       #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
       #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
       #if ( $field.type == "String" )
-            writeAttr( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer );
+            writeAttr("$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer);
       #elseif ( $field.type == "boolean" )
         #set ( $def = ${field.defaultValue} )
         #if ( ${def} == "true" )
-            writeAttr( "$fieldTagName", ${classLcapName}.is${fieldCapName}() ? null : "false", serializer );
+            writeAttr("$fieldTagName", ${classLcapName}.is${fieldCapName}() ? null : "false", serializer);
         #else
-            writeAttr( "$fieldTagName", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer );
+            writeAttr("$fieldTagName", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer);
         #end
       #else
             // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
@@ -232,137 +215,112 @@ public class ${className}
       #set ( $def = ${field.defaultValue} )
       #if ( $field.type == "String" )
         #if ( ! $def )
-            writeTag( "$fieldTagName", null, ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName} );
+            writeTag("$fieldTagName", null, ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName});
         #else
-            writeTag( "$fieldTagName", "${def}", ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName} );
+            writeTag("$fieldTagName", "${def}", ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName});
         #end
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
         #if ( ${def} == "true" )
-            writeTag( "$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? null : "false", serializer, ${classLcapName} );
+            writeTag("$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? null : "false", serializer, ${classLcapName});
         #else
-            writeTag( "$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer, ${classLcapName} );
+            writeTag("$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer, ${classLcapName});
         #end
       #elseif ( $field.type == "int" )
-            writeTag( "$fieldTagName", "${def}", Integer.toString( ${classLcapName}.get${fieldCapName}() ), serializer, ${classLcapName} );
+            writeTag("$fieldTagName", "${def}", Integer.toString(${classLcapName}.get${fieldCapName}()), serializer, ${classLcapName});
       #elseif ( $field.type == "DOM" )
-            writeDom( ${classLcapName}.get${fieldCapName}(), serializer );
+            writeDom(${classLcapName}.get${fieldCapName}(), serializer);
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
         #set( $singularField = ${Helper.singular($fieldTagName)} )
-            writeList( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName},
-                    t -> writeTag( "$singularField", null, t, serializer, null ) );
+            writeList("$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName},
+                    t -> writeTag("$singularField", null, t, serializer, null));
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
-            writeProperties( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName} );
+            writeProperties("$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName});
       #elseif ( $field.to && $field.multiplicity == "1" )
-            write${field.to}( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer );
+            write${field.to}("$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer);
       #elseif ( $field.to && $field.multiplicity == "*" )
         #set( $singularField = ${Helper.singular($fieldTagName)} )
-            writeList( "$fieldTagName", $Helper.isFlatItems($field), ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName},
-                    t -> write${field.to}( "$singularField", t, serializer ) );
+            writeList("$fieldTagName", $Helper.isFlatItems($field), ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName},
+                    t -> write${field.to}("$singularField", t, serializer));
       #else
             // TODO: name=${field.name} type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end
     #end
   #end
-            serializer.endTag( NAMESPACE, tagName );
-            writeLocationTracking( ${classLcapName}, "", serializer );
+            serializer.endTag(NAMESPACE, tagName);
+            writeLocationTracking(${classLcapName}, "", serializer);
         }
     }
 
  #end
 #end
     @FunctionalInterface
-    private interface ElementWriter<T>
-    {
-        public void write( T t ) throws IOException;
+    private interface ElementWriter<T> {
+        public void write(T t) throws IOException;
     }
 
-    private <T> void writeList( String tagName, List<T> list, XmlSerializer serializer, InputLocationTracker locationTracker, ElementWriter<T> writer )
-        throws IOException
-    {
-        writeList( tagName, false, list, serializer, locationTracker, writer );
+    private <T> void writeList(String tagName, List<T> list, XmlSerializer serializer, InputLocationTracker locationTracker, ElementWriter<T> writer) throws IOException {
+        writeList(tagName, false, list, serializer, locationTracker, writer);
     }
 
-    private <T> void writeList( String tagName, boolean flat, List<T> list, XmlSerializer serializer, InputLocationTracker locationTracker, ElementWriter<T> writer )
-        throws IOException
-    {
-        if ( list != null && !list.isEmpty() )
-        {
-            if ( !flat )
-            {
-                serializer.startTag( NAMESPACE, tagName );
+    private <T> void writeList(String tagName, boolean flat, List<T> list, XmlSerializer serializer, InputLocationTracker locationTracker, ElementWriter<T> writer) throws IOException {
+        if (list != null && !list.isEmpty()) {
+            if (!flat) {
+                serializer.startTag(NAMESPACE, tagName);
             }
             int index = 0;
-            InputLocation location = locationTracker != null ? locationTracker.getLocation( tagName ) : null;
-            for ( T t : list )
-            {
-                writer.write( t );
-                writeLocationTracking( location, Integer.valueOf( index++ ), serializer );
+            InputLocation location = locationTracker != null ? locationTracker.getLocation(tagName) : null;
+            for (T t : list) {
+                writer.write(t);
+                writeLocationTracking(location, Integer.valueOf(index++), serializer);
             }
-            if ( !flat )
-            {
-                serializer.endTag( NAMESPACE, tagName );
-                writeLocationTracking( locationTracker, tagName, serializer );
+            if (!flat) {
+                serializer.endTag(NAMESPACE, tagName);
+                writeLocationTracking(locationTracker, tagName, serializer);
             }
         }
     }
 
-    private <T> void writeProperties( String tagName, Map<String, String> props, XmlSerializer serializer, InputLocationTracker locationTracker )
-            throws IOException
-    {
-        if ( props != null && !props.isEmpty() )
-        {
-            serializer.startTag( NAMESPACE, tagName );
-            InputLocation location = locationTracker != null ? locationTracker.getLocation( tagName ) : null;
-            for ( Map.Entry<String, String> entry : props.entrySet() )
-            {
+    private <T> void writeProperties(String tagName, Map<String, String> props, XmlSerializer serializer, InputLocationTracker locationTracker) throws IOException {
+        if (props != null && !props.isEmpty()) {
+            serializer.startTag(NAMESPACE, tagName);
+            InputLocation location = locationTracker != null ? locationTracker.getLocation(tagName) : null;
+            for (Map.Entry<String, String> entry : props.entrySet()) {
                 String key = entry.getKey();
-                writeTag( key, null, entry.getValue(), serializer, null );
-                writeLocationTracking( location, key, serializer );
+                writeTag(key, null, entry.getValue(), serializer, null);
+                writeLocationTracking(location, key, serializer);
             }
-            serializer.endTag( NAMESPACE, tagName );
-            writeLocationTracking( locationTracker, tagName, serializer );
+            serializer.endTag(NAMESPACE, tagName);
+            writeLocationTracking(locationTracker, tagName, serializer);
         }
     }
 
-    private void writeDom( XmlNode dom, XmlSerializer serializer )
-            throws IOException
-    {
-        if ( dom != null )
-        {
-            serializer.startTag( NAMESPACE, dom.getName() );
-            for ( Map.Entry<String, String> attr : dom.getAttributes().entrySet() )
-            {
-                serializer.attribute( NAMESPACE, attr.getKey(), attr.getValue() );
+    private void writeDom(XmlNode dom, XmlSerializer serializer) throws IOException {
+        if (dom != null) {
+            serializer.startTag(NAMESPACE, dom.getName());
+            for (Map.Entry<String, String> attr : dom.getAttributes().entrySet()) {
+                serializer.attribute(NAMESPACE, attr.getKey(), attr.getValue());
             }
-            for ( XmlNode child : dom.getChildren() )
-            {
-                writeDom( child, serializer );
+            for (XmlNode child : dom.getChildren()) {
+                writeDom(child, serializer);
             }
             String value = dom.getValue();
-            if ( value != null )
-            {
-                serializer.text( value );
+            if (value != null) {
+                serializer.text(value);
             }
-            serializer.endTag( NAMESPACE, dom.getName() );
+            serializer.endTag(NAMESPACE, dom.getName());
         }
     }
 
-    private void writeTag( String tagName, String defaultValue, String value, XmlSerializer serializer, InputLocationTracker locationTracker )
-        throws IOException
-    {
-        if ( value != null && !Objects.equals( defaultValue, value ) )
-        {
-            serializer.startTag( NAMESPACE, tagName ).text( value ).endTag( NAMESPACE, tagName );
-            writeLocationTracking( locationTracker, tagName, serializer );
+    private void writeTag(String tagName, String defaultValue, String value, XmlSerializer serializer, InputLocationTracker locationTracker) throws IOException {
+        if (value != null && !Objects.equals(defaultValue, value)) {
+            serializer.startTag(NAMESPACE, tagName).text(value).endTag(NAMESPACE, tagName);
+            writeLocationTracking(locationTracker, tagName, serializer);
         }
     }
 
-    private void writeAttr( String attrName, String value, XmlSerializer serializer )
-        throws IOException
-    {
-        if ( value != null )
-        {
-            serializer.attribute( NAMESPACE, attrName, value );
+    private void writeAttr(String attrName, String value, XmlSerializer serializer) throws IOException {
+        if (value != null) {
+            serializer.attribute(NAMESPACE, attrName, value);
         }
     }
 
@@ -374,15 +332,12 @@ public class ${className}
      * @param key
      * @throws java.io.IOException
      */
-    protected void writeLocationTracking( InputLocationTracker locationTracker, Object key, XmlSerializer serializer )
-        throws java.io.IOException
-    {
-        InputLocation location = ( locationTracker == null ) ? null : locationTracker.getLocation( key );
-        if ( location != null )
-        {
-            serializer.comment( toString( location ) );
+    protected void writeLocationTracking(InputLocationTracker locationTracker, Object key, XmlSerializer serializer) throws java.io.IOException {
+        InputLocation location = (locationTracker == null) ? null : locationTracker.getLocation(key);
+        if (location != null) {
+            serializer.comment(toString(location));
         }
-    } //-- void writeLocationTracking( InputLocationTracker, Object, XmlSerializer )
+    } //-- void writeLocationTracking(InputLocationTracker, Object, XmlSerializer)
 
     /**
      * Method toString.
@@ -390,12 +345,10 @@ public class ${className}
      * @param location
      * @return String
      */
-    protected String toString( InputLocation location )
-    {
-        if ( stringFormatter != null )
-        {
-            return stringFormatter.toString( location );
+    protected String toString(InputLocation location) {
+        if (stringFormatter != null) {
+            return stringFormatter.toString(location);
         }
         return ' ' + location.getSource().toString() + ':' + location.getLineNumber() + ' ';
-    } //-- String toString( InputLocation )
+    } //-- String toString(InputLocation)
 }

@@ -151,8 +151,7 @@ public class ${class.name}
     #if ( $locationTracking )
         Map<Object, InputLocation> locations
     #end
-    )
-    {
+    ) {
     #if ( $class.superClass )
         super(
       #foreach ( $field in $inheritedFields )
@@ -169,44 +168,39 @@ public class ${class.name}
     #end
     #foreach ( $field in $class.getFields($version) )
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" || $field.type == "java.util.Map" )
-        this.${field.name} = ImmutableCollections.copy( ${field.name} );
+        this.${field.name} = ImmutableCollections.copy(${field.name});
       #else
         this.${field.name} = ${field.name};
       #end
     #end
     #if ( $locationTracking )
       #if ( ! $class.superClass )
-        this.locations = ImmutableCollections.copy( locations );
+        this.locations = ImmutableCollections.copy(locations);
       #end
     #end
     }
 
     #if ( ! $eq.empty )
     @Override
-    public boolean equals( Object o )
-    {
-        if ( this == o )
-        {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if ( o == null || !( o instanceof ${class.name} ) )
-        {
+        if (o == null || !(o instanceof ${class.name})) {
             return false;
         }
-        ${class.name} that = ( ${class.name} ) o;
+        ${class.name} that = (${class.name}) o;
         return ${eq};
     }
 
     @Override
-    public int hashCode()
-    {
-        return Objects.hash( ${hc} );
+    public int hashCode() {
+        return Objects.hash(${hc});
     }
 
     #end
     #if ( $class == $root )
-    public String getModelEncoding()
-    {
+    public String getModelEncoding() {
         return modelEncoding;
     }
 
@@ -230,8 +224,7 @@ public class ${class.name}
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" )
     @Nonnull
       #end
-    public ${type} ${pfx}${cap}()
-    {
+    public ${type} ${pfx}${cap}() {
         return this.${field.name};
     }
 
@@ -240,9 +233,8 @@ public class ${class.name}
     /**
      * Gets the location of the specified field in the input source.
      */
-    public InputLocation getLocation( Object key )
-    {
-        return locations != null ? locations.get( key ) : null;
+    public InputLocation getLocation(Object key) {
+        return locations != null ? locations.get(key) : null;
     }
 
     #end
@@ -252,9 +244,8 @@ public class ${class.name}
      * @return a {@code Builder}
      */
     @Nonnull
-    public Builder with()
-    {
-        return newBuilder( this );
+    public Builder with() {
+        return newBuilder(this);
     }
     #foreach ( $field in $allFields )
       #set ( $cap = $Helper.capitalise( $field.name ) )
@@ -269,49 +260,45 @@ public class ${class.name}
      * @return a {@code ${class.name}} with the specified ${field.name}
      */
     @Nonnull
-    public ${class.name} with${cap}( $type $field.name )
-    {
-        return newBuilder(this, true).${field.name}( $field.name ).build();
+    public ${class.name} with${cap}($type $field.name) {
+        return newBuilder(this, true).${field.name}($field.name).build();
     }
     #end
 
     /**
      * Creates a new {@code ${class.name}} instance.
-     * Equivalent to {@code newInstance( true )}.
+     * Equivalent to {@code newInstance(true)}.
      * @see #newInstance(boolean)
      *
      * @return a new {@code ${class.name}}
      */
     @Nonnull
-    public static ${class.name} newInstance()
-    {
-        return newInstance( true );
+    public static ${class.name} newInstance() {
+        return newInstance(true);
     }
 
     /**
      * Creates a new {@code ${class.name}} instance using default values or not.
-     * Equivalent to {@code newBuilder( withDefaults ).build()}.
+     * Equivalent to {@code newBuilder(withDefaults).build()}.
      *
      * @param withDefaults the boolean indicating whether default values should be used
      * @return a new {@code ${class.name}}
      */
     @Nonnull
-    public static ${class.name} newInstance( boolean withDefaults )
-    {
-        return newBuilder( withDefaults ).build();
+    public static ${class.name} newInstance(boolean withDefaults) {
+        return newBuilder(withDefaults).build();
     }
 
     /**
      * Creates a new {@code ${class.name}} builder instance.
-     * Equivalent to {@code newBuilder( true )}.
+     * Equivalent to {@code newBuilder(true)}.
      * @see #newBuilder(boolean)
      *
      * @return a new {@code Builder}
      */
     @Nonnull
-    public static Builder newBuilder()
-    {
-        return newBuilder( true );
+    public static Builder newBuilder() {
+        return newBuilder(true);
     }
 
     /**
@@ -321,22 +308,20 @@ public class ${class.name}
      * @return a new {@code Builder}
      */
     @Nonnull
-    public static Builder newBuilder( boolean withDefaults )
-    {
-        return new Builder( withDefaults );
+    public static Builder newBuilder(boolean withDefaults) {
+        return new Builder(withDefaults);
     }
 
     /**
      * Creates a new {@code ${class.name}} builder instance using the specified object as a basis.
-     * Equivalent to {@code newBuilder( from, false )}.
+     * Equivalent to {@code newBuilder(from, false)}.
      *
      * @param from the {@code ${class.name}} instance to use as a basis
      * @return a new {@code Builder}
      */
     @Nonnull
-    public static Builder newBuilder( ${class.name} from )
-    {
-        return newBuilder( from, false );
+    public static Builder newBuilder(${class.name} from) {
+        return newBuilder(from, false);
     }
 
     /**
@@ -347,9 +332,8 @@ public class ${class.name}
      * @return a new {@code Builder}
      */
     @Nonnull
-    public static Builder newBuilder( ${class.name} from, boolean forceCopy )
-    {
-        return new Builder( from, forceCopy );
+    public static Builder newBuilder(${class.name} from, boolean forceCopy) {
+        return new Builder(from, forceCopy);
     }
 
     /**
@@ -384,13 +368,11 @@ public class ${class.name}
         Map<Object, InputLocation> locations;
     #end
 
-        Builder( boolean withDefaults )
-        {
+        Builder(boolean withDefaults) {
     #if ( $class.superClass )
-            super( withDefaults );
+            super(withDefaults);
     #end
-            if ( withDefaults )
-            {
+            if (withDefaults) {
     #foreach ( $field in $class.getFields($version) )
       #if ( $field.defaultValue )
         #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
@@ -404,30 +386,25 @@ public class ${class.name}
             }
         }
 
-        Builder( ${class.name} base, boolean forceCopy )
-        {
+        Builder(${class.name} base, boolean forceCopy) {
     #if ( $class.superClass )
-            super( base, forceCopy );
+            super(base, forceCopy);
     #end
-            if ( forceCopy )
-            {
+            if (forceCopy) {
     #foreach ( $field in $class.getFields($version) )
                 this.${field.name} = base.${field.name};
     #end
     #if ( $locationTracking )
                 this.locations = base.locations;
     #end
-            }
-            else
-            {
+            } else {
                 this.base = base;
             }
         }
 
     #if ( $class == $root )
         @Nonnull
-        public Builder modelEncoding( String modelEncoding )
-        {
+        public Builder modelEncoding(String modelEncoding) {
             this.modelEncoding = modelEncoding;
             return this;
         }
@@ -439,8 +416,7 @@ public class ${class.name}
         #set ( $type = ${type.replace('List<','Collection<')} )
       #end
         @Nonnull
-        public Builder ${field.name}( ${type} ${field.name} )
-        {
+        public Builder ${field.name}(${type} ${field.name}) {
             this.${field.name} = ${field.name};
             return this;
         }
@@ -449,29 +425,24 @@ public class ${class.name}
 
     #if ( $locationTracking )
         @Nonnull
-        public Builder location( Object key, InputLocation location )
-        {
-            if ( location != null )
-            {
-                if ( !(this.locations instanceof HashMap) )
-                {
-                    this.locations = this.locations != null ? new HashMap<>( this.locations ) : new HashMap<>();
+        public Builder location(Object key, InputLocation location) {
+            if (location != null) {
+                if (!(this.locations instanceof HashMap)) {
+                    this.locations = this.locations != null ? new HashMap<>(this.locations) : new HashMap<>();
                 }
-                this.locations.put( key, location );
+                this.locations.put(key, location);
             }
             return this;
         }
 
     #end
         @Nonnull
-        public ${class.name} build()
-        {
-            if ( base != null
+        public ${class.name} build() {
+            if (base != null
     #foreach ( $field in $allFields )
-                    && ( ${field.name} == null || ${field.name} == base.${field.name} )
+                    && (${field.name} == null || ${field.name} == base.${field.name})
     #end
-            )
-            {
+            ) {
                 return base;
             }
     #if ( $locationTracking )
@@ -480,25 +451,24 @@ public class ${class.name}
       #foreach ( $field in $allFields )
             InputLocation ${field.name}Location = null;
       #end
-            if ( this.locations != null )
-            {
+            if (this.locations != null) {
                 locations = this.locations;
             }
     #end
             return new ${class.name}(
     #if ( $class == $root )
-                modelEncoding != null ? modelEncoding : ( base != null ? base.modelEncoding : "UTF-8" ),
+                modelEncoding != null ? modelEncoding : (base != null ? base.modelEncoding : "UTF-8"),
     #end
     #foreach ( $field in $allFields )
       #set ( $sep = "#if(${locationTracking}||$field!=${allFields[${allFields.size()} - 1]}),#end" )
       #if ( $field.type == "boolean" || $field.type == "int" )
-                ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : ${field.defaultValue} )${sep}
+                ${field.name} != null ? ${field.name} : (base != null ? base.${field.name} : ${field.defaultValue})${sep}
       #else
-                ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : null )${sep}
+                ${field.name} != null ? ${field.name} : (base != null ? base.${field.name} : null)${sep}
       #end
     #end
     #if ( $locationTracking )
-                locations != null ? locations : ( base != null ? base.locations : null )
+                locations != null ? locations : (base != null ? base.locations : null)
     #end
             );
         }
