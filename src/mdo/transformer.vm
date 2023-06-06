@@ -51,84 +51,74 @@ import ${packageModelV4}.${class.name};
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 @Generated
-public class ${className}
-{
+public class ${className} {
 
     private final Function<String, String> transformer;
 
-    public ${className}( Function<String, String> transformer )
-    {
+    public ${className}(Function<String, String> transformer) {
         this.transformer = transformer;
     }
 
     /**
      * Transforms the given model
      */
-    public ${root.name} visit( ${root.name} target )
-    {
-        Objects.requireNonNull( target, "target cannot be null" );
-        return transform${root.name}( target );
+    public ${root.name} visit(${root.name} target) {
+        Objects.requireNonNull(target, "target cannot be null");
+        return transform${root.name}(target);
     }
 
     /**
      * The transformation function.
      */
-    protected String transform( String value )
-    {
-        return transformer.apply( value );
+    protected String transform(String value) {
+        return transformer.apply(value);
     }
 
 #foreach ( $class in $model.allClasses )
   #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
     #set ( $ancestors = $Helper.ancestors( $class ) )
     #set ( $allFields = $Helper.xmlFields( $class ) )
-    protected ${class.name} transform${class.name}( ${class.name} target )
-    {
-        if ( target == null )
-        {
+    protected ${class.name} transform${class.name}(${class.name} target) {
+        if (target == null) {
             return null;
         }
-        ${class.name}.Builder builder = ${class.name}.newBuilder( target );
+        ${class.name}.Builder builder = ${class.name}.newBuilder(target);
     #foreach ( $field in $allFields )
-        transform${field.modelClass.name}_${Helper.capitalise($field.name)}( builder, target );
+        transform${field.modelClass.name}_${Helper.capitalise($field.name)}(builder, target);
     #end
         return builder.build();
     }
 
     #foreach ( $field in $allFields )
       #set ( $capField = ${Helper.capitalise($field.name)} )
-    protected void transform${class.name}_${capField}( ${class.name}.Builder builder, ${class.name} target )
-    {
+    protected void transform${class.name}_${capField}(${class.name}.Builder builder, ${class.name} target) {
       #if ( $field.type == "String" )
-        String newVal = transform( target.get${capField}() );
-        builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
+        String newVal = transform(target.get${capField}());
+        builder.${field.name}(newVal != target.get${capField}() ? newVal : null);
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
-        builder.${field.name}( transform( target.get${capField}(), this::transform ) );
+        builder.${field.name}(transform(target.get${capField}(), this::transform));
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
         Map<String, String> props = target.get${capField}();
         Map<String, String> newProps = null;
-        for ( Map.Entry<String, String> entry : props.entrySet() )
-        {
-            String newVal = transform( entry.getValue() );
-            if ( newVal != null && newVal != entry.getValue() )
-            {
-                if ( newProps == null )
-                {
+        for (Map.Entry<String, String> entry : props.entrySet()) {
+            String newVal = transform(entry.getValue());
+            if (newVal != null && newVal != entry.getValue()) {
+                if (newProps == null) {
                     newProps = new HashMap<>();
-                    newProps.putAll( props );
-                    builder.${field.name}( newProps );
+                    newProps.putAll(props);
+                    builder.${field.name}(newProps);
                 }
-                newProps.put( entry.getKey(), newVal );
+                newProps.put(entry.getKey(), newVal);
             }
         }
       #elseif ( $field.to && $field.multiplicity == "1" )
-        ${field.to} newVal = transform${field.to}( target.get${capField}() );
-        builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
+        ${field.to} newVal = transform${field.to}(target.get${capField}());
+        builder.${field.name}(newVal != target.get${capField}() ? newVal : null);
       #elseif ( $field.to && $field.multiplicity == "*" )
-        builder.${field.name}( transform( target.get${capField}(), this::transform${field.to} ) );
+        builder.${field.name}(transform(target.get${capField}(), this::transform${field.to}));
       #elseif ( $field.type == "DOM" )
-        XmlNode newVal = transform( target.get${capField}() );
-        builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
+        XmlNode newVal = transform(target.get${capField}());
+        builder.${field.name}(newVal != target.get${capField}() ? newVal : null);
       #elseif ( $field.type == "boolean" || $field.type == "int" || $field.type == "java.nio.file.Path" )
         // nothing to do, the transformer only handles strings
       #else
@@ -139,61 +129,49 @@ public class ${className}
 
   #end
 #end
-    protected <T> List<T> transform( List<T> list, Function<T, T> transformer )
-    {
+    protected <T> List<T> transform(List<T> list, Function<T, T> transformer) {
         List<T> newList = null;
-        for ( int i = 0; i < list.size(); i++ )
-        {
-            T newVal = transformer.apply( list.get( i ) );
-            if ( newVal != list.get( i ) )
-            {
-                if ( newList == null )
-                {
-                    newList = new ArrayList<>( list );
+        for (int i = 0; i < list.size(); i++) {
+            T newVal = transformer.apply(list.get(i));
+            if (newVal != list.get(i)) {
+                if (newList == null) {
+                    newList = new ArrayList<>(list);
                 }
-                newList.set( i, newVal );
+                newList.set(i, newVal);
             }
         }
         return newList;
     }
 
-    protected XmlNode transform( XmlNode node )
-    {
-        if ( node != null )
-        {
-            Xpp3Dom xpp = new Xpp3Dom( node );
-            transform( xpp );
+    protected XmlNode transform(XmlNode node) {
+        if (node != null) {
+            Xpp3Dom xpp = new Xpp3Dom(node);
+            transform(xpp);
             return xpp.getDom();
         }
         return node;
     }
 
-    protected void transform( Xpp3Dom dom )
-    {
-        if ( dom != null )
-        {
+    protected void transform(Xpp3Dom dom) {
+        if (dom != null) {
             String org, val;
             // Content
             org = dom.getValue();
-            val = transform( org );
-            if ( org != val )
-            {
-                dom.setValue( val );
+            val = transform(org);
+            if (org != val) {
+                dom.setValue(val);
             }
             // Attributes
-            for ( String attr : dom.getAttributeNames() )
-            {
-                org = dom.getAttribute( attr );
-                val = transform( org );
-                if ( org != val )
-                {
-                    dom.setAttribute( attr, val );
+            for (String attr : dom.getAttributeNames()) {
+                org = dom.getAttribute(attr);
+                val = transform(org);
+                if (org != val) {
+                    dom.setAttribute(attr, val);
                 }
             }
             // Children
-            for ( int i = 0, l = dom.getChildCount(); i < l; i++ )
-            {
-                transform( dom.getChild( i ) );
+            for (int i = 0, l = dom.getChildCount(); i < l; i++) {
+                transform(dom.getChild(i));
             }
         }
     }

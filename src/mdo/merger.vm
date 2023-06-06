@@ -51,8 +51,7 @@ import ${packageModelV4}.${class.Name};
 #end
 
 @Generated
-public class ${className}
-{
+public class ${className} {
 
     private final boolean deepMerge;
 
@@ -76,19 +75,16 @@ public class ${className}
      * @param hints A set of key-value pairs that customized merger implementations can use to carry domain-specific
      *            information along, may be <code>null</code>.
      */
-    public ${root.name} merge( ${root.name} target, ${root.name} source, boolean sourceDominant, Map<?, ?> hints )
-    {
-        Objects.requireNonNull( target, "target cannot be null" );
-        if ( source == null )
-        {
+    public ${root.name} merge(${root.name} target, ${root.name} source, boolean sourceDominant, Map<?, ?> hints) {
+        Objects.requireNonNull(target, "target cannot be null");
+        if (source == null) {
             return target;
         }
         Map<Object, Object> context = new HashMap<>();
-        if ( hints != null )
-        {
-            context.putAll( hints );
+        if (hints != null) {
+            context.putAll(hints);
         }
-        return merge${root.name}( target, source, sourceDominant, context );
+        return merge${root.name}(target, source, sourceDominant, context);
     }
 
 #foreach ( $class in $model.allClasses )
@@ -98,121 +94,101 @@ public class ${className}
     #foreach ( $cl in $ancestors )
       #set ( $dummy = $allFields.addAll( $cl.getFields($version) ) )
     #end
-    protected ${class.name} merge${class.name}( ${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context )
-    {
-        ${class.name}.Builder builder = ${class.name}.newBuilder( target );
-        merge${class.name}( builder, target, source, sourceDominant, context );
+    protected ${class.name} merge${class.name}(${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context) {
+        ${class.name}.Builder builder = ${class.name}.newBuilder(target);
+        merge${class.name}(builder, target, source, sourceDominant, context);
         return builder.build();
     }
 
-    protected void merge${class.name}( ${class.name}.Builder builder, ${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context )
-    {
+    protected void merge${class.name}(${class.name}.Builder builder, ${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context) {
     #if ( $class.superClass )
-        merge${class.superClass}( builder, target ,source, sourceDominant, context );
+        merge${class.superClass}(builder, target ,source, sourceDominant, context);
     #end
     #foreach ( $field in $class.getFields($version) )
-        merge${field.modelClass.name}_${Helper.capitalise($field.name)}( builder, target, source, sourceDominant, context );
+        merge${field.modelClass.name}_${Helper.capitalise($field.name)}(builder, target, source, sourceDominant, context);
     #end
     }
 
     #foreach ( $field in $allFields )
       #set ( $capField = ${Helper.capitalise($field.name)} )
-    protected void merge${class.name}_${capField}( ${class.name}.Builder builder, ${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context )
+    protected void merge${class.name}_${capField}(${class.name}.Builder builder, ${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context)
     {
       #if ( $field.type == "String" )
         String src = source.get${capField}();
         String tgt = target.get${capField}();
-        if ( src != null && ( sourceDominant || tgt == null ) )
-        {
-            builder.${field.name}( src );
+        if (src != null && (sourceDominant || tgt == null)) {
+            builder.${field.name}(src);
         #if ( $locationTracking )
-            builder.location( "${field.name}", source.getLocation( "${field.name}" ) );
+            builder.location("${field.name}", source.getLocation("${field.name}"));
         #end
         }
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
-        builder.${field.name}( merge( target.get${capField}(), source.get${capField}(), sourceDominant, e -> e ) );
+        builder.${field.name}(merge(target.get${capField}(), source.get${capField}(), sourceDominant, e -> e));
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
         Map<String, String> src = source.get${capField}();
-        if ( !src.isEmpty() )
-        {
+        if (!src.isEmpty()) {
             Map<String, String> tgt = target.get${capField}();
-            if ( tgt.isEmpty() )
-            {
-                builder.${field.name}( src );
+            if (tgt.isEmpty()) {
+                builder.${field.name}(src);
         #if ( $locationTracking )
-                builder.location( "${field.name}", source.getLocation( "${field.name}" ) );
+                builder.location("${field.name}", source.getLocation("${field.name}"));
         #end
-            }
-            else
-            {
+            } else {
                 Map<String, String> merged = new HashMap<>();
-                merged.putAll( sourceDominant ? target.get${capField}() : source.get${capField}() );
-                merged.putAll( sourceDominant ? source.get${capField}() : target.get${capField}() );
-                builder.${field.name}( merged );
+                merged.putAll(sourceDominant ? target.get${capField}() : source.get${capField}());
+                merged.putAll(sourceDominant ? source.get${capField}() : target.get${capField}());
+                builder.${field.name}(merged);
         #if ( $locationTracking )
-                builder.location( "${field.name}", InputLocation.merge( target.getLocation( "${field.name}" ), source.getLocation( "${field.name}" ), sourceDominant ) );
+                builder.location("${field.name}", InputLocation.merge(target.getLocation("${field.name}"), source.getLocation("${field.name}"), sourceDominant));
         #end
             }
         }
       #elseif ( $field.to && $field.multiplicity == "1" )
         ${field.to} src = source.get${capField}();
-        if ( src != null )
-        {
+        if (src != null) {
             ${field.to} tgt = target.get${capField}();
-            if ( tgt == null )
-            {
-                tgt = ${field.to}.newInstance( false );
+            if (tgt == null) {
+                tgt = ${field.to}.newInstance(false);
             }
-            ${field.to} merged = merge${field.to}( tgt, src, sourceDominant, context );
-            if ( merged == src )
-            {
-                builder.${field.name}( merged );
+            ${field.to} merged = merge${field.to}(tgt, src, sourceDominant, context);
+            if (merged == src) {
+                builder.${field.name}(merged);
         #if ( $locationTracking )
-                builder.location( "${field.name}", source.getLocation( "${field.name}" ) );
+                builder.location("${field.name}", source.getLocation("${field.name}"));
         #end
-            }
-            else if ( merged != tgt )
-            {
-                builder.${field.name}( merged );
+            } else if (merged != tgt) {
+                builder.${field.name}(merged);
         #if ( $locationTracking )
-                builder.location( "${field.name}", InputLocation.merge( target.getLocation( "${field.name}" ), source.getLocation( "${field.name}" ), sourceDominant ) );
+                builder.location("${field.name}", InputLocation.merge(target.getLocation("${field.name}"), source.getLocation("${field.name}"), sourceDominant));
         #end
             }
         }
       #elseif ( $field.to && $field.multiplicity == "*" )
         if (deepMerge) {
-            builder.${field.name}( merge( target.get${capField}(), source.get${capField}(), get${field.to}Key(),
-                    ( t, s ) -> merge${field.to}( t, s, sourceDominant, context ) ) );
+            builder.${field.name}(merge(target.get${capField}(), source.get${capField}(), get${field.to}Key(),
+                    (t, s) -> merge${field.to}(t, s, sourceDominant, context)));
         } else {
-            builder.${field.name}( merge( target.get${capField}(), source.get${capField}(), sourceDominant, get${field.to}Key() ) );
+            builder.${field.name}(merge(target.get${capField}(), source.get${capField}(), sourceDominant, get${field.to}Key()));
         }
       #elseif ( $field.type == "DOM" )
         XmlNode src = source.getConfiguration();
-        if ( src != null )
-        {
+        if (src != null) {
             XmlNode tgt = target.getConfiguration();
-            if ( tgt == null )
-            {
-                builder.configuration( src );
-            }
-            else if ( sourceDominant )
-            {
-                builder.configuration( src.merge( tgt ) );
-            }
-            else
-            {
-                builder.configuration( tgt.merge( src ) );
+            if (tgt == null) {
+                builder.configuration(src);
+            } else if (sourceDominant) {
+                builder.configuration(src.merge(tgt));
+            } else {
+                builder.configuration(tgt.merge(src));
             }
         }
-      #elseif ( $field.type == "boolean" )
-        if ( sourceDominant )
-        {
-            builder.${field.name}( source.is${capField}() );
+      #elseif ($field.type == "boolean")
+        if (sourceDominant) {
+            builder.${field.name}(source.is${capField}());
         }
-      #elseif ( $field.type == "int" || $field.type == "java.nio.file.Path" )
-        if ( sourceDominant )
-        {
-            builder.${field.name}( source.get${capField}() );
+      #elseif ($field.type == "int" || $field.type == "java.nio.file.Path")
+        if (sourceDominant) {
+            builder.${field.name}(source.get${capField}());
         }
       #else
         // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
@@ -225,8 +201,7 @@ public class ${className}
 
 #foreach ( $class in $model.allClasses )
   #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
-    protected KeyComputer<${class.name}> get${class.name}Key()
-    {
+    protected KeyComputer<${class.name}> get${class.name}Key() {
         return v -> v;
     }
   #end
@@ -237,37 +212,30 @@ public class ${className}
      * @param <T> the data structure type
      */
     @FunctionalInterface
-    public interface KeyComputer<T> extends Function<T, Object>
-    {
+    public interface KeyComputer<T> extends Function<T, Object> {
     }
 
     /**
      * Merge two lists
      */
-    public static <T> List<T> merge( List<T> tgt, List<T> src, boolean sourceDominant, KeyComputer<T> computer )
-    {
-        return merge( tgt, src, computer, ( t, s ) -> sourceDominant ? s : t );
+    public static <T> List<T> merge(List<T> tgt, List<T> src, boolean sourceDominant, KeyComputer<T> computer) {
+        return merge(tgt, src, computer, (t, s) -> sourceDominant ? s : t);
     }
 
-    public static <T> List<T> merge( List<T> tgt, List<T> src, KeyComputer<T> computer, BinaryOperator<T> remapping )
-    {
-        if ( src.isEmpty() )
-        {
+    public static <T> List<T> merge(List<T> tgt, List<T> src, KeyComputer<T> computer, BinaryOperator<T> remapping) {
+        if (src.isEmpty()) {
             return tgt;
         }
 
         MergingList<T> list;
-        if ( tgt instanceof MergingList )
-        {
+        if (tgt instanceof MergingList) {
             list = (MergingList<T>) tgt;
-        }
-        else
-        {
-            list = new MergingList<>( computer, src.size() + tgt.size() );
-            list.mergeAll( tgt, ( t, s ) -> s );
+        } else {
+            list = new MergingList<>(computer, src.size() + tgt.size());
+            list.mergeAll(tgt, (t, s) -> s);
         }
 
-        list.mergeAll( src, remapping );
+        list.mergeAll(src, remapping);
         return list;
     }
 
@@ -275,119 +243,90 @@ public class ${className}
      * Merging list
      * @param <V>
      */
-    private static class MergingList<V> extends AbstractList<V> implements java.io.Serializable
-    {
+    private static class MergingList<V> extends AbstractList<V> implements java.io.Serializable {
 
         private final KeyComputer<V> keyComputer;
         private Map<Object, V> map;
         private List<V> list;
 
-        MergingList( KeyComputer<V> keyComputer, int initialCapacity )
-        {
-            this.map = new LinkedHashMap<>( initialCapacity );
+        MergingList(KeyComputer<V> keyComputer, int initialCapacity) {
+            this.map = new LinkedHashMap<>(initialCapacity);
             this.keyComputer = keyComputer;
         }
 
-        Object writeReplace() throws ObjectStreamException
-        {
-            return new ArrayList<>( this );
+        Object writeReplace() throws ObjectStreamException {
+            return new ArrayList<>(this);
         }
 
         @Override
-        public Iterator<V> iterator()
-        {
-            if ( map != null )
-            {
+        public Iterator<V> iterator() {
+            if (map != null) {
                 return map.values().iterator();
-            }
-            else
-            {
+            } else {
                 return list.iterator();
             }
         }
 
-        void mergeAll( Collection<V> vs, BinaryOperator<V> remapping )
-        {
-            if ( map == null )
-            {
-                map = list.stream().collect( Collectors.toMap( keyComputer,
-                                                               Function.identity(),
-                                                               null,
-                                                               LinkedHashMap::new ) );
-
+        void mergeAll(Collection<V> vs, BinaryOperator<V> remapping) {
+            if (map == null) {
+                map = list.stream().collect(Collectors.toMap(keyComputer,
+                    Function.identity(),
+                    null,
+                    LinkedHashMap::new));
                 list = null;
             }
 
-            if ( vs instanceof MergingList && ( (MergingList<V>) vs ).map != null )
-            {
-                for ( Map.Entry<Object, V> e : ( (MergingList<V>) vs ).map.entrySet() )
-                {
+            if (vs instanceof MergingList && ((MergingList<V>) vs).map != null) {
+                for (Map.Entry<Object, V> e : ((MergingList<V>) vs).map.entrySet()) {
                     Object key = e.getKey();
                     V v = e.getValue();
-                    map.merge( key, v, remapping );
+                    map.merge(key, v, remapping);
                 }
-            }
-            else
-            {
-                for ( V v : vs )
-                {
-                    Object key = keyComputer.apply( v );
-
-                    map.merge( key, v, remapping );
+            } else {
+                for (V v : vs) {
+                    Object key = keyComputer.apply(v);
+                    map.merge(key, v, remapping);
                 }
             }
         }
 
         @Override
-        public boolean contains( Object o )
-        {
-            if ( map != null )
-            {
-                return map.containsValue( o );
-            }
-            else
-            {
-                return list.contains( o );
+        public boolean contains(Object o) {
+            if (map != null) {
+                return map.containsValue(o);
+            } else {
+                return list.contains(o);
             }
         }
 
-        private List<V> asList()
-        {
-            if ( list == null )
-            {
-                list = new ArrayList<>( map.values() );
+        private List<V> asList() {
+            if (list == null) {
+                list = new ArrayList<>(map.values());
                 map = null;
             }
             return list;
         }
 
         @Override
-        public void add( int index, V element )
-        {
-            asList().add( index, element );
+        public void add(int index, V element) {
+            asList().add(index, element);
         }
 
         @Override
-        public V remove( int index )
-        {
-            return asList().remove( index );
+        public V remove(int index) {
+            return asList().remove(index);
         }
 
         @Override
-        public V get( int index )
-        {
-            return asList().get( index );
+        public V get(int index) {
+            return asList().get(index);
         }
 
         @Override
-        public int size()
-        {
-            if ( map != null )
-            {
+        public int size() {
+            if (map != null) {
                 return map.size();
-            }
-            else
-            {
+            } else {
                 return list.size();
             }
         }
