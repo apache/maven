@@ -146,7 +146,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // https://issues.apache.org/jira/browse/MNG-5760?focusedCommentId=17143795&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-17143795)
         final Verifier verifier = newVerifier(noProjectTestDir.getAbsolutePath());
         try {
-            verifier.addCliArgument("resources:resources");
+            verifier.addCliArgument("org.apache.maven.plugins:maven-resources-plugin:resources");
             verifier.execute();
         } catch (final VerificationException ve) {
             verifier.verifyTextInLog("Goal requires a project to execute but there is no POM in this directory");
