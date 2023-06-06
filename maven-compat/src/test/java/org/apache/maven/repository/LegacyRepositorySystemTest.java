@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.SwitchableMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -36,12 +37,15 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.project.artifact.DefaultMetadataSource;
 import org.apache.maven.repository.legacy.LegacyRepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
@@ -183,5 +187,16 @@ class LegacyRepositorySystemTest {
         assertEquals(localRepoDir, new File(basedir));
 
         assertEquals(localRepoDir.getPath(), basedir);
+    }
+
+    @Inject
+    DefaultMetadataSource defaultMetadataSource;
+
+    @Inject
+    SwitchableMetadataSource switchableMetadataSource;
+
+    @BeforeEach
+    void setup() throws CycleDetectedInComponentGraphException {
+        switchableMetadataSource.setDelegate(defaultMetadataSource);
     }
 }

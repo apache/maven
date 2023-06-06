@@ -18,14 +18,17 @@
  */
 package org.apache.maven.project.inheritance;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * DefaultModelInheritanceAssembler
  */
-@Component(role = ModelInheritanceAssembler.class)
+@Named
+@Singleton
 public class DefaultModelInheritanceAssembler implements ModelInheritanceAssembler {
     @Override
     public void assembleModelInheritance(Model child, Model parent, String childPathAdjustment) {

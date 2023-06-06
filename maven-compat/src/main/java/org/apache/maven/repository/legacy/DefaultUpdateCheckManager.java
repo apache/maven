@@ -18,6 +18,9 @@
  */
 package org.apache.maven.repository.legacy;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,14 +37,14 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.repository.Proxy;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 /**
  * DefaultUpdateCheckManager
  */
-@Component(role = UpdateCheckManager.class)
+@Named
+@Singleton
 public class DefaultUpdateCheckManager extends AbstractLogEnabled implements UpdateCheckManager {
 
     private static final String ERROR_KEY_SUFFIX = ".error";

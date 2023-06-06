@@ -18,10 +18,12 @@
  */
 package org.apache.maven.execution;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 
@@ -31,10 +33,11 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @Deprecated
-@Component(role = RuntimeInformation.class)
+@Named
+@Singleton
 public class DefaultRuntimeInformation implements RuntimeInformation, Initializable {
 
-    @Requirement
+    @Inject
     private org.apache.maven.rtinfo.RuntimeInformation rtInfo;
 
     private ArtifactVersion applicationVersion;

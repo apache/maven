@@ -18,7 +18,8 @@
  */
 package org.apache.maven.repository.legacy.resolver.conflict;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * The default conflict resolver that delegates to the nearest strategy.
@@ -28,5 +29,6 @@ import org.codehaus.plexus.component.annotations.Component;
  * @deprecated As of 3.0, use a specific implementation instead, e.g. {@link NearestConflictResolver}
  */
 @Deprecated
-@Component(role = ConflictResolver.class)
+@Named
+@Singleton
 public class DefaultConflictResolver extends NearestConflictResolver {}

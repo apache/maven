@@ -154,7 +154,6 @@ under the License.
     <commonsLangVersion>3.12.0</commonsLangVersion>
     <junitVersion>5.9.1</junitVersion>
     <mockitoVersion>4.11.0</mockitoVersion>
-    <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusUtilsVersion>4.0.0</plexusUtilsVersion>
     <plexusXmlVersion>4.0.0</plexusXmlVersion>
@@ -289,11 +288,6 @@ under the License.
         <groupId>javax.annotation</groupId>
         <artifactId>javax.annotation-api</artifactId>
         <version>1.3.2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-annotations</artifactId>
-        <version>${plexusVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -494,19 +488,6 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-metadata</artifactId>
-          <version>${plexusVersion}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>generate-metadata</goal>
-                <goal>generate-test-metadata</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>

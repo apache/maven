@@ -18,6 +18,8 @@
  */
 package org.apache.maven.project.interpolation;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -35,7 +37,6 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.path.PathTranslator;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
@@ -86,7 +87,7 @@ public abstract class AbstractStringBasedModelInterpolator extends AbstractLogEn
         TRANSLATED_PATH_EXPRESSIONS = translatedPrefixes;
     }
 
-    @Requirement
+    @Inject
     private PathTranslator pathTranslator;
 
     private Interpolator interpolator;

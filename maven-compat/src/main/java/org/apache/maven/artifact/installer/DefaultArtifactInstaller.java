@@ -18,6 +18,10 @@
  */
 package org.apache.maven.artifact.installer;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 
 import org.apache.maven.RepositoryUtils;
@@ -32,8 +36,6 @@ import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryM
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -45,13 +47,14 @@ import org.eclipse.aether.util.artifact.SubArtifact;
 /**
  * @author Jason van Zyl
  */
-@Component(role = ArtifactInstaller.class)
+@Named
+@Singleton
 public class DefaultArtifactInstaller extends AbstractLogEnabled implements ArtifactInstaller {
 
-    @Requirement
+    @Inject
     private RepositorySystem repoSystem;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */

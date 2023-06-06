@@ -18,6 +18,10 @@
  */
 package org.apache.maven.artifact.manager;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -37,31 +41,30 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.proxy.ProxyInfo;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 /**
  * Manages <a href="https://maven.apache.org/wagon">Wagon</a> related operations in Maven.
  */
-@Component(role = WagonManager.class)
+@Named
+@Singleton
 public class DefaultWagonManager extends org.apache.maven.repository.legacy.DefaultWagonManager
         implements WagonManager {
 
     // NOTE: This must use a different field name than in the super class or IoC has no chance to inject the loggers
-    @Requirement
+    @Inject
     private Logger log;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
-    @Requirement
+    @Inject
     private SettingsDecrypter settingsDecrypter;
 
-    @Requirement
+    @Inject
     private MirrorSelector mirrorSelector;
 
-    @Requirement
+    @Inject
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     public AuthenticationInfo getAuthenticationInfo(String id) {

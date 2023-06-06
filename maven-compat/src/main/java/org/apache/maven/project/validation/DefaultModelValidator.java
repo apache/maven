@@ -18,23 +18,26 @@
  */
 package org.apache.maven.project.validation;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
-@Component(role = ModelValidator.class)
 @Deprecated
+@Named
+@Singleton
 public class DefaultModelValidator implements ModelValidator {
 
-    @Requirement
+    @Inject
     private org.apache.maven.model.validation.ModelValidator modelValidator;
 
     public ModelValidationResult validate(Model model) {

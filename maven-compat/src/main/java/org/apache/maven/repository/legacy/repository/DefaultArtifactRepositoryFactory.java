@@ -18,6 +18,10 @@
  */
 package org.apache.maven.repository.legacy.repository;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.Map;
 
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
@@ -26,20 +30,19 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout2;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @author jdcasey
  */
-@Component(role = ArtifactRepositoryFactory.class)
+@Named
+@Singleton
 public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFactory {
     // TODO use settings?
     private String globalUpdatePolicy;
 
     private String globalChecksumPolicy;
 
-    @Requirement(role = ArtifactRepositoryLayout.class)
+    @Inject
     private Map<String, ArtifactRepositoryLayout> repositoryLayouts;
 
     public ArtifactRepositoryLayout getLayout(String layoutId) throws UnknownRepositoryLayoutException {

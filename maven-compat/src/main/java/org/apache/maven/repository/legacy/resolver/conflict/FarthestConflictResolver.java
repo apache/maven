@@ -18,8 +18,10 @@
  */
 package org.apache.maven.repository.legacy.resolver.conflict;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.resolver.ResolutionNode;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Resolves conflicting artifacts by always selecting the <em>farthest</em> declaration. Farthest is defined as the
@@ -28,7 +30,8 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @since 3.0
  */
-@Component(role = ConflictResolver.class, hint = "farthest")
+@Named("farthest")
+@Singleton
 public class FarthestConflictResolver implements ConflictResolver {
     // ConflictResolver methods -----------------------------------------------
 

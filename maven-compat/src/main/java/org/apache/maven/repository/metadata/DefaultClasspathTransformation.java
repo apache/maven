@@ -18,13 +18,15 @@
  */
 package org.apache.maven.repository.metadata;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * default implementation of the metadata classpath transformer
@@ -32,9 +34,10 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
-@Component(role = ClasspathTransformation.class)
+@Named
+@Singleton
 public class DefaultClasspathTransformation implements ClasspathTransformation {
-    @Requirement
+    @Inject
     GraphConflictResolver conflictResolver;
 
     // ----------------------------------------------------------------------------------------------------
