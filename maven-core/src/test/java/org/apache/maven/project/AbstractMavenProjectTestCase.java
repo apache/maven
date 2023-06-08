@@ -139,6 +139,7 @@ public abstract class AbstractMavenProjectTestCase {
     protected ProjectBuildingRequest newBuildingRequest() throws Exception {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository(getLocalRepository());
+        configuration.setRemoteRepositories(Arrays.asList(this.repositorySystem.createDefaultRemoteRepository()));
         initRepoSession(configuration);
         return configuration;
     }
