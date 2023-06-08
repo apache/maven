@@ -24,7 +24,7 @@ under the License.
   <description><![CDATA[
     Plugin descriptor, stored in <code>META-INF/maven/plugin.xml</code> in a plugin's jar artifact.
     This descriptor is generally generated from plugin sources, using
-    <a href="/plugins/maven-plugin-plugin/">maven-plugin-plugin</a>, but other tools may geenrated it or it could even be hand-written.
+    <a href="/plugins/maven-plugin-plugin/">maven-plugin-plugin</a>.
     <p><i>Notice:</i> this documentation is generated from a Modello model but the
     <a href="apidocs/org/apache/maven/plugin/descriptor/PluginDescriptor.html"><code>PluginDescriptor</code></a>/<a href="apidocs/org/apache/maven/plugin/descriptor/MojoDescriptor.html"><code>MojoDescriptor</code></a>
     code executed is not generated from this model. Please report if you find anything wrong this documentation.</p>
