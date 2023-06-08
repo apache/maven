@@ -95,9 +95,6 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
     @Inject
     private LegacySupport legacySupport;
 
-    @Inject
-    private RepositorySystem repoSystem;
-
     private final Executor executor;
 
     public DefaultArtifactResolver() {
@@ -111,7 +108,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
     }
 
     private RepositorySystemSession getSession(ArtifactRepository localRepository) {
-        return LegacyLocalRepositoryManager.overlay(localRepository, legacySupport.getRepositorySession(), repoSystem);
+        return LegacyLocalRepositoryManager.overlay(localRepository, legacySupport.getRepositorySession(), null);
     }
 
     private void injectSession1(RepositoryRequest request, MavenSession session) {
@@ -188,7 +185,10 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
                 String path = lrm.getPathForLocalArtifact(artifactRequest.getArtifact());
                 artifact.setFile(new File(lrm.getRepository().getBasedir(), path));
 
+                RepositorySystem repoSystem = container.lookup(RepositorySystem.class);
                 result = repoSystem.resolveArtifact(session, artifactRequest);
+            } catch (ComponentLookupException e) {
+                throw new IllegalStateException("Unable to lookup " + RepositorySystem.class.getName());
             } catch (org.eclipse.aether.resolution.ArtifactResolutionException e) {
                 if (e.getCause() instanceof org.eclipse.aether.transfer.ArtifactNotFoundException) {
                     throw new ArtifactNotFoundException(e.getMessage(), artifact, remoteRepositories, e);

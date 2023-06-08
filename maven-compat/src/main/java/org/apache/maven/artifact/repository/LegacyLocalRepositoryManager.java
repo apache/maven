@@ -60,6 +60,10 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
     public static RepositorySystemSession overlay(
             ArtifactRepository repository, RepositorySystemSession session, RepositorySystem system) {
+        return overlay(repository, session);
+    }
+
+    public static RepositorySystemSession overlay(ArtifactRepository repository, RepositorySystemSession session) {
         if (repository == null || repository.getBasedir() == null) {
             return session;
         }

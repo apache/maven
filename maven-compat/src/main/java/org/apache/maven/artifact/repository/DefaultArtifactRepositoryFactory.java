@@ -29,6 +29,8 @@ import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.RepositorySystem;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
@@ -45,7 +47,7 @@ public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFacto
     private LegacySupport legacySupport;
 
     @Inject
-    private RepositorySystem repositorySystem;
+    private PlexusContainer container;
 
     public ArtifactRepositoryLayout getLayout(String layoutId) throws UnknownRepositoryLayoutException {
         return factory.getLayout(layoutId);
@@ -94,6 +96,13 @@ public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFacto
 
         if (session != null && repository != null && !isLocalRepository(repository)) {
             List<ArtifactRepository> repositories = Arrays.asList(repository);
+
+            RepositorySystem repositorySystem;
+            try {
+                repositorySystem = container.lookup(RepositorySystem.class);
+            } catch (ComponentLookupException e) {
+                throw new IllegalStateException("Unable to lookup " + RepositorySystem.class.getName());
+            }
 
             if (mirrors) {
                 repositorySystem.injectMirror(session, repositories);
