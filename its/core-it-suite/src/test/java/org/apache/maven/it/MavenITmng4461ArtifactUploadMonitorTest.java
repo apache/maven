@@ -47,6 +47,7 @@ public class MavenITmng4461ArtifactUploadMonitorTest extends AbstractMavenIntegr
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.setEnvironmentVariable("CI", "false");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

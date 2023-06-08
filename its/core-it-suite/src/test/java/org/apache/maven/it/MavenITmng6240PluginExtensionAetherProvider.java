@@ -55,11 +55,13 @@ public class MavenITmng6240PluginExtensionAetherProvider extends AbstractMavenIn
         File projectDir = new File(testDir, "project");
 
         Verifier verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier.setEnvironmentVariable("CI", "false");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier.setEnvironmentVariable("CI", "false");
         verifier.addCliArgument("deploy");
         verifier.execute();
         verifier.verifyErrorFreeLog();
