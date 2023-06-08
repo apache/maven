@@ -44,6 +44,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
@@ -144,7 +145,7 @@ public class TestRepositorySystem implements RepositorySystem {
 
     public ArtifactRepository createLocalRepository(File localRepository) throws InvalidRepositoryException {
         return new MavenArtifactRepository(
-                DEFAULT_LOCAL_REPO_ID,
+                MavenRepositorySystem.DEFAULT_LOCAL_REPO_ID,
                 "file://" + localRepository.toURI().getPath(),
                 new DefaultRepositoryLayout(),
                 new ArtifactRepositoryPolicy(),

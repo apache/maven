@@ -32,7 +32,6 @@ import java.util.Set;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Repository;
@@ -104,7 +103,7 @@ public class DefaultMavenExecutionRequestPopulator implements MavenExecutionRequ
             throws MavenExecutionRequestPopulationException {
         Set<String> definedRepositories = repositorySystem.getRepoIds(request.getRemoteRepositories());
 
-        if (!definedRepositories.contains(RepositorySystem.DEFAULT_REMOTE_REPO_ID)) {
+        if (!definedRepositories.contains(MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID)) {
             try {
                 request.addRemoteRepository(repositorySystem.createDefaultRemoteRepository(request));
             } catch (Exception e) {
@@ -117,7 +116,7 @@ public class DefaultMavenExecutionRequestPopulator implements MavenExecutionRequ
             throws MavenExecutionRequestPopulationException {
         Set<String> definedRepositories = repositorySystem.getRepoIds(request.getPluginArtifactRepositories());
 
-        if (!definedRepositories.contains(RepositorySystem.DEFAULT_REMOTE_REPO_ID)) {
+        if (!definedRepositories.contains(MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID)) {
             try {
                 request.addPluginArtifactRepository(repositorySystem.createDefaultRemoteRepository(request));
             } catch (Exception e) {
@@ -157,11 +156,11 @@ public class DefaultMavenExecutionRequestPopulator implements MavenExecutionRequ
         }
 
         if (localRepositoryPath == null || localRepositoryPath.isEmpty()) {
-            localRepositoryPath = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
+            localRepositoryPath = new File(System.getProperty("user.home"), ".m2/repository").getAbsolutePath();
         }
 
         try {
-            return repositorySystem.createLocalRepository(request, new File(localRepositoryPath));
+            return repositorySystem.createLocalRepository(new File(localRepositoryPath));
         } catch (Exception e) {
             throw new MavenExecutionRequestPopulationException("Cannot create local repository.", e);
         }

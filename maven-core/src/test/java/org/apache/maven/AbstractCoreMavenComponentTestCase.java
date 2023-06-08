@@ -29,6 +29,7 @@ import java.util.Properties;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -179,7 +180,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
         policy.setUpdatePolicy("always");
 
         Repository repository = new Repository();
-        repository.setId(RepositorySystem.DEFAULT_REMOTE_REPO_ID);
+        repository.setId(MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID);
         repository.setUrl("file://" + repoDir.toURI().getPath());
         repository.setReleases(policy);
         repository.setSnapshots(policy);

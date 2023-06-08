@@ -36,6 +36,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
@@ -47,7 +48,6 @@ import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -69,7 +69,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
     private final PlexusContainer container; // TODO not used? Then remove
     private final ClassRealmManager classRealmManager;
     private final ProjectRealmCache projectRealmCache;
-    private final RepositorySystem repositorySystem;
+    private final MavenRepositorySystem repositorySystem;
     private final MavenPluginManager pluginManager;
 
     @Inject
@@ -77,7 +77,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
             PlexusContainer container,
             ClassRealmManager classRealmManager,
             ProjectRealmCache projectRealmCache,
-            RepositorySystem repositorySystem,
+            MavenRepositorySystem repositorySystem,
             MavenPluginManager pluginManager) {
         this.container = container;
         this.classRealmManager = classRealmManager;
@@ -94,7 +94,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
         List<ArtifactRepository> internalRepositories = new ArrayList<>();
 
         for (Repository repository : pomRepositories) {
-            internalRepositories.add(repositorySystem.buildArtifactRepository(repository));
+            internalRepositories.add(MavenRepositorySystem.buildArtifactRepository(repository));
         }
 
         repositorySystem.injectMirror(request.getRepositorySession(), internalRepositories);

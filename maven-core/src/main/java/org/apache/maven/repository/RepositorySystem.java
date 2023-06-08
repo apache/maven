@@ -28,6 +28,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
@@ -38,9 +39,11 @@ import org.eclipse.aether.RepositorySystemSession;
 /**
  * @author Jason van Zyl
  * @since 3.0-alpha
+ * @deprecated Use {@link MavenRepositorySystem} if needed, or maven-resolver directly, until maven 4.x api is out
  */
+@Deprecated
 public interface RepositorySystem {
-    String DEFAULT_LOCAL_REPO_ID = "local";
+    String DEFAULT_LOCAL_REPO_ID = MavenRepositorySystem.DEFAULT_LOCAL_REPO_ID;
 
     @SuppressWarnings("checkstyle:constantname")
     String userHome = System.getProperty("user.home");
@@ -51,9 +54,9 @@ public interface RepositorySystem {
     @SuppressWarnings("checkstyle:constantname")
     File defaultUserLocalRepository = new File(userMavenConfigurationHome, "repository");
 
-    String DEFAULT_REMOTE_REPO_ID = "central";
+    String DEFAULT_REMOTE_REPO_ID = MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID;
 
-    String DEFAULT_REMOTE_REPO_URL = "https://repo.maven.apache.org/maven2";
+    String DEFAULT_REMOTE_REPO_URL = MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID;
 
     Artifact createArtifact(String groupId, String artifactId, String version, String packaging);
 

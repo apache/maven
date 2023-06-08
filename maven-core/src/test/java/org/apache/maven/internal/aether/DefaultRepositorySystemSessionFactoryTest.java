@@ -56,9 +56,6 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 public class DefaultRepositorySystemSessionFactoryTest {
 
     @Inject
-    protected org.apache.maven.repository.RepositorySystem repositorySystem;
-
-    @Inject
     protected MavenRepositorySystem mavenRepositorySystem;
 
     @Inject
@@ -398,6 +395,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
     protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {
         File repoDir = new File(getBasedir(), "target/local-repo").getAbsoluteFile();
 
-        return repositorySystem.createLocalRepository(repoDir);
+        return mavenRepositorySystem.createLocalRepository(repoDir);
     }
 }
