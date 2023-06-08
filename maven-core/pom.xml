@@ -329,6 +329,15 @@ under the License.
               <exclude>org.apache.maven.toolchain.DefaultToolchain#DefaultToolchain(org.apache.maven.toolchain.model.ToolchainModel,org.codehaus.plexus.logging.Logger):CONSTRUCTOR_REMOVED</exclude>
               <exclude>org.apache.maven.toolchain.DefaultToolchain#DefaultToolchain(org.apache.maven.toolchain.model.ToolchainModel,java.lang.String,org.codehaus.plexus.logging.Logger):CONSTRUCTOR_REMOVED</exclude>
               <exclude>org.apache.maven.toolchain.DefaultToolchainManager#logger</exclude>
+              <!-- classes moved to maven-compat -->
+              <exclude>org.apache.maven.repository.ArtifactDoesNotExistException</exclude>
+              <exclude>org.apache.maven.repository.ArtifactTransferEvent</exclude>
+              <exclude>org.apache.maven.repository.ArtifactTransferFailedException</exclude>
+              <exclude>org.apache.maven.repository.ArtifactTransferListener</exclude>
+              <exclude>org.apache.maven.repository.ArtifactTransferResource</exclude>
+              <exclude>org.apache.maven.repository.DelegatingLocalArtifactRepository</exclude>
+              <exclude>org.apache.maven.repository.LocalArtifactRepository</exclude>
+              <exclude>org.apache.maven.repository.RepositorySystem</exclude>
             </excludes>
           </parameter>
         </configuration>

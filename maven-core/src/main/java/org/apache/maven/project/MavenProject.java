@@ -40,6 +40,7 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.lifecycle.internal.DefaultProjectArtifactFactory;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -67,7 +68,6 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -1313,7 +1313,7 @@ public class MavenProject implements Cloneable {
     @Deprecated
     public Set<Artifact> createArtifacts(ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter filter)
             throws InvalidDependencyVersionException {
-        return MavenMetadataSource.createArtifacts(
+        return DefaultProjectArtifactFactory.createArtifacts(
                 artifactFactory, getModel().getDependencies(), inheritedScope, filter, this);
     }
 

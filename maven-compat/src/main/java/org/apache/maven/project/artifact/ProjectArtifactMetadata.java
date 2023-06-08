@@ -33,6 +33,7 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreExce
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@Deprecated
 public class ProjectArtifactMetadata extends AbstractArtifactMetadata {
     private final File file;
 

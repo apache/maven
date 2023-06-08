@@ -25,6 +25,7 @@ import java.io.IOException;
  *
  * @author Benjamin Bentmann
  */
+@Deprecated
 public class LocalRepositoryNotAccessibleException extends IOException {
 
     public LocalRepositoryNotAccessibleException(String message, Throwable cause) {

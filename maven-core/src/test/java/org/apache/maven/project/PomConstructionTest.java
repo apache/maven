@@ -37,7 +37,6 @@ import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -72,7 +71,7 @@ class PomConstructionTest {
     private DefaultProjectBuilder projectBuilder;
 
     @Inject
-    private RepositorySystem repositorySystem;
+    private MavenRepositorySystem repositorySystem;
 
     private File testDirectory;
 

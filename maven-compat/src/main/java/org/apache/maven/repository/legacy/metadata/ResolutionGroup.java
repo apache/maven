@@ -28,6 +28,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  * ResolutionGroup
  */
+@Deprecated
 public class ResolutionGroup {
 
     private final Set<Artifact> artifacts;

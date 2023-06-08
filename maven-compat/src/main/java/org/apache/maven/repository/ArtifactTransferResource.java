@@ -23,6 +23,7 @@ package org.apache.maven.repository;
  *
  * @author Benjamin Bentmann
  */
+@Deprecated
 public interface ArtifactTransferResource {
 
     /**

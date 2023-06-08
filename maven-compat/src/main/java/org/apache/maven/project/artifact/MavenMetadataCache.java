@@ -16,18 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.repository;
+package org.apache.maven.project.artifact;
+
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.MavenArtifactRepository;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
- * LocalArtifactRepository
+ * MavenMetadataCache
  */
-public abstract class LocalArtifactRepository extends MavenArtifactRepository {
-    public static final String IDE_WORKSPACE = "ide-workspace";
+@Deprecated
+public interface MavenMetadataCache {
 
-    public abstract Artifact find(Artifact artifact);
+    ResolutionGroup get(
+            Artifact artifact,
+            boolean resolveManagedVersions,
+            ArtifactRepository localRepository,
+            List<ArtifactRepository> remoteRepositories);
 
-    public abstract boolean hasLocalMetadata();
+    void put(
+            Artifact artifact,
+            boolean resolveManagedVersions,
+            ArtifactRepository localRepository,
+            List<ArtifactRepository> remoteRepositories,
+            ResolutionGroup result);
+
+    void flush();
 }

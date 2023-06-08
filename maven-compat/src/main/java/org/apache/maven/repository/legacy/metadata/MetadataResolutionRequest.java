@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
  *
  * @author Benjamin Bentmann
  */
+@Deprecated
 public interface MetadataResolutionRequest extends RepositoryRequest {
 
     /**

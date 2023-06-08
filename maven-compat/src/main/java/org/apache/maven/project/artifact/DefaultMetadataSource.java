@@ -37,6 +37,7 @@ import org.apache.maven.project.ProjectBuilder;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultMetadataSource extends MavenMetadataSource {
     @Inject
     public DefaultMetadataSource(

@@ -45,6 +45,7 @@ import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
@@ -63,7 +64,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
     protected PlexusContainer container;
 
     @Inject
-    protected MavenRepositorySystem repositorySystem;
+    protected RepositorySystem repositorySystem;
 
     @Inject
     protected org.apache.maven.project.ProjectBuilder projectBuilder;

@@ -43,6 +43,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultMavenMetadataCache implements MavenMetadataCache {
 
     protected final Map<CacheKey, CacheRecord> cache = new ConcurrentHashMap<>();

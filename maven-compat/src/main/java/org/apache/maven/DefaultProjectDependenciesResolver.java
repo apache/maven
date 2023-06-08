@@ -48,9 +48,9 @@ import org.apache.maven.repository.RepositorySystem;
  *             but should have been.
  *
  */
-@Deprecated
 @Named
 @Singleton
+@Deprecated
 public class DefaultProjectDependenciesResolver implements ProjectDependenciesResolver {
 
     private final RepositorySystem repositorySystem;

@@ -61,7 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @PlexusTest
 class LegacyRepositorySystemTest {
     @Inject
-    private RepositorySystem repositorySystem;
+    private LegacyRepositorySystem repositorySystem;
 
     @Inject
     private ResolutionErrorHandler resolutionErrorHandler;

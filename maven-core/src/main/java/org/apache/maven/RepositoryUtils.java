@@ -18,6 +18,7 @@
  */
 package org.apache.maven;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +34,8 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactProperties;
@@ -45,6 +48,8 @@ import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.repository.Authentication;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.Proxy;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
@@ -349,6 +354,29 @@ public class RepositoryUtils {
             result = 31 * result + repositoryHashCode(repository);
         }
         return result;
+    }
+
+    public static RepositorySystemSession overlay(
+            ArtifactRepository repository, RepositorySystemSession session, RepositorySystem system) {
+        if (repository == null || repository.getBasedir() == null) {
+            return session;
+        }
+
+        DefaultRepositorySystemSession newSession;
+        if (session != null) {
+            LocalRepositoryManager lrm = session.getLocalRepositoryManager();
+            if (lrm != null && lrm.getRepository().getBasedir().equals(new File(repository.getBasedir()))) {
+                return session;
+            }
+            newSession = new DefaultRepositorySystemSession(session);
+        } else {
+            newSession = new DefaultRepositorySystemSession();
+        }
+
+        final LocalRepositoryManager llrm =
+                system.newLocalRepositoryManager(newSession, new LocalRepository(repository.getBasedir()));
+        newSession.setLocalRepositoryManager(llrm);
+        return newSession;
     }
 
     private static int repositoryHashCode(RemoteRepository repository) {

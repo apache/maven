@@ -19,14 +19,19 @@
 package org.apache.maven.repository;
 
 /**
- * ArtifactTransferFailedException
+ * ArtifactTransferListener
  */
-public class ArtifactTransferFailedException extends Exception {
-    public ArtifactTransferFailedException(final String message) {
-        super(message);
-    }
+@Deprecated
+public interface ArtifactTransferListener {
+    boolean isShowChecksumEvents();
 
-    public ArtifactTransferFailedException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+    void setShowChecksumEvents(boolean showChecksumEvents);
+
+    void transferInitiated(ArtifactTransferEvent transferEvent);
+
+    void transferStarted(ArtifactTransferEvent transferEvent);
+
+    void transferProgress(ArtifactTransferEvent transferEvent);
+
+    void transferCompleted(ArtifactTransferEvent transferEvent);
 }

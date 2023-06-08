@@ -92,6 +92,7 @@ import org.slf4j.LoggerFactory;
  */
 @Named("maven")
 @Singleton
+@Deprecated
 public class MavenMetadataSource implements ArtifactMetadataSource {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final RepositoryMetadataManager repositoryMetadataManager;

@@ -25,12 +25,12 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuilder;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.testing.PlexusTest;
@@ -55,7 +55,7 @@ class PomConstructionWithSettingsTest {
     private DefaultProjectBuilder projectBuilder;
 
     @Inject
-    private RepositorySystem repositorySystem;
+    private MavenRepositorySystem repositorySystem;
 
     private File testDirectory;
 

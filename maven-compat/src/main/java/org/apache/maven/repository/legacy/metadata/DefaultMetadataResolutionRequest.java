@@ -31,6 +31,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
  *
  * @author Benjamin Bentmann
  */
+@Deprecated
 public class DefaultMetadataResolutionRequest implements MetadataResolutionRequest {
 
     private Artifact artifact;

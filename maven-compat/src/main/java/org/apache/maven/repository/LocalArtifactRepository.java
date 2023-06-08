@@ -18,19 +18,17 @@
  */
 package org.apache.maven.repository;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.MavenArtifactRepository;
+
 /**
- * ArtifactTransferListener
+ * LocalArtifactRepository
  */
-public interface ArtifactTransferListener {
-    boolean isShowChecksumEvents();
+@Deprecated
+public abstract class LocalArtifactRepository extends MavenArtifactRepository {
+    public static final String IDE_WORKSPACE = "ide-workspace";
 
-    void setShowChecksumEvents(boolean showChecksumEvents);
+    public abstract Artifact find(Artifact artifact);
 
-    void transferInitiated(ArtifactTransferEvent transferEvent);
-
-    void transferStarted(ArtifactTransferEvent transferEvent);
-
-    void transferProgress(ArtifactTransferEvent transferEvent);
-
-    void transferCompleted(ArtifactTransferEvent transferEvent);
+    public abstract boolean hasLocalMetadata();
 }

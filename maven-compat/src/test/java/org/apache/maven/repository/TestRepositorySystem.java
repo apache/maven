@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.repository;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -50,10 +51,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.project.artifact.ArtifactWithDependencies;
-import org.apache.maven.repository.ArtifactDoesNotExistException;
-import org.apache.maven.repository.ArtifactTransferFailedException;
-import org.apache.maven.repository.ArtifactTransferListener;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -64,11 +61,16 @@ import org.eclipse.aether.RepositorySystemSession;
  */
 @Named
 @Singleton
+@Priority(10)
 public class TestRepositorySystem implements RepositorySystem {
 
     private final ModelReader modelReader;
 
     private final ArtifactFactory artifactFactory;
+
+    public TestRepositorySystem() {
+        this(null, null);
+    }
 
     @Inject
     public TestRepositorySystem(ModelReader modelReader, ArtifactFactory artifactFactory) {

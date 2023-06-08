@@ -35,6 +35,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -49,7 +50,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
@@ -77,7 +77,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     private static final String FS = File.separator;
 
     @Inject
-    private RepositorySystem factory;
+    private MavenRepositorySystem factory;
 
     private Path rootDirectory;
 
@@ -407,7 +407,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
 
     private ExpressionEvaluator createExpressionEvaluator(
             MavenProject project, PluginDescriptor pluginDescriptor, Properties executionProperties) throws Exception {
-        ArtifactRepository repo = factory.createDefaultLocalRepository();
+        ArtifactRepository repo = getLocalRepository();
 
         MutablePlexusContainer container = (MutablePlexusContainer) getContainer();
         MavenSession mavenSession = createSession(container, repo, executionProperties);

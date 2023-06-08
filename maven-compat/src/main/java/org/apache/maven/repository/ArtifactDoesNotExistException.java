@@ -21,6 +21,7 @@ package org.apache.maven.repository;
 /**
  * ArtifactDoesNotExistException
  */
+@Deprecated
 public class ArtifactDoesNotExistException extends Exception {
     public ArtifactDoesNotExistException(final String message) {
         super(message);

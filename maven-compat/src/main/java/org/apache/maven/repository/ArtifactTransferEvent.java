@@ -27,6 +27,7 @@ import java.util.EventObject;
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  */
+@Deprecated
 public class ArtifactTransferEvent extends EventObject {
     /**
      * A transfer was attempted, but has not yet commenced.

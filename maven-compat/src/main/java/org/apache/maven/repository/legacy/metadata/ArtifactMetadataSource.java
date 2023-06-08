@@ -30,6 +30,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  */
+@Deprecated
 public interface ArtifactMetadataSource {
 
     ResolutionGroup retrieve(MetadataResolutionRequest request) throws ArtifactMetadataRetrievalException;

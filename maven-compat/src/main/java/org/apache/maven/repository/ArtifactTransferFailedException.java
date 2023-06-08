@@ -16,31 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.project.artifact;
-
-import java.util.List;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ResolutionGroup;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+package org.apache.maven.repository;
 
 /**
- * MavenMetadataCache
+ * ArtifactTransferFailedException
  */
-public interface MavenMetadataCache {
+@Deprecated
+public class ArtifactTransferFailedException extends Exception {
+    public ArtifactTransferFailedException(final String message) {
+        super(message);
+    }
 
-    ResolutionGroup get(
-            Artifact artifact,
-            boolean resolveManagedVersions,
-            ArtifactRepository localRepository,
-            List<ArtifactRepository> remoteRepositories);
-
-    void put(
-            Artifact artifact,
-            boolean resolveManagedVersions,
-            ArtifactRepository localRepository,
-            List<ArtifactRepository> remoteRepositories,
-            ResolutionGroup result);
-
-    void flush();
+    public ArtifactTransferFailedException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 }

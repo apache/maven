@@ -526,6 +526,9 @@ public class MavenRepositorySystem {
     //
     // Code taken from LegacyRepositorySystem
     //
+    public ArtifactRepository createDefaultRemoteRepository() throws Exception {
+        return createDefaultRemoteRepository(null);
+    }
 
     public ArtifactRepository createDefaultRemoteRepository(MavenExecutionRequest request) throws Exception {
         return createRepository(
