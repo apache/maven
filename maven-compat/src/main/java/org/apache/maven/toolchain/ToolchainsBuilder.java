@@ -27,7 +27,9 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
  * <strong>Note:</strong> This is an internal component whose interface can change without prior notice.
  *
  * @author Benjamin Bentmann
+ * @deprecated use {@link org.apache.maven.toolchain.building.ToolchainsBuilder} instead
  */
+@Deprecated
 public interface ToolchainsBuilder {
 
     /**

@@ -25,6 +25,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 /**
  * ArtifactFilterManager
  */
+@Deprecated
 public interface ArtifactFilterManager {
     /**
      * Returns a filter for core + extension artifacts.

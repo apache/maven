@@ -23,6 +23,7 @@ import java.util.Set;
 /**
  * @deprecated use {@code META-INF/maven/extension.xml} to define artifacts exported by Maven core extensions.
  */
+@Deprecated
 public interface ArtifactFilterManagerDelegate {
 
     void addExcludes(Set<String> excludes);

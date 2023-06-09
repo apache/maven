@@ -35,7 +35,7 @@ import org.apache.maven.extension.internal.CoreExports;
  */
 @Named
 @Singleton
-@SuppressWarnings("deprecation")
+@Deprecated
 public class DefaultArtifactFilterManager implements ArtifactFilterManager {
 
     // this is a live injected collection

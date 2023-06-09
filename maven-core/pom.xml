@@ -340,6 +340,10 @@ under the License.
               <exclude>org.apache.maven.repository.LocalArtifactRepository</exclude>
               <exclude>org.apache.maven.repository.LocalRepositoryNotAccessibleException</exclude>
               <exclude>org.apache.maven.repository.RepositorySystem</exclude>
+              <exclude>org.apache.maven.settings.DefaultMavenSettingsBuilder</exclude>
+              <exclude>org.apache.maven.settings.MavenSettingsBuilder</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchainsBuilder</exclude>
+              <exclude>org.apache.maven.toolchain.ToolchainsBuilder</exclude>
             </excludes>
           </parameter>
         </configuration>
