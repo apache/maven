@@ -21,10 +21,18 @@ package org.apache.maven.plugin.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.eventspy.AbstractEventSpy;
@@ -34,7 +42,6 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.util.ConfigUtils;
@@ -119,7 +126,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         String pluginKey = pluginKey(pluginArtifact);
         PluginValidationIssues pluginIssues =
                 pluginIssues(session).computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
-        pluginIssues.reportPluginIssue(locality, null, null, issue);
+        pluginIssues.reportPluginIssue(locality, null, issue);
         mayReportInline(session, locality, issue);
     }
 
@@ -129,8 +136,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         String pluginKey = pluginKey(mojoDescriptor);
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
-        pluginIssues.reportPluginIssue(
-                locality, pluginDeclaration(mavenSession, mojoDescriptor), pluginOccurrence(mavenSession), issue);
+        pluginIssues.reportPluginIssue(locality, pluginDeclaration(mavenSession, mojoDescriptor), issue);
         mayReportInline(mavenSession.getRepositorySession(), locality, issue);
     }
 
@@ -145,11 +151,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginMojoIssue(
-                locality,
-                pluginDeclaration(mavenSession, mojoDescriptor),
-                pluginOccurrence(mavenSession),
-                mojoInfo(mojoDescriptor, mojoClass),
-                issue);
+                locality, pluginDeclaration(mavenSession, mojoDescriptor), mojoInfo(mojoDescriptor, mojoClass), issue);
         mayReportInline(mavenSession.getRepositorySession(), locality, issue);
     }
 
@@ -181,12 +183,6 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
                     logger.warn("  Declared at location(s):");
                     for (String pluginDeclaration : issues.pluginDeclarations) {
                         logger.warn("   * {}", pluginDeclaration);
-                    }
-                }
-                if (!issues.pluginOccurrences.isEmpty()) {
-                    logger.warn("  Used in module(s):");
-                    for (String pluginOccurrence : issues.pluginOccurrences) {
-                        logger.warn("   * {}", pluginOccurrence);
                     }
                 }
                 if (!issues.pluginIssues.isEmpty()) {
@@ -278,21 +274,6 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         }
     }
 
-    private String pluginOccurrence(MavenSession mavenSession) {
-        MavenProject prj = mavenSession.getCurrentProject();
-        String result = prj.getGroupId() + ":" + prj.getArtifactId() + ":" + prj.getVersion();
-        File currentPom = prj.getFile();
-        if (currentPom != null) {
-            Path topDirectory = mavenSession.getTopDirectory();
-            Path current = currentPom.toPath().toAbsolutePath().normalize();
-            if (current.startsWith(topDirectory)) {
-                current = topDirectory.relativize(current);
-            }
-            result += " (" + current + ")";
-        }
-        return result;
-    }
-
     private String mojoInfo(MojoDescriptor mojoDescriptor, Class<?> mojoClass) {
         return mojoDescriptor.getFullGoalName() + " (" + mojoClass.getName() + ")";
     }
@@ -306,26 +287,20 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
     private static class PluginValidationIssues {
         private final LinkedHashSet<String> pluginDeclarations;
 
-        private final LinkedHashSet<String> pluginOccurrences;
-
         private final HashMap<IssueLocality, LinkedHashSet<String>> pluginIssues;
 
         private final HashMap<IssueLocality, LinkedHashMap<String, LinkedHashSet<String>>> mojoIssues;
 
         private PluginValidationIssues() {
             this.pluginDeclarations = new LinkedHashSet<>();
-            this.pluginOccurrences = new LinkedHashSet<>();
             this.pluginIssues = new HashMap<>();
             this.mojoIssues = new HashMap<>();
         }
 
         private synchronized void reportPluginIssue(
-                IssueLocality issueLocality, String pluginDeclaration, String pluginOccurrence, String issue) {
+                IssueLocality issueLocality, String pluginDeclaration, String issue) {
             if (pluginDeclaration != null) {
                 pluginDeclarations.add(pluginDeclaration);
-            }
-            if (pluginOccurrence != null) {
-                pluginOccurrences.add(pluginOccurrence);
             }
             pluginIssues
                     .computeIfAbsent(issueLocality, k -> new LinkedHashSet<>())
@@ -333,16 +308,9 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         }
 
         private synchronized void reportPluginMojoIssue(
-                IssueLocality issueLocality,
-                String pluginDeclaration,
-                String pluginOccurrence,
-                String mojoInfo,
-                String issue) {
+                IssueLocality issueLocality, String pluginDeclaration, String mojoInfo, String issue) {
             if (pluginDeclaration != null) {
                 pluginDeclarations.add(pluginDeclaration);
-            }
-            if (pluginOccurrence != null) {
-                pluginOccurrences.add(pluginOccurrence);
             }
             mojoIssues
                     .computeIfAbsent(issueLocality, k -> new LinkedHashMap<>())
