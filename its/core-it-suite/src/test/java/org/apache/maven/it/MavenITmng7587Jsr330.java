@@ -34,8 +34,8 @@ import org.junit.jupiter.api.condition.JRE;
 class MavenITmng7587Jsr330 extends AbstractMavenIntegrationTestCase {
 
     public MavenITmng7587Jsr330() {
-        // affected Maven versions: 3.9.2 and 4.0.0-alpha-5
-        super("(3.9.2,3.999),(4.0.0-alpha-5,)");
+        // affected Maven versions: 4.0.0-alpha-5
+        super("(4.0.0-alpha-5,)");
     }
 
     /**
