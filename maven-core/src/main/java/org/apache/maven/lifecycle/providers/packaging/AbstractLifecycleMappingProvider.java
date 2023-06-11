@@ -35,15 +35,15 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class AbstractLifecycleMappingProvider implements Provider<LifecycleMapping> {
     // START SNIPPET: versions
-    protected static final String RESOURCES_PLUGIN_VERSION = "3.3.0";
+    protected static final String RESOURCES_PLUGIN_VERSION = "3.3.1";
 
-    protected static final String COMPILER_PLUGIN_VERSION = "3.10.1";
+    protected static final String COMPILER_PLUGIN_VERSION = "3.11.0";
 
-    protected static final String SUREFIRE_PLUGIN_VERSION = "3.0.0";
+    protected static final String SUREFIRE_PLUGIN_VERSION = "3.1.2";
 
-    protected static final String INSTALL_PLUGIN_VERSION = "3.1.0";
+    protected static final String INSTALL_PLUGIN_VERSION = "3.1.1";
 
-    protected static final String DEPLOY_PLUGIN_VERSION = "3.1.0";
+    protected static final String DEPLOY_PLUGIN_VERSION = "3.1.1";
 
     // packaging
 
@@ -53,7 +53,7 @@ public abstract class AbstractLifecycleMappingProvider implements Provider<Lifec
 
     protected static final String EJB_PLUGIN_VERSION = "3.2.1";
 
-    protected static final String PLUGIN_PLUGIN_VERSION = "3.7.1";
+    protected static final String PLUGIN_PLUGIN_VERSION = "3.9.0";
 
     protected static final String RAR_PLUGIN_VERSION = "3.0.0";
 
