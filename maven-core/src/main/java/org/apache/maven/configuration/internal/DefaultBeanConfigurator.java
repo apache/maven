@@ -24,15 +24,20 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.configuration.BeanConfigurationException;
 import org.apache.maven.configuration.BeanConfigurationPathTranslator;
 import org.apache.maven.configuration.BeanConfigurationRequest;
 import org.apache.maven.configuration.BeanConfigurationValuePreprocessor;
 import org.apache.maven.configuration.BeanConfigurator;
+import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
+import org.codehaus.plexus.component.configurator.converters.AbstractConfigurationConverter;
 import org.codehaus.plexus.component.configurator.converters.basic.AbstractBasicConverter;
 import org.codehaus.plexus.component.configurator.converters.composite.ObjectWithFieldsConverter;
 import org.codehaus.plexus.component.configurator.converters.lookup.ConverterLookup;
@@ -130,6 +135,41 @@ public class DefaultBeanConfigurator implements BeanConfigurator {
                 return translator.translatePath(file);
             }
             return file;
+        }
+    }
+
+    static class XmlConverter extends AbstractConfigurationConverter {
+        @Override
+        public boolean canConvert(Class<?> type) {
+            return XmlNode.class.equals(type);
+        }
+
+        @Override
+        public Object fromConfiguration(
+                final ConverterLookup lookup,
+                final PlexusConfiguration configuration,
+                final Class<?> type,
+                final Class<?> enclosingType,
+                final ClassLoader loader,
+                final ExpressionEvaluator evaluator,
+                final ConfigurationListener listener)
+                throws ComponentConfigurationException {
+
+            try {
+                return toXml(configuration, evaluator);
+            } catch (ExpressionEvaluationException e) {
+                throw new ComponentConfigurationException("Unable to convert configuration to xml node", e);
+            }
+        }
+
+        XmlNode toXml(PlexusConfiguration config, ExpressionEvaluator evaluator) throws ExpressionEvaluationException {
+            List<XmlNode> children = new ArrayList<>();
+            for (PlexusConfiguration c : config.getChildren()) {
+                children.add(toXml(c, evaluator));
+            }
+            String name = config.getName();
+            Object value = evaluator.evaluate(config.getValue());
+            return new XmlNodeImpl(name, value != null ? value.toString() : null, null, children, null);
         }
     }
 
