@@ -34,7 +34,7 @@ Maven Plugin API
  []
 
  A plugin is described in a {{{./plugin.html}<<<META-INF/maven/plugin.xml>>> plugin descriptor}},
- generally generated from plugin sources using {{{/plugin-tools/maven-plugin-plugin/}maven-plugin-plugin}} (other tools may generate it, or it could eventually be hand-written).
+ generally generated from plugin sources using {{{/plugin-tools/maven-plugin-plugin/}maven-plugin-plugin}}.
 
 * See Also
 
