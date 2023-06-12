@@ -327,7 +327,7 @@ public class DefaultMaven implements Maven {
             }
         } finally {
             try {
-                afterSessionEnd(session.getProjects(), session);
+                afterSessionEnd(session);
             } catch (MavenExecutionException e) {
                 return addExceptionToResult(result, e);
             }
@@ -354,44 +354,29 @@ public class DefaultMaven implements Maven {
     }
 
     private void afterSessionStart(MavenSession session) throws MavenExecutionException {
-        // CHECKSTYLE_OFF: LineLength
-        for (AbstractMavenLifecycleParticipant listener :
-                getExtensionComponents(Collections.emptyList(), AbstractMavenLifecycleParticipant.class))
-        // CHECKSTYLE_ON: LineLength
-        {
-            listener.afterSessionStart(session);
-        }
+        callListeners(session, AbstractMavenLifecycleParticipant::afterSessionStart);
     }
 
     private void afterProjectsRead(MavenSession session) throws MavenExecutionException {
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            // CHECKSTYLE_OFF: LineLength
-            for (AbstractMavenLifecycleParticipant listener :
-                    getExtensionComponents(session.getProjects(), AbstractMavenLifecycleParticipant.class))
-            // CHECKSTYLE_ON: LineLength
-            {
-                Thread.currentThread().setContextClassLoader(listener.getClass().getClassLoader());
-
-                listener.afterProjectsRead(session);
-            }
-        } finally {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
-        }
+        callListeners(session, AbstractMavenLifecycleParticipant::afterProjectsRead);
     }
 
-    private void afterSessionEnd(Collection<MavenProject> projects, MavenSession session)
-            throws MavenExecutionException {
+    private void afterSessionEnd(MavenSession session) throws MavenExecutionException {
+        callListeners(session, AbstractMavenLifecycleParticipant::afterSessionEnd);
+    }
+
+    @FunctionalInterface
+    interface ListenerMethod {
+        void run(AbstractMavenLifecycleParticipant listener, MavenSession session) throws MavenExecutionException;
+    }
+
+    private void callListeners(MavenSession session, ListenerMethod method) throws MavenExecutionException {
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            // CHECKSTYLE_OFF: LineLength
             for (AbstractMavenLifecycleParticipant listener :
-                    getExtensionComponents(projects, AbstractMavenLifecycleParticipant.class))
-            // CHECKSTYLE_ON: LineLength
-            {
+                    getExtensionComponents(session.getProjects(), AbstractMavenLifecycleParticipant.class)) {
                 Thread.currentThread().setContextClassLoader(listener.getClass().getClassLoader());
-
-                listener.afterSessionEnd(session);
+                method.run(listener, session);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(originalClassLoader);
@@ -451,6 +436,9 @@ public class DefaultMaven implements Maven {
     }
 
     protected <T> Collection<T> getProjectScopedExtensionComponents(Collection<MavenProject> projects, Class<T> role) {
+        if (projects == null) {
+            return Collections.emptyList();
+        }
 
         Collection<T> foundComponents = new LinkedHashSet<>();
         Collection<ClassLoader> scannedRealms = new HashSet<>();
