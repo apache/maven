@@ -27,7 +27,7 @@ under the License.
 
   <artifactId>maven-xml-impl</artifactId>
   <name>Implementation of Maven API XML</name>
-  <description>To be merged into Maven plexus-utils</description>
+  <description>Provides the implementation classes for the Maven API XML</description>
 
   <dependencies>
     <dependency>
