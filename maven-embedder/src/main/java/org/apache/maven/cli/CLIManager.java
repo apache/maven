@@ -28,7 +28,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.shared.utils.logging.MessageUtils;
+import org.apache.maven.cli.jansi.MessageUtils;
 
 /**
  * @author Jason van Zyl

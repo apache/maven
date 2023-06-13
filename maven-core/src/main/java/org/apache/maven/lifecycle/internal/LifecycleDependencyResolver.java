@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -75,16 +76,20 @@ public class LifecycleDependencyResolver {
 
     private final ProjectArtifactsCache projectArtifactsCache;
 
+    private final MessageBuilderFactory messageBuilderFactory;
+
     @Inject
     public LifecycleDependencyResolver(
             ProjectDependenciesResolver dependenciesResolver,
             ProjectArtifactFactory artifactFactory,
             EventSpyDispatcher eventSpyDispatcher,
-            ProjectArtifactsCache projectArtifactsCache) {
+            ProjectArtifactsCache projectArtifactsCache,
+            MessageBuilderFactory messageBuilderFactory) {
         this.dependenciesResolver = dependenciesResolver;
         this.artifactFactory = artifactFactory;
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.projectArtifactsCache = projectArtifactsCache;
+        this.messageBuilderFactory = messageBuilderFactory;
     }
 
     public static List<MavenProject> getProjects(MavenProject project, MavenSession session, boolean aggregator) {
@@ -253,7 +258,7 @@ public class LifecycleDependencyResolver {
 
                 logger.warn("Try running the build up to the lifecycle phase \"package\"");
             } else {
-                throw new LifecycleExecutionException(null, project, e);
+                throw new LifecycleExecutionException(messageBuilderFactory, null, project, e);
             }
         }
 

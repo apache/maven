@@ -18,6 +18,7 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -26,6 +27,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
@@ -35,8 +38,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.utils.logging.MessageBuilder;
-import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,9 @@ import static java.util.Arrays.stream;
 @Singleton
 public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurator {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Inject
+    MessageBuilderFactory messageBuilderFactory;
 
     @Override
     public void configure(MavenProject project, MojoExecution mojoExecution, boolean allowPluginLevelConfig) {
@@ -136,7 +140,8 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
         unknownParameters = getUnknownParameters(mojoExecution, parametersNamesAll);
 
         unknownParameters.forEach(name -> {
-            MessageBuilder messageBuilder = MessageUtils.buffer()
+            MessageBuilder messageBuilder = messageBuilderFactory
+                    .builder()
                     .warning("Parameter '")
                     .warning(name)
                     .warning("' is unknown for plugin '")

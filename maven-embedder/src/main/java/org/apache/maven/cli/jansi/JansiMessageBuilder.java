@@ -16,132 +16,137 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.cli.jansi;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.MessageBuilder;
+import org.fusesource.jansi.Ansi;
 
 @Experimental
-public class DefaultMessageBuilder implements MessageBuilder {
+public class JansiMessageBuilder implements MessageBuilder {
+    private final Ansi ansi;
 
-    private final StringBuilder buffer;
-
-    public DefaultMessageBuilder() {
-        this(new StringBuilder());
+    public JansiMessageBuilder() {
+        this.ansi = Ansi.ansi();
     }
 
-    public DefaultMessageBuilder(StringBuilder buffer) {
-        this.buffer = buffer;
+    public JansiMessageBuilder(StringBuilder sb) {
+        this.ansi = Ansi.ansi(sb);
     }
 
     @Override
     @Nonnull
     public MessageBuilder debug(Object o) {
-        return a(o);
+        return style(Style.DEBUG, o);
     }
 
     @Override
     @Nonnull
     public MessageBuilder info(Object o) {
-        return a(o);
+        return style(Style.INFO, o);
     }
 
     @Override
     @Nonnull
     public MessageBuilder warning(Object o) {
-        return a(o);
+        return style(Style.WARNING, o);
     }
 
     @Override
     @Nonnull
     public MessageBuilder error(Object o) {
-        return a(o);
+        return style(Style.ERROR, o);
     }
 
     @Override
     @Nonnull
     public MessageBuilder success(Object o) {
-        return a(o);
+        return style(Style.SUCCESS, o);
     }
 
     @Override
     @Nonnull
     public MessageBuilder failure(Object o) {
-        return a(o);
+        return style(Style.FAILURE, o);
     }
 
     @Override
     @Nonnull
     public MessageBuilder strong(Object o) {
-        return a(o);
+        return style(Style.STRONG, o);
     }
 
     @Override
     @Nonnull
     public MessageBuilder mojo(Object o) {
-        return a(o);
+        return style(Style.MOJO, o);
     }
 
     @Override
     @Nonnull
     public MessageBuilder project(Object o) {
-        return a(o);
+        return style(Style.PROJECT, o);
+    }
+
+    private MessageBuilder style(Style style, Object o) {
+        style.apply(ansi).a(o).reset();
+        return this;
     }
 
     @Override
     @Nonnull
     public MessageBuilder a(char[] chars, int i, int i1) {
-        buffer.append(chars, i, i1);
+        ansi.a(chars, i, i1);
         return this;
     }
 
     @Override
     @Nonnull
     public MessageBuilder a(char[] chars) {
-        buffer.append(chars);
+        ansi.a(chars);
         return this;
     }
 
     @Override
     @Nonnull
     public MessageBuilder a(CharSequence charSequence, int i, int i1) {
-        buffer.append(charSequence, i, i1);
+        ansi.a(charSequence, i, i1);
         return this;
     }
 
     @Override
     @Nonnull
     public MessageBuilder a(CharSequence charSequence) {
-        buffer.append(charSequence);
+        ansi.a(charSequence);
         return this;
     }
 
     @Override
     @Nonnull
     public MessageBuilder a(Object o) {
-        buffer.append(o);
+        ansi.a(o);
         return this;
     }
 
     @Override
     @Nonnull
     public MessageBuilder newline() {
-        buffer.append(System.getProperty("line.separator"));
+        ansi.newline();
         return this;
     }
 
     @Override
     @Nonnull
     public MessageBuilder format(String s, Object... objects) {
-        buffer.append(String.format(s, objects));
+        ansi.format(s, objects);
         return this;
     }
 
     @Override
     @Nonnull
     public String build() {
-        return buffer.toString();
+        return ansi.toString();
     }
 
     @Override
