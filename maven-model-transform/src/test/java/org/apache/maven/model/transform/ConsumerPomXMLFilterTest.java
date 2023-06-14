@@ -120,7 +120,7 @@ class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
                 + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
                 + "       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
                 + "       xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0\n"
-                + "                           http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
+                + "                           https://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
                 + "  <modelVersion>4.0.0</modelVersion>\n"
                 + "  <groupId>org.sonatype.mavenbook.multispring</groupId>\n"
                 + "  <artifactId>parent</artifactId>\n"
@@ -163,7 +163,7 @@ class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
                 + "\n"
                 + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
                 + "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-                + "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
+                + "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
                 + "  <modelVersion>4.0.0</modelVersion>\n"
                 + "  <parent>\n"
                 + "    <groupId>org.apache.maven</groupId>\n"
@@ -225,5 +225,83 @@ class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
         String expected = "<project><!--before--><!--after--></project>";
         String actual = transform(input);
         assertThat(actual).and(expected).areIdentical();
+    }
+
+    @Test
+    void downgradeModelVersion() throws Exception {
+        String input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<project xmlns=\"http://maven.apache.org/POM/4.1.0\"\n"
+                + "       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                + "       xsi:schemaLocation=\"http://maven.apache.org/POM/4.1.0\n"
+                + "                           http://maven.apache.org/xsd/maven-4.1.0.xsd\">\n"
+                + "  <modelVersion>4.1.0</modelVersion>\n"
+                + "  <groupId>org.sonatype.mavenbook.multispring</groupId>\n"
+                + "  <artifactId>parent</artifactId>\n"
+                + "  <version>0.9-SNAPSHOT</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "</project>";
+        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
+                + "       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                + "       xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0\n"
+                + "                           https://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>org.sonatype.mavenbook.multispring</groupId>\n"
+                + "  <artifactId>parent</artifactId>\n"
+                + "  <version>0.9-SNAPSHOT</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "</project>";
+        String actual = transform(input);
+        assertThat(actual).and(expected).ignoreWhitespace().areIdentical();
+    }
+
+    @Test
+    void downgradeNotModelVersion() throws Exception {
+        String input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<project xmlns=\"http://maven.apache.org/POM/4.1.0\"\n"
+                + "       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                + "       xsi:schemaLocation=\"http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd\""
+                + "       preserve.model.version=\"true\">\n"
+                + "  <modelVersion>4.1.0</modelVersion>\n"
+                + "  <groupId>org.sonatype.mavenbook.multispring</groupId>\n"
+                + "  <artifactId>parent</artifactId>\n"
+                + "  <version>0.9-SNAPSHOT</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <build>"
+                + "    <plugins>\n"
+                + "      <plugin>\n"
+                + "        <executions>\n"
+                + "          <execution>\n"
+                + "            <priority>1</priority>\n"
+                + "          </execution>\n"
+                + "        </executions>\n"
+                + "      </plugin>\n"
+                + "    </plugins>\n"
+                + "  </build>\n"
+                + "</project>";
+        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<project xmlns=\"http://maven.apache.org/POM/4.1.0\"\n"
+                + "       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                + "       preserve.model.version=\"true\""
+                + "       xsi:schemaLocation=\"http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd\">\n"
+                + "  <modelVersion>4.1.0</modelVersion>\n"
+                + "  <groupId>org.sonatype.mavenbook.multispring</groupId>\n"
+                + "  <artifactId>parent</artifactId>\n"
+                + "  <version>0.9-SNAPSHOT</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <build>"
+                + "    <plugins>\n"
+                + "      <plugin>\n"
+                + "        <executions>\n"
+                + "          <execution>\n"
+                + "            <priority>1</priority>\n"
+                + "          </execution>\n"
+                + "        </executions>\n"
+                + "      </plugin>\n"
+                + "    </plugins>\n"
+                + "  </build>\n"
+                + "</project>";
+        String actual = transform(input);
+        assertThat(actual).and(expected).ignoreWhitespace().areIdentical();
     }
 }

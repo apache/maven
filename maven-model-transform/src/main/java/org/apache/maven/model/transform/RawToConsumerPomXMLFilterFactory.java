@@ -44,6 +44,8 @@ public class RawToConsumerPomXMLFilterFactory {
         parser = new ModulesXMLFilter(parser);
         // Adjust relativePath
         parser = new RelativePathXMLFilter(parser);
+        // Downgrade modelVersion if needed
+        parser = new ModelVersionDowngradeXMLFilter(parser);
 
         return parser;
     }
