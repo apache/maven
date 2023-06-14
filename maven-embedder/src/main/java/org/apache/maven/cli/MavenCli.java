@@ -36,6 +36,7 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.inject.AbstractModule;
@@ -177,6 +178,8 @@ public class MavenCli {
 
     private CLIManager cliManager;
 
+    private PlexusContainer plexusContainer;
+
     private static final Pattern NEXT_LINE = Pattern.compile("\r?\n");
 
     public MavenCli() {
@@ -281,6 +284,7 @@ public class MavenCli {
             configure(cliRequest);
             toolchains(cliRequest);
             populateRequest(cliRequest);
+            status(cliRequest);
             encryption(cliRequest);
             return execute(cliRequest);
         } catch (ExitException e) {
@@ -444,6 +448,23 @@ public class MavenCli {
             } else {
                 System.out.println(CLIReportingUtils.showVersion());
             }
+            throw new ExitException(0);
+        }
+    }
+
+    private void status(CliRequest cliRequest) throws Exception {
+        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
+        if (cliRequest.commandLine.hasOption(CLIManager.INSTALLATION_STATUS)) {
+            MavenStatusCommand mavenStatusCommand = new MavenStatusCommand(plexusContainer);
+            final List<String> issues = mavenStatusCommand.verify(cliRequest.getRequest());
+            if (!issues.isEmpty()) {
+                slf4jLogger.info("");
+                slf4jLogger.error("The following issues where found");
+                IntStream.range(0, issues.size()).forEach(i -> slf4jLogger.error("{}.  {}", i + 1, issues.get(i)));
+                throw new ExitException(1);
+            }
+
+            slf4jLogger.info("No installation issues found.");
             throw new ExitException(0);
         }
     }
@@ -724,6 +745,8 @@ public class MavenCli {
         toolchainsBuilder = container.lookup(ToolchainsBuilder.class);
 
         dispatcher = (DefaultSecDispatcher) container.lookup(SecDispatcher.class, "maven");
+
+        plexusContainer = container;
 
         return container;
     }

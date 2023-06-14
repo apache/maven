@@ -116,6 +116,8 @@ public class CLIManager {
 
     public static final String COLOR = "color";
 
+    public static final String INSTALLATION_STATUS = "status";
+
     /** This option is deprecated and may be repurposed as Java debug in a future version.
      * Use {@code -X/--verbose} instead. */
     @Deprecated
@@ -301,6 +303,10 @@ public class CLIManager {
                 .hasArg()
                 .optionalArg(true)
                 .desc("Defines the color mode of the output. Supported are 'auto', 'always', 'never'.")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(INSTALLATION_STATUS)
+                .desc("Display Maven installation status")
                 .build());
 
         // Adding this back to make Maven fail if used
