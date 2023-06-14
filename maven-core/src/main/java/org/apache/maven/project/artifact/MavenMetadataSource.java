@@ -83,7 +83,6 @@ import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
-import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -672,16 +671,22 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         if (e.getCause() instanceof MultipleArtifactsNotFoundException) {
             return true;
         }
+        // This is a workaround for MNG-7758/MRESOLVER-335
         return e.getCause() instanceof org.eclipse.aether.resolution.ArtifactResolutionException
-                && e.getCause().getCause() instanceof ArtifactNotFoundException;
+                && ((org.eclipse.aether.resolution.ArtifactResolutionException) e.getCause())
+                        .getResult().getExceptions().stream()
+                                .anyMatch(re -> re instanceof org.eclipse.aether.transfer.ArtifactNotFoundException);
     }
 
     private boolean isNonTransferablePom(Exception e) {
         if (e.getCause() instanceof ArtifactResolutionException) {
             return true;
         }
+        // This is a workaround for MNG-7758/MRESOLVER-335
         return e.getCause() instanceof org.eclipse.aether.resolution.ArtifactResolutionException
-                && !(e.getCause().getCause() instanceof ArtifactNotFoundException);
+                && ((org.eclipse.aether.resolution.ArtifactResolutionException) e.getCause())
+                        .getResult().getExceptions().stream()
+                                .noneMatch(re -> re instanceof org.eclipse.aether.transfer.ArtifactNotFoundException);
     }
 
     private Properties getSystemProperties() {

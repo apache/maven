@@ -160,7 +160,10 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
                     Predicate<Exception> pluginArtifactNotFoundException = exc -> exc instanceof PluginManagerException
                             && exc.getCause() instanceof PluginResolutionException
                             && exc.getCause().getCause() instanceof ArtifactResolutionException
-                            && exc.getCause().getCause().getCause() instanceof ArtifactNotFoundException;
+                            // This is a workaround for MNG-7758/MRESOLVER-335
+                            && ((ArtifactResolutionException) exc.getCause().getCause())
+                                    .getResult().getExceptions().stream()
+                                            .anyMatch(re -> re instanceof ArtifactNotFoundException);
 
                     Predicate<Plugin> isPluginPartOfRequestScope = plugin -> projectsInRequestScope.stream()
                             .anyMatch(project -> project.getGroupId().equals(plugin.getGroupId())

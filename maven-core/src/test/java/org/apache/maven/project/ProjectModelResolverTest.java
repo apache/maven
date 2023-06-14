@@ -69,7 +69,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 () -> newModelResolver().resolveModel(parent.getDelegate(), new AtomicReference<>()),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertNotNull(e.getMessage());
-        assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
+        assertThat(e.getMessage(), containsString("Failed to resolve model artifact 'org.apache:apache:pom:0'"));
     }
 
     @Test
@@ -135,7 +135,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 () -> newModelResolver().resolveModel(dependency.getDelegate(), new AtomicReference<>()),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertNotNull(e.getMessage());
-        assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
+        assertThat(e.getMessage(), containsString("Failed to resolve model artifact 'org.apache:apache:pom:0'"));
     }
 
     @Test
