@@ -18,25 +18,28 @@
  */
 package org.apache.maven.repository.metadata;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Default conflict resolver.Implements closer newer first policy by default, but could be configured via plexus
  *
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  */
-@Component(role = GraphConflictResolver.class)
+@Named
+@Singleton
 public class DefaultGraphConflictResolver implements GraphConflictResolver {
     /**
      * artifact, closer to the entry point, is selected
      */
-    @Requirement(role = GraphConflictResolutionPolicy.class)
+    @Inject
     protected GraphConflictResolutionPolicy policy;
 
     // -------------------------------------------------------------------------------------

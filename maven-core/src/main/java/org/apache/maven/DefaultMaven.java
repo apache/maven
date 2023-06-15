@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,7 +69,6 @@ import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -204,7 +204,7 @@ public class DefaultMaven implements Maven {
 
         try {
             validateLocalRepository(request);
-        } catch (LocalRepositoryNotAccessibleException e) {
+        } catch (IOException e) {
             return addExceptionToResult(result, e);
         }
 
@@ -408,7 +408,7 @@ public class DefaultMaven implements Maven {
         return repositorySessionFactory.newRepositorySession(request);
     }
 
-    private void validateLocalRepository(MavenExecutionRequest request) throws LocalRepositoryNotAccessibleException {
+    private void validateLocalRepository(MavenExecutionRequest request) throws IOException {
         File localRepoDir = request.getLocalRepositoryPath();
 
         logger.debug("Using local repository at " + localRepoDir);
@@ -416,7 +416,7 @@ public class DefaultMaven implements Maven {
         localRepoDir.mkdirs();
 
         if (!localRepoDir.isDirectory()) {
-            throw new LocalRepositoryNotAccessibleException("Could not create local repository at " + localRepoDir);
+            throw new IOException("Could not create local repository at " + localRepoDir);
         }
     }
 

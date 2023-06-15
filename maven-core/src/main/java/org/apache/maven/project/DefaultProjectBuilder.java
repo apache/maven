@@ -42,7 +42,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.feature.Features;
 import org.apache.maven.model.Build;
@@ -971,8 +970,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             this.modelPool = modelPool;
             this.transformerContextBuilder = transformerContextBuilder;
 
-            session = LegacyLocalRepositoryManager.overlay(
-                    request.getLocalRepository(), request.getRepositorySession(), repoSystem);
+            session = RepositoryUtils.overlay(request.getLocalRepository(), request.getRepositorySession(), repoSystem);
             repositories = RepositoryUtils.toRepos(request.getRemoteRepositories());
         }
     }

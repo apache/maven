@@ -18,16 +18,19 @@
  */
 package org.apache.maven.repository.metadata;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 
 /**
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
-@Component(role = GraphConflictResolutionPolicy.class)
+@Named
+@Singleton
 public class DefaultGraphConflictResolutionPolicy implements GraphConflictResolutionPolicy {
     /**
      * artifact, closer to the entry point, is selected

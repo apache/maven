@@ -18,6 +18,10 @@
  */
 package org.apache.maven.artifact.repository.metadata;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -40,20 +44,19 @@ import org.apache.maven.repository.legacy.UpdateCheckManager;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * @author Jason van Zyl
  */
-@Component(role = RepositoryMetadataManager.class)
+@Named
+@Singleton
 public class DefaultRepositoryMetadataManager extends AbstractLogEnabled implements RepositoryMetadataManager {
-    @Requirement
+    @Inject
     private WagonManager wagonManager;
 
-    @Requirement
+    @Inject
     private UpdateCheckManager updateCheckManager;
 
     public void resolve(

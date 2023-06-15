@@ -25,7 +25,6 @@ import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Server;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @PlexusTest
 class LegacyRepositorySystemTest {
     @Inject
-    private RepositorySystem repositorySystem;
+    private LegacyRepositorySystem repositorySystem;
 
     @Test
     void testThatLocalRepositoryWithSpacesIsProperlyHandled() throws Exception {

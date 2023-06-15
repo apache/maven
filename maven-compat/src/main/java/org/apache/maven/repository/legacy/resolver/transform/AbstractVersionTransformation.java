@@ -18,6 +18,8 @@
  */
 package org.apache.maven.repository.legacy.resolver.transform;
 
+import javax.inject.Inject;
+
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -34,7 +36,6 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.repository.legacy.WagonManager;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
@@ -44,10 +45,10 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * TODO try and refactor to remove abstract methods - not particular happy about current design
  */
 public abstract class AbstractVersionTransformation extends AbstractLogEnabled implements ArtifactTransformation {
-    @Requirement
+    @Inject
     protected RepositoryMetadataManager repositoryMetadataManager;
 
-    @Requirement
+    @Inject
     protected WagonManager wagonManager;
 
     public void transformForResolve(

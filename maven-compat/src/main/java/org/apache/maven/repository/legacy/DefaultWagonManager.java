@@ -18,6 +18,10 @@
  */
 package org.apache.maven.repository.legacy;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -46,8 +50,6 @@ import org.apache.maven.wagon.observers.ChecksumObserver;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
@@ -62,7 +64,8 @@ import org.eclipse.aether.util.ConfigUtils;
 /**
  * Manages <a href="https://maven.apache.org/wagon">Wagon</a> related operations in Maven.
  */
-@Component(role = WagonManager.class)
+@Named
+@Singleton
 public class DefaultWagonManager implements WagonManager {
 
     private static final String[] CHECKSUM_IDS = {"md5", "sha1"};
@@ -72,16 +75,16 @@ public class DefaultWagonManager implements WagonManager {
      */
     private static final String[] CHECKSUM_ALGORITHMS = {"MD5", "SHA-1"};
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
-    @Requirement
+    @Inject
     private UpdateCheckManager updateCheckManager;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
     //

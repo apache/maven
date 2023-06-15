@@ -18,6 +18,9 @@
  */
 package org.apache.maven.project.interpolation;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -33,7 +36,6 @@ import java.util.WeakHashMap;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.path.PathTranslator;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
@@ -44,7 +46,8 @@ import org.codehaus.plexus.logging.Logger;
  * StringSearchModelInterpolator
  */
 @Deprecated
-@Component(role = ModelInterpolator.class)
+@Named
+@Singleton
 public class StringSearchModelInterpolator extends AbstractStringBasedModelInterpolator {
 
     private static final Map<Class<?>, Field[]> FIELDS_BY_CLASS = new WeakHashMap<>();

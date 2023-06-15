@@ -18,7 +18,15 @@
  */
 package org.apache.maven.repository.legacy.resolver.transform;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
@@ -27,18 +35,23 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @author Jason van Zyl
  */
-@Component(role = ArtifactTransformationManager.class)
+@Named
+@Singleton
 public class DefaultArtifactTransformationManager implements ArtifactTransformationManager {
-    @Requirement(
-            role = ArtifactTransformation.class,
-            hints = {"release", "latest", "snapshot"})
+
     private List<ArtifactTransformation> artifactTransformations;
+
+    @Inject
+    public DefaultArtifactTransformationManager(Map<String, ArtifactTransformation> artifactTransformations) {
+        this.artifactTransformations = Stream.of("release", "latest", "snapshot")
+                .map(artifactTransformations::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 
     public void transformForResolve(Artifact artifact, RepositoryRequest request)
             throws ArtifactResolutionException, ArtifactNotFoundException {
