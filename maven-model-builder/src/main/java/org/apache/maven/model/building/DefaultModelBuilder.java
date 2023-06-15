@@ -40,7 +40,9 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
+import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -1680,7 +1682,27 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        // [MNG-5600] Dependency management import should support exclusions.
+        List<Exclusion> exclusions = dependency.getDelegate().getExclusions();
+        if (importMgmt != null && !exclusions.isEmpty()) {
+            // Dependency excluded from import.
+            List<org.apache.maven.api.model.Dependency> dependencies = importMgmt.getDependencies().stream()
+                    .filter(candidate -> exclusions.stream().noneMatch(exclusion -> match(exclusion, candidate)))
+                    .map(candidate -> candidate.withExclusions(exclusions))
+                    .collect(Collectors.toList());
+            importMgmt = importMgmt.withDependencies(dependencies);
+        }
+
         return importMgmt != null ? new DependencyManagement(importMgmt) : null;
+    }
+
+    private boolean match(Exclusion exclusion, org.apache.maven.api.model.Dependency candidate) {
+        return match(exclusion.getGroupId(), candidate.getGroupId())
+                && match(exclusion.getArtifactId(), candidate.getArtifactId());
+    }
+
+    private boolean match(String match, String text) {
+        return match.equals("*") || match.equals(text);
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
