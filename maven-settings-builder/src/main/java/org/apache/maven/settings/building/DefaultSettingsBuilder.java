@@ -220,51 +220,5 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     }
                 })
                 .visit(settings.getDelegate()));
-
-        /*
-        interpolator.addPostProcessor((expression, value) -> {
-            if (value != null) {
-                // we're going to parse this back in as XML so we need to escape XML markup
-                value = value.toString()
-                        .replace("&", "&amp;")
-                        .replace("<", "&lt;")
-                        .replace(">", "&gt;");
-                return value;
-            }
-            return null;
-        });
-
-        StringWriter writer = new StringWriter(1024 * 4);
-
-        try {
-            settingsWriter.write(writer, null, settings);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to serialize settings to memory", e);
-        }
-
-        String serializedSettings = writer.toString();
-
-        try {
-            serializedSettings = interpolator.interpolate(serializedSettings, "settings");
-        } catch (InterpolationException e) {
-            problems.add(
-                    SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1, e);
-
-            return settings;
-        }
-
-        Settings result;
-        try {
-            Map<String, ?> options = Collections.singletonMap(SettingsReader.IS_STRICT, Boolean.FALSE);
-            result = settingsReader.read(new StringReader(serializedSettings), options);
-        } catch (IOException e) {
-            problems.add(
-                    SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1, e);
-            return settings;
-        }
-
-        return result;
-
-         */
     }
 }
