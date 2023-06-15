@@ -16,14 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.cli.jansi;
 
-import javax.annotation.Priority;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
-import java.util.Objects;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -33,31 +29,27 @@ import org.apache.maven.api.services.MessageBuilderFactory;
 @Experimental
 @Named
 @Singleton
-@Priority(-1)
-public class DefaultMessageBuilderFactory implements MessageBuilderFactory {
-
-    @Inject
-    public DefaultMessageBuilderFactory() {}
+public class JansiMessageBuilderFactory implements MessageBuilderFactory {
 
     @Override
     public boolean isColorEnabled() {
-        return false;
+        return MessageUtils.isColorEnabled();
     }
 
     @Override
     public int getTerminalWidth() {
-        return -1;
+        return MessageUtils.getTerminalWidth();
     }
 
     @Override
     @Nonnull
     public MessageBuilder builder() {
-        return new DefaultMessageBuilder();
+        return builder(new StringBuilder());
     }
 
     @Override
     @Nonnull
     public MessageBuilder builder(@Nonnull StringBuilder stringBuilder) {
-        return new DefaultMessageBuilder(Objects.requireNonNull(stringBuilder));
+        return MessageUtils.builder(stringBuilder);
     }
 }

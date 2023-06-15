@@ -20,8 +20,8 @@ package org.slf4j.impl;
 
 import java.io.PrintStream;
 
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
-import static org.apache.maven.shared.utils.logging.MessageUtils.level;
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.cli.jansi.MessageUtils;
 
 /**
  * Logger for Maven, that support colorization of levels and stacktraces. This class implements 2 methods introduced in
@@ -38,16 +38,16 @@ public class MavenSimpleLogger extends SimpleLogger {
     protected String renderLevel(int level) {
         switch (level) {
             case LOG_LEVEL_TRACE:
-                return level().debug("TRACE");
+                return builder().debug("TRACE").build();
             case LOG_LEVEL_DEBUG:
-                return level().debug("DEBUG");
+                return builder().debug("DEBUG").build();
             case LOG_LEVEL_INFO:
-                return level().info("INFO");
+                return builder().info("INFO").build();
             case LOG_LEVEL_WARN:
-                return level().warning("WARNING");
+                return builder().warning("WARNING").build();
             case LOG_LEVEL_ERROR:
             default:
-                return level().error("ERROR");
+                return builder().error("ERROR").build();
         }
     }
 
@@ -56,10 +56,10 @@ public class MavenSimpleLogger extends SimpleLogger {
         if (t == null) {
             return;
         }
-        stream.print(buffer().failure(t.getClass().getName()));
+        stream.print(builder().failure(t.getClass().getName()));
         if (t.getMessage() != null) {
             stream.print(": ");
-            stream.print(buffer().failure(t.getMessage()));
+            stream.print(builder().failure(t.getMessage()));
         }
         stream.println();
 
@@ -70,9 +70,9 @@ public class MavenSimpleLogger extends SimpleLogger {
         for (StackTraceElement e : t.getStackTrace()) {
             stream.print(prefix);
             stream.print("    ");
-            stream.print(buffer().strong("at"));
+            stream.print(builder().strong("at"));
             stream.print(" " + e.getClassName() + "." + e.getMethodName());
-            stream.print(buffer().a(" (").strong(getLocation(e)).a(")"));
+            stream.print(builder().a(" (").strong(getLocation(e)).a(")"));
             stream.println();
         }
         for (Throwable se : t.getSuppressed()) {
@@ -85,10 +85,10 @@ public class MavenSimpleLogger extends SimpleLogger {
     }
 
     private void writeThrowable(Throwable t, PrintStream stream, String caption, String prefix) {
-        stream.print(buffer().a(prefix).strong(caption).a(": ").a(t.getClass().getName()));
+        stream.print(builder().a(prefix).strong(caption).a(": ").a(t.getClass().getName()));
         if (t.getMessage() != null) {
             stream.print(": ");
-            stream.print(buffer().failure(t.getMessage()));
+            stream.print(builder().failure(t.getMessage()));
         }
         stream.println();
 
@@ -107,5 +107,9 @@ public class MavenSimpleLogger extends SimpleLogger {
         } else {
             return e.getFileName();
         }
+    }
+
+    private MessageBuilder builder() {
+        return MessageUtils.builder();
     }
 }

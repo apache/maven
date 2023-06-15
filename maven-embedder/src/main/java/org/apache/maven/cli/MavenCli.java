@@ -46,6 +46,8 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.Source;
@@ -56,6 +58,8 @@ import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.cli.internal.extension.model.io.xpp3.CoreExtensionsXpp3Reader;
+import org.apache.maven.cli.jansi.JansiMessageBuilderFactory;
+import org.apache.maven.cli.jansi.MessageUtils;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
@@ -87,8 +91,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
-import org.apache.maven.shared.utils.logging.MessageBuilder;
-import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
@@ -124,7 +126,6 @@ import static org.apache.maven.cli.CLIManager.COLOR;
 import static org.apache.maven.cli.CLIManager.FORCE_INTERACTIVE;
 import static org.apache.maven.cli.CLIManager.NON_INTERACTIVE;
 import static org.apache.maven.cli.ResolveFile.resolveFile;
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 // TODO push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
 
@@ -177,6 +178,8 @@ public class MavenCli {
 
     private CLIManager cliManager;
 
+    private MessageBuilderFactory messageBuilderFactory;
+
     private static final Pattern NEXT_LINE = Pattern.compile("\r?\n");
 
     public MavenCli() {
@@ -186,6 +189,7 @@ public class MavenCli {
     // This supports painless invocation by the Verifier during embedded execution of the core ITs
     public MavenCli(ClassWorld classWorld) {
         this.classWorld = classWorld;
+        this.messageBuilderFactory = new JansiMessageBuilderFactory();
     }
 
     public static void main(String[] args) {
@@ -589,13 +593,12 @@ public class MavenCli {
         if (slf4jLogger.isDebugEnabled()) {
             slf4jLogger.debug("Message scheme: {}", (MessageUtils.isColorEnabled() ? "color" : "plain"));
             if (MessageUtils.isColorEnabled()) {
-                MessageBuilder buff = MessageUtils.buffer();
+                MessageBuilder buff = MessageUtils.builder();
                 buff.a("Message styles: ");
-                buff.a(MessageUtils.level().debug("debug")).a(' ');
-                buff.a(MessageUtils.level().info("info")).a(' ');
-                buff.a(MessageUtils.level().warning("warning")).a(' ');
-                buff.a(MessageUtils.level().error("error")).a(' ');
-
+                buff.debug("debug").a(' ');
+                buff.info("info").a(' ');
+                buff.warning("warning").a(' ');
+                buff.error("error").a(' ');
                 buff.success("success").a(' ');
                 buff.failure("failure").a(' ');
                 buff.strong("strong").a(' ');
@@ -679,6 +682,7 @@ public class MavenCli {
             protected void configure() {
                 bind(ILoggerFactory.class).toInstance(slf4jLoggerFactory);
                 bind(CoreExports.class).toInstance(exports);
+                bind(MessageBuilderFactory.class).toInstance(messageBuilderFactory);
             }
         });
 
@@ -964,10 +968,12 @@ public class MavenCli {
             if (!cliRequest.showErrors) {
                 slf4jLogger.error(
                         "To see the full stack trace of the errors, re-run Maven with the '{}' switch",
-                        buffer().strong("-e"));
+                        MessageUtils.builder().strong("-e"));
             }
             if (!slf4jLogger.isDebugEnabled()) {
-                slf4jLogger.error("Re-run Maven using the '{}' switch to enable verbose output", buffer().strong("-X"));
+                slf4jLogger.error(
+                        "Re-run Maven using the '{}' switch to enable verbose output",
+                        MessageUtils.builder().strong("-X"));
             }
 
             if (!references.isEmpty()) {
@@ -976,7 +982,7 @@ public class MavenCli {
                         + ", please read the following articles:");
 
                 for (Map.Entry<String, String> entry : references.entrySet()) {
-                    slf4jLogger.error("{} {}", buffer().strong(entry.getValue()), entry.getKey());
+                    slf4jLogger.error("{} {}", MessageUtils.builder().strong(entry.getValue()), entry.getKey());
                 }
             }
 
@@ -1010,7 +1016,7 @@ public class MavenCli {
     private void logBuildResumeHint(String resumeBuildHint) {
         slf4jLogger.error("");
         slf4jLogger.error("After correcting the problems, you can resume the build with the command");
-        slf4jLogger.error(buffer().a("  ").strong(resumeBuildHint).toString());
+        slf4jLogger.error(MessageUtils.builder().a("  ").strong(resumeBuildHint).toString());
     }
 
     /**
@@ -1059,9 +1065,9 @@ public class MavenCli {
 
         if (referenceKey != null && !referenceKey.isEmpty()) {
             if (msg.indexOf('\n') < 0) {
-                msg += " -> " + buffer().strong(referenceKey);
+                msg += " -> " + MessageUtils.builder().strong(referenceKey);
             } else {
-                msg += "\n-> " + buffer().strong(referenceKey);
+                msg += "\n-> " + MessageUtils.builder().strong(referenceKey);
             }
         }
 
@@ -1425,7 +1431,7 @@ public class MavenCli {
     }
 
     private ExecutionListener determineExecutionListener() {
-        ExecutionListener executionListener = new ExecutionEventLogger();
+        ExecutionListener executionListener = new ExecutionEventLogger(messageBuilderFactory);
         if (eventSpyDispatcher != null) {
             return eventSpyDispatcher.chainListener(executionListener);
         } else {

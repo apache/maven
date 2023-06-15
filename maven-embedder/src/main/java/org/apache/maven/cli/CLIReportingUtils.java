@@ -25,10 +25,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.apache.maven.cli.jansi.MessageUtils;
 import org.codehaus.plexus.util.Os;
 import org.slf4j.Logger;
-
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.
@@ -54,7 +53,8 @@ public final class CLIReportingUtils {
         final String ls = System.lineSeparator();
         Properties properties = getBuildProperties();
         StringBuilder version = new StringBuilder(256);
-        version.append(buffer().strong(createMavenVersionString(properties))).append(ls);
+        version.append(MessageUtils.builder().strong(createMavenVersionString(properties)))
+                .append(ls);
         version.append(reduce(properties.getProperty("distributionShortName") + " home: "
                         + System.getProperty("maven.home", "<unknown Maven " + "home>")))
                 .append(ls);

@@ -28,13 +28,22 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 public interface MessageBuilder {
     /**
-     * Append message content in success style.
-     * By default, bold green
+     * Append message content in debug style.
+     * By default, bold cyan
      * @param message the message to append
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder success(Object message);
+    MessageBuilder debug(Object message);
+
+    /**
+     * Append message content in info style.
+     * By default, bold blue
+     * @param message the message to append
+     * @return the current builder
+     */
+    @Nonnull
+    MessageBuilder info(Object message);
 
     /**
      * Append message content in warning style.
@@ -44,6 +53,24 @@ public interface MessageBuilder {
      */
     @Nonnull
     MessageBuilder warning(Object message);
+
+    /**
+     * Append message content in error style.
+     * By default, bold red
+     * @param message the message to append
+     * @return the current builder
+     */
+    @Nonnull
+    MessageBuilder error(Object message);
+
+    /**
+     * Append message content in success style.
+     * By default, bold green
+     * @param message the message to append
+     * @return the current builder
+     */
+    @Nonnull
+    MessageBuilder success(Object message);
 
     /**
      * Append message content in failure style.
