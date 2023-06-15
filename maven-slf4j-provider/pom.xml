@@ -79,7 +79,6 @@ under the License.
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.12</version>
         <executions>
           <execution>
             <id>add-slf4j-simple</id>
