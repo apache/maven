@@ -208,7 +208,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         return new Settings(new SettingsTransformer(value -> {
                     try {
-                        return interpolator.interpolate(value);
+                        return value != null ? interpolator.interpolate(value) : null;
                     } catch (InterpolationException e) {
                         problems.add(
                                 SettingsProblem.Severity.WARNING,
