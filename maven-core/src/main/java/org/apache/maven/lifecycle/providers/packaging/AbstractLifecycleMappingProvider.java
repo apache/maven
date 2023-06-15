@@ -57,7 +57,7 @@ public abstract class AbstractLifecycleMappingProvider implements Provider<Lifec
 
     protected static final String RAR_PLUGIN_VERSION = "3.0.0";
 
-    protected static final String WAR_PLUGIN_VERSION = "3.3.2";
+    protected static final String WAR_PLUGIN_VERSION = "3.4.0";
     // END SNIPPET: versions
 
     private final LifecycleMapping lifecycleMapping;
