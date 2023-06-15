@@ -54,6 +54,7 @@ under the License.
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
+          <version>2.0.0</version>
           <basedir>${project.basedir}/../api/maven-api-settings</basedir>
           <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>
           <models>
@@ -74,7 +75,6 @@ under the License.
             </goals>
             <phase>generate-sources</phase>
             <configuration>
-              <version>2.0.0</version>
               <templates>
                 <template>merger.vm</template>
                 <template>transformer.vm</template>
