@@ -29,8 +29,9 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.maven.api.settings.InputSource;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.v4.SettingsXpp3Reader;
+import org.apache.maven.settings.v4.SettingsXpp3ReaderEx;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -47,7 +48,8 @@ public class DefaultSettingsReader implements SettingsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = Files.newInputStream(input.toPath())) {
-            return new Settings(new SettingsXpp3Reader().read(in, isStrict(options)));
+            InputSource source = new InputSource(input.toString());
+            return new Settings(new SettingsXpp3ReaderEx().read(in, isStrict(options), source));
         } catch (XmlPullParserException e) {
             throw new SettingsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }
@@ -58,7 +60,8 @@ public class DefaultSettingsReader implements SettingsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (Reader in = input) {
-            return new Settings(new SettingsXpp3Reader().read(in, isStrict(options)));
+            InputSource source = (InputSource) options.get(InputSource.class.getName());
+            return new Settings(new SettingsXpp3ReaderEx().read(in, isStrict(options), source));
         } catch (XmlPullParserException e) {
             throw new SettingsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }
@@ -69,7 +72,8 @@ public class DefaultSettingsReader implements SettingsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = input) {
-            return new Settings(new SettingsXpp3Reader().read(in, isStrict(options)));
+            InputSource source = (InputSource) options.get(InputSource.class.getName());
+            return new Settings(new SettingsXpp3ReaderEx().read(in, isStrict(options), source));
         } catch (XmlPullParserException e) {
             throw new SettingsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }
