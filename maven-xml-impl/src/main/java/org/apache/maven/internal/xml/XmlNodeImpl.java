@@ -344,14 +344,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                 }
             }
 
-            if (value != null || attrs != null || children != null) {
-                if (attrs != null) {
-                    Map<String, String> nattrs = attrs;
-                    attrs = new HashMap<>(dominant.getAttributes());
-                    attrs.putAll(nattrs);
-                } else {
-                    attrs = dominant.getAttributes();
-                }
+            if (value != null || attrs != dominant.getAttributes() || children != null) {
                 if (children == null) {
                     children = dominant.getChildren();
                 }
