@@ -637,7 +637,7 @@ class XmlNodeImplTest {
         XmlNodeImpl d = XmlNodeBuilder.build(new StringReader(dominant));
         XmlNodeImpl r = XmlNodeBuilder.build(new StringReader(recessive));
         XmlNode m = d.merge(r);
-        assertEquals(expected, m.toString());
+        assertEquals(expected, m.toString().replaceAll("\r\n", "\n"));
     }
 
     private static List<XmlNode> getChildren(XmlNode node, String name) {
