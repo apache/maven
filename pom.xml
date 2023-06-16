@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>39</version>
+    <version>40</version>
     <relativePath />
   </parent>
 
@@ -125,12 +125,15 @@ under the License.
 
   <properties>
     <javaVersion>8</javaVersion>
+    <minimalMavenBuildVersion>3.5.4</minimalMavenBuildVersion>
+
     <classWorldsVersion>2.7.0</classWorldsVersion>
     <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsIoVersion>2.11.0</commonsIoVersion>
     <commonsLangVersion>3.12.0</commonsLangVersion>
     <junitVersion>4.13.2</junitVersion>
     <mockitoVersion>4.11.0</mockitoVersion>
+    <!-- plexus 2.1.1 is broken, no new release exists yet (nor will exist) -->
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <!-- Blocked by 3.4.0+ changes, see MNG-7710 -->
