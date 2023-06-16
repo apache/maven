@@ -32,7 +32,7 @@ public class InputSource implements Serializable {
     }
 
     /**
-     * Get the path/URL of the POM or {@code null} if unknown.
+     * Get the path/URL of the settings definition or {@code null} if unknown.
      *
      * @return the location
      */
