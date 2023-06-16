@@ -225,14 +225,14 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
             String value = dominant.getValue();
             Object location = dominant.getInputLocation();
-            Map<String, String> attrs = null;
+            Map<String, String> attrs = dominant.getAttributes();
             List<XmlNode> children = null;
 
             for (Map.Entry<String, String> attr : recessive.getAttributes().entrySet()) {
                 String key = attr.getKey();
-                if (isEmpty(dominant.getAttribute(key))) {
-                    if (attrs == null) {
-                        attrs = new HashMap<>();
+                if (isEmpty(attrs.get(key))) {
+                    if (attrs == dominant.getAttributes()) {
+                        attrs = new HashMap<>(attrs);
                     }
                     attrs.put(key, attr.getValue());
                 }
@@ -243,7 +243,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                 if (childMergeOverride != null) {
                     mergeChildren = childMergeOverride;
                 } else {
-                    String childMergeMode = dominant.getAttribute(CHILDREN_COMBINATION_MODE_ATTRIBUTE);
+                    String childMergeMode = attrs.get(CHILDREN_COMBINATION_MODE_ATTRIBUTE);
                     if (CHILDREN_COMBINATION_APPEND.equals(childMergeMode)) {
                         mergeChildren = false;
                     }
