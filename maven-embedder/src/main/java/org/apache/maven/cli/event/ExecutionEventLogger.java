@@ -337,9 +337,9 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             File currentPom = project.getFile();
             if (currentPom != null) {
                 MavenSession session = event.getSession();
-                Path topDirectory = session.getTopDirectory();
                 Path current = currentPom.toPath().toAbsolutePath().normalize();
-                if (current.startsWith(topDirectory)) {
+                Path topDirectory = session.getTopDirectory();
+                if (topDirectory != null && current.startsWith(topDirectory)) {
                     current = topDirectory.relativize(current);
                 }
                 logger.info("  from " + current);
