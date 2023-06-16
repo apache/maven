@@ -19,10 +19,14 @@
 package org.apache.maven.lifecycle.mapping;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.codehaus.plexus.util.StringUtils;
 
@@ -54,31 +58,21 @@ public class LifecyclePhase {
 
         if (goals != null && !goals.isEmpty()) {
             String[] mojoGoals = StringUtils.split(goals, ",");
-
-            for (String mojoGoal : mojoGoals) {
-                LifecycleMojo lifecycleMojo = new LifecycleMojo();
-                lifecycleMojo.setGoal(mojoGoal.trim());
-                mojos.add(lifecycleMojo);
-            }
+            mojos = Arrays.stream(mojoGoals).map(fromGoalIntoLifecycleMojo).collect(Collectors.toList());
         }
     }
 
+    private final Function<String, LifecycleMojo> fromGoalIntoLifecycleMojo = s -> {
+        LifecycleMojo lifecycleMojo = new LifecycleMojo();
+        lifecycleMojo.setGoal(s.trim());
+        return lifecycleMojo;
+    };
+
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        List<LifecycleMojo> mojos = getMojos();
-        if (mojos != null) {
-            for (LifecycleMojo mojo : mojos) {
-                if (first) {
-                    first = false;
-                } else {
-                    sb.append(',');
-                }
-                sb.append(mojo.getGoal());
-            }
-        }
-        return sb.toString();
+        return Optional.ofNullable(getMojos()).orElse(Collections.emptyList()).stream()
+                .map(LifecycleMojo::getGoal)
+                .collect(Collectors.joining(","));
     }
 
     @Deprecated

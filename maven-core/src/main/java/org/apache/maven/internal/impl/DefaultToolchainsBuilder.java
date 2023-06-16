@@ -25,8 +25,6 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.BuilderProblem;
@@ -55,7 +53,6 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     @Override
     public ToolchainsBuilderResult build(ToolchainsBuilderRequest request)
             throws ToolchainsBuilderException, IllegalArgumentException {
-        DefaultSession session = (DefaultSession) request.getSession();
         try {
             DefaultToolchainsBuildingRequest req = new DefaultToolchainsBuildingRequest();
             if (request.getGlobalToolchainsSource().isPresent()) {
@@ -87,12 +84,6 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
         } catch (ToolchainsBuildingException e) {
             throw new ToolchainsBuilderException("Unable to build Toolchains", e);
         }
-    }
-
-    private Properties toProperties(Map<String, String> map) {
-        Properties properties = new Properties();
-        properties.putAll(map);
-        return properties;
     }
 
     private static class MappedToolchainsSource implements org.apache.maven.building.Source {

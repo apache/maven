@@ -1054,11 +1054,8 @@ public class MavenCli {
         String referenceKey = "";
 
         if (StringUtils.isNotEmpty(summary.getReference())) {
-            referenceKey = references.get(summary.getReference());
-            if (referenceKey == null) {
-                referenceKey = "[Help " + (references.size() + 1) + "]";
-                references.put(summary.getReference(), referenceKey);
-            }
+            referenceKey =
+                    references.computeIfAbsent(summary.getReference(), k -> "[Help " + (references.size() + 1) + "]");
         }
 
         String msg = summary.getMessage();
