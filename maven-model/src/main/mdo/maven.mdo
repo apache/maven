@@ -2563,26 +2563,13 @@
           <description>The build lifecycle phase to bind the goals in this execution to. If omitted,
             the goals will be bound to the default phase specified by the plugin. </description>
         </field>
-        <field xml.transient="true">
+        <field xml.attribute="true">
           <name>priority</name>
-          <version>4.0.0/4.1.0</version>
-          <type>int</type>
-          <description>
-            <![CDATA[
-            The priority of this execution compared to other executions which are bound to the same phase.
-            <strong>Warning:</strong> This is an internal utility property that is only public for technical reasons,
-            it is not part of the public API. In particular, this property can be changed or deleted without prior
-            notice.
-            ]]>
-          </description>
-        </field>
-        <field>
-          <name>priority</name>
-          <version>4.2.0+</version>
+          <version>4.0.0+</version>
           <type>int</type>
           <description>The priority of this execution compared to other executions which are bound to the same phase.
             Executions derived from the default lifecycle have a negative priority by default so that they are executed
-            before any custom plugin executions.
+            before any custom plugin executions. This field is accessible only since Maven 3.9.3, was purely internal before.
           </description>
         </field>
         <field>

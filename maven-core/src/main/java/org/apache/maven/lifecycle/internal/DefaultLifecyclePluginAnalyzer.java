@@ -159,7 +159,7 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
                 PluginExecution execution = new PluginExecution();
                 execution.setId(getExecutionId(plugin, gs.goal));
                 execution.setPhase(phase);
-                execution.setPriority(i - mojos.size());
+                execution.setPriority(1000 * (i - mojos.size()));
                 execution.getGoals().add(gs.goal);
 
                 execution.setLocation("", location);

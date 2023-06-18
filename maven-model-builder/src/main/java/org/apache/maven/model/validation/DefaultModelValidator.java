@@ -135,7 +135,7 @@ public class DefaultModelValidator implements ModelValidator {
             // models without a version starting with 3.4.
             validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m);
 
-            validateModelVersion(problems, m.getModelVersion(), m, "4.0.0", "4.2.0");
+            validateModelVersion(problems, m.getModelVersion(), m, "4.0.0");
 
             validateStringNoExpression("groupId", problems, Severity.WARNING, Version.V20, m.getGroupId(), m);
             if (parent == null) {
