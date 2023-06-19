@@ -23,6 +23,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -108,6 +109,14 @@ class ComparableVersionTest {
         assertEquals(0, c2.compareTo(c1), "expected " + v2 + " == " + v1);
     }
 
+    private void checkVersionObjectInequality(String v1, String v2) {
+        ComparableVersion c1 = new ComparableVersion(v1);
+        ComparableVersion c2 = new ComparableVersion(v2);
+        assertNotEquals(c1.hashCode(), c2.hashCode(), "expected different hashcode for " + v1 + " and " + v2);
+        assertNotEquals(c1, c2, "expected " + v1 + "not equals " + v2);
+        assertNotEquals(c2, c1, "expected " + v2 + "not equals " + v1);
+    }
+
     private void checkVersionsArrayEqual(String[] array) {
         // compare against each other (including itself)
         for (int i = 0; i < array.length; ++i)
@@ -152,12 +161,7 @@ class ComparableVersionTest {
         checkVersionsEqual("1x", "1.0.0-x");
         checkVersionsEqual("1.0x", "1-x");
         checkVersionsEqual("1.0.0x", "1-x");
-
-        // aliases
-        checkVersionsEqualOrder("1ga", "1");
-        checkVersionsEqualOrder("1release", "1");
-        checkVersionsEqualOrder("1final", "1");
-        checkVersionsEqualOrder("1cr", "1rc");
+        checkVersionsEqual("1cr", "1rc");
 
         // special "aliases" a, b and m for alpha, beta and milestone
         checkVersionsEqual("1a1", "1-alpha-1");
@@ -169,19 +173,37 @@ class ComparableVersionTest {
         checkVersionsEqual("1A", "1a");
         checkVersionsEqual("1B", "1b");
         checkVersionsEqual("1M", "1m");
-        checkVersionsEqualOrder("1Ga", "1");
-        checkVersionsEqualOrder("1GA", "1");
-        checkVersionsEqualOrder("1RELEASE", "1");
-        checkVersionsEqualOrder("1release", "1");
-        checkVersionsEqualOrder("1RELeaSE", "1");
-        checkVersionsEqualOrder("1Final", "1");
-        checkVersionsEqualOrder("1FinaL", "1");
-        checkVersionsEqualOrder("1FINAL", "1");
         checkVersionsEqual("1Cr", "1Rc");
         checkVersionsEqual("1cR", "1rC");
         checkVersionsEqual("1m3", "1Milestone3");
         checkVersionsEqual("1m3", "1MileStone3");
         checkVersionsEqual("1m3", "1MILESTONE3");
+    }
+
+    @Test
+    void testVersionsEqualOrderAndObjectInequality() {
+        checkVersionsEqualOrder("1ga", "1");
+        checkVersionObjectInequality("1ga", "1");
+        checkVersionsEqualOrder("1release", "1");
+        checkVersionObjectInequality("1release", "1");
+        checkVersionsEqualOrder("1final", "1");
+        checkVersionObjectInequality("1final", "1");
+        checkVersionsEqualOrder("1Ga", "1");
+        checkVersionObjectInequality("1Ga", "1");
+        checkVersionsEqualOrder("1GA", "1");
+        checkVersionObjectInequality("1GA", "1");
+        checkVersionsEqualOrder("1RELEASE", "1");
+        checkVersionObjectInequality("1RELEASE", "1");
+        checkVersionsEqualOrder("1release", "1");
+        checkVersionObjectInequality("1release", "1");
+        checkVersionsEqualOrder("1RELeaSE", "1");
+        checkVersionObjectInequality("1RELeaSE", "1");
+        checkVersionsEqualOrder("1Final", "1");
+        checkVersionObjectInequality("1Final", "1");
+        checkVersionsEqualOrder("1FinaL", "1");
+        checkVersionObjectInequality("1FinaL", "1");
+        checkVersionsEqualOrder("1FINAL", "1");
+        checkVersionObjectInequality("1FINAL", "1");
     }
 
     @Test
