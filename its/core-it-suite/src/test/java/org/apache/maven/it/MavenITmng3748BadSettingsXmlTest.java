@@ -69,7 +69,7 @@ public class MavenITmng3748BadSettingsXmlTest extends AbstractMavenIntegrationTe
             List<String> lines = verifier.loadLines(verifier.getLogFileName(), null);
             boolean foundWarning = false;
             for (String line : lines) {
-                if (line.matches("(?i)\\[WARNING\\].*unrecognised tag.+repositories.+2.*")) {
+                if (line.matches("(?i)\\[WARNING\\].*unrecognised tag.+unknown.+2.*")) {
                     foundWarning = true;
                     break;
                 }

@@ -1,5 +1,5 @@
 <settings>
-    <repositories>
+    <unknown>
         <repository>
             <id>central</id>
             <url>http://central</url>
@@ -10,5 +10,5 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-    </repositories>
+    </unknown>
 </settings>
