@@ -24,12 +24,12 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.settings.InputSource;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
 import org.apache.maven.settings.Server;
@@ -39,6 +39,7 @@ import org.apache.maven.settings.io.SettingsParseException;
 import org.apache.maven.settings.io.SettingsReader;
 import org.apache.maven.settings.io.SettingsWriter;
 import org.apache.maven.settings.merge.MavenSettingsMerger;
+import org.apache.maven.settings.v4.SettingsTransformer;
 import org.apache.maven.settings.validation.SettingsValidator;
 import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
@@ -158,8 +159,9 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         Settings settings;
 
         try {
-            Map<String, ?> options = Collections.singletonMap(SettingsReader.IS_STRICT, Boolean.TRUE);
-
+            Map<String, Object> options = new HashMap<>();
+            options.put(SettingsReader.IS_STRICT, Boolean.TRUE);
+            options.put(InputSource.class.getName(), new InputSource(settingsSource.getLocation()));
             try {
                 settings = settingsReader.read(settingsSource.getInputStream(), options);
             } catch (SettingsParseException e) {
@@ -211,15 +213,6 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private Settings interpolate(
             Settings settings, SettingsBuildingRequest request, SettingsProblemCollector problems) {
-        StringWriter writer = new StringWriter(1024 * 4);
-
-        try {
-            settingsWriter.write(writer, null, settings);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to serialize settings to memory", e);
-        }
-
-        String serializedSettings = writer.toString();
 
         RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
 
@@ -238,37 +231,19 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     e);
         }
 
-        interpolator.addPostProcessor((expression, value) -> {
-            if (value != null) {
-                // we're going to parse this back in as XML so we need to escape XML markup
-                value = value.toString()
-                        .replace("&", "&amp;")
-                        .replace("<", "&lt;")
-                        .replace(">", "&gt;");
-                return value;
-            }
-            return null;
-        });
-
-        try {
-            serializedSettings = interpolator.interpolate(serializedSettings, "settings");
-        } catch (InterpolationException e) {
-            problems.add(
-                    SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1, e);
-
-            return settings;
-        }
-
-        Settings result;
-        try {
-            Map<String, ?> options = Collections.singletonMap(SettingsReader.IS_STRICT, Boolean.FALSE);
-            result = settingsReader.read(new StringReader(serializedSettings), options);
-        } catch (IOException e) {
-            problems.add(
-                    SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1, e);
-            return settings;
-        }
-
-        return result;
+        return new Settings(new SettingsTransformer(value -> {
+                    try {
+                        return value != null ? interpolator.interpolate(value) : null;
+                    } catch (InterpolationException e) {
+                        problems.add(
+                                SettingsProblem.Severity.WARNING,
+                                "Failed to interpolate settings: " + e.getMessage(),
+                                -1,
+                                -1,
+                                e);
+                        return value;
+                    }
+                })
+                .visit(settings.getDelegate()));
     }
 }

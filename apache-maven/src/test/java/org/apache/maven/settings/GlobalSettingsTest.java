@@ -19,12 +19,11 @@
 package org.apache.maven.settings;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
+import java.nio.file.Files;
 
-import org.apache.maven.settings.v4.SettingsXpp3Reader;
+import org.apache.maven.api.settings.InputSource;
+import org.apache.maven.settings.v4.SettingsXpp3ReaderEx;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,8 +42,8 @@ class GlobalSettingsTest {
         File globalSettingsFile = new File(basedir, "src/assembly/maven/conf/settings.xml");
         assertTrue(globalSettingsFile.isFile(), globalSettingsFile.getAbsolutePath());
 
-        try (Reader reader = new InputStreamReader(new FileInputStream(globalSettingsFile), StandardCharsets.UTF_8)) {
-            new SettingsXpp3Reader().read(reader);
+        try (InputStream is = Files.newInputStream(globalSettingsFile.toPath())) {
+            new SettingsXpp3ReaderEx().read(is, true, new InputSource(globalSettingsFile.getAbsolutePath()));
         }
     }
 }
