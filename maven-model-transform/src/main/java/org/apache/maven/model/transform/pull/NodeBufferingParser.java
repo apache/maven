@@ -67,5 +67,10 @@ public abstract class NodeBufferingParser extends BufferingParser {
         return true;
     }
 
+    @Override
+    public boolean bypass() {
+        return !buffering && super.bypass();
+    }
+
     protected abstract void process(List<Event> buffer);
 }

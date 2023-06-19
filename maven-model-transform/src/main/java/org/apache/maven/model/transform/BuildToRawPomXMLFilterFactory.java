@@ -65,6 +65,8 @@ public class BuildToRawPomXMLFilterFactory {
         getSha1().ifPresent(ciFriendlyFilter::setSha1);
         parser = ciFriendlyFilter;
 
+        parser = new ModelVersionXMLFilter(parser);
+
         return parser;
     }
 
