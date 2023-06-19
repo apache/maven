@@ -49,6 +49,44 @@ public class DefaultSettingsValidator implements SettingsValidator {
 
     @Override
     public void validate(Settings settings, SettingsProblemCollector problems) {
+        validate(settings, false, problems);
+    }
+
+    @Override
+    public void validate(Settings settings, boolean isProjectSettings, SettingsProblemCollector problems) {
+        if (isProjectSettings) {
+            String msgS = "is not supported on project settings.";
+            String msgP = "are not supported on project settings.";
+            if (settings.getLocalRepository() != null
+                    && !settings.getLocalRepository().isEmpty()) {
+                addViolation(problems, Severity.WARNING, "localRepository", null, msgS);
+            }
+            if (settings.getInteractiveMode() != null && !settings.getInteractiveMode()) {
+                addViolation(problems, Severity.WARNING, "interactiveMode", null, msgS);
+            }
+            if (settings.isOffline()) {
+                addViolation(problems, Severity.WARNING, "offline", null, msgS);
+            }
+            if (!settings.getProxies().isEmpty()) {
+                addViolation(problems, Severity.WARNING, "proxies", null, msgP);
+            }
+            if (settings.isUsePluginRegistry()) {
+                addViolation(problems, Severity.WARNING, "usePluginRegistry", null, msgS);
+            }
+            List<Server> servers = settings.getServers();
+            for (int i = 0; i < servers.size(); i++) {
+                Server server = servers.get(i);
+                String serverField = "servers.server[" + i + "]";
+                validateStringEmpty(problems, serverField + ".username", server.getUsername(), msgS);
+                validateStringEmpty(problems, serverField + ".password", server.getPassword(), msgS);
+                validateStringEmpty(problems, serverField + ".privateKey", server.getPrivateKey(), msgS);
+                validateStringEmpty(problems, serverField + ".passphrase", server.getPassphrase(), msgS);
+                validateStringEmpty(problems, serverField + ".filePermissions", server.getFilePermissions(), msgS);
+                validateStringEmpty(
+                        problems, serverField + ".directoryPermissions", server.getDirectoryPermissions(), msgS);
+            }
+        }
+
         if (settings.isUsePluginRegistry()) {
             addViolation(problems, Severity.WARNING, "usePluginRegistry", null, "is deprecated and has no effect.");
         }
@@ -206,6 +244,25 @@ public class DefaultSettingsValidator implements SettingsValidator {
     // ----------------------------------------------------------------------
     // Field validation
     // ----------------------------------------------------------------------
+
+    /**
+     * Asserts:
+     * <p/>
+     * <ul>
+     * <li><code>string.length == null</code>
+     * <li><code>string.length == 0</code>
+     * </ul>
+     */
+    private static boolean validateStringEmpty(
+            SettingsProblemCollector problems, String fieldName, String string, String message) {
+        if (string == null || string.length() == 0) {
+            return true;
+        }
+
+        addViolation(problems, Severity.WARNING, fieldName, null, message);
+
+        return false;
+    }
 
     /**
      * Asserts:

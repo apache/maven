@@ -87,6 +87,7 @@ public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements M
     public Settings buildSettings(MavenExecutionRequest request) throws IOException, XmlPullParserException {
         SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
         settingsRequest.setUserSettingsFile(request.getUserSettingsFile());
+        settingsRequest.setProjectSettingsFile(request.getProjectSettingsFile());
         settingsRequest.setGlobalSettingsFile(request.getGlobalSettingsFile());
         settingsRequest.setUserProperties(request.getUserProperties());
         settingsRequest.setSystemProperties(request.getSystemProperties());

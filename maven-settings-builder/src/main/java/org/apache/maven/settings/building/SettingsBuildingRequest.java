@@ -61,6 +61,40 @@ public interface SettingsBuildingRequest {
     SettingsBuildingRequest setGlobalSettingsSource(SettingsSource globalSettingsSource);
 
     /**
+     * Gets the project settings file.
+     *
+     * @return The project settings file or {@code null} if none.
+     * @since 4.0.0
+     */
+    File getProjectSettingsFile();
+
+    /**
+     * Sets the project settings file. A non-existent settings file is equivalent to empty settings.
+     *
+     * @param projectSettingsFile The project settings file, may be {@code null} to disable project settings.
+     * @return This request, never {@code null}.
+     * @since 4.0.0
+     */
+    DefaultSettingsBuildingRequest setProjectSettingsFile(File projectSettingsFile);
+
+    /**
+     * Gets the project settings source.
+     *
+     * @return The project settings source or {@code null} if none.
+     * @since 4.0.0
+     */
+    SettingsSource getProjectSettingsSource();
+
+    /**
+     * Sets the project settings source.
+     *
+     * @param projectSettingsSource The project settings source, may be {@code null} to disable global settings.
+     * @return This request, never {@code null}.
+     * @since 4.0.0
+     */
+    SettingsBuildingRequest setProjectSettingsSource(SettingsSource projectSettingsSource);
+
+    /**
      * Gets the user settings file.
      *
      * @return The user settings file or {@code null} if none.
