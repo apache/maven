@@ -32,6 +32,8 @@ import java.util.Map;
 import org.apache.maven.api.settings.InputSource;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
+import org.apache.maven.settings.Repository;
+import org.apache.maven.settings.RepositoryPolicy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.TrackableBase;
@@ -103,6 +105,26 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         settingsMerger.merge(projectSettings, globalSettings, TrackableBase.GLOBAL_LEVEL);
         settingsMerger.merge(userSettings, projectSettings, TrackableBase.PROJECT_LEVEL);
+
+        // If no repository is defined in the user/global settings,
+        // it means that we have "old" settings (as those are new in 4.0)
+        // so add central to the computed settings for backward compatibility.
+        if (userSettings.getRepositories().isEmpty()
+                && userSettings.getPluginRepositories().isEmpty()) {
+            Repository central = new Repository();
+            central.setId("central");
+            central.setName("Central Repository");
+            central.setUrl("https://repo.maven.apache.org/maven2");
+            RepositoryPolicy disabledPolicy = new RepositoryPolicy();
+            disabledPolicy.setEnabled(false);
+            central.setSnapshots(disabledPolicy);
+            userSettings.getRepositories().add(central);
+            central = central.clone();
+            RepositoryPolicy updateNeverPolicy = new RepositoryPolicy();
+            disabledPolicy.setUpdatePolicy("never");
+            central.setReleases(updateNeverPolicy);
+            userSettings.getPluginRepositories().add(central);
+        }
 
         problems.setSource("");
 

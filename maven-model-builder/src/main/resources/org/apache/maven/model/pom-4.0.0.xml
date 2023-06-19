@@ -28,33 +28,6 @@ under the License.
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>central</id>
-      <name>Maven Central Repository</name>
-      <url>https://repo.maven.apache.org/maven2</url>
-      <layout>default</layout>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>central</id>
-      <name>Maven Central Repository</name>
-      <url>https://repo.maven.apache.org/maven2</url>
-      <layout>default</layout>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
-
   <build>
     <directory>${project.basedir}/target</directory>
     <outputDirectory>${project.build.directory}/classes</outputDirectory>
