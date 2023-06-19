@@ -25,7 +25,7 @@
 
 Maven Logging
 
- End-user logging documentation is available {{{/maven-logging.html}in Maven site}}.
+ {{{/maven-logging.html}End-user logging documentation}} is available {{{/maven-logging.html}in Maven site}}.
  This documentation is focused on internal implementation details.
 
 * Logging API
@@ -48,7 +48,7 @@ Maven Logging
 
 * Logging Implementation
 
- Maven 3.1.0 ships bundled with {{{http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html}SLF4J simple logger}},
+ Maven 3.1.0 ships bundled with {{{https://www.slf4j.org/api/org/slf4j/simple/SimpleLogger.html}SLF4J simple logger}} and since 3.5.0 {{{../maven-slf4j-provider/}Maven-customized <<<maven-slf4j-provider>>>}},
  but is ready to use other logging implementations: SLF4J is responsible for loading the implementation, referred to as
  {{{http://www.slf4j.org/manual.html#swapping}"SLF4J bindings"}}.
 
@@ -61,6 +61,8 @@ Maven Logging
  in SLF4J API, logging implementation specific extensions need to be added into Maven to support these CLI options: see
  {{{./apidocs/org/apache/maven/cli/logging/Slf4jConfigurationFactory.html}Slf4jConfigurationFactory}} /
  {{{./apidocs/org/apache/maven/cli/logging/Slf4jConfiguration.html}Slf4jConfiguration}}.
+
+~~ TODO document META-INF/maven/slf4j-configuration.properties
 
 * Getting Logger Instance
 
@@ -79,14 +81,7 @@ public class MyClass
 
 * Logger Name
 
- Before Maven 3.1.0, with logging implementation done in Maven, logger name wasn't used by basic console logging implementation:
- they are as-is, without clear convention on when to pass logger from class to class or when to create a new logger.
+ Logger name is basically the classical fully qualified class name: it's not visible by default, but can be activated (see {{{/maven-logging.html}user documentation}}).
 
- Starting with Maven 3.1.0, logging implementation can be of greatest use if logger names are well defined. This definition still
- needs to be defined and implemented:
-
- * classical "class name" pattern?
-
- * Maven-specific name hierarchy?
-
- * a mix (some with class name, some with Maven-specific hierarchy)?
+ Notice that before Maven 3.1.0, with logger created by Maven, some code used to pass logger from class to class because it could not create a new logger:
+ discrepencies between logger name and actual class may happen.
