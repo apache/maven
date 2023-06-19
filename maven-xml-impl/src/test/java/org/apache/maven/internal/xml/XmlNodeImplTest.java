@@ -610,6 +610,36 @@ class XmlNodeImplTest {
         assertEquals(recessiveConfig.toString(), result.toString());
     }
 
+    @Test
+    void testMergeCombineChildrenAppendOnRecessive() throws XmlPullParserException, IOException {
+        String dominant = "<relocations>\n" + "  <relocation>\n"
+                + "    <pattern>org.apache.shiro.crypto.CipherService</pattern>\n"
+                + "    <shadedPattern>org.apache.shiro.crypto.cipher.CipherService</shadedPattern>\n"
+                + "  </relocation>\n"
+                + "</relocations>";
+        String recessive = "<relocations combine.children=\"append\">\n"
+                + "  <relocation>\n"
+                + "    <pattern>javax.faces</pattern>\n"
+                + "    <shadedPattern>jakarta.faces</shadedPattern>\n"
+                + "  </relocation>\n"
+                + "</relocations>";
+        String expected = "<relocations combine.children=\"append\">\n"
+                + "  <relocation>\n"
+                + "    <pattern>javax.faces</pattern>\n"
+                + "    <shadedPattern>jakarta.faces</shadedPattern>\n"
+                + "  </relocation>\n"
+                + "  <relocation>\n"
+                + "    <pattern>org.apache.shiro.crypto.CipherService</pattern>\n"
+                + "    <shadedPattern>org.apache.shiro.crypto.cipher.CipherService</shadedPattern>\n"
+                + "  </relocation>\n"
+                + "</relocations>";
+
+        XmlNodeImpl d = XmlNodeBuilder.build(new StringReader(dominant));
+        XmlNodeImpl r = XmlNodeBuilder.build(new StringReader(recessive));
+        XmlNode m = d.merge(r);
+        assertEquals(expected, m.toString().replaceAll("\r\n", "\n"));
+    }
+
     private static List<XmlNode> getChildren(XmlNode node, String name) {
         return node.getChildren().stream().filter(n -> n.getName().equals(name)).collect(Collectors.toList());
     }
