@@ -102,8 +102,8 @@ class ComparableVersionTest {
     }
 
     private void checkVersionsEqualOrder(String v1, String v2) {
-        Comparable c1 = newComparable(v1);
-        Comparable c2 = newComparable(v2);
+        ComparableVersion c1 = new ComparableVersion(v1);
+        ComparableVersion c2 = new ComparableVersion(v2);
         assertEquals(0, c1.compareTo(c2), "expected " + v1 + " == " + v2);
         assertEquals(0, c2.compareTo(c1), "expected " + v2 + " == " + v1);
     }
