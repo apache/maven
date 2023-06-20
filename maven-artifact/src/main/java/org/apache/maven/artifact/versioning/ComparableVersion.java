@@ -401,7 +401,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return comparableQualifier(value).compareTo(comparableQualifier(((StringItem) item).value));
 
                 case COMBINATION_ITEM:
-                    int result = this.compareTo(((CombinationItem) item).getStringValue());
+                    int result = this.compareTo(((CombinationItem) item).getStringPart());
                     if (result == 0) {
                         return -1;
                     }
@@ -445,9 +445,9 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
      */
     private static class CombinationItem implements Item {
 
-        StringItem stringValue;
+        StringItem stringPart;
 
-        Item digitValue;
+        Item digitPart;
 
         CombinationItem(String value) {
             int index = 0;
@@ -459,15 +459,15 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 }
             }
 
-            stringValue = new StringItem(value.substring(0, index), true);
-            digitValue = parseItem(true, value.substring(index));
+            stringPart = new StringItem(value.substring(0, index), true);
+            digitPart = parseItem(true, value.substring(index));
         }
 
         @Override
         public int compareTo(Item item) {
             if (item == null) {
                 // 1-rc1 < 1, 1-ga1 > 1
-                return stringValue.compareTo(item);
+                return stringPart.compareTo(item);
             }
             int result = 0;
             switch (item.getType()) {
@@ -477,7 +477,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return -1;
 
                 case STRING_ITEM:
-                    result = stringValue.compareTo(item);
+                    result = stringPart.compareTo(item);
                     if (result == 0) {
                         // X1 > X
                         return 1;
@@ -488,9 +488,9 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return -1;
 
                 case COMBINATION_ITEM:
-                    result = stringValue.compareTo(((CombinationItem) item).getStringValue());
+                    result = stringPart.compareTo(((CombinationItem) item).getStringPart());
                     if (result == 0) {
-                        return digitValue.compareTo(((CombinationItem) item).getDigitValue());
+                        return digitPart.compareTo(((CombinationItem) item).getDigitPart());
                     }
                     return result;
                 default:
@@ -498,12 +498,12 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
             }
         }
 
-        public StringItem getStringValue() {
-            return stringValue;
+        public StringItem getStringPart() {
+            return stringPart;
         }
 
-        public Item getDigitValue() {
-            return digitValue;
+        public Item getDigitPart() {
+            return digitPart;
         }
 
         @Override
@@ -525,17 +525,17 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 return false;
             }
             CombinationItem that = (CombinationItem) o;
-            return Objects.equals(stringValue, that.stringValue) && Objects.equals(digitValue, that.digitValue);
+            return Objects.equals(stringPart, that.stringPart) && Objects.equals(digitPart, that.digitPart);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(stringValue, digitValue);
+            return Objects.hash(stringPart, digitPart);
         }
 
         @Override
         public String toString() {
-            return stringValue.toString() + digitValue.toString();
+            return stringPart.toString() + digitPart.toString();
         }
     }
 
@@ -828,7 +828,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
      * </pre>
      *
      * @param args the version strings to parse and compare. You can pass arbitrary number of version strings and always
-     *             two adjacent will be compared
+     *             two adjacent will be compared.
      */
     // CHECKSTYLE_ON: LineLength
     public static void main(String... args) {

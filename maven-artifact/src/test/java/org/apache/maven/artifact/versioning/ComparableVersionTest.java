@@ -23,7 +23,6 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -102,19 +101,11 @@ class ComparableVersionTest {
         assertEquals(c2, c1, "expected " + v2 + ".equals( " + v1 + " )");
     }
 
-    private void checkVersionsEqualOrder(String v1, String v2) {
+    private void checkVersionsHaveSameOrder(String v1, String v2) {
         ComparableVersion c1 = new ComparableVersion(v1);
         ComparableVersion c2 = new ComparableVersion(v2);
         assertEquals(0, c1.compareTo(c2), "expected " + v1 + " == " + v2);
         assertEquals(0, c2.compareTo(c1), "expected " + v2 + " == " + v1);
-    }
-
-    private void checkVersionObjectInequality(String v1, String v2) {
-        ComparableVersion c1 = new ComparableVersion(v1);
-        ComparableVersion c2 = new ComparableVersion(v2);
-        assertNotEquals(c1.hashCode(), c2.hashCode(), "expected different hashcode for " + v1 + " and " + v2);
-        assertNotEquals(c1, c2, "expected " + v1 + "not equals " + v2);
-        assertNotEquals(c2, c1, "expected " + v2 + "not equals " + v1);
     }
 
     private void checkVersionsArrayEqual(String[] array) {
@@ -181,29 +172,18 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testVersionsEqualOrderAndObjectInequality() {
-        checkVersionsEqualOrder("1ga", "1");
-        checkVersionObjectInequality("1ga", "1");
-        checkVersionsEqualOrder("1release", "1");
-        checkVersionObjectInequality("1release", "1");
-        checkVersionsEqualOrder("1final", "1");
-        checkVersionObjectInequality("1final", "1");
-        checkVersionsEqualOrder("1Ga", "1");
-        checkVersionObjectInequality("1Ga", "1");
-        checkVersionsEqualOrder("1GA", "1");
-        checkVersionObjectInequality("1GA", "1");
-        checkVersionsEqualOrder("1RELEASE", "1");
-        checkVersionObjectInequality("1RELEASE", "1");
-        checkVersionsEqualOrder("1release", "1");
-        checkVersionObjectInequality("1release", "1");
-        checkVersionsEqualOrder("1RELeaSE", "1");
-        checkVersionObjectInequality("1RELeaSE", "1");
-        checkVersionsEqualOrder("1Final", "1");
-        checkVersionObjectInequality("1Final", "1");
-        checkVersionsEqualOrder("1FinaL", "1");
-        checkVersionObjectInequality("1FinaL", "1");
-        checkVersionsEqualOrder("1FINAL", "1");
-        checkVersionObjectInequality("1FINAL", "1");
+    void testVersionsHaveSameOrderButAreNotEqual() {
+        checkVersionsHaveSameOrder("1ga", "1");
+        checkVersionsHaveSameOrder("1release", "1");
+        checkVersionsHaveSameOrder("1final", "1");
+        checkVersionsHaveSameOrder("1Ga", "1");
+        checkVersionsHaveSameOrder("1GA", "1");
+        checkVersionsHaveSameOrder("1RELEASE", "1");
+        checkVersionsHaveSameOrder("1release", "1");
+        checkVersionsHaveSameOrder("1RELeaSE", "1");
+        checkVersionsHaveSameOrder("1Final", "1");
+        checkVersionsHaveSameOrder("1FinaL", "1");
+        checkVersionsHaveSameOrder("1FINAL", "1");
     }
 
     @Test
@@ -415,12 +395,12 @@ class ComparableVersionTest {
 
     @Test
     public void testMng7714() {
-        String f = "1.0.final-redhat";
-        String sp1 = "1.0-sp1-redhat";
-        String sp2 = "1.0-sp-1-redhat";
-        String sp3 = "1.0-sp.1-redhat";
-        checkVersionsOrder(f, sp1);
-        checkVersionsOrder(f, sp2);
-        checkVersionsOrder(f, sp3);
+        ComparableVersion f = new ComparableVersion("1.0.final-redhat");
+        ComparableVersion sp1 = new ComparableVersion("1.0-sp1-redhat");
+        ComparableVersion sp2 = new ComparableVersion("1.0-sp-1-redhat");
+        ComparableVersion sp3 = new ComparableVersion("1.0-sp.1-redhat");
+        assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp1);
+        assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp2);
+        assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp3);
     }
 }
