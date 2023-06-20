@@ -368,9 +368,6 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
          * This method takes into account the ordering of known qualifiers then unknown qualifiers with lexical
          * ordering.
          * <p>
-         * just returning an Integer with the index here is faster, but requires a lot of if/then/else to check for -1
-         * or QUALIFIERS.size and then resort to lexical ordering. Most comparisons are decided by the first character,
-         * so this is still fast. If more characters are needed then it requires a lexical sort anyway.
          *
          * @param qualifier
          * @return an equivalent value that can be used with lexical comparison
@@ -382,6 +379,11 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
             int i = QUALIFIERS.indexOf(qualifier);
 
+            // Just returning an Integer with the index here is faster, but requires a lot of if/then/else to check for
+            // -1
+            //  or QUALIFIERS.size and then resort to lexical ordering. Most comparisons are decided by the first
+            // character,
+            // so this is still fast. If more characters are needed then it requires a lexical sort anyway.
             return i == -1 ? (QUALIFIERS.size() + "-" + qualifier) : String.valueOf(i);
         }
 
@@ -441,7 +443,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
     /**
      * Represents a combination in the version item list.
-     * It is usually a combination of a string and a number, with the string first and the number second
+     * It is usually a combination of a string and a number, with the string first and the number second.
      */
     private static class CombinationItem implements Item {
 
