@@ -101,6 +101,13 @@ class ComparableVersionTest {
         assertEquals(c2, c1, "expected " + v2 + ".equals( " + v1 + " )");
     }
 
+    private void checkVersionsHaveSameOrder(String v1, String v2) {
+        ComparableVersion c1 = new ComparableVersion(v1);
+        ComparableVersion c2 = new ComparableVersion(v2);
+        assertEquals(0, c1.compareTo(c2), "expected " + v1 + " == " + v2);
+        assertEquals(0, c2.compareTo(c1), "expected " + v2 + " == " + v1);
+    }
+
     private void checkVersionsArrayEqual(String[] array) {
         // compare against each other (including itself)
         for (int i = 0; i < array.length; ++i)
@@ -145,11 +152,6 @@ class ComparableVersionTest {
         checkVersionsEqual("1x", "1.0.0-x");
         checkVersionsEqual("1.0x", "1-x");
         checkVersionsEqual("1.0.0x", "1-x");
-
-        // aliases
-        checkVersionsEqual("1ga", "1");
-        checkVersionsEqual("1release", "1");
-        checkVersionsEqual("1final", "1");
         checkVersionsEqual("1cr", "1rc");
 
         // special "aliases" a, b and m for alpha, beta and milestone
@@ -162,19 +164,26 @@ class ComparableVersionTest {
         checkVersionsEqual("1A", "1a");
         checkVersionsEqual("1B", "1b");
         checkVersionsEqual("1M", "1m");
-        checkVersionsEqual("1Ga", "1");
-        checkVersionsEqual("1GA", "1");
-        checkVersionsEqual("1RELEASE", "1");
-        checkVersionsEqual("1release", "1");
-        checkVersionsEqual("1RELeaSE", "1");
-        checkVersionsEqual("1Final", "1");
-        checkVersionsEqual("1FinaL", "1");
-        checkVersionsEqual("1FINAL", "1");
         checkVersionsEqual("1Cr", "1Rc");
         checkVersionsEqual("1cR", "1rC");
         checkVersionsEqual("1m3", "1Milestone3");
         checkVersionsEqual("1m3", "1MileStone3");
         checkVersionsEqual("1m3", "1MILESTONE3");
+    }
+
+    @Test
+    void testVersionsHaveSameOrderButAreNotEqual() {
+        checkVersionsHaveSameOrder("1ga", "1");
+        checkVersionsHaveSameOrder("1release", "1");
+        checkVersionsHaveSameOrder("1final", "1");
+        checkVersionsHaveSameOrder("1Ga", "1");
+        checkVersionsHaveSameOrder("1GA", "1");
+        checkVersionsHaveSameOrder("1RELEASE", "1");
+        checkVersionsHaveSameOrder("1release", "1");
+        checkVersionsHaveSameOrder("1RELeaSE", "1");
+        checkVersionsHaveSameOrder("1Final", "1");
+        checkVersionsHaveSameOrder("1FinaL", "1");
+        checkVersionsHaveSameOrder("1FINAL", "1");
     }
 
     @Test
@@ -382,5 +391,16 @@ class ComparableVersionTest {
             checkVersionsEqual("2-" + x, "2.0.0." + x); // previously ordered, now equals
             checkVersionsEqual("2.0." + x, "2.0.0." + x); // previously ordered, now equals
         }
+    }
+
+    @Test
+    public void testMng7714() {
+        ComparableVersion f = new ComparableVersion("1.0.final-redhat");
+        ComparableVersion sp1 = new ComparableVersion("1.0-sp1-redhat");
+        ComparableVersion sp2 = new ComparableVersion("1.0-sp-1-redhat");
+        ComparableVersion sp3 = new ComparableVersion("1.0-sp.1-redhat");
+        assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp1);
+        assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp2);
+        assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp3);
     }
 }
