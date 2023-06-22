@@ -50,7 +50,7 @@ public interface ModelReader {
      * The key for the option to provide a transformer context, which can be used to transform the input while reading
      * to get an advanced version of the model.
      */
-    String TRANSFORMER_CONTEXT = "transformerContext";
+    String TRANSFORMER_CONTEXT = "org.apache.maven.model.io.transformerContext";
 
     /**
      * Reads the model from the specified file.
