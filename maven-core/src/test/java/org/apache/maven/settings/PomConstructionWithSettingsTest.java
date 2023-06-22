@@ -34,7 +34,7 @@ import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
@@ -123,7 +123,7 @@ class PomConstructionWithSettingsTest {
     private static Settings readSettingsFile(File settingsFile) throws IOException, XmlPullParserException {
         Settings settings = null;
 
-        try (Reader reader = ReaderFactory.newXmlReader(settingsFile)) {
+        try (Reader reader = new XmlStreamReader(settingsFile)) {
             SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
 
             settings = modelReader.read(reader);

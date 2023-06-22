@@ -58,7 +58,6 @@ import org.apache.maven.internal.xml.XmlNodeBuilder;
 import ${packageModelV4}.${class.name};
   #end
 #end
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.MXSerializer;

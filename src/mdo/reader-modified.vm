@@ -51,7 +51,7 @@ import org.apache.maven.internal.xml.XmlNodeBuilder;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -91,8 +91,6 @@ public class ${className} {
     } //-- void setAddDefaultEntities(boolean)
 
     /**
-     * @see ReaderFactory#newXmlReader
-     *
      * @param reader a reader object.
      * @param strict a strict object.
      * @throws IOException IOException if any.
@@ -107,8 +105,6 @@ public class ${className} {
     } //--  ${root.name} read(Reader, boolean)
 
     /**
-     * @see ReaderFactory#newXmlReader
-     *
      * @param reader a reader object.
      * @throws IOException IOException if any.
      * @throws XmlPullParserException XmlPullParserException if
@@ -130,7 +126,7 @@ public class ${className} {
      * @return  ${root.name}
      */
     public ${root.name} read(InputStream in, boolean strict) throws IOException, XmlPullParserException {
-        return read(ReaderFactory.newXmlReader(in), strict);
+        return read(new XmlStreamReader(in), strict);
     } //--  ${root.name} read(InputStream, boolean)
 
     /**
@@ -143,7 +139,7 @@ public class ${className} {
      * @return  ${root.name}
      */
     public  ${root.name} read(InputStream in) throws IOException, XmlPullParserException {
-        return read(ReaderFactory.newXmlReader(in));
+        return read(new XmlStreamReader(in));
     } //--  ${root.name} read(InputStream)
 
     /**

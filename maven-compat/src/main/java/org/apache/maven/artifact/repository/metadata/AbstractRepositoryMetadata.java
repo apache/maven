@@ -29,8 +29,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.WriterFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
+import org.codehaus.plexus.util.xml.XmlStreamWriter;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -85,7 +85,7 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
                 // to delete on exit
             }
         } else if (metadataFile.exists()) {
-            try (Reader reader = ReaderFactory.newXmlReader(metadataFile)) {
+            try (Reader reader = new XmlStreamReader(metadataFile)) {
                 metadata = mappingReader.read(reader, false);
             }
         }
@@ -110,7 +110,7 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
 
         if (changed || !metadataFile.exists()) {
             metadataFile.getParentFile().mkdirs();
-            try (Writer writer = WriterFactory.newXmlWriter(metadataFile)) {
+            try (Writer writer = new XmlStreamWriter(metadataFile)) {
                 MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
 
                 mappingWriter.write(writer, metadata);

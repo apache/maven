@@ -29,8 +29,8 @@ import java.util.Map;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.WriterFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
+import org.codehaus.plexus.util.xml.XmlStreamWriter;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.metadata.AbstractMetadata;
@@ -86,7 +86,7 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
             return new Metadata();
         }
 
-        try (Reader reader = ReaderFactory.newXmlReader(metadataFile)) {
+        try (Reader reader = new XmlStreamReader(metadataFile)) {
             return new MetadataXpp3Reader().read(reader, false);
         } catch (IOException e) {
             throw new RepositoryException("Could not read metadata " + metadataFile + ": " + e.getMessage(), e);
@@ -97,7 +97,7 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
 
     private void write(File metadataFile, Metadata metadata) throws RepositoryException {
         metadataFile.getParentFile().mkdirs();
-        try (Writer writer = WriterFactory.newXmlWriter(metadataFile)) {
+        try (Writer writer = new XmlStreamWriter(metadataFile)) {
             new MetadataXpp3Writer().write(writer, metadata);
         } catch (IOException e) {
             throw new RepositoryException("Could not write metadata " + metadataFile + ": " + e.getMessage(), e);

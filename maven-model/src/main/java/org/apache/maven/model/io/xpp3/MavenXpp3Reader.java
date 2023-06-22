@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import org.apache.maven.model.Model;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -52,8 +52,6 @@ public class MavenXpp3Reader {
     } // -- boolean getAddDefaultEntities()
 
     /**
-     * @see ReaderFactory#newXmlReader
-     *
      * @param reader a reader object.
      * @param strict a strict object.
      * @throws IOException IOException if any.
@@ -69,8 +67,6 @@ public class MavenXpp3Reader {
     } // -- Model read( Reader, boolean )
 
     /**
-     * @see ReaderFactory#newXmlReader
-     *
      * @param reader a reader object.
      * @throws IOException IOException if any.
      * @throws XmlPullParserException XmlPullParserException if
@@ -92,7 +88,7 @@ public class MavenXpp3Reader {
      * @return Model
      */
     public Model read(InputStream in, boolean strict) throws IOException, XmlPullParserException {
-        return read(ReaderFactory.newXmlReader(in), strict);
+        return read(new XmlStreamReader(in), strict);
     } // -- Model read( InputStream, boolean )
 
     /**
@@ -105,7 +101,7 @@ public class MavenXpp3Reader {
      * @return Model
      */
     public Model read(InputStream in) throws IOException, XmlPullParserException {
-        return read(ReaderFactory.newXmlReader(in));
+        return read(new XmlStreamReader(in));
     } // -- Model read( InputStream )
 
     /**
