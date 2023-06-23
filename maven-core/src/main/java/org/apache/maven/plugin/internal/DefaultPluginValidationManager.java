@@ -95,7 +95,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
 
     private ValidationReportLevel validationReportLevel(RepositorySystemSession session) {
         return (ValidationReportLevel) session.getData()
-                .computeIfAbsent(MAVEN_PLUGIN_VALIDATION_KEY, () -> parseValidationReportLevel(session));
+                .computeIfAbsent(ValidationReportLevel.class, () -> parseValidationReportLevel(session));
     }
 
     private ValidationReportLevel parseValidationReportLevel(RepositorySystemSession session) {
