@@ -83,13 +83,22 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
     public void onEvent(Object event) {
         if (event instanceof ExecutionEvent) {
             ExecutionEvent executionEvent = (ExecutionEvent) event;
-            if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
+            if (executionEvent.getType() == ExecutionEvent.Type.SessionStarted) {
+                RepositorySystemSession repositorySystemSession =
+                        executionEvent.getSession().getRepositorySession();
+                validationReportLevel(repositorySystemSession); // this will parse and store it in session.data
+            } else if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
                 reportSessionCollectedValidationIssues(executionEvent.getSession());
             }
         }
     }
 
     private ValidationReportLevel validationReportLevel(RepositorySystemSession session) {
+        return (ValidationReportLevel) session.getData()
+                .computeIfAbsent(ValidationReportLevel.class, () -> parseValidationReportLevel(session));
+    }
+
+    private ValidationReportLevel parseValidationReportLevel(RepositorySystemSession session) {
         String level = ConfigUtils.getString(session, null, MAVEN_PLUGIN_VALIDATION_KEY);
         if (level == null || level.isEmpty()) {
             return DEFAULT_VALIDATION_LEVEL;
