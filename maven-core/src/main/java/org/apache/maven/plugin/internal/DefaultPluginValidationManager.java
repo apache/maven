@@ -86,7 +86,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
             if (executionEvent.getType() == ExecutionEvent.Type.SessionStarted) {
                 RepositorySystemSession repositorySystemSession =
                         executionEvent.getSession().getRepositorySession();
-                validationReportLevel(repositorySystemSession); // this will parse and store it in session
+                validationReportLevel(repositorySystemSession); // this will parse and store it in session.data
             } else if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
                 reportSessionCollectedValidationIssues(executionEvent.getSession());
             }
