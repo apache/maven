@@ -25,12 +25,20 @@ import org.fusesource.jansi.AnsiConsole;
 import org.fusesource.jansi.AnsiMode;
 
 /**
- * Colored message utils, to manage colors consistently across plugins (only if Maven version is at least 3.5.0).
- * For Maven version before 3.5.0, message built with this util will never add color.
+ * Colored message utils, to manage colors.  This is the core implementation of the
+ * {@link JansiMessageBuilderFactory} and {@link JansiMessageBuilder} classes.
+ * This class should not be used outside of maven-embedder and the public
+ * {@link org.apache.maven.api.services.MessageBuilderFactory} should be used instead.
  * <p>
  * Internally, <a href="http://fusesource.github.io/jansi/">Jansi</a> is used to render
  * <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#Colors">ANSI colors</a> on any platform.
- * @since 3.1.0
+ * <p>
+ *
+ * @see MessageBuilder
+ * @see org.apache.maven.api.services.MessageBuilderFactory
+ * @see JansiMessageBuilderFactory
+ * @see JansiMessageBuilder
+ * @since 4.0.0
  */
 public class MessageUtils {
     private static final boolean JANSI;
