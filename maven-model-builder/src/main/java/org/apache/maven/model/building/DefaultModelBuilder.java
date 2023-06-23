@@ -658,7 +658,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         Model fileModel = readFileModel(request, problems);
 
         request.setFileModel(fileModel);
-        result.setFileModel(fileModel);
+        result.setFileModel(fileModel.clone());
 
         activateFileModel(request, result, problems);
 
