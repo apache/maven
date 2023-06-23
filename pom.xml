@@ -133,6 +133,7 @@ under the License.
     <commonsIoVersion>2.11.0</commonsIoVersion>
     <commonsLangVersion>3.12.0</commonsLangVersion>
     <junitVersion>4.13.2</junitVersion>
+    <hamcrestVersion>2.2</hamcrestVersion>
     <mockitoVersion>4.11.0</mockitoVersion>
     <!-- plexus 2.1.1 is broken, no new release exists yet (nor will exist) -->
     <plexusVersion>2.1.0</plexusVersion>
@@ -525,7 +526,13 @@ under the License.
       <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest</artifactId>
-        <version>2.2</version>
+        <version>${hamcrestVersion}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-core</artifactId>
+        <version>${hamcrestVersion}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -533,12 +540,6 @@ under the License.
         <artifactId>junit</artifactId>
         <version>${junitVersion}</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
