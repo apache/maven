@@ -86,8 +86,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
             if (executionEvent.getType() == ExecutionEvent.Type.SessionStarted) {
                 RepositorySystemSession repositorySystemSession =
                         executionEvent.getSession().getRepositorySession();
-                ValidationReportLevel level = parseValidationReportLevel(repositorySystemSession);
-                repositorySystemSession.getData().set(MAVEN_PLUGIN_VALIDATION_KEY, level);
+                validationReportLevel(repositorySystemSession); // this will parse and store it in session
             } else if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
                 reportSessionCollectedValidationIssues(executionEvent.getSession());
             }
