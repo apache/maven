@@ -104,6 +104,7 @@ org.apache.maven.plugins:maven-resources-plugin:3.2.0
 org.apache.maven.plugins:maven-resources-plugin:3.3.0
 org.apache.maven.plugins:maven-site-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-site-plugin:3.9.1
+org.apache.maven.plugins:maven-shade-plugin:3.5.0
 org.apache.maven.plugins:maven-source-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-surefire-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M5
@@ -167,4 +168,5 @@ org.ow2.asm:asm:4.1
 org.ow2.asm:asm:6.2
 org.ow2.asm:asm:7.2
 org.slf4j:slf4j-api:1.6.1
+org.slf4j:slf4j-api:1.7.36
 org.sonatype.sisu:sisu-guice:3.1.0:jar:no_aop
