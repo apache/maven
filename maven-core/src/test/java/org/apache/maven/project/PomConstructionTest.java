@@ -175,7 +175,7 @@ class PomConstructionTest {
         assertEquals("||${project.basedir}||", originalModel.getProperties().get("prop-outside"));
 
         List<Plugin> outsidePlugins = originalModel.getBuild().getPlugins();
-        assertEquals(2, outsidePlugins.size());
+        assertEquals(1, outsidePlugins.size());
 
         checkBuildPluginWithArtifactId(
                 outsidePlugins,
@@ -270,7 +270,7 @@ class PomConstructionTest {
         assertEquals("||${project.basedir}||", originalModel.getProperties().get("prop-outside"));
 
         List<ReportPlugin> outsidePlugins = originalModel.getReporting().getPlugins();
-        assertEquals(2, outsidePlugins.size(), "Wrong number of plugins found");
+        assertEquals(1, outsidePlugins.size(), "Wrong number of plugins found");
 
         checkReportPluginWithArtifactId(
                 outsidePlugins,
