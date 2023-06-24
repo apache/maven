@@ -480,7 +480,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             noErrors = false;
         }
 
-        Model model = result.getFileModel();
+        Model model = request.getFileModel();
 
         poolBuilder.put(model.getPomFile().toPath(), model);
 
