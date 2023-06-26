@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Detects Maven3 plugins using maven-compat Maven2 compatibility layer in dependencies.
  *
- * @since 3.9.2
+ * @since 3.9.3
  */
 @Singleton
 @Named

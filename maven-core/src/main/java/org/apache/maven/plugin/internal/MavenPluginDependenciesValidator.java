@@ -28,7 +28,7 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 /**
  * Service responsible for validating plugin dependencies.
  *
- * @since 3.9.2
+ * @since 3.9.3
  */
 interface MavenPluginDependenciesValidator {
     /**
@@ -43,7 +43,7 @@ interface MavenPluginDependenciesValidator {
      * Checks mojo dependency issues by validating transitive dependencies of plugin. The dependencies passed in here
      * does NOT contain plugin, and it's direct dependencies.
      *
-     * @since 3.9.3
+     * @since 3.9.4
      */
     default void validate(RepositorySystemSession session, Artifact pluginArtifact, List<Dependency> dependencies) {
         // nothing
