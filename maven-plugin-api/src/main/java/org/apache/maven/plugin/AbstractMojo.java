@@ -18,10 +18,17 @@
  */
 package org.apache.maven.plugin;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
+
+import static java.util.Optional.ofNullable;
 
 /**
  * Abstract class to provide most of the infrastructure required to implement a <code>Mojo</code> except for
@@ -147,7 +154,7 @@ public abstract class AbstractMojo implements Mojo, ContextEnabled {
     private Map pluginContext;
 
     /**
-     * @deprecated Use SLF4J directly
+     * @deprecated Use an injected {@link Log} instead in the mojo or component.
      */
     @Deprecated
     @Override
@@ -167,13 +174,48 @@ public abstract class AbstractMojo implements Mojo, ContextEnabled {
      * method directly whenever you need the logger, it is fast enough and needs no caching.
      *
      * @see org.apache.maven.plugin.Mojo#getLog()
-     * @deprecated Use SLF4J directly
+     * @deprecated Use an injected {@link org.apache.maven.api.plugin.Log} instead in the mojo or component.
      */
     @Deprecated
     @Override
     public Log getLog() {
         if (log == null) {
-            log = new SystemStreamLog();
+            // unlikely for a standard plugin, idea is to try to fallback on maven-core impl else use stdout/stderr
+            try {
+                // ensure we have slf4j
+                final ClassLoader loader = ofNullable(getClass().getClassLoader())
+                        .orElseGet(() -> Thread.currentThread().getContextClassLoader());
+                final Class<?> lf = loader.loadClass("org.slf4j.LoggerFactory");
+                final Method getLogger = lf.getDeclaredMethod("getLogger", Class.class);
+                if (!getLogger.isAccessible()) {
+                    getLogger.setAccessible(true);
+                }
+
+                // ensure we have maven-core - else we don't care to align on it
+                final Constructor<?> delegatingLogConstructor = loader.loadClass(
+                                "org.apache.maven.internal.impl.DefaultLog")
+                        .getDeclaredConstructor(getLogger.getReturnType());
+                if (!delegatingLogConstructor.isAccessible()) {
+                    delegatingLogConstructor.setAccessible(true);
+                }
+
+                // load the slf4j logger and its log impl + create a facade to comply the deprecated API
+                final Object logger = getLogger.invoke(null, getClass());
+                final Object delegate = delegatingLogConstructor.newInstance(logger);
+                log = (Log) Proxy.newProxyInstance( // Supplier is mainly an "unwrap" impl for advanced cases
+                        loader, new Class<?>[] {Log.class, Supplier.class}, (proxy, method, args) -> {
+                            if (method.getDeclaringClass() == Supplier.class) {
+                                return delegate;
+                            }
+                            try {
+                                return method.invoke(delegate, args);
+                            } catch (InvocationTargetException ite) {
+                                throw ite.getTargetException();
+                            }
+                        });
+            } catch (Error | Exception e) {
+                log = new SystemStreamLog();
+            }
         }
 
         return log;

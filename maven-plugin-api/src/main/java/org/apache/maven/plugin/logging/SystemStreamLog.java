@@ -20,16 +20,17 @@ package org.apache.maven.plugin.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.function.Supplier;
 
 /**
  * Logger with "standard" output and error output stream.
  *
  * @author jdcasey
  *
- * @deprecated Use SLF4J directly
+ * @deprecated Use directly {@link org.apache.maven.api.plugin.Log} instead.
  */
 @Deprecated
-public class SystemStreamLog implements Log {
+public class SystemStreamLog implements Log, org.apache.maven.api.plugin.Log {
     /**
      * @see org.apache.maven.plugin.logging.Log#debug(java.lang.CharSequence)
      */
@@ -49,6 +50,16 @@ public class SystemStreamLog implements Log {
      */
     public void debug(Throwable error) {
         print("debug", error);
+    }
+
+    @Override
+    public void debug(final Supplier<String> content) {
+        debug(content.get());
+    }
+
+    @Override
+    public void debug(final Supplier<String> content, final Throwable error) {
+        debug(content.get(), error);
     }
 
     /**
@@ -72,6 +83,16 @@ public class SystemStreamLog implements Log {
         print("info", error);
     }
 
+    @Override
+    public void info(final Supplier<String> content) {
+        info(content.get());
+    }
+
+    @Override
+    public void info(final Supplier<String> content, final Throwable error) {
+        info(content.get(), error);
+    }
+
     /**
      * @see org.apache.maven.plugin.logging.Log#warn(java.lang.CharSequence)
      */
@@ -93,6 +114,16 @@ public class SystemStreamLog implements Log {
         print("warn", error);
     }
 
+    @Override
+    public void warn(final Supplier<String> content) {
+        warn(content.get());
+    }
+
+    @Override
+    public void warn(final Supplier<String> content, final Throwable error) {
+        warn(content.get(), error);
+    }
+
     /**
      * @see org.apache.maven.plugin.logging.Log#error(java.lang.CharSequence)
      */
@@ -109,8 +140,7 @@ public class SystemStreamLog implements Log {
 
         error.printStackTrace(pWriter);
 
-        System.err.println(
-                "[error] " + content.toString() + System.lineSeparator() + System.lineSeparator() + sWriter.toString());
+        System.err.println("[error] " + content.toString() + System.lineSeparator() + System.lineSeparator() + sWriter);
     }
 
     /**
@@ -122,7 +152,17 @@ public class SystemStreamLog implements Log {
 
         error.printStackTrace(pWriter);
 
-        System.err.println("[error] " + sWriter.toString());
+        System.err.println("[error] " + sWriter);
+    }
+
+    @Override
+    public void error(final Supplier<String> content) {
+        error(content.get());
+    }
+
+    @Override
+    public void error(final Supplier<String> content, final Throwable error) {
+        error(content.get(), error);
     }
 
     /**
@@ -164,7 +204,7 @@ public class SystemStreamLog implements Log {
 
         error.printStackTrace(pWriter);
 
-        System.out.println("[" + prefix + "] " + sWriter.toString());
+        System.out.println("[" + prefix + "] " + sWriter);
     }
 
     private void print(String prefix, CharSequence content, Throwable error) {
@@ -173,7 +213,7 @@ public class SystemStreamLog implements Log {
 
         error.printStackTrace(pWriter);
 
-        System.out.println("[" + prefix + "] " + content.toString() + System.lineSeparator() + System.lineSeparator()
-                + sWriter.toString());
+        System.out.println(
+                "[" + prefix + "] " + content.toString() + System.lineSeparator() + System.lineSeparator() + sWriter);
     }
 }
