@@ -38,7 +38,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Detects Maven3 direct dependencies scope.
  *
- * @since 3.9.2
+ * @since 3.9.3
  */
 @Singleton
 @Named
