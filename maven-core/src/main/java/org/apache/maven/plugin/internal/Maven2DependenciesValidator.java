@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,26 +32,40 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
+import static java.util.Objects.requireNonNull;
+
 /**
- * Detects Maven2 plugins.
+ * Detects Maven2 plugins in dependencies.
  *
  * @since 3.9.2
  */
 @Singleton
 @Named
-class Maven2DependenciesValidator extends AbstractMavenPluginDependenciesValidator {
+class Maven2DependenciesValidator implements MavenPluginDependenciesValidator {
+
+    private final PluginValidationManager pluginValidationManager;
 
     @Inject
     Maven2DependenciesValidator(PluginValidationManager pluginValidationManager) {
-        super(pluginValidationManager);
+        this.pluginValidationManager = requireNonNull(pluginValidationManager);
     }
 
     @Override
-    protected void doValidate(
+    public void validate(
             RepositorySystemSession session,
             Artifact pluginArtifact,
             ArtifactDescriptorResult artifactDescriptorResult) {
-        Set<String> maven2Versions = artifactDescriptorResult.getDependencies().stream()
+        doValidate(session, pluginArtifact, artifactDescriptorResult.getDependencies(), true);
+    }
+
+    @Override
+    public void validate(RepositorySystemSession session, Artifact pluginArtifact, List<Dependency> dependencies) {
+        doValidate(session, pluginArtifact, dependencies, false);
+    }
+
+    private void doValidate(
+            RepositorySystemSession session, Artifact pluginArtifact, List<Dependency> dependencies, boolean direct) {
+        Set<String> maven2Versions = dependencies.stream()
                 .map(Dependency::getArtifact)
                 .filter(d -> "org.apache.maven".equals(d.getGroupId()))
                 .filter(d -> !DefaultPluginValidationManager.EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA.contains(
@@ -64,7 +79,8 @@ class Maven2DependenciesValidator extends AbstractMavenPluginDependenciesValidat
                     PluginValidationManager.IssueLocality.EXTERNAL,
                     session,
                     pluginArtifact,
-                    "Plugin is a Maven 2.x plugin, which will be not supported in Maven 4.x");
+                    (direct ? "Direct" : "Transitive")
+                            + " dependencies contain Maven 2.x artifacts, which will be not supported in Maven 4.x");
         }
     }
 }

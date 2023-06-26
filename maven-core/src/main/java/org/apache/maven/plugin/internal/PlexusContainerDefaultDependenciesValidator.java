@@ -22,30 +22,47 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.List;
+
 import org.apache.maven.plugin.PluginValidationManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
+import static java.util.Objects.requireNonNull;
+
 /**
- * Detects Plexus Container Default in plugins.
+ * Detects Plexus Container Default in plugin dependencies.
  *
  * @since 3.9.2
  */
 @Singleton
 @Named
-class PlexusContainerDefaultDependenciesValidator extends AbstractMavenPluginDependenciesValidator {
+class PlexusContainerDefaultDependenciesValidator implements MavenPluginDependenciesValidator {
+
+    private final PluginValidationManager pluginValidationManager;
 
     @Inject
     PlexusContainerDefaultDependenciesValidator(PluginValidationManager pluginValidationManager) {
-        super(pluginValidationManager);
+        this.pluginValidationManager = requireNonNull(pluginValidationManager);
     }
 
-    protected void doValidate(
+    public void validate(
             RepositorySystemSession session,
             Artifact pluginArtifact,
             ArtifactDescriptorResult artifactDescriptorResult) {
-        boolean pcdPresent = artifactDescriptorResult.getDependencies().stream()
+        doValidate(session, pluginArtifact, artifactDescriptorResult.getDependencies(), true);
+    }
+
+    @Override
+    public void validate(RepositorySystemSession session, Artifact pluginArtifact, List<Dependency> dependencies) {
+        doValidate(session, pluginArtifact, dependencies, false);
+    }
+
+    private void doValidate(
+            RepositorySystemSession session, Artifact pluginArtifact, List<Dependency> dependencies, boolean direct) {
+        boolean pcdPresent = dependencies.stream()
                 .filter(d -> "org.codehaus.plexus".equals(d.getArtifact().getGroupId()))
                 .anyMatch(d -> "plexus-container-default".equals(d.getArtifact().getArtifactId()));
 
@@ -54,7 +71,8 @@ class PlexusContainerDefaultDependenciesValidator extends AbstractMavenPluginDep
                     PluginValidationManager.IssueLocality.EXTERNAL,
                     session,
                     pluginArtifact,
-                    "Plugin depends on plexus-container-default, which is EOL");
+                    (direct ? "Direct" : "Transitive")
+                            + " dependencies contain plexus-container-default, which is EOL");
         }
     }
 }
