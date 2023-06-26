@@ -36,7 +36,7 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Detects Maven3 direct dependencies scope.
+ * Detects Maven3 dependencies scope.
  *
  * @since 3.9.3
  */

@@ -41,7 +41,7 @@ interface MavenPluginDependenciesValidator {
 
     /**
      * Checks mojo dependency issues by validating transitive dependencies of plugin. The dependencies passed in here
-     * does NOT contain plugin, and it's direct dependencies.
+     * does NOT contain plugin, and it's direct dependencies, only the transitive dependencies beyond direct ones.
      *
      * @since 3.9.4
      */
