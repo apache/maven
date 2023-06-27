@@ -18,6 +18,8 @@
  */
 package org.apache.maven.plugin.internal;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -205,6 +207,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 }
                 request.addDependency(pluginDep);
             }
+            request.setManagedDependencies(getPluginManagedDependencies(session));
 
             DependencyRequest depRequest = new DependencyRequest(request, resolutionFilter);
             depRequest.setTrace(trace);
@@ -237,6 +240,202 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         }
 
         return node;
+    }
+
+    private List<org.eclipse.aether.graph.Dependency> getPluginManagedDependencies(RepositorySystemSession session) {
+        ArrayList<org.eclipse.aether.graph.Dependency> result = new ArrayList<>();
+        File mavenHome = new File(System.getProperty("maven.home"));
+        File boot = new File(mavenHome, "boot");
+        File lib = new File(mavenHome, "lib");
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.codehaus.plexus",
+                        "plexus-classworlds",
+                        "2.7.0",
+                        new File(boot, "plexus-classworlds-2.7.0.jar")),
+                session.getArtifactTypeRegistry()));
+
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.codehaus.plexus",
+                        "plexus-component-annotations",
+                        "2.1.0",
+                        new File(lib, "plexus-component-annotations-2.1.0.jar")),
+                session.getArtifactTypeRegistry()));
+
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.codehaus.plexus",
+                        "plexus-container-default",
+                        "2.1.0",
+                        new File(lib, "org.eclipse.sisu.plexus-0.3.5.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.eclipse.sisu",
+                        "org.eclipse.sisu.plexus",
+                        "0.3.5",
+                        new File(lib, "org.eclipse.sisu.plexus-0.3.5.jar")),
+                session.getArtifactTypeRegistry()));
+
+        result.add(RepositoryUtils.toDependency(
+                dependency("javax.inject", "javax.inject", "1", new File(lib, "javax.inject-1.jar")),
+                session.getArtifactTypeRegistry()));
+
+        result.add(RepositoryUtils.toDependency(
+                dependency("org.slf4j", "slf4j-api", "1.7.36", new File(lib, "slf4j-api-1.7.36.jar")),
+                session.getArtifactTypeRegistry()));
+
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven",
+                        "maven-artifact",
+                        "3.9.4-SNAPSHOT",
+                        new File(lib, "maven-artifact-3.9.4-SNAPSHOT.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven",
+                        "maven-builder-support",
+                        "3.9.4-SNAPSHOT",
+                        new File(lib, "maven-builder-support-3.9.4-SNAPSHOT.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven",
+                        "maven-compat",
+                        "3.9.4-SNAPSHOT",
+                        new File(lib, "maven-compat-3.9.4-SNAPSHOT.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven",
+                        "maven-core",
+                        "3.9.4-SNAPSHOT",
+                        new File(lib, "maven-core-3.9.4-SNAPSHOT.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven",
+                        "maven-embedder",
+                        "3.9.4-SNAPSHOT",
+                        new File(lib, "maven-embedder-3.9.4-SNAPSHOT.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven",
+                        "maven-model",
+                        "3.9.4-SNAPSHOT",
+                        new File(lib, "maven-model-3.9.4-SNAPSHOT.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven",
+                        "maven-model-builder",
+                        "3.9.4-SNAPSHOT",
+                        new File(lib, "maven-model-builder-3.9.4-SNAPSHOT.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven",
+                        "maven-plugin-api",
+                        "3.9.4-SNAPSHOT",
+                        new File(lib, "maven-plugin-api-3.9.4-SNAPSHOT.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven",
+                        "maven-repository-metadata",
+                        "3.9.4-SNAPSHOT",
+                        new File(lib, "maven-repository-metadata-3.9.4-SNAPSHOT.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven",
+                        "maven-settings",
+                        "3.9.4-SNAPSHOT",
+                        new File(lib, "maven-settings-3.9.4-SNAPSHOT.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven",
+                        "maven-settings-builder",
+                        "3.9.4-SNAPSHOT",
+                        new File(lib, "maven-settings-builder-3.9.4-SNAPSHOT.jar")),
+                session.getArtifactTypeRegistry()));
+
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven.resolver",
+                        "maven-resolver-api",
+                        "1.9.13",
+                        new File(lib, "maven-resolver-api-1.9.13.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven.resolver",
+                        "maven-resolver-impl",
+                        "1.9.13",
+                        new File(lib, "maven-resolver-impl-1.9.13.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven.resolver",
+                        "maven-resolver-spi",
+                        "1.9.13",
+                        new File(lib, "maven-resolver-spi-1.9.13.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven.resolver",
+                        "maven-resolver-util",
+                        "1.9.13",
+                        new File(lib, "maven-resolver-util-1.9.13.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.apache.maven.resolver",
+                        "maven-resolver-connector-basic",
+                        "1.9.13",
+                        new File(lib, "maven-resolver-connector-basic-1.9.13.jar")),
+                session.getArtifactTypeRegistry()));
+
+        // org.eclipse.aether
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.eclipse.aether", "aether-api", "1.9.13", new File(lib, "maven-resolver-api-1.9.13.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.eclipse.aether", "aether-impl", "1.9.13", new File(lib, "maven-resolver-impl-1.9.13.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.eclipse.aether", "aether-spi", "1.9.13", new File(lib, "maven-resolver-spi-1.9.13.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.eclipse.aether", "aether-util", "1.9.13", new File(lib, "maven-resolver-util-1.9.13.jar")),
+                session.getArtifactTypeRegistry()));
+        result.add(RepositoryUtils.toDependency(
+                dependency(
+                        "org.eclipse.aether",
+                        "aether-connector-basic",
+                        "1.9.13",
+                        new File(lib, "maven-resolver-connector-basic-1.9.13.jar")),
+                session.getArtifactTypeRegistry()));
+
+        return result;
+    }
+
+    private Dependency dependency(String g, String a, String v, File file) {
+        Dependency dependency = new Dependency();
+        dependency.setGroupId(g);
+        dependency.setArtifactId(a);
+        dependency.setVersion(v);
+        dependency.setScope(JavaScopes.SYSTEM);
+        dependency.setSystemPath(file.getAbsolutePath());
+        return dependency;
     }
 
     // Keep this class in sync with org.apache.maven.project.DefaultProjectDependenciesResolver.GraphLogger
