@@ -107,7 +107,6 @@ import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
@@ -851,7 +850,7 @@ public class MavenCli {
         List<File> jars = new ArrayList<>();
 
         if (extClassPath != null && !extClassPath.isEmpty()) {
-            for (String jar : StringUtils.split(extClassPath, File.pathSeparator)) {
+            for (String jar : extClassPath.split(File.pathSeparator)) {
                 File file = resolveFile(new File(jar), cliRequest.workingDirectory);
 
                 slf4jLogger.debug("  included '{}'", file);
@@ -1051,7 +1050,7 @@ public class MavenCli {
             ExceptionSummary summary, Map<String, String> references, String indent, boolean showErrors) {
         String referenceKey = "";
 
-        if (StringUtils.isNotEmpty(summary.getReference())) {
+        if (summary.getReference() != null && !summary.getReference().isEmpty()) {
             referenceKey =
                     references.computeIfAbsent(summary.getReference(), k -> "[Help " + (references.size() + 1) + "]");
         }

@@ -37,7 +37,6 @@ import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -436,9 +435,9 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
     private void appendForkInfo(MessageBuilder buffer, MojoDescriptor md) {
         StringBuilder buff = new StringBuilder();
-        if (StringUtils.isNotEmpty(md.getExecutePhase())) {
+        if (md.getExecutePhase() != null && !md.getExecutePhase().isEmpty()) {
             // forked phase
-            if (StringUtils.isNotEmpty(md.getExecuteLifecycle())) {
+            if (md.getExecuteLifecycle() != null && !md.getExecuteLifecycle().isEmpty()) {
                 buff.append('[');
                 buff.append(md.getExecuteLifecycle());
                 buff.append(']');

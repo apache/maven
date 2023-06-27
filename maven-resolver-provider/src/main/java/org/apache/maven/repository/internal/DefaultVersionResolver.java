@@ -37,7 +37,6 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -211,7 +210,7 @@ public class DefaultVersionResolver implements VersionResolver {
                 }
             }
 
-            if (StringUtils.isEmpty(result.getVersion())) {
+            if (result.getVersion() == null || result.getVersion().isEmpty()) {
                 throw new VersionResolutionException(result);
             }
         }
@@ -297,16 +296,16 @@ public class DefaultVersionResolver implements VersionResolver {
 
     private void merge(
             Artifact artifact, Map<String, VersionInfo> infos, Versioning versioning, ArtifactRepository repository) {
-        if (StringUtils.isNotEmpty(versioning.getRelease())) {
+        if (versioning.getRelease() != null && !versioning.getRelease().isEmpty()) {
             merge(RELEASE, infos, versioning.getLastUpdated(), versioning.getRelease(), repository);
         }
 
-        if (StringUtils.isNotEmpty(versioning.getLatest())) {
+        if (versioning.getLatest() != null && !versioning.getLatest().isEmpty()) {
             merge(LATEST, infos, versioning.getLastUpdated(), versioning.getLatest(), repository);
         }
 
         for (SnapshotVersion sv : versioning.getSnapshotVersions()) {
-            if (StringUtils.isNotEmpty(sv.getVersion())) {
+            if (sv.getVersion() != null && !sv.getVersion().isEmpty()) {
                 String key = getKey(sv.getClassifier(), sv.getExtension());
                 merge(SNAPSHOT + key, infos, sv.getUpdated(), sv.getVersion(), repository);
             }
@@ -353,7 +352,7 @@ public class DefaultVersionResolver implements VersionResolver {
     }
 
     private String getKey(String classifier, String extension) {
-        return StringUtils.clean(classifier) + ':' + StringUtils.clean(extension);
+        return (classifier == null ? "" : classifier.trim()) + ':' + (extension == null ? "" : extension.trim());
     }
 
     private ArtifactRepository getRepository(

@@ -32,7 +32,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -240,7 +239,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
 
                 buffer.append(art);
-                if (StringUtils.isNotEmpty(dep.getScope())) {
+                if (dep.getScope() != null && !dep.getScope().isEmpty()) {
                     buffer.append(':').append(dep.getScope());
                 }
 

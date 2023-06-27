@@ -49,7 +49,6 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
 import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,7 +201,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
             throws MavenExecutionException {
         List<MavenProject> result = projects;
 
-        if (StringUtils.isNotEmpty(request.getResumeFrom())) {
+        if (request.getResumeFrom() != null && !request.getResumeFrom().isEmpty()) {
             File reactorDirectory = projectSelector.getBaseDirectoryFromRequest(request);
 
             String selector = request.getResumeFrom();

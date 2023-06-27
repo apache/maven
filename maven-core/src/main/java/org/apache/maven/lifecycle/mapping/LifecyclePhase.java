@@ -28,8 +28,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.codehaus.plexus.util.StringUtils;
-
 /**
  * Mojo (goals) bindings to a lifecycle phase.
  *
@@ -57,7 +55,7 @@ public class LifecyclePhase {
         mojos = new ArrayList<>();
 
         if (goals != null && !goals.isEmpty()) {
-            String[] mojoGoals = StringUtils.split(goals, ",");
+            String[] mojoGoals = goals.split(",");
             mojos = Arrays.stream(mojoGoals).map(fromGoalIntoLifecycleMojo).collect(Collectors.toList());
         }
     }

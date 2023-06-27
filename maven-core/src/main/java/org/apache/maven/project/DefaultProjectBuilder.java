@@ -24,17 +24,7 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -72,7 +62,6 @@ import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.codehaus.plexus.util.Os;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
@@ -91,6 +80,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultProjectBuilder implements ProjectBuilder {
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ModelBuilder modelBuilder;
     private final ModelProcessor modelProcessor;
@@ -739,7 +729,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         if (extensions != null) {
             for (Extension ext : extensions) {
                 String version;
-                if (StringUtils.isEmpty(ext.getVersion())) {
+                if (ext.getVersion() == null || ext.getVersion().isEmpty()) {
                     version = "RELEASE";
                 } else {
                     version = ext.getVersion();
@@ -821,7 +811,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 && project.getDistributionManagement().getRepository() != null) {
             try {
                 DeploymentRepository r = project.getDistributionManagement().getRepository();
-                if (!StringUtils.isEmpty(r.getId()) && !StringUtils.isEmpty(r.getUrl())) {
+                if (r.getId() != null
+                        && !r.getId().isEmpty()
+                        && r.getUrl() != null
+                        && !r.getUrl().isEmpty()) {
                     ArtifactRepository repo = MavenRepositorySystem.buildArtifactRepository(r);
                     repositorySystem.injectProxy(projectBuildingRequest.getRepositorySession(), Arrays.asList(repo));
                     repositorySystem.injectAuthentication(
@@ -839,7 +832,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 && project.getDistributionManagement().getSnapshotRepository() != null) {
             try {
                 DeploymentRepository r = project.getDistributionManagement().getSnapshotRepository();
-                if (!StringUtils.isEmpty(r.getId()) && !StringUtils.isEmpty(r.getUrl())) {
+                if (r.getId() != null
+                        && !r.getId().isEmpty()
+                        && r.getUrl() != null
+                        && !r.getUrl().isEmpty()) {
                     ArtifactRepository repo = MavenRepositorySystem.buildArtifactRepository(r);
                     repositorySystem.injectProxy(projectBuildingRequest.getRepositorySession(), Arrays.asList(repo));
                     repositorySystem.injectAuthentication(
