@@ -25,6 +25,10 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -53,7 +58,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.util.ConfigUtils;
 
@@ -532,7 +536,9 @@ public class DefaultWagonManager implements WagonManager {
                 // TODO shouldn't need a file intermediary - improve wagon to take a stream
                 File temp = File.createTempFile("maven-artifact", null);
                 temp.deleteOnExit();
-                FileUtils.fileWrite(temp.getAbsolutePath(), "UTF-8", sums.get(extension));
+                byte[] bytes = sums.get(extension).getBytes(StandardCharsets.UTF_8);
+                Files.write(
+                        Paths.get(temp.getAbsolutePath()), bytes, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
 
                 temporaryFiles.add(temp);
                 wagon.put(temp, remotePath + "." + extension);
@@ -611,8 +617,8 @@ public class DefaultWagonManager implements WagonManager {
             File tempChecksumFile = new File(tempDestination + checksumFileExtension + ".tmp");
             tempChecksumFile.deleteOnExit();
             wagon.get(remotePath + checksumFileExtension, tempChecksumFile);
-
-            String expectedChecksum = FileUtils.fileRead(tempChecksumFile, "UTF-8");
+            byte[] bytes = Files.readAllBytes(tempChecksumFile.toPath());
+            String expectedChecksum = new String(bytes, StandardCharsets.UTF_8);
 
             // remove whitespaces at the end
             expectedChecksum = expectedChecksum.trim();

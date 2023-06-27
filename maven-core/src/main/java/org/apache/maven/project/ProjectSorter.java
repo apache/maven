@@ -31,10 +31,10 @@ import org.apache.maven.api.model.Extension;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
-import org.codehaus.plexus.util.dag.DAG;
-import org.codehaus.plexus.util.dag.TopologicalSorter;
-import org.codehaus.plexus.util.dag.Vertex;
+import org.apache.maven.utils.dag.CycleDetectedException;
+import org.apache.maven.utils.dag.DAG;
+import org.apache.maven.utils.dag.TopologicalSorter;
+import org.apache.maven.utils.dag.Vertex;
 
 /**
  * ProjectSorter

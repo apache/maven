@@ -26,7 +26,7 @@ import java.io.Reader;
 
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
         PersistedToolchains toolchains = null;
 
         if (userToolchainsFile != null && userToolchainsFile.isFile()) {
-            try (Reader in = ReaderFactory.newXmlReader(userToolchainsFile)) {
+            try (Reader in = new XmlStreamReader(userToolchainsFile)) {
                 toolchains = new PersistedToolchains(new MavenToolchainsXpp3Reader().read(in));
             } catch (Exception e) {
                 throw new MisconfiguredToolchainException(

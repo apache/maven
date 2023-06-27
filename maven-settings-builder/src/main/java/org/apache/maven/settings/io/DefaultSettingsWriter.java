@@ -68,7 +68,6 @@ public class DefaultSettingsWriter implements SettingsWriter {
         Objects.requireNonNull(settings, "settings cannot be null");
 
         String encoding = settings.getModelEncoding();
-        // TODO Use StringUtils here
         if (encoding == null || encoding.length() <= 0) {
             encoding = "UTF-8";
         }

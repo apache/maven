@@ -42,7 +42,6 @@ public final class RelocatedArtifact extends AbstractArtifact {
 
     RelocatedArtifact(Artifact artifact, String groupId, String artifactId, String version, String message) {
         this.artifact = Objects.requireNonNull(artifact, "artifact cannot be null");
-        // TODO Use StringUtils here
         this.groupId = (groupId != null && groupId.length() > 0) ? groupId : null;
         this.artifactId = (artifactId != null && artifactId.length() > 0) ? artifactId : null;
         this.version = (version != null && version.length() > 0) ? version : null;

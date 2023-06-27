@@ -40,7 +40,7 @@ import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
 import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -331,7 +331,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         if (lifecycleMappings == null) {
             LifecycleConfiguration lifecycleConfiguration;
 
-            try (Reader reader = ReaderFactory.newXmlReader(getDescriptorStream(LIFECYCLE_DESCRIPTOR))) {
+            try (Reader reader = new XmlStreamReader(getDescriptorStream(LIFECYCLE_DESCRIPTOR))) {
                 lifecycleConfiguration = new LifecycleMappingsXpp3Reader().read(reader);
             }
 

@@ -100,7 +100,6 @@ import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
@@ -195,7 +194,17 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
             PluginDescriptor descriptor = extractPluginDescriptor(pluginArtifact, plugin);
 
-            if (StringUtils.isBlank(descriptor.getRequiredMavenVersion())) {
+            boolean isBlankVersion = true;
+            if (descriptor.getRequiredMavenVersion() != null) {
+                for (int i = 0; i < descriptor.getRequiredMavenVersion().length(); i++) {
+                    if (!Character.isWhitespace(
+                            descriptor.getRequiredMavenVersion().charAt(i))) {
+                        isBlankVersion = false;
+                    }
+                }
+            }
+
+            if (isBlankVersion) {
                 // only take value from underlying POM if plugin descriptor has no explicit Maven requirement
                 descriptor.setRequiredMavenVersion(artifact.getProperty("requiredMavenVersion", null));
             }

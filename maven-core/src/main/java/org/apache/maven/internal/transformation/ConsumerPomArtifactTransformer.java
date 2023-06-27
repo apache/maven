@@ -41,7 +41,6 @@ import org.apache.maven.model.transform.RawToConsumerPomXMLFilterFactory;
 import org.apache.maven.model.transform.pull.XmlUtils;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
 import org.codehaus.plexus.util.xml.pull.MXParser;
@@ -186,7 +185,7 @@ public final class ConsumerPomArtifactTransformer {
      * The actual transformation: visible for testing.
      */
     static InputStream transform(Path pomFile, TransformerContext context) throws IOException, XmlPullParserException {
-        XmlStreamReader reader = ReaderFactory.newXmlReader(Files.newInputStream(pomFile));
+        XmlStreamReader reader = new XmlStreamReader(Files.newInputStream(pomFile));
         XmlPullParser parser = new MXParser(EntityReplacementMap.defaultEntityReplacementMap);
         parser.setInput(reader);
         parser = new RawToConsumerPomXMLFilterFactory(new DefaultBuildPomXMLFilterFactory(context, true))

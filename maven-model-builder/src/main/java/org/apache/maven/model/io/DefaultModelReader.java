@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
@@ -36,7 +37,6 @@ import org.apache.maven.model.building.ModelSourceTransformer;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.v4.MavenXpp3Reader;
 import org.apache.maven.model.v4.MavenXpp3ReaderEx;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
 import org.codehaus.plexus.util.xml.pull.MXParser;
@@ -62,7 +62,7 @@ public class DefaultModelReader implements ModelReader {
     public Model read(File input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
 
-        try (XmlStreamReader in = ReaderFactory.newXmlReader(input)) {
+        try (XmlStreamReader in = new XmlStreamReader(Files.newInputStream(input.toPath()))) {
             Model model = read(in, input.toPath(), options);
 
             model.setPomFile(input);
@@ -84,7 +84,7 @@ public class DefaultModelReader implements ModelReader {
     public Model read(InputStream input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
 
-        try (XmlStreamReader in = ReaderFactory.newXmlReader(input)) {
+        try (XmlStreamReader in = new XmlStreamReader(input)) {
             return read(in, null, options);
         }
     }

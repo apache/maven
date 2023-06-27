@@ -53,7 +53,7 @@ import ${packageModelV4}.InputLocation;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -93,7 +93,6 @@ public class ${className} {
     } //-- void setAddDefaultEntities(boolean)
 
     /**
-     * @see ReaderFactory#newXmlReader
      *
      * @param reader a reader object.
      * @param strict a strict object.
@@ -119,7 +118,7 @@ public class ${className} {
      * @return ${root.name}
      */
     public ${root.name} read(InputStream in, boolean strict, InputSource source) throws IOException, XmlPullParserException {
-        return read(ReaderFactory.newXmlReader(in), strict, source);
+        return read(new XmlStreamReader(in), strict, source);
     } //-- ${root.name} read(InputStream, boolean)
 
     /**

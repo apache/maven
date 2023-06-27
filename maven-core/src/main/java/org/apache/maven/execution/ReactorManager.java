@@ -28,7 +28,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectSorter;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.apache.maven.utils.dag.CycleDetectedException;
 
 /**
  * ReactorManager - unused

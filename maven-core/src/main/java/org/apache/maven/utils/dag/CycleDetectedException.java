@@ -16,19 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven;
+package org.apache.maven.utils.dag;
 
-import org.apache.maven.utils.dag.CycleDetectedException;
+import java.util.Iterator;
+import java.util.List;
 
-/**
- * @author jdcasey
- */
-public class ProjectCycleException extends BuildFailureException {
-    public ProjectCycleException(String message) {
+public class CycleDetectedException extends Exception {
+    private List<String> cycle;
+
+    public CycleDetectedException(final String message, final List<String> cycle) {
         super(message);
+
+        this.cycle = cycle;
     }
 
-    public ProjectCycleException(String message, CycleDetectedException cause) {
-        super(message, cause);
+    public List<String> getCycle() {
+        return cycle;
+    }
+
+    public String cycleToString() {
+        final StringBuilder buffer = new StringBuilder();
+
+        for (Iterator<String> iterator = cycle.iterator(); iterator.hasNext(); ) {
+            buffer.append(iterator.next());
+
+            if (iterator.hasNext()) {
+                buffer.append(" --> ");
+            }
+        }
+        return buffer.toString();
+    }
+
+    @Override
+    public String getMessage() {
+        return super.getMessage() + " " + cycleToString();
     }
 }

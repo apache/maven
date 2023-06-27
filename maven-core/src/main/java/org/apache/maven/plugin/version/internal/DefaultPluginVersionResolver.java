@@ -45,7 +45,6 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.plugin.version.PluginVersionResult;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryListener;
@@ -300,15 +299,21 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     private void mergeMetadata(Versions versions, Metadata source, ArtifactRepository repository) {
         Versioning versioning = source.getVersioning();
         if (versioning != null) {
-            String timestamp = StringUtils.clean(versioning.getLastUpdated());
+            String timestamp = versioning.getLastUpdated() == null
+                    ? ""
+                    : versioning.getLastUpdated().trim();
 
-            if (StringUtils.isNotEmpty(versioning.getRelease()) && timestamp.compareTo(versions.releaseTimestamp) > 0) {
+            if (versioning.getRelease() != null
+                    && !versioning.getRelease().isEmpty()
+                    && timestamp.compareTo(versions.releaseTimestamp) > 0) {
                 versions.releaseVersion = versioning.getRelease();
                 versions.releaseTimestamp = timestamp;
                 versions.releaseRepository = repository;
             }
 
-            if (StringUtils.isNotEmpty(versioning.getLatest()) && timestamp.compareTo(versions.latestTimestamp) > 0) {
+            if (versioning.getLatest() != null
+                    && !versioning.getLatest().isEmpty()
+                    && timestamp.compareTo(versions.latestTimestamp) > 0) {
                 versions.latestVersion = versioning.getLatest();
                 versions.latestTimestamp = timestamp;
                 versions.latestRepository = repository;

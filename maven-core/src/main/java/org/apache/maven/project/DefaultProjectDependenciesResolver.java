@@ -33,7 +33,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -102,9 +101,12 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
 
         if (project.getDependencyArtifacts() == null) {
             for (Dependency dependency : project.getDependencies()) {
-                if (StringUtils.isEmpty(dependency.getGroupId())
-                        || StringUtils.isEmpty(dependency.getArtifactId())
-                        || StringUtils.isEmpty(dependency.getVersion())) {
+                if (dependency.getGroupId() == null
+                        || dependency.getGroupId().isEmpty()
+                        || dependency.getArtifactId() == null
+                        || dependency.getArtifactId().isEmpty()
+                        || dependency.getVersion() == null
+                        || dependency.getVersion().isEmpty()) {
                     // guard against case where best-effort resolution for invalid models is requested
                     continue;
                 }
@@ -225,7 +227,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                 org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
 
                 buffer.append(art);
-                if (StringUtils.isNotEmpty(dep.getScope())) {
+                if (dep.getScope() != null && !dep.getScope().isEmpty()) {
                     buffer.append(':').append(dep.getScope());
                 }
 

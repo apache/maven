@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +43,17 @@ public class MavenPluginMavenPrerequisiteChecker implements MavenPluginPrerequis
     @Override
     public void accept(PluginDescriptor pluginDescriptor) {
         String requiredMavenVersion = pluginDescriptor.getRequiredMavenVersion();
-        if (StringUtils.isNotBlank(requiredMavenVersion)) {
+
+        boolean isBlankVersion = true;
+        if (requiredMavenVersion != null) {
+            for (int i = 0; i < requiredMavenVersion.length(); i++) {
+                if (!Character.isWhitespace(requiredMavenVersion.charAt(i))) {
+                    isBlankVersion = false;
+                }
+            }
+        }
+
+        if (!isBlankVersion) {
             boolean isRequirementMet = false;
             try {
                 isRequirementMet = runtimeInformation.isMavenVersion(requiredMavenVersion);

@@ -22,8 +22,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import org.codehaus.plexus.util.Os;
-
 /**
  * Assists the project builder. <strong>Warning:</strong> This is an internal utility class that is only public for
  * technical reasons, it is not part of the public API. In particular, this class can be changed or deleted without
@@ -35,6 +33,10 @@ import org.codehaus.plexus.util.Os;
 public class EnvironmentUtils {
 
     private static Properties envVars;
+
+    public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.US);
+
+    public static final String FAMILY_WINDOWS = "windows";
 
     /**
      * Adds the environment variables in the form of properties whose keys are prefixed with {@code env.}, e.g. {@code
@@ -48,7 +50,7 @@ public class EnvironmentUtils {
         if (props != null) {
             if (envVars == null) {
                 Properties tmp = new Properties();
-                boolean caseSensitive = !Os.isFamily(Os.FAMILY_WINDOWS);
+                boolean caseSensitive = !OS_NAME.contains(FAMILY_WINDOWS);
                 for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
                     String key = "env."
                             + (caseSensitive ? entry.getKey() : entry.getKey().toUpperCase(Locale.ENGLISH));

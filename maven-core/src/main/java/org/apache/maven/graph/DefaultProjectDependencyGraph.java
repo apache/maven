@@ -34,7 +34,7 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectSorter;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.apache.maven.utils.dag.CycleDetectedException;
 
 /**
  * Describes the interdependencies between projects in the reactor.

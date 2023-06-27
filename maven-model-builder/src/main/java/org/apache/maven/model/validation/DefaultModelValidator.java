@@ -59,7 +59,6 @@ import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.interpolation.ModelVersionProcessor;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -283,10 +282,10 @@ public class DefaultModelValidator implements ModelValidator {
             String path;
             boolean missing;
 
-            if (StringUtils.isNotEmpty(file.getExists())) {
+            if (file.getExists() != null && !file.getExists().isEmpty()) {
                 path = file.getExists();
                 missing = false;
-            } else if (StringUtils.isNotEmpty(file.getMissing())) {
+            } else if (file.getMissing() != null && !file.getMissing().isEmpty()) {
                 path = file.getMissing();
                 missing = true;
             } else {
@@ -428,7 +427,17 @@ public class DefaultModelValidator implements ModelValidator {
 
             for (int i = 0, n = m.getModules().size(); i < n; i++) {
                 String module = m.getModules().get(i);
-                if (StringUtils.isBlank(module)) {
+
+                boolean isBlankModule = true;
+                if (module != null) {
+                    for (int j = 0; j < module.length(); j++) {
+                        if (!Character.isWhitespace(module.charAt(i))) {
+                            isBlankModule = false;
+                        }
+                    }
+                }
+
+                if (isBlankModule) {
                     addViolation(
                             problems,
                             Severity.ERROR,
@@ -582,7 +591,8 @@ public class DefaultModelValidator implements ModelValidator {
                             key,
                             "must be 'pom' to import the managed dependencies.",
                             dependency);
-                } else if (StringUtils.isNotEmpty(dependency.getClassifier())) {
+                } else if (dependency.getClassifier() != null
+                        && !dependency.getClassifier().isEmpty()) {
                     addViolation(
                             problems,
                             errOn30,
@@ -875,7 +885,7 @@ public class DefaultModelValidator implements ModelValidator {
                             d);
                 }
             }
-        } else if (StringUtils.isNotEmpty(d.getSystemPath())) {
+        } else if (d.getSystemPath() != null && !d.getSystemPath().isEmpty()) {
             addViolation(
                     problems,
                     Severity.ERROR,
@@ -1529,8 +1539,8 @@ public class DefaultModelValidator implements ModelValidator {
      */
     private static int compareModelVersions(String first, String second) {
         // we use a dedicated comparator because we control our model version scheme.
-        String[] firstSegments = StringUtils.split(first, ".");
-        String[] secondSegments = StringUtils.split(second, ".");
+        String[] firstSegments = first.split("\\.");
+        String[] secondSegments = second.split("\\.");
         for (int i = 0; i < Math.min(firstSegments.length, secondSegments.length); i++) {
             int result = Long.valueOf(firstSegments[i]).compareTo(Long.valueOf(secondSegments[i]));
             if (result != 0) {
@@ -1719,7 +1729,9 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private static boolean equals(String s1, String s2) {
-        return StringUtils.clean(s1).equals(StringUtils.clean(s2));
+        String c1 = s1 == null ? "" : s1.trim();
+        String c2 = s2 == null ? "" : s2.trim();
+        return c1.equals(c2);
     }
 
     private static Severity getSeverity(ModelBuildingRequest request, int errorThreshold) {

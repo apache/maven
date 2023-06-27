@@ -30,7 +30,7 @@ import java.util.zip.ZipEntry;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.XmlNodeBuilder;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -88,7 +88,7 @@ public class ExtensionDescriptorBuilder {
 
         XmlNode dom;
         try {
-            dom = XmlNodeBuilder.build(ReaderFactory.newXmlReader(is));
+            dom = XmlNodeBuilder.build(new XmlStreamReader(is));
         } catch (XmlPullParserException e) {
             throw new IOException(e.getMessage(), e);
         }
