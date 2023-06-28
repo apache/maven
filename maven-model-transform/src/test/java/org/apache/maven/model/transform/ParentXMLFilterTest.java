@@ -18,19 +18,20 @@
  */
 package org.apache.maven.model.transform;
 
+import javax.xml.stream.XMLStreamReader;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ParentXMLFilterTest extends AbstractXMLFilterTests {
-    private Function<XmlPullParser, XmlPullParser> filterCreator;
+    private Function<XMLStreamReader, XMLStreamReader> filterCreator;
 
     @BeforeEach
     void reset() {
@@ -38,21 +39,21 @@ class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Override
-    protected XmlPullParser getFilter(XmlPullParser parser) {
-        Function<XmlPullParser, XmlPullParser> filterCreator =
+    protected XMLStreamReader getFilter(XMLStreamReader parser) {
+        Function<XMLStreamReader, XMLStreamReader> filterCreator =
                 (this.filterCreator != null ? this.filterCreator : this::createFilter);
         return filterCreator.apply(parser);
     }
 
-    protected XmlPullParser createFilter(XmlPullParser parser) {
+    protected XMLStreamReader createFilter(XMLStreamReader parser) {
         return createFilter(
                 parser,
                 x -> Optional.of(new RelativeProject("GROUPID", "ARTIFACTID", "1.0.0")),
                 Paths.get("pom.xml").toAbsolutePath());
     }
 
-    protected XmlPullParser createFilter(
-            XmlPullParser parser, Function<Path, Optional<RelativeProject>> pathMapper, Path projectPath) {
+    protected XMLStreamReader createFilter(
+            XMLStreamReader parser, Function<Path, Optional<RelativeProject>> pathMapper, Path projectPath) {
         return new ParentXMLFilter(new FastForwardFilter(parser), pathMapper, projectPath);
     }
 
@@ -154,12 +155,12 @@ class ParentXMLFilterTest extends AbstractXMLFilterTests {
                 + "    <artifactId>ARTIFACTID</artifactId>\n"
                 + "  </parent>\n"
                 + "</project>";
-        String expected = "<project>" + System.lineSeparator()
-                + "  <parent>" + System.lineSeparator()
-                + "    <groupId>GROUPID</groupId>" + System.lineSeparator()
-                + "    <artifactId>ARTIFACTID</artifactId>" + System.lineSeparator()
-                + "    <version>1.0.0</version>" + System.lineSeparator()
-                + "  </parent>" + System.lineSeparator()
+        String expected = "<project>\n"
+                + "  <parent>\n"
+                + "    <groupId>GROUPID</groupId>\n"
+                + "    <artifactId>ARTIFACTID</artifactId>\n"
+                + "    <version>1.0.0</version>\n"
+                + "  </parent>\n"
                 + "</project>";
 
         String actual = transform(input);
@@ -299,13 +300,13 @@ class ParentXMLFilterTest extends AbstractXMLFilterTests {
                 + "    <!--version here-->\n"
                 + "  </parent>\n"
                 + "</project>";
-        String expected = "<project>" + System.lineSeparator()
-                + "  <parent>" + System.lineSeparator()
-                + "    <groupId>GROUPID</groupId>" + System.lineSeparator()
-                + "    <artifactId>ARTIFACTID</artifactId>" + System.lineSeparator()
-                + "    <!--version here-->" + System.lineSeparator()
-                + "    <version>1.0.0</version>" + System.lineSeparator()
-                + "  </parent>" + System.lineSeparator()
+        String expected = "<project>\n"
+                + "  <parent>\n"
+                + "    <groupId>GROUPID</groupId>\n"
+                + "    <artifactId>ARTIFACTID</artifactId>\n"
+                + "    <!--version here-->\n"
+                + "    <version>1.0.0</version>\n"
+                + "  </parent>\n"
                 + "</project>";
 
         String actual = transform(input);

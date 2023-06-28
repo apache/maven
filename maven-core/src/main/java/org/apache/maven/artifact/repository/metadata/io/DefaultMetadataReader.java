@@ -20,6 +20,7 @@ package org.apache.maven.artifact.repository.metadata.io;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,9 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Handles deserialization of metadata from some kind of textual format like XML.
@@ -52,9 +51,13 @@ public class DefaultMetadataReader implements MetadataReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (Reader in = input) {
-            return new MetadataXpp3Reader().read(in, isStrict(options));
-        } catch (XmlPullParserException e) {
-            throw new MetadataParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+            return new Metadata(new MetadataStaxReader().read(in, isStrict(options)));
+        } catch (XMLStreamException e) {
+            throw new MetadataParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 
@@ -62,9 +65,13 @@ public class DefaultMetadataReader implements MetadataReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = input) {
-            return new MetadataXpp3Reader().read(in, isStrict(options));
-        } catch (XmlPullParserException e) {
-            throw new MetadataParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+            return new Metadata(new MetadataStaxReader().read(in, isStrict(options)));
+        } catch (XMLStreamException e) {
+            throw new MetadataParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 

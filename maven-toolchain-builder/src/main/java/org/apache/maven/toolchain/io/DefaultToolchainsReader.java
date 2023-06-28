@@ -20,6 +20,7 @@ package org.apache.maven.toolchain.io;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,8 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.toolchain.model.PersistedToolchains;
-import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
 
 /**
  * Handles deserialization of toolchains from the default textual format.
@@ -48,9 +48,13 @@ public class DefaultToolchainsReader implements ToolchainsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = Files.newInputStream(input.toPath())) {
-            return new PersistedToolchains(new MavenToolchainsXpp3Reader().read(in, isStrict(options)));
-        } catch (XmlPullParserException e) {
-            throw new ToolchainsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options)));
+        } catch (XMLStreamException e) {
+            throw new ToolchainsParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 
@@ -59,9 +63,13 @@ public class DefaultToolchainsReader implements ToolchainsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (Reader in = input) {
-            return new PersistedToolchains(new MavenToolchainsXpp3Reader().read(in, isStrict(options)));
-        } catch (XmlPullParserException e) {
-            throw new ToolchainsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options)));
+        } catch (XMLStreamException e) {
+            throw new ToolchainsParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 
@@ -70,9 +78,13 @@ public class DefaultToolchainsReader implements ToolchainsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = input) {
-            return new PersistedToolchains(new MavenToolchainsXpp3Reader().read(in, isStrict(options)));
-        } catch (XmlPullParserException e) {
-            throw new ToolchainsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options)));
+        } catch (XMLStreamException e) {
+            throw new ToolchainsParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 

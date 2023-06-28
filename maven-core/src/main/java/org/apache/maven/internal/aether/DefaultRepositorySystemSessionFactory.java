@@ -236,7 +236,7 @@ public class DefaultRepositorySystemSessionFactory {
             authSelector.add(server.getId(), authBuilder.build());
 
             if (server.getConfiguration() != null) {
-                XmlNode dom = ((org.codehaus.plexus.util.xml.Xpp3Dom) server.getConfiguration()).getDom();
+                XmlNode dom = server.getDelegate().getConfiguration();
                 List<XmlNode> children = dom.getChildren().stream()
                         .filter(c -> !"wagonProvider".equals(c.getName()))
                         .collect(Collectors.toList());

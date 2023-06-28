@@ -18,7 +18,11 @@
  */
 package org.apache.maven.internal.xml;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,8 +33,6 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -241,7 +243,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testPreserveDominantBlankValue() throws XmlPullParserException, IOException {
+    void testPreserveDominantBlankValue() throws XMLStreamException, IOException {
         String lhs = "<parameter xml:space=\"preserve\"> </parameter>";
 
         String rhs = "<parameter>recessive</parameter>";
@@ -254,7 +256,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testPreserveDominantEmptyNode() throws XmlPullParserException, IOException {
+    void testPreserveDominantEmptyNode() throws XMLStreamException, IOException {
         String lhs = "<parameter></parameter>";
 
         String rhs = "<parameter>recessive</parameter>";
@@ -267,7 +269,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testPreserveDominantEmptyNode2() throws XmlPullParserException, IOException {
+    void testPreserveDominantEmptyNode2() throws XMLStreamException, IOException {
         String lhs = "<parameter/>";
 
         String rhs = "<parameter>recessive</parameter>";
@@ -442,14 +444,11 @@ class XmlNodeImplTest {
 
     /**
      * <p>testEqualsIsNullSafe.</p>
-     *
-     * @throws org.codehaus.plexus.util.xml.pull.XmlPullParserException if any.
-     * @throws java.io.IOException if any.
      */
     @Test
-    void testEqualsIsNullSafe() throws XmlPullParserException, IOException {
+    void testEqualsIsNullSafe() throws XMLStreamException, IOException {
         String testDom = "<configuration><items thing='blah'><item>one</item><item>two</item></items></configuration>";
-        Xpp3Dom dom = Xpp3DomBuilder.build(new StringReader(testDom));
+        XmlNode dom = toXmlNode(testDom);
 
         Map<String, String> attributes = new HashMap<>();
         attributes.put("nullValue", null);
@@ -464,19 +463,14 @@ class XmlNodeImplTest {
 
     /**
      * <p>testShouldOverwritePluginConfigurationSubItemsByDefault.</p>
-     *
-     * @throws org.codehaus.plexus.util.xml.pull.XmlPullParserException if any.
-     * @throws java.io.IOException if any.
      */
     @Test
-    void testShouldOverwritePluginConfigurationSubItemsByDefault() throws XmlPullParserException, IOException {
+    void testShouldOverwritePluginConfigurationSubItemsByDefault() throws XMLStreamException, IOException {
         String parentConfigStr = "<configuration><items><item>one</item><item>two</item></items></configuration>";
-        XmlNode parentConfig =
-                XmlNodeBuilder.build(new StringReader(parentConfigStr), new FixedInputLocationBuilder("parent"));
+        XmlNode parentConfig = toXmlNode(parentConfigStr, new FixedInputLocationBuilder("parent"));
 
         String childConfigStr = "<configuration><items><item>three</item></items></configuration>";
-        XmlNode childConfig =
-                XmlNodeBuilder.build(new StringReader(childConfigStr), new FixedInputLocationBuilder("child"));
+        XmlNode childConfig = toXmlNode(childConfigStr, new FixedInputLocationBuilder("child"));
 
         XmlNode result = XmlNode.merge(childConfig, parentConfig);
         XmlNode items = result.getChild("items");
@@ -490,20 +484,15 @@ class XmlNodeImplTest {
 
     /**
      * <p>testShouldMergePluginConfigurationSubItemsWithMergeAttributeSet.</p>
-     *
-     * @throws org.codehaus.plexus.util.xml.pull.XmlPullParserException if any.
-     * @throws java.io.IOException if any.
      */
     @Test
-    void testShouldMergePluginConfigurationSubItemsWithMergeAttributeSet() throws XmlPullParserException, IOException {
+    void testShouldMergePluginConfigurationSubItemsWithMergeAttributeSet() throws XMLStreamException, IOException {
         String parentConfigStr = "<configuration><items><item>one</item><item>two</item></items></configuration>";
-        XmlNode parentConfig =
-                XmlNodeBuilder.build(new StringReader(parentConfigStr), new FixedInputLocationBuilder("parent"));
+        XmlNode parentConfig = toXmlNode(parentConfigStr, new FixedInputLocationBuilder("parent"));
 
         String childConfigStr =
                 "<configuration><items combine.children=\"append\"><item>three</item></items></configuration>";
-        XmlNode childConfig =
-                XmlNodeBuilder.build(new StringReader(childConfigStr), new FixedInputLocationBuilder("child"));
+        XmlNode childConfig = toXmlNode(childConfigStr, new FixedInputLocationBuilder("child"));
 
         XmlNode result = XmlNode.merge(childConfig, parentConfig);
         XmlNode items = result.getChild("items");
@@ -562,14 +551,11 @@ class XmlNodeImplTest {
 
     /**
      * <p>testDupeChildren.</p>
-     *
-     * @throws java.io.IOException if any.
-     * @throws org.codehaus.plexus.util.xml.pull.XmlPullParserException if any.
      */
     @Test
-    void testDupeChildren() throws IOException, XmlPullParserException {
+    void testDupeChildren() throws IOException, XMLStreamException {
         String dupes = "<configuration><foo>x</foo><foo>y</foo></configuration>";
-        Xpp3Dom dom = Xpp3DomBuilder.build(new StringReader(dupes));
+        XmlNode dom = toXmlNode(new StringReader(dupes));
         assertNotNull(dom);
         assertEquals("y", dom.getChild("foo").getValue());
     }
@@ -611,7 +597,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testMergeCombineChildrenAppendOnRecessive() throws XmlPullParserException, IOException {
+    void testMergeCombineChildrenAppendOnRecessive() throws XMLStreamException, IOException {
         String dominant = "<relocations>\n" + "  <relocation>\n"
                 + "    <pattern>org.apache.shiro.crypto.CipherService</pattern>\n"
                 + "    <shadedPattern>org.apache.shiro.crypto.cipher.CipherService</shadedPattern>\n"
@@ -634,8 +620,8 @@ class XmlNodeImplTest {
                 + "  </relocation>\n"
                 + "</relocations>";
 
-        XmlNodeImpl d = XmlNodeBuilder.build(new StringReader(dominant));
-        XmlNodeImpl r = XmlNodeBuilder.build(new StringReader(recessive));
+        XmlNode d = toXmlNode(dominant);
+        XmlNode r = toXmlNode(recessive);
         XmlNode m = d.merge(r);
         assertEquals(expected, m.toString().replaceAll("\r\n", "\n"));
     }
@@ -652,23 +638,32 @@ class XmlNodeImplTest {
                 .orElse(null);
     }
 
-    private static XmlNode toXmlNode(String xml) throws XmlPullParserException, IOException {
+    private static XmlNode toXmlNode(String xml) throws XMLStreamException, IOException {
         return toXmlNode(xml, null);
     }
 
-    private static XmlNode toXmlNode(String xml, XmlNodeBuilder.InputLocationBuilder locationBuilder)
-            throws XmlPullParserException, IOException {
-        return XmlNodeBuilder.build(new StringReader(xml), locationBuilder);
+    private static XmlNode toXmlNode(String xml, XmlNodeBuilder.InputLocationBuilderStax locationBuilder)
+            throws XMLStreamException, IOException {
+        return toXmlNode(new StringReader(xml), locationBuilder);
     }
 
-    private static class FixedInputLocationBuilder implements XmlNodeBuilder.InputLocationBuilder {
+    private static XmlNode toXmlNode(Reader reader) throws XMLStreamException, IOException {
+        return toXmlNode(reader, null);
+    }
+
+    private static XmlNode toXmlNode(Reader reader, XmlNodeBuilder.InputLocationBuilderStax locationBuilder)
+            throws XMLStreamException, IOException {
+        return XmlNodeBuilder.build(reader, locationBuilder);
+    }
+
+    private static class FixedInputLocationBuilder implements XmlNodeBuilder.InputLocationBuilderStax {
         private final Object location;
 
         public FixedInputLocationBuilder(Object location) {
             this.location = location;
         }
 
-        public Object toInputLocation(XmlPullParser parser) {
+        public Object toInputLocation(XMLStreamReader parser) {
             return location;
         }
     }

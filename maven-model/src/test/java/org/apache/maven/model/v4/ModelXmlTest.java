@@ -18,6 +18,8 @@
  */
 package org.apache.maven.model.v4;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -25,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.maven.api.model.Model;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,7 +56,7 @@ class ModelXmlTest {
         return sw.toString();
     }
 
-    Model fromXml(String xml) throws IOException, XmlPullParserException {
-        return new MavenXpp3Reader().read(new StringReader(xml));
+    Model fromXml(String xml) throws XMLStreamException {
+        return new MavenStaxReader().read(new StringReader(xml));
     }
 }

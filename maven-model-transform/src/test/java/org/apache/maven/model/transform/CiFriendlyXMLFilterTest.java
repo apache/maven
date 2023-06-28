@@ -18,14 +18,15 @@
  */
 package org.apache.maven.model.transform;
 
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import javax.xml.stream.XMLStreamReader;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CiFriendlyXMLFilterTest extends AbstractXMLFilterTests {
     @Override
-    protected CiFriendlyXMLFilter getFilter(XmlPullParser parser) {
+    protected CiFriendlyXMLFilter getFilter(XMLStreamReader parser) {
 
         CiFriendlyXMLFilter filter = new CiFriendlyXMLFilter(parser, true);
         filter.setChangelist("CHANGELIST");

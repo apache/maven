@@ -18,9 +18,10 @@
  */
 package org.apache.maven.model.transform;
 
+import javax.xml.stream.XMLStreamReader;
+
 import java.util.function.BiFunction;
 
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Override
-    protected ReactorDependencyXMLFilter getFilter(XmlPullParser parser) {
+    protected ReactorDependencyXMLFilter getFilter(XMLStreamReader parser) {
         return new ReactorDependencyXMLFilter(
                 parser, reactorVersionMapper != null ? reactorVersionMapper : (g, a) -> "1.0.0");
     }

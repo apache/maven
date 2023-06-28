@@ -78,11 +78,14 @@ under the License.
                 <template>model.vm</template>
                 <template>reader.vm</template>
                 <template>writer.vm</template>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
               </templates>
               <params>
                 <param>packageModelV3=org.apache.maven.plugin.lifecycle</param>
                 <param>packageModelV4=org.apache.maven.plugin.lifecycle</param>
-                <param>packageToolV4=org.apache.maven.plugin.lifecycle.io.xpp3</param>
+                <param>packageToolV4=org.apache.maven.plugin.lifecycle.io</param>
+                <param>packageToolV4Xpp3=org.apache.maven.plugin.lifecycle.io.xpp3</param>
               </params>
             </configuration>
           </execution>

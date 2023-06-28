@@ -18,7 +18,11 @@
 *#
 #parse ( "common.vm" )
 #
-#set ( $package = "${packageToolV4}" )
+#if( ${packageToolV4Xpp3} )
+  #set ( $package = "${packageToolV4Xpp3}" )
+#else
+  #set ( $package = "${packageToolV4}" )
+#end
 #set ( $className = "${model.name}Xpp3ReaderEx" )
 #
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
@@ -59,6 +63,7 @@ import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+@Deprecated
 @Generated
 public class ${className} {
 

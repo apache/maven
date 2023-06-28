@@ -46,6 +46,10 @@ under the License.
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -61,6 +65,7 @@ under the License.
             <model>src/main/mdo/settings.mdo</model>
           </models>
           <params>
+            <param>forcedIOModelVersion=1.2.0</param>
             <param>packageModelV3=org.apache.maven.settings</param>
             <param>packageModelV4=org.apache.maven.api.settings</param>
             <param>packageToolV4=org.apache.maven.settings.v4</param>
@@ -78,9 +83,9 @@ under the License.
                 <template>merger.vm</template>
                 <template>transformer.vm</template>
                 <template>reader.vm</template>
-                <template>reader-ex.vm</template>
                 <template>writer.vm</template>
-                <template>writer-ex.vm</template>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
               </templates>
               <params combine.children="append">
                 <param>locationTracking=true</param>

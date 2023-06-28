@@ -18,10 +18,11 @@
  */
 package org.apache.maven.model.transform;
 
+import javax.xml.stream.XMLStreamReader;
+
 import java.util.List;
 
-import org.apache.maven.model.transform.pull.NodeBufferingParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.apache.maven.model.transform.stax.NodeBufferingParser;
 
 /**
  * Remove all modules, this is just buildtime information
@@ -31,8 +32,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  * @since 4.0.0
  */
 class ModulesXMLFilter extends NodeBufferingParser {
-    ModulesXMLFilter(XmlPullParser xmlPullParser) {
-        super(xmlPullParser, "modules");
+    ModulesXMLFilter(XMLStreamReader delegate) {
+        super(delegate, "modules");
     }
 
     protected void process(List<Event> buffer) {

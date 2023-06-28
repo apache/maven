@@ -20,12 +20,12 @@ package org.apache.maven.model.building;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamReader;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
  * ModelSourceTransformer for the build pom
@@ -37,7 +37,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 @Singleton
 class BuildModelSourceTransformer implements ModelSourceTransformer {
     @Override
-    public XmlPullParser transform(XmlPullParser parser, Path pomFile, TransformerContext context)
+    public XMLStreamReader transform(XMLStreamReader parser, Path pomFile, TransformerContext context)
             throws IOException, TransformerException {
         BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory = new DefaultBuildPomXMLFilterFactory(context, false);
 

@@ -18,10 +18,10 @@
  */
 package org.apache.maven.cli;
 
-import java.io.BufferedInputStream;
+import javax.xml.stream.XMLStreamException;
+
 import java.io.Console;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -56,8 +56,8 @@ import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
+import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
-import org.apache.maven.cli.internal.extension.model.io.xpp3.CoreExtensionsXpp3Reader;
 import org.apache.maven.cli.jansi.JansiMessageBuilderFactory;
 import org.apache.maven.cli.jansi.MessageUtils;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
@@ -108,7 +108,6 @@ import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
@@ -795,12 +794,11 @@ public class MavenCli {
     }
 
     private List<CoreExtension> readCoreExtensionsDescriptor(File extensionsFile)
-            throws IOException, XmlPullParserException {
-        CoreExtensionsXpp3Reader parser = new CoreExtensionsXpp3Reader();
+            throws IOException, XMLStreamException {
+        CoreExtensionsStaxReader parser = new CoreExtensionsStaxReader();
 
-        try (InputStream is = new BufferedInputStream(new FileInputStream(extensionsFile))) {
-
-            return parser.read(is).getExtensions();
+        try (InputStream is = Files.newInputStream(extensionsFile.toPath())) {
+            return parser.read(is, true).getExtensions();
         }
     }
 

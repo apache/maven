@@ -22,8 +22,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ import java.util.Objects;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositorySystemSession;
@@ -202,9 +202,10 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                     syncContext.acquire(null, Collections.singleton(metadata));
 
                     if (metadata.getFile() != null && metadata.getFile().exists()) {
-                        try (InputStream in = new FileInputStream(metadata.getFile())) {
-                            versioning =
-                                    new MetadataXpp3Reader().read(in, false).getVersioning();
+                        try (InputStream in =
+                                Files.newInputStream(metadata.getFile().toPath())) {
+                            versioning = new Versioning(
+                                    new MetadataStaxReader().read(in, false).getVersioning());
                         }
                     }
                 }
