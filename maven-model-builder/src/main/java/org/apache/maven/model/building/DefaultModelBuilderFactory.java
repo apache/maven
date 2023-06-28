@@ -22,7 +22,9 @@ import java.util.Arrays;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
+import org.apache.maven.model.composition.DefaultPluginManagementImporter;
 import org.apache.maven.model.composition.DependencyManagementImporter;
+import org.apache.maven.model.composition.PluginManagementImporter;
 import org.apache.maven.model.inheritance.DefaultInheritanceAssembler;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.DefaultModelVersionProcessor;
@@ -93,6 +95,7 @@ public class DefaultModelBuilderFactory {
     private InheritanceAssembler inheritanceAssembler;
     private ProfileSelector profileSelector;
     private ProfileInjector profileInjector;
+    private PluginManagementImporter pluginManagementImporter;
     private PluginManagementInjector pluginManagementInjector;
     private DependencyManagementInjector dependencyManagementInjector;
     private DependencyManagementImporter dependencyManagementImporter;
@@ -151,6 +154,11 @@ public class DefaultModelBuilderFactory {
 
     public DefaultModelBuilderFactory setProfileInjector(ProfileInjector profileInjector) {
         this.profileInjector = profileInjector;
+        return this;
+    }
+
+    public DefaultModelBuilderFactory setPluginManagementImporter(PluginManagementImporter pluginManagementImporter) {
+        this.pluginManagementImporter = pluginManagementImporter;
         return this;
     }
 
@@ -303,6 +311,10 @@ public class DefaultModelBuilderFactory {
         return new StubLifecycleBindingsInjector();
     }
 
+    protected PluginManagementImporter newPluginManagementImporter() {
+        return new DefaultPluginManagementImporter();
+    }
+
     protected PluginManagementInjector newPluginManagementInjector() {
         return new DefaultPluginManagementInjector();
     }
@@ -341,6 +353,7 @@ public class DefaultModelBuilderFactory {
                 inheritanceAssembler != null ? inheritanceAssembler : newInheritanceAssembler(),
                 profileSelector != null ? profileSelector : newProfileSelector(),
                 profileInjector != null ? profileInjector : newProfileInjector(),
+                pluginManagementImporter != null ? pluginManagementImporter : newPluginManagementImporter(),
                 pluginManagementInjector != null ? pluginManagementInjector : newPluginManagementInjector(),
                 dependencyManagementInjector != null ? dependencyManagementInjector : newDependencyManagementInjector(),
                 dependencyManagementImporter != null ? dependencyManagementImporter : newDependencyManagementImporter(),
