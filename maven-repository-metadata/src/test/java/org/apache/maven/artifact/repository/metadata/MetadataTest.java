@@ -18,12 +18,21 @@
  */
 package org.apache.maven.artifact.repository.metadata;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import com.ctc.wstx.stax.WstxInputFactory;
+import com.ctc.wstx.stax.WstxOutputFactory;
+import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
+import org.apache.maven.artifact.repository.metadata.io.MetadataStaxWriter;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +40,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MetadataTest {
@@ -208,6 +218,22 @@ class MetadataTest {
         assertEquals(2, target.getVersioning().getSnapshot().getBuildNumber());
     }
     /*-- END test "groupId/artifactId/version" metadata ---*/
+
+    @Test
+    void testRoundtrip() throws Exception {
+        System.setProperty(XMLInputFactory.class.getName(), WstxInputFactory.class.getName());
+        System.setProperty(XMLOutputFactory.class.getName(), WstxOutputFactory.class.getName());
+
+        Metadata source = new Metadata(org.apache.maven.artifact.repository.metadata.v4.Metadata.newBuilder(
+                        createMetadataFromArtifact(artifact).getDelegate(), true)
+                .modelEncoding("UTF-16")
+                .build());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        new MetadataStaxWriter().write(baos, source.getDelegate());
+        Metadata source2 =
+                new Metadata(new MetadataStaxReader().read(new ByteArrayInputStream(baos.toByteArray()), true));
+        assertNotNull(source2);
+    }
 
     /*-- START helper methods to populate metadata objects ---*/
     private static final String SNAPSHOT = "SNAPSHOT";

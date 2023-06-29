@@ -18,6 +18,8 @@
  */
 package org.apache.maven.model.transform;
 
+import javax.xml.stream.XMLStreamReader;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,8 +29,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-import org.apache.maven.model.transform.pull.NodeBufferingParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.apache.maven.model.transform.stax.NodeBufferingParser;
 
 /**
  * <p>
@@ -54,8 +55,8 @@ class ParentXMLFilter extends NodeBufferingParser {
      * @param relativePathMapper
      */
     ParentXMLFilter(
-            XmlPullParser parser, Function<Path, Optional<RelativeProject>> relativePathMapper, Path projectPath) {
-        super(parser, "parent");
+            XMLStreamReader delegate, Function<Path, Optional<RelativeProject>> relativePathMapper, Path projectPath) {
+        super(delegate, "parent");
         this.relativePathMapper = relativePathMapper;
         this.projectPath = projectPath;
     }
@@ -71,11 +72,11 @@ class ParentXMLFilter extends NodeBufferingParser {
         boolean hasRelativePath = false;
         for (int i = 0; i < buffer.size(); i++) {
             Event event = buffer.get(i);
-            if (event.event == START_TAG) {
+            if (event.event == START_ELEMENT) {
                 tagName = event.name;
                 hasVersion |= "version".equals(tagName);
                 hasRelativePath |= "relativePath".equals(tagName);
-            } else if (event.event == TEXT) {
+            } else if (event.event == CHARACTERS) {
                 if (S_FILTER.matcher(event.text).matches()) {
                     if (whitespaceAfterParentStart.isEmpty()) {
                         whitespaceAfterParentStart = event.text;
@@ -89,7 +90,7 @@ class ParentXMLFilter extends NodeBufferingParser {
                 } else if ("version".equals(tagName)) {
                     version = nullSafeAppend(version, event.text);
                 }
-            } else if (event.event == END_TAG && "parent".equals(event.name)) {
+            } else if (event.event == END_ELEMENT && "parent".equals(event.name)) {
                 Optional<RelativeProject> resolvedParent;
                 if (!hasVersion && (!hasRelativePath || relativePath != null)) {
                     Path relPath = Paths.get(Objects.toString(relativePath, "../pom.xml"));
@@ -98,23 +99,23 @@ class ParentXMLFilter extends NodeBufferingParser {
                     resolvedParent = Optional.empty();
                 }
                 if (!hasVersion && resolvedParent.isPresent()) {
-                    int pos = buffer.get(i - 1).event == TEXT ? i - 1 : i;
+                    int pos = buffer.get(i - 1).event == CHARACTERS ? i - 1 : i;
                     Event e = new Event();
-                    e.event = TEXT;
+                    e.event = CHARACTERS;
                     e.text = whitespaceAfterParentStart;
                     buffer.add(pos++, e);
                     e = new Event();
-                    e.event = START_TAG;
+                    e.event = START_ELEMENT;
                     e.namespace = buffer.get(0).namespace;
                     e.prefix = buffer.get(0).prefix;
                     e.name = "version";
                     buffer.add(pos++, e);
                     e = new Event();
-                    e.event = TEXT;
+                    e.event = CHARACTERS;
                     e.text = resolvedParent.get().getVersion();
                     buffer.add(pos++, e);
                     e = new Event();
-                    e.event = END_TAG;
+                    e.event = END_ELEMENT;
                     e.name = "version";
                     e.namespace = buffer.get(0).namespace;
                     e.prefix = buffer.get(0).prefix;

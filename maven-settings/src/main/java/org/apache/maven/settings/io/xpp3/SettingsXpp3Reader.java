@@ -28,6 +28,7 @@ import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+@Deprecated
 public class SettingsXpp3Reader {
     private boolean addDefaultEntities = true;
 

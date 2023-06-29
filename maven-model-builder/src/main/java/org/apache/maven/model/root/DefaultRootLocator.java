@@ -19,14 +19,15 @@
 package org.apache.maven.model.root;
 
 import javax.inject.Named;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import com.ctc.wstx.stax.WstxInputFactory;
 
 @Named
 public class DefaultRootLocator implements RootLocator {
@@ -38,16 +39,16 @@ public class DefaultRootLocator implements RootLocator {
         // we're too early to use the modelProcessor ...
         Path pom = dir.resolve("pom.xml");
         try (InputStream is = Files.newInputStream(pom)) {
-            MXParser parser = new MXParser();
-            parser.setInput(is, null);
-            if (parser.nextTag() == MXParser.START_TAG && parser.getName().equals("project")) {
+            XMLStreamReader parser = new WstxInputFactory().createXMLStreamReader(is);
+            if (parser.nextTag() == XMLStreamReader.START_ELEMENT
+                    && parser.getLocalName().equals("project")) {
                 for (int i = 0; i < parser.getAttributeCount(); i++) {
-                    if ("root".equals(parser.getAttributeName(i))) {
+                    if ("root".equals(parser.getAttributeLocalName(i))) {
                         return Boolean.parseBoolean(parser.getAttributeValue(i));
                     }
                 }
             }
-        } catch (IOException | XmlPullParserException e) {
+        } catch (IOException | XMLStreamException e) {
             // The root locator can be used very early during the setup of Maven,
             // even before the arguments from the command line are parsed.  Any exception
             // that would happen here should cause the build to fail at a later stage

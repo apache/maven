@@ -18,20 +18,20 @@
  */
 package org.apache.maven.artifact.repository.metadata;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.WriterFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
+import org.apache.maven.artifact.repository.metadata.io.MetadataStaxWriter;
 
 /**
  * Shared methods of the repository metadata handling.
@@ -59,15 +59,13 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
             throws RepositoryMetadataStoreException {
         try {
             updateRepositoryMetadata(localRepository, remoteRepository);
-        } catch (IOException | XmlPullParserException e) {
+        } catch (IOException | XMLStreamException e) {
             throw new RepositoryMetadataStoreException("Error updating group repository metadata", e);
         }
     }
 
     protected void updateRepositoryMetadata(ArtifactRepository localRepository, ArtifactRepository remoteRepository)
-            throws IOException, XmlPullParserException {
-        MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
+            throws IOException, XMLStreamException {
         Metadata metadata = null;
 
         File metadataFile = new File(
@@ -85,8 +83,8 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
                 // to delete on exit
             }
         } else if (metadataFile.exists()) {
-            try (Reader reader = ReaderFactory.newXmlReader(metadataFile)) {
-                metadata = mappingReader.read(reader, false);
+            try (InputStream input = Files.newInputStream(metadataFile.toPath())) {
+                metadata = new Metadata(new MetadataStaxReader().read(input, false));
             }
         }
 
@@ -110,10 +108,9 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
 
         if (changed || !metadataFile.exists()) {
             metadataFile.getParentFile().mkdirs();
-            try (Writer writer = WriterFactory.newXmlWriter(metadataFile)) {
-                MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
-
-                mappingWriter.write(writer, metadata);
+            try (OutputStream output = Files.newOutputStream(metadataFile.toPath())) {
+                MetadataStaxWriter mappingWriter = new MetadataStaxWriter();
+                mappingWriter.write(output, metadata.getDelegate());
             }
         } else {
             metadataFile.setLastModified(System.currentTimeMillis());

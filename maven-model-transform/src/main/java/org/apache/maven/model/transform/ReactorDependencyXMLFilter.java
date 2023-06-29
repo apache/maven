@@ -18,12 +18,13 @@
  */
 package org.apache.maven.model.transform;
 
+import javax.xml.stream.XMLStreamReader;
+
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
-import org.apache.maven.model.transform.pull.NodeBufferingParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.apache.maven.model.transform.stax.NodeBufferingParser;
 
 /**
  * Will apply the version if the dependency is part of the reactor
@@ -38,8 +39,8 @@ public class ReactorDependencyXMLFilter extends NodeBufferingParser {
     private static final Pattern S_FILTER = Pattern.compile("\\s+");
 
     public ReactorDependencyXMLFilter(
-            XmlPullParser xmlPullParser, BiFunction<String, String, String> reactorVersionMapper) {
-        super(xmlPullParser, "dependency");
+            XMLStreamReader delegate, BiFunction<String, String, String> reactorVersionMapper) {
+        super(delegate, "dependency");
         this.reactorVersionMapper = reactorVersionMapper;
     }
 
@@ -52,10 +53,10 @@ public class ReactorDependencyXMLFilter extends NodeBufferingParser {
         String tagName = null;
         for (int i = 0; i < buffer.size(); i++) {
             Event event = buffer.get(i);
-            if (event.event == START_TAG) {
+            if (event.event == START_ELEMENT) {
                 tagName = event.name;
                 hasVersion |= "version".equals(tagName);
-            } else if (event.event == TEXT) {
+            } else if (event.event == CHARACTERS) {
                 if (S_FILTER.matcher(event.text).matches()) {
                     if (dependencyWhitespace.isEmpty()) {
                         dependencyWhitespace = event.text;
@@ -65,26 +66,26 @@ public class ReactorDependencyXMLFilter extends NodeBufferingParser {
                 } else if ("artifactId".equals(tagName)) {
                     artifactId = nullSafeAppend(artifactId, event.text);
                 }
-            } else if (event.event == END_TAG && "dependency".equals(event.name)) {
+            } else if (event.event == END_ELEMENT && "dependency".equals(event.name)) {
                 String version = reactorVersionMapper.apply(groupId, artifactId);
                 if (!hasVersion && version != null) {
-                    int pos = buffer.get(i - 1).event == TEXT ? i - 1 : i;
+                    int pos = buffer.get(i - 1).event == CHARACTERS ? i - 1 : i;
                     Event e = new Event();
-                    e.event = TEXT;
+                    e.event = CHARACTERS;
                     e.text = dependencyWhitespace;
                     buffer.add(pos++, e);
                     e = new Event();
-                    e.event = START_TAG;
+                    e.event = START_ELEMENT;
                     e.namespace = buffer.get(0).namespace;
                     e.prefix = buffer.get(0).prefix;
                     e.name = "version";
                     buffer.add(pos++, e);
                     e = new Event();
-                    e.event = TEXT;
+                    e.event = CHARACTERS;
                     e.text = version;
                     buffer.add(pos++, e);
                     e = new Event();
-                    e.event = END_TAG;
+                    e.event = END_ELEMENT;
                     e.name = "version";
                     e.namespace = buffer.get(0).namespace;
                     e.prefix = buffer.get(0).prefix;

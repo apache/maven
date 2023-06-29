@@ -18,10 +18,10 @@
  */
 package org.apache.maven.model.building;
 
+import javax.xml.stream.XMLStreamReader;
+
 import java.io.IOException;
 import java.nio.file.Path;
-
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
  * Default ModelSourceTransformer, provides pomFile as inputStream and ignores the context
@@ -32,7 +32,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 public class DefaultModelSourceTransformer implements ModelSourceTransformer {
 
     @Override
-    public XmlPullParser transform(XmlPullParser parser, Path pomFile, TransformerContext context)
+    public XMLStreamReader transform(XMLStreamReader parser, Path pomFile, TransformerContext context)
             throws IOException, TransformerException {
         return parser;
     }

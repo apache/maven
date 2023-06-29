@@ -18,34 +18,32 @@
  */
 package org.apache.maven.model.transform;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
 
-import org.apache.maven.model.transform.pull.XmlUtils;
-import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.model.transform.stax.XmlUtils;
 
 public abstract class AbstractXMLFilterTests {
-    protected XmlPullParser getFilter(XmlPullParser parser) {
+    protected XMLStreamReader getFilter(XMLStreamReader parser) {
         throw new UnsupportedOperationException("Override one of the getFilter() methods");
     }
 
-    protected String transform(String input) throws XmlPullParserException, IOException {
+    protected String transform(String input) throws XMLStreamException, IOException {
         return transform(new StringReader(input));
     }
 
-    protected String transform(Reader input) throws XmlPullParserException, IOException {
+    protected String transform(Reader input) throws XMLStreamException, IOException {
+        XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(input);
+        XMLStreamReader filter = getFilter(parser);
 
-        MXParser parser = new MXParser();
-        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
-        parser.setInput(input);
-        XmlPullParser filter = getFilter(parser);
-
-        StringWriter writer = new StringWriter();
-        XmlUtils.writeDocument(filter, writer);
-        return writer.toString();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        XmlUtils.writeDocument(filter, baos);
+        return baos.toString();
     }
 }

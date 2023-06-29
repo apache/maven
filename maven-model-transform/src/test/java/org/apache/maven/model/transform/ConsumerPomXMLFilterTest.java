@@ -18,20 +18,21 @@
  */
 package org.apache.maven.model.transform;
 
+import javax.xml.stream.XMLStreamReader;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.Test;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
     @Override
-    protected XmlPullParser getFilter(XmlPullParser orgParser) {
+    protected XMLStreamReader getFilter(XMLStreamReader orgParser) {
         final BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory = new BuildToRawPomXMLFilterFactory(true) {
             @Override
             protected Function<Path, Optional<RelativeProject>> getRelativePathMapper() {
@@ -59,7 +60,7 @@ class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
             }
         };
 
-        XmlPullParser parser =
+        XMLStreamReader parser =
                 new RawToConsumerPomXMLFilterFactory(buildPomXMLFilterFactory).get(orgParser, Paths.get("pom.xml"));
         return parser;
     }

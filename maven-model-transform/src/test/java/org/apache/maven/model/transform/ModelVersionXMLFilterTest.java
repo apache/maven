@@ -18,14 +18,15 @@
  */
 package org.apache.maven.model.transform;
 
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import javax.xml.stream.XMLStreamReader;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ModelVersionXMLFilterTest extends AbstractXMLFilterTests {
     @Override
-    protected XmlPullParser getFilter(XmlPullParser parser) {
+    protected XMLStreamReader getFilter(XMLStreamReader parser) {
         return new ModelVersionXMLFilter(parser);
     }
 

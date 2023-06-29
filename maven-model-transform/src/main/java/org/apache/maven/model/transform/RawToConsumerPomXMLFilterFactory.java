@@ -18,9 +18,9 @@
  */
 package org.apache.maven.model.transform;
 
-import java.nio.file.Path;
+import javax.xml.stream.XMLStreamReader;
 
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import java.nio.file.Path;
 
 /**
  * @author Guillaume Nodet
@@ -34,9 +34,9 @@ public class RawToConsumerPomXMLFilterFactory {
         this.buildPomXMLFilterFactory = buildPomXMLFilterFactory;
     }
 
-    public final XmlPullParser get(XmlPullParser orgParser, Path projectPath) {
+    public final XMLStreamReader get(XMLStreamReader orgParser, Path projectPath) {
         // Ensure that xs:any elements aren't touched by next filters
-        XmlPullParser parser = orgParser instanceof FastForwardFilter ? orgParser : new FastForwardFilter(orgParser);
+        XMLStreamReader parser = orgParser instanceof FastForwardFilter ? orgParser : new FastForwardFilter(orgParser);
 
         parser = buildPomXMLFilterFactory.get(parser, projectPath);
 

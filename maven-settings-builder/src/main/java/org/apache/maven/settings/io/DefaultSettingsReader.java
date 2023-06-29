@@ -20,6 +20,7 @@ package org.apache.maven.settings.io;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,8 +32,7 @@ import java.util.Objects;
 
 import org.apache.maven.api.settings.InputSource;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.v4.SettingsXpp3ReaderEx;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.settings.v4.SettingsStaxReader;
 
 /**
  * Handles deserialization of settings from the default textual format.
@@ -49,9 +49,13 @@ public class DefaultSettingsReader implements SettingsReader {
 
         try (InputStream in = Files.newInputStream(input.toPath())) {
             InputSource source = new InputSource(input.toString());
-            return new Settings(new SettingsXpp3ReaderEx().read(in, isStrict(options), source));
-        } catch (XmlPullParserException e) {
-            throw new SettingsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+            return new Settings(new SettingsStaxReader().read(in, isStrict(options), source));
+        } catch (XMLStreamException e) {
+            throw new SettingsParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 
@@ -61,9 +65,13 @@ public class DefaultSettingsReader implements SettingsReader {
 
         try (Reader in = input) {
             InputSource source = (InputSource) options.get(InputSource.class.getName());
-            return new Settings(new SettingsXpp3ReaderEx().read(in, isStrict(options), source));
-        } catch (XmlPullParserException e) {
-            throw new SettingsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+            return new Settings(new SettingsStaxReader().read(in, isStrict(options), source));
+        } catch (XMLStreamException e) {
+            throw new SettingsParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 
@@ -73,9 +81,13 @@ public class DefaultSettingsReader implements SettingsReader {
 
         try (InputStream in = input) {
             InputSource source = (InputSource) options.get(InputSource.class.getName());
-            return new Settings(new SettingsXpp3ReaderEx().read(in, isStrict(options), source));
-        } catch (XmlPullParserException e) {
-            throw new SettingsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+            return new Settings(new SettingsStaxReader().read(in, isStrict(options), source));
+        } catch (XMLStreamException e) {
+            throw new SettingsParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 

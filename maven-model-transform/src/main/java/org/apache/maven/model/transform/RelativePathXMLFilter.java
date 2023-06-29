@@ -18,11 +18,12 @@
  */
 package org.apache.maven.model.transform;
 
+import javax.xml.stream.XMLStreamReader;
+
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.model.transform.pull.NodeBufferingParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.apache.maven.model.transform.stax.NodeBufferingParser;
 
 /**
  * Remove relativePath element, has no value for consumer pom
@@ -35,23 +36,23 @@ public class RelativePathXMLFilter extends NodeBufferingParser {
 
     private static final Pattern S_FILTER = Pattern.compile("\\s+");
 
-    public RelativePathXMLFilter(XmlPullParser xmlPullParser) {
-        super(xmlPullParser, "parent");
+    public RelativePathXMLFilter(XMLStreamReader delegate) {
+        super(delegate, "parent");
     }
 
     protected void process(List<Event> buffer) {
         boolean skip = false;
         Event prev = null;
         for (Event event : buffer) {
-            if (event.event == START_TAG && "relativePath".equals(event.name)) {
+            if (event.event == START_ELEMENT && "relativePath".equals(event.name)) {
                 skip = true;
                 if (prev != null
-                        && prev.event == TEXT
+                        && prev.event == CHARACTERS
                         && S_FILTER.matcher(prev.text).matches()) {
                     prev = null;
                 }
                 event = null;
-            } else if (event.event == END_TAG && "relativePath".equals(event.name)) {
+            } else if (event.event == END_ELEMENT && "relativePath".equals(event.name)) {
                 skip = false;
                 event = null;
             } else if (skip) {

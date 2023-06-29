@@ -21,6 +21,7 @@ package org.apache.maven.lifecycle.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,7 +61,6 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -290,8 +290,9 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
     private void finalizeMojoConfiguration(MojoExecution mojoExecution) {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        org.codehaus.plexus.util.xml.Xpp3Dom config = mojoExecution.getConfiguration();
-        XmlNode executionConfiguration = config != null ? config.getDom() : null;
+        XmlNode executionConfiguration = mojoExecution.getConfiguration() != null
+                ? mojoExecution.getConfiguration().getDom()
+                : null;
         if (executionConfiguration == null) {
             executionConfiguration = new XmlNodeImpl("configuration");
         }
@@ -462,7 +463,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
 
         try {
             lifecycleOverlay = pluginDescriptor.getLifecycleMapping(forkedLifecycle);
-        } catch (IOException | XmlPullParserException e) {
+        } catch (IOException | XMLStreamException e) {
             throw new PluginDescriptorParsingException(pluginDescriptor.getPlugin(), pluginDescriptor.getSource(), e);
         }
 
