@@ -59,8 +59,12 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
         assertEquals("1.0.0.changelist", props.getProperty("project.version"));
 
         List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
+        boolean seenScanning = false;
         for (String line : lines) {
-            assertFalse(line, line.contains("WARNING"));
+            seenScanning |= line.contains("Scanning for projects");
+            if (seenScanning) {
+                assertFalse(String.join("\n", lines), line.contains("WARNING"));
+            }
         }
     }
 
@@ -88,8 +92,12 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
         assertEquals("1.0.0.changelist", props.getProperty("project.version"));
 
         List<String> lines = verifier.loadFile(new File(testDir, "log-bc.txt"), false);
+        boolean seenScanning = false;
         for (String line : lines) {
-            assertFalse(line, line.contains("WARNING"));
+            seenScanning |= line.contains("Scanning for projects");
+            if (seenScanning) {
+                assertFalse(String.join("\n", lines), line.contains("WARNING"));
+            }
         }
     }
 }

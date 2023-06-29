@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
@@ -59,8 +60,13 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest extends Abst
         List<String> lines = verifier.loadLines(verifier.getLogFileName(), null);
         for (String line : lines) {
             if (line.contains(":bad/id:")) {
-                assertTrue("Line number not found in: " + line, line.indexOf("34") > 0);
-                assertTrue("Column number not found in: " + line, line.indexOf("19") > 0);
+                String location;
+                if (getMavenVersion().compareTo(new DefaultArtifactVersion("4.0.0-alpha-8-SNAPSHOT")) >= 0) {
+                    location = "line 34, column 7";
+                } else {
+                    location = "line 34, column 19";
+                }
+                assertTrue("Position not found in: " + line, line.indexOf(location) > 0);
                 foundError = true;
                 break;
             }
