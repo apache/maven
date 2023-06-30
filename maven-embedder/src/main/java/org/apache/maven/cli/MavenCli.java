@@ -325,7 +325,7 @@ public class MavenCli {
         for (String arg : cliRequest.args) {
             if (isAltFile) {
                 // this is the argument following -f/--file
-                Path path = topDirectory.resolve(arg);
+                Path path = topDirectory.resolve(stripLeadingAndTrailingQuotes(arg));
                 if (Files.isDirectory(path)) {
                     topDirectory = path;
                 } else if (Files.isRegularFile(path)) {
@@ -343,7 +343,7 @@ public class MavenCli {
                 break;
             } else {
                 // Check if this is the -f/--file option
-                isAltFile = arg.equals(String.valueOf(CLIManager.ALTERNATE_POM_FILE)) || arg.equals("file");
+                isAltFile = arg.equals("-f") || arg.equals("--file");
             }
         }
         topDirectory = getCanonicalPath(topDirectory);
@@ -1591,6 +1591,18 @@ public class MavenCli {
             }
         });
         return interpolator;
+    }
+
+    private static String stripLeadingAndTrailingQuotes(String str) {
+        final int length = str.length();
+        if (length > 1
+                && str.startsWith("\"")
+                && str.endsWith("\"")
+                && str.substring(1, length - 1).indexOf('"') == -1) {
+            str = str.substring(1, length - 1);
+        }
+
+        return str;
     }
 
     private static Path getCanonicalPath(Path path) {
