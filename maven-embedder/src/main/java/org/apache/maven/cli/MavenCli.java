@@ -1352,7 +1352,11 @@ public class MavenCli {
         if (alternatePomFile != null) {
             File pom = resolveFile(new File(alternatePomFile), workingDirectory);
             if (pom.isDirectory()) {
-                pom = new File(pom, "pom.xml");
+                if (modelProcessor != null) {
+                    pom = modelProcessor.locatePom(pom);
+                } else {
+                    pom = new File(pom, "pom.xml");
+                }
             }
 
             return pom;
