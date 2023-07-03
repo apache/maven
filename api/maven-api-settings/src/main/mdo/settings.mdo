@@ -468,6 +468,7 @@
             <![CDATA[
             Whether this proxy configuration is the active one. Note: While the type of this field
             is {@code String} for technical reasons, the semantic type is actually {@code boolean}.
+            @see #isActive()
             ]]>
           </description>
           <type>String</type>
@@ -508,8 +509,9 @@
           <version>1.0.0+</version>
           <description>
             <![CDATA[
-            The proxy port. Note: While the type of this field is {@code String<} for technical
+            The proxy port. Note: While the type of this field is {@code String} for technical
             reasons, the semantic type is actually {@code int}.
+            @see #getPort()
             ]]>
           </description>
           <type>String</type>
@@ -539,28 +541,56 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.3.0</version>
           <code>
             <![CDATA[
-    public boolean isActive()
-    {
-        return ( getActiveString() != null ) ? Boolean.parseBoolean( getActiveString() ) : true;
+    public boolean isActive() {
+        return (getActiveString() != null) ? Boolean.parseBoolean(getActiveString()) : true;
     }
 
-    public void setActive( boolean active )
-    {
-        setActiveString( String.valueOf( active ) );
+    public void setActive(boolean active) {
+        setActiveString(String.valueOf(active));
     }
 
-    public int getPort()
-    {
-        return ( getPortString() != null ) ? Integer.parseInt( getPortString() ) : 8080;
+    public int getPort() {
+        return (getPortString() != null) ? Integer.parseInt(getPortString()) : 8080;
     }
 
-    public void setPort( int port )
-    {
-        setPortString( String.valueOf( port ) );
+    public void setPort(int port) {
+        setPortString(String.valueOf(port));
     }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>2.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * Indicates if this proxy is active or not.
+     * To allow interpolation of this field, this method lazily parses
+     * the {@link #getActiveString()} value as a boolean and defaults to {@code true}
+     * if not set.
+     *
+     * @return a boolean indicating whether this proxy is active or not
+     */
+    public boolean isActive() {
+        return (getActiveString() != null) ? Boolean.parseBoolean(getActiveString()) : true;
+    }
+
+    /**
+     * Returns the port to use for this proxy.
+     * To allow interpolation of this field, this method lazily parses
+     * the {@link #getPortString()} value as an integer and defaults to {@code 8080}
+     * if not set.
+     *
+     * @return an integer indicating the port to use for this proxy
+     * @throws NumberFormatException if the port string is not a valid integer
+     */
+    public int getPort() {
+        return (getPortString() != null) ? Integer.parseInt(getPortString()) : 8080;
+    }
+
             ]]>
           </code>
         </codeSegment>
