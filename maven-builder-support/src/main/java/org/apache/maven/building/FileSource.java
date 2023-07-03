@@ -19,9 +19,9 @@
 package org.apache.maven.building;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Objects;
 
 /**
@@ -46,7 +46,7 @@ public class FileSource implements Source {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return new FileInputStream(file);
+        return Files.newInputStream(file.toPath());
     }
 
     @Override
