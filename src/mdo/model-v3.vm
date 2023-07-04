@@ -212,9 +212,11 @@ public class ${class.name}
         }
       #elseif ( $field.to && $field.to != "String" )
         if (!Objects.equals(${field.name}, ${pfx}${cap}())){
-            update(getDelegate().with${cap}(${field.name}.getDelegate()));
             if (${field.name} != null) {
+                update(getDelegate().with${cap}(${field.name}.getDelegate()));
                 ${field.name}.childrenTracking = this::replace;
+            } else {
+                update(getDelegate().with${cap}(null));
             }
         }
       #else
