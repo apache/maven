@@ -567,12 +567,12 @@
           <code>
             <![CDATA[
     /**
-     * Indicates if this proxy is active or not.
+     * Indicates if this proxy is active.
      * To allow interpolation of this field, this method lazily parses
      * the {@link #getActiveString()} value as a boolean and defaults to {@code true}
      * if not set.
      *
-     * @return a boolean indicating whether this proxy is active or not
+     * @return a boolean indicating if this proxy is active
      */
     public boolean isActive() {
         return (getActiveString() != null) ? Boolean.parseBoolean(getActiveString()) : true;
