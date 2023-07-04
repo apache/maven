@@ -20,8 +20,10 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -34,6 +36,19 @@ class ModelTest {
     @Test
     void testHashCodeNullSafe() {
         new Model().hashCode();
+    }
+
+    @Test
+    void testBuild() {
+        Model model = new Model();
+        Build build = new Build();
+        build.setOutputDirectory("myOutputDirectory");
+        model.setBuild(build);
+        Build build2 = model.getBuild();
+        assertNotNull(build2);
+        assertEquals("myOutputDirectory", build2.getOutputDirectory());
+        model.setBuild(null);
+        assertNull(model.getBuild());
     }
 
     @Test
