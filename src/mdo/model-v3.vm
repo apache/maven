@@ -201,18 +201,25 @@ public class ${class.name}
         if (!Objects.equals(map, getDelegate().get${cap}())) {
             update(getDelegate().with${cap}(map));
         }
+      #elseif ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
+        if (${field.name} == null) {
+            ${field.name} = Collections.emptyList();
+        }
+        if (!Objects.equals(${field.name}, ${pfx}${cap}())) {
+            update(getDelegate().with${cap}(
+                ${field.name}.stream().map(c -> c.getDelegate()).collect(Collectors.toList())));
+            ${field.name}.forEach(e -> e.childrenTracking = this::replace);
+        }
+      #elseif ( $field.to && $field.to != "String" )
+        if (!Objects.equals(${field.name}, ${pfx}${cap}())){
+            update(getDelegate().with${cap}(${field.name}.getDelegate()));
+            if (${field.name} != null) {
+                ${field.name}.childrenTracking = this::replace;
+            }
+        }
       #else
         if (!Objects.equals(${field.name}, ${pfx}${cap}())) {
-        #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
-            update(getDelegate().with${cap}(
-                   ${field.name}.stream().map(c -> c.getDelegate()).collect(Collectors.toList())));
-            ${field.name}.forEach(e -> e.childrenTracking = this::replace);
-        #elseif ( $field.to && $field.to != "String" )
-            update(getDelegate().with${cap}(${field.name}.getDelegate()));
-            ${field.name}.childrenTracking = this::replace;
-        #else
             update(getDelegate().with${cap}(${field.name}));
-        #end
         }
       #end
     }
