@@ -19,10 +19,10 @@
 package org.apache.maven.artifact.handler;
 
 /**
- * An artifact handler provides metadata for an artifact derived from the dependency element that references the artifact:<ul>
- * <li>extension and classifier, to be able to download the file,</li>
+ * An artifact handler contains metadata derived from the dependency element that references the artifact:<ul>
+ * <li>extension and classifier, to be able to download the file</li>
  * <li>information on how to use the artifact: whether to add it to the classpath, or to take into account its
- * dependencies.</li>
+ * dependencies</li>
  * </ul>
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -32,7 +32,7 @@ public interface ArtifactHandler {
     String ROLE = ArtifactHandler.class.getName();
 
     /**
-     * Returns the file name extension used for dependencies of that type;
+     * Returns the file name extension of the artifact;
      * e.g. "jar", "pom", "xml", etc.
      *
      * @return the file extension
