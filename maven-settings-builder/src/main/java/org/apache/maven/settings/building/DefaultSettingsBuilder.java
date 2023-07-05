@@ -128,8 +128,6 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         problems.setSource("");
 
-        userSettings = interpolate(userSettings, request, problems);
-
         // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
         String localRepository = userSettings.getLocalRepository();
         if (localRepository != null && localRepository.length() > 0) {
@@ -211,6 +209,8 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     e);
             return new Settings();
         }
+
+        settings = interpolate(settings, request, problems);
 
         settingsValidator.validate(settings, isProjectSettings, problems);
 
