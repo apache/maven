@@ -25,11 +25,11 @@ import org.apache.maven.api.model.Dependency;
 /**
  * A dependency's {@code Type} is uniquely identified by a {@code String},
  * and semantically represents a known <i>kind</i> of dependency.
- * <br/>
+ * <p>
  * It provides information about the file type (or extension) of the associated artifact,
  * its default classifier, and how the artifact will be used in the build when creating
  * classpaths.
- * <br/>
+ * <p>
  * For example, the type {@code java-source} has a {@code jar} extension and a
  * {@code sources} classifier, the artifact and its dependencies should be added
  * to the classpath.
