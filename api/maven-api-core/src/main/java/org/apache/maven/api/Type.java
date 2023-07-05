@@ -22,7 +22,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 
 /**
- * An artifact's{@code Type} represents a known kind of artifacts.
+ * A dependency's {@code Type} represents a known kind of dependencies.
  * Such types are often associated to an extension and possibly
  * a classifier, for example {@code java-source} has a {@code jar}
  * extension and a {@code sources} classifier.
