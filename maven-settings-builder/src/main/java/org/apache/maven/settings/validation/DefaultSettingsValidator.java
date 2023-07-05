@@ -195,6 +195,17 @@ public class DefaultSettingsValidator implements SettingsValidator {
                             "must be unique but found duplicate proxy with id " + proxy.getId());
                 }
                 validateStringNotEmpty(problems, "proxies.proxy.host", proxy.getHost(), proxy.getId());
+
+                try {
+                    Integer.parseInt(proxy.getPortString());
+                } catch (NumberFormatException e) {
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            "proxies.proxy[" + proxy.getId() + "].port",
+                            null,
+                            "must be a valid integer but found '" + proxy.getPortString() + "'");
+                }
             }
         }
     }
