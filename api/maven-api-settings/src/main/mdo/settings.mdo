@@ -559,7 +559,6 @@
         <codeSegment>
           <version>2.0.0+</version>
           <code>
-            <![CDATA[
     /**
      * Indicates if this proxy is active.
      * To allow interpolation of this field, this method lazily parses
@@ -584,7 +583,6 @@
         return (getPortString() != null) ? Integer.parseInt(getPortString()) : 8080;
     }
 
-            ]]>
           </code>
         </codeSegment>
       </codeSegments>
