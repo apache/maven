@@ -31,7 +31,7 @@ import org.apache.maven.api.model.Dependency;
  * classpaths.
  * <p>
  * For example, the type {@code java-source} has a {@code jar} extension and a
- * {@code sources} classifier, the artifact and its dependencies should be added
+ * {@code sources} classifier. The artifact and its dependencies should be added
  * to the classpath.
  *
  * @since 4.0.0
@@ -64,7 +64,7 @@ public interface Type {
 
     /**
      * Get the default classifier associated to the dependency type.
-     * The default classifier can be overriden when specifying
+     * The default classifier can be overridden when specifying
      * the {@link Dependency#getClassifier()}.
      *
      * @return the default classifier
@@ -72,7 +72,7 @@ public interface Type {
     String getClassifier();
 
     /**
-     * Specifies if the artifact contains java code and should be
+     * Specifies if the artifact contains java classes and should be
      * added to the classpath.
      *
      * @return if the artifact should be added to the classpath
@@ -80,9 +80,9 @@ public interface Type {
     boolean isAddedToClasspath();
 
     /**
-     * Specifies if the artifacts already embeds its own dependencies.
+     * Specifies if the artifact already embeds its own dependencies.
      * This is the case for JEE packages or similar artifacts such as
-     * WARs, EARs, etc...
+     * WARs, EARs, etc.
      *
      * @return if the artifact's dependencies are included in the artifact
      */
