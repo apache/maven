@@ -101,9 +101,9 @@ class ReactorReader implements MavenWorkspaceReader {
         MavenProject project = getProject(artifact);
 
         if (project != null) {
-            File file = findArtifact(project, artifact);
+            File file = findArtifact(project, artifact, true);
             if (file == null && project != project.getExecutionProject()) {
-                file = findArtifact(project.getExecutionProject(), artifact);
+                file = findArtifact(project.getExecutionProject(), artifact, true);
             }
             return file;
         }
@@ -133,7 +133,7 @@ class ReactorReader implements MavenWorkspaceReader {
                 .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
                 .values()
                 .stream()
-                .filter(p -> Objects.nonNull(findArtifact(p, artifact)))
+                .filter(p -> Objects.nonNull(findArtifact(p, artifact, false)))
                 .map(MavenProject::getVersion)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
@@ -148,28 +148,28 @@ class ReactorReader implements MavenWorkspaceReader {
     // Implementation
     //
 
-    private File findArtifact(MavenProject project, Artifact artifact) {
+    private File findArtifact(MavenProject project, Artifact artifact, boolean checkUptodate) {
         // POMs are always returned from the file system
         if ("pom".equals(artifact.getExtension())) {
             return project.getFile();
-        }
-
-        // First check in the project local repository
-        File packagedArtifactFile = findInProjectLocalRepository(artifact);
-        if (packagedArtifactFile != null
-                && packagedArtifactFile.exists()
-                && isPackagedArtifactUpToDate(project, packagedArtifactFile)) {
-            return packagedArtifactFile;
         }
 
         // Get the matching artifact from the project
         Artifact projectArtifact = findMatchingArtifact(project, artifact);
         if (projectArtifact != null) {
             // If the artifact has been associated to a file, use it
-            packagedArtifactFile = projectArtifact.getFile();
+            File packagedArtifactFile = projectArtifact.getFile();
             if (packagedArtifactFile != null && packagedArtifactFile.exists()) {
                 return packagedArtifactFile;
             }
+        }
+
+        // Check in the project local repository
+        File packagedArtifactFile = findInProjectLocalRepository(artifact);
+        if (packagedArtifactFile != null
+                && packagedArtifactFile.exists()
+                && (!checkUptodate || isPackagedArtifactUpToDate(project, packagedArtifactFile))) {
+            return packagedArtifactFile;
         }
 
         if (!hasBeenPackagedDuringThisSession(project)) {
