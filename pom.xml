@@ -141,7 +141,7 @@ under the License.
     <!-- Blocked by 3.4.0+ changes, see MNG-7710 -->
     <plexusUtilsVersion>3.5.1</plexusUtilsVersion>
     <guiceVersion>5.1.0</guiceVersion>
-    <guavaVersion>31.1-jre</guavaVersion>
+    <guavaVersion>32.0.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
