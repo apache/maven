@@ -19,10 +19,10 @@
 package org.apache.maven.artifact.handler;
 
 /**
- * An artifact handler contains metadata derived from the dependency element that references the artifact:<ul>
- * <li>extension and classifier, to be able to download the file</li>
- * <li>information on how to use the artifact: whether to add it to the classpath, or to take into account its
- * dependencies</li>
+ * An artifact handler contains information explaining how an artifact plugs into the Maven build:<ul>
+ * <li>Information needed to find the artifact file in a repository including extension and classifier</li>
+ * <li>Information on how to use the artifact as a dependency: whether to add it to the classpath, whether to load its
+ * dependencies transitively</li>
  * </ul>
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -42,7 +42,7 @@ public interface ArtifactHandler {
     String getDirectory();
 
     /**
-     * Returns the classifier of the dependency.
+     * Returns the default classifier used if a different one is not set in pom.xml.
      *
      * @return the classifier
      */
