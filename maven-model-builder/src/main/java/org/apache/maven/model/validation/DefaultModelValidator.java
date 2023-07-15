@@ -882,7 +882,7 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.BASE,
                     prefix + "systemPath",
                     d.getManagementKey(),
-                    "must be omitted." + " This field may only be specified for a dependency with system scope.",
+                    "must be omitted. This field may only be specified for a dependency with system scope.",
                     d);
         }
 
