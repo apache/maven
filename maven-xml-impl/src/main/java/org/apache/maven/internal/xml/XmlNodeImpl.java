@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.xml;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -35,16 +34,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.xml.XmlNode;
-import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
-import org.codehaus.plexus.util.xml.SerializerXMLWriter;
-import org.codehaus.plexus.util.xml.XMLWriter;
-import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 
 /**
  *  NOTE: remove all the util code in here when separated, this class should be pure data.
  */
 public class XmlNodeImpl implements Serializable, XmlNode {
     private static final long serialVersionUID = 2567894443061173996L;
+
+    protected final String prefix;
+
+    protected final String namespaceUri;
 
     protected final String name;
 
@@ -70,6 +69,19 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     public XmlNodeImpl(
             String name, String value, Map<String, String> attributes, List<XmlNode> children, Object location) {
+        this("", "", name, value, attributes, children, location);
+    }
+
+    public XmlNodeImpl(
+            String prefix,
+            String namespaceUri,
+            String name,
+            String value,
+            Map<String, String> attributes,
+            List<XmlNode> children,
+            Object location) {
+        this.prefix = prefix == null ? "" : prefix;
+        this.namespaceUri = namespaceUri == null ? "" : namespaceUri;
         this.name = Objects.requireNonNull(name);
         this.value = value;
         this.attributes =
@@ -84,14 +96,21 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         return merge(this, source, childMergeOverride);
     }
 
-    public XmlNode clone() {
-        return this;
-    }
-
     // ----------------------------------------------------------------------
     // Name handling
     // ----------------------------------------------------------------------
 
+    @Override
+    public String getPrefix() {
+        return prefix;
+    }
+
+    @Override
+    public String getNamespaceUri() {
+        return namespaceUri;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -157,16 +176,6 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     // ----------------------------------------------------------------------
     // Helpers
     // ----------------------------------------------------------------------
-
-    public void writeToSerializer(String namespace, XmlSerializer serializer) throws IOException {
-        // TODO: WARNING! Later versions of plexus-utils psit out an <?xml ?> header due to thinking this is a new
-        // document - not the desired behaviour!
-        SerializerXMLWriter xmlWriter = new SerializerXMLWriter(namespace, serializer);
-        XmlNodeWriter.write(xmlWriter, this);
-        if (xmlWriter.getExceptions().size() > 0) {
-            throw (IOException) xmlWriter.getExceptions().get(0);
-        }
-    }
 
     /**
      * Merges one DOM into another, given a specific algorithm and possible override points for that algorithm.<p>
@@ -238,7 +247,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                 }
             }
 
-            if (recessive.getChildren().size() > 0) {
+            if (!recessive.getChildren().isEmpty()) {
                 boolean mergeChildren = true;
                 if (childMergeOverride != null) {
                     mergeChildren = childMergeOverride;
@@ -256,7 +265,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                     List<XmlNode> dominantChildren = dominant.getChildren().stream()
                             .filter(n -> n.getName().equals(name))
                             .collect(Collectors.toList());
-                    if (dominantChildren.size() > 0) {
+                    if (!dominantChildren.isEmpty()) {
                         commonChildren.put(name, dominantChildren.iterator());
                     }
                 }
@@ -267,7 +276,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                     String idValue = recessiveChild.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE);
 
                     XmlNode childDom = null;
-                    if (isNotEmpty(idValue)) {
+                    if (!isEmpty(idValue)) {
                         for (XmlNode dominantChild : dominant.getChildren()) {
                             if (idValue.equals(dominantChild.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE))) {
                                 childDom = dominantChild;
@@ -275,7 +284,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                                 mergeChildren = true;
                             }
                         }
-                    } else if (isNotEmpty(keysValue)) {
+                    } else if (!isEmpty(keysValue)) {
                         String[] keys = keysValue.split(",");
                         Map<String, Optional<String>> recessiveKeyValues = Stream.of(keys)
                                 .collect(Collectors.toMap(
@@ -400,18 +409,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         return writer.toString();
     }
 
-    public String toUnescapedString() {
-        StringWriter writer = new StringWriter();
-        XMLWriter xmlWriter = new PrettyPrintXMLWriter(writer);
-        XmlNodeWriter.write(xmlWriter, this, false);
-        return writer.toString();
-    }
-
-    private static boolean isNotEmpty(String str) {
-        return ((str != null) && (str.length() > 0));
-    }
-
     private static boolean isEmpty(String str) {
-        return ((str == null) || (str.length() == 0));
+        return str == null || str.isEmpty();
     }
 }

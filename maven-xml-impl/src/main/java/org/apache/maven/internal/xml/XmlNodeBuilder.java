@@ -176,6 +176,8 @@ public class XmlNodeBuilder {
     public static XmlNodeImpl build(XMLStreamReader parser, boolean trim, InputLocationBuilderStax locationBuilder)
             throws XMLStreamException {
         boolean spacePreserve = false;
+        String pfx = null;
+        String nsUri = null;
         String name = null;
         String value = null;
         Object location = null;
@@ -189,11 +191,9 @@ public class XmlNodeBuilder {
                         + parser.getLocation().getColumnNumber();
                 if (name == null) {
                     int namespacesSize = parser.getNamespaceCount();
+                    pfx = parser.getPrefix();
+                    nsUri = parser.getNamespaceURI();
                     name = parser.getLocalName();
-                    String pfx = parser.getPrefix();
-                    if (pfx != null && !pfx.isEmpty()) {
-                        name = pfx + ":" + name;
-                    }
                     location = locationBuilder != null ? locationBuilder.toInputLocation(parser) : null;
                     int attributesSize = parser.getAttributeCount();
                     if (attributesSize > 0 || namespacesSize > 0) {
@@ -232,6 +232,8 @@ public class XmlNodeBuilder {
                     value = value.trim();
                 }
                 return new XmlNodeImpl(
+                        pfx,
+                        nsUri,
                         name,
                         children == null ? (value != null ? value : emptyTag ? null : "") : null,
                         attrs,
