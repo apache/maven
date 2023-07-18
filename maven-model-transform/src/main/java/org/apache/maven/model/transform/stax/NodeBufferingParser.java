@@ -39,8 +39,8 @@ public abstract class NodeBufferingParser extends BufferingParser {
 
     private boolean buffering;
 
-    public NodeBufferingParser(XMLStreamReader xmlPullParser, String nodeName) {
-        super(xmlPullParser);
+    public NodeBufferingParser(XMLStreamReader delegate, String nodeName) {
+        super(delegate);
         this.nodeName = Objects.requireNonNull(nodeName);
     }
 
