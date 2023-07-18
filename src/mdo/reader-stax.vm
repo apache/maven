@@ -65,6 +65,11 @@ import javax.xml.transform.stream.StreamSource;
 @Generated
 public class ${className} {
 
+    /**
+     * XSI namespace
+     */
+    private static final String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
+
     private static final Map<String, String> DEFAULT_ENTITIES;
     static {
         Map<String, String> entities = new HashMap<>();
@@ -508,7 +513,7 @@ public class ${className} {
         String tagName = parser.getLocalName();
         ${classUcapName}.Builder ${classLcapName} = ${classUcapName}.newBuilder(true);
   #if ( $locationTracking )
-        if (addLocationInformation){
+        if (addLocationInformation) {
             ${classLcapName}.location("", new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source));
         }
   #end
@@ -516,7 +521,7 @@ public class ${className} {
             String name = parser.getAttributeLocalName(i);
             String ns = parser.getAttributeNamespace(i);
             String value = parser.getAttributeValue(i);
-            if ("http://www.w3.org/2001/XMLSchema-instance".equals(ns)) {
+            if (XSI_NAMESPACE.equals(ns)) {
                 // just ignore attributes with non-default namespace (for example: xmlns:xsi)
   #if ( $class == $root )
             } else if ("xmlns".equals(name)) {
