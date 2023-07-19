@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -226,9 +225,8 @@ public class DefaultExceptionHandler implements ExceptionHandler {
     private String getMessage(String message, Throwable exception) {
         String fullMessage = (message != null) ? message : "";
 
-        // To break out of possible endless loop when there is a cycle in causes chain
-        HashSet<Throwable> processed = new HashSet<>();
-        for (Throwable t = exception; t != null && processed.add(t); t = t.getCause()) {
+        // To break out of possible endless loop when getCause returns "this"
+        for (Throwable t = exception; t != null && t != t.getCause(); t = t.getCause()) {
             String exceptionMessage = t.getMessage();
 
             if (t instanceof AbstractMojoExecutionException) {

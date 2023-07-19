@@ -20,6 +20,7 @@ package org.apache.maven.exception;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
@@ -98,8 +99,16 @@ class DefaultExceptionHandlerTest {
 
     @Test
     void testHandleExceptionLoopInCause() {
-        // loop here: cause -> cause2 -> cause...
-        Exception cause2 = new RuntimeException("loop");
+        // Some broken exception that does return "this" as getCause
+        AtomicReference<Throwable> causeRef = new AtomicReference<>(null);
+        Exception cause2 = new RuntimeException("loop") {
+            @Override
+            public synchronized Throwable getCause() {
+                return causeRef.get();
+            }
+        };
+        causeRef.set(cause2);
+
         Plugin plugin = new Plugin();
         Exception cause = new PluginContainerException(plugin, null, null, cause2);
         cause2.initCause(cause);
