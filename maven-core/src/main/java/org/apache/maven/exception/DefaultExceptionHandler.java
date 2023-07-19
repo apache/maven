@@ -18,6 +18,7 @@
  */
 package org.apache.maven.exception;
 
+import java.util.HashSet;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -225,7 +226,9 @@ public class DefaultExceptionHandler implements ExceptionHandler {
     private String getMessage(String message, Throwable exception) {
         String fullMessage = (message != null) ? message : "";
 
-        for (Throwable t = exception; t != null; t = t.getCause()) {
+        // To break out of possible endless loop when there is a cycle in causes chain
+        HashSet<Throwable> processed = new HashSet<>();
+        for (Throwable t = exception; t != null && processed.add(t); t = t.getCause()) {
             String exceptionMessage = t.getMessage();
 
             if (t instanceof AbstractMojoExecutionException) {

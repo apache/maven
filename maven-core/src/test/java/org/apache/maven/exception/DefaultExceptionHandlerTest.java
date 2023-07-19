@@ -95,4 +95,24 @@ class DefaultExceptionHandlerTest {
         String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/PluginContainerException";
         assertEquals(expectedReference, summary.getReference());
     }
+
+    @Test
+    void testHandleExceptionLoopInCause() {
+        // loop here: cause -> cause2 -> cause...
+        Exception cause2 = new RuntimeException("loop");
+        Plugin plugin = new Plugin();
+        Exception cause = new PluginContainerException(plugin, null, null, cause2);
+        cause2.initCause(cause);
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setPluginDescriptor(pluginDescriptor);
+        MojoExecution mojoExecution = new MojoExecution(mojoDescriptor);
+        Throwable exception = new PluginExecutionException(mojoExecution, null, cause);
+
+        DefaultExceptionHandler handler = new DefaultExceptionHandler();
+        ExceptionSummary summary = handler.handleException(exception);
+
+        String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/PluginContainerException";
+        assertEquals(expectedReference, summary.getReference());
+    }
 }
