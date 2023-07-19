@@ -18,7 +18,6 @@
  */
 package org.apache.maven.exception;
 
-import java.util.HashSet;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -26,6 +25,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.maven.lifecycle.LifecycleExecutionException;
