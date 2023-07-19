@@ -20,6 +20,7 @@ package org.apache.maven.exception;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
@@ -83,6 +84,34 @@ public class DefaultExceptionHandlerTest {
         Throwable cause2 = new NoClassDefFoundError();
         Plugin plugin = new Plugin();
         Exception cause = new PluginContainerException(plugin, null, null, cause2);
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setPluginDescriptor(pluginDescriptor);
+        MojoExecution mojoExecution = new MojoExecution(mojoDescriptor);
+        Throwable exception = new PluginExecutionException(mojoExecution, null, cause);
+
+        DefaultExceptionHandler handler = new DefaultExceptionHandler();
+        ExceptionSummary summary = handler.handleException(exception);
+
+        String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/PluginContainerException";
+        assertEquals(expectedReference, summary.getReference());
+    }
+
+    @Test
+    public void testHandleExceptionLoopInCause() {
+        // Some broken exception that does return "this" as getCause
+        AtomicReference<Throwable> causeRef = new AtomicReference<>(null);
+        Exception cause2 = new RuntimeException("loop") {
+            @Override
+            public synchronized Throwable getCause() {
+                return causeRef.get();
+            }
+        };
+        causeRef.set(cause2);
+
+        Plugin plugin = new Plugin();
+        Exception cause = new PluginContainerException(plugin, null, null, cause2);
+        cause2.initCause(cause);
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setPluginDescriptor(pluginDescriptor);

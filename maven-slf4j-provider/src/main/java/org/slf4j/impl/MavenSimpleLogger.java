@@ -78,7 +78,7 @@ public class MavenSimpleLogger extends SimpleLogger {
             writeThrowable(se, stream, "Suppressed", prefix + "    ");
         }
         Throwable cause = t.getCause();
-        if (cause != null) {
+        if (cause != null && t != cause) {
             writeThrowable(cause, stream, "Caused by", prefix);
         }
     }
