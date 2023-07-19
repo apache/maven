@@ -225,7 +225,8 @@ public class DefaultExceptionHandler implements ExceptionHandler {
     private String getMessage(String message, Throwable exception) {
         String fullMessage = (message != null) ? message : "";
 
-        for (Throwable t = exception; t != null; t = t.getCause()) {
+        // To break out of possible endless loop when getCause returns "this"
+        for (Throwable t = exception; t != null && t != t.getCause(); t = t.getCause()) {
             String exceptionMessage = t.getMessage();
 
             if (t instanceof AbstractMojoExecutionException) {
