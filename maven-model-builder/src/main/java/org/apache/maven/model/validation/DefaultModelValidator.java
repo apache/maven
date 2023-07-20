@@ -431,7 +431,7 @@ public class DefaultModelValidator implements ModelValidator {
                 boolean isBlankModule = true;
                 if (module != null) {
                     for (int j = 0; j < module.length(); j++) {
-                        if (!Character.isWhitespace(module.charAt(i))) {
+                        if (!Character.isWhitespace(module.charAt(j))) {
                             isBlankModule = false;
                         }
                     }
