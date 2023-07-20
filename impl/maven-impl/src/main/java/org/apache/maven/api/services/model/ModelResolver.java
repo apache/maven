@@ -87,6 +87,13 @@ public interface ModelResolver extends Service {
             @Nonnull String version,
             @Nullable String classifier)
             implements Request<Session> {
+        public ModelResolverRequest {
+            Objects.requireNonNull(session, "session cannot be null");
+            Objects.requireNonNull(groupId, "groupId cannot be null");
+            Objects.requireNonNull(artifactId, "artifactId cannot be null");
+            Objects.requireNonNull(version, "version cannot be null");
+        }
+
         @Nonnull
         @Override
         public Session getSession() {
