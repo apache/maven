@@ -22,13 +22,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -238,7 +237,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 File pluginXml = new File(pluginFile, getPluginDescriptorLocation());
 
                 if (pluginXml.isFile()) {
-                    try (InputStream is = new BufferedInputStream(new FileInputStream(pluginXml))) {
+                    try (InputStream is = Files.newInputStream(pluginXml.toPath())) {
                         pluginDescriptor = parsePluginDescriptor(is, plugin, pluginXml.getAbsolutePath());
                     }
                 }

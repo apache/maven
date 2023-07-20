@@ -33,7 +33,7 @@ public interface Artifact {
 
     /**
      * Returns a unique identifier for this artifact.
-     * The identifier is composed of groupId, artifactId, version, classifier, extension.
+     * The identifier is composed of groupId, artifactId, extension, classifier, and version.
      *
      * @return the unique identifier
      */
@@ -43,7 +43,7 @@ public interface Artifact {
                 + getArtifactId()
                 + ':'
                 + getExtension()
-                + (getClassifier().length() > 0 ? ":" + getClassifier() : "")
+                + (getClassifier().isEmpty() ? "" : ":" + getClassifier())
                 + ':'
                 + getVersion();
     }

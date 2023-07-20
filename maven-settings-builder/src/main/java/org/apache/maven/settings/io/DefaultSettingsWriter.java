@@ -20,18 +20,18 @@ package org.apache.maven.settings.io;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.v4.SettingsXpp3Writer;
-import org.codehaus.plexus.util.xml.XmlStreamWriter;
+import org.apache.maven.settings.v4.SettingsStaxWriter;
 
 /**
  * Handles serialization of settings into the default textual format.
@@ -49,7 +49,7 @@ public class DefaultSettingsWriter implements SettingsWriter {
 
         output.getParentFile().mkdirs();
 
-        write(new XmlStreamWriter(output), options, settings);
+        write(Files.newOutputStream(output.toPath()), options, settings);
     }
 
     @Override
@@ -58,7 +58,9 @@ public class DefaultSettingsWriter implements SettingsWriter {
         Objects.requireNonNull(settings, "settings cannot be null");
 
         try (Writer out = output) {
-            new SettingsXpp3Writer().write(out, settings.getDelegate());
+            new SettingsStaxWriter().write(out, settings.getDelegate());
+        } catch (XMLStreamException e) {
+            throw new IOException("Error writing settings", e);
         }
     }
 
@@ -67,13 +69,10 @@ public class DefaultSettingsWriter implements SettingsWriter {
         Objects.requireNonNull(output, "output cannot be null");
         Objects.requireNonNull(settings, "settings cannot be null");
 
-        String encoding = settings.getModelEncoding();
-        if (encoding == null || encoding.length() <= 0) {
-            encoding = "UTF-8";
-        }
-
-        try (Writer out = new OutputStreamWriter(output, encoding)) {
-            write(out, options, settings);
+        try (OutputStream out = output) {
+            new SettingsStaxWriter().write(out, settings.getDelegate());
+        } catch (XMLStreamException e) {
+            throw new IOException("Error writing settings", e);
         }
     }
 }

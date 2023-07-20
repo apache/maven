@@ -18,12 +18,12 @@
  */
 package org.apache.maven.model.transform;
 
+import javax.xml.stream.XMLStreamReader;
+
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
  * Base implementation for providing the BuildToRawPomXML.
@@ -46,10 +46,10 @@ public class BuildToRawPomXMLFilterFactory {
      *
      * @param projectFile will be used by ConsumerPomXMLFilter to get the right filter
      */
-    public final XmlPullParser get(XmlPullParser orgParser, Path projectFile) {
+    public final XMLStreamReader get(XMLStreamReader orgParser, Path projectFile) {
 
         // Ensure that xs:any elements aren't touched by next filters
-        XmlPullParser parser = orgParser instanceof FastForwardFilter ? orgParser : new FastForwardFilter(orgParser);
+        XMLStreamReader parser = orgParser instanceof FastForwardFilter ? orgParser : new FastForwardFilter(orgParser);
 
         if (getDependencyKeyToVersionMapper() != null) {
             parser = new ReactorDependencyXMLFilter(parser, getDependencyKeyToVersionMapper());

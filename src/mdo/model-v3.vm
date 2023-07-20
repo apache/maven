@@ -22,7 +22,13 @@
 #
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #
+#set ( $allClasses = [] )
 #foreach ( $class in $model.allClasses )
+  #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
+    #set ( $dummy = $allClasses.add( $class ) )
+  #end
+#end
+#foreach ( $class in $allClasses )
   #set ( $ancestors = $Helper.ancestors( $class ) )
   #set ( $allFields = [] )
   #set ( $inheritedFields = [] )
@@ -38,7 +44,6 @@
 #MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/WrapperProperties.java
 #parse ( "java/WrapperProperties.java" )
 #MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/${className}.java
-  #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
     #set ( $types = { } )
     #set ( $imports = $class.getClass().forName("java.util.TreeSet").newInstance() )
     #set ( $dummy = $imports.add( "java.io.Serializable" ) )
@@ -201,18 +206,27 @@ public class ${class.name}
         if (!Objects.equals(map, getDelegate().get${cap}())) {
             update(getDelegate().with${cap}(map));
         }
+      #elseif ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
+        if (${field.name} == null) {
+            ${field.name} = Collections.emptyList();
+        }
+        if (!Objects.equals(${field.name}, ${pfx}${cap}())) {
+            update(getDelegate().with${cap}(
+                ${field.name}.stream().map(c -> c.getDelegate()).collect(Collectors.toList())));
+            ${field.name}.forEach(e -> e.childrenTracking = this::replace);
+        }
+      #elseif ( $field.to && $field.to != "String" )
+        if (!Objects.equals(${field.name}, ${pfx}${cap}())){
+            if (${field.name} != null) {
+                update(getDelegate().with${cap}(${field.name}.getDelegate()));
+                ${field.name}.childrenTracking = this::replace;
+            } else {
+                update(getDelegate().with${cap}(null));
+            }
+        }
       #else
         if (!Objects.equals(${field.name}, ${pfx}${cap}())) {
-        #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
-            update(getDelegate().with${cap}(
-                   ${field.name}.stream().map(c -> c.getDelegate()).collect(Collectors.toList())));
-            ${field.name}.forEach(e -> e.childrenTracking = this::replace);
-        #elseif ( $field.to && $field.to != "String" )
-            update(getDelegate().with${cap}(${field.name}.getDelegate()));
-            ${field.name}.childrenTracking = this::replace;
-        #else
             update(getDelegate().with${cap}(${field.name}));
-        #end
         }
       #end
     }
@@ -309,5 +323,4 @@ public class ${class.name}
 $cs.code
     #end
 }
-  #end
 #end

@@ -23,9 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ import java.util.Objects;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -244,9 +244,10 @@ public class DefaultVersionResolver implements VersionResolver {
                     syncContext.acquire(null, Collections.singleton(metadata));
 
                     if (metadata.getFile() != null && metadata.getFile().exists()) {
-                        try (InputStream in = new FileInputStream(metadata.getFile())) {
-                            versioning =
-                                    new MetadataXpp3Reader().read(in, false).getVersioning();
+                        try (InputStream in =
+                                Files.newInputStream(metadata.getFile().toPath())) {
+                            versioning = new Versioning(
+                                    new MetadataStaxReader().read(in, false).getVersioning());
 
                             /*
                             NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata

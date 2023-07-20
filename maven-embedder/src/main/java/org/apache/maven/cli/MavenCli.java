@@ -18,10 +18,10 @@
  */
 package org.apache.maven.cli;
 
-import java.io.BufferedInputStream;
+import javax.xml.stream.XMLStreamException;
+
 import java.io.Console;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -56,8 +56,8 @@ import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
+import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
-import org.apache.maven.cli.internal.extension.model.io.xpp3.CoreExtensionsXpp3Reader;
 import org.apache.maven.cli.jansi.JansiMessageBuilderFactory;
 import org.apache.maven.cli.jansi.MessageUtils;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
@@ -107,7 +107,6 @@ import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
@@ -333,7 +332,7 @@ public class MavenCli {
         for (String arg : cliRequest.args) {
             if (isAltFile) {
                 // this is the argument following -f/--file
-                Path path = topDirectory.resolve(arg);
+                Path path = topDirectory.resolve(stripLeadingAndTrailingQuotes(arg));
                 if (Files.isDirectory(path)) {
                     topDirectory = path;
                 } else if (Files.isRegularFile(path)) {
@@ -351,15 +350,15 @@ public class MavenCli {
                 break;
             } else {
                 // Check if this is the -f/--file option
-                isAltFile = arg.equals(String.valueOf(CLIManager.ALTERNATE_POM_FILE)) || arg.equals("file");
+                isAltFile = arg.equals("-f") || arg.equals("--file");
             }
         }
         topDirectory = getCanonicalPath(topDirectory);
         cliRequest.topDirectory = topDirectory;
-        // We're very early in the process and we don't have the container set up yet,
-        // so we rely on the JDK services to eventually lookup a custom RootLocator.
+        // We're very early in the process, and we don't have the container set up yet,
+        // so we rely on the JDK services to eventually look up a custom RootLocator.
         // This is used to compute {@code session.rootDirectory} but all {@code project.rootDirectory}
-        // properties will be compute through the RootLocator found in the container.
+        // properties will be computed through the RootLocator found in the container.
         RootLocator rootLocator =
                 ServiceLoader.load(RootLocator.class).iterator().next();
         Path rootDirectory = rootLocator.findRoot(topDirectory);
@@ -794,12 +793,11 @@ public class MavenCli {
     }
 
     private List<CoreExtension> readCoreExtensionsDescriptor(File extensionsFile)
-            throws IOException, XmlPullParserException {
-        CoreExtensionsXpp3Reader parser = new CoreExtensionsXpp3Reader();
+            throws IOException, XMLStreamException {
+        CoreExtensionsStaxReader parser = new CoreExtensionsStaxReader();
 
-        try (InputStream is = new BufferedInputStream(new FileInputStream(extensionsFile))) {
-
-            return parser.read(is).getExtensions();
+        try (InputStream is = Files.newInputStream(extensionsFile.toPath())) {
+            return parser.read(is, true).getExtensions();
         }
     }
 
@@ -1353,7 +1351,11 @@ public class MavenCli {
         if (alternatePomFile != null) {
             File pom = resolveFile(new File(alternatePomFile), workingDirectory);
             if (pom.isDirectory()) {
-                pom = new File(pom, "pom.xml");
+                if (modelProcessor != null) {
+                    pom = modelProcessor.locatePom(pom);
+                } else {
+                    pom = new File(pom, "pom.xml");
+                }
             }
 
             return pom;
@@ -1615,6 +1617,18 @@ public class MavenCli {
             }
         });
         return interpolator;
+    }
+
+    private static String stripLeadingAndTrailingQuotes(String str) {
+        final int length = str.length();
+        if (length > 1
+                && str.startsWith("\"")
+                && str.endsWith("\"")
+                && str.substring(1, length - 1).indexOf('"') == -1) {
+            str = str.substring(1, length - 1);
+        }
+
+        return str;
     }
 
     private static Path getCanonicalPath(Path path) {

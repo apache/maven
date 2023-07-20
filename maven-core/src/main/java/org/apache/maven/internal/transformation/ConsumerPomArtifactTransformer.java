@@ -21,6 +21,8 @@ package org.apache.maven.internal.transformation;
 import javax.annotation.PreDestroy;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,14 +40,10 @@ import org.apache.maven.feature.Features;
 import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.transform.RawToConsumerPomXMLFilterFactory;
-import org.apache.maven.model.transform.pull.XmlUtils;
+import org.apache.maven.model.transform.stax.XmlUtils;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
-import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
-import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.codehaus.stax2.XMLInputFactory2;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -174,7 +172,7 @@ public final class ConsumerPomArtifactTransformer {
                 try (InputStream inputStream = transform(src, context)) {
                     Files.createDirectories(dest.getParent());
                     Files.copy(inputStream, dest, StandardCopyOption.REPLACE_EXISTING);
-                } catch (XmlPullParserException | IOException e) {
+                } catch (XMLStreamException | IOException e) {
                     throw new RuntimeException(e);
                 }
             };
@@ -184,13 +182,14 @@ public final class ConsumerPomArtifactTransformer {
     /**
      * The actual transformation: visible for testing.
      */
-    static InputStream transform(Path pomFile, TransformerContext context) throws IOException, XmlPullParserException {
-        XmlStreamReader reader = new XmlStreamReader(Files.newInputStream(pomFile));
-        XmlPullParser parser = new MXParser(EntityReplacementMap.defaultEntityReplacementMap);
-        parser.setInput(reader);
-        parser = new RawToConsumerPomXMLFilterFactory(new DefaultBuildPomXMLFilterFactory(context, true))
-                .get(parser, pomFile);
-
-        return XmlUtils.writeDocument(reader, parser);
+    static InputStream transform(Path pomFile, TransformerContext context) throws IOException, XMLStreamException {
+        try (InputStream input = Files.newInputStream(pomFile)) {
+            XMLInputFactory2 factory = new com.ctc.wstx.stax.WstxInputFactory();
+            factory.configureForRoundTripping();
+            XMLStreamReader reader = factory.createXMLStreamReader(input);
+            reader = new RawToConsumerPomXMLFilterFactory(new DefaultBuildPomXMLFilterFactory(context, true))
+                    .get(reader, pomFile);
+            return XmlUtils.writeDocument(reader);
+        }
     }
 }

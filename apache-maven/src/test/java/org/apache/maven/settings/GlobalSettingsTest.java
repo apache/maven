@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 
 import org.apache.maven.api.settings.InputSource;
-import org.apache.maven.settings.v4.SettingsXpp3ReaderEx;
+import org.apache.maven.settings.v4.SettingsStaxReader;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,7 +43,7 @@ class GlobalSettingsTest {
         assertTrue(globalSettingsFile.isFile(), globalSettingsFile.getAbsolutePath());
 
         try (InputStream is = Files.newInputStream(globalSettingsFile.toPath())) {
-            new SettingsXpp3ReaderEx().read(is, true, new InputSource(globalSettingsFile.getAbsolutePath()));
+            new SettingsStaxReader().read(is, true, new InputSource(globalSettingsFile.getAbsolutePath()));
         }
     }
 }

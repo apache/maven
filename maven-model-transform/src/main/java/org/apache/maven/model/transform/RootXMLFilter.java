@@ -18,12 +18,14 @@
  */
 package org.apache.maven.model.transform;
 
-import java.io.IOException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.stream.Stream;
 
-import org.apache.maven.model.transform.pull.BufferingParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.model.transform.stax.BufferingParser;
 
 /**
  * Remove the root attribute on the model
@@ -32,14 +34,18 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @since 4.0.0
  */
 class RootXMLFilter extends BufferingParser {
-    RootXMLFilter(XmlPullParser xmlPullParser) {
-        super(xmlPullParser);
+
+    final Deque<String> elements = new ArrayDeque<>();
+
+    RootXMLFilter(XMLStreamReader delegate) {
+        super(delegate);
     }
 
     @Override
-    protected boolean accept() throws XmlPullParserException, IOException {
-        if (xmlPullParser.getEventType() == XmlPullParser.START_TAG) {
-            if (xmlPullParser.getDepth() == 1 && "project".equals(xmlPullParser.getName())) {
+    protected boolean accept() throws XMLStreamException {
+        if (delegate.getEventType() == START_ELEMENT) {
+            elements.push(delegate.getLocalName());
+            if (elements.size() == 1 && "project".equals(delegate.getLocalName())) {
                 Event event = bufferEvent();
                 event.attributes = Stream.of(event.attributes)
                         .filter(a -> !"root".equals(a.name))
@@ -47,6 +53,8 @@ class RootXMLFilter extends BufferingParser {
                 pushEvent(event);
                 return false;
             }
+        } else if (delegate.getEventType() == END_ELEMENT) {
+            elements.pop();
         }
         return true;
     }

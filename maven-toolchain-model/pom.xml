@@ -45,6 +45,10 @@ under the License.
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -71,8 +75,8 @@ under the License.
               <templates>
                 <template>model-v3.vm</template>
                 <template>merger.vm</template>
-                <template>reader.vm</template>
-                <template>writer.vm</template>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
               </templates>
               <params>
                 <param>packageModelV3=org.apache.maven.toolchain.model</param>

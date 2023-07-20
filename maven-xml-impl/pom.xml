@@ -46,6 +46,10 @@ under the License.
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
       <version>${plexusXmlVersion}</version>

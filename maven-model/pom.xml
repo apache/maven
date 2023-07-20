@@ -46,6 +46,22 @@ under the License.
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-core</artifactId>
+      <version>1.36</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-annprocess</artifactId>
+      <version>1.36</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -61,6 +77,7 @@ under the License.
             <model>src/main/mdo/maven.mdo</model>
           </models>
           <params>
+            <param>forcedIOModelVersion=4.0.0</param>
             <param>packageModelV3=org.apache.maven.model</param>
             <param>packageModelV4=org.apache.maven.api.model</param>
             <param>packageToolV4=org.apache.maven.model.v4</param>
@@ -104,6 +121,8 @@ under the License.
                 <template>reader-ex.vm</template>
                 <template>writer.vm</template>
                 <template>writer-ex.vm</template>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
               </templates>
             </configuration>
           </execution>

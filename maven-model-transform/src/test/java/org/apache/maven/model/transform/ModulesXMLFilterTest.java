@@ -18,7 +18,8 @@
  */
 package org.apache.maven.model.transform;
 
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import javax.xml.stream.XMLStreamReader;
+
 import org.junit.jupiter.api.Test;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
@@ -26,7 +27,7 @@ import static org.xmlunit.assertj.XmlAssert.assertThat;
 class ModulesXMLFilterTest extends AbstractXMLFilterTests {
 
     @Override
-    protected ModulesXMLFilter getFilter(XmlPullParser parser) {
+    protected ModulesXMLFilter getFilter(XMLStreamReader parser) {
         return new ModulesXMLFilter(parser);
     }
 

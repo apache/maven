@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 
 import java.util.List;
 
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -30,7 +31,6 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Handles expansion of general build plugin configuration into individual executions.
@@ -58,16 +58,13 @@ public class DefaultPluginConfigurationExpander implements PluginConfigurationEx
 
     private void expand(List<Plugin> plugins) {
         for (Plugin plugin : plugins) {
-            Xpp3Dom pluginConfiguration = (Xpp3Dom) plugin.getConfiguration();
+            XmlNode pluginConfiguration = plugin.getDelegate().getConfiguration();
 
             if (pluginConfiguration != null) {
                 for (PluginExecution execution : plugin.getExecutions()) {
-                    Xpp3Dom executionConfiguration = (Xpp3Dom) execution.getConfiguration();
-
-                    executionConfiguration =
-                            Xpp3Dom.mergeXpp3Dom(executionConfiguration, new Xpp3Dom(pluginConfiguration));
-
-                    execution.setConfiguration(executionConfiguration);
+                    XmlNode executionConfiguration = execution.getDelegate().getConfiguration();
+                    executionConfiguration = XmlNode.merge(executionConfiguration, pluginConfiguration);
+                    execution.update(execution.getDelegate().withConfiguration(executionConfiguration));
                 }
             }
         }

@@ -157,7 +157,7 @@ under the License.
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusXmlVersion>4.0.1</plexusXmlVersion>
     <guiceVersion>5.1.0</guiceVersion>
-    <guavaVersion>30.1-jre</guavaVersion>
+    <guavaVersion>32.0.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
@@ -396,6 +396,16 @@ under the License.
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-cipher</artifactId>
         <version>${cipherVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.woodstox</groupId>
+        <artifactId>woodstox-core</artifactId>
+        <version>6.5.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>stax2-api</artifactId>
+        <version>4.2.1</version>
       </dependency>
       <dependency>
         <groupId>org.xmlunit</groupId>

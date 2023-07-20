@@ -18,14 +18,15 @@
  */
 package org.apache.maven.model.transform;
 
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import javax.xml.stream.XMLStreamReader;
+
 import org.junit.jupiter.api.Test;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 class RelativePathXMLFilterTest extends AbstractXMLFilterTests {
     @Override
-    protected RelativePathXMLFilter getFilter(XmlPullParser parser) {
+    protected RelativePathXMLFilter getFilter(XMLStreamReader parser) {
         return new RelativePathXMLFilter(parser);
     }
 

@@ -245,7 +245,9 @@ public final class CLIReportingUtils {
             if (e != null) {
                 logger.error(e.getMessage());
 
-                for (Throwable cause = e.getCause(); cause != null; cause = cause.getCause()) {
+                for (Throwable cause = e.getCause();
+                        cause != null && cause != cause.getCause();
+                        cause = cause.getCause()) {
                     logger.error("Caused by: {}", cause.getMessage());
                 }
             }

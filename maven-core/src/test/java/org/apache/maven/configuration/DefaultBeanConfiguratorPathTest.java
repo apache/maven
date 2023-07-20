@@ -18,8 +18,9 @@
  */
 package org.apache.maven.configuration;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.File;
-import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,7 +28,6 @@ import java.nio.file.Paths;
 import org.apache.maven.configuration.internal.DefaultBeanConfigurator;
 import org.apache.maven.internal.xml.XmlNodeBuilder;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,8 +53,10 @@ class DefaultBeanConfiguratorPathTest {
 
     private Xpp3Dom toConfig(String xml) {
         try {
-            return new Xpp3Dom(XmlNodeBuilder.build(new StringReader("<configuration>" + xml + "</configuration>")));
-        } catch (XmlPullParserException | IOException e) {
+            return new Xpp3Dom(XmlNodeBuilder.build(
+                    new StringReader("<configuration>" + xml + "</configuration>"),
+                    (XmlNodeBuilder.InputLocationBuilderStax) null));
+        } catch (XMLStreamException e) {
             throw new IllegalArgumentException(e);
         }
     }

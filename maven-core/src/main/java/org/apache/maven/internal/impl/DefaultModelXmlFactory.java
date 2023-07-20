@@ -37,9 +37,8 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
-import org.apache.maven.model.v4.MavenXpp3ReaderEx;
-import org.apache.maven.model.v4.MavenXpp3WriterEx;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
+import org.apache.maven.model.v4.MavenStaxReader;
+import org.apache.maven.model.v4.MavenStaxWriter;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
@@ -61,16 +60,21 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             if (request.getModelId() != null || request.getLocation() != null) {
                 source = new InputSource(request.getModelId(), request.getLocation());
             }
-            MavenXpp3ReaderEx xml = new MavenXpp3ReaderEx();
+            MavenStaxReader xml = new MavenStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
-            if (path != null) {
-                reader = new XmlStreamReader(path.toFile());
-            } else if (url != null) {
-                reader = new XmlStreamReader(url);
-            } else if (inputStream != null) {
-                reader = new XmlStreamReader(inputStream);
+            if (inputStream != null) {
+                return xml.read(inputStream, request.isStrict(), source);
+            } else if (reader != null) {
+                return xml.read(reader, request.isStrict(), source);
+            } else if (path != null) {
+                try (InputStream is = Files.newInputStream(path)) {
+                    return xml.read(is, request.isStrict(), source);
+                }
+            } else {
+                try (InputStream is = url.openStream()) {
+                    return xml.read(is, request.isStrict(), source);
+                }
             }
-            return xml.read(reader, request.isStrict(), source);
         } catch (Exception e) {
             throw new XmlReaderException("Unable to read model", e);
         }
@@ -88,12 +92,12 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         }
         try {
             if (writer != null) {
-                new MavenXpp3WriterEx().write(writer, content);
+                new MavenStaxWriter().write(writer, content);
             } else if (outputStream != null) {
-                new MavenXpp3WriterEx().write(outputStream, content);
+                new MavenStaxWriter().write(outputStream, content);
             } else {
                 try (OutputStream os = Files.newOutputStream(path)) {
-                    new MavenXpp3WriterEx().write(outputStream, content);
+                    new MavenStaxWriter().write(outputStream, content);
                 }
             }
         } catch (Exception e) {

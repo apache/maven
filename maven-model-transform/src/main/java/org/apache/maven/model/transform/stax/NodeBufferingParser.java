@@ -16,15 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.model.transform.pull;
+package org.apache.maven.model.transform.stax;
 
-import java.io.IOException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Buffer events while parsing a given element to allow some post-processing.
@@ -40,31 +39,29 @@ public abstract class NodeBufferingParser extends BufferingParser {
 
     private boolean buffering;
 
-    public NodeBufferingParser(XmlPullParser xmlPullParser, String nodeName) {
-        super(xmlPullParser);
+    public NodeBufferingParser(XMLStreamReader delegate, String nodeName) {
+        super(delegate);
         this.nodeName = Objects.requireNonNull(nodeName);
     }
 
     @Override
-    protected boolean accept() throws XmlPullParserException, IOException {
-        if (nodeName.equals(xmlPullParser.getName())) {
-            if (xmlPullParser.getEventType() == START_TAG && !buffering) {
-                buffer.add(bufferEvent());
-                buffering = true;
-                return false;
-            }
-            if (xmlPullParser.getEventType() == END_TAG && buffering) {
-                buffer.add(bufferEvent());
-                process(buffer);
-                buffering = false;
-                buffer.clear();
-                return false;
-            }
+    protected boolean accept() throws XMLStreamException {
+        if (!buffering && delegate.getEventType() == START_ELEMENT && nodeName.equals(delegate.getLocalName())) {
+            buffer.add(bufferEvent());
+            buffering = true;
+            return false;
+        } else if (buffering && delegate.getEventType() == END_ELEMENT && nodeName.equals(delegate.getLocalName())) {
+            buffer.add(bufferEvent());
+            process(buffer);
+            buffering = false;
+            buffer.clear();
+            return false;
         } else if (buffering) {
             buffer.add(bufferEvent());
             return false;
+        } else {
+            return true;
         }
-        return true;
     }
 
     @Override

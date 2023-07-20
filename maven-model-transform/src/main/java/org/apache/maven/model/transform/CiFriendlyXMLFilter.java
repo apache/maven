@@ -18,11 +18,12 @@
  */
 package org.apache.maven.model.transform;
 
+import javax.xml.stream.XMLStreamReader;
+
 import java.util.List;
 import java.util.function.Function;
 
-import org.apache.maven.model.transform.pull.NodeBufferingParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.apache.maven.model.transform.stax.NodeBufferingParser;
 
 /**
  * Resolves all ci-friendly properties occurrences between version-tags
@@ -36,8 +37,8 @@ class CiFriendlyXMLFilter extends NodeBufferingParser {
 
     private Function<String, String> replaceChain = Function.identity();
 
-    CiFriendlyXMLFilter(XmlPullParser xmlPullParser, boolean replace) {
-        super(xmlPullParser, "version");
+    CiFriendlyXMLFilter(XMLStreamReader delegate, boolean replace) {
+        super(delegate, "version");
         this.replace = replace;
     }
 
@@ -66,7 +67,7 @@ class CiFriendlyXMLFilter extends NodeBufferingParser {
     @Override
     protected void process(List<Event> buffer) {
         for (Event event : buffer) {
-            if (event.event == TEXT && replace && event.text.contains("${")) {
+            if (event.event == CHARACTERS && replace && event.text.contains("${")) {
                 event.text = replaceChain.apply(event.text);
             }
             pushEvent(event);

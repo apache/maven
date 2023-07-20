@@ -105,7 +105,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 e.getResults(),
                 contains(projectBuildingResultWithProblemMessage(
                         "'dependencies.dependency.version' for org.apache.maven.its:a:jar is missing")));
-        assertThat(e.getResults(), contains(projectBuildingResultWithLocation(17, 9)));
+        assertThat(e.getResults(), contains(projectBuildingResultWithLocation(5, 9)));
     }
 
     @Test
@@ -234,7 +234,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // single project build entry point
         Exception ex = assertThrows(Exception.class, () -> projectBuilder.build(pomFile, configuration));
-        assertThat(ex.getMessage(), containsString("expected START_TAG or END_TAG not TEXT"));
+        assertThat(ex.getMessage(), containsString("Received non-all-whitespace CHARACTERS or CDATA event"));
 
         // multi projects build entry point
         ProjectBuildingException pex = assertThrows(
@@ -245,7 +245,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertThat(pex.getResults().get(0).getProblems().size(), greaterThan(0));
         assertThat(
                 pex.getResults(),
-                contains(projectBuildingResultWithProblemMessage("expected START_TAG or END_TAG not TEXT")));
+                contains(projectBuildingResultWithProblemMessage("expected START_TAG or END_TAG not CHARACTERS")));
     }
 
     @Test

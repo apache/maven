@@ -19,6 +19,7 @@
 package org.apache.maven.project.interpolation;
 
 import javax.inject.Inject;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +33,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.model.v4.MavenStaxReader;
+import org.apache.maven.model.v4.MavenStaxWriter;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.path.PathTranslator;
@@ -52,7 +53,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
@@ -130,10 +130,10 @@ public abstract class AbstractStringBasedModelInterpolator extends AbstractLogEn
             throws ModelInterpolationException {
         StringWriter sWriter = new StringWriter(1024);
 
-        MavenXpp3Writer writer = new MavenXpp3Writer();
+        MavenStaxWriter writer = new MavenStaxWriter();
         try {
-            writer.write(sWriter, model);
-        } catch (IOException e) {
+            writer.write(sWriter, model.getDelegate());
+        } catch (IOException | XMLStreamException e) {
             throw new ModelInterpolationException("Cannot serialize project model for interpolation.", e);
         }
 
@@ -142,10 +142,10 @@ public abstract class AbstractStringBasedModelInterpolator extends AbstractLogEn
 
         StringReader sReader = new StringReader(serializedModel);
 
-        MavenXpp3Reader modelReader = new MavenXpp3Reader();
+        MavenStaxReader modelReader = new MavenStaxReader();
         try {
-            model = modelReader.read(sReader);
-        } catch (IOException | XmlPullParserException e) {
+            model = new Model(modelReader.read(sReader));
+        } catch (XMLStreamException e) {
             throw new ModelInterpolationException(
                     "Cannot read project model from interpolating filter of serialized version.", e);
         }
