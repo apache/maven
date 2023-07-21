@@ -19,6 +19,7 @@
 package org.apache.maven.settings;
 
 import javax.inject.Inject;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +36,6 @@ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
@@ -120,7 +120,7 @@ class PomConstructionWithSettingsTest {
         return new PomTestWrapper(pomFile, projectBuilder.build(pomFile, config).getProject());
     }
 
-    private static Settings readSettingsFile(File settingsFile) throws IOException, XmlPullParserException {
+    private static Settings readSettingsFile(File settingsFile) throws IOException, XMLStreamException {
         Settings settings = null;
 
         try (Reader reader = new XmlStreamReader(settingsFile)) {

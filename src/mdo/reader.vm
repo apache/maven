@@ -70,7 +70,12 @@ public class ${className} {
 
     private final ContentTransformer contentTransformer;
 
-        private static final Map<String, String> DEFAULT_ENTITIES;
+    /**
+    * XSI namespace
+    */
+    private static final String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
+
+    private static final Map<String, String> DEFAULT_ENTITIES;
     static {
         Map<String, String> entities = new HashMap<>();
         entities.put("nbsp", "\u00a0");
@@ -459,11 +464,12 @@ public class ${className} {
         ${classUcapName}.Builder ${classLcapName} = ${classUcapName}.newBuilder(true);
         for (int i = parser.getAttributeCount() - 1; i >= 0; i--) {
             String name = parser.getAttributeLocalName(i);
+            String ns = parser.getAttributeNamespace(i);
             String value = parser.getAttributeValue(i);
-            if (name.indexOf(':') >= 0) {
+            if (XSI_NAMESPACE.equals(ns)) {
                 // just ignore attributes with non-default namespace (for example: xmlns:xsi)
-  #if ( $class == $root )
-            } else if ("xmlns".equals(name)) {
+     #if ( $class == $root )
+            }  else if ("xmlns".equals(name)) {
                 // ignore xmlns attribute in root class, which is a reserved attribute name
   #end
             }
