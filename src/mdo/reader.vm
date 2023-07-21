@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,11 +57,10 @@ import org.apache.maven.internal.xml.XmlNodeBuilder;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
-import org.codehaus.plexus.util.xml.XmlStreamReader;
-import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
-import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
 
 @Deprecated
 @Generated
@@ -69,6 +69,271 @@ public class ${className} {
     private boolean addDefaultEntities = true;
 
     private final ContentTransformer contentTransformer;
+
+        private static final Map<String, String> DEFAULT_ENTITIES;
+    static {
+        Map<String, String> entities = new HashMap<>();
+        entities.put("nbsp", "\u00a0");
+        entities.put("iexcl", "\u00a1");
+        entities.put("cent", "\u00a2");
+        entities.put("pound", "\u00a3");
+        entities.put("curren", "\u00a4");
+        entities.put("yen", "\u00a5");
+        entities.put("brvbar", "\u00a6");
+        entities.put("sect", "\u00a7");
+        entities.put("uml", "\u00a8");
+        entities.put("copy", "\u00a9");
+        entities.put("ordf", "\u00aa");
+        entities.put("laquo", "\u00ab");
+        entities.put("not", "\u00ac");
+        entities.put("shy", "\u00ad");
+        entities.put("reg", "\u00ae");
+        entities.put("macr", "\u00af");
+        entities.put("deg", "\u00b0");
+        entities.put("plusmn", "\u00b1");
+        entities.put("sup2", "\u00b2");
+        entities.put("sup3", "\u00b3");
+        entities.put("acute", "\u00b4");
+        entities.put("micro", "\u00b5");
+        entities.put("para", "\u00b6");
+        entities.put("middot", "\u00b7");
+        entities.put("cedil", "\u00b8");
+        entities.put("sup1", "\u00b9");
+        entities.put("ordm", "\u00ba");
+        entities.put("raquo", "\u00bb");
+        entities.put("frac14", "\u00bc");
+        entities.put("frac12", "\u00bd");
+        entities.put("frac34", "\u00be");
+        entities.put("iquest", "\u00bf");
+        entities.put("Agrave", "\u00c0");
+        entities.put("Aacute", "\u00c1");
+        entities.put("Acirc", "\u00c2");
+        entities.put("Atilde", "\u00c3");
+        entities.put("Auml", "\u00c4");
+        entities.put("Aring", "\u00c5");
+        entities.put("AElig", "\u00c6");
+        entities.put("Ccedil", "\u00c7");
+        entities.put("Egrave", "\u00c8");
+        entities.put("Eacute", "\u00c9");
+        entities.put("Ecirc", "\u00ca");
+        entities.put("Euml", "\u00cb");
+        entities.put("Igrave", "\u00cc");
+        entities.put("Iacute", "\u00cd");
+        entities.put("Icirc", "\u00ce");
+        entities.put("Iuml", "\u00cf");
+        entities.put("ETH", "\u00d0");
+        entities.put("Ntilde", "\u00d1");
+        entities.put("Ograve", "\u00d2");
+        entities.put("Oacute", "\u00d3");
+        entities.put("Ocirc", "\u00d4");
+        entities.put("Otilde", "\u00d5");
+        entities.put("Ouml", "\u00d6");
+        entities.put("times", "\u00d7");
+        entities.put("Oslash", "\u00d8");
+        entities.put("Ugrave", "\u00d9");
+        entities.put("Uacute", "\u00da");
+        entities.put("Ucirc", "\u00db");
+        entities.put("Uuml", "\u00dc");
+        entities.put("Yacute", "\u00dd");
+        entities.put("THORN", "\u00de");
+        entities.put("szlig", "\u00df");
+        entities.put("agrave", "\u00e0");
+        entities.put("aacute", "\u00e1");
+        entities.put("acirc", "\u00e2");
+        entities.put("atilde", "\u00e3");
+        entities.put("auml", "\u00e4");
+        entities.put("aring", "\u00e5");
+        entities.put("aelig", "\u00e6");
+        entities.put("ccedil", "\u00e7");
+        entities.put("egrave", "\u00e8");
+        entities.put("eacute", "\u00e9");
+        entities.put("ecirc", "\u00ea");
+        entities.put("euml", "\u00eb");
+        entities.put("igrave", "\u00ec");
+        entities.put("iacute", "\u00ed");
+        entities.put("icirc", "\u00ee");
+        entities.put("iuml", "\u00ef");
+        entities.put("eth", "\u00f0");
+        entities.put("ntilde", "\u00f1");
+        entities.put("ograve", "\u00f2");
+        entities.put("oacute", "\u00f3");
+        entities.put("ocirc", "\u00f4");
+        entities.put("otilde", "\u00f5");
+        entities.put("ouml", "\u00f6");
+        entities.put("divide", "\u00f7");
+        entities.put("oslash", "\u00f8");
+        entities.put("ugrave", "\u00f9");
+        entities.put("uacute", "\u00fa");
+        entities.put("ucirc", "\u00fb");
+        entities.put("uuml", "\u00fc");
+        entities.put("yacute", "\u00fd");
+        entities.put("thorn", "\u00fe");
+        entities.put("yuml", "\u00ff");
+
+        // ----------------------------------------------------------------------
+        // Special entities
+        // ----------------------------------------------------------------------
+
+        entities.put("OElig", "\u0152");
+        entities.put("oelig", "\u0153");
+        entities.put("Scaron", "\u0160");
+        entities.put("scaron", "\u0161");
+        entities.put("Yuml", "\u0178");
+        entities.put("circ", "\u02c6");
+        entities.put("tilde", "\u02dc");
+        entities.put("ensp", "\u2002");
+        entities.put("emsp", "\u2003");
+        entities.put("thinsp", "\u2009");
+        entities.put("zwnj", "\u200c");
+        entities.put("zwj", "\u200d");
+        entities.put("lrm", "\u200e");
+        entities.put("rlm", "\u200f");
+        entities.put("ndash", "\u2013");
+        entities.put("mdash", "\u2014");
+        entities.put("lsquo", "\u2018");
+        entities.put("rsquo", "\u2019");
+        entities.put("sbquo", "\u201a");
+        entities.put("ldquo", "\u201c");
+        entities.put("rdquo", "\u201d");
+        entities.put("bdquo", "\u201e");
+        entities.put("dagger", "\u2020");
+        entities.put("Dagger", "\u2021");
+        entities.put("permil", "\u2030");
+        entities.put("lsaquo", "\u2039");
+        entities.put("rsaquo", "\u203a");
+        entities.put("euro", "\u20ac");
+
+        // ----------------------------------------------------------------------
+        // Symbol entities
+        // ----------------------------------------------------------------------
+
+        entities.put("fnof", "\u0192");
+        entities.put("Alpha", "\u0391");
+        entities.put("Beta", "\u0392");
+        entities.put("Gamma", "\u0393");
+        entities.put("Delta", "\u0394");
+        entities.put("Epsilon", "\u0395");
+        entities.put("Zeta", "\u0396");
+        entities.put("Eta", "\u0397");
+        entities.put("Theta", "\u0398");
+        entities.put("Iota", "\u0399");
+        entities.put("Kappa", "\u039a");
+        entities.put("Lambda", "\u039b");
+        entities.put("Mu", "\u039c");
+        entities.put("Nu", "\u039d");
+        entities.put("Xi", "\u039e");
+        entities.put("Omicron", "\u039f");
+        entities.put("Pi", "\u03a0");
+        entities.put("Rho", "\u03a1");
+        entities.put("Sigma", "\u03a3");
+        entities.put("Tau", "\u03a4");
+        entities.put("Upsilon", "\u03a5");
+        entities.put("Phi", "\u03a6");
+        entities.put("Chi", "\u03a7");
+        entities.put("Psi", "\u03a8");
+        entities.put("Omega", "\u03a9");
+        entities.put("alpha", "\u03b1");
+        entities.put("beta", "\u03b2");
+        entities.put("gamma", "\u03b3");
+        entities.put("delta", "\u03b4");
+        entities.put("epsilon", "\u03b5");
+        entities.put("zeta", "\u03b6");
+        entities.put("eta", "\u03b7");
+        entities.put("theta", "\u03b8");
+        entities.put("iota", "\u03b9");
+        entities.put("kappa", "\u03ba");
+        entities.put("lambda", "\u03bb");
+        entities.put("mu", "\u03bc");
+        entities.put("nu", "\u03bd");
+        entities.put("xi", "\u03be");
+        entities.put("omicron", "\u03bf");
+        entities.put("pi", "\u03c0");
+        entities.put("rho", "\u03c1");
+        entities.put("sigmaf", "\u03c2");
+        entities.put("sigma", "\u03c3");
+        entities.put("tau", "\u03c4");
+        entities.put("upsilon", "\u03c5");
+        entities.put("phi", "\u03c6");
+        entities.put("chi", "\u03c7");
+        entities.put("psi", "\u03c8");
+        entities.put("omega", "\u03c9");
+        entities.put("thetasym", "\u03d1");
+        entities.put("upsih", "\u03d2");
+        entities.put("piv", "\u03d6");
+        entities.put("bull", "\u2022");
+        entities.put("hellip", "\u2026");
+        entities.put("prime", "\u2032");
+        entities.put("Prime", "\u2033");
+        entities.put("oline", "\u203e");
+        entities.put("frasl", "\u2044");
+        entities.put("weierp", "\u2118");
+        entities.put("image", "\u2111");
+        entities.put("real", "\u211c");
+        entities.put("trade", "\u2122");
+        entities.put("alefsym", "\u2135");
+        entities.put("larr", "\u2190");
+        entities.put("uarr", "\u2191");
+        entities.put("rarr", "\u2192");
+        entities.put("darr", "\u2193");
+        entities.put("harr", "\u2194");
+        entities.put("crarr", "\u21b5");
+        entities.put("lArr", "\u21d0");
+        entities.put("uArr", "\u21d1");
+        entities.put("rArr", "\u21d2");
+        entities.put("dArr", "\u21d3");
+        entities.put("hArr", "\u21d4");
+        entities.put("forall", "\u2200");
+        entities.put("part", "\u2202");
+        entities.put("exist", "\u2203");
+        entities.put("empty", "\u2205");
+        entities.put("nabla", "\u2207");
+        entities.put("isin", "\u2208");
+        entities.put("notin", "\u2209");
+        entities.put("ni", "\u220b");
+        entities.put("prod", "\u220f");
+        entities.put("sum", "\u2211");
+        entities.put("minus", "\u2212");
+        entities.put("lowast", "\u2217");
+        entities.put("radic", "\u221a");
+        entities.put("prop", "\u221d");
+        entities.put("infin", "\u221e");
+        entities.put("ang", "\u2220");
+        entities.put("and", "\u2227");
+        entities.put("or", "\u2228");
+        entities.put("cap", "\u2229");
+        entities.put("cup", "\u222a");
+        entities.put("int", "\u222b");
+        entities.put("there4", "\u2234");
+        entities.put("sim", "\u223c");
+        entities.put("cong", "\u2245");
+        entities.put("asymp", "\u2248");
+        entities.put("ne", "\u2260");
+        entities.put("equiv", "\u2261");
+        entities.put("le", "\u2264");
+        entities.put("ge", "\u2265");
+        entities.put("sub", "\u2282");
+        entities.put("sup", "\u2283");
+        entities.put("nsub", "\u2284");
+        entities.put("sube", "\u2286");
+        entities.put("supe", "\u2287");
+        entities.put("oplus", "\u2295");
+        entities.put("otimes", "\u2297");
+        entities.put("perp", "\u22a5");
+        entities.put("sdot", "\u22c5");
+        entities.put("lceil", "\u2308");
+        entities.put("rceil", "\u2309");
+        entities.put("lfloor", "\u230a");
+        entities.put("rfloor", "\u230b");
+        entities.put("lang", "\u2329");
+        entities.put("rang", "\u232a");
+        entities.put("loz", "\u25ca");
+        entities.put("spades", "\u2660");
+        entities.put("clubs", "\u2663");
+        entities.put("hearts", "\u2665");
+        entities.put("diams", "\u2666");
+        DEFAULT_ENTITIES = Collections.unmodifiableMap(entities);
+    }
+
 
     public ${className}() {
         this((s, f) -> s);
@@ -83,13 +348,19 @@ public class ${className} {
      * @param reader a reader object.
      * @param strict a strict object.
      * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return ${root.name}
      */
-    public ${root.name} read(Reader reader, boolean strict) throws IOException, XmlPullParserException {
-        XmlPullParser parser = addDefaultEntities ? new MXParser(EntityReplacementMap.defaultEntityReplacementMap) : new MXParser();
-        parser.setInput(reader);
+    public ${root.name} read(Reader reader, boolean strict) throws IOException, XMLStreamException {
+        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+        XMLStreamReader parser = null;
+        try {
+            parser = factory.createXMLStreamReader(reader);
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
         return read(parser, strict);
     } //-- ${root.name} read(Reader, boolean)
 
@@ -97,11 +368,11 @@ public class ${className} {
      *
      * @param reader a reader object.
      * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return ${root.name}
      */
-    public ${root.name} read(Reader reader) throws IOException, XmlPullParserException {
+    public ${root.name} read(Reader reader) throws IOException, XMLStreamException {
         return read(reader, true);
     } //-- ${root.name} read(Reader)
 
@@ -111,12 +382,16 @@ public class ${className} {
      * @param in a in object.
      * @param strict a strict object.
      * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return ${root.name}
      */
-    public ${root.name} read(InputStream in, boolean strict) throws IOException, XmlPullParserException {
-        return read(new XmlStreamReader(in), strict);
+    public ${root.name} read(InputStream in, boolean strict) throws IOException, XMLStreamException {
+        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+        StreamSource streamSource = new StreamSource(in, null);
+        XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
+        return read(parser, strict);
     } //-- ${root.name} read(InputStream, boolean)
 
     /**
@@ -124,12 +399,16 @@ public class ${className} {
      *
      * @param in a in object.
      * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return ${root.name}
      */
-    public ${root.name} read(InputStream in) throws IOException, XmlPullParserException {
-        return read(new XmlStreamReader(in));
+    public ${root.name} read(InputStream in) throws IOException, XMLStreamException {
+        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+        StreamSource streamSource = new StreamSource(in, null);
+        XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
+        return read(parser,true);
     } //-- ${root.name} read(InputStream)
 
     /**
@@ -138,21 +417,21 @@ public class ${className} {
      * @param parser a parser object.
      * @param strict a strict object.
      * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return ${root.name}
      */
-    public ${root.name} read(XmlPullParser parser, boolean strict) throws IOException, XmlPullParserException {
+    public ${root.name} read(XMLStreamReader parser, boolean strict) throws IOException, XMLStreamException {
         $rootUcapName $rootLcapName = null;
         int eventType = parser.getEventType();
         boolean parsed = false;
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            if (eventType == XmlPullParser.START_TAG) {
-                if (strict && ! "${rootTag}".equals(parser.getName())) {
-                    throw new XmlPullParserException("Expected root element '${rootTag}' but found '" + parser.getName() + "'", parser, null);
+        while (eventType != XMLStreamReader.END_DOCUMENT) {
+            if (eventType == XMLStreamReader.START_ELEMENT) {
+                if (strict && ! "${rootTag}".equals(parser.getLocalName())) {
+                    throw new XMLStreamException("Expected root element '${rootTag}' but found '" + parser.getLocalName() + "'", parser.getLocation(), null);
                 } else if (parsed) {
-                    // fallback, already expected a XmlPullParserException due to invalid XML
-                    throw new XmlPullParserException("Duplicated tag: '${rootTag}'", parser, null);
+                    // fallback, already expected a XMLStreamException due to invalid XML
+                    throw new XMLStreamException("Duplicated tag: '${rootTag}'", parser.getLocation(), null);
                 }
                 $rootLcapName = parse${rootUcapName}(parser, strict);
                 parsed = true;
@@ -162,8 +441,8 @@ public class ${className} {
         if (parsed) {
             return $rootLcapName;
         }
-        throw new XmlPullParserException("Expected root element '${rootTag}' but found no element at all: invalid XML document", parser, null);
-    } //-- ${root.name} read(XmlPullParser, boolean)
+        throw new XMLStreamException("Expected root element '${rootTag}' but found no element at all: invalid XML document", parser.getLocation(), null);
+    } //-- ${root.name} read(XMLStreamReader, boolean)
 
 #foreach ( $class in $model.allClasses )
  #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
@@ -174,12 +453,12 @@ public class ${className} {
   #foreach ( $cl in $ancestors )
     #set ( $dummy = $allFields.addAll( $cl.getFields($version) ) )
   #end
-    private ${classUcapName} parse${classUcapName}(XmlPullParser parser, boolean strict)
-            throws IOException, XmlPullParserException {
-        String tagName = parser.getName();
+    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict)
+            throws IOException, XMLStreamException {
+        String tagName = parser.getLocalName();
         ${classUcapName}.Builder ${classLcapName} = ${classUcapName}.newBuilder(true);
         for (int i = parser.getAttributeCount() - 1; i >= 0; i--) {
-            String name = parser.getAttributeName(i);
+            String name = parser.getAttributeLocalName(i);
             String value = parser.getAttributeValue(i);
             if (name.indexOf(':') >= 0) {
                 // just ignore attributes with non-default namespace (for example: xmlns:xsi)
@@ -213,8 +492,8 @@ public class ${className} {
         List<$field.to> ${field.name} = new ArrayList<>();
     #end
   #end
-        while ((strict ? parser.nextTag() : nextTag(parser)) == XmlPullParser.START_TAG) {
-            String childName = checkDuplicate(parser.getName(), parser, parsed);
+        while ((strict ? parser.nextTag() : nextTag(parser)) == XMLStreamReader.START_ELEMENT) {
+            String childName = checkDuplicate(parser.getLocalName(), parser, parsed);
             switch (childName) {
   #set( $ift = "if" )
   #foreach ( $field in $allFields )
@@ -229,22 +508,22 @@ public class ${className} {
       #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
                 case "${fieldTagName}": {
       #if ( $field.type == "String" )
-                    ${classLcapName}.${field.name}(interpolatedTrimmed(parser.nextText(), "${fieldTagName}"));
+                    ${classLcapName}.${field.name}(interpolatedTrimmed(nextText(parser, strict), "${fieldTagName}"));
                     break;
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
-                    ${classLcapName}.${field.name}(getBooleanValue(interpolatedTrimmed(parser.nextText(), "${fieldTagName}"), "${fieldTagName}", parser, ${field.defaultValue}));
+                    ${classLcapName}.${field.name}(getBooleanValue(interpolatedTrimmed(nextText(parser, strict), "${fieldTagName}"), "${fieldTagName}", parser, ${field.defaultValue}));
                     break;
       #elseif ( $field.type == "int" )
-                    ${classLcapName}.${field.name}(getIntegerValue(interpolatedTrimmed(parser.nextText(), "${fieldTagName}"), "${fieldTagName}", parser, strict, ${field.defaultValue}));
+                    ${classLcapName}.${field.name}(getIntegerValue(interpolatedTrimmed(nextText(parser, strict), "${fieldTagName}"), "${fieldTagName}", parser, strict, ${field.defaultValue}));
                     break;
       #elseif ( $field.type == "DOM" )
-                    ${classLcapName}.${field.name}(XmlNodeBuilder.build(parser, true));
+                    ${classLcapName}.${field.name}(XmlNodeBuilder.build(parser));
                     break;
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
                     List<String> ${field.name} = new ArrayList<>();
-                    while (parser.nextTag() == XmlPullParser.START_TAG) {
-                        if ("${Helper.singular($fieldTagName)}".equals(parser.getName())) {
-                            ${field.name}.add(interpolatedTrimmed(parser.nextText(), "${fieldTagName}"));
+                    while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
+                        if ("${Helper.singular($fieldTagName)}".equals(parser.getLocalName())) {
+                            ${field.name}.add(interpolatedTrimmed(nextText(parser, strict), "${fieldTagName}"));
                         } else {
                             checkUnknownElement(parser, strict);
                         }
@@ -253,9 +532,9 @@ public class ${className} {
                     break;
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
                     Map<String, String> ${field.name} = new LinkedHashMap<>();
-                    while (parser.nextTag() == XmlPullParser.START_TAG) {
-                        String key = parser.getName();
-                        String value = parser.nextText().trim();
+                    while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
+                        String key = parser.getLocalName();
+                        String value = nextText(parser, strict).trim();
                         ${field.name}.put(key, value);
                     }
                     ${classLcapName}.${field.name}(${field.name});
@@ -268,8 +547,8 @@ public class ${className} {
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" )
                     List<$field.to> ${field.name} = new ArrayList<>();
-                    while (parser.nextTag() == XmlPullParser.START_TAG) {
-                        if ("${Helper.singular($fieldTagName)}".equals(parser.getName())) {
+                    while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
+                        if ("${Helper.singular($fieldTagName)}".equals(parser.getLocalName())) {
                             ${field.name}.add(parse${field.toClass.name}(parser, strict));
                         } else {
                             checkUnknownElement(parser, strict);
@@ -297,7 +576,7 @@ public class ${className} {
     #end
   #end
   #if ( $class == $root )
-        ${classLcapName}.modelEncoding(parser.getInputEncoding());
+        ${classLcapName}.modelEncoding(parser.getEncoding());
   #end
         return ${classLcapName}.build();
     }
@@ -305,7 +584,7 @@ public class ${className} {
  #end
 #end
 
-    private String checkDuplicate(String tagName, XmlPullParser parser, Set<String> parsed) throws XmlPullParserException {
+    private String checkDuplicate(String tagName, XMLStreamReader parser, Set<String> parsed) throws XMLStreamException {
 #set( $aliases = { } )
 #set( $flats = { } )
 #foreach( $class in $model.allClasses )
@@ -339,7 +618,7 @@ public class ${className} {
                 break;
             default:
                 if (!parsed.add(tagName)) {
-                    throw new XmlPullParserException("Duplicated tag: '" + tagName + "'", parser, null);
+                    throw new XMLStreamException("Duplicated tag: '" + tagName + "'", parser.getLocation(), null);
                 }
         }
 #end
@@ -373,20 +652,20 @@ public class ${className} {
      * @param parsed a parsed object.
      * @param alias a alias object.
      * @param tagName a tagName object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return boolean
      */
-    private boolean checkFieldWithDuplicate(XmlPullParser parser, String tagName, String alias, Set<String> parsed)
-        throws XmlPullParserException {
-        if (!(parser.getName().equals(tagName) || parser.getName().equals(alias))) {
+    private boolean checkFieldWithDuplicate(XMLStreamReader parser, String tagName, String alias, Set<String> parsed)
+        throws XMLStreamException {
+        if (!(parser.getLocalName().equals(tagName) || parser.getLocalName().equals(alias))) {
             return false;
         }
         if (!parsed.add(tagName)) {
-            throw new XmlPullParserException("Duplicated tag: '" + tagName + "'", parser, null);
+            throw new XMLStreamException("Duplicated tag: '" + tagName + "'", parser.getLocation(), null);
         }
         return true;
-    } //-- boolean checkFieldWithDuplicate(XmlPullParser, String, String, Set<String>)
+    } //-- boolean checkFieldWithDuplicate(XMLStreamReader, String, String, Set<String>)
 
     /**
      * Method checkUnknownAttribute.
@@ -395,42 +674,42 @@ public class ${className} {
      * @param strict a strict object.
      * @param tagName a tagName object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @throws IOException IOException if any.
      */
-    private void checkUnknownAttribute(XmlPullParser parser, String attribute, String tagName, boolean strict)
-        throws XmlPullParserException, IOException {
+    private void checkUnknownAttribute(XMLStreamReader parser, String attribute, String tagName, boolean strict)
+        throws XMLStreamException, IOException {
         // strictXmlAttributes = true for model: if strict == true, not only elements are checked but attributes too
         if (strict) {
-            throw new XmlPullParserException("Unknown attribute '" + attribute + "' for tag '" + tagName + "'", parser, null);
+            throw new XMLStreamException("Unknown attribute '" + attribute + "' for tag '" + tagName + "'", parser.getLocation(), null);
         }
-    } //-- void checkUnknownAttribute(XmlPullParser, String, String, boolean)
+    } //-- void checkUnknownAttribute(XMLStreamReader, String, String, boolean)
 
     /**
      * Method checkUnknownElement.
      *
      * @param parser a parser object.
      * @param strict a strict object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @throws IOException IOException if any.
      */
-    private void checkUnknownElement(XmlPullParser parser, boolean strict)
-        throws XmlPullParserException, IOException {
+    private void checkUnknownElement(XMLStreamReader parser, boolean strict)
+        throws XMLStreamException, IOException {
         if (strict) {
-            throw new XmlPullParserException("Unrecognised tag: '" + parser.getName() + "'", parser, null);
+            throw new XMLStreamException("Unrecognised tag: '" + parser.getLocalName() + "'", parser.getLocation(), null);
         }
 
         for (int unrecognizedTagCount = 1; unrecognizedTagCount > 0;) {
             int eventType = parser.next();
-            if (eventType == XmlPullParser.START_TAG) {
+            if (eventType == XMLStreamReader.START_ELEMENT) {
                 unrecognizedTagCount++;
-            } else if (eventType == XmlPullParser.END_TAG) {
+            } else if (eventType == XMLStreamReader.END_ELEMENT) {
                 unrecognizedTagCount--;
             }
         }
-    } //-- void checkUnknownElement(XmlPullParser, boolean)
+    } //-- void checkUnknownElement(XMLStreamReader, boolean)
 
     /**
      * Returns the state of the "add default entities" flag.
@@ -447,14 +726,14 @@ public class ${className} {
      * @param s a s object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return boolean
      */
-    private boolean getBooleanValue(String s, String attribute, XmlPullParser parser)
-        throws XmlPullParserException {
+    private boolean getBooleanValue(String s, String attribute, XMLStreamReader parser)
+        throws XMLStreamException {
         return getBooleanValue(s, attribute, parser, false);
-    } //-- boolean getBooleanValue(String, String, XmlPullParser)
+    } //-- boolean getBooleanValue(String, String, XMLStreamReader)
 
     /**
      * Method getBooleanValue.
@@ -463,17 +742,17 @@ public class ${className} {
      * @param defaultValue a defaultValue object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return boolean
      */
-    private boolean getBooleanValue(String s, String attribute, XmlPullParser parser, boolean defaultValue)
-        throws XmlPullParserException {
+    private boolean getBooleanValue(String s, String attribute, XMLStreamReader parser, boolean defaultValue)
+        throws XMLStreamException {
         if (s != null && s.length() != 0) {
             return Boolean.valueOf(s).booleanValue();
         }
         return defaultValue;
-    } //-- boolean getBooleanValue(String, String, XmlPullParser, String)
+    } //-- boolean getBooleanValue(String, String, XMLStreamReader, String)
 
     /**
      * Method getByteValue.
@@ -482,23 +761,23 @@ public class ${className} {
      * @param strict a strict object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return byte
      */
-    private byte getByteValue(String s, String attribute, XmlPullParser parser, boolean strict)
-        throws XmlPullParserException {
+    private byte getByteValue(String s, String attribute, XMLStreamReader parser, boolean strict)
+        throws XMLStreamException {
         if (s != null) {
             try {
                 return Byte.valueOf(s).byteValue();
             } catch (NumberFormatException nfe) {
                 if (strict) {
-                    throw new XmlPullParserException("Unable to parse element '" + attribute + "', must be a byte", parser, nfe);
+                    throw new XMLStreamException("Unable to parse element '" + attribute + "', must be a byte", parser.getLocation(), nfe);
                 }
             }
         }
         return 0;
-    } //-- byte getByteValue(String, String, XmlPullParser, boolean)
+    } //-- byte getByteValue(String, String, XMLStreamReader, boolean)
 
     /**
      * Method getCharacterValue.
@@ -506,17 +785,17 @@ public class ${className} {
      * @param s a s object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return char
      */
-    private char getCharacterValue(String s, String attribute, XmlPullParser parser)
-        throws XmlPullParserException {
+    private char getCharacterValue(String s, String attribute, XMLStreamReader parser)
+        throws XMLStreamException {
         if (s != null) {
             return s.charAt(0);
         }
         return 0;
-    } //-- char getCharacterValue(String, String, XmlPullParser)
+    } //-- char getCharacterValue(String, String, XMLStreamReader)
 
     /**
      * Method getDateValue.
@@ -524,14 +803,14 @@ public class ${className} {
      * @param s a s object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return Date
      */
-    private Date getDateValue(String s, String attribute, XmlPullParser parser)
-        throws XmlPullParserException {
+    private Date getDateValue(String s, String attribute, XMLStreamReader parser)
+        throws XMLStreamException {
         return getDateValue(s, attribute, null, parser);
-    } //-- Date getDateValue(String, String, XmlPullParser)
+    } //-- Date getDateValue(String, String, XMLStreamReader)
 
     /**
      * Method getDateValue.
@@ -540,12 +819,12 @@ public class ${className} {
      * @param parser a parser object.
      * @param dateFormat a dateFormat object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return Date
      */
-    private Date getDateValue(String s, String attribute, String dateFormat, XmlPullParser parser)
-        throws XmlPullParserException {
+    private Date getDateValue(String s, String attribute, String dateFormat, XMLStreamReader parser)
+        throws XMLStreamException {
         if (s != null) {
             String effectiveDateFormat = dateFormat;
             if (dateFormat == null) {
@@ -555,19 +834,19 @@ public class ${className} {
                 try {
                     return new java.util.Date(Long.parseLong(s));
                 } catch (NumberFormatException e) {
-                    throw new XmlPullParserException(e.getMessage(), parser, e);
+                    throw new XMLStreamException(e.getMessage(), parser.getLocation(), e);
                 }
             } else {
                 try {
                     DateFormat dateParser = new java.text.SimpleDateFormat(effectiveDateFormat, java.util.Locale.US);
                     return dateParser.parse(s);
                 } catch (java.text.ParseException e) {
-                    throw new XmlPullParserException(e.getMessage(), parser, e);
+                    throw new XMLStreamException(e.getMessage(), parser.getLocation(), e);
                 }
             }
         }
         return null;
-    } //-- Date getDateValue(String, String, String, XmlPullParser)
+    } //-- Date getDateValue(String, String, String, XMLStreamReader)
 
     /**
      * Method getDoubleValue.
@@ -576,23 +855,23 @@ public class ${className} {
      * @param strict a strict object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return double
      */
-    private double getDoubleValue(String s, String attribute, XmlPullParser parser, boolean strict)
-        throws XmlPullParserException {
+    private double getDoubleValue(String s, String attribute, XMLStreamReader parser, boolean strict)
+        throws XMLStreamException {
         if (s != null) {
             try {
                 return Double.valueOf(s).doubleValue();
             } catch (NumberFormatException nfe) {
                 if (strict) {
-                    throw new XmlPullParserException("Unable to parse element '" + attribute + "', must be a floating point number", parser, nfe);
+                    throw new XMLStreamException("Unable to parse element '" + attribute + "', must be a floating point number", parser.getLocation(), nfe);
                 }
             }
         }
         return 0;
-    } //-- double getDoubleValue(String, String, XmlPullParser, boolean)
+    } //-- double getDoubleValue(String, String, XMLStreamReader, boolean)
 
     /**
      * Method getFloatValue.
@@ -601,23 +880,23 @@ public class ${className} {
      * @param strict a strict object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return float
      */
-    private float getFloatValue(String s, String attribute, XmlPullParser parser, boolean strict)
-        throws XmlPullParserException {
+    private float getFloatValue(String s, String attribute, XMLStreamReader parser, boolean strict)
+        throws XMLStreamException {
         if (s != null) {
             try {
                 return Float.valueOf(s).floatValue();
             } catch (NumberFormatException nfe) {
                 if (strict) {
-                    throw new XmlPullParserException("Unable to parse element '" + attribute + "', must be a floating point number", parser, nfe);
+                    throw new XMLStreamException("Unable to parse element '" + attribute + "', must be a floating point number", parser.getLocation(), nfe);
                 }
             }
         }
         return 0;
-    } //-- float getFloatValue(String, String, XmlPullParser, boolean)
+    } //-- float getFloatValue(String, String, XMLStreamReader, boolean)
 
     /**
      * Method getIntegerValue.
@@ -625,14 +904,14 @@ public class ${className} {
      * @param s a s object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return int
      */
-    private int getIntegerValue(String s, String attribute, XmlPullParser parser, boolean strict)
-        throws XmlPullParserException {
+    private int getIntegerValue(String s, String attribute, XMLStreamReader parser, boolean strict)
+        throws XMLStreamException {
         return getIntegerValue(s, attribute, parser, strict, 0);
-    } //-- int getBooleanValue(String, String, XmlPullParser)
+    } //-- int getBooleanValue(String, String, XMLStreamReader)
 
     /**
      * Method getIntegerValue.
@@ -641,23 +920,23 @@ public class ${className} {
      * @param strict a strict object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return int
      */
-    private int getIntegerValue(String s, String attribute, XmlPullParser parser, boolean strict, int defaultValue)
-        throws XmlPullParserException {
+    private int getIntegerValue(String s, String attribute, XMLStreamReader parser, boolean strict, int defaultValue)
+        throws XMLStreamException {
         if (s != null) {
             try {
                 return Integer.valueOf(s).intValue();
             } catch (NumberFormatException nfe) {
                 if (strict) {
-                    throw new XmlPullParserException("Unable to parse element '" + attribute + "', must be an integer", parser, nfe);
+                    throw new XMLStreamException("Unable to parse element '" + attribute + "', must be an integer", parser.getLocation(), nfe);
                 }
             }
         }
         return defaultValue;
-    } //-- int getIntegerValue(String, String, XmlPullParser, boolean, int)
+    } //-- int getIntegerValue(String, String, XMLStreamReader, boolean, int)
 
     /**
      * Method getLongValue.
@@ -666,23 +945,23 @@ public class ${className} {
      * @param strict a strict object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return long
      */
-    private long getLongValue(String s, String attribute, XmlPullParser parser, boolean strict)
-            throws XmlPullParserException {
+    private long getLongValue(String s, String attribute, XMLStreamReader parser, boolean strict)
+            throws XMLStreamException {
         if (s != null) {
             try {
                 return Long.valueOf(s).longValue();
             } catch (NumberFormatException nfe) {
                 if (strict) {
-                    throw new XmlPullParserException("Unable to parse element '" + attribute + "', must be a long integer", parser, nfe);
+                    throw new XMLStreamException("Unable to parse element '" + attribute + "', must be a long integer", parser.getLocation(), nfe);
                 }
             }
         }
         return 0;
-    } //-- long getLongValue(String, String, XmlPullParser, boolean)
+    } //-- long getLongValue(String, String, XMLStreamReader, boolean)
 
     /**
      * Method getRequiredAttributeValue.
@@ -691,19 +970,19 @@ public class ${className} {
      * @param strict a strict object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return String
      */
-    private String getRequiredAttributeValue(String s, String attribute, XmlPullParser parser, boolean strict)
-            throws XmlPullParserException {
+    private String getRequiredAttributeValue(String s, String attribute, XMLStreamReader parser, boolean strict)
+            throws XMLStreamException {
         if (s == null) {
             if (strict) {
-                throw new XmlPullParserException("Missing required value for attribute '" + attribute + "'", parser, null);
+                throw new XMLStreamException("Missing required value for attribute '" + attribute + "'", parser.getLocation(), null);
             }
         }
         return s;
-    } //-- String getRequiredAttributeValue(String, String, XmlPullParser, boolean)
+    } //-- String getRequiredAttributeValue(String, String, XMLStreamReader, boolean)
 
     /**
      * Method getShortValue.
@@ -712,23 +991,23 @@ public class ${className} {
      * @param strict a strict object.
      * @param parser a parser object.
      * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return short
      */
-    private short getShortValue(String s, String attribute, XmlPullParser parser, boolean strict)
-            throws XmlPullParserException {
+    private short getShortValue(String s, String attribute, XMLStreamReader parser, boolean strict)
+            throws XMLStreamException {
         if (s != null) {
             try {
                 return Short.valueOf(s).shortValue();
             } catch (NumberFormatException nfe) {
                 if (strict) {
-                    throw new XmlPullParserException("Unable to parse element '" + attribute + "', must be a short integer", parser, nfe);
+                    throw new XMLStreamException("Unable to parse element '" + attribute + "', must be a short integer", parser.getLocation(), nfe);
                 }
             }
         }
         return 0;
-    } //-- short getShortValue(String, String, XmlPullParser, boolean)
+    } //-- short getShortValue(String, String, XMLStreamReader, boolean)
 
     /**
      * Method getTrimmedValue.
@@ -759,19 +1038,59 @@ public class ${className} {
      *
      * @param parser a parser object.
      * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
+     * @throws XMLStreamException XMLStreamException if
      * any.
      * @return int
      */
-    private int nextTag(XmlPullParser parser) throws IOException, XmlPullParserException {
-        int eventType = parser.next();
-        if (eventType == XmlPullParser.TEXT) {
+    private int nextTag(XMLStreamReader parser) throws IOException, XMLStreamException {
+        while (true) {
+            int next = parser.next();
+            switch (next) {
+                case XMLStreamReader.SPACE:
+                case XMLStreamReader.COMMENT:
+                case XMLStreamReader.PROCESSING_INSTRUCTION:
+                case XMLStreamReader.CDATA:
+                case XMLStreamReader.CHARACTERS:
+                    continue;
+                case XMLStreamReader.START_ELEMENT:
+                case XMLStreamReader.END_ELEMENT:
+                    return next;
+            }
+        }
+    } //-- int nextTag(XMLStreamReader)
+
+    private String nextText(XMLStreamReader parser, boolean strict) throws XMLStreamException {
+        int eventType = parser.getEventType();
+        if (eventType != XMLStreamReader.START_ELEMENT) {
+            throw new XMLStreamException("parser must be on START_ELEMENT to read next text", parser.getLocation(), null);
+        }
+        eventType = parser.next();
+        StringBuilder result = new StringBuilder();
+        while (true) {
+            if (eventType == XMLStreamReader.CHARACTERS || eventType == XMLStreamReader.CDATA) {
+                result.append(parser.getText());
+            } else if (eventType == XMLStreamReader.ENTITY_REFERENCE) {
+                String val = null;
+                if (strict) {
+                    throw new XMLStreamException("Entities are not supported in strict mode", parser.getLocation(), null);
+                } else if (addDefaultEntities) {
+                    val = DEFAULT_ENTITIES.get(parser.getLocalName());
+                }
+                if (val != null) {
+                    result.append(val);
+                } else {
+                    result.append("&").append(parser.getLocalName()).append(";");
+                }
+            } else if (eventType != XMLStreamReader.COMMENT) {
+                break;
+            }
             eventType = parser.next();
         }
-        if (eventType != XmlPullParser.START_TAG && eventType != XmlPullParser.END_TAG) {
-            throw new XmlPullParserException("expected START_TAG or END_TAG not " + XmlPullParser.TYPES[eventType], parser, null);
+        if (eventType != XMLStreamReader.END_ELEMENT) {
+            throw new XMLStreamException(
+                    "TEXT must be immediately followed by END_ELEMENT and not " + eventType /*TODO: TYPES[eventType]*/, parser.getLocation(), null);
         }
-        return eventType;
-    } //-- int nextTag(XmlPullParser)
+        return result.toString();
+    }
 
 }
