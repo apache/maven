@@ -23,20 +23,22 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -456,7 +458,7 @@ public class DefaultWagonManager implements WagonManager {
             // then we will use a brute force copy and delete the temporary file.
             if (!temp.renameTo(destination)) {
                 try {
-                    FileUtils.copyFile(temp, destination);
+                    copyFile(temp, destination);
 
                     if (!temp.delete()) {
                         temp.deleteOnExit();
@@ -466,6 +468,57 @@ public class DefaultWagonManager implements WagonManager {
                             "Error copying temporary file to the final destination: " + e.getMessage(), e);
                 }
             }
+        }
+    }
+
+    private void copyFile(File srcFile, File destFile) throws IOException {
+        Objects.requireNonNull(srcFile, "source");
+        if (!srcFile.exists()) {
+            throw new FileNotFoundException(
+                    "File system element for parameter 'source' does not exist: '" + srcFile + "'");
+        }
+        Objects.requireNonNull(destFile, "destination");
+        Objects.requireNonNull(srcFile, "srcFile");
+        if (!srcFile.isFile()) {
+            throw new IllegalArgumentException("Parameter 'srcFile' is not a file: " + srcFile);
+        }
+
+        String canonicalPath = srcFile.getCanonicalPath();
+        if (canonicalPath.equals(destFile.getCanonicalPath())) {
+            throw new IllegalArgumentException(String.format(
+                    "File canonical paths are equal: '%s' (file1='%s', file2='%s')", canonicalPath, srcFile, destFile));
+        }
+
+        mkdirs(destFile.getParentFile());
+
+        Objects.requireNonNull(destFile, "destFile");
+        if (!destFile.isFile()) {
+            throw new IllegalArgumentException("Parameter 'destFile' is not a file: " + destFile);
+        }
+
+        if (destFile.exists()) {
+            Objects.requireNonNull(destFile, "destFile");
+            if (!destFile.canWrite()) {
+                throw new IllegalArgumentException("File parameter 'destFile is not writable: '" + destFile + "'");
+            }
+        }
+
+        Files.copy(
+                srcFile.toPath(),
+                destFile.toPath(),
+                StandardCopyOption.COPY_ATTRIBUTES,
+                StandardCopyOption.REPLACE_EXISTING);
+        if (srcFile.length() != destFile.length()) {
+            throw new IOException("Failed to copy full contents from '" + srcFile + "' to '" + destFile
+                    + "' Expected length: " + srcFile.length() + " Actual: " + destFile.length());
+        }
+    }
+
+    private File mkdirs(File directory) throws IOException {
+        if (directory != null && !directory.mkdirs() && !directory.isDirectory()) {
+            throw new IOException("Cannot create directory '" + directory + "'.");
+        } else {
+            return directory;
         }
     }
 
@@ -641,7 +694,7 @@ public class DefaultWagonManager implements WagonManager {
                 if (checksumFile.exists()) {
                     checksumFile.delete(); // ignore if failed as we will overwrite
                 }
-                FileUtils.copyFile(tempChecksumFile, checksumFile);
+                copyFile(tempChecksumFile, checksumFile);
                 if (!tempChecksumFile.delete()) {
                     tempChecksumFile.deleteOnExit();
                 }
