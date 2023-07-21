@@ -23,7 +23,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +35,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
@@ -471,54 +469,25 @@ public class DefaultWagonManager implements WagonManager {
         }
     }
 
-    private void copyFile(File srcFile, File destFile) throws IOException {
-        Objects.requireNonNull(srcFile, "source");
-        if (!srcFile.exists()) {
-            throw new FileNotFoundException(
-                    "File system element for parameter 'source' does not exist: '" + srcFile + "'");
-        }
-        Objects.requireNonNull(destFile, "destination");
-        Objects.requireNonNull(srcFile, "srcFile");
-        if (!srcFile.isFile()) {
-            throw new IllegalArgumentException("Parameter 'srcFile' is not a file: " + srcFile);
-        }
-
-        String canonicalPath = srcFile.getCanonicalPath();
-        if (canonicalPath.equals(destFile.getCanonicalPath())) {
-            throw new IllegalArgumentException(String.format(
-                    "File canonical paths are equal: '%s' (file1='%s', file2='%s')", canonicalPath, srcFile, destFile));
-        }
-
-        mkdirs(destFile.getParentFile());
-
-        Objects.requireNonNull(destFile, "destFile");
-        if (!destFile.isFile()) {
-            throw new IllegalArgumentException("Parameter 'destFile' is not a file: " + destFile);
-        }
-
-        if (destFile.exists()) {
-            Objects.requireNonNull(destFile, "destFile");
-            if (!destFile.canWrite()) {
-                throw new IllegalArgumentException("File parameter 'destFile is not writable: '" + destFile + "'");
+    private void copyFile(File source, File destination) throws IOException {
+        String message;
+        if (!source.exists()) {
+            message = "File " + source + " does not exist";
+            throw new IOException(message);
+        } else if (!source.getCanonicalPath().equals(destination.getCanonicalPath())) {
+            File parentFile = destination.getParentFile();
+            if (parentFile != null && !parentFile.exists()) {
+                parentFile.mkdirs();
             }
-        }
-
-        Files.copy(
-                srcFile.toPath(),
-                destFile.toPath(),
-                StandardCopyOption.COPY_ATTRIBUTES,
-                StandardCopyOption.REPLACE_EXISTING);
-        if (srcFile.length() != destFile.length()) {
-            throw new IOException("Failed to copy full contents from '" + srcFile + "' to '" + destFile
-                    + "' Expected length: " + srcFile.length() + " Actual: " + destFile.length());
-        }
-    }
-
-    private File mkdirs(File directory) throws IOException {
-        if (directory != null && !directory.mkdirs() && !directory.isDirectory()) {
-            throw new IOException("Cannot create directory '" + directory + "'.");
-        } else {
-            return directory;
+            Files.copy(
+                    source.toPath(),
+                    destination.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.COPY_ATTRIBUTES);
+            if (source.length() != destination.length()) {
+                message = "Failed to copy full contents from " + source + " to " + destination;
+                throw new IOException(message);
+            }
         }
     }
 
