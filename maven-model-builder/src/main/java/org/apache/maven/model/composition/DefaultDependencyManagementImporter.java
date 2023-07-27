@@ -30,7 +30,9 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 
 /**
  * Handles the import of dependency management from other models into the target model.
@@ -66,6 +68,11 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
                     String key = dependency.getManagementKey();
                     if (!dependencies.containsKey(key)) {
                         dependencies.put(key, dependency);
+                    } else {
+                        problems.add(new ModelProblemCollectorRequest(
+                                        ModelProblem.Severity.WARNING, ModelProblem.Version.BASE)
+                                .setMessage("Ignored import for key as key is already present " + key)
+                                .setLocation(dependency.getLocation("")));
                     }
                 }
             }
