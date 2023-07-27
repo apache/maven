@@ -48,10 +48,9 @@ import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
-import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
 /**
  * BootstrapCoreExtensionManager
@@ -171,13 +170,9 @@ public class BootstrapCoreExtensionManager {
             plugin.setArtifactId(interpolator.interpolate(extension.getArtifactId()));
             plugin.setVersion(interpolator.interpolate(extension.getVersion()));
 
-            DependencyNode root = pluginDependenciesResolver.resolveCoreExtension(
+            DependencyResult root = pluginDependenciesResolver.resolveCoreExtension(
                     plugin, dependencyFilter, repositories, repoSession);
-            PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-            root.accept(nlg);
-            List<Artifact> artifacts = nlg.getArtifacts(false);
-
-            return artifacts;
+            return root.getArtifacts(false);
         } catch (PluginResolutionException e) {
             throw new ExtensionResolutionException(extension, e.getCause());
         } catch (InterpolationException e) {

@@ -25,8 +25,8 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.DependencyResult;
 
 /**
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility interface
@@ -62,7 +62,7 @@ public interface PluginDependenciesResolver {
      * @return The dependency tree denoting the resolved plugin class path, never {@code null}.
      * @throws PluginResolutionException If any dependency could not be resolved.
      */
-    DependencyNode resolve(
+    DependencyResult resolve(
             Plugin plugin,
             Artifact pluginArtifact,
             DependencyFilter dependencyFilter,
