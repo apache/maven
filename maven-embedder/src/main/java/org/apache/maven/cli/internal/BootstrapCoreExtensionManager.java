@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
@@ -49,6 +50,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 
@@ -172,7 +174,10 @@ public class BootstrapCoreExtensionManager {
 
             DependencyResult root = pluginDependenciesResolver.resolveCoreExtension(
                     plugin, dependencyFilter, repositories, repoSession);
-            return root.getArtifacts(false);
+            return root.getArtifactResults().stream()
+                    .filter(ArtifactResult::isResolved)
+                    .map(ArtifactResult::getArtifact)
+                    .collect(Collectors.toList());
         } catch (PluginResolutionException e) {
             throw new ExtensionResolutionException(extension, e.getCause());
         } catch (InterpolationException e) {

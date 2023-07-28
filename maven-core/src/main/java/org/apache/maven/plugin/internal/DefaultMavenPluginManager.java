@@ -103,6 +103,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 
@@ -420,7 +421,9 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private List<Artifact> toMavenArtifacts(DependencyResult dependencyResult) {
         List<Artifact> artifacts =
                 new ArrayList<>(dependencyResult.getArtifactResults().size());
-        dependencyResult.getArtifacts(false).forEach(a -> artifacts.add(RepositoryUtils.toArtifact(a)));
+        dependencyResult.getArtifactResults().stream()
+                .filter(ArtifactResult::isResolved)
+                .forEach(a -> artifacts.add(RepositoryUtils.toArtifact(a.getArtifact())));
         return Collections.unmodifiableList(artifacts);
     }
 

@@ -249,11 +249,11 @@ public class LifecycleDependencyResolver {
         Set<Artifact> artifacts = new LinkedHashSet<>();
         if (result.getDependencyGraph() != null
                 && !result.getDependencyGraph().getChildren().isEmpty()) {
-            RepositoryUtils.toArtifacts(
+
+            RepositoryUtils.toArtifactChildrenOnly(
                     artifacts,
-                    result.getDependencyGraph().getChildren(),
-                    Collections.singletonList(project.getArtifact().getId()),
-                    collectionFilter);
+                    result,
+                    Collections.singletonList(project.getArtifact().getId()));
         }
         return artifacts;
     }
