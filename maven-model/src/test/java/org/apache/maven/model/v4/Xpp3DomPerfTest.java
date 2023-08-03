@@ -46,7 +46,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.InputSource;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -75,13 +74,13 @@ public class Xpp3DomPerfTest {
     }
 
     @Benchmark
-    public int readWithXpp3(AdditionState state) throws IOException, XmlPullParserException {
+    public int readWithXpp3(AdditionState state) throws IOException {
         int i = 0;
         for (Path pom : state.poms) {
             try (InputStream is = Files.newInputStream(pom)) {
                 new MavenXpp3ReaderEx().read(is, true, new InputSource("id", pom.toString()));
                 i++;
-            } catch (XmlPullParserException e) {
+            } catch (XMLStreamException e) {
                 throw new RuntimeException("Error parsing: " + pom, e);
             }
         }
