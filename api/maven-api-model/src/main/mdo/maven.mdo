@@ -1366,6 +1366,9 @@
         <![CDATA[
         The {@code <exclusion>} element contains informations required to exclude
         an artifact to the project.
+        <p>
+        The {@code groupId} and {@code artifactId} fields are interpreted as glob patterns,
+        see {@link java.nio.file.FileSystem#getPathMatcher}.
         ]]>
       </description>
       <fields>

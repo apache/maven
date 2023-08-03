@@ -156,4 +156,15 @@ class ExclusionArtifactFilterTest {
         assertThat(filter.include(artifact), is(false));
         assertThat(filter.include(artifact2), is(true));
     }
+
+    @Test
+    void testExcludeWithGlobStar() {
+        Exclusion exclusion = new Exclusion();
+        exclusion.setGroupId("**");
+        exclusion.setArtifactId("maven-**");
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+
+        assertThat(filter.include(artifact), is(false));
+        assertThat(filter.include(artifact2), is(true));
+    }
 }
