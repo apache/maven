@@ -18,16 +18,17 @@
  */
 package org.apache.maven.model.io.xpp3;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
-import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
-import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class MavenXpp3ReaderEx {
     private boolean addDefaultEntities = true;
@@ -54,43 +55,49 @@ public class MavenXpp3ReaderEx {
     /**
      * @param reader a reader object.
      * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
      * @return Model
+     * @throws IOException            IOException if any.
+     * @throws XMLStreamException XMLStreamException if
+     *                                any.
      */
-    public Model read(Reader reader, boolean strict, InputSource source) throws IOException, XmlPullParserException {
-        XmlPullParser parser =
-                addDefaultEntities ? new MXParser(EntityReplacementMap.defaultEntityReplacementMap) : new MXParser();
-        parser.setInput(reader);
+    public Model read(Reader reader, boolean strict, InputSource source) throws IOException, XMLStreamException {
+        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+        XMLStreamReader parser = null;
+        try {
+            parser = factory.createXMLStreamReader(reader);
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
         return read(parser, strict, source);
     } // -- Model read( Reader, boolean )
 
     /**
      * @param reader a reader object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
      * @return Model
+     * @throws IOException            IOException if any.
+     * @throws XMLStreamException XMLStreamException if
+     *                                any.
      */
-    public Model read(Reader reader, InputSource source) throws IOException, XmlPullParserException {
+    public Model read(Reader reader, InputSource source) throws IOException, XMLStreamException {
         return read(reader, true, source);
     } // -- Model read( Reader )
 
     /**
      * Method read.
      *
-     * @param in a in object.
+     * @param in     a in object.
      * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
      * @return Model
+     * @throws IOException            IOException if any.
+     * @throws XMLStreamException XMLStreamException if
+     *                                any.
      */
-    public Model read(InputStream in, boolean strict, InputSource source) throws IOException, XmlPullParserException {
-        XmlPullParser parser =
-                addDefaultEntities ? new MXParser(EntityReplacementMap.defaultEntityReplacementMap) : new MXParser();
-        parser.setInput(in, null);
+    public Model read(InputStream in, boolean strict, InputSource source) throws IOException, XMLStreamException {
+        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+        StreamSource streamSource = new StreamSource(in, null);
+        XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
         return read(parser, strict, source);
     } // -- Model read( InputStream, boolean )
 
@@ -98,12 +105,12 @@ public class MavenXpp3ReaderEx {
      * Method read.
      *
      * @param in a in object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
      * @return Model
+     * @throws IOException            IOException if any.
+     * @throws XMLStreamException XMLStreamException if
+     *                                any.
      */
-    public Model read(InputStream in, InputSource source) throws IOException, XmlPullParserException {
+    public Model read(InputStream in, InputSource source) throws IOException, XMLStreamException {
         return read(in, true, source);
     } // -- Model read( InputStream )
 
@@ -112,13 +119,13 @@ public class MavenXpp3ReaderEx {
      *
      * @param parser a parser object.
      * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
      * @return Model
+     * @throws IOException            IOException if any.
+     * @throws XMLStreamException XMLStreamException if
+     *                                any.
      */
-    public Model read(XmlPullParser parser, boolean strict, InputSource source)
-            throws IOException, XmlPullParserException {
+    public Model read(XMLStreamReader parser, boolean strict, InputSource source)
+            throws IOException, XMLStreamException {
         org.apache.maven.model.v4.MavenXpp3ReaderEx reader = contentTransformer != null
                 ? new org.apache.maven.model.v4.MavenXpp3ReaderEx(contentTransformer::transform)
                 : new org.apache.maven.model.v4.MavenXpp3ReaderEx();
@@ -140,9 +147,10 @@ public class MavenXpp3ReaderEx {
     public interface ContentTransformer {
         /**
          * Interpolate the value read from the xpp3 document
-         * @param source The source value
+         *
+         * @param source    The source value
          * @param fieldName A description of the field being interpolated. The implementation may use this to
-         *                           log stuff.
+         *                  log stuff.
          * @return The interpolated value.
          */
         String transform(String source, String fieldName);

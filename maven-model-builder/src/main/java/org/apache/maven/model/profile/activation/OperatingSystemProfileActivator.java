@@ -39,35 +39,35 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 @Singleton
 public class OperatingSystemProfileActivator implements ProfileActivator {
 
-    public static final String FAMILY_DOS = "dos";
+    private static final String FAMILY_DOS = "dos";
 
-    public static final String FAMILY_MAC = "mac";
+    private static final String FAMILY_MAC = "mac";
 
-    public static final String FAMILY_NETWARE = "netware";
+    private static final String FAMILY_NETWARE = "netware";
 
-    public static final String FAMILY_OS2 = "os/2";
+    private static final String FAMILY_OS2 = "os/2";
 
-    public static final String FAMILY_TANDEM = "tandem";
+    private static final String FAMILY_TANDEM = "tandem";
 
-    public static final String FAMILY_UNIX = "unix";
+    private static final String FAMILY_UNIX = "unix";
 
-    public static final String FAMILY_WINDOWS = "windows";
+    private static final String FAMILY_WINDOWS = "windows";
 
-    public static final String FAMILY_WIN9X = "win9x";
+    private static final String FAMILY_WIN9X = "win9x";
 
-    public static final String FAMILY_ZOS = "z/os";
+    private static final String FAMILY_ZOS = "z/os";
 
-    public static final String FAMILY_OS400 = "os/400";
+    private static final String FAMILY_OS400 = "os/400";
 
-    public static final String FAMILY_OPENVMS = "openvms";
+    private static final String FAMILY_OPENVMS = "openvms";
 
     private static final String PATH_SEP = System.getProperty("path.separator");
 
-    public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.US);
+    private static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.US);
 
-    public static final String OS_ARCH = System.getProperty("os.arch").toLowerCase(Locale.US);
+    private static final String OS_ARCH = System.getProperty("os.arch").toLowerCase(Locale.US);
 
-    public static final String OS_VERSION = System.getProperty("os.version").toLowerCase(Locale.US);
+    private static final String OS_VERSION = System.getProperty("os.version").toLowerCase(Locale.US);
 
     @Override
     public boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
