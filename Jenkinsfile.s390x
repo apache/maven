@@ -239,6 +239,6 @@ def notify_s390x() {
     if (sendMail) {
         messageBody = messageBody + '\n${FAILED_TESTS}\n' + messageTail
         println("Sending email ...")
-        emailext body: messageBody, replyTo: 'dev@maven.apache.org', subject: messageSubject, to: 'rishi@ca.ibm.com'
+        emailext body: messageBody, replyTo: 'rishi@ca.ibm.com', subject: messageSubject, to: 'rishi@ca.ibm.com'
     }
 }
