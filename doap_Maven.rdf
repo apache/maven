@@ -88,6 +88,17 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2023-08-03</created>
+        <revision>3.9.4</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.4/source/apache-maven-3.9.4-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.4/source/apache-maven-3.9.4-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.9.3</name>
         <created>2023-06-26</created>
         <revision>3.9.3</revision>
         <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.3/binaries/apache-maven-3.9.3-bin.zip</file-release>
@@ -98,6 +109,7 @@ under the License.
     </release>
     <release>
       <Version>
+        <name>Apache Maven 3.9.2</name>
         <created>2023-05-11</created>
         <revision>3.9.2</revision>
         <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.2/binaries/apache-maven-3.9.2-bin.zip</file-release>
