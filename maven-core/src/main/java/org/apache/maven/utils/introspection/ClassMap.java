@@ -78,7 +78,7 @@ public class ClassMap {
      * @param name method name
      * @param params method params
      * @return the find Method or <code>null</code>
-     * @throws org.codehaus.plexus.util.introspection.MethodMap.AmbiguousException if ambiguous name
+     * @throws MethodMap.AmbiguousException if ambiguous name
      */
     public Method findMethod(String name, Object[] params) throws MethodMap.AmbiguousException {
         String methodKey = makeMethodKey(name, params);
