@@ -2496,7 +2496,7 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-    private java.util.Map<String, PluginExecution> executionMap = null;
+    private Map<String, PluginExecution> executionMap = null;
 
     /**
      * Reset the {@code executionMap} field to {@code null}
@@ -2509,7 +2509,7 @@
      * @return a Map of executions field with {@code PluginExecution#getId()} as key
      * @see PluginExecution#getId()
      */
-    public java.util.Map<String, PluginExecution> getExecutionsAsMap() {
+    public Map<String, PluginExecution> getExecutionsAsMap() {
         if (executionMap == null) {
             executionMap = new java.util.LinkedHashMap<String, PluginExecution>();
             for (java.util.Iterator<PluginExecution> i = getExecutions().iterator(); i.hasNext();) {
@@ -2546,8 +2546,8 @@
     }
 
     /**
-     * @param groupId The group ID of the plugin in the repository
-     * @param artifactId The artifact ID of the reporting plugin in the repository
+     * @param groupId the group ID of the plugin in the repository
+     * @param artifactId the artifact ID of the reporting plugin in the repository
      * @return the key of the plugin, ie {@code groupId:artifactId}
      */
     public static String constructKey(String groupId, String artifactId) {
