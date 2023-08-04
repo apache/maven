@@ -18,7 +18,6 @@
  */
 package org.apache.maven.utils.dag;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class CycleDetectedException extends Exception {
@@ -34,21 +33,8 @@ public class CycleDetectedException extends Exception {
         return cycle;
     }
 
-    public String cycleToString() {
-        final StringBuilder buffer = new StringBuilder();
-
-        for (Iterator<String> iterator = cycle.iterator(); iterator.hasNext(); ) {
-            buffer.append(iterator.next());
-
-            if (iterator.hasNext()) {
-                buffer.append(" --> ");
-            }
-        }
-        return buffer.toString();
-    }
-
     @Override
     public String getMessage() {
-        return super.getMessage() + " " + cycleToString();
+        return super.getMessage() + " " + String.join(" --> ", cycle);
     }
 }
