@@ -594,6 +594,7 @@ public class MavenCli {
             if (MessageUtils.isColorEnabled()) {
                 MessageBuilder buff = MessageUtils.builder();
                 buff.a("Message styles: ");
+                buff.trace("trace").a(' ');
                 buff.debug("debug").a(' ');
                 buff.info("info").a(' ');
                 buff.warning("warning").a(' ');

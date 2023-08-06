@@ -27,6 +27,16 @@ import org.apache.maven.api.annotations.Nonnull;
  * @see MessageBuilderFactory
  */
 public interface MessageBuilder {
+
+    /**
+     * Append message content in trace style.
+     * By default, bold magenta
+     * @param message the message to append
+     * @return the current builder
+     */
+    @Nonnull
+    MessageBuilder trace(Object message);
+
     /**
      * Append message content in debug style.
      * By default, bold cyan

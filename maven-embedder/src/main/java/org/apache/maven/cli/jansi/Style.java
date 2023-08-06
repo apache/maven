@@ -28,6 +28,7 @@ import org.fusesource.jansi.Ansi.Color;
  * @since 4.0.0
  */
 enum Style {
+    TRACE("bold,magenta"),
     DEBUG("bold,cyan"),
     INFO("bold,blue"),
     WARNING("bold,yellow"),
