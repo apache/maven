@@ -40,12 +40,6 @@ node('s390x') {
         def WORK_DIR=pwd()
         def MAVEN_GOAL='verify'
 
-        stage('Configure deploy') {
-           if (env.BRANCH_NAME in ['master', 'maven-3.8.x', 'maven-3.9.x']){
-               MAVEN_GOAL='deploy'
-           }
-        }
-
         stage('Build / Unit Test') {
             String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
             jdkName = "ibm-semeru-8u362-b09"
