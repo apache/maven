@@ -59,4 +59,6 @@ public interface TransformerContext {
      * @throws IllegalStateException if multiple versions of the same GA are part of the reactor
      */
     Model getRawModel(String groupId, String artifactId);
+
+    Path locate(Path path);
 }

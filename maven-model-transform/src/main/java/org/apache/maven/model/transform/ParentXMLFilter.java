@@ -47,6 +47,8 @@ class ParentXMLFilter extends NodeBufferingParser {
 
     private final Function<Path, Optional<RelativeProject>> relativePathMapper;
 
+    private final Function<Path, Path> modelLocator;
+
     private final Path projectPath;
 
     private static final Pattern S_FILTER = Pattern.compile("\\s+");
@@ -55,9 +57,13 @@ class ParentXMLFilter extends NodeBufferingParser {
      * @param relativePathMapper
      */
     ParentXMLFilter(
-            XMLStreamReader delegate, Function<Path, Optional<RelativeProject>> relativePathMapper, Path projectPath) {
+            XMLStreamReader delegate,
+            Function<Path, Optional<RelativeProject>> relativePathMapper,
+            Function<Path, Path> modelLocator,
+            Path projectPath) {
         super(delegate, "parent");
         this.relativePathMapper = relativePathMapper;
+        this.modelLocator = modelLocator;
         this.projectPath = projectPath;
     }
 
@@ -93,7 +99,7 @@ class ParentXMLFilter extends NodeBufferingParser {
             } else if (event.event == END_ELEMENT && "parent".equals(event.name)) {
                 Optional<RelativeProject> resolvedParent;
                 if (!hasVersion && (!hasRelativePath || relativePath != null)) {
-                    Path relPath = Paths.get(Objects.toString(relativePath, "../pom.xml"));
+                    Path relPath = Paths.get(Objects.toString(relativePath, ".."));
                     resolvedParent = resolveRelativePath(relPath, groupId, artifactId);
                 } else {
                     resolvedParent = Optional.empty();
@@ -128,9 +134,13 @@ class ParentXMLFilter extends NodeBufferingParser {
     }
 
     protected Optional<RelativeProject> resolveRelativePath(Path relativePath, String groupId, String artifactId) {
-        Path pomPath = projectPath.resolve(relativePath);
-        if (Files.isDirectory(pomPath)) {
-            pomPath = pomPath.resolve("pom.xml");
+        Path pomPath = projectPath.resolve(relativePath).normalize();
+        if (Files.isDirectory(pomPath) && modelLocator != null) {
+            pomPath = modelLocator.apply(pomPath);
+        }
+
+        if (pomPath == null || !Files.isRegularFile(pomPath)) {
+            return Optional.empty();
         }
 
         Optional<RelativeProject> mappedProject = relativePathMapper.apply(pomPath.normalize());

@@ -52,6 +52,11 @@ public class DefaultBuildPomXMLFilterFactory extends BuildToRawPomXMLFilterFacto
     }
 
     @Override
+    protected Function<Path, Path> getModelLocator() {
+        return context::locate;
+    }
+
+    @Override
     protected BiFunction<String, String, String> getDependencyKeyToVersionMapper() {
         return (g, a) -> Optional.ofNullable(context.getRawModel(g, a))
                 .map(DefaultBuildPomXMLFilterFactory::toVersion)

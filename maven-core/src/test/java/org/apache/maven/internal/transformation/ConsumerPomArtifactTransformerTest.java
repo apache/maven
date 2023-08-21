@@ -81,5 +81,10 @@ class ConsumerPomArtifactTransformerTest {
         public Model getRawModel(Path p) {
             return null;
         }
+
+        @Override
+        public Path locate(Path path) {
+            return null;
+        }
     }
 }
