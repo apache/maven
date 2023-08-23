@@ -274,7 +274,8 @@ public class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTe
 
         basedir = new File(verifier.getBasedir(), "test-3/sub-parent/child-a");
         props = verifier.loadProperties("test-3/sub-parent/child-a/target/pom.properties");
-        assertEquals("../pom.xml", props.getProperty("project.originalModel.parent.relativePath"));
+        String val = matchesVersionRange("(4.0-alpha-7,)") ? ".." : "../pom.xml";
+        assertEquals(val, props.getProperty("project.originalModel.parent.relativePath"));
     }
 
     private void assertPathEquals(File basedir, String expected, String actual) {
