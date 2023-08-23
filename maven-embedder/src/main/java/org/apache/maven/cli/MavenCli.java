@@ -1349,23 +1349,20 @@ public class MavenCli {
             alternatePomFile = commandLine.getOptionValue(CLIManager.ALTERNATE_POM_FILE);
         }
 
+        File current = baseDirectory;
         if (alternatePomFile != null) {
-            File pom = resolveFile(new File(alternatePomFile), workingDirectory);
-            if (pom.isDirectory()) {
-                if (modelProcessor != null) {
-                    pom = modelProcessor.locatePom(pom);
-                } else {
-                    pom = new File(pom, "pom.xml");
-                }
-            }
+            current = resolveFile(new File(alternatePomFile), workingDirectory);
+        }
 
+        File pom;
+        if (current.isDirectory() && modelProcessor != null) {
+            pom = modelProcessor.locatePom(current);
+        } else {
+            pom = current;
+        }
+
+        if (pom.isFile()) {
             return pom;
-        } else if (modelProcessor != null) {
-            File pom = modelProcessor.locatePom(baseDirectory);
-
-            if (pom.isFile()) {
-                return pom;
-            }
         }
 
         return null;

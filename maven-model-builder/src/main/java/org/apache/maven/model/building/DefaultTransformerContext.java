@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.locator.ModelLocator;
 
 /**
  *
@@ -32,6 +33,8 @@ import org.apache.maven.model.Model;
  * @since 4.0.0
  */
 class DefaultTransformerContext implements TransformerContext {
+    final ModelLocator modelLocator;
+
     final Map<String, String> userProperties = new ConcurrentHashMap<>();
 
     final Map<Path, Holder> modelByPath = new ConcurrentHashMap<>();
@@ -77,6 +80,10 @@ class DefaultTransformerContext implements TransformerContext {
         }
     }
 
+    DefaultTransformerContext(ModelLocator modelLocator) {
+        this.modelLocator = modelLocator;
+    }
+
     @Override
     public String getUserProperty(String key) {
         return userProperties.get(key);
@@ -90,6 +97,11 @@ class DefaultTransformerContext implements TransformerContext {
     @Override
     public Model getRawModel(String groupId, String artifactId) {
         return Holder.deref(modelByGA.get(new GAKey(groupId, artifactId)));
+    }
+
+    @Override
+    public Path locate(Path path) {
+        return modelLocator.locatePom(path.toFile()).toPath();
     }
 
     static class GAKey {

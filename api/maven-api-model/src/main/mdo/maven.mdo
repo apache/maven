@@ -1802,7 +1802,7 @@
             ]]>
           </description>
           <type>String</type>
-          <defaultValue>../pom.xml</defaultValue>
+          <defaultValue>..</defaultValue>
         </field>
       </fields>
       <codeSegments>

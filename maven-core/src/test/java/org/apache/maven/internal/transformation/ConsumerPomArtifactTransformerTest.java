@@ -74,12 +74,17 @@ class ConsumerPomArtifactTransformerTest {
 
         @Override
         public Model getRawModel(String groupId, String artifactId) throws IllegalStateException {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public Model getRawModel(Path p) {
-            return null;
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Path locate(Path path) {
+            throw new UnsupportedOperationException();
         }
     }
 }

@@ -56,7 +56,7 @@ public class BuildToRawPomXMLFilterFactory {
         }
 
         if (getRelativePathMapper() != null) {
-            parser = new ParentXMLFilter(parser, getRelativePathMapper(), projectFile.getParent());
+            parser = new ParentXMLFilter(parser, getRelativePathMapper(), getModelLocator(), projectFile.getParent());
         }
 
         CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter(parser, consume);
@@ -74,6 +74,10 @@ public class BuildToRawPomXMLFilterFactory {
      * @return the mapper or {@code null} if relativePaths don't need to be mapped
      */
     protected Function<Path, Optional<RelativeProject>> getRelativePathMapper() {
+        return null;
+    }
+
+    protected Function<Path, Path> getModelLocator() {
         return null;
     }
 

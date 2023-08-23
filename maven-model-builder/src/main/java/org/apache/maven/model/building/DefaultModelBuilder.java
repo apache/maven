@@ -1363,7 +1363,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         final Parent parent = childModel.getParent();
-        final ModelSource candidateSource;
+        final ModelSource2 candidateSource;
         final Model candidateModel;
         final WorkspaceModelResolver resolver = request.getWorkspaceModelResolver();
         if (resolver == null) {
@@ -1480,7 +1480,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 || rawChildModelVersion.equals("${project.parent.version}");
     }
 
-    private ModelSource getParentPomFile(Model childModel, Source source) {
+    private ModelSource2 getParentPomFile(Model childModel, Source source) {
         if (!(source instanceof ModelSource2)) {
             return null;
         }
@@ -1491,7 +1491,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
-        return ((ModelSource2) source).getRelatedSource(parentPath);
+        if (source instanceof ModelSource3) {
+            return ((ModelSource3) source).getRelatedSource(modelProcessor, parentPath);
+        } else {
+            return ((ModelSource2) source).getRelatedSource(parentPath);
+        }
     }
 
     private ModelData readParentExternally(
@@ -1866,7 +1870,7 @@ public class DefaultModelBuilder implements ModelBuilder {
      * @since 4.0.0
      */
     private class DefaultTransformerContextBuilder implements TransformerContextBuilder {
-        private final DefaultTransformerContext context = new DefaultTransformerContext();
+        private final DefaultTransformerContext context = new DefaultTransformerContext(modelProcessor);
 
         private final Map<DefaultTransformerContext.GAKey, Set<Source>> mappedSources = new ConcurrentHashMap<>(64);
 
@@ -1882,6 +1886,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             // We must assume the TransformerContext was created using this.newTransformerContextBuilder()
             DefaultModelProblemCollector problems = (DefaultModelProblemCollector) collector;
             return new TransformerContext() {
+                @Override
+                public Path locate(Path path) {
+                    return modelProcessor.locatePom(path.toFile()).toPath();
+                }
+
                 @Override
                 public String getUserProperty(String key) {
                     return context.userProperties.computeIfAbsent(
