@@ -37,9 +37,9 @@ public interface ModelSource3 extends ModelSource2 {
      * to find the POM file, else if no locator is provided, a file named 'pom.xml' needs to be
      * used by the requested model source.
      *
-     * @param locator locator used to actually locate the pom file.
-     * @param relPath path of the requested model source relative to this model source POM.
-     * @return related model source or <code>null</code> if no such model source.
+     * @param locator locator used to locate the pom file
+     * @param relPath path of the requested model source relative to this model source POM
+     * @return related model source or <code>null</code> if no such model source
      */
     ModelSource3 getRelatedSource(ModelLocator locator, String relPath);
 
