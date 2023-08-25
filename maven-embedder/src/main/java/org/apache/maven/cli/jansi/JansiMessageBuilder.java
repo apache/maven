@@ -37,6 +37,12 @@ public class JansiMessageBuilder implements MessageBuilder {
 
     @Override
     @Nonnull
+    public MessageBuilder trace(Object o) {
+        return style(Style.TRACE, o);
+    }
+
+    @Override
+    @Nonnull
     public MessageBuilder debug(Object o) {
         return style(Style.DEBUG, o);
     }

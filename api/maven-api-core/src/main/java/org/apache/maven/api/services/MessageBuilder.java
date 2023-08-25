@@ -27,9 +27,21 @@ import org.apache.maven.api.annotations.Nonnull;
  * @see MessageBuilderFactory
  */
 public interface MessageBuilder {
+
+    /**
+     * Append message content in trace style.
+     * By default, bold magenta
+     *
+     * @param message the message to append
+     * @return the current builder
+     */
+    @Nonnull
+    MessageBuilder trace(Object message);
+
     /**
      * Append message content in debug style.
      * By default, bold cyan
+     *
      * @param message the message to append
      * @return the current builder
      */
@@ -39,6 +51,7 @@ public interface MessageBuilder {
     /**
      * Append message content in info style.
      * By default, bold blue
+     *
      * @param message the message to append
      * @return the current builder
      */
@@ -48,6 +61,7 @@ public interface MessageBuilder {
     /**
      * Append message content in warning style.
      * By default, bold yellow
+     *
      * @param message the message to append
      * @return the current builder
      */
@@ -57,6 +71,7 @@ public interface MessageBuilder {
     /**
      * Append message content in error style.
      * By default, bold red
+     *
      * @param message the message to append
      * @return the current builder
      */
@@ -66,6 +81,7 @@ public interface MessageBuilder {
     /**
      * Append message content in success style.
      * By default, bold green
+     *
      * @param message the message to append
      * @return the current builder
      */
@@ -75,6 +91,7 @@ public interface MessageBuilder {
     /**
      * Append message content in failure style.
      * By default, bold red
+     *
      * @param message the message to append
      * @return the current builder
      */
@@ -84,6 +101,7 @@ public interface MessageBuilder {
     /**
      * Append message content in strong style.
      * By default, bold
+     *
      * @param message the message to append
      * @return the current builder
      */
@@ -93,6 +111,7 @@ public interface MessageBuilder {
     /**
      * Append message content in mojo style.
      * By default, green
+     *
      * @param message the message to append
      * @return the current builder
      */
@@ -102,6 +121,7 @@ public interface MessageBuilder {
     /**
      * Append message content in project style.
      * By default, cyan
+     *
      * @param message the message to append
      * @return the current builder
      */
@@ -113,6 +133,7 @@ public interface MessageBuilder {
     //
     /**
      * Append content to the message buffer.
+     *
      * @param value the content to append
      * @param offset the index of the first {@code char} to append
      * @param len the number of {@code char}s to append
@@ -123,6 +144,7 @@ public interface MessageBuilder {
 
     /**
      * Append content to the message buffer.
+     *
      * @param value the content to append
      * @return the current builder
      */
@@ -131,6 +153,7 @@ public interface MessageBuilder {
 
     /**
      * Append content to the message buffer.
+     *
      * @param value the content to append
      * @param start the starting index of the subsequence to be appended
      * @param end the end index of the subsequence to be appended
@@ -141,6 +164,7 @@ public interface MessageBuilder {
 
     /**
      * Append content to the message buffer.
+     *
      * @param value the content to append
      * @return the current builder
      */
@@ -149,6 +173,7 @@ public interface MessageBuilder {
 
     /**
      * Append content to the message buffer.
+     *
      * @param value the content to append
      * @return the current builder
      */
@@ -157,6 +182,7 @@ public interface MessageBuilder {
 
     /**
      * Append newline to the message buffer.
+     *
      * @return the current builder
      */
     @Nonnull
@@ -165,6 +191,7 @@ public interface MessageBuilder {
     /**
      * Append formatted content to the buffer.
      * @see String#format(String, Object...)
+     *
      * @param pattern a <a href="../util/Formatter.html#syntax">format string</a>
      * @param args arguments referenced by the format specifiers in the format string
      * @return the current builder
@@ -174,6 +201,7 @@ public interface MessageBuilder {
 
     /**
      * Return the built message.
+     *
      * @return the message
      */
     @Nonnull

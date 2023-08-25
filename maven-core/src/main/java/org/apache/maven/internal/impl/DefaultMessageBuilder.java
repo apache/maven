@@ -37,6 +37,12 @@ public class DefaultMessageBuilder implements MessageBuilder {
 
     @Override
     @Nonnull
+    public MessageBuilder trace(Object o) {
+        return a(o);
+    }
+
+    @Override
+    @Nonnull
     public MessageBuilder debug(Object o) {
         return a(o);
     }

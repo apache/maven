@@ -38,7 +38,7 @@ public class MavenSimpleLogger extends SimpleLogger {
     protected String renderLevel(int level) {
         switch (level) {
             case LOG_LEVEL_TRACE:
-                return builder().debug("TRACE").build();
+                return builder().trace("TRACE").build();
             case LOG_LEVEL_DEBUG:
                 return builder().debug("DEBUG").build();
             case LOG_LEVEL_INFO:
