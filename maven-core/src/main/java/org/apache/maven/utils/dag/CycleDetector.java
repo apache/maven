@@ -36,35 +36,14 @@ public class CycleDetector {
 
     private static final Integer VISITED = 2;
 
-    public static List<String> hasCycle(final DAG graph) {
-        final List<Vertex> vertices = graph.getVertices();
-
-        final Map<Vertex, Integer> vertexStateMap = new HashMap<>();
-
-        List<String> retValue = null;
-
-        for (Vertex vertex : vertices) {
-            if (isNotVisited(vertex, vertexStateMap)) {
-                retValue = introducesCycle(vertex, vertexStateMap);
-
-                if (retValue != null) {
-                    break;
-                }
-            }
-        }
-
-        return retValue;
-    }
-
     /**
-     * This method will be called when an edge leading to given vertex was added and we want to check if introduction of
-     * this edge has not resulted in apparition of cycle in the graph
+     * Return all edges that cause a cycle in the graph when an edge leading to given vertex was added.
      *
      * @param vertex the vertex
      * @param vertexStateMap the vertex Map
      * @return the found cycle
      */
-    public static List<String> introducesCycle(final Vertex vertex, final Map<Vertex, Integer> vertexStateMap) {
+    private static List<String> introducesCycle(final Vertex vertex, final Map<Vertex, Integer> vertexStateMap) {
         final LinkedList<String> cycleStack = new LinkedList<>();
 
         final boolean hasCycle = dfsVisit(vertex, cycleStack, vertexStateMap);
