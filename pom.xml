@@ -164,6 +164,7 @@ under the License.
     <cipherVersion>2.0</cipherVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <resolverVersion>1.9.14</resolverVersion>
+    <sharedVersion>3.4.2</sharedVersion>
     <sisuVersion>0.9.0.M2</sisuVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
     <xmlunitVersion>2.6.4</xmlunitVersion>
@@ -350,6 +351,11 @@ under the License.
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-util</artifactId>
         <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.shared</groupId>
+        <artifactId>maven-shared-utils</artifactId>
+        <version>${sharedVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
