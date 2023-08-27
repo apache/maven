@@ -22,12 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.maven.cli.jansi.MessageUtils;
+import org.apache.maven.utils.Os;
 import org.slf4j.Logger;
 
 /**
@@ -49,36 +48,6 @@ public final class CLIReportingUtils {
     // CHECKSTYLE_ON: MagicNumber
 
     public static final String BUILD_VERSION_PROPERTY = "version";
-
-    public static final String FAMILY_DOS = "dos";
-
-    public static final String FAMILY_MAC = "mac";
-
-    public static final String FAMILY_NETWARE = "netware";
-
-    public static final String FAMILY_OS2 = "os/2";
-
-    public static final String FAMILY_TANDEM = "tandem";
-
-    public static final String FAMILY_UNIX = "unix";
-
-    public static final String FAMILY_WINDOWS = "windows";
-
-    public static final String FAMILY_WIN9X = "win9x";
-
-    public static final String FAMILY_ZOS = "z/os";
-
-    public static final String FAMILY_OS400 = "os/400";
-
-    public static final String FAMILY_OPENVMS = "openvms";
-
-    private static final String PATH_SEP = System.getProperty("path.separator");
-
-    public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.US);
-
-    public static final String OS_ARCH = System.getProperty("os.arch").toLowerCase(Locale.US);
-
-    public static final String OS_VERSION = System.getProperty("os.version").toLowerCase(Locale.US);
 
     public static String showVersion() {
         final String ls = System.lineSeparator();
@@ -102,79 +71,15 @@ public final class CLIReportingUtils {
                 .append(System.getProperty("file.encoding", "<unknown encoding>"))
                 .append(ls);
         version.append("OS name: \"")
-                .append(OS_NAME)
+                .append(Os.OS_NAME)
                 .append("\", version: \"")
-                .append(OS_VERSION)
+                .append(Os.OS_VERSION)
                 .append("\", arch: \"")
-                .append(OS_ARCH)
+                .append(Os.OS_ARCH)
                 .append("\", family: \"")
-                .append(getFamily())
+                .append(Os.OS_FAMILY)
                 .append('\"');
         return version.toString();
-    }
-
-    private static String getFamily() {
-        Set<String> valid = new HashSet<>();
-        valid.add(FAMILY_DOS);
-        valid.add(FAMILY_MAC);
-        valid.add(FAMILY_NETWARE);
-        valid.add(FAMILY_OS2);
-        valid.add(FAMILY_TANDEM);
-        valid.add(FAMILY_UNIX);
-        valid.add(FAMILY_WINDOWS);
-        valid.add(FAMILY_WIN9X);
-        valid.add(FAMILY_ZOS);
-        valid.add(FAMILY_OS400);
-        valid.add(FAMILY_OPENVMS);
-        for (String family : valid) {
-            if (isFamily(family)) {
-                return family;
-            }
-        }
-        return null;
-    }
-
-    private static boolean isFamily(String family) {
-        boolean isFamily = true;
-
-        if (family != null) {
-            if (family.equalsIgnoreCase(FAMILY_WINDOWS)) {
-                isFamily = OS_NAME.contains(FAMILY_WINDOWS);
-            } else if (family.equalsIgnoreCase(FAMILY_OS2)) {
-                isFamily = OS_NAME.contains(FAMILY_OS2);
-            } else if (family.equalsIgnoreCase(FAMILY_NETWARE)) {
-                isFamily = OS_NAME.contains(FAMILY_NETWARE);
-            } else if (family.equalsIgnoreCase(FAMILY_DOS)) {
-                isFamily = PATH_SEP.equals(";")
-                        && !isFamily(FAMILY_NETWARE)
-                        && !isFamily(FAMILY_WINDOWS)
-                        && !isFamily(FAMILY_WIN9X);
-
-            } else if (family.equalsIgnoreCase(FAMILY_MAC)) {
-                isFamily = OS_NAME.contains(FAMILY_MAC);
-            } else if (family.equalsIgnoreCase(FAMILY_TANDEM)) {
-                isFamily = OS_NAME.contains("nonstop_kernel");
-            } else if (family.equalsIgnoreCase(FAMILY_UNIX)) {
-                isFamily = PATH_SEP.equals(":")
-                        && !isFamily(FAMILY_OPENVMS)
-                        && (!isFamily(FAMILY_MAC) || OS_NAME.endsWith("x"));
-            } else if (family.equalsIgnoreCase(FAMILY_WIN9X)) {
-                isFamily = isFamily(FAMILY_WINDOWS)
-                        && (OS_NAME.contains("95")
-                                || OS_NAME.contains("98")
-                                || OS_NAME.contains("me")
-                                || OS_NAME.contains("ce"));
-            } else if (family.equalsIgnoreCase(FAMILY_ZOS)) {
-                isFamily = OS_NAME.contains(FAMILY_ZOS) || OS_NAME.contains("os/390");
-            } else if (family.equalsIgnoreCase(FAMILY_OS400)) {
-                isFamily = OS_NAME.contains(FAMILY_OS400);
-            } else if (family.equalsIgnoreCase(FAMILY_OPENVMS)) {
-                isFamily = OS_NAME.contains(FAMILY_OPENVMS);
-            } else {
-                isFamily = OS_NAME.contains(family.toLowerCase(Locale.US));
-            }
-        }
-        return isFamily;
     }
 
     public static String showVersionMinimal() {
