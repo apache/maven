@@ -1539,18 +1539,16 @@ public class DefaultModelValidator implements ModelValidator {
      */
     private static int compareModelVersions(String first, String second) {
         // we use a dedicated comparator because we control our model version scheme.
-        String[] firstSegments = first.split("\\.");
-        String[] secondSegments = second.split("\\.");
-        for (int i = 0; i < Math.min(firstSegments.length, secondSegments.length); i++) {
-            int result = Long.valueOf(firstSegments[i]).compareTo(Long.valueOf(secondSegments[i]));
+        String[] firstSegments = StringUtils.split(first, ".");
+        String[] secondSegments = StringUtils.split(second, ".");
+        for (int i = 0; i < Math.max(firstSegments.length, secondSegments.length); i++) {
+            int result = Long.valueOf(i < firstSegments.length ? firstSegments[i] : "0")
+                    .compareTo(Long.valueOf(i < secondSegments.length ? secondSegments[i] : "0"));
             if (result != 0) {
                 return result;
             }
         }
-        if (firstSegments.length == secondSegments.length) {
-            return 0;
-        }
-        return firstSegments.length > secondSegments.length ? -1 : 1;
+        return 0;
     }
 
     @SuppressWarnings("checkstyle:parameternumber")

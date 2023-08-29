@@ -123,6 +123,16 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void testModelVersionMessage() throws Exception {
+        SimpleProblemCollector result =
+                validateRaw("modelVersion-4_0.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
+
+        assertViolations(result, 0, 1, 0);
+
+        assertTrue(result.getErrors().get(0).contains("'modelVersion' must be one of"));
+    }
+
+    @Test
     void testMissingArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-artifactId-pom.xml");
 

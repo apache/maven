@@ -20,6 +20,8 @@ package org.apache.maven.model.transform;
 
 import javax.xml.stream.XMLStreamReader;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -32,10 +34,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ParentXMLFilterTest extends AbstractXMLFilterTests {
     private Function<XMLStreamReader, XMLStreamReader> filterCreator;
+    private Path projectPath;
 
     @BeforeEach
-    void reset() {
+    void reset() throws IOException {
         filterCreator = null;
+        projectPath = Paths.get("target/test-classes/" + getClass().getSimpleName() + "/child");
+        Files.createDirectories(projectPath);
+        if (!Files.isRegularFile(projectPath.resolve("../pom.xml"))) {
+            Files.createFile(projectPath.resolve("../pom.xml"));
+        }
+        if (!Files.isRegularFile(projectPath.resolve("pom.xml"))) {
+            Files.createFile(projectPath.resolve("pom.xml"));
+        }
+        Path relPath = projectPath.resolve("RELATIVEPATH");
+        Files.createDirectories(relPath);
+        if (!Files.isRegularFile(relPath.resolve("pom.xml"))) {
+            Files.createFile(relPath.resolve("pom.xml"));
+        }
     }
 
     @Override
@@ -47,14 +63,13 @@ class ParentXMLFilterTest extends AbstractXMLFilterTests {
 
     protected XMLStreamReader createFilter(XMLStreamReader parser) {
         return createFilter(
-                parser,
-                x -> Optional.of(new RelativeProject("GROUPID", "ARTIFACTID", "1.0.0")),
-                Paths.get("pom.xml").toAbsolutePath());
+                parser, x -> Optional.of(new RelativeProject("GROUPID", "ARTIFACTID", "1.0.0")), projectPath);
     }
 
     protected XMLStreamReader createFilter(
             XMLStreamReader parser, Function<Path, Optional<RelativeProject>> pathMapper, Path projectPath) {
-        return new ParentXMLFilter(new FastForwardFilter(parser), pathMapper, projectPath);
+        Function<Path, Path> locator = p -> p.resolve("pom.xml");
+        return new ParentXMLFilter(new FastForwardFilter(parser), pathMapper, locator, projectPath);
     }
 
     @Test
