@@ -18,77 +18,170 @@
  */
 package org.apache.maven.utils;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+/*
+ * This class is copied from maven-shared-utils.
+ *
+ * This class was copied over from Apache ANT.
+ * Even the version from plexus-utils was
+ * only an ANT fork!
+ * The last time it got copied was on 2011-08-12</p>
+ * When merging changes please take care of the special
+ * OS_FAMILY handling in this version of Os.java!
+ */
+
 /**
- * Condition that tests the OS type.
+ * <p>Condition that tests the OS type.</p>
  *
  * @author Stefan Bodewig
  * @author Magesh Umasankar
  * @author Brian Fox
- *
+ * @author Mark Struberg
  */
 public class Os {
     /**
-     * define the families for easier reference
+     * The OS Name.
      */
-    public static final String FAMILY_DOS = "dos";
-
-    public static final String FAMILY_MAC = "mac";
-
-    public static final String FAMILY_NETWARE = "netware";
-
-    public static final String FAMILY_OS2 = "os/2";
-
-    public static final String FAMILY_TANDEM = "tandem";
-
-    public static final String FAMILY_UNIX = "unix";
-
-    public static final String FAMILY_WINDOWS = "windows";
-
-    public static final String FAMILY_WIN9X = "win9x";
-
-    public static final String FAMILY_ZOS = "z/os";
-
-    public static final String FAMILY_OS400 = "os/400";
-
-    public static final String FAMILY_OPENVMS = "openvms";
+    public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
 
     /**
-     * store the valid families
+     * The OA architecture.
      */
-    private static final Set<String> VALID_FAMILIES = setValidFamilies();
+    public static final String OS_ARCH = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH);
 
     /**
-     * get the current info
+     * The OS version.
      */
-    private static final String PATH_SEP = System.getProperty("path.separator");
-
-    public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.US);
-
-    public static final String OS_ARCH = System.getProperty("os.arch").toLowerCase(Locale.US);
-
-    public static final String OS_VERSION = System.getProperty("os.version").toLowerCase(Locale.US);
+    public static final String OS_VERSION = System.getProperty("os.version").toLowerCase(Locale.ENGLISH);
 
     /**
-     * Make sure this method is called after static fields it depends on have been set!
+     * The path separator.
+     */
+    public static final String PATH_SEP = System.getProperty("path.separator");
+
+    /**
+     * system line separator , e.g. &quot;\n&quot; on unixoid systems and &quot;\r\n&quot; on Windows
+     */
+    public static final String LINE_SEP = System.getProperty("line.separator");
+
+    /**
+     * OS Family
      */
     public static final String OS_FAMILY = getOsFamily();
 
+    // store the valid families
+    private static final Set<String> VALID_FAMILIES = getValidFamilies();
+
+    /**
+     * OS family to look for
+     */
     private String family;
 
-    private String name;
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_WINDOWS = "windows";
 
-    private String version;
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_WIN9X = "win9x";
 
-    private String arch;
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_NT = "winnt";
+
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_OS2 = "os/2";
+
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_NETWARE = "netware";
+
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_DOS = "dos";
+
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_MAC = "mac";
+
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_TANDEM = "tandem";
+
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_UNIX = "unix";
+
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_OPENVMS = "openvms";
+
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_ZOS = "z/os";
+
+    /**
+     * OS family that can be tested for. {@value}
+     */
+    public static final String FAMILY_OS400 = "os/400";
+
+    /**
+     * OpenJDK is reported to call MacOS X "Darwin"
+     *
+     * @see <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=44889">bugzilla issue</a>
+     * @see <a href="https://issues.apache.org/jira/browse/HADOOP-3318">HADOOP-3318</a>
+     */
+    private static final String DARWIN = "darwin";
+
+    /**
+     * The set of valid families. This methods initializes the set until
+     * VALID_FAMILIES constant is set.
+     * @return The set of families.
+     */
+    public static Set<String> getValidFamilies() {
+        if (VALID_FAMILIES != null) {
+            return VALID_FAMILIES;
+        }
+
+        Set<String> valid = new HashSet<>();
+        valid.add(FAMILY_DOS);
+        valid.add(FAMILY_MAC);
+        valid.add(FAMILY_NETWARE);
+        valid.add(FAMILY_NT);
+        valid.add(FAMILY_OPENVMS);
+        valid.add(FAMILY_OS2);
+        valid.add(FAMILY_OS400);
+        valid.add(FAMILY_TANDEM);
+        valid.add(FAMILY_UNIX);
+        valid.add(FAMILY_WIN9X);
+        valid.add(FAMILY_WINDOWS);
+        valid.add(FAMILY_ZOS);
+
+        return Collections.unmodifiableSet(valid);
+    }
 
     /**
      * Default constructor
      */
-    public Os() {}
+    public Os() {
+        // default
+    }
 
     /**
      * Constructor that sets the family attribute
@@ -100,141 +193,98 @@ public class Os {
     }
 
     /**
-     * Initializes the set of valid families.
-     */
-    private static Set<String> setValidFamilies() {
-        Set<String> valid = new HashSet<String>();
-        valid.add(FAMILY_DOS);
-        valid.add(FAMILY_MAC);
-        valid.add(FAMILY_NETWARE);
-        valid.add(FAMILY_OS2);
-        valid.add(FAMILY_TANDEM);
-        valid.add(FAMILY_UNIX);
-        valid.add(FAMILY_WINDOWS);
-        valid.add(FAMILY_WIN9X);
-        valid.add(FAMILY_ZOS);
-        valid.add(FAMILY_OS400);
-        valid.add(FAMILY_OPENVMS);
-
-        return valid;
-    }
-
-    /**
      * Sets the desired OS family type
      *
-     * @param f The OS family type desired<br>
-     *            Possible values:
-     *            <ul>
-     *            <li>dos</li>
-     *            <li>mac</li>
-     *            <li>netware</li>
-     *            <li>os/2</li>
-     *            <li>tandem</li>
-     *            <li>unix</li>
-     *            <li>windows</li>
-     *            <li>win9x</li>
-     *            <li>z/os</li>
-     *            <li>os/400</li>
-     *            <li>openvms</li>
-     *            </ul>
+     * @param f The OS family type desired<br />
+     *          Possible values:<br />
+     *          <ul>
+     *          <li>dos</li>
+     *          <li>mac</li>
+     *          <li>netware</li>
+     *          <li>os/2</li>
+     *          <li>tandem</li>
+     *          <li>unix</li>
+     *          <li>windows</li>
+     *          <li>win9x</li>
+     *          <li>z/os</li>
+     *          <li>os/400</li>
+     *          </ul>
      */
-    public void setFamily(String f) {
-        family = f.toLowerCase(Locale.US);
+    private void setFamily(String f) {
+        family = f.toLowerCase(Locale.ENGLISH);
     }
 
     /**
-     * Sets the desired OS name
+     * Determines if the OS on which Ant is executing matches the type of
+     * that set in setFamily.
      *
-     * @param name The OS name
-     */
-    public void setName(String name) {
-        this.name = name.toLowerCase(Locale.US);
-    }
-
-    /**
-     * Sets the desired OS architecture
-     *
-     * @param arch The OS architecture
-     */
-    public void setArch(String arch) {
-        this.arch = arch.toLowerCase(Locale.US);
-    }
-
-    /**
-     * Sets the desired OS version
-     *
-     * @param version The OS version
-     */
-    public void setVersion(String version) {
-        this.version = version.toLowerCase(Locale.US);
-    }
-
-    /**
-     * @return Determines if the current OS matches the type of that set in setFamily.
-     *
+     * @return true if the os matches.
      * @see Os#setFamily(String)
-     * @throws Exception any errir
      */
-    public boolean eval() throws Exception {
-        return isOs(family, name, arch, version);
+    boolean eval() {
+        return isOs(family, null, null, null);
     }
 
     /**
-     * Determines if the current OS matches the given OS family.
+     * Determines if the OS on which Ant is executing matches the
+     * given OS family.
      *
      * @param family the family to check for
      * @return true if the OS matches
-     * @since 1.0
+     *
      */
     public static boolean isFamily(String family) {
         return isOs(family, null, null, null);
     }
 
     /**
-     * Determines if the current OS matches the given OS name.
+     * Determines if the OS on which Ant is executing matches the
+     * given OS name.
      *
      * @param name the OS name to check for
      * @return true if the OS matches
-     * @since 1.0
+     *
      */
     public static boolean isName(String name) {
         return isOs(null, name, null, null);
     }
 
     /**
-     * Determines if the current OS matches the given OS architecture.
+     * Determines if the OS on which Ant is executing matches the
+     * given OS architecture.
      *
      * @param arch the OS architecture to check for
      * @return true if the OS matches
-     * @since 1.0
+     *
      */
     public static boolean isArch(String arch) {
         return isOs(null, null, arch, null);
     }
 
     /**
-     * Determines if the current OS matches the given OS version.
+     * Determines if the OS on which Ant is executing matches the
+     * given OS version.
      *
      * @param version the OS version to check for
      * @return true if the OS matches
-     * @since 1.0
+     *
      */
     public static boolean isVersion(String version) {
         return isOs(null, null, null, version);
     }
 
     /**
-     * Determines if the current OS matches the given OS family, name, architecture and version. The name, architecture
-     * and version are compared to the System properties os.name, os.version and os.arch in a case-independent way.
+     * Determines if the OS on which Ant is executing matches the
+     * given OS family, name, architecture and version
      *
-     * @param family The OS family
-     * @param name The OS name
-     * @param arch The OS architecture
+     * @param family  The OS family
+     * @param name    The OS name
+     * @param arch    The OS architecture
      * @param version The OS version
      * @return true if the OS matches
-     * @since 1.0
+     *
      */
-    public static boolean isOs(String family, String name, String arch, String version) {
+    private static boolean isOs(String family, String name, String arch, String version) {
         boolean retValue = false;
 
         if (family != null || name != null || arch != null || version != null) {
@@ -245,50 +295,60 @@ public class Os {
             boolean isVersion = true;
 
             if (family != null) {
-                if (family.equalsIgnoreCase(FAMILY_WINDOWS)) {
-                    isFamily = OS_NAME.contains(FAMILY_WINDOWS);
-                } else if (family.equalsIgnoreCase(FAMILY_OS2)) {
-                    isFamily = OS_NAME.contains(FAMILY_OS2);
-                } else if (family.equalsIgnoreCase(FAMILY_NETWARE)) {
-                    isFamily = OS_NAME.contains(FAMILY_NETWARE);
-                } else if (family.equalsIgnoreCase(FAMILY_DOS)) {
-                    isFamily = PATH_SEP.equals(";")
-                            && !isFamily(FAMILY_NETWARE)
-                            && !isFamily(FAMILY_WINDOWS)
-                            && !isFamily(FAMILY_WIN9X);
 
-                } else if (family.equalsIgnoreCase(FAMILY_MAC)) {
-                    isFamily = OS_NAME.contains(FAMILY_MAC);
-                } else if (family.equalsIgnoreCase(FAMILY_TANDEM)) {
+                // windows probing logic relies on the word 'windows' in
+                // the OS
+                boolean isWindows = OS_NAME.contains(FAMILY_WINDOWS);
+                boolean is9x = false;
+                boolean isNT = false;
+                if (isWindows) {
+                    // there are only four 9x platforms that we look for
+                    is9x = (OS_NAME.contains("95")
+                            || OS_NAME.contains("98")
+                            || OS_NAME.contains("me")
+                            // wince isn't really 9x, but crippled enough to
+                            // be a muchness. Ant doesnt run on CE, anyway.
+                            || OS_NAME.contains("ce"));
+                    isNT = !is9x;
+                }
+                if (family.equals(FAMILY_WINDOWS)) {
+                    isFamily = isWindows;
+                } else if (family.equals(FAMILY_WIN9X)) {
+                    isFamily = isWindows && is9x;
+                } else if (family.equals(FAMILY_NT)) {
+                    isFamily = isWindows && isNT;
+                } else if (family.equals(FAMILY_OS2)) {
+                    isFamily = OS_NAME.contains(FAMILY_OS2);
+                } else if (family.equals(FAMILY_NETWARE)) {
+                    isFamily = OS_NAME.contains(FAMILY_NETWARE);
+                } else if (family.equals(FAMILY_DOS)) {
+                    isFamily = PATH_SEP.equals(";") && !isFamily(FAMILY_NETWARE);
+                } else if (family.equals(FAMILY_MAC)) {
+                    isFamily = OS_NAME.contains(FAMILY_MAC) || OS_NAME.contains(DARWIN);
+                } else if (family.equals(FAMILY_TANDEM)) {
                     isFamily = OS_NAME.contains("nonstop_kernel");
-                } else if (family.equalsIgnoreCase(FAMILY_UNIX)) {
+                } else if (family.equals(FAMILY_UNIX)) {
                     isFamily = PATH_SEP.equals(":")
                             && !isFamily(FAMILY_OPENVMS)
-                            && (!isFamily(FAMILY_MAC) || OS_NAME.endsWith("x"));
-                } else if (family.equalsIgnoreCase(FAMILY_WIN9X)) {
-                    isFamily = isFamily(FAMILY_WINDOWS)
-                            && (OS_NAME.contains("95")
-                                    || OS_NAME.contains("98")
-                                    || OS_NAME.contains("me")
-                                    || OS_NAME.contains("ce"));
-                } else if (family.equalsIgnoreCase(FAMILY_ZOS)) {
+                            && (!isFamily(FAMILY_MAC) || OS_NAME.endsWith("x") || OS_NAME.contains(DARWIN));
+                } else if (family.equals(FAMILY_ZOS)) {
                     isFamily = OS_NAME.contains(FAMILY_ZOS) || OS_NAME.contains("os/390");
-                } else if (family.equalsIgnoreCase(FAMILY_OS400)) {
+                } else if (family.equals(FAMILY_OS400)) {
                     isFamily = OS_NAME.contains(FAMILY_OS400);
-                } else if (family.equalsIgnoreCase(FAMILY_OPENVMS)) {
+                } else if (family.equals(FAMILY_OPENVMS)) {
                     isFamily = OS_NAME.contains(FAMILY_OPENVMS);
                 } else {
                     isFamily = OS_NAME.contains(family.toLowerCase(Locale.US));
                 }
             }
             if (name != null) {
-                isName = name.toLowerCase(Locale.US).equals(OS_NAME);
+                isName = name.equals(OS_NAME);
             }
             if (arch != null) {
-                isArch = arch.toLowerCase(Locale.US).equals(OS_ARCH);
+                isArch = arch.equals(OS_ARCH);
             }
             if (version != null) {
-                isVersion = version.toLowerCase(Locale.US).equals(OS_VERSION);
+                isVersion = version.equals(OS_VERSION);
             }
             retValue = isFamily && isName && isArch && isVersion;
         }
@@ -299,18 +359,10 @@ public class Os {
      * Helper method to determine the current OS family.
      *
      * @return name of current OS family.
-     * @since 1.4.2
      */
     private static String getOsFamily() {
-        // in case the order of static initialization is
-        // wrong, get the list
-        // safely.
-        Set<String> families = null;
-        if (!VALID_FAMILIES.isEmpty()) {
-            families = VALID_FAMILIES;
-        } else {
-            families = setValidFamilies();
-        }
+        Set<String> families = getValidFamilies();
+
         for (String fam : families) {
             if (Os.isFamily(fam)) {
                 return fam;
@@ -320,34 +372,12 @@ public class Os {
     }
 
     /**
-     * Helper method to check if the given family is in the following list:
-     * <ul>
-     * <li>dos</li>
-     * <li>mac</li>
-     * <li>netware</li>
-     * <li>os/2</li>
-     * <li>tandem</li>
-     * <li>unix</li>
-     * <li>windows</li>
-     * <li>win9x</li>
-     * <li>z/os</li>
-     * <li>os/400</li>
-     * <li>openvms</li>
-     * </ul>
+     * Test if the given family String represents a valid Family
      *
-     * @param theFamily the family to check.
-     * @return true if one of the valid families.
-     * @since 1.4.2
+     * @param family the os family
+     * @return <code>true</code> if 'family' represents a valid OS-Family, <code>false</code> otherwise.
      */
-    public static boolean isValidFamily(String theFamily) {
-        return (VALID_FAMILIES.contains(theFamily));
-    }
-
-    /**
-     * @return a copy of the valid families
-     * @since 1.4.2
-     */
-    public static Set<String> getValidFamilies() {
-        return new HashSet<String>(VALID_FAMILIES);
+    public static boolean isValidFamily(String family) {
+        return VALID_FAMILIES.contains(family);
     }
 }
