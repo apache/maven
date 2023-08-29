@@ -353,11 +353,6 @@ under the License.
         <version>${resolverVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.maven.shared</groupId>
-        <artifactId>maven-shared-utils</artifactId>
-        <version>${sharedVersion}</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-connector-basic</artifactId>
         <version>${resolverVersion}</version>
