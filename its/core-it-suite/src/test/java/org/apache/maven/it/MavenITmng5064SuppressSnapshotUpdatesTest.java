@@ -61,7 +61,7 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
 
         String metadataUri = "org/apache/maven/its/mng5064/dep/0.1-SNAPSHOT/maven-metadata.xml";
 
-        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<String>());
+        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 
         AbstractHandler logHandler = new AbstractHandler() {
             @Override

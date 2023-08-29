@@ -60,7 +60,7 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest extends AbstractMav
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<String>());
+        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 
         Handler repoHandler = new AbstractHandler() {
             @Override

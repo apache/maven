@@ -60,7 +60,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
     public void testitMNG768() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0768");
 
-        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<String>());
+        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 
         Handler repoHandler = new AbstractHandler() {
             public void handle(

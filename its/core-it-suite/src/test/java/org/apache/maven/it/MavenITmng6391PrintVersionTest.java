@@ -144,7 +144,7 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
      * </pre>
      */
     private List<String> extractReactorBuildOrder(List<String> loadedLines) {
-        List<String> resultingLines = new LinkedList<String>();
+        List<String> resultingLines = new LinkedList<>();
         boolean start = false;
         for (String line : loadedLines) {
             if (start) {

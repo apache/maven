@@ -63,7 +63,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<String>());
+        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 
         AbstractHandler logHandler = new AbstractHandler() {
             @Override
@@ -142,7 +142,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<String>());
+        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 
         AbstractHandler logHandler = new AbstractHandler() {
             @Override
@@ -224,7 +224,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
 
         String metadataUri = "/repo-it/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<String>());
+        final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 
         AbstractHandler logHandler = new AbstractHandler() {
             @Override
