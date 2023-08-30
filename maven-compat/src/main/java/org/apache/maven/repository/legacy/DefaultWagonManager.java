@@ -456,7 +456,11 @@ public class DefaultWagonManager implements WagonManager {
             // then we will use a brute force copy and delete the temporary file.
             if (!temp.renameTo(destination)) {
                 try {
-                    copyFile(temp, destination);
+                    Files.copy(
+                            temp.toPath(),
+                            destination.toPath(),
+                            StandardCopyOption.REPLACE_EXISTING,
+                            StandardCopyOption.COPY_ATTRIBUTES);
 
                     if (!temp.delete()) {
                         temp.deleteOnExit();
@@ -465,28 +469,6 @@ public class DefaultWagonManager implements WagonManager {
                     throw new TransferFailedException(
                             "Error copying temporary file to the final destination: " + e.getMessage(), e);
                 }
-            }
-        }
-    }
-
-    private void copyFile(File source, File destination) throws IOException {
-        String message;
-        if (!source.exists()) {
-            message = "File " + source + " does not exist";
-            throw new IOException(message);
-        } else if (!source.getCanonicalPath().equals(destination.getCanonicalPath())) {
-            File parentFile = destination.getParentFile();
-            if (parentFile != null && !parentFile.exists()) {
-                parentFile.mkdirs();
-            }
-            Files.copy(
-                    source.toPath(),
-                    destination.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING,
-                    StandardCopyOption.COPY_ATTRIBUTES);
-            if (source.length() != destination.length()) {
-                message = "Failed to copy full contents from " + source + " to " + destination;
-                throw new IOException(message);
             }
         }
     }
@@ -663,7 +645,12 @@ public class DefaultWagonManager implements WagonManager {
                 if (checksumFile.exists()) {
                     checksumFile.delete(); // ignore if failed as we will overwrite
                 }
-                copyFile(tempChecksumFile, checksumFile);
+                Files.copy(
+                        tempChecksumFile.toPath(),
+                        checksumFile.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING,
+                        StandardCopyOption.COPY_ATTRIBUTES);
+
                 if (!tempChecksumFile.delete()) {
                     tempChecksumFile.deleteOnExit();
                 }
