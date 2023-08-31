@@ -30,9 +30,8 @@ import java.util.Set;
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  *
- * TODO this class should be renamed from DAG to Dag
  */
-public class DAG implements Cloneable, Serializable {
+public class Dag implements Cloneable, Serializable {
     // ------------------------------------------------------------
     // Fields
     // ------------------------------------------------------------
@@ -56,7 +55,7 @@ public class DAG implements Cloneable, Serializable {
     /**
      *
      */
-    public DAG() {
+    public Dag() {
         super();
     }
 

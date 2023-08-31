@@ -39,7 +39,7 @@ public class TopologicalSorter {
      * @param graph the graph
      * @return list of String (vertex labels)
      */
-    public static List<String> sort(final DAG graph) {
+    public static List<String> sort(final Dag graph) {
         return dfs(graph);
     }
 
@@ -52,7 +52,7 @@ public class TopologicalSorter {
         return retValue;
     }
 
-    private static List<String> dfs(final DAG graph) {
+    private static List<String> dfs(final Dag graph) {
         // we need to use addFirst method so we will use LinkedList explicitly
         final List<String> retValue = new LinkedList<>();
         final Map<Vertex, Integer> vertexStateMap = new HashMap<>();

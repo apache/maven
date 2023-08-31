@@ -32,7 +32,7 @@ import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.utils.dag.CycleDetectedException;
-import org.apache.maven.utils.dag.DAG;
+import org.apache.maven.utils.dag.Dag;
 import org.apache.maven.utils.dag.TopologicalSorter;
 import org.apache.maven.utils.dag.Vertex;
 
@@ -40,7 +40,7 @@ import org.apache.maven.utils.dag.Vertex;
  * ProjectSorter
  */
 public class ProjectSorter {
-    private DAG dag;
+    private Dag dag;
 
     private List<MavenProject> sortedProjects;
 
@@ -70,7 +70,7 @@ public class ProjectSorter {
     // in a different lifecycle. Though the compiler-plugin has a valid use case, although
     // that seems to work fine. We need to take versions and lifecycle into account.
     public ProjectSorter(Collection<MavenProject> projects) throws CycleDetectedException, DuplicateProjectException {
-        dag = new DAG();
+        dag = new Dag();
 
         // groupId:artifactId:version -> project
         projectMap = new HashMap<>(projects.size() * 2);
@@ -276,7 +276,7 @@ public class ProjectSorter {
         return ArtifactUtils.key(project.getGroupId(), project.getArtifactId(), project.getVersion());
     }
 
-    public DAG getDAG() {
+    public Dag getDag() {
         return dag;
     }
 
