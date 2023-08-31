@@ -22,16 +22,25 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.google.common.collect.Streams;
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -41,9 +50,12 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.collection.DependencySelector;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
+import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
@@ -79,11 +91,103 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
     private final List<MavenPluginDependenciesValidator> dependenciesValidators;
 
+    private final String mavenVersion;
+
+    private final Set<String> mavenGoneCoreGAs;
+
+    private final Set<String> mavenCoreGAs;
+
+    private final Map<Dependency, Set<String>> otherCoreGAVs;
+
+    private final List<Dependency> mavenManagedDependencies;
+
+    private final Dependency mavenCompat;
+
+    private final List<Exclusion> mavenGlobalExclusions;
+
     @Inject
     public DefaultPluginDependenciesResolver(
-            RepositorySystem repoSystem, List<MavenPluginDependenciesValidator> dependenciesValidators) {
+            RepositorySystem repoSystem,
+            List<MavenPluginDependenciesValidator> dependenciesValidators,
+            RuntimeInformation runtimeInformation) {
         this.repoSystem = repoSystem;
         this.dependenciesValidators = dependenciesValidators;
+        this.mavenVersion = runtimeInformation.getMavenVersion();
+        this.mavenGoneCoreGAs = Collections.unmodifiableSet(Stream.of(
+                        "org.apache.maven:maven-artifact-manager",
+                        "org.apache.maven:maven-plugin-descriptor",
+                        "org.apache.maven:maven-plugin-registry",
+                        "org.apache.maven:maven-profile",
+                        "org.apache.maven:maven-project",
+                        "org.apache.maven:maven-toolchain")
+                .collect(Collectors.toSet()));
+        this.mavenCoreGAs = Collections.unmodifiableSet(Stream.of(
+                        "org.apache.maven:maven-artifact",
+                        "org.apache.maven:maven-builder-support",
+                        "org.apache.maven:maven-compat",
+                        "org.apache.maven:maven-core",
+                        "org.apache.maven:maven-embedder",
+                        "org.apache.maven:maven-model",
+                        "org.apache.maven:maven-model-builder",
+                        "org.apache.maven:maven-model-transform",
+                        "org.apache.maven:maven-plugin-api",
+                        "org.apache.maven:maven-repository-metadata",
+                        "org.apache.maven:maven-resolver-provider",
+                        "org.apache.maven:maven-settings",
+                        "org.apache.maven:maven-settings-builder",
+                        "org.apache.maven:maven-slf4j-provider",
+                        "org.apache.maven:maven-slf4j-wrapper",
+                        "org.apache.maven:maven-toolchain-builder",
+                        "org.apache.maven:maven-toolchain-model")
+                .collect(Collectors.toSet()));
+
+        // here we "align" other deps by fixing their version (for runtime scope), and rest are (should be) provided
+        // anyway
+        Map<Dependency, Set<String>> otherCoreGAVs = new HashMap<>();
+        otherCoreGAVs.put(
+                new Dependency(
+                        new DefaultArtifact("org.eclipse.sisu:org.eclipse.sisu.inject:0.3.5"), JavaScopes.RUNTIME),
+                Collections.singleton("org.sonatype.sisu:sisu-inject-bean"));
+        otherCoreGAVs.put(
+                new Dependency(new DefaultArtifact("com.google.inject:guice:5.1.0"), JavaScopes.RUNTIME),
+                Collections.singleton("org.sonatype.sisu:sisu-guice"));
+
+        otherCoreGAVs.put(
+                new Dependency(
+                        new DefaultArtifact("org.eclipse.sisu:org.eclipse.sisu.plexus:0.3.5"), JavaScopes.PROVIDED),
+                new HashSet<>(Arrays.asList(
+                        "org.sonatype.spice:spice-inject-plexus",
+                        "org.sonatype.sisu:sisu-inject-plexus",
+                        "org.codehaus.plexus:plexus-container-default",
+                        "plexus:plexus-container-default")));
+        otherCoreGAVs.put(
+                new Dependency(
+                        new DefaultArtifact("org.codehaus.plexus:plexus-classworlds:2.6.0"), JavaScopes.PROVIDED),
+                Collections.singleton("classworlds:classworlds"));
+        this.otherCoreGAVs = Collections.unmodifiableMap(otherCoreGAVs);
+
+        List<Dependency> mavenCoreDependencies = Collections.unmodifiableList(mavenCoreGAs.stream()
+                .map(s -> new Dependency(new DefaultArtifact(s + ":" + mavenVersion), JavaScopes.PROVIDED))
+                .collect(Collectors.toList()));
+        this.mavenCompat = mavenCoreDependencies.stream()
+                .filter(d -> "maven-compat".equals(d.getArtifact().getArtifactId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("maven-compat not found among Maven Core dependencies"));
+
+        this.mavenManagedDependencies = Collections.unmodifiableList(
+                Streams.concat(mavenCoreDependencies.stream(), otherCoreGAVs.keySet().stream())
+                        .collect(Collectors.toList()));
+
+        this.mavenGlobalExclusions = Collections.unmodifiableList(Streams.concat(
+                        mavenGoneCoreGAs.stream(),
+                        otherCoreGAVs.values().stream().flatMap(Collection::stream))
+                .map(s -> {
+                    int idx = s.indexOf(':');
+                    String g = s.substring(0, idx);
+                    String a = s.substring(idx + 1);
+                    return new Exclusion(g, a, "*", "*");
+                })
+                .collect(Collectors.toList()));
     }
 
     private Artifact toArtifact(Plugin plugin, RepositorySystemSession session) {
@@ -96,26 +200,31 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 session.getArtifactTypeRegistry().get("maven-plugin"));
     }
 
+    private ArtifactDescriptorResult readArtifactDescriptor(
+            RequestTrace trace, Plugin plugin, RepositorySystemSession session, List<RemoteRepository> repositories)
+            throws ArtifactDescriptorException {
+        Artifact pluginArtifact = toArtifact(plugin, session);
+        DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession(session);
+        pluginSession.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, false));
+
+        ArtifactDescriptorRequest request =
+                new ArtifactDescriptorRequest(pluginArtifact, repositories, REPOSITORY_CONTEXT);
+        request.setTrace(trace);
+        return repoSystem.readArtifactDescriptor(pluginSession, request);
+    }
+
     public Artifact resolve(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginResolutionException {
         RequestTrace trace = RequestTrace.newChild(null, plugin);
-
-        Artifact pluginArtifact = toArtifact(plugin, session);
-
+        Artifact pluginArtifact;
         try {
-            DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession(session);
-            pluginSession.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, false));
+            ArtifactDescriptorResult result = readArtifactDescriptor(trace, plugin, session, repositories);
 
-            ArtifactDescriptorRequest request =
-                    new ArtifactDescriptorRequest(pluginArtifact, repositories, REPOSITORY_CONTEXT);
-            request.setTrace(trace);
-            ArtifactDescriptorResult result = repoSystem.readArtifactDescriptor(pluginSession, request);
+            pluginArtifact = result.getArtifact();
 
             for (MavenPluginDependenciesValidator dependenciesValidator : dependenciesValidators) {
                 dependenciesValidator.validate(session, pluginArtifact, result);
             }
-
-            pluginArtifact = result.getArtifact();
 
             if (logger.isWarnEnabled()) {
                 if (!result.getRelocations().isEmpty()) {
@@ -183,27 +292,56 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             pluginArtifact = toArtifact(plugin, session);
         }
 
-        DependencyFilter collectionFilter = new ScopeDependencyFilter("provided", "test");
-        DependencyFilter resolutionFilter = AndDependencyFilter.newInstance(collectionFilter, dependencyFilter);
+        DependencySelector dependencySelector = session.getDependencySelector();
+        DependencyFilter resolutionFilter =
+                AndDependencyFilter.newInstance(new ScopeDependencyFilter("provided", "test"), dependencyFilter);
 
         DependencyNode node;
 
         try {
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession(session);
-            pluginSession.setDependencySelector(session.getDependencySelector());
+            pluginSession.setDependencySelector(dependencySelector);
             pluginSession.setDependencyGraphTransformer(session.getDependencyGraphTransformer());
 
             CollectRequest request = new CollectRequest();
             request.setRequestContext(REPOSITORY_CONTEXT);
             request.setRepositories(repositories);
-            request.setRoot(new org.eclipse.aether.graph.Dependency(pluginArtifact, null));
-            for (Dependency dependency : plugin.getDependencies()) {
-                org.eclipse.aether.graph.Dependency pluginDep =
-                        RepositoryUtils.toDependency(dependency, session.getArtifactTypeRegistry());
+            request.setManagedDependencies(mavenManagedDependencies);
+            Dependency rootDependency = new Dependency(pluginArtifact, null).setExclusions(mavenGlobalExclusions);
+            request.setRoot(rootDependency);
+
+            // plugin dependencies from POM
+            ArtifactDescriptorResult descriptor = readArtifactDescriptor(trace, plugin, session, repositories);
+            List<Dependency> dependencies = new ArrayList<>(descriptor.getDependencies());
+
+            // extra plugin deps in project/build/plugins/plugin/dependencies
+            for (org.apache.maven.model.Dependency dependency : plugin.getDependencies()) {
+                Dependency pluginDep = RepositoryUtils.toDependency(dependency, session.getArtifactTypeRegistry());
                 if (!JavaScopes.SYSTEM.equals(pluginDep.getScope())) {
                     pluginDep = pluginDep.setScope(JavaScopes.RUNTIME);
                 }
-                request.addDependency(pluginDep);
+                dependencies.add(pluginDep);
+            }
+
+            // alter them all: if any "core" dependency, set proper scope
+            boolean mavenCompatAdded = false;
+            for (Dependency dependency : dependencies) {
+                String ga = dependency.getArtifact().getGroupId() + ":"
+                        + dependency.getArtifact().getArtifactId();
+                if (mavenCoreGAs.contains(ga)) {
+                    dependency = dependency
+                            .setScope(JavaScopes.PROVIDED)
+                            .setArtifact(dependency.getArtifact().setVersion(mavenVersion));
+                }
+                Dependency otherDependency = otherGav(ga);
+                if (otherDependency != null) {
+                    request.addDependency(otherDependency);
+                } else if (!mavenGoneCoreGAs.contains(ga)) {
+                    request.addDependency(dependency);
+                } else if (!mavenCompatAdded) {
+                    request.addDependency(mavenCompat);
+                    mavenCompatAdded = true;
+                }
             }
 
             DependencyRequest depRequest = new DependencyRequest(request, resolutionFilter);
@@ -219,13 +357,25 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
             depRequest.setRoot(node);
             repoSystem.resolveDependencies(session, depRequest);
-        } catch (DependencyCollectionException e) {
+        } catch (ArtifactDescriptorException | DependencyCollectionException e) {
             throw new PluginResolutionException(plugin, e);
         } catch (DependencyResolutionException e) {
             throw new PluginResolutionException(plugin, e.getCause());
         }
 
         return node;
+    }
+
+    private Dependency otherGav(String ga) {
+        for (Map.Entry<Dependency, Set<String>> entry : otherCoreGAVs.entrySet()) {
+            if (entry.getValue().contains(ga)
+                    || (entry.getKey().getArtifact().getGroupId() + ":"
+                                    + entry.getKey().getArtifact().getArtifactId())
+                            .equals(ga)) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     // Keep this class in sync with org.apache.maven.project.DefaultProjectDependenciesResolver.GraphLogger
@@ -236,7 +386,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         public boolean visitEnter(DependencyNode node) {
             StringBuilder buffer = new StringBuilder(128);
             buffer.append(indent);
-            org.eclipse.aether.graph.Dependency dep = node.getDependency();
+            Dependency dep = node.getDependency();
             if (dep != null) {
                 org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
 
