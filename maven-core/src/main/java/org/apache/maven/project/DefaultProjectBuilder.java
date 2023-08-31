@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -72,6 +71,7 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.ModelCacheFactory;
+import org.apache.maven.utils.Os;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
@@ -101,10 +101,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     private final ModelCacheFactory modelCacheFactory;
 
     private final RootLocator rootLocator;
-
-    public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.US);
-
-    public static final String FAMILY_WINDOWS = "windows";
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -522,7 +518,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     continue;
                 }
 
-                if (OS_NAME.contains(FAMILY_WINDOWS)) {
+                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
                     // we don't canonicalize on unix to avoid interfering with symlinks
                     try {
                         moduleFile = moduleFile.getCanonicalFile();
