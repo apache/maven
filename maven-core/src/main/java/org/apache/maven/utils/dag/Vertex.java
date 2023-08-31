@@ -75,7 +75,7 @@ public class Vertex implements Cloneable, Serializable {
     /**
      * Get the labels used by the most direct children.
      *
-     * @return the labels used by the most direct children.
+     * @return the labels used by the most direct children
      */
     public List<String> getChildLabels() {
         final List<String> retValue = new ArrayList<>(children.size());

@@ -44,14 +44,7 @@ public class MavenPluginMavenPrerequisiteChecker implements MavenPluginPrerequis
     public void accept(PluginDescriptor pluginDescriptor) {
         String requiredMavenVersion = pluginDescriptor.getRequiredMavenVersion();
 
-        boolean isBlankVersion = true;
-        if (requiredMavenVersion != null) {
-            for (int i = 0; i < requiredMavenVersion.length(); i++) {
-                if (!Character.isWhitespace(requiredMavenVersion.charAt(i))) {
-                    isBlankVersion = false;
-                }
-            }
-        }
+        boolean isBlankVersion = requiredMavenVersion == null || requiredMavenVersion.trim().isEmpty();
 
         if (!isBlankVersion) {
             boolean isRequirementMet = false;

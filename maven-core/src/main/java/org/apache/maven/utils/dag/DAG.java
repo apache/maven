@@ -91,8 +91,8 @@ public class DAG implements Cloneable, Serializable {
     /**
      * Adds vertex to DAG. If vertex of given label already exist in DAG no vertex is added
      *
-     * @param label The label of the Vertex
-     * @return New vertex if vertex of given label was not present in the DAG or existing vertex if vertex of given
+     * @param label the label of the Vertex
+     * @return new vertex if vertex of given label was not present in the DAG or existing vertex if vertex of given
      *         label was already added to DAG
      */
     public Vertex addVertex(final String label) {
@@ -194,7 +194,7 @@ public class DAG implements Cloneable, Serializable {
      */
     @Override
     public Object clone() throws CloneNotSupportedException {
-        // this is what's failing..
+        // this is what's failing.
         final Object retValue = super.clone();
 
         return retValue;
@@ -202,6 +202,7 @@ public class DAG implements Cloneable, Serializable {
 
     /**
      * Indicates if there is at least one edge leading to or from vertex of given label
+     *
      * @param label the label
      * @return <code>true</code> if this vertex is connected with other vertex,<code>false</code> otherwise
      */
@@ -216,8 +217,8 @@ public class DAG implements Cloneable, Serializable {
     /**
      * Return the list of labels of successor in order decided by topological sort
      *
-     * @param label The label of the vertex whose predecessors are searched
-     * @return The list of labels. Returned list contains also the label passed as parameter to this method. This label
+     * @param label the label of the vertex whose predecessors are searched
+     * @return the list of labels. Returned list contains also the label passed as parameter to this method. This label
      *         should always be the last item in the list.
      */
     public List<String> getSuccessorLabels(final String label) {

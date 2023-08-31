@@ -193,15 +193,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
             PluginDescriptor descriptor = extractPluginDescriptor(pluginArtifact, plugin);
 
-            boolean isBlankVersion = true;
-            if (descriptor.getRequiredMavenVersion() != null) {
-                for (int i = 0; i < descriptor.getRequiredMavenVersion().length(); i++) {
-                    if (!Character.isWhitespace(
-                            descriptor.getRequiredMavenVersion().charAt(i))) {
-                        isBlankVersion = false;
-                    }
-                }
-            }
+            boolean isBlankVersion = descriptor.getRequiredMavenVersion() == null || descriptor.getRequiredMavenVersion().trim().isEmpty();
 
             if (isBlankVersion) {
                 // only take value from underlying POM if plugin descriptor has no explicit Maven requirement

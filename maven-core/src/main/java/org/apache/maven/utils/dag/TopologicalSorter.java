@@ -37,7 +37,7 @@ public class TopologicalSorter {
 
     /**
      * @param graph the graph
-     * @return List of String (vertex labels)
+     * @return list of String (vertex labels)
      */
     public static List<String> sort(final DAG graph) {
         return dfs(graph);
