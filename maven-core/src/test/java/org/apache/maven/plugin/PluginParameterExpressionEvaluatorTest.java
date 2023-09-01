@@ -376,6 +376,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     void testRootDirectoryWithNull() throws Exception {
         ExpressionEvaluator ee = createExpressionEvaluator(createDefaultProject(), null, new Properties());
         Exception e = assertThrows(Exception.class, () -> ee.evaluate("${session.rootDirectory}"));
+        e = assertInstanceOf(RuntimeException.class, e.getCause());
         e = assertInstanceOf(InvocationTargetException.class, e.getCause());
         e = assertInstanceOf(IllegalStateException.class, e.getCause());
         assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());

@@ -53,31 +53,28 @@ public class MavenXpp3ReaderEx {
     } // -- boolean getAddDefaultEntities()
 
     /**
-     * @param reader a reader object.
-     * @param strict a strict object.
+     * @param reader a reader object
+     * @param strict a strict object
      * @return Model
-     * @throws IOException            IOException if any.
-     * @throws XMLStreamException XMLStreamException if
-     *                                any.
+     * @throws IOException            IOException if an I/O error occurs while reading from the underlying source
+     * @throws XMLStreamException XMLStreamException if an error occurs while parser xml
      */
     public Model read(Reader reader, boolean strict, InputSource source) throws IOException, XMLStreamException {
         XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
         factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-        XMLStreamReader parser = null;
         try {
-            parser = factory.createXMLStreamReader(reader);
+            XMLStreamReader parser = factory.createXMLStreamReader(reader);
+            return read(parser, strict, source);
         } catch (XMLStreamException e) {
             throw new RuntimeException(e);
         }
-        return read(parser, strict, source);
     } // -- Model read( Reader, boolean )
 
     /**
-     * @param reader a reader object.
+     * @param reader a reader object
      * @return Model
-     * @throws IOException            IOException if any.
-     * @throws XMLStreamException XMLStreamException if
-     *                                any.
+     * @throws IOException            IOException if an I/O error occurs while reading from the underlying source
+     * @throws XMLStreamException XMLStreamException if an error occurs while parser xml
      */
     public Model read(Reader reader, InputSource source) throws IOException, XMLStreamException {
         return read(reader, true, source);
@@ -86,12 +83,11 @@ public class MavenXpp3ReaderEx {
     /**
      * Method read.
      *
-     * @param in     a in object.
-     * @param strict a strict object.
+     * @param in     a in object
+     * @param strict a strict object
      * @return Model
-     * @throws IOException            IOException if any.
-     * @throws XMLStreamException XMLStreamException if
-     *                                any.
+     * @throws IOException            IOException if an I/O error occurs while reading from the underlying source
+     * @throws XMLStreamException XMLStreamException if an error occurs while parser xml
      */
     public Model read(InputStream in, boolean strict, InputSource source) throws IOException, XMLStreamException {
         XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
@@ -104,11 +100,10 @@ public class MavenXpp3ReaderEx {
     /**
      * Method read.
      *
-     * @param in a in object.
+     * @param in a in object
      * @return Model
-     * @throws IOException            IOException if any.
-     * @throws XMLStreamException XMLStreamException if
-     *                                any.
+     * @throws IOException            IOException if an I/O error occurs while reading from the underlying source
+     * @throws XMLStreamException XMLStreamException if an error occurs while parser xml
      */
     public Model read(InputStream in, InputSource source) throws IOException, XMLStreamException {
         return read(in, true, source);
@@ -117,12 +112,11 @@ public class MavenXpp3ReaderEx {
     /**
      * Method read.
      *
-     * @param parser a parser object.
-     * @param strict a strict object.
+     * @param parser a parser object
+     * @param strict a strict object
      * @return Model
-     * @throws IOException            IOException if any.
-     * @throws XMLStreamException XMLStreamException if
-     *                                any.
+     * @throws IOException            IOException if an I/O error occurs while reading from the underlying source
+     * @throws XMLStreamException XMLStreamException if an error occurs while parser xml
      */
     public Model read(XMLStreamReader parser, boolean strict, InputSource source)
             throws IOException, XMLStreamException {
@@ -138,7 +132,7 @@ public class MavenXpp3ReaderEx {
     /**
      * Sets the state of the "add default entities" flag.
      *
-     * @param addDefaultEntities a addDefaultEntities object.
+     * @param addDefaultEntities a addDefaultEntities object
      */
     public void setAddDefaultEntities(boolean addDefaultEntities) {
         this.addDefaultEntities = addDefaultEntities;
@@ -148,10 +142,10 @@ public class MavenXpp3ReaderEx {
         /**
          * Interpolate the value read from the xpp3 document
          *
-         * @param source    The source value
-         * @param fieldName A description of the field being interpolated. The implementation may use this to
-         *                  log stuff.
-         * @return The interpolated value.
+         * @param source    the source value
+         * @param fieldName a description of the field being interpolated. The implementation may use this to
+         *                  log stuff
+         * @return the interpolated value
          */
         String transform(String source, String fieldName);
     }

@@ -138,9 +138,8 @@ public class ReflectionValueExtractor {
      * @param expression not null expression
      * @param root not null object
      * @return the object defined by the expression
-     * @throws Exception if any
      */
-    public static Object evaluate(String expression, Object root) throws Exception {
+    public static Object evaluate(String expression, Object root) {
         return evaluate(expression, root, true);
     }
 
@@ -159,10 +158,8 @@ public class ReflectionValueExtractor {
      * @param root not null object
      * @param trimRootToken  root start
      * @return the object defined by the expression
-     * @throws Exception if any
      */
-    // TODO: don't throw Exception
-    public static Object evaluate(String expression, final Object root, final boolean trimRootToken) throws Exception {
+    public static Object evaluate(String expression, final Object root, final boolean trimRootToken) {
         Object value = root;
 
         // ----------------------------------------------------------------------
@@ -220,79 +217,82 @@ public class ReflectionValueExtractor {
     }
 
     private static Object getMappedValue(
-            final String expression, final int from, final int to, final Object value, final String key)
-            throws Exception {
+            final String expression, final int from, final int to, final Object value, final String key) {
         if (value == null || key == null) {
             return null;
         }
-
         if (value instanceof Map) {
-            Object[] localParams = new Object[] {key};
-            ClassMap classMap = getClassMap(value.getClass());
-            Method method = classMap.findMethod("get", localParams);
-            return method.invoke(value, localParams);
+            try {
+                Object[] localParams = new Object[] {key};
+                ClassMap classMap = getClassMap(value.getClass());
+                Method method = classMap.findMethod("get", localParams);
+                return method.invoke(value, localParams);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            final String message = String.format(
+                    "The token '%s' at position '%d' refers to a java.util.Map, but the value seems is an instance of '%s'",
+                    expression.subSequence(from, to), from, value.getClass());
+            throw new IllegalArgumentException(message);
         }
-
-        final String message = String.format(
-                "The token '%s' at position '%d' refers to a java.util.Map, but the value seems is an instance of '%s'",
-                expression.subSequence(from, to), from, value.getClass());
-
-        throw new Exception(message);
     }
 
     private static Object getIndexedValue(
-            final String expression, final int from, final int to, final Object value, final String indexStr)
-            throws Exception {
+            final String expression, final int from, final int to, final Object value, final String indexStr) {
+        int index;
         try {
-            int index = Integer.parseInt(indexStr);
+            index = Integer.parseInt(indexStr);
 
             if (value.getClass().isArray()) {
                 return Array.get(value, index);
             }
 
-            if (value instanceof List) {
+        } catch (NumberFormatException e) {
+            final String message = String.format("The indexStr '%s' is not a number", indexStr);
+            throw new IllegalArgumentException(message);
+        }
+
+        if (value instanceof List) {
+            try {
                 ClassMap classMap = getClassMap(value.getClass());
                 // use get method on List interface
                 Object[] localParams = new Object[] {index};
                 Method method = classMap.findMethod("get", localParams);
                 return method.invoke(value, localParams);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-        } catch (NumberFormatException e) {
-            return null;
-        } catch (InvocationTargetException e) {
-            // catch array index issues gracefully, otherwise release
-            if (e.getCause() instanceof IndexOutOfBoundsException) {
-                return null;
-            }
-
-            throw e;
+        } else {
+            final String message = String.format(
+                    "The token '%s' at position '%d' refers to a java.util.List or an array, but the value seems is an instance of '%s'",
+                    expression.subSequence(from, to), from, value.getClass());
+            throw new IllegalArgumentException(message);
         }
-
-        final String message = String.format(
-                "The token '%s' at position '%d' refers to a java.util.List or an array, but the value seems is an instance of '%s'",
-                expression.subSequence(from, to), from, value.getClass());
-
-        throw new Exception(message);
     }
 
-    private static Object getPropertyValue(Object value, String property) throws Exception {
+    private static Object getPropertyValue(Object value, String property) {
         if (value == null || property == null) {
             return null;
         }
 
         ClassMap classMap = getClassMap(value.getClass());
-
-        char firstLetter = Character.toTitleCase(property.substring(0, 1).charAt(0));
-        String restLetters = property.substring(1);
-        String methodBase = firstLetter + restLetters;
-        String methodName = "get" + methodBase;
-        Method method = classMap.findMethod(methodName, CLASS_ARGS);
-
-        if (method == null) {
-            // perhaps this is a boolean property??
-            methodName = "is" + methodBase;
-
+        Method method;
+        try {
+            char firstLetter = Character.toTitleCase(property.substring(0, 1).charAt(0));
+            String restLetters = property.substring(1);
+            String methodBase = firstLetter + restLetters;
+            String methodName = "get" + methodBase;
             method = classMap.findMethod(methodName, CLASS_ARGS);
+
+            if (method == null) {
+                // perhaps this is a boolean property??
+                methodName = "is" + methodBase;
+
+                method = classMap.findMethod(methodName, CLASS_ARGS);
+            }
+        } catch (MethodMap.AmbiguousException e) {
+            return null;
         }
 
         if (method == null) {
@@ -301,8 +301,8 @@ public class ReflectionValueExtractor {
 
         try {
             return method.invoke(value, OBJECT_ARGS);
-        } catch (InvocationTargetException e) {
-            throw e;
+        } catch (InvocationTargetException | java.lang.IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
