@@ -144,9 +144,6 @@ under the License.
     <exportedArtifact>org.apache.maven:maven-api-toolchain</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-api-xml</exportedArtifact>
 
-    <exportedArtifact>com.fasterxml:aalto-xml</exportedArtifact>
-    <exportedArtifact>org.codehaus.woodstox:stax2-api</exportedArtifact>
-
     <exportedArtifact>classworlds:classworlds</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-classworlds</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-component-api</exportedArtifact>
