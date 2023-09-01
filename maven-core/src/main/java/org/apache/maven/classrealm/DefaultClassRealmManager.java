@@ -150,15 +150,10 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             List<String> parentImports,
             Map<String, ClassLoader> foreignImports,
             List<Artifact> artifacts) {
-        Set<String> artifactIds = Collections.emptySet();
-
+        Set<String> artifactIds = new LinkedHashSet<>(artifacts == null ? 0 : artifacts.size());
         List<ClassRealmConstituent> constituents = new ArrayList<>(artifacts == null ? 0 : artifacts.size());
 
         if (artifacts != null && !artifacts.isEmpty()) {
-            if (logger.isDebugEnabled()) {
-                artifactIds = new LinkedHashSet<>(artifacts.size());
-            }
-
             for (Artifact artifact : artifacts) {
                 if (!isProvidedArtifact(artifact)) {
                     if (logger.isDebugEnabled()) {
@@ -305,11 +300,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     }
 
     private Set<String> populateRealm(ClassRealm classRealm, List<ClassRealmConstituent> constituents) {
-        Set<String> includedIds = Collections.emptySet();
-
-        if (logger.isDebugEnabled()) {
-            includedIds = new LinkedHashSet<>(constituents.size());
-        }
+        Set<String> includedIds = new LinkedHashSet<>(constituents.size());
 
         logger.debug("Populating class realm {}", classRealm.getId());
 
