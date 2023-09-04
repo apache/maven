@@ -111,7 +111,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
             locations.putAll(sourceDominant ? sourceLocations : targetLocations);
         }
 
-        return new InputLocation(target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations);
+        return new InputLocation(-1, -1, InputSource.merge(source.getSource(), target.getSource()), locations);
     } // -- InputLocation merge( InputLocation, InputLocation, boolean )
 
     /**
@@ -150,7 +150,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
             }
         }
 
-        return new InputLocation(target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations);
+        return new InputLocation(-1, -1, InputSource.merge(source.getSource(), target.getSource()), locations);
     } // -- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
 
     /**
