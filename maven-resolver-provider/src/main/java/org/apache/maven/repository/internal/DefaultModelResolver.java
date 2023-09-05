@@ -75,7 +75,7 @@ class DefaultModelResolver implements ModelResolver {
 
     private final Set<String> repositoryIds;
 
-    public DefaultModelResolver(
+    DefaultModelResolver(
             RepositorySystemSession session,
             RequestTrace trace,
             String context,
