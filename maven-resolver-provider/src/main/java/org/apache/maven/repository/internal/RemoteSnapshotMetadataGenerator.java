@@ -65,6 +65,7 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
         }
     }
 
+    @Override
     public Collection<? extends Metadata> prepare(Collection<? extends Artifact> artifacts) {
         for (Artifact artifact : artifacts) {
             if (artifact.isSnapshot()) {
@@ -81,6 +82,7 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
         return snapshots.values();
     }
 
+    @Override
     public Artifact transformArtifact(Artifact artifact) {
         if (artifact.isSnapshot() && artifact.getVersion().equals(artifact.getBaseVersion())) {
             Object key = RemoteSnapshotMetadata.getKey(artifact);
@@ -93,6 +95,7 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
         return artifact;
     }
 
+    @Override
     public Collection<? extends Metadata> finish(Collection<? extends Artifact> artifacts) {
         return Collections.emptyList();
     }
