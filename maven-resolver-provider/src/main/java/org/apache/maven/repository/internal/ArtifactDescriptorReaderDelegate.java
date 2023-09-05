@@ -44,7 +44,7 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
  * Populates Aether {@link ArtifactDescriptorResult} from Maven project {@link Model}.
- * <p/>
+ * <p>
  * <strong>Note:</strong> This class is part of work in progress and can be changed or removed without notice.
  * @since 3.2.4
  */
@@ -95,8 +95,8 @@ public class ArtifactDescriptorReaderDelegate {
             stereotype = new DefaultArtifactType(dependency.getType());
         }
 
-        boolean system =
-                dependency.getSystemPath() != null && !dependency.getSystemPath().isEmpty();
+        boolean system = dependency.getSystemPath() != null
+                && !dependency.getSystemPath().isEmpty();
 
         Map<String, String> props = null;
         if (system) {
