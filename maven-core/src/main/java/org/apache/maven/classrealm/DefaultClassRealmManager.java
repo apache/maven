@@ -26,7 +26,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -150,17 +149,15 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             List<String> parentImports,
             Map<String, ClassLoader> foreignImports,
             List<Artifact> artifacts) {
-        Set<String> artifactIds = new LinkedHashSet<>(artifacts == null ? 0 : artifacts.size());
         List<ClassRealmConstituent> constituents = new ArrayList<>(artifacts == null ? 0 : artifacts.size());
 
         if (artifacts != null && !artifacts.isEmpty()) {
             for (Artifact artifact : artifacts) {
                 if (!isProvidedArtifact(artifact)) {
-                    if (logger.isDebugEnabled()) {
-                        artifactIds.add(getId(artifact));
-                    }
                     if (artifact.getFile() != null) {
                         constituents.add(new ArtifactClassRealmConstituent(artifact));
+                    } else if (logger.isDebugEnabled()) {
+                        logger.debug("  Excluded: {}", getId(artifact));
                     }
                 }
             }
@@ -188,15 +185,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
         wireRealm(classRealm, parentImports, foreignImports);
 
-        Set<String> includedIds = populateRealm(classRealm, constituents);
-
-        if (logger.isDebugEnabled()) {
-            artifactIds.removeAll(includedIds);
-
-            for (String id : artifactIds) {
-                logger.debug("  Excluded: {}", id);
-            }
-        }
+        populateRealm(classRealm, constituents);
 
         return classRealm;
     }
@@ -299,9 +288,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         }
     }
 
-    private Set<String> populateRealm(ClassRealm classRealm, List<ClassRealmConstituent> constituents) {
-        Set<String> includedIds = new LinkedHashSet<>(constituents.size());
-
+    private void populateRealm(ClassRealm classRealm, List<ClassRealmConstituent> constituents) {
         logger.debug("Populating class realm {}", classRealm.getId());
 
         for (ClassRealmConstituent constituent : constituents) {
@@ -309,8 +296,6 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
             if (logger.isDebugEnabled()) {
                 String id = getId(constituent);
-                includedIds.add(id);
-
                 logger.debug("  Included: {}", id);
             }
 
@@ -321,8 +306,6 @@ public class DefaultClassRealmManager implements ClassRealmManager {
                 logger.error(e.getMessage(), e);
             }
         }
-
-        return includedIds;
     }
 
     private void wireRealm(ClassRealm classRealm, List<String> parentImports, Map<String, ClassLoader> foreignImports) {

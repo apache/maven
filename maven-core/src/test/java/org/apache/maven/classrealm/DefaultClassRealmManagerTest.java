@@ -122,10 +122,10 @@ class DefaultClassRealmManagerTest {
 
         verifier.verify(logger, calls(1)).debug("Importing foreign packages into class realm {}", "maven.api");
         verifier.verify(logger, calls(1)).debug("  Imported: {} < {}", "group1:artifact1", "test");
+        verifier.verify(logger, calls(1)).debug("  Excluded: {}", "group1:artifact2:ext:classifier1:null");
         verifier.verify(logger, calls(1))
                 .debug("Populating class realm {}", "project>modelGroup1:modelArtifact1:modelVersion1");
         verifier.verify(logger, calls(1)).debug("  Included: {}", "group1:artifact1:ext:classifier1:null");
-        verifier.verify(logger, calls(1)).debug("  Excluded: {}", "group1:artifact2:ext:classifier1:null");
     }
 
     @Test
