@@ -48,6 +48,7 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
+import org.apache.maven.utils.Os;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -401,7 +402,7 @@ public class DefaultRepositorySystemSessionFactory {
     private String getUserAgent() {
         String version = runtimeInformation.getMavenVersion();
         version = version.isEmpty() ? version : "/" + version;
-        return "Apache-Maven" + version + " (Java " + System.getProperty("java.version") + "; "
-                + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")";
+        return "Apache-Maven" + version + " (Java " + System.getProperty("java.version") + "; " + Os.OS_NAME + " "
+                + Os.OS_VERSION + ")";
     }
 }

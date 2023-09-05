@@ -24,17 +24,7 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -90,6 +80,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultProjectBuilder implements ProjectBuilder {
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ModelBuilder modelBuilder;
     private final ModelProcessor modelProcessor;
@@ -518,7 +509,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     continue;
                 }
 
-                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                if (Os.IS_WINDOWS) {
                     // we don't canonicalize on unix to avoid interfering with symlinks
                     try {
                         moduleFile = moduleFile.getCanonicalFile();

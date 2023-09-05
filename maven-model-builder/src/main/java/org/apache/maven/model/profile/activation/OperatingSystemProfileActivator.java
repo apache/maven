@@ -96,7 +96,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
             test = test.substring(1);
         }
 
-        boolean result = Os.isVersion(test);
+        boolean result = Os.OS_VERSION.equals(test);
 
         return reverse != result;
     }
@@ -110,7 +110,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
             test = test.substring(1);
         }
 
-        boolean result = Os.isArch(test);
+        boolean result = Os.OS_ARCH.equals(test);
 
         return reverse != result;
     }
@@ -124,7 +124,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
             test = test.substring(1);
         }
 
-        boolean result = Os.isName(test);
+        boolean result = Os.OS_NAME.equals(test);
 
         return reverse != result;
     }

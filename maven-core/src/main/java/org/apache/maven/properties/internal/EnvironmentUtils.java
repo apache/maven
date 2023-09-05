@@ -48,7 +48,7 @@ public class EnvironmentUtils {
         if (props != null) {
             if (envVars == null) {
                 Properties tmp = new Properties();
-                boolean caseSensitive = !Os.isFamily(Os.FAMILY_WINDOWS);
+                boolean caseSensitive = !Os.IS_WINDOWS;
                 for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
                     String key = "env."
                             + (caseSensitive ? entry.getKey() : entry.getKey().toUpperCase(Locale.ENGLISH));

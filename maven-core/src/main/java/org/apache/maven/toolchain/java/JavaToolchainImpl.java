@@ -20,10 +20,10 @@ package org.apache.maven.toolchain.java;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.Locale;
 
 import org.apache.maven.toolchain.DefaultToolchain;
 import org.apache.maven.toolchain.model.ToolchainModel;
+import org.apache.maven.utils.Os;
 import org.slf4j.Logger;
 
 /**
@@ -36,8 +36,6 @@ public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain
     private String javaHome;
 
     public static final String KEY_JAVAHOME = "jdkHome"; // NOI18N
-
-    public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.US);
 
     JavaToolchainImpl(ToolchainModel model, Logger logger) {
         super(model, "jdk", logger);
@@ -66,8 +64,7 @@ public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain
     private static File findTool(String toolName, File installDir) {
         File bin = new File(installDir, "bin"); // NOI18N
         if (bin.exists()) {
-            boolean isWindows = OS_NAME.contains("windows"); // NOI18N
-            if (isWindows) {
+            if (Os.IS_WINDOWS) {
                 File tool = new File(bin, toolName + ".exe");
                 if (tool.exists()) {
                     return tool;
