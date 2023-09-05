@@ -102,7 +102,7 @@ public class ${className} {
 
     protected void merge${class.name}(${class.name}.Builder builder, ${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context) {
     #if ( $class.superClass )
-        merge${class.superClass}(builder, target ,source, sourceDominant, context);
+        merge${class.superClass}(builder, target, source, sourceDominant, context);
     #end
     #foreach ( $field in $class.getFields($version) )
         merge${field.modelClass.name}_${Helper.capitalise($field.name)}(builder, target, source, sourceDominant, context);
@@ -111,8 +111,7 @@ public class ${className} {
 
     #foreach ( $field in $allFields )
       #set ( $capField = ${Helper.capitalise($field.name)} )
-    protected void merge${class.name}_${capField}(${class.name}.Builder builder, ${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context)
-    {
+    protected void merge${class.name}_${capField}(${class.name}.Builder builder, ${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context) {
       #if ( $field.type == "String" )
         String src = source.get${capField}();
         String tgt = target.get${capField}();
@@ -151,17 +150,14 @@ public class ${className} {
                 tgt = ${field.to}.newInstance(false);
             }
             ${field.to} merged = merge${field.to}(tgt, src, sourceDominant, context);
-            if (merged == src) {
-                builder.${field.name}(merged);
+            builder.${field.name}(merged);
         #if ( $locationTracking )
+            if (target.get${capField}() == null) {
                 builder.location("${field.name}", source.getLocation("${field.name}"));
-        #end
             } else if (merged != tgt) {
-                builder.${field.name}(merged);
-        #if ( $locationTracking )
-                builder.location("${field.name}", InputLocation.merge(target.getLocation("${field.name}"), source.getLocation("${field.name}"), sourceDominant));
-        #end
+                builder.location("${field.name}", new InputLocation(-1, -1));
             }
+        #end
         }
       #elseif ( $field.to && $field.multiplicity == "*" )
         if (deepMerge) {
@@ -176,10 +172,19 @@ public class ${className} {
             XmlNode tgt = target.getConfiguration();
             if (tgt == null) {
                 builder.configuration(src);
+        #if ( $locationTracking )
+                builder.location("${field.name}", source.getLocation("configuration"));
+        #end
             } else if (sourceDominant) {
                 builder.configuration(src.merge(tgt));
+        #if ( $locationTracking )
+                builder.location("${field.name}", target.getLocation("configuration"));
+        #end
             } else {
                 builder.configuration(tgt.merge(src));
+        #if ( $locationTracking )
+                builder.location("${field.name}", null);
+        #end
             }
         }
       #elseif ($field.type == "boolean")
