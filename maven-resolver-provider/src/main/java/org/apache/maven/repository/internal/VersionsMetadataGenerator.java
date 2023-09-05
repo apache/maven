@@ -40,9 +40,9 @@ import org.eclipse.aether.util.ConfigUtils;
  */
 class VersionsMetadataGenerator implements MetadataGenerator {
 
-    private Map<Object, VersionsMetadata> versions;
+    private final Map<Object, VersionsMetadata> versions;
 
-    private Map<Object, VersionsMetadata> processedVersions;
+    private final Map<Object, VersionsMetadata> processedVersions;
 
     private final Date timestamp;
 
@@ -75,14 +75,17 @@ class VersionsMetadataGenerator implements MetadataGenerator {
         }
     }
 
+    @Override
     public Collection<? extends Metadata> prepare(Collection<? extends Artifact> artifacts) {
         return Collections.emptyList();
     }
 
+    @Override
     public Artifact transformArtifact(Artifact artifact) {
         return artifact;
     }
 
+    @Override
     public Collection<? extends Metadata> finish(Collection<? extends Artifact> artifacts) {
         for (Artifact artifact : artifacts) {
             Object key = VersionsMetadata.getKey(artifact);

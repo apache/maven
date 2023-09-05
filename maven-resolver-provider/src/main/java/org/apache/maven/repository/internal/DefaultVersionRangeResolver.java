@@ -86,6 +86,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
         this.versionScheme = Objects.requireNonNull(versionScheme, "versionScheme cannot be null");
     }
 
+    @Override
     public VersionRangeResult resolveVersionRange(RepositorySystemSession session, VersionRangeRequest request)
             throws VersionRangeResolutionException {
         VersionRangeResult result = new VersionRangeResult(request);

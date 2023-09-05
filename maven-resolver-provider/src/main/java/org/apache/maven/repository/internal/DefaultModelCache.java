@@ -63,10 +63,12 @@ public class DefaultModelCache implements ModelCache {
         put(new SourceCacheKey(path, tag), data);
     }
 
+    @Override
     public Object get(String groupId, String artifactId, String version, String tag) {
         return get(new GavCacheKey(groupId, artifactId, version, tag));
     }
 
+    @Override
     public void put(String groupId, String artifactId, String version, String tag, Object data) {
         put(new GavCacheKey(groupId, artifactId, version, tag), data);
     }

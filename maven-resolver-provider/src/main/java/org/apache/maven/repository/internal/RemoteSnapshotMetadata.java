@@ -52,6 +52,7 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
         super(metadata, file, timestamp);
     }
 
+    @Override
     public MavenMetadata setFile(File file) {
         return new RemoteSnapshotMetadata(metadata, file, timestamp);
     }
