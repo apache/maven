@@ -78,6 +78,12 @@ under the License.
                   </excludes>
                 </filter>
               </filters>
+              <relocations>
+                <relocation>
+                  <pattern>org.objectweb.asm</pattern>
+                  <shadedPattern>shaded.org.objectweb.asm</shadedPattern>
+                </relocation>
+              </relocations>
             </configuration>
           </execution>
         </executions>
