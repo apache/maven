@@ -147,7 +147,7 @@ public class Os {
                     || OS_NAME.contains("98")
                     || OS_NAME.contains("me")
                     // wince isn't really 9x, but crippled enough to
-                    // be a muchness. Ant doesnt run on CE, anyway.
+                    // be a muchness. Maven doesnt run on CE, anyway.
                     || OS_NAME.contains("ce"));
             isNT = !is9x;
         }
