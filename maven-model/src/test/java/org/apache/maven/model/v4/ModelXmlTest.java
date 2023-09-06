@@ -38,6 +38,53 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class ModelXmlTest {
 
     @Test
+    void testExternalEntities() throws Exception {
+        String xml = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<!DOCTYPE foo [\n"
+                + "        <!ENTITY desc SYSTEM \"file:desc.xml\">\n"
+                + "        ]>\n"
+                + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n"
+                + "\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "\n"
+                + "  <parent>\n"
+                + "    <groupId>org.apache.maven</groupId>\n"
+                + "    <artifactId>maven-parent</artifactId>\n"
+                + "    <version>40</version>\n"
+                + "    <relativePath />\n"
+                + "  </parent>\n"
+                + "\n"
+                + "  <groupId>org.apache.maven.daemon</groupId>\n"
+                + "  <artifactId>mvnd</artifactId>\n"
+                + "  <version>1.0-m7-SNAPSHOT</version>\n"
+                + "  &desc;\n"
+                + "</project>\n";
+        MavenStaxReader staxReader = new MavenStaxReader();
+        staxReader.setXmlResolver((publicID, systemID, baseURI, namespace) -> {
+            if ("file:desc.xml".equals(systemID)) {
+                return "<?xml version='1.0' encoding='UTF-8'?><description>foo</description>";
+            }
+            return null;
+        });
+        Model model = staxReader.read(new StringReader(xml));
+        assertNotNull(model);
+        assertEquals("foo", model.getDescription());
+    }
+
+    @Test
+    void testDefaultEntities() throws Exception {
+        String xml = "<?xml version='1.0'?>\n"
+                + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>org.apache.maven.daemon</groupId>\n"
+                + "  <artifactId>mvnd&oelig;</artifactId>\n"
+                + "  <version>1.0-m7-SNAPSHOT</version>\n"
+                + "</project>\n";
+        Model model = new MavenStaxReader().read(new StringReader(xml), false, null);
+        assertNotNull(model);
+        assertEquals("mvndœ", model.getArtifactId());
+    }
+
+    @Test
     void testXmlRoundtripWithProperties() throws Exception {
         Map<String, String> props = new LinkedHashMap<>();
         props.put("javax.version", "3.1.0");

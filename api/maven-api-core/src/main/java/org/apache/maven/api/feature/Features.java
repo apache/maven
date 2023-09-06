@@ -39,6 +39,8 @@ public final class Features {
      */
     public static final String BUILDCONSUMER = "maven.experimental.buildconsumer";
 
+    public static final String XINCLUDE = "maven.xinclude";
+
     private Features() {}
 
     /**
@@ -60,6 +62,18 @@ public final class Features {
      */
     public static boolean buildConsumer(@Nullable Session session) {
         return buildConsumer(session != null ? session.getUserProperties() : null);
+    }
+
+    public static boolean xinclude(@Nullable Properties userProperties) {
+        return doGet(userProperties, XINCLUDE, true);
+    }
+
+    public static boolean xinclude(@Nullable Map<String, String> userProperties) {
+        return doGet(userProperties, XINCLUDE, true);
+    }
+
+    public static boolean xinclude(@Nullable Session session) {
+        return xinclude(session != null ? session.getUserProperties() : null);
     }
 
     private static boolean doGet(Properties userProperties, String key, boolean def) {

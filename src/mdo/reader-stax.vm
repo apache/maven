@@ -63,6 +63,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.ctc.wstx.api.WstxInputProperties;
 import org.apache.maven.api.annotations.Generated;
 #if ( $locationTracking )
 import ${packageModelV4}.InputSource;
@@ -74,6 +76,7 @@ import ${packageModelV4}.${class.name};
 import org.apache.maven.internal.xml.XmlNodeBuilder;
 import org.apache.maven.api.xml.XmlNode;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLResolver;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
@@ -353,10 +356,11 @@ public class ${className} {
     private boolean addLocationInformation = true;
 #end
 
-    private final ContentTransformer contentTransformer;
+    private ContentTransformer contentTransformer = (s, f) -> s;
+
+    private XMLResolver xmlResolver;
 
     public ${className}() {
-        this((s, f) -> s);
     }
 
     public ${className}(ContentTransformer contentTransformer) {
@@ -401,6 +405,22 @@ public class ${className} {
     } //-- void setAddLocationInformation(boolean)
 #end
 
+    public ContentTransformer getContentTransformer() {
+        return contentTransformer;
+    }
+
+    public void setContentTransformer(ContentTransformer contentTransformer) {
+        this.contentTransformer = contentTransformer;
+    }
+
+    public XMLResolver getXmlResolver() {
+        return xmlResolver;
+    }
+
+    public void setXmlResolver(XMLResolver xmlResolver) {
+        this.xmlResolver = xmlResolver;
+    }
+
     public ${root.name} read(Reader reader) throws XMLStreamException {
 #if ( $locationTracking )
         return read(reader, true, null);
@@ -422,7 +442,11 @@ public class ${className} {
     public ${root.name} read(Reader reader, boolean strict) throws XMLStreamException {
 #end
         XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
-        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, true);
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
+        factory.setProperty(WstxInputProperties.P_TREAT_CHAR_REFS_AS_ENTS, false);
+        factory.setProperty(WstxInputProperties.P_ENTITY_RESOLVER, xmlResolver);
+        factory.setProperty(WstxInputProperties.P_UNDECLARED_ENTITY_RESOLVER, getUndeclaredXmlResolver(strict));
 #if ( $locationTracking )
         StreamSource streamSource = new StreamSource(reader, source != null ? source.getLocation() : null);
 #else
@@ -459,7 +483,11 @@ public class ${className} {
     public ${root.name} read(InputStream in, boolean strict) throws XMLStreamException {
 #end
         XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
-        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, true);
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
+        factory.setProperty(WstxInputProperties.P_TREAT_CHAR_REFS_AS_ENTS, false);
+        factory.setProperty(WstxInputProperties.P_ENTITY_RESOLVER, xmlResolver);
+        factory.setProperty(WstxInputProperties.P_UNDECLARED_ENTITY_RESOLVER, getUndeclaredXmlResolver(strict));
 #if ( $locationTracking )
         StreamSource streamSource = new StreamSource(in, source != null ? source.getLocation() : null);
 #else
@@ -769,6 +797,15 @@ public class ${className} {
         return tagName;
     }
 
+    private XMLResolver getUndeclaredXmlResolver(boolean strict) {
+        return (String publicID, String systemID, String baseURI, String namespace) -> {
+            if (publicID == null && !strict && addDefaultEntities) {
+                return DEFAULT_ENTITIES.get(namespace);
+            }
+            return null;
+        };
+    }
+
     /**
      * Method checkUnknownAttribute.
      *
@@ -871,18 +908,6 @@ public class ${className} {
         while (true) {
             if (eventType == XMLStreamReader.CHARACTERS || eventType == XMLStreamReader.CDATA) {
                 result.append(parser.getText());
-            } else if (eventType == XMLStreamReader.ENTITY_REFERENCE) {
-                String val = null;
-                if (strict) {
-                    throw new XMLStreamException("Entities are not supported in strict mode", parser.getLocation(), null);
-                } else if (addDefaultEntities) {
-                    val = DEFAULT_ENTITIES.get(parser.getLocalName());
-                }
-                if (val != null) {
-                    result.append(val);
-                } else {
-                    result.append("&").append(parser.getLocalName()).append(";");
-                }
             } else if (eventType != XMLStreamReader.COMMENT) {
                 break;
             }

@@ -46,6 +46,12 @@ public interface ModelReader {
     String INPUT_SOURCE = "org.apache.maven.model.io.inputSource";
 
     /**
+     * Name of the property used to store a boolean {@code true} if XInclude supports
+     * is needed.
+     */
+    String XINCLUDE = "xinclude";
+
+    /**
      * Name of the property used to store the project's root directory to use with
      * XInclude support.
      */

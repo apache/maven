@@ -235,7 +235,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // single project build entry point
         Exception ex = assertThrows(Exception.class, () -> projectBuilder.build(pomFile, configuration));
-        assertThat(ex.getMessage(), containsString("Received non-all-whitespace CHARACTERS or CDATA event"));
+        assertThat(ex.getMessage(), containsString("expected START_TAG or END_TAG, not CHARACTERS"));
 
         // multi projects build entry point
         ProjectBuildingException pex = assertThrows(
@@ -246,8 +246,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertThat(pex.getResults().get(0).getProblems().size(), greaterThan(0));
         assertThat(
                 pex.getResults(),
-                contains(projectBuildingResultWithProblemMessage(
-                        "Received non-all-whitespace CHARACTERS or CDATA event in nextTag()")));
+                contains(projectBuildingResultWithProblemMessage("expected START_TAG or END_TAG, not CHARACTERS")));
     }
 
     @Test
