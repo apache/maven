@@ -1873,7 +1873,7 @@ public class DefaultModelBuilder implements ModelBuilder {
      * After the buildplan is ready, the build()-method returns the immutable context useful during distribution.
      * This is an inner class, as it must be able to call readRawModel()
      *
-         * @since 4.0.0
+     * @since 4.0.0
      */
     private class DefaultTransformerContextBuilder implements TransformerContextBuilder {
         private final DefaultTransformerContext context = new DefaultTransformerContext(modelProcessor);

@@ -51,7 +51,7 @@ public final class Features {
     /**
      * Represents some feature
      *
-         * @since 4.0.0
+     * @since 4.0.0
      */
     public static class Feature {
         private final boolean active;
