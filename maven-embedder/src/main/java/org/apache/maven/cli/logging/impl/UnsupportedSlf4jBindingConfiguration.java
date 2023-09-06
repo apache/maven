@@ -27,7 +27,6 @@ import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 /**
  * Pseudo-configuration for unsupported SLF4J binding.
  *
- * @author Hervé Boutemy
  * @since 3.2.4
  */
 public class UnsupportedSlf4jBindingConfiguration extends BaseSlf4jConfiguration {

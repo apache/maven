@@ -61,7 +61,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test the default artifact collector.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @PlexusTest
 class DefaultArtifactCollectorTest {

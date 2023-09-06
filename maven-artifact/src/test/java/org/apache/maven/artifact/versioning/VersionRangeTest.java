@@ -33,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests version range construction.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 class VersionRangeTest {
     private static final String CHECK_NUM_RESTRICTIONS = "check number of restrictions";

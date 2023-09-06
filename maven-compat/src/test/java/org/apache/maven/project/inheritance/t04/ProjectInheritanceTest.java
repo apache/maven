@@ -35,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * dependencyManagement section is chosen over another version of the same
  * dependency, listed transitively.
  *
- * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  */
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------

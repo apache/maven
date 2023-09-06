@@ -45,7 +45,6 @@ import org.eclipse.aether.installation.InstallationException;
 import org.eclipse.aether.util.artifact.SubArtifact;
 
 /**
- * @author Jason van Zyl
  */
 @Named
 @Singleton

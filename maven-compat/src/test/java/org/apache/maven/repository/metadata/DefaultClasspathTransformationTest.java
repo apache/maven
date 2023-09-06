@@ -30,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  *
- * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
 @PlexusTest

@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Provides common services to test {@link ProfileActivator} implementations.
  *
- * @author Benjamin Bentmann
  */
 public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> {
 

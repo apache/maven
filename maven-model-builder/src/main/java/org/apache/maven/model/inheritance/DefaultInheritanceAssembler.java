@@ -42,7 +42,6 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * Handles inheritance of model values.
  *
- * @author Benjamin Bentmann
  */
 @SuppressWarnings({"checkstyle:methodname"})
 @Named

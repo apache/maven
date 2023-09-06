@@ -31,7 +31,6 @@ import org.codehaus.plexus.util.Os;
 /**
  * Determines profile activation based on the operating system of the current runtime platform.
  *
- * @author Benjamin Bentmann
  * @see ActivationOS
  */
 @Named("os")

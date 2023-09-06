@@ -27,7 +27,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
- * @author Hervé Boutemy
  */
 abstract class MavenSnapshotMetadata extends MavenMetadata {
     static final String SNAPSHOT = "SNAPSHOT";

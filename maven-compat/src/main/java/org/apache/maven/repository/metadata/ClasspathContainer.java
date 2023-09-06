@@ -27,7 +27,6 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
 /**
  * classpath container that is aware of the classpath scope
  *
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
 @Deprecated

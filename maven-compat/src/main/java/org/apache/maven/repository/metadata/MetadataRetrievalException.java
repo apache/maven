@@ -21,7 +21,6 @@ package org.apache.maven.repository.metadata;
 /**
  * Error while retrieving repository metadata from the repository.
  *
- * @author Jason van Zyl
  */
 @Deprecated
 public class MetadataRetrievalException extends Exception {

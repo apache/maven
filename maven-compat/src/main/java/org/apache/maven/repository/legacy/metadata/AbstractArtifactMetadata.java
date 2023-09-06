@@ -23,7 +23,6 @@ import org.apache.maven.artifact.Artifact;
 /**
  * Common elements of artifact metadata.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @Deprecated
 public abstract class AbstractArtifactMetadata implements ArtifactMetadata {

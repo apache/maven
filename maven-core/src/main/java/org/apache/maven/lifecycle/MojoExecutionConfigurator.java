@@ -27,7 +27,6 @@ import org.apache.maven.project.MavenProject;
  * in the MavenProject and the default configuration for the Mojo from the containing plugin's plugin.xml descriptor.
  * </p>
  * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice.
- * @author Jason van Zyl
  * @since 3.3.1, MNG-5753
  */
 public interface MojoExecutionConfigurator {

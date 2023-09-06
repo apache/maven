@@ -29,7 +29,6 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
 /**
  * maven dependency metadata graph
  *
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
 @Deprecated

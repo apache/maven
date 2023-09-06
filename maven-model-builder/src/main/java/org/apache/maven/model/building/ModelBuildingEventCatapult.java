@@ -22,7 +22,6 @@ package org.apache.maven.model.building;
  * Assists in firing events from a generic method by abstracting from the actual callback method to be called on the
  * listener.
  *
- * @author Benjamin Bentmann
  */
 interface ModelBuildingEventCatapult {
 

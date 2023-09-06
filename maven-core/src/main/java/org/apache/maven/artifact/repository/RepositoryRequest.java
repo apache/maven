@@ -23,7 +23,6 @@ import java.util.List;
 /**
  * Collects basic settings to access the repository system.
  *
- * @author Benjamin Bentmann
  */
 public interface RepositoryRequest {
 

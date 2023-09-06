@@ -25,7 +25,6 @@ import org.apache.maven.project.MavenProject;
 /**
  * Summarizes the result of a project build in the reactor.
  *
- * @author Benjamin Bentmann
  */
 public abstract class BuildSummary {
 

@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * @author Jason van Zyl
  */
 class CanonicalProjectBuilderTest extends AbstractMavenProjectTestCase {
     @Test

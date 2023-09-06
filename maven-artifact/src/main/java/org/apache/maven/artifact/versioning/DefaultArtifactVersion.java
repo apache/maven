@@ -23,7 +23,6 @@ import java.util.StringTokenizer;
 /**
  * Default implementation of artifact versioning.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class DefaultArtifactVersion implements ArtifactVersion {
     private Integer majorVersion;

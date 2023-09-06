@@ -29,7 +29,6 @@ import org.apache.maven.model.Model;
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelReader {
 

@@ -25,7 +25,6 @@ import java.util.EventObject;
  * TransferEvent is used to notify TransferListeners about progress
  * in transfer of resources form/to the repository
  *
- * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  */
 @Deprecated
 public class ArtifactTransferEvent extends EventObject {

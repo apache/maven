@@ -48,7 +48,6 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
- * @author Jason van Zyl
  */
 @Named
 @Singleton

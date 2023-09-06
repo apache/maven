@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 /**
  * Centralized class for feature information
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 public final class Features {
@@ -52,7 +51,6 @@ public final class Features {
     /**
      * Represents some feature
      *
-     * @author Robert Scholte
      * @since 4.0.0
      */
     public static class Feature {

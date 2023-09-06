@@ -44,7 +44,6 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles profile injection into the model.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

@@ -34,7 +34,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 /**
  * Change the version <code>RELEASE</code> to the appropriate release version from the remote repository.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @Named("release")
 @Singleton

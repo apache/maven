@@ -37,7 +37,6 @@ import org.apache.maven.internal.xml.XmlNodeBuilder;
 /**
  * Creates an extension descriptor from some XML stream.
  *
- * @author Benjamin Bentmann
  */
 public class ExtensionDescriptorBuilder {
 

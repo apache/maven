@@ -30,7 +30,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Indicates that annotated component should be instantiated before mojo execution starts and discarded after mojo
  * execution completes.
  *
- * @author igor
  * @since 3.1.2
  */
 @Target({TYPE})

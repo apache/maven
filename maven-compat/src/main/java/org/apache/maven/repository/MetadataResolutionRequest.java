@@ -28,7 +28,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  *
  *
- * @author Oleg Gusakov
  *
  */
 @Deprecated

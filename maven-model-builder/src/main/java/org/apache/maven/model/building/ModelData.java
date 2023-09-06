@@ -27,7 +27,6 @@ import org.apache.maven.model.Model;
  * Holds a model along with some auxiliary information. This internal utility class assists the model builder during POM
  * processing by providing a means to transport information that cannot be (easily) extracted from the model itself.
  *
- * @author Benjamin Bentmann
  */
 class ModelData {
     private final Source source;

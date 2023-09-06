@@ -129,7 +129,6 @@ import static org.apache.maven.cli.ResolveFile.resolveFile;
 // TODO push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
 
 /**
- * @author Jason van Zyl
  */
 public class MavenCli {
     public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";

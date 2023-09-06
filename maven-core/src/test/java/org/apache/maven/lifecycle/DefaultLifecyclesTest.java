@@ -40,7 +40,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * @author Kristian Rosenvold
  */
 @PlexusTest
 class DefaultLifecyclesTest {

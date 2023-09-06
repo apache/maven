@@ -38,8 +38,6 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Kristian Rosenvold  (extract interface only)
  */
 public interface LifecycleExecutionPlanCalculator {
     MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<Object> tasks)

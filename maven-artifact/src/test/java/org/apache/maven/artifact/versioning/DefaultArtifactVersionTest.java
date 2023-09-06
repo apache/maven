@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test DefaultArtifactVersion.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 class DefaultArtifactVersionTest {
     private ArtifactVersion newArtifactVersion(String version) {

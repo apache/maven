@@ -44,7 +44,6 @@ import org.apache.maven.model.v4.MavenStaxReader;
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

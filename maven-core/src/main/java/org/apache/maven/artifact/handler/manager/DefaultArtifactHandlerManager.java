@@ -30,7 +30,6 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 
 /**
- * @author Jason van Zyl
  */
 @Named
 @Singleton

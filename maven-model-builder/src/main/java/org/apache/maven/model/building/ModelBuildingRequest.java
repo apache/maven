@@ -31,7 +31,6 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 /**
  * Collects settings that control the building of effective models.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelBuildingRequest {
 

@@ -22,7 +22,6 @@ package org.apache.maven.model.building;
  * Offers a transformation implementation based on PipelineStreams.
  * Subclasses are responsible for providing the right SAXFilter.
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 public abstract class AbstractModelSourceTransformer implements ModelSourceTransformer {}

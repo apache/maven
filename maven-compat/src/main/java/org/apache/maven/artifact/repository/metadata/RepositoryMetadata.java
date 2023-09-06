@@ -24,7 +24,6 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 /**
  * Describes repository directory metadata.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * TODO not happy about the store method - they use "this"
  */
 @Deprecated

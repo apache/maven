@@ -25,7 +25,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * repository doesn't have a corresponding {@link org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout}
  * component in the current container.
  *
- * @author jdcasey
  */
 @Deprecated
 public class UnknownRepositoryLayoutException extends InvalidRepositoryException {

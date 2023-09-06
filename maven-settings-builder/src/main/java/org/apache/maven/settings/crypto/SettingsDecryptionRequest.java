@@ -26,7 +26,6 @@ import org.apache.maven.settings.Server;
 /**
  * Collects parameters that control the decryption of settings.
  *
- * @author Benjamin Bentmann
  */
 public interface SettingsDecryptionRequest {
 

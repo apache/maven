@@ -21,7 +21,6 @@ package org.apache.maven.toolchain.building;
 /**
  * Builds the effective toolchains from a user toolchains file and/or a global toolchains file.
  *
- * @author Robert Scholte
  * @since 3.3.0
  */
 public interface ToolchainsBuilder {

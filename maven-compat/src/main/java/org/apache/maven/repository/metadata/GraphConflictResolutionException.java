@@ -20,7 +20,6 @@ package org.apache.maven.repository.metadata;
 
 /**
  *
- * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
 @Deprecated

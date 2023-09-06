@@ -135,9 +135,6 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
  * @see <a href="https://maven.apache.org/guides/mini/guide-configuring-plugins.html" target="_blank">Guide to Configuring Plug-ins</a>
  * @see <a href="https://maven.apache.org/developers/mojo-api-specification.html" target="_blank">Mojo API Specification</a>
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @author jdcasey
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  */
 public abstract class AbstractMojo implements Mojo, ContextEnabled {
     /** Instance logger */

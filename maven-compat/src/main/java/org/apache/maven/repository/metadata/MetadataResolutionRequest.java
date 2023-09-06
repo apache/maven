@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
-/** @author Oleg Gusakov */
 @Deprecated
 public class MetadataResolutionRequest {
     protected ArtifactMetadata query;

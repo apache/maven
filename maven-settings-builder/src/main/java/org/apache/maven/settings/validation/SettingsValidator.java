@@ -24,7 +24,6 @@ import org.apache.maven.settings.building.SettingsProblemCollector;
 /**
  * Validate a model settings
  *
- * @author Milos Kleint
  */
 public interface SettingsValidator {
 

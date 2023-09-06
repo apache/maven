@@ -22,7 +22,6 @@ package org.apache.maven.plugin.prefix;
  * Resolves a plugin prefix.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 public interface PluginPrefixResolver {
 

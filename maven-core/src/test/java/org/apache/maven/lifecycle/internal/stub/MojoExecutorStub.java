@@ -41,7 +41,6 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 
 /**
- * @author Kristian Rosenvold
  */
 public class MojoExecutorStub extends MojoExecutor { // This is being lazy instead of making interface
 

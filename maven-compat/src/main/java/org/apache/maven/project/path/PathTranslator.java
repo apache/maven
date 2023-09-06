@@ -23,7 +23,6 @@ import java.io.File;
 import org.apache.maven.model.Model;
 
 /**
- * @author Jason van Zyl
  */
 @Deprecated
 public interface PathTranslator {

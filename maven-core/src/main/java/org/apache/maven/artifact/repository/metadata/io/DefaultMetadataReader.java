@@ -35,7 +35,6 @@ import org.codehaus.plexus.util.ReaderFactory;
 /**
  * Handles deserialization of metadata from some kind of textual format like XML.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

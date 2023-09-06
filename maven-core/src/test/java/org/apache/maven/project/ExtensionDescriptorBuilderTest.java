@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Tests {@link ExtensionDescriptorBuilder}.
  *
- * @author Benjamin Bentmann
  */
 class ExtensionDescriptorBuilderTest {
 

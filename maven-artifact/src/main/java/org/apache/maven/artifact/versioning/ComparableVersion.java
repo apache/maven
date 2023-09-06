@@ -59,8 +59,6 @@ import java.util.Properties;
  *   over {@code 1.0.0.X1}.</li>
  * </ul>
  *
- * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
- * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
  * @see <a href="https://maven.apache.org/pom.html#version-order-specification">"Versioning" in the POM reference</a>
  */
 public class ComparableVersion implements Comparable<ComparableVersion> {

@@ -38,7 +38,6 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.BeforeEach;
 
 /**
- * @author Jason van Zyl
  */
 @PlexusTest
 public abstract class AbstractMavenProjectTestCase {

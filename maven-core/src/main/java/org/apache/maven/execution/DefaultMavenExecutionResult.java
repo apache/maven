@@ -27,7 +27,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 
-/** @author Jason van Zyl */
 public class DefaultMavenExecutionResult implements MavenExecutionResult {
     private MavenProject project;
 

@@ -61,7 +61,6 @@ import org.slf4j.LoggerFactory;
  * An implementation of a workspace reader that knows how to search the Maven reactor for artifacts, either as packaged
  * jar if it has been built, or only compile output directory if packaging hasn't happened yet.
  *
- * @author Jason van Zyl
  */
 @Named(ReactorReader.HINT)
 @SessionScoped

@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code Site}.
  *
- * @author Benjamin Bentmann
  */
 class SiteTest {
 

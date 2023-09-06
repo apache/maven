@@ -22,7 +22,6 @@ package org.apache.maven.model.building;
  * The transformerContextBuilder is responsible for initializing the TransformerContext.
  * In case rawModels are missing, it could do new buildingRequests on the ModelBuilder.
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 public interface TransformerContextBuilder {

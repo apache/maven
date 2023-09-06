@@ -37,7 +37,6 @@ import org.apache.maven.project.MavenProject;
 /**
  * A facade that provides lifecycle services to components outside Maven core.
  *
- * @author Jason van  Zyl
  */
 public interface LifecycleExecutor {
 

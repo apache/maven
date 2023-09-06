@@ -35,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Tests {@link LegacyRepositorySystem}.
  *
- * @author Benjamin Bentmann
  */
 @PlexusTest
 class LegacyRepositorySystemTest {

@@ -114,7 +114,6 @@ import org.slf4j.LoggerFactory;
  * that the plugins/mojos can be used in arbitrary contexts. In particular, the mojos can be used for ordinary build
  * plugins as well as special purpose plugins like reports.
  *
- * @author Benjamin Bentmann
  * @since 3.0
  */
 @Named

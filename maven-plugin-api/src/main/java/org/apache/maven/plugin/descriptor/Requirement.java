@@ -21,7 +21,6 @@ package org.apache.maven.plugin.descriptor;
 /**
  * Describes a component requirement.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class Requirement implements Cloneable {
     private final String role;

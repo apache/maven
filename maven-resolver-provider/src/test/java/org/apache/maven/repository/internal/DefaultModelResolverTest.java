@@ -40,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test cases for the default {@code ModelResolver} implementation.
  *
- * @author Christian Schulte
  * @since 3.5.0
  */
 final class DefaultModelResolverTest extends AbstractRepositoryTestCase {

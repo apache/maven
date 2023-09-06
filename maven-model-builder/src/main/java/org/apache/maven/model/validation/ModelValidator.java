@@ -25,7 +25,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Checks the model for missing or invalid values.
  *
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 public interface ModelValidator {
     /**

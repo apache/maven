@@ -27,7 +27,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * A simple recording of the Artifacts that could not be resolved for a given resolution request, along with
  * the remote repositories where attempts were made to resolve the artifacts.
  *
- * @author Jason van Zyl
  */
 @Deprecated
 public class UnresolvedArtifacts {

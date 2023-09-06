@@ -23,7 +23,6 @@ import java.util.Map;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 
 /**
- * @author Jason van Zyl
  */
 public interface ArtifactHandlerManager {
     String ROLE = ArtifactHandlerManager.class.getName();

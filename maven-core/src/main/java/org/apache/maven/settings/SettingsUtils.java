@@ -21,7 +21,6 @@ package org.apache.maven.settings;
 /**
  * Several convenience methods to handle settings
  *
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  */
 public final class SettingsUtils {
 

@@ -21,7 +21,6 @@ package org.apache.maven.settings.crypto;
 /**
  * Decrypts passwords in the settings.
  *
- * @author Benjamin Bentmann
  */
 public interface SettingsDecrypter {
 

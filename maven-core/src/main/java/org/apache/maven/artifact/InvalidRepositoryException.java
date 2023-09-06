@@ -25,7 +25,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 /**
  * Error constructing an artifact repository.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class InvalidRepositoryException extends Exception {
     private final String repositoryId;

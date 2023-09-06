@@ -78,8 +78,6 @@ import org.apache.maven.model.validation.ModelValidator;
  * this factory to provide custom implementations for some of the components used by the model builder, or use the
  * builder API to inject custom instances.
  *
- * @author Benjamin Bentmann
- * @author Guillaume Nodet
  */
 public class DefaultModelBuilderFactory {
 

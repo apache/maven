@@ -21,8 +21,6 @@ package org.apache.maven.artifact.handler;
 import static java.util.Objects.requireNonNull;
 
 /**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @author Jason van Zyl
  */
 public class DefaultArtifactHandler implements ArtifactHandler {
     private final String type;

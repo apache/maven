@@ -28,8 +28,6 @@ import org.apache.maven.model.transform.stax.NodeBufferingParser;
 /**
  * Resolves all ci-friendly properties occurrences between version-tags
  *
- * @author Robert Scholte
- * @author Guillaume Nodet
  * @since 4.0.0
  */
 class CiFriendlyXMLFilter extends NodeBufferingParser {

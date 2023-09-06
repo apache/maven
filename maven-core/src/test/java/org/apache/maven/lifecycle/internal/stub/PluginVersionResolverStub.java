@@ -25,7 +25,6 @@ import org.apache.maven.plugin.version.PluginVersionResult;
 import org.eclipse.aether.repository.ArtifactRepository;
 
 /**
- * @author Kristian Rosenvold
  */
 public class PluginVersionResolverStub implements PluginVersionResolver {
 

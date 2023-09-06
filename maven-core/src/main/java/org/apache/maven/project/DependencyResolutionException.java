@@ -19,7 +19,6 @@
 package org.apache.maven.project;
 
 /**
- * @author Benjamin Bentmann
  */
 public class DependencyResolutionException extends Exception {
 

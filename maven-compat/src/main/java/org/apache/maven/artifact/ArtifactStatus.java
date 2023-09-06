@@ -24,7 +24,6 @@ import java.util.Map;
 /**
  * Type safe enumeration for the artifact status field.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @Deprecated
 public final class ArtifactStatus implements Comparable<ArtifactStatus> {

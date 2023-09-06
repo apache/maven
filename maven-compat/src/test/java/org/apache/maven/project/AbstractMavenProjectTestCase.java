@@ -40,7 +40,6 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * @author Jason van Zyl
  */
 @PlexusTest
 public abstract class AbstractMavenProjectTestCase {

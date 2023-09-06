@@ -36,7 +36,6 @@ import org.apache.maven.project.MavenProject;
  * Wraps an active project instance to be able to receive updates from its artifact without affecting the original
  * attributes of this artifact.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * TODO I think this exposes a design flaw in that the immutable and mutable parts of an artifact are in one class and
  * should be split. ie scope, file, etc depend on the context of use, whereas everything else is immutable.
  */
