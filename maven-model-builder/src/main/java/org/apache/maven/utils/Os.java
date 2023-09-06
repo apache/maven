@@ -129,7 +129,7 @@ public class Os {
     private Os() {}
 
     /**
-     * Determines if the OS on which Ant is executing matches the
+     * Determines if the OS on which Maven is executing matches the
      * given OS family.
      *
      * @param family the family to check for
