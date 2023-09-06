@@ -42,9 +42,6 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
 
 /**
- * @author Igor Fedorenko
- * @author Benjamin Bentmann
- * @author Anton Tanasenko
  */
 @Named
 @Singleton

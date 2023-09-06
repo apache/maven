@@ -31,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests that the global settings.xml shipped with the distribution is in good state.
  *
- * @author Benjamin Bentmann
  */
 class GlobalSettingsTest {
 

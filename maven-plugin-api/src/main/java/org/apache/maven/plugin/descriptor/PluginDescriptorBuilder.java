@@ -36,7 +36,6 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 /**
- * @author Jason van Zyl
  */
 public class PluginDescriptorBuilder {
     public PluginDescriptor build(Reader reader) throws PlexusConfigurationException {

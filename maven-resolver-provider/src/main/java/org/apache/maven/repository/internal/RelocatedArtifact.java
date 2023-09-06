@@ -26,7 +26,6 @@ import org.eclipse.aether.artifact.AbstractArtifact;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
- * @author Benjamin Bentmann
  */
 public final class RelocatedArtifact extends AbstractArtifact {
 

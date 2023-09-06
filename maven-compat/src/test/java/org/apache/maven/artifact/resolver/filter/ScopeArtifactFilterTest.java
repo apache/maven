@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@link ScopeArtifactFilter}.
  *
- * @author Benjamin Bentmann
  */
 class ScopeArtifactFilterTest {
 

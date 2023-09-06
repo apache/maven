@@ -29,8 +29,6 @@ import java.nio.file.Path;
  * The {@link #transform(XMLStreamReader, Path, TransformerContext)} method uses a Path on purpose, to ensure the
  * local pom is the original source.
  *
- * @author Robert Scholte
- * @author Guillaume Nodet
  * @since 4.0.0
  */
 public interface ModelSourceTransformer {

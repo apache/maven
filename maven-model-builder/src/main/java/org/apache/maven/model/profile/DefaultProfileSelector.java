@@ -39,7 +39,6 @@ import org.apache.maven.model.profile.activation.ProfileActivator;
 /**
  * Calculates the active profiles among a given collection of profiles.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

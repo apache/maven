@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * Tests {@link FileProfileActivator}.
  *
- * @author Ravil Galeyev
  */
 class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator> {
 

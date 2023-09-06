@@ -33,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@link ArtifactUtils}.
  *
- * @author Benjamin Bentmann
  */
 class ArtifactUtilsTest {
 

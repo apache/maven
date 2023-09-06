@@ -30,7 +30,6 @@ import org.apache.maven.model.transform.stax.BufferingParser;
 /**
  * Remove the root attribute on the model
  *
- * @author Guillaume Nodet
  * @since 4.0.0
  */
 class RootXMLFilter extends BufferingParser {

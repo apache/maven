@@ -27,7 +27,6 @@ import org.apache.maven.artifact.resolver.ResolutionNode;
  * Resolves conflicting artifacts by always selecting the <em>farthest</em> declaration. Farthest is defined as the
  * declaration that has the most transitive steps away from the project being built.
  *
- * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @since 3.0
  */
 @Named("farthest")

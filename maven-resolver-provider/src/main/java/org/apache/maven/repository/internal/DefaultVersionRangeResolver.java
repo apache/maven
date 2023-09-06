@@ -60,7 +60,6 @@ import org.eclipse.aether.version.VersionRange;
 import org.eclipse.aether.version.VersionScheme;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

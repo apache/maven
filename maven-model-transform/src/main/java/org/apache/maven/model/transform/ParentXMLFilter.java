@@ -39,8 +39,6 @@ import org.apache.maven.model.transform.stax.NodeBufferingParser;
  * optionally include the version based on the path
  * </p>
  *
- * @author Robert Scholte
- * @author Guillaume Nodet
  * @since 4.0.0
  */
 class ParentXMLFilter extends NodeBufferingParser {

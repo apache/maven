@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Test the artifact resolution exception message
  *
- * @author Mauro Talevi
  */
 class ArtifactResolutionExceptionTest {
     private static final String LS = System.lineSeparator();

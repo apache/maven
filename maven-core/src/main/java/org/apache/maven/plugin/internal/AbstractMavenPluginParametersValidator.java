@@ -31,7 +31,6 @@ import static java.util.Objects.requireNonNull;
 /**
  * Common implementations for plugin parameters configuration validation.
  *
- * @author Slawomir Jaranowski
  */
 abstract class AbstractMavenPluginParametersValidator implements MavenPluginConfigurationValidator {
 

@@ -24,7 +24,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 /**
  * Listens to the resolution process and handles events.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public interface ResolutionListener {
     String ROLE = ResolutionListener.class.getName();

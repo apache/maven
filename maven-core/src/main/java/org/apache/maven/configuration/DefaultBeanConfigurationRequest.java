@@ -29,7 +29,6 @@ import org.apache.maven.model.PluginManagement;
 /**
  * A basic bean configuration request.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultBeanConfigurationRequest implements BeanConfigurationRequest {
 

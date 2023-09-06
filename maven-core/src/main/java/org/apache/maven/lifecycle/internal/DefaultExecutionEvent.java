@@ -26,7 +26,6 @@ import org.apache.maven.project.MavenProject;
 /**
  * Holds data relevant for an execution event.
  *
- * @author Benjamin Bentmann
  */
 class DefaultExecutionEvent implements ExecutionEvent {
 

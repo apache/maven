@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code Organization}.
  *
- * @author Benjamin Bentmann
  */
 class OrganizationTest {
 

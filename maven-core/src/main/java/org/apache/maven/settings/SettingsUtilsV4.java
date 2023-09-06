@@ -57,7 +57,6 @@ import org.apache.maven.settings.v4.SettingsMerger;
 /**
  * Several convenience methods to handle settings
  *
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  */
 public final class SettingsUtilsV4 {
 

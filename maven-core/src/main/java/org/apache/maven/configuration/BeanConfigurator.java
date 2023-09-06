@@ -25,7 +25,6 @@ package org.apache.maven.configuration;
  * have a public setter or be backed by an equally named field (of any visibility).
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 public interface BeanConfigurator {
 

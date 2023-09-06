@@ -28,7 +28,6 @@ import java.util.function.Function;
 /**
  * Base implementation for providing the BuildToRawPomXML.
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 public class BuildToRawPomXMLFilterFactory {

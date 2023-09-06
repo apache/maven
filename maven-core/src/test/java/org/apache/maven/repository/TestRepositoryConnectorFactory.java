@@ -28,7 +28,6 @@ import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.transfer.NoRepositoryConnectorException;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named("test")
 @Singleton

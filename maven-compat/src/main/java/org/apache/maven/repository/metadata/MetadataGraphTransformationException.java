@@ -19,7 +19,6 @@
 package org.apache.maven.repository.metadata;
 
 /**
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  */
 public class MetadataGraphTransformationException extends Exception {
 

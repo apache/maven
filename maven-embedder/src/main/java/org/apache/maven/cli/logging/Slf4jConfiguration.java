@@ -22,7 +22,6 @@ package org.apache.maven.cli.logging;
  * Interface for configuration operations on loggers, which are not available in slf4j, then require per-slf4f-binding
  * implementation.
  *
- * @author Hervé Boutemy
  * @since 3.1.0
  */
 public interface Slf4jConfiguration {

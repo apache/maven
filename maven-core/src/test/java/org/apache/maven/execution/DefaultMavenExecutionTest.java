@@ -30,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
- * @author Benjamin Bentmann
  */
 class DefaultMavenExecutionTest {
     @Test

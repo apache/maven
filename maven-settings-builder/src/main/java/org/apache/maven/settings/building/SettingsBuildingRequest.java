@@ -24,7 +24,6 @@ import java.util.Properties;
 /**
  * Collects settings that control the building of effective settings.
  *
- * @author Benjamin Bentmann
  */
 public interface SettingsBuildingRequest {
 

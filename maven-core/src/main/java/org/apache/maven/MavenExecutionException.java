@@ -23,7 +23,6 @@ import java.io.File;
 import org.apache.maven.project.ProjectBuildingException;
 
 /**
- * @author Jason van Zyl
  */
 public class MavenExecutionException extends Exception {
     private File pomFile;

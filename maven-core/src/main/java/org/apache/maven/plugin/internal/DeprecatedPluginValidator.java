@@ -33,7 +33,6 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 /**
  * Print warnings if deprecated mojo or parameters of plugin are used in configuration.
  *
- * @author Slawomir Jaranowski
  */
 @Singleton
 @Named

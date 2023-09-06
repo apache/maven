@@ -41,8 +41,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka</a>
  */
 @Named("snapshot")
 @Singleton

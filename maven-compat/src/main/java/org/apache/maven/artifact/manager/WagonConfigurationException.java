@@ -19,7 +19,6 @@
 package org.apache.maven.artifact.manager;
 
 /**
- * @author Olivier Lamy
  */
 @Deprecated
 public class WagonConfigurationException extends org.apache.maven.repository.legacy.WagonConfigurationException {

@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 /**
  * JDK toolchain implementation.
  *
- * @author Milos Kleint
  * @since 2.0.9, renamed from DefaultJavaToolChain in 3.2.4
  */
 public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain {

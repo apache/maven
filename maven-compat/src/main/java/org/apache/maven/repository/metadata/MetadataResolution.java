@@ -24,7 +24,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  *
- * @author Jason van Zyl
  *
  */
 public class MetadataResolution {

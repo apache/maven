@@ -25,7 +25,6 @@ import org.apache.maven.api.model.Model;
  * Describes a tag used by the model builder to access a {@link ModelCache}. This interface basically aggregates a name
  * and a class to provide some type safety when working with the otherwise untyped cache.
  *
- * @author Benjamin Bentmann
  * @param <T> The type of data associated with the tag.
  */
 interface ModelCacheTag<T> {

@@ -30,7 +30,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 /**
  * Describes runtime information about the application.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @Deprecated
 @Named

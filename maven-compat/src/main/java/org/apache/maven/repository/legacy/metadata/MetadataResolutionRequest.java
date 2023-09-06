@@ -27,7 +27,6 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 /**
  * Forms a request to retrieve artifact metadata.
  *
- * @author Benjamin Bentmann
  */
 @Deprecated
 public interface MetadataResolutionRequest extends RepositoryRequest {

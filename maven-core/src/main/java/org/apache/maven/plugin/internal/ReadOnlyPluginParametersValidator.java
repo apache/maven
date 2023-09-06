@@ -32,7 +32,6 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 /**
  * Print warnings if read-only parameters of a plugin are used in configuration.
  *
- * @author Slawomir Jaranowski
  */
 @Named
 @Singleton

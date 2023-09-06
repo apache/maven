@@ -19,7 +19,6 @@
 package org.apache.maven.plugin.descriptor;
 
 /**
- * @author Jason van Zyl
  */
 public class InvalidParameterException extends InvalidPluginDescriptorException {
     public InvalidParameterException(String element, int i) {

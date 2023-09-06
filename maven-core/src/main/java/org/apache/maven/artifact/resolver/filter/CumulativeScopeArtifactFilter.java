@@ -28,8 +28,6 @@ import java.util.Set;
  * single step. This should be a more efficient implementation of multiple standard {@link ScopeArtifactFilter}
  * instances ORed together.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @author jdcasey
  */
 public class CumulativeScopeArtifactFilter extends AbstractScopeArtifactFilter {
 

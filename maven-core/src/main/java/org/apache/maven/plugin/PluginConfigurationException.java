@@ -24,7 +24,6 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluatio
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
- * @author Jason van Zyl
  */
 public class PluginConfigurationException extends Exception {
     private PluginDescriptor pluginDescriptor;

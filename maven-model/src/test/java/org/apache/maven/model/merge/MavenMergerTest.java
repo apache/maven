@@ -33,7 +33,6 @@ import static org.hamcrest.Matchers.is;
 /**
  * MavenMerger is based on same instances, subclasses should override KeyComputer per type
  *
- * @author Robert Scholte
  *
  */
 class MavenMergerTest {

@@ -34,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * @author <a href="mailto:baerrach@apache.org">Barrie Treloar</a>
  */
 class DefaultExceptionHandlerTest {
     /**

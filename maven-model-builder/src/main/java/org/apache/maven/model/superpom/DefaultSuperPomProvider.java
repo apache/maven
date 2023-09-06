@@ -34,7 +34,6 @@ import org.apache.maven.model.building.ModelProcessor;
 /**
  * Provides the super POM that all models implicitly inherit from.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

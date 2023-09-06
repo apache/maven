@@ -35,7 +35,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
- * @author Kristian Rosenvold
  */
 class BuilderCommonTest {
     private Logger logger = mock(Logger.class);

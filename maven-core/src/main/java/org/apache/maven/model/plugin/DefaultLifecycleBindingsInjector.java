@@ -47,7 +47,6 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

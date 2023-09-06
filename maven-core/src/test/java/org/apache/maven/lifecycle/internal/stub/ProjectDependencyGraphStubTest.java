@@ -29,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests the stub. Yeah, I know.
  *
- * @author Kristian Rosenvold
  */
 class ProjectDependencyGraphStubTest {
     ProjectDependencyGraphStub stub = new ProjectDependencyGraphStub();

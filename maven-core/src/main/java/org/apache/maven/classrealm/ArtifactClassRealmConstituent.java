@@ -23,7 +23,6 @@ import java.io.File;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
- * @author Benjamin Bentmann
  */
 class ArtifactClassRealmConstituent implements ClassRealmConstituent {
 

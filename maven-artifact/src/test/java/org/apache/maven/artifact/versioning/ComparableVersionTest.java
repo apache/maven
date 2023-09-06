@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test ComparableVersion.
  *
- * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
  */
 @SuppressWarnings("unchecked")
 class ComparableVersionTest {

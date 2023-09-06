@@ -22,7 +22,6 @@ package org.apache.maven.settings.building;
  * Builds the effective settings from a user settings file, a project settings file
  * and/or a global settings file.
  *
- * @author Benjamin Bentmann
  */
 public interface SettingsBuilder {
 

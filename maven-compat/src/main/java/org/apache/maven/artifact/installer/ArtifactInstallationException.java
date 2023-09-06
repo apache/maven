@@ -19,7 +19,6 @@
 package org.apache.maven.artifact.installer;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
 public class ArtifactInstallationException extends Exception {
     public ArtifactInstallationException(String message) {

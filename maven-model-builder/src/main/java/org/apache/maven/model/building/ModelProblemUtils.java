@@ -25,7 +25,6 @@ import org.apache.maven.model.Model;
 /**
  * Assists in the handling of model problems.
  *
- * @author Benjamin Bentmann
  */
 public class ModelProblemUtils {
 

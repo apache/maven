@@ -24,7 +24,6 @@ import java.util.Collection;
 /**
  * This is the main graph data structure used by the RepositorySystem to present tree and graph objects.
  *
- * @author Oleg Gusakov
  *
  */
 public class MetadataGraph {

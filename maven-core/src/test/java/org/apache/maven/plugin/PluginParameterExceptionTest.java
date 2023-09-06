@@ -30,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * MNG-3131
  *
- * @author Robert Scholte
  *
  */
 class PluginParameterExceptionTest {

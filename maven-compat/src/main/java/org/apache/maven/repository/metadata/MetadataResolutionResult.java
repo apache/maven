@@ -26,7 +26,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * This object is tinted with ClasspathTransformation and GraphConflictResolver.
  * Get rid of them after debugging
  *
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  */
 public class MetadataResolutionResult {
     MetadataTreeNode treeRoot;

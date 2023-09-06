@@ -31,8 +31,6 @@ import org.apache.maven.model.transform.stax.BufferingParser;
  * Should be used in case of a DOM that should not be effected by other filters,
  * even though the elements match.
  *
- * @author Robert Scholte
- * @author Guillaume Nodet
  * @since 4.0.0
  */
 class FastForwardFilter extends BufferingParser {

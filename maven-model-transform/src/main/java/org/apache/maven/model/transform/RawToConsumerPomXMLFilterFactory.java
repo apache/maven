@@ -23,8 +23,6 @@ import javax.xml.stream.XMLStreamReader;
 import java.nio.file.Path;
 
 /**
- * @author Guillaume Nodet
- * @author Robert Scholte
  * @since 4.0.0
  */
 public class RawToConsumerPomXMLFilterFactory {

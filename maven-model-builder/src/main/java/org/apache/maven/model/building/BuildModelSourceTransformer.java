@@ -30,7 +30,6 @@ import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory;
 /**
  * ModelSourceTransformer for the build pom
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 @Named

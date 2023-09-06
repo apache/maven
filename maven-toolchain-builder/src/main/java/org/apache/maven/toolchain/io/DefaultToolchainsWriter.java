@@ -33,8 +33,6 @@ import org.apache.maven.toolchain.v4.MavenToolchainsStaxWriter;
 /**
  * Handles serialization of toolchains into the default textual format.
  *
- * @author Mike Mol
- * @author Martin Kanters
  */
 @Named
 @Singleton

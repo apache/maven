@@ -57,7 +57,6 @@ import org.apache.maven.settings.Server;
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

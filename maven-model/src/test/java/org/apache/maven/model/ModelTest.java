@@ -29,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code Model}.
  *
- * @author Benjamin Bentmann
  */
 class ModelTest {
 

@@ -21,7 +21,6 @@ package org.apache.maven.repository;
 /**
  * Describes a resource being uploaded or downloaded by the repository system.
  *
- * @author Benjamin Bentmann
  */
 @Deprecated
 public interface ArtifactTransferResource {

@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests {@link JdkVersionProfileActivator}.
  *
- * @author Benjamin Bentmann
  */
 class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVersionProfileActivator> {
 

@@ -27,7 +27,6 @@ import org.apache.maven.plugin.PluginValidationManager;
  * Common implementations for plugin parameters configuration validation that relies on Mojo descriptor (leaves out
  * core parameters by default).
  *
- * @author Slawomir Jaranowski
  */
 abstract class AbstractMavenPluginDescriptorSourcedParametersValidator extends AbstractMavenPluginParametersValidator {
 

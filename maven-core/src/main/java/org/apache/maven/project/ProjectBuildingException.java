@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 
 /**
- * @author Jason van Zyl
  */
 public class ProjectBuildingException extends Exception {
     private final String projectId;

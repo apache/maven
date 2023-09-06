@@ -71,7 +71,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author Jason van Zyl
  */
 public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenComponentTestCase {
     private static final String FS = File.separator;

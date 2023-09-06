@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 public class ModelValidationResult {
 

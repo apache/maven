@@ -53,7 +53,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author jdcasey
  */
 public abstract class AbstractModelInterpolatorTest {
     private Properties context;

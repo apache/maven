@@ -35,7 +35,6 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  */
 @Deprecated
 public interface PluginManager {

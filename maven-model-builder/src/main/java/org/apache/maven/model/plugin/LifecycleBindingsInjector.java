@@ -25,7 +25,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.
  *
- * @author Benjamin Bentmann
  */
 public interface LifecycleBindingsInjector {
 

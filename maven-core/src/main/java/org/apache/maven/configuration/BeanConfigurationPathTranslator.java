@@ -24,7 +24,6 @@ import java.io.File;
  * Postprocesses filesystem paths. For instance, a path translator might want to resolve relative paths given in the
  * bean configuration against some base directory.
  *
- * @author Benjamin Bentmann
  */
 public interface BeanConfigurationPathTranslator {
 

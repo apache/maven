@@ -27,7 +27,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Calculates the active profiles among a given collection of profiles.
  *
- * @author Benjamin Bentmann
  */
 public interface ProfileSelector {
 

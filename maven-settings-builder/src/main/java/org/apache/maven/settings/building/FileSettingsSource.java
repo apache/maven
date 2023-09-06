@@ -25,7 +25,6 @@ import org.apache.maven.building.FileSource;
 /**
  * Wraps an ordinary {@link File} as a settings source.
  *
- * @author Benjamin Bentmann
  *
  * @deprecated instead use {@link FileSource}
  */

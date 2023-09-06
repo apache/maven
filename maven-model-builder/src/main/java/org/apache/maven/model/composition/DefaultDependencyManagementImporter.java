@@ -34,7 +34,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles the import of dependency management from other models into the target model.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

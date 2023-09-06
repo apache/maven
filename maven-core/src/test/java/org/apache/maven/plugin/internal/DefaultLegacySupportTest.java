@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * @author Kristian Rosenvold
  */
 class DefaultLegacySupportTest {
     final CountDownLatch latch = new CountDownLatch(1);

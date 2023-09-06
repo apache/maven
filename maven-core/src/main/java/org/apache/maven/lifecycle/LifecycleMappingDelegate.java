@@ -40,7 +40,6 @@ import org.apache.maven.project.MavenProject;
  *
  * @since 3.2.0
  * @see org.apache.maven.lifecycle.internal.DefaultLifecycleMappingDelegate
- * @author ifedorenko
  */
 public interface LifecycleMappingDelegate {
     Map<String, List<MojoExecution>> calculateLifecycleMappings(

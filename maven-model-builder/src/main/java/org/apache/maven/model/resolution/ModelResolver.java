@@ -30,7 +30,6 @@ import org.apache.maven.model.building.ModelSource;
  * {@link org.apache.maven.model.building.ModelBuilder} will add any relevant repositories to the model resolver. In
  * other words, the model resolver is stateful and should not be reused across multiple model building requests.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelResolver {
 

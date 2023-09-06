@@ -35,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
- * @author Igor Fedorenko
  */
 class DefaultMavenMetadataCacheTest {
     private RepositorySystem repositorySystem;

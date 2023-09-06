@@ -22,7 +22,6 @@ import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
 /**
- * @author jdcasey
  */
 public interface ArtifactRepositoryFactory {
     String ROLE = ArtifactRepositoryFactory.class.getName();

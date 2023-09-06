@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Log at debug level the mojo configuration.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @Deprecated
 public class DebugConfigurationListener implements ConfigurationListener {

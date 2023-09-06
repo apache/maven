@@ -22,7 +22,6 @@ import java.util.List;
 
 /**
  * Extends the ModelProblemCollector by the capacity of returning the collected problems.
- * @author Milos Kleint
  */
 public interface ModelProblemCollectorExt extends ModelProblemCollector {
 

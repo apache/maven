@@ -25,7 +25,6 @@ import java.util.Map;
 /**
  * Describes the environmental context used to determine the activation status of profiles.
  *
- * @author Benjamin Bentmann
  */
 public interface ProfileActivationContext {
     /**

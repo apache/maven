@@ -98,7 +98,6 @@ import static org.apache.maven.model.building.Result.error;
 import static org.apache.maven.model.building.Result.newResult;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
@@ -1874,7 +1873,6 @@ public class DefaultModelBuilder implements ModelBuilder {
      * After the buildplan is ready, the build()-method returns the immutable context useful during distribution.
      * This is an inner class, as it must be able to call readRawModel()
      *
-     * @author Robert Scholte
      * @since 4.0.0
      */
     private class DefaultTransformerContextBuilder implements TransformerContextBuilder {

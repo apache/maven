@@ -29,7 +29,6 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.wagon.events.TransferListener;
 
 /**
- * @author Jason van Zyl
  */
 // Just hide the one method we want behind the RepositorySystem interface.
 public interface ArtifactResolver {

@@ -23,7 +23,6 @@ import org.apache.maven.model.Model;
 /**
  * Holds data relevant for a model building event.
  *
- * @author Benjamin Bentmann
  */
 class DefaultModelBuildingEvent implements ModelBuildingEvent {
 

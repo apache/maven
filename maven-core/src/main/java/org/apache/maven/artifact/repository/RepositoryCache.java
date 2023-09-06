@@ -22,7 +22,6 @@ package org.apache.maven.artifact.repository;
  * Caches auxiliary data used during repository access like already processed metadata. The data in the cache is meant
  * for exclusive consumption by the repository system and is opaque to the cache implementation.
  *
- * @author Benjamin Bentmann
  */
 @Deprecated
 //
