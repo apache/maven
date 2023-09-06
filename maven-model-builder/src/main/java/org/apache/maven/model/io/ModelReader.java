@@ -46,6 +46,12 @@ public interface ModelReader {
     String INPUT_SOURCE = "org.apache.maven.model.io.inputSource";
 
     /**
+     * Name of the property used to store the project's root directory to use with
+     * XInclude support.
+     */
+    String ROOT_DIRECTORY = "rootDirectory";
+
+    /**
      * Reads the model from the specified file.
      *
      * @param input The file to deserialize the model from, must not be {@code null}.

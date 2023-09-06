@@ -44,6 +44,7 @@ import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -279,6 +280,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             request.setModelCache(modelCacheFactory.createCache(config.session));
         }
         request.setTransformerContextBuilder(config.transformerContextBuilder);
+        DefaultSession session = (DefaultSession) config.session.getData().get(DefaultSession.class);
+        if (session != null) {
+            try {
+                request.setRootDirectory(session.getRootDirectory());
+            } catch (IllegalStateException e) {
+                // can happen if root directory can not be found, just ignore
+            }
+        }
 
         return request;
     }

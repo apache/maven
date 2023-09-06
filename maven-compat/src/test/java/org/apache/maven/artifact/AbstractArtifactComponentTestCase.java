@@ -35,14 +35,18 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
+import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
@@ -100,6 +104,12 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
         RepositorySystemSession repoSession = initRepoSession();
         MavenSession session = new MavenSession(
                 getContainer(), repoSession, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult());
+        new DefaultSessionFactory(
+                        getContainer().lookup(RepositorySystem.class),
+                        getContainer().lookup(MavenRepositorySystem.class),
+                        getContainer(),
+                        getContainer().lookup(RuntimeInformation.class))
+                .getSession(session);
 
         legacySupport.setSession(session);
     }

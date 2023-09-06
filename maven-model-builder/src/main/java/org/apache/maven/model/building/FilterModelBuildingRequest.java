@@ -19,6 +19,7 @@
 package org.apache.maven.model.building;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -262,6 +263,17 @@ class FilterModelBuildingRequest implements ModelBuildingRequest {
     @Override
     public ModelBuildingRequest setTransformerContextBuilder(TransformerContextBuilder contextBuilder) {
         request.setTransformerContextBuilder(contextBuilder);
+        return this;
+    }
+
+    @Override
+    public Path getRootDirectory() {
+        return request.getRootDirectory();
+    }
+
+    @Override
+    public ModelBuildingRequest setRootDirectory(Path rootDirectory) {
+        request.setRootDirectory(rootDirectory);
         return this;
     }
 }

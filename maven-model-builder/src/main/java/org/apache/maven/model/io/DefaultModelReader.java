@@ -95,6 +95,11 @@ public class DefaultModelReader implements ModelReader {
         return (InputSource) value;
     }
 
+    private Path getRootDirectory(Map<String, ?> options) {
+        Object value = (options != null) ? options.get(ROOT_DIRECTORY) : null;
+        return (Path) value;
+    }
+
     private Model read(InputStream input, Path pomFile, Map<String, ?> options) throws IOException {
         try {
             XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
