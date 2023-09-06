@@ -26,6 +26,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  *
  *
  */
+@Deprecated
 public class MetadataTreeNode {
     ArtifactMetadata md; // this node
 

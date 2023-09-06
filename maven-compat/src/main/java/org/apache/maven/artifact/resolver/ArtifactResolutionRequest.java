@@ -37,6 +37,7 @@ import org.apache.maven.settings.Server;
  * to process a POMs dependencies.
  *
  */
+@Deprecated
 public class ArtifactResolutionRequest implements RepositoryRequest {
     private static final String LS = System.lineSeparator();
 

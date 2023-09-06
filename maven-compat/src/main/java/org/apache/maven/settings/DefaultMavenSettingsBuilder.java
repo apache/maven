@@ -36,6 +36,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  */
+@Deprecated
 @Named
 @Singleton
 public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements MavenSettingsBuilder {

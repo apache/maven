@@ -23,6 +23,7 @@ package org.apache.maven.repository;
  *
  *
  */
+@Deprecated
 public class MavenArtifactMetadata {
     public static final String DEFAULT_TYPE = "jar";
 

@@ -20,6 +20,7 @@ package org.apache.maven.artifact.deployer;
 
 /**
  */
+@Deprecated
 public class ArtifactDeploymentException extends Exception {
     public ArtifactDeploymentException(String message) {
         super(message);

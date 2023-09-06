@@ -29,6 +29,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
  * Metadata for the artifact directory of the repository.
  *
  */
+@Deprecated
 public class ArtifactRepositoryMetadata extends AbstractRepositoryMetadata {
     private Artifact artifact;
 

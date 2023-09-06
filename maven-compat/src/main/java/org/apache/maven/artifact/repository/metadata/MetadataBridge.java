@@ -36,6 +36,7 @@ import org.eclipse.aether.metadata.Metadata;
  * of the public API. In particular, this class can be changed or deleted without prior notice.
  *
  */
+@Deprecated
 public final class MetadataBridge extends AbstractMetadata implements MergeableMetadata {
 
     private ArtifactMetadata metadata;

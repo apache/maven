@@ -51,6 +51,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultRepositoryMetadataManager extends AbstractLogEnabled implements RepositoryMetadataManager {
     @Inject
     private WagonManager wagonManager;

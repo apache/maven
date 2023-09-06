@@ -44,6 +44,7 @@ import org.codehaus.plexus.util.StringUtils;
  */
 @Named("snapshot")
 @Singleton
+@Deprecated
 public class SnapshotTransformation extends AbstractVersionTransformation {
     private static final String DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT = "yyyyMMdd.HHmmss";
 

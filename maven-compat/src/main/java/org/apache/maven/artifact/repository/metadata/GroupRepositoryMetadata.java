@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * Metadata for the group directory of the repository.
  *
  */
+@Deprecated
 public class GroupRepositoryMetadata extends AbstractRepositoryMetadata {
     private final String groupId;
 

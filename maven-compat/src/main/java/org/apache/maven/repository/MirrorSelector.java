@@ -27,6 +27,7 @@ import org.apache.maven.settings.Mirror;
  * Handles the selection of mirrors for repositories.
  *
  */
+@Deprecated
 public interface MirrorSelector {
 
     /**

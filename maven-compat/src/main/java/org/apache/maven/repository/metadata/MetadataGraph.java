@@ -31,6 +31,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  *
  *
  */
+@Deprecated
 public class MetadataGraph {
     public static final int DEFAULT_VERTICES = 32;
     public static final int DEFAULT_EDGES = 64;

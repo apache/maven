@@ -26,6 +26,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * component in the current container.
  *
  */
+@Deprecated
 public class UnknownRepositoryLayoutException extends InvalidRepositoryException {
 
     private final String layoutId;

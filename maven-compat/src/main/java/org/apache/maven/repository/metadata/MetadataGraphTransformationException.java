@@ -20,6 +20,7 @@ package org.apache.maven.repository.metadata;
 
 /**
  */
+@Deprecated
 public class MetadataGraphTransformationException extends Exception {
 
     private static final long serialVersionUID = -4029897098314019152L;

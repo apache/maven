@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
 /**
  */
+@Deprecated
 public interface ArtifactRepositoryFactory {
     String ROLE = ArtifactRepositoryFactory.class.getName();
 

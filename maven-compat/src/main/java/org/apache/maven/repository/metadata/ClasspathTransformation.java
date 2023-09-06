@@ -25,6 +25,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  *
  *
  */
+@Deprecated
 public interface ClasspathTransformation {
     String ROLE = ClasspathTransformation.class.getName();
 

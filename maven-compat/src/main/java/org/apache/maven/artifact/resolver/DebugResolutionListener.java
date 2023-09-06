@@ -30,6 +30,7 @@ import org.codehaus.plexus.logging.Logger;
  * Send resolution events to the debug log.
  *
  */
+@Deprecated
 public class DebugResolutionListener implements ResolutionListener, ResolutionListenerForDepMgmt {
     private Logger logger;
 

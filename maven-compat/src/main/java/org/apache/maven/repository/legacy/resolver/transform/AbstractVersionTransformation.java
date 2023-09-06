@@ -43,6 +43,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  *
  * TODO try and refactor to remove abstract methods - not particular happy about current design
  */
+@Deprecated
 public abstract class AbstractVersionTransformation extends AbstractLogEnabled implements ArtifactTransformation {
     @Inject
     protected RepositoryMetadataManager repositoryMetadataManager;

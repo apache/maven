@@ -22,6 +22,7 @@ package org.apache.maven.artifact.repository.metadata;
  * Error while deploying repository metadata.
  *
  */
+@Deprecated
 public class RepositoryMetadataDeploymentException extends Throwable {
     public RepositoryMetadataDeploymentException(String message) {
         super(message);

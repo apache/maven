@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+@Deprecated
 public class MetadataResolutionRequest {
     protected ArtifactMetadata query;
     protected ArtifactRepository localRepository;

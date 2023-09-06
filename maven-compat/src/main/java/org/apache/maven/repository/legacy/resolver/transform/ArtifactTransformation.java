@@ -30,6 +30,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
 /**
  */
+@Deprecated
 public interface ArtifactTransformation {
     String ROLE = ArtifactTransformation.class.getName();
 

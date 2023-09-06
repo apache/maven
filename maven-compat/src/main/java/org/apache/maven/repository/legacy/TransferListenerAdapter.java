@@ -32,6 +32,7 @@ import org.apache.maven.wagon.resource.Resource;
 /**
  * TransferListenerAdapter
  */
+@Deprecated
 public class TransferListenerAdapter implements TransferListener {
 
     private final ArtifactTransferListener listener;

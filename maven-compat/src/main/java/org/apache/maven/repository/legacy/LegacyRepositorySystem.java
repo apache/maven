@@ -84,6 +84,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  */
 @Named("default")
 @Singleton
+@Deprecated
 public class LegacyRepositorySystem implements RepositorySystem {
 
     @Inject

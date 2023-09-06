@@ -60,6 +60,7 @@ import org.codehaus.plexus.logging.Logger;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
 
     @Inject

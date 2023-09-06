@@ -24,6 +24,7 @@ package org.apache.maven.artifact;
  *
  *
  */
+@Deprecated
 public enum ArtifactScopeEnum {
     compile(1),
     test(2),

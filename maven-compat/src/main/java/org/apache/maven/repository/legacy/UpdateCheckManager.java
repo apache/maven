@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 /**
  * UpdateCheckManager
  */
+@Deprecated
 public interface UpdateCheckManager {
 
     boolean isUpdateRequired(Artifact artifact, ArtifactRepository repository);

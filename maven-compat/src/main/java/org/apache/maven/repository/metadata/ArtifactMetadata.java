@@ -27,6 +27,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  * Artifact Metadata that is resolved independent of Artifact itself.
  *
  */
+@Deprecated
 public class ArtifactMetadata {
     /**
      * standard glorified artifact coordinates

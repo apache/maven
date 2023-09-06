@@ -31,6 +31,7 @@ import org.apache.maven.artifact.resolver.ResolutionNode;
  */
 @Named("farthest")
 @Singleton
+@Deprecated
 public class FarthestConflictResolver implements ConflictResolver {
     // ConflictResolver methods -----------------------------------------------
 

@@ -49,6 +49,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  * of the public API. In particular, this class can be changed or deleted without prior notice.
  *
  */
+@Deprecated
 public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
     private final ArtifactRepository delegate;

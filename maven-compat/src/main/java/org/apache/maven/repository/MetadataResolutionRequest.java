@@ -30,6 +30,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  *
  *
  */
+@Deprecated
 public class MetadataResolutionRequest {
     private MavenArtifactMetadata mad;
 

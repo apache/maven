@@ -37,6 +37,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultConflictResolverFactory implements ConflictResolverFactory, Contextualizable {
     // fields -----------------------------------------------------------------
 

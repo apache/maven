@@ -22,6 +22,7 @@ package org.apache.maven.artifact.repository.metadata;
  * Error while retrieving repository metadata from the repository.
  *
  */
+@Deprecated
 public class RepositoryMetadataResolutionException extends Exception {
     public RepositoryMetadataResolutionException(String message) {
         super(message);

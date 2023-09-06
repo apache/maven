@@ -24,6 +24,7 @@ import org.apache.maven.artifact.resolver.ResolutionNode;
  * Determines which version of an artifact to use when there are conflicting declarations.
  *
  */
+@Deprecated
 public interface ConflictResolver {
     String ROLE = ConflictResolver.class.getName();
 

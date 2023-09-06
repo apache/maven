@@ -21,6 +21,7 @@ package org.apache.maven.repository.metadata;
 /**
  * MetadataResolutionException
  */
+@Deprecated
 public class MetadataResolutionException extends Exception {
 
     public MetadataResolutionException() {

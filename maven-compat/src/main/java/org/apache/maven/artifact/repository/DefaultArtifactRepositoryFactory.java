@@ -37,6 +37,7 @@ import org.eclipse.aether.RepositorySystemSession;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFactory {
 
     @Inject

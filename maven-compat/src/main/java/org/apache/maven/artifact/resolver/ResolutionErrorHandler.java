@@ -20,6 +20,7 @@ package org.apache.maven.artifact.resolver;
 
 /**
  */
+@Deprecated
 public interface ResolutionErrorHandler {
 
     void throwErrors(ArtifactResolutionRequest request, ArtifactResolutionResult result)

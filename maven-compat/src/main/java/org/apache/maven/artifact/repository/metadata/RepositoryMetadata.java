@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
  *
  * TODO not happy about the store method - they use "this"
  */
+@Deprecated
 public interface RepositoryMetadata extends org.apache.maven.artifact.metadata.ArtifactMetadata {
 
     int RELEASE = 1;

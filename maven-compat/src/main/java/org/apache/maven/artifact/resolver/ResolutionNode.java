@@ -34,6 +34,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 /**
  * ResolutionNode
  */
+@Deprecated
 public class ResolutionNode {
     private Artifact artifact;
 

@@ -30,6 +30,7 @@ import org.codehaus.plexus.component.annotations.Configuration;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultGraphConflictResolutionPolicy implements GraphConflictResolutionPolicy {
     /**
      * artifact, closer to the entry point, is selected

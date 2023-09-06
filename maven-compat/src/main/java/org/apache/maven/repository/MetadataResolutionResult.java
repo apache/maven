@@ -35,6 +35,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  *
  *
  */
+@Deprecated
 public class MetadataResolutionResult {
     private Artifact originatingArtifact;
 

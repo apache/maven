@@ -34,6 +34,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  */
 @Named("oldest")
 @Singleton
+@Deprecated
 public class OldestConflictResolver implements ConflictResolver {
     // ConflictResolver methods -----------------------------------------------
 

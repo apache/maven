@@ -26,6 +26,7 @@ import org.codehaus.plexus.logging.Logger;
  * Send resolution warning events to the warning log.
  *
  */
+@Deprecated
 public class WarningResolutionListener implements ResolutionListener {
     private Logger logger;
 

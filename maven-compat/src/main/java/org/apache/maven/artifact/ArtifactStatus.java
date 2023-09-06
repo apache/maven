@@ -25,6 +25,7 @@ import java.util.Map;
  * Type safe enumeration for the artifact status field.
  *
  */
+@Deprecated
 public final class ArtifactStatus implements Comparable<ArtifactStatus> {
     /**
      * No trust - no information about status.

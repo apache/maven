@@ -20,6 +20,7 @@ package org.apache.maven.artifact.installer;
 
 /**
  */
+@Deprecated
 public class ArtifactInstallationException extends Exception {
     public ArtifactInstallationException(String message) {
         super(message);

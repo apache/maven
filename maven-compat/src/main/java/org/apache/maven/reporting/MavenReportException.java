@@ -22,6 +22,7 @@ package org.apache.maven.reporting;
  * An exception occurring during the execution of a Maven report.
  *
  */
+@Deprecated
 public class MavenReportException extends Exception {
     public MavenReportException(String msg) {
         super(msg);

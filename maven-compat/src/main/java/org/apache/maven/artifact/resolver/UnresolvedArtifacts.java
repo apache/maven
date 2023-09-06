@@ -28,6 +28,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * the remote repositories where attempts were made to resolve the artifacts.
  *
  */
+@Deprecated
 public class UnresolvedArtifacts {
     private Artifact originatingArtifact;
 

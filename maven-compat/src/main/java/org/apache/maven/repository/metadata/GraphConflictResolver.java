@@ -25,6 +25,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  * Different implementations will implement different conflict resolution policies.
  *
  */
+@Deprecated
 public interface GraphConflictResolver {
     String ROLE = GraphConflictResolver.class.getName();
 

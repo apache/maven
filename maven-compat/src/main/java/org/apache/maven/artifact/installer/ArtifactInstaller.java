@@ -25,6 +25,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  */
+@Deprecated
 public interface ArtifactInstaller {
     String ROLE = ArtifactInstaller.class.getName();
 

@@ -25,6 +25,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
  * Listens to the resolution process and handles events.
  *
  */
+@Deprecated
 public interface ResolutionListener {
     String ROLE = ResolutionListener.class.getName();
 

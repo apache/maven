@@ -35,6 +35,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultClasspathTransformation implements ClasspathTransformation {
     @Inject
     GraphConflictResolver conflictResolver;

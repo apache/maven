@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  *
  *
  */
+@Deprecated
 public class MetadataResolution {
     /** resolved MD  */
     private ArtifactMetadata artifactMetadata;

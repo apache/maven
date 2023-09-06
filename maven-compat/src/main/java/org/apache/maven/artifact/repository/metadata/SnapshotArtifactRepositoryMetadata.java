@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  *
  * TODO split instantiation (versioning, plugin mappings) from definition
  */
+@Deprecated
 public class SnapshotArtifactRepositoryMetadata extends AbstractRepositoryMetadata {
     private Artifact artifact;
 

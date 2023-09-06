@@ -27,6 +27,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * Get rid of them after debugging
  *
  */
+@Deprecated
 public class MetadataResolutionResult {
     MetadataTreeNode treeRoot;
 

@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * artifact.
  *
  */
+@Deprecated
 public interface MetadataSource {
     String ROLE = MetadataSource.class.getName();
 

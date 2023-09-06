@@ -24,6 +24,7 @@ package org.apache.maven.repository.metadata;
  *
  *
  */
+@Deprecated
 public interface GraphConflictResolutionPolicy {
     String ROLE = GraphConflictResolutionPolicy.class.getName();
 
