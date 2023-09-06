@@ -38,6 +38,7 @@ import org.apache.maven.settings.Server;
  *
  * @author Jason van Zyl
  */
+@Deprecated
 public class ArtifactResolutionRequest implements RepositoryRequest {
     private static final String LS = System.lineSeparator();
 

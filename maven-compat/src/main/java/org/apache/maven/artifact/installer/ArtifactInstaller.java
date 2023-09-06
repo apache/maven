@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  * @author <a href="michal@codehaus.org">Michal Maczka</a>
  */
+@Deprecated
 public interface ArtifactInstaller {
     String ROLE = ArtifactInstaller.class.getName();
 

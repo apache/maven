@@ -25,6 +25,7 @@ package org.apache.maven.repository.metadata;
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
+@Deprecated
 public interface GraphConflictResolutionPolicy {
     String ROLE = GraphConflictResolutionPolicy.class.getName();
 

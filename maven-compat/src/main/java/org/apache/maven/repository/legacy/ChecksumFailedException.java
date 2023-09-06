@@ -25,6 +25,7 @@ import org.apache.maven.wagon.TransferFailedException;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@Deprecated
 public class ChecksumFailedException extends TransferFailedException {
     public ChecksumFailedException(String s) {
         super(s);

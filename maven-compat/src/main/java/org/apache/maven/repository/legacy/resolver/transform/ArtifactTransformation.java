@@ -31,6 +31,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  */
+@Deprecated
 public interface ArtifactTransformation {
     String ROLE = ArtifactTransformation.class.getName();
 

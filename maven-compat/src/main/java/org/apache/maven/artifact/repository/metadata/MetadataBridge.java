@@ -37,6 +37,7 @@ import org.eclipse.aether.metadata.Metadata;
  *
  * @author Benjamin Bentmann
  */
+@Deprecated
 public final class MetadataBridge extends AbstractMetadata implements MergeableMetadata {
 
     private ArtifactMetadata metadata;

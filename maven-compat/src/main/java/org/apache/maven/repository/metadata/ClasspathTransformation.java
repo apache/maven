@@ -26,6 +26,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
+@Deprecated
 public interface ClasspathTransformation {
     String ROLE = ClasspathTransformation.class.getName();
 

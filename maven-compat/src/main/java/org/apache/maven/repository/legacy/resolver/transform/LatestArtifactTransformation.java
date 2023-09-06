@@ -34,6 +34,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
  */
 @Named("latest")
 @Singleton
+@Deprecated
 public class LatestArtifactTransformation extends AbstractVersionTransformation {
 
     public void transformForResolve(Artifact artifact, RepositoryRequest request)

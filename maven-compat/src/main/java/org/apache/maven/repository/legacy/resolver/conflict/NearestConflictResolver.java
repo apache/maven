@@ -33,6 +33,7 @@ import org.apache.maven.artifact.resolver.ResolutionNode;
  */
 @Named("nearest")
 @Singleton
+@Deprecated
 public class NearestConflictResolver implements ConflictResolver {
     // ConflictResolver methods -----------------------------------------------
 

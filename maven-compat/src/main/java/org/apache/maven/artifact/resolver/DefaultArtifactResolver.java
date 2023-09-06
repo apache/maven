@@ -73,6 +73,7 @@ import org.eclipse.aether.resolution.ArtifactResult;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
     @Inject
     private Logger logger;

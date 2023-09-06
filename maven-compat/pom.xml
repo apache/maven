@@ -28,8 +28,8 @@ under the License.
 
   <artifactId>maven-compat</artifactId>
 
-  <name>Maven Compat</name>
-  <description>Maven2 classes maintained as compatibility layer.</description>
+  <name>Maven Compat (deprecated)</name>
+  <description>Deprecated Maven2 classes maintained as compatibility layer.</description>
 
   <dependencies>
     <dependency>

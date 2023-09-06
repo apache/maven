@@ -24,6 +24,7 @@ package org.apache.maven.reporting;
  * @author Brett Porter
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  */
+@Deprecated
 public class MavenReportException extends Exception {
     public MavenReportException(String msg) {
         super(msg);

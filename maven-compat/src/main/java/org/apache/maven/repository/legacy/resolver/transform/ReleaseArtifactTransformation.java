@@ -38,6 +38,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
  */
 @Named("release")
 @Singleton
+@Deprecated
 public class ReleaseArtifactTransformation extends AbstractVersionTransformation {
 
     public void transformForResolve(Artifact artifact, RepositoryRequest request)

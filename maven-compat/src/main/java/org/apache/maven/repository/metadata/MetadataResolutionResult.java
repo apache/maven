@@ -28,6 +28,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  *
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  */
+@Deprecated
 public class MetadataResolutionResult {
     MetadataTreeNode treeRoot;
 

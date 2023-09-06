@@ -23,6 +23,7 @@ package org.apache.maven.repository.metadata;
  *
  * @author Jason van Zyl
  */
+@Deprecated
 public class MetadataRetrievalException extends Exception {
 
     private ArtifactMetadata artifact;

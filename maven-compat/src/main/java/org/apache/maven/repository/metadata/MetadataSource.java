@@ -28,6 +28,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  *
  * @author Jason van Zyl
  */
+@Deprecated
 public interface MetadataSource {
     String ROLE = MetadataSource.class.getName();
 

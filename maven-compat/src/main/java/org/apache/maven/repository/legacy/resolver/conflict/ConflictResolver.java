@@ -26,6 +26,7 @@ import org.apache.maven.artifact.resolver.ResolutionNode;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  */
+@Deprecated
 public interface ConflictResolver {
     String ROLE = ConflictResolver.class.getName();
 

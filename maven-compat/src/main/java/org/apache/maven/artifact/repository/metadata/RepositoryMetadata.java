@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * TODO not happy about the store method - they use "this"
  */
+@Deprecated
 public interface RepositoryMetadata extends org.apache.maven.artifact.metadata.ArtifactMetadata {
 
     int RELEASE = 1;

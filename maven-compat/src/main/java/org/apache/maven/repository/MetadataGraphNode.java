@@ -27,6 +27,7 @@ import java.util.List;
  * @author Oleg Gusakov
  *
  */
+@Deprecated
 public class MetadataGraphNode {
     /** node payload */
     MavenArtifactMetadata metadata;

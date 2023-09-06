@@ -28,6 +28,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@Deprecated
 public class GroupRepositoryMetadata extends AbstractRepositoryMetadata {
     private final String groupId;
 

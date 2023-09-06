@@ -25,6 +25,7 @@ package org.apache.maven.artifact;
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
+@Deprecated
 public enum ArtifactScopeEnum {
     compile(1),
     test(2),

@@ -26,6 +26,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@Deprecated
 public interface ResolutionListener {
     String ROLE = ResolutionListener.class.getName();
 

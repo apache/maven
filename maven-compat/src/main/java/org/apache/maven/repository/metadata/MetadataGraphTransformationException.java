@@ -21,6 +21,7 @@ package org.apache.maven.repository.metadata;
 /**
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  */
+@Deprecated
 public class MetadataGraphTransformationException extends Exception {
 
     private static final long serialVersionUID = -4029897098314019152L;

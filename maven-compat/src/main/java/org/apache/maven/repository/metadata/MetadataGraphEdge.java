@@ -27,6 +27,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
+@Deprecated
 public class MetadataGraphEdge {
     String version;
     ArtifactScopeEnum scope;

@@ -25,6 +25,7 @@ import java.util.List;
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
+@Deprecated
 public class ModelValidationResult {
 
     /** */

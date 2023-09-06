@@ -36,6 +36,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout2;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFactory {
     // TODO use settings?
     private String globalUpdatePolicy;

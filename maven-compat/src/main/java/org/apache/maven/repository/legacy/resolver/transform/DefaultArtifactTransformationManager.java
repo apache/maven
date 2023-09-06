@@ -41,6 +41,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultArtifactTransformationManager implements ArtifactTransformationManager {
 
     private List<ArtifactTransformation> artifactTransformations;

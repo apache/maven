@@ -30,6 +30,7 @@ import java.util.List;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultResolutionErrorHandler implements ResolutionErrorHandler {
 
     public void throwErrors(ArtifactResolutionRequest request, ArtifactResolutionResult result)

@@ -30,6 +30,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
+@Deprecated
 public class ClasspathContainer implements Iterable<ArtifactMetadata> {
     private List<ArtifactMetadata> classpath;
 

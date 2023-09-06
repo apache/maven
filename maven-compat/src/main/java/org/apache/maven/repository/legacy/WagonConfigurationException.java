@@ -23,6 +23,7 @@ import org.apache.maven.wagon.TransferFailedException;
 /**
  * WagonConfigurationException
  */
+@Deprecated
 public class WagonConfigurationException extends TransferFailedException {
 
     static final long serialVersionUID = 1;

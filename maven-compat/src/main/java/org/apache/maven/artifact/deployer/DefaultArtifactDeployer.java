@@ -51,6 +51,7 @@ import org.eclipse.aether.util.artifact.SubArtifact;
  * DefaultArtifactDeployer
  */
 @Named
+@Deprecated
 public class DefaultArtifactDeployer extends AbstractLogEnabled implements ArtifactDeployer {
 
     @Inject

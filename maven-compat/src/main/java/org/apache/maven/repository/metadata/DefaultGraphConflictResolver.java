@@ -35,6 +35,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultGraphConflictResolver implements GraphConflictResolver {
     /**
      * artifact, closer to the entry point, is selected

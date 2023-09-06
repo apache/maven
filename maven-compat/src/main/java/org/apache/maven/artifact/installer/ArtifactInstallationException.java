@@ -21,6 +21,7 @@ package org.apache.maven.artifact.installer;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
+@Deprecated
 public class ArtifactInstallationException extends Exception {
     public ArtifactInstallationException(String message) {
         super(message);

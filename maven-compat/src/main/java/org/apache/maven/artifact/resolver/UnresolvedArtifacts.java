@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  *
  * @author Jason van Zyl
  */
+@Deprecated
 public class UnresolvedArtifacts {
     private Artifact originatingArtifact;
 

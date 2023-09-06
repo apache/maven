@@ -49,6 +49,7 @@ import org.eclipse.aether.util.artifact.SubArtifact;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultArtifactInstaller extends AbstractLogEnabled implements ArtifactInstaller {
 
     @Inject

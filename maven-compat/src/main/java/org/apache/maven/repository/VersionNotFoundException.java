@@ -29,6 +29,7 @@ import org.apache.maven.model.Dependency;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@Deprecated
 public class VersionNotFoundException extends Exception {
     private Dependency dependency;
 

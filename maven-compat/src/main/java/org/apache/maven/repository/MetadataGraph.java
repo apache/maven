@@ -27,6 +27,7 @@ import java.util.Collection;
  * @author Oleg Gusakov
  *
  */
+@Deprecated
 public class MetadataGraph {
     /** all graph nodes */
     Collection<MetadataGraphNode> nodes;

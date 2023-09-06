@@ -31,6 +31,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  */
 @Named("flat")
 @Singleton
+@Deprecated
 public class FlatRepositoryLayout implements ArtifactRepositoryLayout {
 
     private static final char ARTIFACT_SEPARATOR = '-';

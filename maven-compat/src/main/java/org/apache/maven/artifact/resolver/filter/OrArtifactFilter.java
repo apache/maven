@@ -29,6 +29,7 @@ import org.apache.maven.artifact.Artifact;
  *
  * @author Benjamin Bentmann
  */
+@Deprecated
 public class OrArtifactFilter implements ArtifactFilter {
 
     private Set<ArtifactFilter> filters;

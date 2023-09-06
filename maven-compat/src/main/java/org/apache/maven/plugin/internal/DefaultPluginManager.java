@@ -65,6 +65,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultPluginManager implements PluginManager {
 
     private final PlexusContainer container;

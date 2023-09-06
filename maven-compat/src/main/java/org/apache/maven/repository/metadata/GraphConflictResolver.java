@@ -26,6 +26,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  *
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  */
+@Deprecated
 public interface GraphConflictResolver {
     String ROLE = GraphConflictResolver.class.getName();
 

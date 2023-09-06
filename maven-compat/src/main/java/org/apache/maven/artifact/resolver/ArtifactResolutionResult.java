@@ -44,6 +44,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  *       complex requiring a long list of checks, need to create a parent/interface/encapsulation
  *       for the types of exceptions
  */
+@Deprecated
 public class ArtifactResolutionResult {
     private static final String LS = System.lineSeparator();
 

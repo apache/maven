@@ -21,6 +21,7 @@ package org.apache.maven.repository.metadata;
 /**
  * MetadataResolutionRequestTypeEnum
  */
+@Deprecated
 public enum MetadataResolutionRequestTypeEnum {
     tree(1),
     graph(2),

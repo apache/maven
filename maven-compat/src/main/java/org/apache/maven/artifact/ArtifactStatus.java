@@ -26,6 +26,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@Deprecated
 public final class ArtifactStatus implements Comparable<ArtifactStatus> {
     /**
      * No trust - no information about status.

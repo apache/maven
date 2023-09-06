@@ -28,6 +28,7 @@ import org.apache.maven.settings.Mirror;
  *
  * @author Benjamin Bentmann
  */
+@Deprecated
 public interface MirrorSelector {
 
     /**

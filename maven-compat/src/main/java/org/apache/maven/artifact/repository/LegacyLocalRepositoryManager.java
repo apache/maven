@@ -50,6 +50,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  *
  * @author Benjamin Bentmann
  */
+@Deprecated
 public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
     private final ArtifactRepository delegate;

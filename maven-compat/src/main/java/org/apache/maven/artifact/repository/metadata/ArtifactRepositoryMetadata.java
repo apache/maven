@@ -30,6 +30,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@Deprecated
 public class ArtifactRepositoryMetadata extends AbstractRepositoryMetadata {
     private Artifact artifact;
 
