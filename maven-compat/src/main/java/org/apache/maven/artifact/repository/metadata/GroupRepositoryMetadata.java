@@ -26,7 +26,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  * Metadata for the group directory of the repository.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class GroupRepositoryMetadata extends AbstractRepositoryMetadata {
     private final String groupId;

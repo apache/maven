@@ -40,7 +40,6 @@ import org.eclipse.aether.transfer.MetadataNotFoundException;
 import org.eclipse.aether.transfer.MetadataTransferException;
 
 /**
- * @author Benjamin Bentmann
  */
 public class TestRepositoryConnector implements RepositoryConnector {
 

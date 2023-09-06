@@ -36,7 +36,6 @@ import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.building.SettingsProblemCollector;
 
 /**
- * @author Milos Kleint
  */
 @Named
 @Singleton

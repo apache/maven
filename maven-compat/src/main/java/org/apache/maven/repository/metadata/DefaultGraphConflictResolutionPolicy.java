@@ -26,7 +26,6 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.codehaus.plexus.component.annotations.Configuration;
 
 /**
- * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
 @Named

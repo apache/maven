@@ -26,7 +26,6 @@ import java.io.File;
 /**
  * Resolves relative paths against a specific base directory.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

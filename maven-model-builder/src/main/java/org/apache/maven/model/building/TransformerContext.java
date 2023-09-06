@@ -26,7 +26,6 @@ import org.apache.maven.model.Model;
  * Context used to transform a pom file.
  *
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 public interface TransformerContext {

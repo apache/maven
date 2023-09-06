@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Just asserts that it's able to create those components. Handy when CDI container gets a nervous breakdown.
  *
- * @author Kristian Rosenvold
  */
 class LifecycleExecutorSubModulesTest extends AbstractCoreMavenComponentTestCase {
     @Inject

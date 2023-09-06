@@ -21,7 +21,6 @@ package org.apache.maven.model.resolution;
 /**
  * Signals an error when resolving the path to an external model.
  *
- * @author Benjamin Bentmann
  */
 public class UnresolvableModelException extends Exception {
 

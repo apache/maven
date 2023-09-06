@@ -33,7 +33,6 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 /**
  *
  *
- * @author Oleg Gusakov
  *
  */
 public class MetadataResolutionResult {

@@ -35,7 +35,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles expansion of general build plugin configuration into individual executions.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

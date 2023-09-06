@@ -31,7 +31,6 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
 /**
  * Default conflict resolver.Implements closer newer first policy by default, but could be configured via plexus
  *
- * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  */
 @Named
 @Singleton

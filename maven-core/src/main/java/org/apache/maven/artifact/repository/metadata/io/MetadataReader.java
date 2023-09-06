@@ -29,7 +29,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 /**
  * Handles deserialization of metadata from some kind of textual format like XML.
  *
- * @author Benjamin Bentmann
  */
 public interface MetadataReader {
 

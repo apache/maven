@@ -27,8 +27,6 @@ import org.apache.maven.model.transform.stax.NodeBufferingParser;
 /**
  * Remove all modules, this is just buildtime information
  *
- * @author Robert Scholte
- * @author Guillaume Nodet
  * @since 4.0.0
  */
 class ModulesXMLFilter extends NodeBufferingParser {

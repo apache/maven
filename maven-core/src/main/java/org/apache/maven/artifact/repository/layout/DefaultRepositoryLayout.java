@@ -27,7 +27,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
- * @author jdcasey
  */
 @Named("default")
 @Singleton

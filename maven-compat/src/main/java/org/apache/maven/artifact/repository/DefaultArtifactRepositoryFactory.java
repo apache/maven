@@ -34,7 +34,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
- * @author jdcasey
  */
 @Named
 @Singleton

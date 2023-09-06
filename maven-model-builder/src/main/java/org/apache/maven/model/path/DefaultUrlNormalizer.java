@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 /**
  * Normalizes a URL.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

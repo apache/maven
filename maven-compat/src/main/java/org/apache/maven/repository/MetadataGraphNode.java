@@ -24,7 +24,6 @@ import java.util.List;
 /**
  * MetadataGraph node - as it's a directed graph - holds adjacency lists for incident and exident nodes
  *
- * @author Oleg Gusakov
  *
  */
 public class MetadataGraphNode {

@@ -21,7 +21,6 @@ package org.apache.maven.repository;
 /**
  *
  *
- * @author Oleg Gusakov
  *
  */
 public class MavenArtifactMetadata {

@@ -45,7 +45,6 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
 /**
  *
- * @author Robert Scholte
  * @since 3.3.0
  */
 @Named

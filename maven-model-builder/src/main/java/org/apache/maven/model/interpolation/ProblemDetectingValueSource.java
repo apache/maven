@@ -29,7 +29,6 @@ import org.codehaus.plexus.interpolation.ValueSource;
 /**
  * Wraps another value source and intercepts interpolated expressions, checking for problems.
  *
- * @author Benjamin Bentmann
  */
 class ProblemDetectingValueSource implements ValueSource {
 

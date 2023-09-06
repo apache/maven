@@ -28,7 +28,6 @@ import org.apache.maven.plugin.logging.Log;
  * Also included is the <code>setLog(...)</code> method, which simply allows Maven to inject a logging mechanism which
  * will allow the Mojo to communicate to the outside world through standard Maven channels.
  *
- * @author Jason van Zyl
  */
 public interface Mojo {
     /** The component <code>role</code> hint for Plexus container */

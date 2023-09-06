@@ -23,7 +23,6 @@ import org.apache.maven.model.Model;
 /**
  * Provides the super POM that all models implicitly inherit from.
  *
- * @author Benjamin Bentmann
  */
 public interface SuperPomProvider {
 

@@ -37,7 +37,6 @@ import org.apache.maven.settings.v4.SettingsStaxReader;
 /**
  * Handles deserialization of settings from the default textual format.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

@@ -57,7 +57,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  */
 @PlexusTest
 class DefaultWagonManagerTest {

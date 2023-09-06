@@ -45,7 +45,6 @@ import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.transfer.TransferListener;
 
 /**
- * @author Jason van Zyl
  */
 public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 

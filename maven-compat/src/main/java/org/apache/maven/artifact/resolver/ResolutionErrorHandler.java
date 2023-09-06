@@ -19,7 +19,6 @@
 package org.apache.maven.artifact.resolver;
 
 /**
- * @author Benjamin Bentmann
  */
 public interface ResolutionErrorHandler {
 

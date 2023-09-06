@@ -23,7 +23,6 @@ import java.io.File;
 /**
  * A path translator that resolves relative paths against a specific base directory.
  *
- * @author Benjamin Bentmann
  */
 public class BasedirBeanConfigurationPathTranslator implements BeanConfigurationPathTranslator {
 

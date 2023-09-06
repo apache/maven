@@ -33,8 +33,6 @@ import org.slf4j.Logger;
 /**
  * TODO: refactor this, component extending component is bad practice.
  *
- * @author mkleint
- * @author Robert Scholte
  */
 @Named
 @Singleton

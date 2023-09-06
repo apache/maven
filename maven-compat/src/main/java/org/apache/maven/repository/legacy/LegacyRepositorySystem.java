@@ -81,7 +81,6 @@ import org.eclipse.aether.repository.ProxySelector;
 import org.eclipse.aether.repository.RemoteRepository;
 
 /**
- * @author Jason van Zyl
  */
 @Named("default")
 @Singleton

@@ -24,7 +24,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 
 /**
  *
- * @author mkleint
  */
 public final class RequirementMatcherFactory {
     private RequirementMatcherFactory() {}

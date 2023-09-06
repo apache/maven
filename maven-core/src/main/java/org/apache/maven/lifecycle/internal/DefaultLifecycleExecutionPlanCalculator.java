@@ -66,8 +66,6 @@ import org.codehaus.plexus.util.StringUtils;
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Kristian Rosenvold (Extract class)
  */
 @Named
 @Singleton

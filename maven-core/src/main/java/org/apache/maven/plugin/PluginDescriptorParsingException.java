@@ -21,7 +21,6 @@ package org.apache.maven.plugin;
 import org.apache.maven.model.Plugin;
 
 /**
- * @author Jason van Zyl
  */
 public class PluginDescriptorParsingException extends Exception {
 

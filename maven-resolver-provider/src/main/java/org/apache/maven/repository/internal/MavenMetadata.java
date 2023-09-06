@@ -37,7 +37,6 @@ import org.eclipse.aether.metadata.AbstractMetadata;
 import org.eclipse.aether.metadata.MergeableMetadata;
 
 /**
- * @author Benjamin Bentmann
  */
 abstract class MavenMetadata extends AbstractMetadata implements MergeableMetadata {
 

@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code ReportSet}.
  *
- * @author Benjamin Bentmann
  */
 class ReportSetTest {
 

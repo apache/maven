@@ -19,7 +19,6 @@
 package org.apache.maven.monitor.event;
 
 /**
- * @author jdcasey
  */
 @Deprecated
 public interface EventMonitor {

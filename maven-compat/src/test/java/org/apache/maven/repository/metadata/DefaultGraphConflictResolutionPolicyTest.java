@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
- * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
 class DefaultGraphConflictResolutionPolicyTest {

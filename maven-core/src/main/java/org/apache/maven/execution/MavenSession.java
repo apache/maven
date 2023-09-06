@@ -49,7 +49,6 @@ import org.eclipse.aether.RepositorySystemSession;
 /**
  * A Maven execution session.
  *
- * @author Jason van Zyl
  */
 public class MavenSession implements Cloneable {
     private MavenExecutionRequest request;

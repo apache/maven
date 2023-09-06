@@ -24,7 +24,6 @@ package org.apache.maven.model.building;
  * <em>Note:</em> To cope with future extensions to this interface, it is strongly recommended to extend
  * {@link AbstractModelBuildingListener} rather than to directly implement this interface.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelBuildingListener {
 

@@ -28,7 +28,6 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 /**
  * Base class for artifact resolution exceptions.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class AbstractArtifactResolutionException extends Exception {
     private String groupId;

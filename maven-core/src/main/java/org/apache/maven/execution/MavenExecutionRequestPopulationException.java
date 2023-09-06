@@ -19,7 +19,6 @@
 package org.apache.maven.execution;
 
 /**
- * @author Jason van Zyl
  */
 public class MavenExecutionRequestPopulationException extends Exception {
     public MavenExecutionRequestPopulationException(String message) {

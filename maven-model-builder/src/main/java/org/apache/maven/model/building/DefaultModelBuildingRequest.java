@@ -32,7 +32,6 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 /**
  * Collects settings that control building of effective models.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultModelBuildingRequest implements ModelBuildingRequest {
     private Model fileModel;

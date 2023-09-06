@@ -24,7 +24,6 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  * metadata graph edge - combination of version, scope and depth define
  * an edge in the graph
  *
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
 public class MetadataGraphEdge {

@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests {@link PropertyProfileActivator}.
  *
- * @author Benjamin Bentmann
  */
 class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<PropertyProfileActivator> {
 

@@ -32,7 +32,6 @@ import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.mockito.Mockito.mock;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
 class ArtifactInstallerTest extends AbstractArtifactComponentTestCase {
     @Inject

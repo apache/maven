@@ -25,7 +25,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  * Repository layout.
  *
- * @author jdcasey
  * @deprecated Avoid use of this type, if you need access to local repository use repository system session instead.
  */
 @Deprecated

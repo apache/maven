@@ -66,7 +66,6 @@ import org.slf4j.LoggerFactory;
  * deleted without prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

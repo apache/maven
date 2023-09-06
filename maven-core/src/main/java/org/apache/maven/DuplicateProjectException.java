@@ -26,7 +26,6 @@ import java.util.Map;
 /**
  * Signals a collision of two or more projects with the same g:a:v during a reactor build.
  *
- * @author Benjamin Bentmann
  */
 public class DuplicateProjectException extends MavenExecutionException {
 

@@ -36,7 +36,6 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 /**
  * Finds an absolute path for {@link ActivationFile#getExists()} or {@link ActivationFile#getMissing()}
  *
- * @author Ravil Galeyev
  */
 @Named
 @Singleton

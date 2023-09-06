@@ -29,7 +29,6 @@ import org.apache.maven.settings.Settings;
 /**
  * Collects parameters that control the decryption of settings.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultSettingsDecryptionRequest implements SettingsDecryptionRequest {
 

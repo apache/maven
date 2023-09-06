@@ -61,7 +61,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

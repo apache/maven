@@ -19,7 +19,6 @@
 package org.apache.maven.artifact.deployer;
 
 /**
- * @author Jason van Zyl
  */
 public class ArtifactDeploymentException extends Exception {
     public ArtifactDeploymentException(String message) {

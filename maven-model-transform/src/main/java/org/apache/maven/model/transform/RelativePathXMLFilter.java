@@ -28,8 +28,6 @@ import org.apache.maven.model.transform.stax.NodeBufferingParser;
 /**
  * Remove relativePath element, has no value for consumer pom
  *
- * @author Robert Scholte
- * @author Guillaume Nodet
  * @since 4.0.0
  */
 public class RelativePathXMLFilter extends NodeBufferingParser {

@@ -29,7 +29,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
  * Handles conversion of the <code>&lt;reporting&gt;</code> section into the configuration of Maven Site Plugin 3.x,
  * i.e. <code>reportPlugins</code> and <code>outputDirectory</code> parameters.
  *
- * @author Benjamin Bentmann
  * @deprecated since maven 4.0, this class is now a no-op class and is only here for compatibility
  */
 @Named

@@ -31,7 +31,6 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreExce
 /**
  * Attach a POM to an artifact.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @Deprecated
 public class ProjectArtifactMetadata extends AbstractArtifactMetadata {

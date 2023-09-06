@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests <code>NearestConflictResolver</code>.
  *
- * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @see NearestConflictResolver
  */
 class NearestConflictResolverTest extends AbstractConflictResolverTest {

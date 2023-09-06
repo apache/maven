@@ -26,7 +26,6 @@ package org.apache.maven.plugin.logging;
  * convenience, to enable developers to pass things like <code>java.lang.StringBuffer</code> directly into the logger,
  * rather than formatting first by calling <code>toString()</code>.
  *
- * @author jdcasey
  *
  * @deprecated Use SLF4J directly
  */

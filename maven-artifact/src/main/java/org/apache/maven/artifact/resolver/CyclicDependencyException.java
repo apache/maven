@@ -23,7 +23,6 @@ import org.apache.maven.artifact.Artifact;
 /**
  * Indicates a cycle in the dependency graph.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class CyclicDependencyException extends ArtifactResolutionException {
     private Artifact artifact;

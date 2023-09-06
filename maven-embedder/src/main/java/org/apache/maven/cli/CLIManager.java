@@ -31,7 +31,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.maven.cli.jansi.MessageUtils;
 
 /**
- * @author Jason van Zyl
  */
 public class CLIManager {
     public static final char ALTERNATE_POM_FILE = 'f';

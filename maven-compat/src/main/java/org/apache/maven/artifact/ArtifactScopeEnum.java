@@ -22,7 +22,6 @@ package org.apache.maven.artifact;
  * Type safe reincarnation of Artifact scope. Also supplies the {@code DEFAULT_SCOPE} as well
  * as convenience method to deal with scope relationships.
  *
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
 public enum ArtifactScopeEnum {

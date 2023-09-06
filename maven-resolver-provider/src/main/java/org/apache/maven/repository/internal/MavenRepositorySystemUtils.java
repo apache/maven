@@ -45,7 +45,6 @@ import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
  * assist those clients that employ the repository system outside of an IoC container, Maven plugins should instead
  * always use regular dependency injection to acquire the repository system.
  *
- * @author Benjamin Bentmann
  */
 public final class MavenRepositorySystemUtils {
 

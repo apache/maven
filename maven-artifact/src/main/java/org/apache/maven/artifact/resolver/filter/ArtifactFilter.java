@@ -21,7 +21,6 @@ package org.apache.maven.artifact.resolver.filter;
 import org.apache.maven.artifact.Artifact;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
 public interface ArtifactFilter {
     boolean include(Artifact artifact);

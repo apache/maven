@@ -43,7 +43,6 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 
 /**
- * @author Jason van Zyl
  */
 public class PluginDescriptor extends ComponentSetDescriptor implements Cloneable {
 

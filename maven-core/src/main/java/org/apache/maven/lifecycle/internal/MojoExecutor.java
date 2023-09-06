@@ -67,9 +67,6 @@ import org.slf4j.LoggerFactory;
  * </p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
- * @author Jason van Zyl
- * @author Benjamin Bentmann
- * @author Kristian Rosenvold
  * @since 3.0
  */
 @Named

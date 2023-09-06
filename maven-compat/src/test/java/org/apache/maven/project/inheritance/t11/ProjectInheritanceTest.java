@@ -30,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * Verifies scope of root project is preserved regardless of parent dependency management.
  *
- * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  * @see <a href="https://issues.apache.org/jira/browse/MNG-2919">MNG-2919</a>
  */
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {

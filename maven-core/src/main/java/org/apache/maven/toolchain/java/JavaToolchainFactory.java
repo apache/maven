@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
  * This is a <code>ToolchainFactory</code> Plexus component registered with
  * <code>jdk</code> hint.
  *
- * @author mkleint
  * @since 2.0.9, renamed from <code>DefaultJavaToolchainFactory</code> in 3.2.4
  */
 @Named("jdk")

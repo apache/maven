@@ -46,7 +46,6 @@ import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStu
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * @author Kristian Rosenvold
  */
 class ConcurrencyDependencyGraphTest {
     @Test
