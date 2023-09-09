@@ -251,7 +251,9 @@ public class ${className} {
     #end
   #end
             serializer.endTag(NAMESPACE, tagName);
+  #if ( $field.to && $field.multiplicity == "1" )
             writeLocationTracking(${classLcapName}, "", serializer);
+  #end
         }
     }
 
@@ -279,7 +281,6 @@ public class ${className} {
             }
             if (!flat) {
                 serializer.endTag(NAMESPACE, tagName);
-                writeLocationTracking(locationTracker, tagName, serializer);
             }
         }
     }
@@ -312,6 +313,11 @@ public class ${className} {
                 serializer.text(value);
             }
             serializer.endTag(NAMESPACE, dom.getName());
+#if ( $locationTracking )
+            if (dom.getInputLocation() instanceof InputLocation && dom.getChildren().isEmpty()) {
+                serializer.comment(toString((InputLocation) dom.getInputLocation()));
+            }
+#end
         }
     }
 

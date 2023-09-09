@@ -39,7 +39,6 @@ import org.apache.maven.utils.dag.CycleDetectedException;
 /**
  * Describes the interdependencies between projects in the reactor.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultProjectDependencyGraph implements ProjectDependencyGraph {
 

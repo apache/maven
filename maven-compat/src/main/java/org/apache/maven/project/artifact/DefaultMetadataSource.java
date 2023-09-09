@@ -33,7 +33,6 @@ import org.apache.maven.project.ProjectBuilder;
  * registered component descriptors twice: once keyed by role+roleHint and once keyed by role only. This effectively
  * made the metadata source available with its original role hint ("maven") as well as the default hint.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

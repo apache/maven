@@ -52,10 +52,6 @@ import static java.util.Objects.requireNonNull;
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Jason van Zyl
- * @author jdcasey
- * @author Kristian Rosenvold (extracted class only)
  */
 @Singleton
 @Named

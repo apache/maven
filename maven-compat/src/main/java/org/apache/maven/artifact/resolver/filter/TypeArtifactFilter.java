@@ -21,6 +21,7 @@ package org.apache.maven.artifact.resolver.filter;
 import org.apache.maven.artifact.Artifact;
 
 /** Artifact Filter which filters on artifact type */
+@Deprecated
 public class TypeArtifactFilter implements ArtifactFilter {
     private String type = "jar";
 

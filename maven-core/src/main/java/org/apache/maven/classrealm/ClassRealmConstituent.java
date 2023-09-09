@@ -23,7 +23,6 @@ import java.io.File;
 /**
  * Describes a constituent of a class realm.
  *
- * @author Benjamin Bentmann
  */
 public interface ClassRealmConstituent {
 

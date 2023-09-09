@@ -26,7 +26,6 @@ import java.util.Objects;
 /**
  * Wraps an ordinary {@link URL} as a source.
  *
- * @author Benjamin Bentmann
  */
 public class UrlSource implements Source {
 

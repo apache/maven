@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -99,7 +98,6 @@ import static org.apache.maven.model.building.Result.error;
 import static org.apache.maven.model.building.Result.newResult;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
@@ -1106,9 +1104,18 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             try {
                 // must implement TransformContext, but should use request to access properties/model cache
-                Model transformedFileModel = modelProcessor.read(
-                        pomFile, Collections.singletonMap(ModelReader.TRANSFORMER_CONTEXT, context));
-
+                Map<String, Object> options = new HashMap<>();
+                if (request.isLocationTracking()) {
+                    org.apache.maven.api.model.InputLocation location =
+                            rawModel.getDelegate().getLocation("");
+                    if (location != null) {
+                        options.put(
+                                ModelProcessor.INPUT_SOURCE,
+                                new org.apache.maven.model.InputSource(location.getSource()));
+                    }
+                }
+                options.put(ModelReader.TRANSFORMER_CONTEXT, context);
+                Model transformedFileModel = modelProcessor.read(pomFile, options);
                 // rawModel with locationTrackers, required for proper feedback during validations
 
                 // Apply enriched data
@@ -1866,7 +1873,6 @@ public class DefaultModelBuilder implements ModelBuilder {
      * After the buildplan is ready, the build()-method returns the immutable context useful during distribution.
      * This is an inner class, as it must be able to call readRawModel()
      *
-     * @author Robert Scholte
      * @since 4.0.0
      */
     private class DefaultTransformerContextBuilder implements TransformerContextBuilder {

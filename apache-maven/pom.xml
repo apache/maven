@@ -96,6 +96,10 @@ under the License.
       <groupId>org.fusesource.jansi</groupId>
       <artifactId>jansi</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+    </dependency>
   </dependencies>
 
   <pluginRepositories>

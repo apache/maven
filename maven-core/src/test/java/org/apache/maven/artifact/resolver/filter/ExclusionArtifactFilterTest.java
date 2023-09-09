@@ -33,12 +33,17 @@ import static org.mockito.Mockito.when;
 
 class ExclusionArtifactFilterTest {
     private Artifact artifact;
+    private Artifact artifact2;
 
     @BeforeEach
     void setup() {
         artifact = mock(Artifact.class);
         when(artifact.getGroupId()).thenReturn("org.apache.maven");
         when(artifact.getArtifactId()).thenReturn("maven-core");
+
+        artifact2 = mock(Artifact.class);
+        when(artifact2.getGroupId()).thenReturn("org.junit.jupiter");
+        when(artifact2.getArtifactId()).thenReturn("junit-jupiter-engine");
     }
 
     @Test
@@ -139,5 +144,27 @@ class ExclusionArtifactFilterTest {
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Arrays.asList(exclusion1, exclusion2));
 
         assertThat(filter.include(artifact), is(false));
+    }
+
+    @Test
+    void testExcludeWithGlob() {
+        Exclusion exclusion = new Exclusion();
+        exclusion.setGroupId("*");
+        exclusion.setArtifactId("maven-*");
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+
+        assertThat(filter.include(artifact), is(false));
+        assertThat(filter.include(artifact2), is(true));
+    }
+
+    @Test
+    void testExcludeWithGlobStar() {
+        Exclusion exclusion = new Exclusion();
+        exclusion.setGroupId("**");
+        exclusion.setArtifactId("maven-**");
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+
+        assertThat(filter.include(artifact), is(false));
+        assertThat(filter.include(artifact2), is(true));
     }
 }

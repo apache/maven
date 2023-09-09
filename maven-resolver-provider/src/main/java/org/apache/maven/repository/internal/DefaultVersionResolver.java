@@ -63,7 +63,6 @@ import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.util.ConfigUtils;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
@@ -93,6 +92,7 @@ public class DefaultVersionResolver implements VersionResolver {
     }
 
     @SuppressWarnings("checkstyle:methodlength")
+    @Override
     public VersionResult resolveVersion(RepositorySystemSession session, VersionRequest request)
             throws VersionResolutionException {
         RequestTrace trace = RequestTrace.newChild(request.getTrace(), request);

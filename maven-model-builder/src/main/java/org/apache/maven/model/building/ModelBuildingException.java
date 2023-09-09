@@ -30,7 +30,6 @@ import org.apache.maven.model.Model;
  * before eventually failing to provide callers with rich error information. Use {@link #getProblems()} to query the
  * details of the failure.
  *
- * @author Benjamin Bentmann
  */
 public class ModelBuildingException extends Exception {
 

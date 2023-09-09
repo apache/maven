@@ -29,8 +29,6 @@ import org.apache.maven.model.transform.stax.NodeBufferingParser;
 /**
  * Will apply the version if the dependency is part of the reactor
  *
- * @author Robert Scholte
- * @author Guillaume Nodet
  * @since 4.0.0
  */
 public class ReactorDependencyXMLFilter extends NodeBufferingParser {

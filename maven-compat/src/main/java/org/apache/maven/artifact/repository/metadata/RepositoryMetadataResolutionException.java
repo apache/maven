@@ -21,8 +21,8 @@ package org.apache.maven.artifact.repository.metadata;
 /**
  * Error while retrieving repository metadata from the repository.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@Deprecated
 public class RepositoryMetadataResolutionException extends Exception {
     public RepositoryMetadataResolutionException(String message) {
         super(message);

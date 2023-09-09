@@ -29,7 +29,6 @@ import org.apache.maven.model.locator.ModelLocator;
 
 /**
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 class DefaultTransformerContext implements TransformerContext {

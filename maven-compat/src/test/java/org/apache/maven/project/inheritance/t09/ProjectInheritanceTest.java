@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Verifies exclusions listed in dependencyManagement are valid for
  * transitive dependencies.
  *
- * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  */
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------

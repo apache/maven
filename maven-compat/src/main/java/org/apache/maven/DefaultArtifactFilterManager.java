@@ -31,7 +31,6 @@ import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.extension.internal.CoreExports;
 
 /**
- * @author Jason van Zyl
  */
 @Named
 @Singleton

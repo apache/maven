@@ -70,6 +70,7 @@ import org.eclipse.aether.util.ConfigUtils;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultWagonManager implements WagonManager {
 
     private static final String[] CHECKSUM_IDS = {"md5", "sha1"};

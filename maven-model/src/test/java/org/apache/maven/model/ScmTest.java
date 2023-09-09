@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code Scm}.
  *
- * @author Benjamin Bentmann
  */
 class ScmTest {
 

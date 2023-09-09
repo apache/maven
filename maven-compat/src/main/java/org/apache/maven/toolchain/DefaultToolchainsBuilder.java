@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Benjamin Bentmann
  * @deprecated instead use {@link org.apache.maven.toolchain.building.DefaultToolchainsBuilder}
  */
 @Deprecated

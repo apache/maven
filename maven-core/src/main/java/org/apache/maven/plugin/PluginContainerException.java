@@ -32,7 +32,6 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
  * execution failed; a message detailing the problem; the ClassRealm used to
  * look up the plugin; and the Plexus exception that caused this error.
  *
- * @author jdcasey
  *
  */
 public class PluginContainerException extends PluginManagerException {

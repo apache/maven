@@ -39,7 +39,6 @@ import org.apache.maven.project.MavenProject;
  * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice.
  *
  * @since 3.0
- * @author Kristian Rosenvold
  */
 public class ProjectBuildList implements Iterable<ProjectSegment> {
     private final List<ProjectSegment> items;

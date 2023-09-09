@@ -32,7 +32,6 @@ import org.slf4j.ILoggerFactory;
  * configuration files in class loader: key is the class name of the ILoggerFactory, value is the class name of
  * the corresponding Slf4jConfiguration.
  *
- * @author Hervé Boutemy
  * @since 3.1.0
  */
 public class Slf4jConfigurationFactory {

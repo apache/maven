@@ -30,7 +30,6 @@ import org.apache.maven.model.transform.RelativeProject;
 /**
  * A BuildPomXMLFilterFactory which is context aware
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 public class DefaultBuildPomXMLFilterFactory extends BuildToRawPomXMLFilterFactory {

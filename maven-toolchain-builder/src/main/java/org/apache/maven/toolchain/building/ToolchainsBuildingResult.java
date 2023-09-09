@@ -26,7 +26,6 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 /**
  * Collects the output of the toolchains builder.
  *
- * @author Robert Scholte
  * @since 3.3.0
  */
 public interface ToolchainsBuildingResult {

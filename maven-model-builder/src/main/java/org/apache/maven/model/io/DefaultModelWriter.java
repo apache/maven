@@ -37,7 +37,6 @@ import org.codehaus.plexus.util.xml.XmlStreamWriter;
 /**
  * Handles serialization of a model into some kind of textual format like XML.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

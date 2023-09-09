@@ -19,7 +19,6 @@
 package org.apache.maven.plugin.descriptor;
 
 /**
- * @author Jason van Zyl
  */
 public class Parameter implements Cloneable {
     private String alias;

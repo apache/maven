@@ -32,10 +32,10 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout2;
 
 /**
- * @author jdcasey
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFactory {
     // TODO use settings?
     private String globalUpdatePolicy;

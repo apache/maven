@@ -23,7 +23,6 @@ import org.apache.maven.model.Model;
 /**
  * Holds data relevant for a model building event.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelBuildingEvent {
 

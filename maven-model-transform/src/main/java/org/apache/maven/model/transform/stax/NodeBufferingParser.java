@@ -28,7 +28,6 @@ import java.util.Objects;
 /**
  * Buffer events while parsing a given element to allow some post-processing.
  *
- * @author Guillaume Nodet
  * @since 4.0.0
  */
 public abstract class NodeBufferingParser extends BufferingParser {

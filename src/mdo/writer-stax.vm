@@ -178,7 +178,6 @@ public class ${className} {
             serializer.writeCharacters(value);
         }
         serializer.writeEndElement();
-
     } //-- void writeDomToSerializer(org.apache.maven.api.xml.XmlNode, XMLStreamWriter)
 
 
@@ -268,9 +267,6 @@ public class ${className} {
     #end
   #end
             serializer.writeEndElement();
-  #if ( $locationTracking )
-            writeLocationTracking(${classLcapName}, "", serializer);
-  #end
         }
     }
 
@@ -311,9 +307,6 @@ public class ${className} {
             }
             if (!flat) {
                 serializer.writeEndElement();
-#if ( $locationTracking )
-                writeLocationTracking(locationTracker, tagName, serializer);
-#end
             }
         }
     }
@@ -338,9 +331,6 @@ public class ${className} {
 #end
             }
             serializer.writeEndElement();
-#if ( $locationTracking )
-            writeLocationTracking(locationTracker, tagName, serializer);
-#end
         }
     }
 
@@ -358,6 +348,11 @@ public class ${className} {
                 serializer.writeCharacters(value);
             }
             serializer.writeEndElement();
+#if ( $locationTracking )
+            if (dom.getInputLocation() instanceof InputLocation && dom.getChildren().isEmpty()) {
+                serializer.writeComment(toString((InputLocation) dom.getInputLocation()));
+            }
+#end
         }
     }
 

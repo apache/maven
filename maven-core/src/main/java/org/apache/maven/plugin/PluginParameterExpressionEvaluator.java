@@ -66,7 +66,6 @@ import org.codehaus.plexus.component.configurator.expression.TypeAwareExpression
  * </table>
  * <i>Notice:</i> <code>reports</code> was supported in Maven 2.x but was removed in Maven 3
  *
- * @author Jason van Zyl
  * @see MavenSession
  * @see MojoExecution
  */

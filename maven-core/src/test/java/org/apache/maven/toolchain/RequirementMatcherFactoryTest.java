@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
- * @author mkleint
  */
 class RequirementMatcherFactoryTest {
 

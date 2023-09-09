@@ -586,7 +586,11 @@ public class ${className} {
                     ${classLcapName}.${field.name}(getIntegerValue(interpolatedTrimmed(nextText(parser, strict), "${fieldTagName}"), "${fieldTagName}", parser, strict, ${field.defaultValue}));
                     break;
       #elseif ( $field.type == "DOM" )
+        #if ( $locationTracking )
+                    ${classLcapName}.${field.name}(buildXmlNode(parser, source));
+        #else
                     ${classLcapName}.${field.name}(buildXmlNode(parser));
+        #end
                     break;
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
                     List<String> ${field.name} = new ArrayList<>();
@@ -850,9 +854,16 @@ public class ${className} {
         return result.toString();
     }
 
+#if ( $locationTracking )
+    private XmlNode buildXmlNode(XMLStreamReader parser, InputSource source) throws XMLStreamException {
+        return XmlNodeBuilder.build(parser,
+                p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source));
+    }
+#else
     private XmlNode buildXmlNode(XMLStreamReader parser) throws XMLStreamException {
         return XmlNodeBuilder.build(parser);
     }
+#end
 
 #foreach ( $class in $model.allClasses )
   #foreach ( $field in $class.getFields($version) )

@@ -30,7 +30,6 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
  * Signifies a failure to load a plugin. This is used to abstract the specific errors which may be
  * encountered at lower levels, and provide a dependable interface to the plugin-loading framework.
  *
- * @author jdcasey
  *
  */
 public class PluginLoaderException extends Exception {

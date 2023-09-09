@@ -26,7 +26,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles profile injection into the model.
  *
- * @author Benjamin Bentmann
  */
 public interface ProfileInjector {
 

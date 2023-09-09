@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@link PluginDescriptorBuilder}.
  *
- * @author Benjamin Bentmann
  */
 class PluginDescriptorBuilderTest {
 

@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 /**
  * Utility class used to report errors, statistics, application version info, etc.
  *
- * @author jdcasey
  */
 public final class CLIReportingUtils {
     // CHECKSTYLE_OFF: MagicNumber

@@ -29,7 +29,6 @@ import org.apache.maven.api.model.Model;
 /**
  * Handles serialization of a model into some kind of textual format like XML.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelWriter {
 

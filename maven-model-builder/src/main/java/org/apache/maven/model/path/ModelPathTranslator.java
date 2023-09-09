@@ -26,7 +26,6 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 /**
  * Resolves relative paths of a model against a specific base directory.
  *
- * @author Jason van Zyl
  */
 public interface ModelPathTranslator {
 

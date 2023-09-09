@@ -43,7 +43,6 @@ import org.codehaus.plexus.interpolation.InterpolationException;
  * <code>${project.basedir}</code> is intentionally not supported as this form would suggest that other
  * <code>${project.*}</code> expressions can be used, which is however beyond the design.
  *
- * @author Benjamin Bentmann
  * @see ActivationFile
  * @see org.apache.maven.model.validation.DefaultModelValidator#validateRawModel
  */

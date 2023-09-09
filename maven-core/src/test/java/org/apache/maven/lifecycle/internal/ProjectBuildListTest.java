@@ -28,7 +28,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * @author Kristian Rosenvold
  */
 class ProjectBuildListTest {
     @Test

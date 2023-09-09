@@ -61,7 +61,6 @@ import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.interpolation.ModelVersionProcessor;
 
 /**
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 @Named
 @Singleton

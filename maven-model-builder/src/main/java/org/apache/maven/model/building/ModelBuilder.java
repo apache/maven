@@ -25,7 +25,6 @@ import org.apache.maven.model.Model;
 /**
  * Builds the effective model from a POM.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelBuilder {
 

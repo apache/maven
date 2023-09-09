@@ -39,11 +39,11 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  *   <li>file system errors: permissions</li>
  * </ul>
  *
- * @author Jason van Zyl
  * TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
  *       complex requiring a long list of checks, need to create a parent/interface/encapsulation
  *       for the types of exceptions
  */
+@Deprecated
 public class ArtifactResolutionResult {
     private static final String LS = System.lineSeparator();
 

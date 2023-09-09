@@ -23,9 +23,9 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
 /**
  * Helper class to convert a metadata Graph into some form of a classpath
  *
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
+@Deprecated
 public interface ClasspathTransformation {
     String ROLE = ClasspathTransformation.class.getName();
 

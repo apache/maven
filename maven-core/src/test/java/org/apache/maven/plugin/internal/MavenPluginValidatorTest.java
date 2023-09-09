@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author Michael Simacek
  */
 class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
     @Inject

@@ -24,7 +24,6 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 /**
  * Thrown when a plugin is not internally consistent.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class InvalidPluginException extends Exception {
     public InvalidPluginException(String message, ProjectBuildingException e) {

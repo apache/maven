@@ -40,7 +40,6 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles injection of plugin management into the model.
  *
- * @author Benjamin Bentmann
  */
 @SuppressWarnings({"checkstyle:methodname"})
 @Named

@@ -41,7 +41,6 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles inheritance of model values.
  *
- * @author Benjamin Bentmann
  */
 @SuppressWarnings({"checkstyle:methodname"})
 @Named

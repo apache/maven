@@ -30,7 +30,6 @@ import org.apache.maven.project.MavenProject;
 /**
  * @deprecated As of 3.2.2, and there is no direct replacement. This is an internal class which was not marked as such,
  *             but should have been.
- * @author jvanzyl
  *
  */
 @Deprecated

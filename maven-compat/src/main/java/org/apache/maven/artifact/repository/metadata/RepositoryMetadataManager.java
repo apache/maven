@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 /**
  * RepositoryMetadataManager
  */
+@Deprecated
 public interface RepositoryMetadataManager {
 
     void resolve(RepositoryMetadata repositoryMetadata, RepositoryRequest repositoryRequest)

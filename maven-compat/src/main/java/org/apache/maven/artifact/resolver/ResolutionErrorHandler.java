@@ -19,8 +19,8 @@
 package org.apache.maven.artifact.resolver;
 
 /**
- * @author Benjamin Bentmann
  */
+@Deprecated
 public interface ResolutionErrorHandler {
 
     void throwErrors(ArtifactResolutionRequest request, ArtifactResolutionResult result)

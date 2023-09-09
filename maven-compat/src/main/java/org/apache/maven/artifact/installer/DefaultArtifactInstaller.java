@@ -45,10 +45,10 @@ import org.eclipse.aether.installation.InstallationException;
 import org.eclipse.aether.util.artifact.SubArtifact;
 
 /**
- * @author Jason van Zyl
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultArtifactInstaller extends AbstractLogEnabled implements ArtifactInstaller {
 
     @Inject

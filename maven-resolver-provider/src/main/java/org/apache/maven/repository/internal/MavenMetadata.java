@@ -37,7 +37,6 @@ import org.eclipse.aether.metadata.AbstractMetadata;
 import org.eclipse.aether.metadata.MergeableMetadata;
 
 /**
- * @author Benjamin Bentmann
  */
 abstract class MavenMetadata extends AbstractMetadata implements MergeableMetadata {
 
@@ -57,14 +56,17 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
         this.timestamp = timestamp;
     }
 
+    @Override
     public String getType() {
         return MAVEN_METADATA_XML;
     }
 
+    @Override
     public File getFile() {
         return file;
     }
 
+    @Override
     public void merge(File existing, File result) throws RepositoryException {
         Metadata recessive = read(existing);
 
@@ -75,6 +77,7 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
         merged = true;
     }
 
+    @Override
     public boolean isMerged() {
         return merged;
     }
@@ -102,6 +105,7 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
         }
     }
 
+    @Override
     public Map<String, String> getProperties() {
         return Collections.emptyMap();
     }

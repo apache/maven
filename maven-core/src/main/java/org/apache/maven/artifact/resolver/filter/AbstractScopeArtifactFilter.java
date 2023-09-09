@@ -23,7 +23,6 @@ import org.apache.maven.artifact.Artifact;
 /**
  * Filter to only retain objects in the given artifactScope or better.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 abstract class AbstractScopeArtifactFilter implements ArtifactFilter {
 

@@ -23,7 +23,6 @@ import java.io.IOException;
 /**
  * Signals a failure to parse the settings due to invalid syntax (e.g. non well formed XML or unknown elements).
  *
- * @author Benjamin Bentmann
  */
 public class SettingsParseException extends IOException {
 

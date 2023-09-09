@@ -27,7 +27,6 @@ import org.apache.maven.model.locator.ModelLocator;
 /**
  * Wraps an ordinary {@link File} as a model source.
  *
- * @author Benjamin Bentmann
  */
 public class FileModelSource extends FileSource implements ModelSource3 {
 

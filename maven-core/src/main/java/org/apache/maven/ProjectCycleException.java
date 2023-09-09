@@ -21,7 +21,6 @@ package org.apache.maven;
 import org.apache.maven.utils.dag.CycleDetectedException;
 
 /**
- * @author jdcasey
  */
 public class ProjectCycleException extends BuildFailureException {
     public ProjectCycleException(String message) {

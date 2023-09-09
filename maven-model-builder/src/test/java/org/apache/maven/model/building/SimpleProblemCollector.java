@@ -26,7 +26,6 @@ import org.apache.maven.model.Model;
 /**
  * A simple model problem collector for testing the model building components.
  *
- * @author Benjamin Bentmann
  */
 public class SimpleProblemCollector implements ModelProblemCollector {
     private Model model;

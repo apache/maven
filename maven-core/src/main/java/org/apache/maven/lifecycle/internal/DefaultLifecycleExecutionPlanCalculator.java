@@ -64,8 +64,6 @@ import org.apache.maven.project.MavenProject;
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
- * @author Benjamin Bentmann
- * @author Kristian Rosenvold (Extract class)
  * @since 3.0
  */
 @Named

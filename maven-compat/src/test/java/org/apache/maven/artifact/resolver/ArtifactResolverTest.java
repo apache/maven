@@ -50,7 +50,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 // the layout used for a particular artifact type.
 
 /**
- * @author Jason van Zyl
  */
 class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     @Inject

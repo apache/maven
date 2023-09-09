@@ -36,8 +36,8 @@ import org.apache.maven.settings.Server;
  * A resolution request allows you to either use an existing MavenProject, or a coordinate (gid:aid:version)
  * to process a POMs dependencies.
  *
- * @author Jason van Zyl
  */
+@Deprecated
 public class ArtifactResolutionRequest implements RepositoryRequest {
     private static final String LS = System.lineSeparator();
 

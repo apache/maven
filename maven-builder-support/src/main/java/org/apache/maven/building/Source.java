@@ -24,7 +24,6 @@ import java.io.InputStream;
 /**
  * Provides access to the contents of a source independently of the backing store (e.g. file system, database, memory).
  *
- * @author Benjamin Bentmann
  */
 public interface Source {
 

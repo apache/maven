@@ -25,7 +25,6 @@ import org.apache.maven.project.AbstractMavenProjectTestCase;
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 
 /**
- * @author Jason van Zyl
  */
 public abstract class AbstractProjectInheritanceTestCase extends AbstractMavenProjectTestCase {
     protected String getTestSeries() {

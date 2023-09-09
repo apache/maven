@@ -39,7 +39,6 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles normalization of a model.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

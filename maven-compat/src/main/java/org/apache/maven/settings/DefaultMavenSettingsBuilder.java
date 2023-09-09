@@ -35,8 +35,8 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * @author jdcasey
  */
+@Deprecated
 @Named
 @Singleton
 public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements MavenSettingsBuilder {

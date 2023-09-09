@@ -165,6 +165,7 @@ under the License.
     <resolverVersion>1.9.14</resolverVersion>
     <sharedVersion>3.4.2</sharedVersion>
     <sisuVersion>0.9.0.M2</sisuVersion>
+    <asmVersion>9.5</asmVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
     <xmlunitVersion>2.6.4</xmlunitVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
@@ -210,6 +211,7 @@ under the License.
         <groupId>com.google.inject</groupId>
         <artifactId>guice</artifactId>
         <version>${guiceVersion}</version>
+        <classifier>classes</classifier>
         <exclusions>
           <exclusion>
             <groupId>com.google.guava</groupId>
@@ -265,12 +267,23 @@ under the License.
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
           </exclusion>
+          <!-- we use the no_asm classifier for sisu.inject -->
+          <exclusion>
+            <groupId>org.eclipse.sisu</groupId>
+            <artifactId>org.eclipse.sisu.inject</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
         <version>${sisuVersion}</version>
+        <classifier>no_asm</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm</artifactId>
+        <version>${asmVersion}</version>
       </dependency>
       <dependency>
         <groupId>javax.inject</groupId>

@@ -40,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 3. Direct dependencies should inherit scope from dependencyManagement when
  *    they do not explicitly state a scope.
  *
- * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  */
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------

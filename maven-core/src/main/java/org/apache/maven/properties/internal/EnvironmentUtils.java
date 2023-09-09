@@ -30,7 +30,6 @@ import org.apache.maven.utils.Os;
  * prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 public class EnvironmentUtils {
 

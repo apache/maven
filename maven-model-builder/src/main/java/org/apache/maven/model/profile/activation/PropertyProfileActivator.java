@@ -33,7 +33,6 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 /**
  * Determines profile activation based on the existence or value of some execution property.
  *
- * @author Benjamin Bentmann
  * @see ActivationProperty
  */
 @Named("property")

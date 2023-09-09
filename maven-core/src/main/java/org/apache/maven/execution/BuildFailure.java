@@ -23,7 +23,6 @@ import org.apache.maven.project.MavenProject;
 /**
  * Summarizes the result of a failed project build in the reactor.
  *
- * @author Benjamin Bentmann
  */
 public class BuildFailure extends BuildSummary {
 

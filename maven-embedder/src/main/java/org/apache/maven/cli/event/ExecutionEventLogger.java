@@ -47,7 +47,6 @@ import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
 /**
  * Logs execution events to logger, eventually user-supplied.
  *
- * @author Benjamin Bentmann
  */
 public class ExecutionEventLogger extends AbstractExecutionListener {
     private static final int MAX_LOG_PREFIX_SIZE = 8; // "[ERROR] "

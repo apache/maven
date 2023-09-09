@@ -68,7 +68,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
@@ -103,6 +102,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         this.modelCacheFactory = Objects.requireNonNull(modelCacheFactory, "modelCacheFactory cannot be null");
     }
 
+    @Override
     public ArtifactDescriptorResult readArtifactDescriptor(
             RepositorySystemSession session, ArtifactDescriptorRequest request) throws ArtifactDescriptorException {
         ArtifactDescriptorResult result = new ArtifactDescriptorResult(request);

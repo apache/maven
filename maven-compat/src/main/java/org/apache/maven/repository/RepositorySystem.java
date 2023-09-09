@@ -37,7 +37,6 @@ import org.apache.maven.settings.Server;
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
- * @author Jason van Zyl
  * @since 3.0-alpha
  * @deprecated Use {@link MavenRepositorySystem} if needed, or maven-resolver directly, until maven 4.x api is out
  */

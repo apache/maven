@@ -65,6 +65,7 @@ final class LocalSnapshotMetadata extends MavenMetadata {
         artifacts.add(artifact);
     }
 
+    @Override
     public MavenMetadata setFile(File file) {
         return new LocalSnapshotMetadata(metadata, file, timestamp);
     }
@@ -113,18 +114,22 @@ final class LocalSnapshotMetadata extends MavenMetadata {
         return classifier + ':' + extension;
     }
 
+    @Override
     public String getGroupId() {
         return metadata.getGroupId();
     }
 
+    @Override
     public String getArtifactId() {
         return metadata.getArtifactId();
     }
 
+    @Override
     public String getVersion() {
         return metadata.getVersion();
     }
 
+    @Override
     public Nature getNature() {
         return Nature.SNAPSHOT;
     }

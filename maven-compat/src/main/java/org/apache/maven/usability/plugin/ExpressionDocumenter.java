@@ -34,6 +34,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * ExpressionDocumenter
  */
+@Deprecated
 public class ExpressionDocumenter {
 
     private static final String[] EXPRESSION_ROOTS = {"project", "settings", "session", "plugin", "rootless"};

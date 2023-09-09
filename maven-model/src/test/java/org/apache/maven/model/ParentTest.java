@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code Parent}.
  *
- * @author Benjamin Bentmann
  */
 class ParentTest {
 

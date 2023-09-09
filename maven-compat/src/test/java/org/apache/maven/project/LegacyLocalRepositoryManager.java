@@ -34,7 +34,6 @@ import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
 
 /**
- * @author Benjamin Bentmann
  */
 public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 

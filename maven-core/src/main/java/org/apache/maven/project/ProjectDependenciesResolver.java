@@ -21,7 +21,6 @@ package org.apache.maven.project;
 /**
  * Resolves the transitive dependencies of a project.
  *
- * @author Benjamin Bentmann
  */
 public interface ProjectDependenciesResolver {
 

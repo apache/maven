@@ -71,7 +71,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  */
 @PlexusTest
 public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCase

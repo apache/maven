@@ -31,7 +31,6 @@ import org.eclipse.aether.repository.RemoteRepository;
  * Collects settings required to resolve a plugin prefix.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 public class DefaultPluginPrefixRequest implements PluginPrefixRequest {
 

@@ -31,7 +31,6 @@ import org.apache.maven.artifact.Artifact;
 /**
  * Construct a version range from a specification.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class VersionRange {
     private static final Map<String, VersionRange> CACHE_SPEC = Collections.synchronizedMap(new WeakHashMap<>());

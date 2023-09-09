@@ -20,7 +20,6 @@ package org.apache.maven.model.transform;
 
 /**
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 public class RelativeProject {

@@ -32,7 +32,6 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
  * A model building request that delegates all methods invocations to another request, meant for easy transformations by
  * subclassing.
  *
- * @author Benjamin Bentmann
  */
 class FilterModelBuildingRequest implements ModelBuildingRequest {
 

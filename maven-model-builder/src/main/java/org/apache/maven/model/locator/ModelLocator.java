@@ -23,7 +23,6 @@ import java.io.File;
 /**
  * Locates a POM file within a project base directory.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelLocator {
 

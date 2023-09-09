@@ -37,10 +37,10 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
 /**
- * @author Jason van Zyl
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultArtifactTransformationManager implements ArtifactTransformationManager {
 
     private List<ArtifactTransformation> artifactTransformations;

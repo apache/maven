@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * @author Benjamin Bentmann
  */
 class DefaultSettingsBuilderFactoryTest {
 

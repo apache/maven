@@ -31,7 +31,6 @@ import org.apache.maven.utils.Os;
 /**
  * Determines profile activation based on the operating system of the current runtime platform.
  *
- * @author Benjamin Bentmann
  * @see ActivationOS
  */
 @Named("os")

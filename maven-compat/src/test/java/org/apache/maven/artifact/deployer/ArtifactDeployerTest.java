@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
 class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
     @Inject

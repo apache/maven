@@ -21,7 +21,6 @@ package org.apache.maven.lifecycle;
 /**
  * Signals a failure to locate the lifecycle for some phase.
  *
- * @author Benjamin Bentmann
  */
 public class LifecyclePhaseNotFoundException extends Exception {
 

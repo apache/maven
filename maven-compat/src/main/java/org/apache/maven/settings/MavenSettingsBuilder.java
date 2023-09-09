@@ -25,8 +25,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * @author jdcasey
- * @author Jason van Zyl
  */
 @Deprecated
 public interface MavenSettingsBuilder {
