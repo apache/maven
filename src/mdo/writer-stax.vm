@@ -72,6 +72,7 @@ import org.apache.maven.internal.xml.XmlNodeBuilder;
 import ${packageModelV4}.${class.name};
   #end
 #end
+import org.codehaus.stax2.util.StreamWriterDelegate;
 
 @Generated
 public class ${className} {
@@ -96,6 +97,8 @@ public class ${className} {
     private String fileComment = null;
 
 #if ( $locationTracking )
+    private boolean addLocationInformation = true;
+
     /**
      * Field stringFormatter.
      */
@@ -117,6 +120,13 @@ public class ${className} {
 
 #if ( $locationTracking )
     /**
+     * Method setAddLocationInformation.
+     */
+    public void setAddLocationInformation(boolean addLocationInformation) {
+        this.addLocationInformation = addLocationInformation;
+    } //-- void setAddLocationInformation(String)
+
+    /**
      * Method setStringFormatter.
      *
      * @param stringFormatter
@@ -136,7 +146,9 @@ public class ${className} {
     public void write(Writer writer, ${root.name} ${rootLcapName}) throws IOException, XMLStreamException {
         XMLOutputFactory factory = new com.ctc.wstx.stax.WstxOutputFactory();
         factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
-        XMLStreamWriter serializer = factory.createXMLStreamWriter(writer);
+        factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_USE_DOUBLE_QUOTES_IN_XML_DECL, true);
+        factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_ADD_SPACE_AFTER_EMPTY_ELEM, true);
+        XMLStreamWriter serializer = new IndentingXMLStreamWriter(factory.createXMLStreamWriter(writer));
         serializer.writeStartDocument(${rootLcapName}.getModelEncoding(), null);
         write${root.name}("$rootTag", ${rootLcapName}, serializer);
         serializer.writeEndDocument();
@@ -152,7 +164,9 @@ public class ${className} {
     public void write(OutputStream stream, ${root.name} ${rootLcapName}) throws IOException, XMLStreamException {
         XMLOutputFactory factory = new com.ctc.wstx.stax.WstxOutputFactory();
         factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
-        XMLStreamWriter serializer = factory.createXMLStreamWriter(stream, ${rootLcapName}.getModelEncoding());
+        factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_USE_DOUBLE_QUOTES_IN_XML_DECL, true);
+        factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_ADD_SPACE_AFTER_EMPTY_ELEM, true);
+        XMLStreamWriter serializer = new IndentingXMLStreamWriter(factory.createXMLStreamWriter(stream, ${rootLcapName}.getModelEncoding()));
         serializer.writeStartDocument(${rootLcapName}.getModelEncoding(), null);
         write${root.name}("$rootTag", ${rootLcapName}, serializer);
         serializer.writeEndDocument();
@@ -168,7 +182,9 @@ public class ${className} {
         if (${classLcapName} != null) {
   #if ( $class == $root )
             if (this.fileComment != null) {
+                serializer.writeCharacters("\n");
                 serializer.writeComment(this.fileComment);
+                serializer.writeCharacters("\n");
             }
             serializer.writeStartElement("", tagName, NAMESPACE);
             serializer.writeNamespace("", NAMESPACE);
@@ -315,7 +331,12 @@ public class ${className} {
         if (dom != null) {
             serializer.writeStartElement(NAMESPACE, dom.getName());
             for (Map.Entry<String, String> attr : dom.getAttributes().entrySet()) {
-                serializer.writeAttribute(NAMESPACE, attr.getKey(), attr.getValue());
+                if (attr.getKey().startsWith("xml:")) {
+                    serializer.writeAttribute("http://www.w3.org/XML/1998/namespace",
+                    attr.getKey().substring(4), attr.getValue());
+                } else {
+                    serializer.writeAttribute(attr.getKey(), attr.getValue());
+                }
             }
             for (XmlNode child : dom.getChildren()) {
                 writeDom(child, serializer);
@@ -364,9 +385,11 @@ public class ${className} {
      * @throws IOException
      */
     protected void writeLocationTracking(InputLocationTracker locationTracker, Object key, XMLStreamWriter serializer) throws IOException, XMLStreamException {
-        InputLocation location = (locationTracker == null) ? null : locationTracker.getLocation(key);
-        if (location != null) {
-            serializer.writeComment(toString(location));
+        if (addLocationInformation) {
+            InputLocation location = (locationTracker == null) ? null : locationTracker.getLocation(key);
+            if (location != null) {
+                serializer.writeComment(toString(location));
+            }
         }
     } //-- void writeLocationTracking(InputLocationTracker, Object, XMLStreamWriter)
 
@@ -383,4 +406,76 @@ public class ${className} {
         return ' ' + location.getSource().toString() + ':' + location.getLineNumber() + ' ';
     } //-- String toString(InputLocation)
 #end
+
+    static class IndentingXMLStreamWriter extends StreamWriterDelegate {
+
+        int depth = 0;
+        boolean hasChildren = false;
+
+        public IndentingXMLStreamWriter(XMLStreamWriter parent) {
+            super(parent);
+        }
+
+        @Override
+        public void writeEmptyElement(String localName) throws XMLStreamException {
+            indent();
+            super.writeEmptyElement(localName);
+            hasChildren = true;
+        }
+
+        @Override
+        public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
+            indent();
+            super.writeEmptyElement(namespaceURI, localName);
+            hasChildren = true;
+        }
+
+        @Override
+        public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+            indent();
+            super.writeEmptyElement(prefix, localName, namespaceURI);
+            hasChildren = true;
+        }
+
+        @Override
+        public void writeStartElement(String localName) throws XMLStreamException {
+            indent();
+            super.writeStartElement(localName);
+            depth++;
+            hasChildren = false;
+        }
+
+        @Override
+        public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
+            indent();
+            super.writeStartElement(namespaceURI, localName);
+            depth++;
+            hasChildren = false;
+        }
+
+        @Override
+        public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+            indent();
+            super.writeStartElement(prefix, localName, namespaceURI);
+            depth++;
+            hasChildren = false;
+        }
+
+        @Override
+        public void writeEndElement() throws XMLStreamException {
+            depth--;
+            if (hasChildren) {
+                indent();
+            }
+            super.writeEndElement();
+            hasChildren = true;
+        }
+
+        private void indent() throws XMLStreamException {
+            super.writeCharacters("\n");
+            for (int i = 0; i < depth; i++) {
+                super.writeCharacters("  ");
+            }
+        }
+    }
 }
