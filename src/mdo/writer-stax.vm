@@ -74,6 +74,8 @@ import ${packageModelV4}.${class.name};
 #end
 import org.codehaus.stax2.util.StreamWriterDelegate;
 
+import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+
 @Generated
 public class ${className} {
 
@@ -85,11 +87,6 @@ public class ${className} {
      * Field NAMESPACE.
      */
     private static final String NAMESPACE = "${namespace}";
-
-    /**
-     * XSI namespace
-     */
-    private static final String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
 
     /**
      * Field fileComment.
@@ -188,8 +185,8 @@ public class ${className} {
             }
             serializer.writeStartElement("", tagName, NAMESPACE);
             serializer.writeNamespace("", NAMESPACE);
-            serializer.writeNamespace("xsi", XSI_NAMESPACE);
-            serializer.writeAttribute(XSI_NAMESPACE, "schemaLocation", NAMESPACE + " ${schemaLocation}");
+            serializer.writeNamespace("xsi", W3C_XML_SCHEMA_INSTANCE_NS_URI);
+            serializer.writeAttribute(W3C_XML_SCHEMA_INSTANCE_NS_URI, "schemaLocation", NAMESPACE + " ${schemaLocation}");
   #else
             serializer.writeStartElement(NAMESPACE, tagName);
   #end
