@@ -38,12 +38,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.feature.Features;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -390,7 +390,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             Thread.currentThread().setContextClassLoader(oldContextClassLoader);
         }
 
-        if (Features.buildConsumer(request.getUserProperties()).isActive()) {
+        if (Features.buildConsumer(request.getUserProperties())) {
             request.getRepositorySession()
                     .getData()
                     .set(TransformerContext.KEY, config.transformerContextBuilder.build());
