@@ -25,24 +25,37 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
- * Centralized class for feature information
+ * Centralized class for Maven Core feature information.
+ * Features configured are supposed to be final in a given maven session.
  *
  * @since 4.0.0
  */
 public final class Features {
 
+    /**
+     * Name of the Maven user property to enable or disable the build/consumer POM feature.
+     */
     public static final String BUILDCONSUMER = "maven.experimental.buildconsumer";
 
     private Features() {}
 
+    /**
+     * Check if the build/consumer POM feature is active.
+     */
     public static boolean buildConsumer(@Nullable Properties userProperties) {
         return doGet(userProperties, BUILDCONSUMER, true);
     }
 
+    /**
+     * Check if the build/consumer POM feature is active.
+     */
     public static boolean buildConsumer(@Nullable Map<String, String> userProperties) {
         return doGet(userProperties, BUILDCONSUMER, true);
     }
 
+    /**
+     * Check if the build/consumer POM feature is active.
+     */
     public static boolean buildConsumer(@Nullable Session session) {
         return buildConsumer(session != null ? session.getUserProperties() : null);
     }
