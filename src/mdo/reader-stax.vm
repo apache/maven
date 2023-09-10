@@ -855,7 +855,9 @@ public class ${className} {
 #if ( $locationTracking )
     private XmlNode buildXmlNode(XMLStreamReader parser, InputSource source) throws XMLStreamException {
         return XmlNodeBuilder.build(parser,
-                p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source));
+                addLocationInformation
+                        ? p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source)
+                        : null);
     }
 #else
     private XmlNode buildXmlNode(XMLStreamReader parser) throws XMLStreamException {
