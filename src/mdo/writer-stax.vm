@@ -158,29 +158,6 @@ public class ${className} {
         serializer.writeEndDocument();
     } //-- void write(OutputStream, ${root.name})
 
-    /**
-     * Method writeDomToSerializer.
-     *
-     * @param dom a dom object.
-     * @param serializer a serializer object.
-     * @throws IOException IOException if any.
-     */
-    protected void writeDomToSerializer(org.apache.maven.api.xml.XmlNode dom, XMLStreamWriter serializer) throws IOException, XMLStreamException {
-        serializer.writeStartElement(NAMESPACE, dom.getName());
-        for (Map.Entry<String, String> attribute : dom.getAttributes().entrySet()) {
-            serializer.writeAttribute(NAMESPACE, attribute.getKey(), attribute.getValue());
-        }
-        for (XmlNode aChild : dom.getChildren()) {
-            writeDomToSerializer(aChild, serializer);
-        }
-        String value = dom.getValue();
-        if (value != null) {
-            serializer.writeCharacters(value);
-        }
-        serializer.writeEndElement();
-    } //-- void writeDomToSerializer(org.apache.maven.api.xml.XmlNode, XMLStreamWriter)
-
-
 #foreach ( $class in $model.allClasses )
  #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
   #set ( $classUcapName = $Helper.capitalise( $class.name ) )
