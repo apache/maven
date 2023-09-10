@@ -23,6 +23,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import org.apache.maven.cli.jansi.MessageUtils;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -32,6 +33,10 @@ import org.eclipse.aether.transfer.TransferResource;
  * AbstractMavenTransferListener
  */
 public abstract class AbstractMavenTransferListener extends AbstractTransferListener {
+
+    private static final String ESC = "\u001B";
+    private static final String ANSI_DARK_SET = ESC + "[90m";
+    private static final String ANSI_DARK_RESET = ESC + "[0m";
 
     // CHECKSTYLE_OFF: LineLength
     /**
@@ -188,14 +193,18 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
     @Override
     public void transferInitiated(TransferEvent event) {
+        String darkOn = MessageUtils.isColorEnabled() ? ANSI_DARK_SET : "";
+        String darkOff = MessageUtils.isColorEnabled() ? ANSI_DARK_RESET : "";
+
         String action = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();
         StringBuilder message = new StringBuilder();
-        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
-        message.append(": ");
-        message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
+        message.append(darkOn).append(action).append(' ').append(direction).append(' ');
+        message.append(darkOff).append(resource.getRepositoryId());
+        message.append(darkOn).append(": ").append(resource.getRepositoryUrl());
+        message.append(darkOff).append(resource.getResourceName());
 
         out.println(message.toString());
     }
@@ -210,6 +219,9 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
     @Override
     public void transferSucceeded(TransferEvent event) {
+        String darkOn = MessageUtils.isColorEnabled() ? ANSI_DARK_SET : "";
+        String darkOff = MessageUtils.isColorEnabled() ? ANSI_DARK_RESET : "";
+
         String action = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
@@ -218,10 +230,11 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         StringBuilder message = new StringBuilder();
-        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
-        message.append(": ");
-        message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
-        message.append(" (").append(format.format(contentLength));
+        message.append(action).append(darkOn).append(' ').append(direction).append(' ');
+        message.append(darkOff).append(resource.getRepositoryId());
+        message.append(darkOn).append(": ").append(resource.getRepositoryUrl());
+        message.append(darkOff).append(resource.getResourceName());
+        message.append(darkOn).append(" (").append(format.format(contentLength));
 
         long duration = System.currentTimeMillis() - resource.getTransferStartTime();
         if (duration > 0L) {
@@ -229,7 +242,7 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
             message.append(" at ").append(format.format((long) bytesPerSecond)).append("/s");
         }
 
-        message.append(')');
+        message.append(')').append(darkOff);
         out.println(message.toString());
     }
 }
