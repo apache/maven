@@ -19,7 +19,9 @@
 package org.apache.maven.api.services;
 
 import org.apache.maven.api.Service;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Builds the effective toolchains from a user toolchains file and/or a global toolchains file.
@@ -28,11 +30,27 @@ import org.apache.maven.api.annotations.Experimental;
 public interface ToolchainsBuilder extends Service {
 
     /**
-     * Builds the effective toolchains of the specified toolchains files.
+     * Builds the effective toolchains for the specified toolchains files.
      *
      * @param request the toolchains building request that holds the parameters, must not be {@code null}
      * @return the result of the toolchains building, never {@code null}
      * @throws ToolchainsBuilderException if the effective toolchains could not be built
      */
     ToolchainsBuilderResult build(ToolchainsBuilderRequest request);
+
+    /**
+     * Builds the effective toolchains for the specified toolchains sources.
+     *
+     * @param session the {@link Session}, must not be {@code null}
+     * @param globalToolchainsSource The {@link Source} pointing to the global toolchains, must not be {@code null}
+     * @param userToolchainsSource The {@link Source} pointing to the user toolchains, must not be {@code null}
+     * @throws ToolchainsBuilderException if the project cannot be created
+     * @throws IllegalArgumentException if an argument is {@code null} or invalid
+     * @see #build(ToolchainsBuilderRequest)
+     */
+    @Nonnull
+    default ToolchainsBuilderResult build(
+            @Nonnull Session session, @Nonnull Source globalToolchainsSource, @Nonnull Source userToolchainsSource) {
+        return build(ToolchainsBuilderRequest.build(session, globalToolchainsSource, userToolchainsSource));
+    }
 }
