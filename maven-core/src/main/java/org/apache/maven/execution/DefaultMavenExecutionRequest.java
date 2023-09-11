@@ -135,6 +135,9 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private TransferListener transferListener;
 
+    private TransferListenerConfiguration transferListenerConfiguration =
+            TransferListenerConfiguration.builder().build();
+
     private int loggingLevel = LOGGING_LEVEL_INFO;
 
     private String globalChecksumPolicy;
@@ -194,6 +197,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setActiveProfiles(original.getActiveProfiles());
         copy.setInactiveProfiles(original.getInactiveProfiles());
         copy.setTransferListener(original.getTransferListener());
+        copy.setTransferListenerConfiguration(original.getTransferListenerConfiguration());
         copy.setLoggingLevel(original.getLoggingLevel());
         copy.setGlobalChecksumPolicy(original.getGlobalChecksumPolicy());
         copy.setUpdateSnapshots(original.isUpdateSnapshots());
@@ -370,6 +374,11 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     @Override
     public TransferListener getTransferListener() {
         return transferListener;
+    }
+
+    @Override
+    public TransferListenerConfiguration getTransferListenerConfiguration() {
+        return transferListenerConfiguration;
     }
 
     @Override
@@ -605,6 +614,14 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     @Override
     public MavenExecutionRequest setTransferListener(TransferListener transferListener) {
         this.transferListener = transferListener;
+
+        return this;
+    }
+
+    @Override
+    public MavenExecutionRequest setTransferListenerConfiguration(
+            TransferListenerConfiguration transferListenerConfiguration) {
+        this.transferListenerConfiguration = transferListenerConfiguration;
 
         return this;
     }

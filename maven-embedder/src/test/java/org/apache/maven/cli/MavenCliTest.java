@@ -36,20 +36,17 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
 import org.apache.maven.cli.jansi.MessageUtils;
-import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
-import org.apache.maven.cli.transfer.QuietMavenTransferListener;
-import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
+import org.apache.maven.execution.TransferListenerConfiguration;
 import org.apache.maven.model.root.DefaultRootLocator;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
-import org.eclipse.aether.transfer.TransferListener;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -634,39 +631,107 @@ class MavenCliTest {
 
     @ParameterizedTest
     @MethodSource("calculateTransferListenerArguments")
-    public void calculateTransferListener(boolean ciEnv, String[] cliArgs, Class<TransferListener> expectedSubClass)
+    public void calculateTransferListener(boolean ciEnv, String[] cliArgs, TransferListenerConfiguration expectedConfig)
             throws Exception {
         CliRequest request = new CliRequest(cliArgs, null);
         if (ciEnv) request.getSystemProperties().put("env.CI", "true");
         cli.cli(request);
         cli.logging(request);
 
-        TransferListener transferListener = cli.populateRequest(request).getTransferListener();
+        TransferListenerConfiguration transferListenerConfig =
+                cli.populateRequest(request).getTransferListenerConfiguration();
 
-        assertThat(transferListener.getClass(), is(expectedSubClass));
+        assertThat(transferListenerConfig, equalTo(expectedConfig));
     }
 
     public static Stream<Arguments> calculateTransferListenerArguments() {
         return Stream.of(
-                Arguments.of(false, new String[] {}, ConsoleMavenTransferListener.class),
-                Arguments.of(true, new String[] {}, QuietMavenTransferListener.class),
-                Arguments.of(false, new String[] {"-ntp"}, QuietMavenTransferListener.class),
-                Arguments.of(false, new String[] {"--quiet"}, QuietMavenTransferListener.class),
-                Arguments.of(true, new String[] {"--force-interactive"}, ConsoleMavenTransferListener.class),
+                Arguments.of(
+                        false,
+                        new String[] {},
+                        TransferListenerConfiguration.builder().build()),
+                Arguments.of(
+                        true,
+                        new String[] {},
+                        TransferListenerConfiguration.builder()
+                                .withMode(TransferListenerConfiguration.Mode.QUIET)
+                                .build()),
+                Arguments.of(
+                        false,
+                        new String[] {"-ntp"},
+                        TransferListenerConfiguration.builder()
+                                .withMode(TransferListenerConfiguration.Mode.QUIET)
+                                .build()),
+                Arguments.of(
+                        false,
+                        new String[] {"--quiet"},
+                        TransferListenerConfiguration.builder()
+                                .withMode(TransferListenerConfiguration.Mode.QUIET)
+                                .build()),
+                Arguments.of(
+                        true,
+                        new String[] {"--force-interactive"},
+                        TransferListenerConfiguration.builder().build()),
                 Arguments.of(
                         true,
                         new String[] {"--force-interactive", "--non-interactive"},
-                        ConsoleMavenTransferListener.class),
+                        TransferListenerConfiguration.builder().build()),
                 Arguments.of(
-                        true, new String[] {"--force-interactive", "--batch-mode"}, ConsoleMavenTransferListener.class),
+                        true,
+                        new String[] {"--force-interactive", "--batch-mode"},
+                        TransferListenerConfiguration.builder().build()),
                 Arguments.of(
                         true,
                         new String[] {"--force-interactive", "--non-interactive", "--batch-mode"},
-                        ConsoleMavenTransferListener.class),
-                Arguments.of(false, new String[] {"--non-interactive"}, Slf4jMavenTransferListener.class),
-                Arguments.of(false, new String[] {"--batch-mode"}, Slf4jMavenTransferListener.class),
+                        TransferListenerConfiguration.builder().build()),
                 Arguments.of(
-                        false, new String[] {"--non-interactive", "--batch-mode"}, Slf4jMavenTransferListener.class));
+                        false,
+                        new String[] {"--non-interactive"},
+                        TransferListenerConfiguration.builder()
+                                .withColored(false)
+                                .build()),
+                Arguments.of(
+                        false,
+                        new String[] {"--batch-mode"},
+                        TransferListenerConfiguration.builder()
+                                .withColored(false)
+                                .build()),
+                Arguments.of(
+                        false,
+                        new String[] {"--non-interactive", "--batch-mode"},
+                        TransferListenerConfiguration.builder()
+                                .withColored(false)
+                                .build()),
+                Arguments.of(
+                        false,
+                        new String[] {"--transfer-listener-mode=quiet"},
+                        TransferListenerConfiguration.builder()
+                                .withMode(TransferListenerConfiguration.Mode.QUIET)
+                                .build()),
+                Arguments.of(
+                        false,
+                        new String[] {"--transfer-listener-mode=classic"},
+                        TransferListenerConfiguration.builder()
+                                .withMode(TransferListenerConfiguration.Mode.CLASSIC)
+                                .build()),
+                Arguments.of(
+                        false,
+                        new String[] {"--transfer-listener-mode=classic_light"},
+                        TransferListenerConfiguration.builder()
+                                .withMode(TransferListenerConfiguration.Mode.CLASSIC_LIGHT)
+                                .build()),
+                Arguments.of(
+                        false,
+                        new String[] {"--transfer-listener-mode=summary"},
+                        TransferListenerConfiguration.builder()
+                                .withMode(TransferListenerConfiguration.Mode.SUMMARY)
+                                .build()),
+                Arguments.of(
+                        false,
+                        new String[] {"--no-transfer-listener-progress"},
+                        TransferListenerConfiguration.builder()
+                                .withProgress(false)
+                                .build()));
     }
 
     private MavenProject createMavenProject(String groupId, String artifactId) {

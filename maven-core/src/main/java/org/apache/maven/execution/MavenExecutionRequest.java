@@ -233,9 +233,21 @@ public interface MavenExecutionRequest {
     boolean isShowErrors();
 
     // Transfer listeners
+    @Deprecated
     MavenExecutionRequest setTransferListener(TransferListener transferListener);
 
+    @Deprecated
     TransferListener getTransferListener();
+
+    /**
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setTransferListenerConfiguration(TransferListenerConfiguration transferListenerConfiguration);
+
+    /**
+     * @since 4.0.0
+     */
+    TransferListenerConfiguration getTransferListenerConfiguration();
 
     // Logging
     MavenExecutionRequest setLoggingLevel(int loggingLevel);

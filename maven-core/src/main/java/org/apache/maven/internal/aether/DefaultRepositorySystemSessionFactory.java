@@ -36,6 +36,7 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.TransferListenerFactory;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.ModelBase;
@@ -137,6 +138,8 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final RuntimeInformation runtimeInformation;
 
+    private final TransferListenerFactory transferListenerFactory;
+
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
     public DefaultRepositorySystemSessionFactory(
@@ -146,7 +149,8 @@ public class DefaultRepositorySystemSessionFactory {
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
             MavenRepositorySystem mavenRepositorySystem,
-            RuntimeInformation runtimeInformation) {
+            RuntimeInformation runtimeInformation,
+            TransferListenerFactory transferListenerFactory) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.workspaceRepository = workspaceRepository;
@@ -154,6 +158,7 @@ public class DefaultRepositorySystemSessionFactory {
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.runtimeInformation = runtimeInformation;
+        this.transferListenerFactory = transferListenerFactory;
     }
 
     @SuppressWarnings("checkstyle:methodLength")
@@ -339,7 +344,8 @@ public class DefaultRepositorySystemSessionFactory {
         session.setSystemProperties(request.getSystemProperties());
         session.setConfigProperties(configProps);
 
-        session.setTransferListener(request.getTransferListener());
+        session.setTransferListener(
+                transferListenerFactory.createTransferListener(session, request.getTransferListenerConfiguration()));
 
         session.setRepositoryListener(eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger)));
 

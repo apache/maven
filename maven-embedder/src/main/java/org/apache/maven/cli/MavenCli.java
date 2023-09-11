@@ -64,9 +64,6 @@ import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
 import org.apache.maven.cli.logging.Slf4jStdoutLogger;
-import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
-import org.apache.maven.cli.transfer.QuietMavenTransferListener;
-import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -79,6 +76,7 @@ import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
+import org.apache.maven.execution.TransferListenerConfiguration;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
@@ -109,7 +107,6 @@ import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositoryCache;
-import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1264,7 +1261,8 @@ public class MavenCli {
         request.setRootDirectory(cliRequest.rootDirectory);
         request.setTopDirectory(cliRequest.topDirectory);
         request.setPom(determinePom(commandLine, workingDirectory, baseDirectory));
-        request.setTransferListener(determineTransferListener(quiet, verbose, commandLine, request));
+        // request.setTransferListener(determineTransferListener(quiet, verbose, commandLine, request));
+        request.setTransferListenerConfiguration(determineTransferListenerConfig(quiet, verbose, commandLine, request));
         request.setExecutionListener(determineExecutionListener());
 
         if ((request.getPom() != null) && (request.getPom().getParentFile() != null)) {
@@ -1441,7 +1439,7 @@ public class MavenCli {
         }
     }
 
-    private TransferListener determineTransferListener(
+    private TransferListenerConfiguration determineTransferListenerConfig(
             final boolean quiet,
             final boolean verbose,
             final CommandLine commandLine,
@@ -1449,18 +1447,31 @@ public class MavenCli {
         boolean runningOnCI = isRunningOnCI(request.getSystemProperties());
         boolean quietCI = runningOnCI && !commandLine.hasOption(FORCE_INTERACTIVE);
 
+        String modeString = commandLine.getOptionValue(CLIManager.TRANSFER_LISTENER_MODE);
+        if (modeString == null) {
+            modeString = TransferListenerConfiguration.Mode.CLASSIC.name();
+        }
+        TransferListenerConfiguration.Builder builder = TransferListenerConfiguration.builder();
+        builder.withColored(true)
+                .withVerbose(verbose)
+                .withProgress(!commandLine.hasOption(CLIManager.NO_TRANSFER_LISTENER_PROGRESS))
+                .withMode(TransferListenerConfiguration.Mode.valueOf(modeString.toUpperCase(Locale.ENGLISH)));
+
+        if (commandLine.hasOption(CLIManager.THREADS)) {
+            builder.withParallel(true);
+        }
+
         if (quiet || commandLine.hasOption(CLIManager.NO_TRANSFER_PROGRESS) || quietCI) {
-            return new QuietMavenTransferListener();
-        } else if (request.isInteractiveMode() && !commandLine.hasOption(CLIManager.LOG_FILE)) {
+            builder.withMode(TransferListenerConfiguration.Mode.QUIET);
+        } else if (!request.isInteractiveMode() || commandLine.hasOption(CLIManager.LOG_FILE)) {
             //
             // If we're logging to a file then we don't want the console transfer listener as it will spew
             // download progress all over the place
             //
-            return getConsoleTransferListener(verbose);
-        } else {
-            // default: batch mode which goes along with interactive
-            return getBatchTransferListener();
+            builder.withColored(false);
         }
+
+        return builder.build();
     }
 
     private String determineMakeBehavior(final CommandLine cl) {
@@ -1636,18 +1647,6 @@ public class MavenCli {
         ExitException(int exitCode) {
             this.exitCode = exitCode;
         }
-    }
-
-    //
-    // Customizations available via the CLI
-    //
-
-    protected TransferListener getConsoleTransferListener(boolean printResourceNames) {
-        return new ConsoleMavenTransferListener(System.out, printResourceNames);
-    }
-
-    protected TransferListener getBatchTransferListener() {
-        return new Slf4jMavenTransferListener();
     }
 
     protected void customizeContainer(PlexusContainer container) {}

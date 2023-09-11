@@ -113,7 +113,18 @@ public class CLIManager {
 
     public static final String BUILDER = "b";
 
+    @Deprecated
     public static final String NO_TRANSFER_PROGRESS = "ntp";
+
+    /**
+     * @since 4.0.0
+     */
+    public static final String TRANSFER_LISTENER_MODE = "tlm";
+
+    /**
+     * @since 4.0.0
+     */
+    public static final String NO_TRANSFER_LISTENER_PROGRESS = "ntlp";
 
     public static final String COLOR = "color";
 
@@ -300,7 +311,17 @@ public class CLIManager {
                 .build());
         options.addOption(Option.builder(NO_TRANSFER_PROGRESS)
                 .longOpt("no-transfer-progress")
-                .desc("Do not display transfer progress when downloading or uploading")
+                .desc("DEPRECATED: Use --transfer-listener-mode=quiet")
+                .build());
+        options.addOption(Option.builder(TRANSFER_LISTENER_MODE)
+                .longOpt("transfer-listener-mode")
+                .desc(
+                        "The mode how to present transfer progress, supported modes are 'quiet', 'classic', 'summary', 'summary-detailed`.")
+                .hasArg()
+                .build());
+        options.addOption(Option.builder(NO_TRANSFER_LISTENER_PROGRESS)
+                .longOpt("no-transfer-listener-progress")
+                .desc("Do not display transfer progress when downloading or uploading (in-flight progress).")
                 .build());
         options.addOption(Option.builder()
                 .longOpt(COLOR)
