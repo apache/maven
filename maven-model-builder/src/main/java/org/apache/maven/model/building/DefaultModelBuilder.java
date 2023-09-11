@@ -41,13 +41,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.building.Source;
-import org.apache.maven.feature.Features;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
@@ -1093,7 +1093,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         Model rawModel;
-        if (Features.buildConsumer(request.getUserProperties()).isActive() && modelSource instanceof FileModelSource) {
+        if (Features.buildConsumer(request.getUserProperties()) && modelSource instanceof FileModelSource) {
             rawModel = readFileModel(request, problems);
             File pomFile = ((FileModelSource) modelSource).getFile();
 
@@ -1894,7 +1894,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             return new TransformerContext() {
                 @Override
                 public Path locate(Path path) {
-                    return modelProcessor.locatePom(path.toFile()).toPath();
+                    File file = modelProcessor.locateExistingPom(path.toFile());
+                    return file != null ? file.toPath() : null;
                 }
 
                 @Override

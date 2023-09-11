@@ -20,7 +20,6 @@ package org.apache.maven.model.transform;
 
 import javax.xml.stream.XMLStreamReader;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -132,12 +131,9 @@ class ParentXMLFilter extends NodeBufferingParser {
     }
 
     protected Optional<RelativeProject> resolveRelativePath(Path relativePath, String groupId, String artifactId) {
-        Path pomPath = projectPath.resolve(relativePath).normalize();
-        if (Files.isDirectory(pomPath) && modelLocator != null) {
-            pomPath = modelLocator.apply(pomPath);
-        }
+        Path pomPath = modelLocator.apply(projectPath.resolve(relativePath).normalize());
 
-        if (pomPath == null || !Files.isRegularFile(pomPath)) {
+        if (pomPath == null) {
             return Optional.empty();
         }
 

@@ -62,13 +62,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
+import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+import static javax.xml.XMLConstants.XML_NS_URI;
+
 @Generated
 public class ${className} {
-
-    /**
-     * XSI namespace
-     */
-    private static final String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
 
     private static final Map<String, String> DEFAULT_ENTITIES;
     static {
@@ -521,8 +519,8 @@ public class ${className} {
             String name = parser.getAttributeLocalName(i);
             String ns = parser.getAttributeNamespace(i);
             String value = parser.getAttributeValue(i);
-            if (XSI_NAMESPACE.equals(ns)) {
-                // just ignore attributes with non-default namespace (for example: xmlns:xsi)
+            if (W3C_XML_SCHEMA_INSTANCE_NS_URI.equals(ns) || XML_NS_URI.equals(ns)) {
+                // just ignore attributes with non-default namespace (for example: xsi and xml)
   #if ( $class == $root )
             } else if ("xmlns".equals(name)) {
                 // ignore xmlns attribute in root class, which is a reserved attribute name
@@ -857,7 +855,9 @@ public class ${className} {
 #if ( $locationTracking )
     private XmlNode buildXmlNode(XMLStreamReader parser, InputSource source) throws XMLStreamException {
         return XmlNodeBuilder.build(parser,
-                p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source));
+                addLocationInformation
+                        ? p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source)
+                        : null);
     }
 #else
     private XmlNode buildXmlNode(XMLStreamReader parser) throws XMLStreamException {

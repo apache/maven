@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.BiConsumer;
 
-import org.apache.maven.feature.Features;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.transform.RawToConsumerPomXMLFilterFactory;
@@ -68,7 +68,7 @@ public final class ConsumerPomArtifactTransformer {
             // If there is no build POM there is no reason to inject artifacts for the consumer POM.
             return;
         }
-        if (isActive(session)) {
+        if (Features.buildConsumer(session.getUserProperties())) {
             Path generatedFile;
             String buildDirectory =
                     project.getBuild() != null ? project.getBuild().getDirectory() : null;
@@ -103,21 +103,17 @@ public final class ConsumerPomArtifactTransformer {
     }
 
     public InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
-        if (isActive(session) && consumerPomPresent(request.getArtifacts())) {
+        if (Features.buildConsumer(session.getUserProperties()) && consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));
         }
         return request;
     }
 
     public DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request) {
-        if (isActive(session) && consumerPomPresent(request.getArtifacts())) {
+        if (Features.buildConsumer(session.getUserProperties()) && consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));
         }
         return request;
-    }
-
-    private boolean isActive(RepositorySystemSession session) {
-        return Features.buildConsumer(session.getUserProperties()).isActive();
     }
 
     private boolean consumerPomPresent(Collection<Artifact> artifacts) {

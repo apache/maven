@@ -1353,18 +1353,11 @@ public class MavenCli {
             current = resolveFile(new File(alternatePomFile), workingDirectory);
         }
 
-        File pom;
-        if (current.isDirectory() && modelProcessor != null) {
-            pom = modelProcessor.locatePom(current);
+        if (modelProcessor != null) {
+            return modelProcessor.locateExistingPom(current);
         } else {
-            pom = current;
+            return current.isFile() ? current : null;
         }
-
-        if (pom.isFile()) {
-            return pom;
-        }
-
-        return null;
     }
 
     // Visible for testing

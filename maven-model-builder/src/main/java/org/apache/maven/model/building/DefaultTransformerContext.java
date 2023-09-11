@@ -18,6 +18,7 @@
  */
 package org.apache.maven.model.building;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
@@ -100,7 +101,8 @@ class DefaultTransformerContext implements TransformerContext {
 
     @Override
     public Path locate(Path path) {
-        return modelLocator.locatePom(path.toFile()).toPath();
+        File file = modelLocator.locateExistingPom(path.toFile());
+        return file != null ? file.toPath() : null;
     }
 
     static class GAKey {

@@ -27,8 +27,9 @@ import org.apache.maven.model.transform.stax.NodeBufferingParser;
 
 public class ModelVersionXMLFilter extends NodeBufferingParser {
 
-    private static final Pattern S_FILTER = Pattern.compile("\\s+");
     public static final String NAMESPACE_PREFIX = "http://maven.apache.org/POM/";
+
+    private static final Pattern S_FILTER = Pattern.compile("\\s+");
 
     public ModelVersionXMLFilter(XMLStreamReader delegate) {
         super(delegate, "project");

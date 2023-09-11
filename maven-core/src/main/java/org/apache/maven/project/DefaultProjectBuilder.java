@@ -28,12 +28,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.feature.Features;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -380,7 +380,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             Thread.currentThread().setContextClassLoader(oldContextClassLoader);
         }
 
-        if (Features.buildConsumer(request.getUserProperties()).isActive()) {
+        if (Features.buildConsumer(request.getUserProperties())) {
             request.getRepositorySession()
                     .getData()
                     .set(TransformerContext.KEY, config.transformerContextBuilder.build());
@@ -487,15 +487,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
                 module = module.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-                File moduleFile = new File(basedir, module);
+                File moduleFile = modelProcessor.locateExistingPom(new File(basedir, module));
 
-                if (moduleFile.isDirectory()) {
-                    moduleFile = modelProcessor.locatePom(moduleFile);
-                }
-
-                if (!moduleFile.isFile()) {
+                if (moduleFile == null) {
                     ModelProblem problem = new DefaultModelProblem(
-                            "Child module " + moduleFile + " of " + pomFile + " does not exist",
+                            "Child module " + module + " of " + pomFile + " does not exist",
                             ModelProblem.Severity.ERROR,
                             ModelProblem.Version.BASE,
                             model,
