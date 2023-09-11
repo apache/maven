@@ -60,7 +60,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.interpolation.ModelVersionProcessor;
 import org.apache.maven.model.v4.MavenModelVersion;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  */
