@@ -18,7 +18,7 @@
  */
 package org.apache.maven;
 
-import org.apache.maven.utils.dag.CycleDetectedException;
+import org.apache.maven.project.CycleDetectedException;
 
 /**
  */
