@@ -95,7 +95,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
         @Override
         public InputStream getInputStream() throws IOException {
-            return source.getInputStream();
+            return source.openStream();
         }
 
         @Override
