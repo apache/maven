@@ -84,9 +84,24 @@ public class ${className} {
     //--------------------------/
 
     /**
-     * Field NAMESPACE.
+     * Default namespace.
      */
     private static final String NAMESPACE = "${namespace}";
+
+    /**
+     * Default schemaLocation.
+     */
+    private static final String SCHEMA_LOCATION = "${schemaLocation}";
+
+    /**
+     * Field namespace.
+     */
+    private String namespace = NAMESPACE;
+
+    /**
+     * Field schemaLocation.
+     */
+    private String schemaLocation = SCHEMA_LOCATION;
 
     /**
      * Field fileComment.
@@ -105,6 +120,24 @@ public class ${className} {
       //-----------/
      //- Methods -/
     //-----------/
+
+    /**
+     * Method setNamespace.
+     *
+     * @param namespace the namespace to use.
+     */
+    public void setNamespace(String namespace) {
+        this.namespace = Objects.requireNonNull(namespace);
+    } //-- void setNamespace(String)
+
+    /**
+     * Method setSchemaLocation.
+     *
+     * @param schemaLocation the schema location to use.
+     */
+    public void setSchemaLocation(String schemaLocation) {
+        this.schemaLocation = Objects.requireNonNull(schemaLocation);
+        } //-- void setSchemaLocation(String)
 
     /**
      * Method setFileComment.
@@ -183,12 +216,12 @@ public class ${className} {
                 serializer.writeComment(this.fileComment);
                 serializer.writeCharacters("\n");
             }
-            serializer.writeStartElement("", tagName, NAMESPACE);
-            serializer.writeNamespace("", NAMESPACE);
+            serializer.writeStartElement("", tagName, namespace);
+            serializer.writeNamespace("", namespace);
             serializer.writeNamespace("xsi", W3C_XML_SCHEMA_INSTANCE_NS_URI);
-            serializer.writeAttribute(W3C_XML_SCHEMA_INSTANCE_NS_URI, "schemaLocation", NAMESPACE + " ${schemaLocation}");
+            serializer.writeAttribute(W3C_XML_SCHEMA_INSTANCE_NS_URI, "schemaLocation", namespace + " " + schemaLocation);
   #else
-            serializer.writeStartElement(NAMESPACE, tagName);
+            serializer.writeStartElement(namespace, tagName);
   #end
   #foreach ( $field in $allFields )
     #if ( $Helper.xmlFieldMetadata( $field ).attribute )
@@ -283,7 +316,7 @@ public class ${className} {
 #end
         if (list != null && !list.isEmpty()) {
             if (!flat) {
-                serializer.writeStartElement(NAMESPACE, tagName);
+                serializer.writeStartElement(namespace, tagName);
             }
             int index = 0;
 #if ( $locationTracking )
@@ -307,7 +340,7 @@ public class ${className} {
     private <T> void writeProperties(String tagName, Map<String, String> props, XMLStreamWriter serializer) throws IOException, XMLStreamException {
 #end
         if (props != null && !props.isEmpty()) {
-            serializer.writeStartElement(NAMESPACE, tagName);
+            serializer.writeStartElement(namespace, tagName);
 #if ( $locationTracking )
             InputLocation location = locationTracker != null ? locationTracker.getLocation(tagName) : null;
 #end
@@ -326,7 +359,7 @@ public class ${className} {
 
     private void writeDom(XmlNode dom, XMLStreamWriter serializer) throws IOException, XMLStreamException {
         if (dom != null) {
-            serializer.writeStartElement(NAMESPACE, dom.getName());
+            serializer.writeStartElement(namespace, dom.getName());
             for (Map.Entry<String, String> attr : dom.getAttributes().entrySet()) {
                 if (attr.getKey().startsWith("xml:")) {
                     serializer.writeAttribute("http://www.w3.org/XML/1998/namespace",
@@ -357,7 +390,7 @@ public class ${className} {
     private void writeTag(String tagName, String defaultValue, String value, XMLStreamWriter serializer) throws IOException, XMLStreamException {
 #end
         if (value != null && !Objects.equals(defaultValue, value)) {
-            serializer.writeStartElement(NAMESPACE, tagName);
+            serializer.writeStartElement(namespace, tagName);
             serializer.writeCharacters(value);
             serializer.writeEndElement();
 #if ( $locationTracking )

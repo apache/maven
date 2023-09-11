@@ -61,13 +61,19 @@ public class SimpleProblemCollector implements ModelProblemCollector {
     public void add(ModelProblemCollectorRequest req) {
         switch (req.getSeverity()) {
             case FATAL:
-                fatals.add(req.getMessage());
+                if (!fatals.contains(req.getMessage())) {
+                    fatals.add(req.getMessage());
+                }
                 break;
             case ERROR:
-                errors.add(req.getMessage());
+                if (!errors.contains(req.getMessage())) {
+                    errors.add(req.getMessage());
+                }
                 break;
             case WARNING:
-                warnings.add(req.getMessage());
+                if (!warnings.contains(req.getMessage())) {
+                    warnings.add(req.getMessage());
+                }
                 break;
         }
     }
