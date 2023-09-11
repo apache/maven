@@ -497,15 +497,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
                 module = module.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-                File moduleFile = new File(basedir, module);
+                File moduleFile = modelProcessor.locateExistingPom(new File(basedir, module));
 
-                if (moduleFile.isDirectory()) {
-                    moduleFile = modelProcessor.locatePom(moduleFile);
-                }
-
-                if (!moduleFile.isFile()) {
+                if (moduleFile == null) {
                     ModelProblem problem = new DefaultModelProblem(
-                            "Child module " + moduleFile + " of " + pomFile + " does not exist",
+                            "Child module " + module + " of " + pomFile + " does not exist",
                             ModelProblem.Severity.ERROR,
                             ModelProblem.Version.BASE,
                             model,

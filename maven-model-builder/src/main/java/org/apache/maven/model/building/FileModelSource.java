@@ -54,13 +54,11 @@ public class FileModelSource extends FileSource implements ModelSource3 {
     public ModelSource3 getRelatedSource(ModelLocator locator, String relPath) {
         relPath = relPath.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-        File relatedPom = new File(getFile().getParentFile(), relPath);
+        File path = new File(getFile().getParentFile(), relPath);
 
-        if (relatedPom.isDirectory() && locator != null) {
-            relatedPom = locator.locatePom(relatedPom);
-        }
+        File relatedPom = locator.locateExistingPom(path);
 
-        if (relatedPom.isFile() && relatedPom.canRead()) {
+        if (relatedPom != null) {
             return new FileModelSource(relatedPom.toPath().normalize().toFile());
         }
 

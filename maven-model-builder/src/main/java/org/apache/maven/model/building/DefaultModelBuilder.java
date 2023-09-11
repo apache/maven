@@ -1894,7 +1894,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             return new TransformerContext() {
                 @Override
                 public Path locate(Path path) {
-                    return modelProcessor.locatePom(path.toFile()).toPath();
+                    File file = modelProcessor.locateExistingPom(path.toFile());
+                    return file != null ? file.toPath() : null;
                 }
 
                 @Override

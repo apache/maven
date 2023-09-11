@@ -144,6 +144,7 @@ under the License.
               <exclude>org.apache.maven.model.interpolation.StringSearchModelInterpolator</exclude>
               <exclude>org.apache.maven.model.interpolation.StringVisitorModelInterpolator</exclude>
               <exclude>org.apache.maven.model.io.DefaultModelReader#DefaultModelReader():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.model.locator.ModelLocator#locateExistingPom(java.io.File):METHOD_NEW_DEFAULT</exclude>
               <exclude>org.apache.maven.model.management.DefaultDependencyManagementInjector$ManagementModelMerger</exclude>
               <exclude>org.apache.maven.model.management.DefaultPluginManagementInjector$ManagementModelMerger</exclude>
               <exclude>org.apache.maven.model.merge.MavenModelMerger</exclude>
