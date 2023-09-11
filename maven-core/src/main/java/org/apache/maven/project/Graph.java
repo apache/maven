@@ -89,6 +89,7 @@ class Graph {
                     return ret;
                 }
                 cycle.removeLast();
+                stateMap.put(v, DfsState.VISITED);
             } else if (state == DfsState.VISITING) {
                 // we are already visiting this vertex, this mean we have a cycle
                 int pos = cycle.lastIndexOf(v.label);
