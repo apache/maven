@@ -220,7 +220,7 @@ class ReflectionValueExtractor {
         }
 
         String message = String.format(
-                "The token '%s' at position '%d' refers to a java.util.Map, but the value seems is an instance of '%s'",
+                "The token '%s' at position '%d' refers to a java.util.Map, but the value is an instance of '%s'",
                 expression.subSequence(from, to), from, value.getClass());
         throw new IllegalArgumentException(message);
     }
@@ -251,7 +251,7 @@ class ReflectionValueExtractor {
         }
 
         String message = String.format(
-                "The token '%s' at position '%d' refers to a java.util.List or an array, but the value seems to be an instance of '%s'",
+                "The token '%s' at position '%d' refers to a java.util.List or an array, but the value is an instance of '%s'",
                 expression.subSequence(from, to), from, value.getClass());
         throw new IllegalArgumentException(message);
     }
@@ -261,26 +261,24 @@ class ReflectionValueExtractor {
             return null;
         }
 
-        ClassMap classMap = getClassMap(value.getClass());
         Method method;
         try {
             char firstLetter = Character.toTitleCase(property.substring(0, 1).charAt(0));
             String restLetters = property.substring(1);
             String methodBase = firstLetter + restLetters;
             String methodName = "get" + methodBase;
+            ClassMap classMap = getClassMap(value.getClass());
             method = classMap.findMethod(methodName, CLASS_ARGS);
 
             if (method == null) {
                 // perhaps this is a boolean property??
                 methodName = "is" + methodBase;
-
                 method = classMap.findMethod(methodName, CLASS_ARGS);
+                if (method == null) {
+                    return null;
+                }
             }
         } catch (MethodMap.AmbiguousException e) {
-            return null;
-        }
-
-        if (method == null) {
             return null;
         }
 
@@ -292,19 +290,14 @@ class ReflectionValueExtractor {
     }
 
     private static ClassMap getClassMap(Class<?> clazz) {
-
         WeakReference<ClassMap> softRef = CLASS_MAPS.get(clazz);
-
         ClassMap classMap;
-
         if (softRef == null || softRef.get() == null) {
             classMap = new ClassMap(clazz);
-
             CLASS_MAPS.put(clazz, new WeakReference<>(classMap));
         } else {
             classMap = softRef.get();
         }
-
         return classMap;
     }
 }
