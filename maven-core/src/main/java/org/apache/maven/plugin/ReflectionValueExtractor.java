@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.utils.introspection;
+package org.apache.maven.plugin;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
@@ -27,21 +27,15 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * <p>
- * Using simple dotted expressions to extract the values from an Object instance, For example we might want to extract a
- * value like: <code>project.build.sourceDirectory</code>
- * </p>
+ * Extract values from an Object instance using simple dotted expressions
+ * such as <code>project.build.sourceDirectory</code>
  * <p>
  * The implementation supports indexed, nested and mapped properties similar to the JSP way.
- * </p>
- *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  *
  * @see <a href=
  *      "http://struts.apache.org/1.x/struts-taglib/indexedprops.html">http://struts.apache.org/1.x/struts-taglib/indexedprops.html</a>
  */
-public class ReflectionValueExtractor {
+class ReflectionValueExtractor {
     private static final Class<?>[] CLASS_ARGS = new Class[0];
 
     private static final Object[] OBJECT_ARGS = new Object[0];

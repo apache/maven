@@ -30,7 +30,6 @@ import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.utils.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
 

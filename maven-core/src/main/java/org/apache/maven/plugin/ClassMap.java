@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.utils.introspection;
+package org.apache.maven.plugin;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -26,14 +26,8 @@ import java.util.Map;
 /**
  * A cache of introspection information for a specific class instance. Keys {@link java.lang.reflect.Method} objects by
  * a concatenation of the method name and the names of classes that make up the parameters.
- *
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
- * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
- * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- *
  */
-public class ClassMap {
+class ClassMap {
     private static final class CacheMiss {}
 
     private static final CacheMiss CACHE_MISS = new CacheMiss();

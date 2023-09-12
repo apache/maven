@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.utils.introspection;
+package org.apache.maven.plugin;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -26,15 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
- * @author <a href="mailto:Christoph.Reck@dlr.de">Christoph Reck</a>
- * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
- *
- */
-public class MethodMap {
+class MethodMap {
     private static final int MORE_SPECIFIC = 0;
 
     private static final int LESS_SPECIFIC = 1;
