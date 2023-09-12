@@ -34,6 +34,11 @@ import org.apache.maven.api.annotations.Nonnull;
 public interface Repository {
 
     /**
+     * The reserved id for Maven Central
+     */
+    String CENTRAL_ID = "central";
+
+    /**
      * Gets the identifier of this repository.
      *
      * @return the (case-sensitive) identifier, never {@code null}

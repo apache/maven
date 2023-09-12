@@ -81,7 +81,6 @@ public class DefaultModelProcessor implements ModelProcessor {
 
     public Path locatePom(Path projectDirectory) {
         // Note that the ModelProcessor#locatePom never returns null
-        // while the ModelParser#locatePom needs to return an existing path!
         Path pom = modelLocator.locatePom(projectDirectory.toFile()).toPath();
         if (!pom.equals(projectDirectory) && !pom.getParent().equals(projectDirectory)) {
             throw new IllegalArgumentException("The POM found does not belong to the given directory: " + pom);

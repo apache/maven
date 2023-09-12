@@ -676,6 +676,7 @@ public class ${className} {
     #end
   #end
   #if ( $class == $root )
+        ${classLcapName}.namespaceUri(parser.getNamespaceURI());
         ${classLcapName}.modelEncoding(parser.getEncoding());
   #end
         return ${classLcapName}.build();

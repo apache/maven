@@ -131,7 +131,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
     @Override
     public ProjectBuildingResult build(File pomFile, ProjectBuildingRequest request) throws ProjectBuildingException {
-        return build(pomFile, new FileModelSource(pomFile), new InternalConfig(request, null, null));
+        InternalConfig config = new InternalConfig(request, null, modelBuilder.newTransformerContextBuilder());
+        return build(pomFile, new FileModelSource(pomFile), config);
     }
 
     @Override
@@ -160,6 +161,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
                 DefaultModelBuildingListener listener =
                         new DefaultModelBuildingListener(project, projectBuildingHelper, projectBuildingRequest);
+
                 request.setModelBuildingListener(listener);
 
                 request.setPomFile(pomFile);

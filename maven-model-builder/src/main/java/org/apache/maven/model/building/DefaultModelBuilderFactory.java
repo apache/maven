@@ -73,7 +73,7 @@ import org.apache.maven.model.validation.ModelValidator;
 
 /**
  * A factory to create model builder instances when no dependency injection is available. <em>Note:</em> This class is
- * only meant as a utility for developers that want to employ the model builder outside of the Maven build system, Maven
+ * only meant as a utility for developers that want to employ the model builder outside the Maven build system, Maven
  * plugins should always acquire model builder instances via dependency injection. Developers might want to subclass
  * this factory to provide custom implementations for some of the components used by the model builder, or use the
  * builder API to inject custom instances.
@@ -99,6 +99,7 @@ public class DefaultModelBuilderFactory {
     private ReportConfigurationExpander reportConfigurationExpander;
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private ModelVersionProcessor versionProcessor;
+    private ModelSourceTransformer transformer;
 
     private RootLocator rootLocator;
 
@@ -205,6 +206,11 @@ public class DefaultModelBuilderFactory {
 
     public DefaultModelBuilderFactory setRootLocator(RootLocator rootLocator) {
         this.rootLocator = rootLocator;
+        return this;
+    }
+
+    public DefaultModelBuilderFactory setTransformer(ModelSourceTransformer transformer) {
+        this.transformer = transformer;
         return this;
     }
 
@@ -319,7 +325,7 @@ public class DefaultModelBuilderFactory {
     }
 
     private ModelSourceTransformer newModelSourceTransformer() {
-        return new DefaultModelSourceTransformer();
+        return new BuildModelSourceTransformer();
     }
 
     /**
@@ -348,7 +354,8 @@ public class DefaultModelBuilderFactory {
                 profileActivationFilePathInterpolator != null
                         ? profileActivationFilePathInterpolator
                         : newProfileActivationFilePathInterpolator(),
-                versionProcessor != null ? versionProcessor : newModelVersionPropertiesProcessor());
+                versionProcessor != null ? versionProcessor : newModelVersionPropertiesProcessor(),
+                transformer != null ? transformer : newModelSourceTransformer());
     }
 
     private static class StubLifecycleBindingsInjector implements LifecycleBindingsInjector {

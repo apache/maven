@@ -18,15 +18,14 @@
  */
 package org.apache.maven.model.building;
 
-import javax.xml.stream.XMLStreamReader;
-
-import java.io.IOException;
 import java.nio.file.Path;
+
+import org.apache.maven.model.Model;
 
 /**
  * The ModelSourceTransformer is a way to transform the local pom while streaming the input.
  *
- * The {@link #transform(XMLStreamReader, Path, TransformerContext)} method uses a Path on purpose, to ensure the
+ * The {@link #transform(Path, TransformerContext, Model)} method uses a Path on purpose, to ensure the
  * local pom is the original source.
  *
  * @since 4.0.0
@@ -36,10 +35,8 @@ public interface ModelSourceTransformer {
      *
      * @param pomFile the pom file, cannot be null
      * @param context the context, cannot be null
-     * @return the InputStream for the ModelReader
-     * @throws IOException if an I/O error occurs
+     * @param  model the model to transform
      * @throws TransformerException if the transformation fails
      */
-    XMLStreamReader transform(XMLStreamReader parser, Path pomFile, TransformerContext context)
-            throws IOException, TransformerException;
+    void transform(Path pomFile, TransformerContext context, Model model) throws TransformerException;
 }

@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import org.apache.maven.artifact.Artifact;
@@ -42,12 +41,7 @@ abstract class TransformedArtifact extends DefaultArtifact {
     private final OnChangeTransformer onChangeTransformer;
 
     TransformedArtifact(
-            Artifact source,
-            Supplier<Path> sourcePathProvider,
-            String classifier,
-            String extension,
-            Path targetPath,
-            BiConsumer<Path, Path> transformerConsumer) {
+            Artifact source, Supplier<Path> sourcePathProvider, String classifier, String extension, Path targetPath) {
         super(
                 source.getGroupId(),
                 source.getArtifactId(),
@@ -58,7 +52,7 @@ abstract class TransformedArtifact extends DefaultArtifact {
                 new TransformedArtifactHandler(
                         classifier, extension, source.getArtifactHandler().getPackaging()));
         this.onChangeTransformer =
-                new OnChangeTransformer(sourcePathProvider, targetPath, TransformedArtifact::sha1, transformerConsumer);
+                new OnChangeTransformer(sourcePathProvider, targetPath, TransformedArtifact::sha1, this::transform);
     }
 
     @Override
@@ -101,6 +95,8 @@ abstract class TransformedArtifact extends DefaultArtifact {
             throw new RuntimeException(e);
         }
     }
+
+    protected abstract void transform(Path src, Path dst);
 
     private static class TransformedArtifactHandler implements ArtifactHandler {
         private final String classifier;

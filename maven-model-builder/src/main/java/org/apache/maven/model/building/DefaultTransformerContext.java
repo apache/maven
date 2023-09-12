@@ -47,6 +47,11 @@ class DefaultTransformerContext implements TransformerContext {
 
         Holder() {}
 
+        Holder(Model model) {
+            this.model = Objects.requireNonNull(model);
+            this.set = true;
+        }
+
         public static Model deref(Holder holder) {
             return holder != null ? holder.get() : null;
         }
