@@ -46,19 +46,19 @@ class ReflectionValueExtractor {
      */
     private static final Map<Class<?>, WeakReference<ClassMap>> CLASS_MAPS = new WeakHashMap<>();
 
-    static final int EOF = -1;
+    private static final int EOF = -1;
 
-    static final char PROPERTY_START = '.';
+    private static final char PROPERTY_START = '.';
 
-    static final char INDEXED_START = '[';
+    private static final char INDEXED_START = '[';
 
-    static final char INDEXED_END = ']';
+    private static final char INDEXED_END = ']';
 
-    static final char MAPPED_START = '(';
+    private static final char MAPPED_START = '(';
 
-    static final char MAPPED_END = ')';
+    private static final char MAPPED_END = ')';
 
-    static class Tokenizer {
+    private static class Tokenizer {
         final String expression;
 
         int idx;
