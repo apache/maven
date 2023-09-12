@@ -21,7 +21,8 @@ package org.apache.maven.toolchain.java;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -86,12 +87,12 @@ public class JavaToolchainFactory implements ToolchainFactory {
             throw new MisconfiguredToolchainException(
                     "Java toolchain without the " + JavaToolchainImpl.KEY_JAVAHOME + " configuration element.");
         }
-        File normal = Paths.get(javahome.getValue()).normalize().toFile();
-        if (normal.exists()) {
+        Path normal = Paths.get(javahome.getValue()).normalize();
+        if (Files.exists(normal)) {
             jtc.setJavaHome(Paths.get(javahome.getValue()).normalize().toString());
         } else {
             throw new MisconfiguredToolchainException(
-                    "Non-existing JDK home configuration at " + normal.getAbsolutePath());
+                    "Non-existing JDK home configuration at " + normal.toAbsolutePath());
         }
 
         return jtc;

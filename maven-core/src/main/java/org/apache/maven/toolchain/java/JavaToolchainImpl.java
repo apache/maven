@@ -18,7 +18,8 @@
  */
 package org.apache.maven.toolchain.java;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.maven.toolchain.DefaultToolchain;
@@ -53,24 +54,24 @@ public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain
     }
 
     public String findTool(String toolName) {
-        File toRet = findTool(toolName, Paths.get(getJavaHome()).normalize().toFile());
+        Path toRet = findTool(toolName, Paths.get(getJavaHome()).normalize());
         if (toRet != null) {
-            return toRet.getAbsolutePath();
+            return toRet.toAbsolutePath().toString();
         }
         return null;
     }
 
-    private static File findTool(String toolName, File installDir) {
-        File bin = new File(installDir, "bin"); // NOI18N
-        if (bin.exists()) {
+    private static Path findTool(String toolName, Path installDir) {
+        Path bin = installDir.resolve("bin"); // NOI18N
+        if (Files.isDirectory(bin)) {
             if (Os.IS_WINDOWS) {
-                File tool = new File(bin, toolName + ".exe");
-                if (tool.exists()) {
+                Path tool = bin.resolve(toolName + ".exe");
+                if (Files.exists(tool)) {
                     return tool;
                 }
             }
-            File tool = new File(bin, toolName);
-            if (tool.exists()) {
+            Path tool = bin.resolve(toolName);
+            if (Files.exists(tool)) {
                 return tool;
             }
         }
