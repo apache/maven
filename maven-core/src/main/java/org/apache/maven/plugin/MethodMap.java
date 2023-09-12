@@ -36,7 +36,7 @@ class MethodMap {
     /**
      * Keep track of all methods with the same name.
      */
-    Map<String, List<Method>> methodByNameMap = new Hashtable<String, List<Method>>();
+    Map<String, List<Method>> methodByNameMap = new Hashtable<>();
 
     /**
      * Add a method to a list of methods by name. For a particular class we are keeping track of all the methods with

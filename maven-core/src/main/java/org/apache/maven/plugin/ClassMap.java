@@ -50,7 +50,7 @@ class ClassMap {
      * Standard constructor
      * @param clazz the Class
      */
-    public ClassMap(Class clazz) {
+    ClassMap(Class clazz) {
         this.clazz = clazz;
         populateMethodCache();
     }

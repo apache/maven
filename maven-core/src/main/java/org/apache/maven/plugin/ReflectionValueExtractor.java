@@ -216,20 +216,13 @@ class ReflectionValueExtractor {
             return null;
         }
         if (value instanceof Map) {
-            try {
-                Object[] localParams = new Object[] {key};
-                ClassMap classMap = getClassMap(value.getClass());
-                Method method = classMap.findMethod("get", localParams);
-                return method.invoke(value, localParams);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            final String message = String.format(
-                    "The token '%s' at position '%d' refers to a java.util.Map, but the value seems is an instance of '%s'",
-                    expression.subSequence(from, to), from, value.getClass());
-            throw new IllegalArgumentException(message);
+            return ((Map) value).get(key);
         }
+
+        String message = String.format(
+                "The token '%s' at position '%d' refers to a java.util.Map, but the value seems is an instance of '%s'",
+                expression.subSequence(from, to), from, value.getClass());
+        throw new IllegalArgumentException(message);
     }
 
     private static Object getIndexedValue(
@@ -237,32 +230,30 @@ class ReflectionValueExtractor {
         int index;
         try {
             index = Integer.parseInt(indexStr);
-
-            if (value.getClass().isArray()) {
-                return Array.get(value, index);
-            }
-
         } catch (NumberFormatException e) {
-            final String message = String.format("The indexStr '%s' is not a number", indexStr);
-            throw new IllegalArgumentException(message);
+            return null;
+        }
+
+        if (value.getClass().isArray()) {
+            try {
+                return Array.get(value, index);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return null;
+            }
         }
 
         if (value instanceof List) {
             try {
-                ClassMap classMap = getClassMap(value.getClass());
-                // use get method on List interface
-                Object[] localParams = new Object[] {index};
-                Method method = classMap.findMethod("get", localParams);
-                return method.invoke(value, localParams);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                return ((List) value).get(index);
+            } catch (IndexOutOfBoundsException e) {
+                return null;
             }
-        } else {
-            final String message = String.format(
-                    "The token '%s' at position '%d' refers to a java.util.List or an array, but the value seems is an instance of '%s'",
-                    expression.subSequence(from, to), from, value.getClass());
-            throw new IllegalArgumentException(message);
         }
+
+        String message = String.format(
+                "The token '%s' at position '%d' refers to a java.util.List or an array, but the value seems to be an instance of '%s'",
+                expression.subSequence(from, to), from, value.getClass());
+        throw new IllegalArgumentException(message);
     }
 
     private static Object getPropertyValue(Object value, String property) {
