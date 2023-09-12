@@ -51,12 +51,12 @@ public class Os {
     /**
      * OS family that can be tested for. {@value}
      */
-    public static final String FAMILY_WINDOWS = "windows";
+    private static final String FAMILY_WINDOWS = "windows";
 
     /**
      * OS family that can be tested for. {@value}
      */
-    public static final String FAMILY_WIN9X = "win9x";
+    private static final String FAMILY_WIN9X = "win9x";
 
     /**
      * OS family that can be tested for. {@value}
@@ -66,47 +66,47 @@ public class Os {
     /**
      * OS family that can be tested for. {@value}
      */
-    public static final String FAMILY_OS2 = "os/2";
+    private static final String FAMILY_OS2 = "os/2";
 
     /**
      * OS family that can be tested for. {@value}
      */
-    public static final String FAMILY_NETWARE = "netware";
+    private static final String FAMILY_NETWARE = "netware";
 
     /**
      * OS family that can be tested for. {@value}
      */
-    public static final String FAMILY_DOS = "dos";
+    private static final String FAMILY_DOS = "dos";
 
     /**
      * OS family that can be tested for. {@value}
      */
-    public static final String FAMILY_MAC = "mac";
+    private static final String FAMILY_MAC = "mac";
 
     /**
      * OS family that can be tested for. {@value}
      */
-    public static final String FAMILY_TANDEM = "tandem";
+    private static final String FAMILY_TANDEM = "tandem";
 
     /**
      * OS family that can be tested for. {@value}
      */
-    public static final String FAMILY_UNIX = "unix";
+    private static final String FAMILY_UNIX = "unix";
 
     /**
      * OS family that can be tested for. {@value}
      */
-    public static final String FAMILY_OPENVMS = "openvms";
+    private static final String FAMILY_OPENVMS = "openvms";
 
     /**
      * OS family that can be tested for. {@value}
      */
-    public static final String FAMILY_ZOS = "z/os";
+    private static final String FAMILY_ZOS = "z/os";
 
     /**
      * OS family that can be tested for. {@value}
      */
-    public static final String FAMILY_OS400 = "os/400";
+    private static final String FAMILY_OS400 = "os/400";
 
     /**
      * OpenJDK is reported to call MacOS X "Darwin"
