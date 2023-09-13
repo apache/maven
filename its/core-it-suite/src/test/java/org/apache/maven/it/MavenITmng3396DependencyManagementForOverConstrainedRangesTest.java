@@ -46,6 +46,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest exte
         verifier.deleteArtifact(GROUP_ID, "A", "1.0", "jar");
         verifier.deleteArtifact(GROUP_ID, "B", "1.0", "pom");
         verifier.deleteArtifact(GROUP_ID, "B", "1.0", "jar");
+        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=false");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -59,6 +60,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest exte
         verifier.deleteArtifact(GROUP_ID, "A", "3.0", "jar");
         verifier.deleteArtifact(GROUP_ID, "plugin", "1.0", "pom");
         verifier.deleteArtifact(GROUP_ID, "plugin", "1.0", "jar");
+        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=false");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -68,6 +70,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest exte
         verifier = newVerifier(testDir.getAbsolutePath(), "remote");
         verifier.deleteArtifact(GROUP_ID, "pluginuser", "1.0", "pom");
         verifier.deleteArtifact(GROUP_ID, "pluginuser", "1.0", "jar");
+        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=false");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

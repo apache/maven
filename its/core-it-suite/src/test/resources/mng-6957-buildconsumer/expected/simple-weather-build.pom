@@ -17,29 +17,23 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/maven-v4_1_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.mavenbook.multi</groupId>
-    <artifactId>parent</artifactId>
+    <artifactId>simple-parent</artifactId>
   </parent>
-  <artifactId>simple-parent</artifactId>
-  <packaging>pom</packaging>
-  <name>Multi Chapter Simple Parent Project</name>
+  <artifactId>simple-weather</artifactId>
+  <packaging>jar</packaging>
 
-  <modules>
-    <module>simple-weather</module>
-    <module>simple-webapp</module>
-  </modules>
+  <name>Multi Chapter Simple Weather API</name>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.mavenbook.multi</groupId>
+      <artifactId>simple-testutils</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
 </project>

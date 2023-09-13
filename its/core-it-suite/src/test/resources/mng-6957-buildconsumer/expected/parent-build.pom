@@ -17,29 +17,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/maven-v4_1_0.xsd">
-  <parent>
-    <groupId>org.sonatype.mavenbook.multi</groupId>
-    <artifactId>parent</artifactId>
-  </parent>
-  <artifactId>simple-parent</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.sonatype.mavenbook.multi</groupId>
+  <artifactId>parent</artifactId>
+  <version>0.9-${changelist}-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Multi Chapter Simple Parent Project</name>
+  <name>Multi Chapter Parent Project</name>
 
+  <!-- Optimized from https://github.com/sonatype/maven-example-en/tree/master/examples/ch-multi -->
   <modules>
-    <module>simple-weather</module>
-    <module>simple-webapp</module>
+    <module>simple-parent</module>
   </modules>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-
 </project>
