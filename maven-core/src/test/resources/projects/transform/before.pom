@@ -47,6 +47,23 @@ under the License.
             <target xml:space="preserve">  1.5  </target>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ear-plugin</artifactId>
+          <version>3.3.0</version>
+          <configuration>
+            <modules>
+              <module>
+                <test>test</test>
+              </module>
+              <jarModule>
+                <groupId>artifactGroupId</groupId>
+                <artifactId>artifactId</artifactId>
+                <uri>APP-INF/lib/anotherName-1.2.3.jar</uri>
+              </jarModule>
+            </modules>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -58,6 +75,19 @@ under the License.
             <id>test</id>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <configuration>
+          <modules>
+            <webModule>
+              <groupId>artifactGroupId</groupId>
+              <artifactId>artifactId</artifactId>
+              <excluded>true</excluded>
+            </webModule>
+          </modules>
+        </configuration>
       </plugin>
     </plugins>
   </build>
