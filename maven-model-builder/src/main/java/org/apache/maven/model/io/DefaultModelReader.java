@@ -38,7 +38,6 @@ import java.util.Objects;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelSourceTransformer;
-import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.v4.MavenStaxReader;
 
 /**
@@ -96,28 +95,23 @@ public class DefaultModelReader implements ModelReader {
         return (InputSource) value;
     }
 
-    private TransformerContext getTransformerContext(Map<String, ?> options) {
-        Object value = (options != null) ? options.get(TRANSFORMER_CONTEXT) : null;
-        return (TransformerContext) value;
-    }
-
     private Model read(InputStream input, Path pomFile, Map<String, ?> options) throws IOException {
         try {
             XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
             factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
             XMLStreamReader parser = factory.createXMLStreamReader(input);
 
-            TransformerContext context = getTransformerContext(options);
-            XMLStreamReader transformingParser =
-                    context != null ? transformer.transform(parser, pomFile, context) : parser;
-
             InputSource source = getSource(options);
             boolean strict = isStrict(options);
-            if (source != null) {
-                return readModelEx(transformingParser, source, strict);
-            } else {
-                return readModel(transformingParser, strict);
-            }
+            MavenStaxReader mr = new MavenStaxReader();
+            mr.setAddLocationInformation(source != null);
+            Model model = new Model(mr.read(
+                    parser,
+                    strict,
+                    source != null
+                            ? new org.apache.maven.api.model.InputSource(source.getModelId(), source.getLocation())
+                            : null));
+            return model;
         } catch (XMLStreamException e) {
             Location location = e.getLocation();
             throw new ModelParseException(
@@ -125,8 +119,6 @@ public class DefaultModelReader implements ModelReader {
                     location != null ? location.getLineNumber() : -1,
                     location != null ? location.getColumnNumber() : -1,
                     e);
-        } catch (IOException e) {
-            throw e;
         } catch (Exception e) {
             throw new IOException("Unable to transform pom", e);
         }
@@ -138,17 +130,15 @@ public class DefaultModelReader implements ModelReader {
             factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
             XMLStreamReader parser = factory.createXMLStreamReader(reader);
 
-            TransformerContext context = getTransformerContext(options);
-            XMLStreamReader transformingParser =
-                    context != null ? transformer.transform(parser, pomFile, context) : parser;
-
             InputSource source = getSource(options);
             boolean strict = isStrict(options);
-            if (source != null) {
-                return readModelEx(transformingParser, source, strict);
-            } else {
-                return readModel(transformingParser, strict);
-            }
+            MavenStaxReader mr = new MavenStaxReader();
+            mr.setAddLocationInformation(source != null);
+            Model model = new Model(mr.read(
+                    parser,
+                    strict,
+                    new org.apache.maven.api.model.InputSource(source.getModelId(), source.getLocation())));
+            return model;
         } catch (XMLStreamException e) {
             Location location = e.getLocation();
             throw new ModelParseException(
@@ -156,23 +146,8 @@ public class DefaultModelReader implements ModelReader {
                     location != null ? location.getLineNumber() : -1,
                     location != null ? location.getColumnNumber() : -1,
                     e);
-        } catch (IOException e) {
-            throw e;
         } catch (Exception e) {
             throw new IOException("Unable to transform pom", e);
         }
-    }
-
-    private Model readModel(XMLStreamReader parser, boolean strict) throws XMLStreamException, IOException {
-        MavenStaxReader mr = new MavenStaxReader();
-        mr.setAddLocationInformation(false);
-        return new Model(mr.read(parser, strict, null));
-    }
-
-    private Model readModelEx(XMLStreamReader parser, InputSource source, boolean strict)
-            throws XMLStreamException, IOException {
-        MavenStaxReader mr = new MavenStaxReader();
-        return new Model(mr.read(
-                parser, strict, new org.apache.maven.api.model.InputSource(source.getModelId(), source.getLocation())));
     }
 }

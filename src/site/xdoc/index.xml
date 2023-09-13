@@ -57,7 +57,6 @@ under the License.
           <area shape="rect" coords="244,381,406,421"  alt="maven-settings-builder" href="maven-settings-builder/" />
           <area shape="rect" coords="278,447,371,486"  alt="maven-settings" href="maven-settings/" />
           <area shape="rect" coords="387,512,540,553"  alt="maven-model-builder" href="maven-model-builder/" />
-          <area shape="rect" coords="304,578,485,619"  alt="maven-model-transform" href="maven-model-transform/" />
           <area shape="rect" coords="492,577,594,619"  alt="maven-model" href="maven-model/" />
           <area shape="rect" coords="71,0,222,41"      alt="maven-slf4j-provider" href="maven-slf4j-provider/" />
           <area shape="rect" coords="73,66,220,108"    alt="maven-slf4j-wrapper" href="maven-slf4j-wrapper/" />

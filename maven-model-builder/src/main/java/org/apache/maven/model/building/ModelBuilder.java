@@ -55,5 +55,8 @@ public interface ModelBuilder {
      */
     Result<? extends Model> buildRawModel(File pomFile, int validationLevel, boolean locationTracking);
 
+    Result<? extends Model> buildRawModel(
+            File pomFile, int validationLevel, boolean locationTracking, TransformerContext context);
+
     TransformerContextBuilder newTransformerContextBuilder();
 }
