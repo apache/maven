@@ -153,12 +153,10 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
         if (artifacts != null && !artifacts.isEmpty()) {
             for (Artifact artifact : artifacts) {
-                if (!isProvidedArtifact(artifact)) {
-                    if (artifact.getFile() != null) {
-                        constituents.add(new ArtifactClassRealmConstituent(artifact));
-                    } else if (logger.isDebugEnabled()) {
-                        logger.debug("  Excluded: {}", getId(artifact));
-                    }
+                if (!isProvidedArtifact(artifact) && artifact.getFile() != null) {
+                    constituents.add(new ArtifactClassRealmConstituent(artifact));
+                } else if (logger.isDebugEnabled()) {
+                    logger.debug("  Excluded: {}", getId(artifact));
                 }
             }
         }
