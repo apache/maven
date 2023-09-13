@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
  * public for technical reasons, it is not part of the public API. In particular, this class can be changed or deleted
  * without prior notice.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

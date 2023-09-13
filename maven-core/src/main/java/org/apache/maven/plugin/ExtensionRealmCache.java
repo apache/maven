@@ -30,8 +30,6 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
  * for technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted
  * without prior notice.
  *
- * @author Igor Fedorenko
- * @author Benjamin Bentmann
  */
 public interface ExtensionRealmCache {
     /**

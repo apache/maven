@@ -37,7 +37,6 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named("classpath")
 @Singleton

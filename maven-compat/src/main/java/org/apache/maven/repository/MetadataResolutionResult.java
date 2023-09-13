@@ -33,9 +33,9 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 /**
  *
  *
- * @author Oleg Gusakov
  *
  */
+@Deprecated
 public class MetadataResolutionResult {
     private Artifact originatingArtifact;
 

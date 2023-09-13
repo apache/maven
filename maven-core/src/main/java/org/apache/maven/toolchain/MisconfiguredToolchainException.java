@@ -20,7 +20,6 @@ package org.apache.maven.toolchain;
 
 /**
  *
- * @author mkleint
  */
 public class MisconfiguredToolchainException extends Exception {
 

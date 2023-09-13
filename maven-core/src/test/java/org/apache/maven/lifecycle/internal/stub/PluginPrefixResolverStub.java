@@ -25,7 +25,6 @@ import org.apache.maven.plugin.prefix.PluginPrefixResult;
 import org.eclipse.aether.repository.ArtifactRepository;
 
 /**
- * @author Kristian Rosenvold
  */
 public class PluginPrefixResolverStub implements PluginPrefixResolver {
     public PluginPrefixResult resolve(PluginPrefixRequest request) throws NoPluginFoundForPrefixException {

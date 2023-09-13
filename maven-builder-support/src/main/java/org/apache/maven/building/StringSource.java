@@ -26,7 +26,6 @@ import java.nio.charset.StandardCharsets;
 /**
  * Wraps an ordinary {@link CharSequence} as a source.
  *
- * @author Benjamin Bentmann
  */
 public class StringSource implements Source {
     private final String content;

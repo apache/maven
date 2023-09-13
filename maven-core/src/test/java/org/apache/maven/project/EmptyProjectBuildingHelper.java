@@ -28,7 +28,6 @@ import org.apache.maven.model.Repository;
 /**
  * A stub implementation to bypass artifact resolution from repositories.
  *
- * @author Benjamin Bentmann
  */
 public class EmptyProjectBuildingHelper implements ProjectBuildingHelper {
 

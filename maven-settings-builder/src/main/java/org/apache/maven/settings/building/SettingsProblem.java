@@ -23,7 +23,6 @@ package org.apache.maven.settings.building;
  * thrown or a simple string message. In addition, a problem carries a hint about its source, e.g. the settings file
  * that exhibits the problem.
  *
- * @author Benjamin Bentmann
  */
 public interface SettingsProblem {
 

@@ -27,7 +27,6 @@ import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Plugin;
 
 /**
- * @author Benjamin Bentmann
  */
 class CacheUtils {
 

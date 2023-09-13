@@ -41,11 +41,10 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka</a>
  */
 @Named("snapshot")
 @Singleton
+@Deprecated
 public class SnapshotTransformation extends AbstractVersionTransformation {
     private static final String DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT = "yyyyMMdd.HHmmss";
 

@@ -23,7 +23,6 @@ import java.io.File;
 /**
  * Locates a POM file within a project base directory.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelLocator {
 
@@ -38,4 +37,14 @@ public interface ModelLocator {
      * @return The path to the (possibly non-existent) POM file, never {@code null}.
      */
     File locatePom(File projectDirectory);
+
+    /**
+     * Returns the file containing the pom or null if a pom can not be found at the given file or in the given directory.
+     */
+    default File locateExistingPom(File project) {
+        if (project == null || project.isDirectory()) {
+            project = locatePom(project);
+        }
+        return project.isFile() ? project : null;
+    }
 }

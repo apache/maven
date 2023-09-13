@@ -21,9 +21,9 @@ package org.apache.maven.repository;
 /**
  *
  *
- * @author Oleg Gusakov
  *
  */
+@Deprecated
 public class MavenArtifactMetadata {
     public static final String DEFAULT_TYPE = "jar";
 

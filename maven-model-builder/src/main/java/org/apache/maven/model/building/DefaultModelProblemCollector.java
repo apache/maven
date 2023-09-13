@@ -32,7 +32,6 @@ import org.apache.maven.model.io.ModelParseException;
  * it delegates to other components that potentially encounter problems. Then, the problem reporter can focus on
  * providing a simple error message, leaving the donkey work of creating a nice model problem to this component.
  *
- * @author Benjamin Bentmann
  */
 class DefaultModelProblemCollector implements ModelProblemCollectorExt {
 

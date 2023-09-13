@@ -36,7 +36,6 @@ import org.apache.maven.settings.v4.SettingsStaxWriter;
 /**
  * Handles serialization of settings into the default textual format.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

@@ -114,6 +114,7 @@ public class ${class.name}
     #end
 {
     #if ( $class == $root )
+    final String namespaceUri;
     final String modelEncoding;
     #end
     #foreach ( $field in $class.getFields($version) )
@@ -138,6 +139,7 @@ public class ${class.name}
       */
     ${class.name}(
     #if ( $class == $root )
+        String namespaceUri,
         String modelEncoding,
     #end
     #foreach ( $field in $allFields )
@@ -164,6 +166,7 @@ public class ${class.name}
         );
     #end
     #if ( $class == $root )
+        this.namespaceUri = namespaceUri;
         this.modelEncoding = modelEncoding;
     #end
     #foreach ( $field in $class.getFields($version) )
@@ -200,6 +203,10 @@ public class ${class.name}
 
     #end
     #if ( $class == $root )
+    public String getNamespaceUri() {
+        return namespaceUri;
+    }
+
     public String getModelEncoding() {
         return modelEncoding;
     }
@@ -349,6 +356,7 @@ public class ${class.name}
     {
         ${class.name} base;
     #if ( $class == $root )
+        String namespaceUri;
         String modelEncoding;
     #end
     #foreach ( $field in $class.getFields($version) )
@@ -390,6 +398,10 @@ public class ${class.name}
     #if ( $class.superClass )
             super(base, forceCopy);
     #end
+    #if ( $class == $root )
+            this.namespaceUri = base.namespaceUri;
+            this.modelEncoding = base.modelEncoding;
+    #end
             if (forceCopy) {
     #foreach ( $field in $class.getFields($version) )
                 this.${field.name} = base.${field.name};
@@ -403,6 +415,12 @@ public class ${class.name}
         }
 
     #if ( $class == $root )
+        @Nonnull
+        public Builder namespaceUri(String namespaceUri) {
+            this.namespaceUri = namespaceUri;
+            return this;
+        }
+
         @Nonnull
         public Builder modelEncoding(String modelEncoding) {
             this.modelEncoding = modelEncoding;
@@ -446,17 +464,17 @@ public class ${class.name}
                 return base;
             }
     #if ( $locationTracking )
-            Map<Object, InputLocation> locations = null;
-            InputLocation location = null;
+            Map<Object, InputLocation> newlocs = this.locations != null ? this.locations : Collections.emptyMap();
+            Map<Object, InputLocation> oldlocs = this.base != null && this.base.locations != null ? this.base.locations : Collections.emptyMap();
+            Map<Object, InputLocation> locations = new HashMap<>();
+            locations.put("", newlocs.containsKey("") ? newlocs.get("") : oldlocs.get(""));
       #foreach ( $field in $allFields )
-            InputLocation ${field.name}Location = null;
+            locations.put("${field.name}", newlocs.containsKey("${field.name}") ? newlocs.get("${field.name}") : oldlocs.get("${field.name}"));
       #end
-            if (this.locations != null) {
-                locations = this.locations;
-            }
     #end
             return new ${class.name}(
     #if ( $class == $root )
+                namespaceUri != null ? namespaceUri : (base != null ? base.namespaceUri : ""),
                 modelEncoding != null ? modelEncoding : (base != null ? base.modelEncoding : "UTF-8"),
     #end
     #foreach ( $field in $allFields )
@@ -468,7 +486,7 @@ public class ${class.name}
       #end
     #end
     #if ( $locationTracking )
-                locations != null ? locations : (base != null ? base.locations : null)
+                locations
     #end
             );
         }

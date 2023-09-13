@@ -29,7 +29,6 @@ import org.apache.maven.model.Model;
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelReader {
 
@@ -45,12 +44,6 @@ public interface ModelReader {
      * location tracking.
      */
     String INPUT_SOURCE = "org.apache.maven.model.io.inputSource";
-
-    /**
-     * The key for the option to provide a transformer context, which can be used to transform the input while reading
-     * to get an advanced version of the model.
-     */
-    String TRANSFORMER_CONTEXT = "transformerContext";
 
     /**
      * Reads the model from the specified file.

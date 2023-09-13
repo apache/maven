@@ -25,7 +25,6 @@ import org.apache.maven.model.Model;
 /**
  * Builds the effective model from a POM.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelBuilder {
 
@@ -55,6 +54,9 @@ public interface ModelBuilder {
      * Performs only the part of {@link ModelBuilder#build(ModelBuildingRequest)} that loads the raw model
      */
     Result<? extends Model> buildRawModel(File pomFile, int validationLevel, boolean locationTracking);
+
+    Result<? extends Model> buildRawModel(
+            File pomFile, int validationLevel, boolean locationTracking, TransformerContext context);
 
     TransformerContextBuilder newTransformerContextBuilder();
 }

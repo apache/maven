@@ -27,8 +27,6 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 /**
  * Handles serialization of toolchains into some kind of textual format like XML.
  *
- * @author Mike Mol
- * @author Martin Kanters
  */
 public interface ToolchainsWriter {
 

@@ -34,6 +34,7 @@ import org.apache.maven.wagon.repository.Repository;
 /**
  * WagonManager
  */
+@Deprecated
 public interface WagonManager {
     @Deprecated
     Wagon getWagon(String protocol) throws UnsupportedProtocolException;

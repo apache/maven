@@ -25,7 +25,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 
 /**
- * @author jdcasey
  */
 @Deprecated
 public interface ModelInterpolator {

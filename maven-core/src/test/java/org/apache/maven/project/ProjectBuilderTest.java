@@ -227,7 +227,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         File pomFile = new File("src/test/resources/projects/badPom.xml").getAbsoluteFile();
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
-        configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
         configuration.setRepositorySession(mavenSession.getRepositorySession());
         org.apache.maven.project.ProjectBuilder projectBuilder =
                 getContainer().lookup(org.apache.maven.project.ProjectBuilder.class);
@@ -245,7 +245,8 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertThat(pex.getResults().get(0).getProblems().size(), greaterThan(0));
         assertThat(
                 pex.getResults(),
-                contains(projectBuildingResultWithProblemMessage("expected START_TAG or END_TAG not CHARACTERS")));
+                contains(projectBuildingResultWithProblemMessage(
+                        "Received non-all-whitespace CHARACTERS or CDATA event in nextTag()")));
     }
 
     @Test

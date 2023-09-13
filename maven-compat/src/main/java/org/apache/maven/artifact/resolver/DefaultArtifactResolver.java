@@ -69,10 +69,10 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
 
 /**
- * @author Jason van Zyl
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
     @Inject
     private Logger logger;

@@ -24,7 +24,6 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
  * Describes runtime information about the application.
  *
  * @deprecated Use {@link org.apache.maven.rtinfo.RuntimeInformation} instead.
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @Deprecated
 public interface RuntimeInformation {

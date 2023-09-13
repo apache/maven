@@ -37,8 +37,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @since 3.0
- * @author Jason van Zyl
- * @author Kristian Rosenvold
  */
 // TODO The configuration for the lifecycle needs to be externalized so that I can use the annotations properly for the
 // wiring and reference and external source for the lifecycle configuration.

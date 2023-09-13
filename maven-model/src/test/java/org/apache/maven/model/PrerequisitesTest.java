@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code Prerequisites}.
  *
- * @author Benjamin Bentmann
  */
 class PrerequisitesTest {
 

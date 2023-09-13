@@ -93,22 +93,27 @@ final class VersionsMetadata extends MavenMetadata {
         return artifact.getGroupId() + ':' + artifact.getArtifactId();
     }
 
+    @Override
     public MavenMetadata setFile(File file) {
         return new VersionsMetadata(artifact, file, timestamp);
     }
 
+    @Override
     public String getGroupId() {
         return artifact.getGroupId();
     }
 
+    @Override
     public String getArtifactId() {
         return artifact.getArtifactId();
     }
 
+    @Override
     public String getVersion() {
         return "";
     }
 
+    @Override
     public Nature getNature() {
         return artifact.isSnapshot() ? Nature.RELEASE_OR_SNAPSHOT : Nature.RELEASE;
     }

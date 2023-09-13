@@ -33,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * anywhere else in the lineage. We are just making sure that values
  * down in the lineage are bubbling up where they should.
  *
- * @author Jason van Zyl
  */
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------

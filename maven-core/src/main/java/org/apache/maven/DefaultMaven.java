@@ -82,7 +82,6 @@ import org.slf4j.helpers.MessageFormatter;
 import static java.util.stream.Collectors.toSet;
 
 /**
- * @author Jason van Zyl
  */
 @Named
 @Singleton

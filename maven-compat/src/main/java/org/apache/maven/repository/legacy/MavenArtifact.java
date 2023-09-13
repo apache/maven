@@ -21,6 +21,7 @@ package org.apache.maven.repository.legacy;
 import org.apache.maven.repository.ArtifactTransferResource;
 import org.apache.maven.wagon.resource.Resource;
 
+@Deprecated
 class MavenArtifact implements ArtifactTransferResource {
 
     private String repositoryUrl;

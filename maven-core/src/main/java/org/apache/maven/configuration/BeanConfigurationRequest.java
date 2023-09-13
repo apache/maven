@@ -21,7 +21,6 @@ package org.apache.maven.configuration;
 /**
  * A request to configure a bean from some configuration in the POM or similar.
  *
- * @author Benjamin Bentmann
  */
 public interface BeanConfigurationRequest {
 

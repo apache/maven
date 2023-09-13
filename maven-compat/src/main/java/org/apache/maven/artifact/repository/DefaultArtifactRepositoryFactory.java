@@ -34,10 +34,10 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
- * @author jdcasey
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFactory {
 
     @Inject

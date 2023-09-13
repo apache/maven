@@ -28,7 +28,6 @@ import org.eclipse.aether.repository.RemoteRepository;
  * Collects settings required to resolve the version for a plugin.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 public interface PluginVersionRequest {
 

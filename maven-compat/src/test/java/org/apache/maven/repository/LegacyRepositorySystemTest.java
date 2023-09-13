@@ -56,7 +56,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@link LegacyRepositorySystem}.
  *
- * @author Benjamin Bentmann
  */
 @PlexusTest
 class LegacyRepositorySystemTest {

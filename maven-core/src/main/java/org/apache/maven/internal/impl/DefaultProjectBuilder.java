@@ -85,7 +85,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 ModelSource modelSource = new ModelSource() {
                     @Override
                     public InputStream getInputStream() throws IOException {
-                        return source.getInputStream();
+                        return source.openStream();
                     }
 
                     @Override

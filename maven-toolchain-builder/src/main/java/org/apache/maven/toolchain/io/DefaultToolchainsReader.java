@@ -36,7 +36,6 @@ import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
 /**
  * Handles deserialization of toolchains from the default textual format.
  *
- * @author Robert Scholte
  * @since 3.3.0
  */
 @Named

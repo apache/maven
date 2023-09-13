@@ -82,6 +82,7 @@ under the License.
             <param>packageModelV4=org.apache.maven.api.model</param>
             <param>packageToolV4=org.apache.maven.model.v4</param>
             <param>isMavenModel=true</param>
+            <param>minimalVersion=4.0.0</param>
           </params>
         </configuration>
         <executions>
@@ -123,6 +124,7 @@ under the License.
                 <template>writer-ex.vm</template>
                 <template>reader-stax.vm</template>
                 <template>writer-stax.vm</template>
+                <template>model-version.vm</template>
               </templates>
             </configuration>
           </execution>

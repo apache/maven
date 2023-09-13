@@ -48,6 +48,7 @@ import org.codehaus.plexus.logging.Logger;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultWagonManager extends org.apache.maven.repository.legacy.DefaultWagonManager
         implements WagonManager {
 

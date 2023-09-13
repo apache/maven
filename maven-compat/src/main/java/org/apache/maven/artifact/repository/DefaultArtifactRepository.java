@@ -32,7 +32,6 @@ import org.apache.maven.wagon.repository.Repository;
  * This class is an abstraction of the location from/to resources can be
  * transferred.
  *
- * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  */
 @Deprecated
 public class DefaultArtifactRepository extends Repository implements ArtifactRepository {

@@ -149,30 +149,6 @@ public class ${className} {
         serializer.endDocument();
     } //-- void write(OutputStream, ${root.name})
 
-    /**
-     * Method writeDomToSerializer.
-     *
-     * @param dom a dom object.
-     * @param serializer a serializer object.
-     * @throws java.io.IOException java.io.IOException if any.
-     */
-    protected void writeDomToSerializer(org.apache.maven.api.xml.XmlNode dom, XmlSerializer serializer) throws java.io.IOException {
-        serializer.startTag(NAMESPACE, dom.getName());
-        for (Map.Entry<String, String> attribute : dom.getAttributes().entrySet()) {
-            serializer.attribute(NAMESPACE, attribute.getKey(), attribute.getValue());
-        }
-        for (XmlNode aChild : dom.getChildren()) {
-            writeDomToSerializer(aChild, serializer);
-        }
-        String value = dom.getValue();
-        if (value != null) {
-            serializer.text(value);
-        }
-        serializer.endTag(NAMESPACE, dom.getName());
-
-    } //-- void writeDomToSerializer(org.apache.maven.api.xml.XmlNode, XmlSerializer)
-
-
 #foreach ( $class in $model.allClasses )
  #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
   #set ( $classUcapName = $Helper.capitalise( $class.name ) )
@@ -252,7 +228,9 @@ public class ${className} {
     #end
   #end
             serializer.endTag(NAMESPACE, tagName);
+  #if ( $field.to && $field.multiplicity == "1" )
             writeLocationTracking(${classLcapName}, "", serializer);
+  #end
         }
     }
 
@@ -280,7 +258,6 @@ public class ${className} {
             }
             if (!flat) {
                 serializer.endTag(NAMESPACE, tagName);
-                writeLocationTracking(locationTracker, tagName, serializer);
             }
         }
     }
@@ -313,6 +290,11 @@ public class ${className} {
                 serializer.text(value);
             }
             serializer.endTag(NAMESPACE, dom.getName());
+#if ( $locationTracking )
+            if (dom.getInputLocation() instanceof InputLocation && dom.getChildren().isEmpty()) {
+                serializer.comment(toString((InputLocation) dom.getInputLocation()));
+            }
+#end
         }
     }
 

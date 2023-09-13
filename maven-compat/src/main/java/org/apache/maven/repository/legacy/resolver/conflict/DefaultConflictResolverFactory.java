@@ -32,12 +32,12 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 /**
  * A conflict resolver factory that obtains instances from a plexus container.
  *
- * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * TODO you don't need the container in here with the active maps (jvz).
  * @since 3.0
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultConflictResolverFactory implements ConflictResolverFactory, Contextualizable {
     // fields -----------------------------------------------------------------
 

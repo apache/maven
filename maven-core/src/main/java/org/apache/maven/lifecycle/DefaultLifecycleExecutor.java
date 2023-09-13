@@ -52,9 +52,6 @@ import org.apache.maven.project.MavenProject;
  *
  * Note that this component is not normally used from within core itself.
  *
- * @author Jason van Zyl
- * @author Benjamin Bentmann
- * @author Kristian Rosenvold
  */
 @Named
 @Singleton

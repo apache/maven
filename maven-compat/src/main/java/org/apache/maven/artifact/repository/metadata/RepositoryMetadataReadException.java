@@ -21,8 +21,8 @@ package org.apache.maven.artifact.repository.metadata;
 /**
  * Problem storing the repository metadata in the local repository.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@Deprecated
 public class RepositoryMetadataReadException extends Exception {
     public RepositoryMetadataReadException(String message) {
         super(message);

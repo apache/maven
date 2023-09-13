@@ -27,7 +27,6 @@ import org.apache.maven.plugin.MojoExecution;
  * public for technical reasons, it is not part of the public API. In particular, this interface can be changed or
  * deleted without prior notice.
  *
- * @author Benjamin Bentmann
  */
 public interface ExecutionEventCatapult {
 

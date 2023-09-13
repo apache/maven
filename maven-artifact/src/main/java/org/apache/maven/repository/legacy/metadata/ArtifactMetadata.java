@@ -26,7 +26,6 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreExce
  * TODO merge with artifactmetadatasource
  * TODO retrieval exception not appropriate for store
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public interface ArtifactMetadata {
     /**

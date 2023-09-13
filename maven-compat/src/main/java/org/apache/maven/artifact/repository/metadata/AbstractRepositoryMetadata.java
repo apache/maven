@@ -36,8 +36,8 @@ import org.apache.maven.artifact.repository.metadata.io.MetadataStaxWriter;
 /**
  * Shared methods of the repository metadata handling.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@Deprecated
 public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
     private static final String LS = System.lineSeparator();
 

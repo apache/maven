@@ -26,7 +26,6 @@ import org.eclipse.aether.transfer.MetadataNotFoundException;
 import org.slf4j.Logger;
 
 /**
- * @author Benjamin Bentmann
  */
 class LoggingRepositoryListener extends AbstractRepositoryListener {
 

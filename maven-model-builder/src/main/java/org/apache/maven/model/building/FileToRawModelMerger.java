@@ -40,7 +40,6 @@ import org.apache.maven.model.v4.MavenMerger;
  * As long as Maven controls the BuildPomXMLFilter, the entities that need merging are known.
  * All others can simply be copied from source to target to restore the locationTracker
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 class FileToRawModelMerger extends MavenMerger {

@@ -46,7 +46,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * Test cases for the project {@code ModelResolver} implementation.
  *
- * @author Christian Schulte
  * @since 3.5.0
  */
 class ProjectModelResolverTest extends AbstractMavenProjectTestCase {

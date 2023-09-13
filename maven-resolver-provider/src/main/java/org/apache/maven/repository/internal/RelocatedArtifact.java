@@ -26,7 +26,6 @@ import org.eclipse.aether.artifact.AbstractArtifact;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
- * @author Benjamin Bentmann
  */
 public final class RelocatedArtifact extends AbstractArtifact {
 
@@ -49,6 +48,7 @@ public final class RelocatedArtifact extends AbstractArtifact {
         this.message = (message != null && message.length() > 0) ? message : null;
     }
 
+    @Override
     public String getGroupId() {
         if (groupId != null) {
             return groupId;
@@ -57,6 +57,7 @@ public final class RelocatedArtifact extends AbstractArtifact {
         }
     }
 
+    @Override
     public String getArtifactId() {
         if (artifactId != null) {
             return artifactId;
@@ -65,6 +66,7 @@ public final class RelocatedArtifact extends AbstractArtifact {
         }
     }
 
+    @Override
     public String getVersion() {
         if (version != null) {
             return version;
@@ -101,22 +103,27 @@ public final class RelocatedArtifact extends AbstractArtifact {
         return new RelocatedArtifact(artifact.setProperties(properties), groupId, artifactId, version, message);
     }
 
+    @Override
     public String getClassifier() {
         return artifact.getClassifier();
     }
 
+    @Override
     public String getExtension() {
         return artifact.getExtension();
     }
 
+    @Override
     public File getFile() {
         return artifact.getFile();
     }
 
+    @Override
     public String getProperty(String key, String defaultValue) {
         return artifact.getProperty(key, defaultValue);
     }
 
+    @Override
     public Map<String, String> getProperties() {
         return artifact.getProperties();
     }

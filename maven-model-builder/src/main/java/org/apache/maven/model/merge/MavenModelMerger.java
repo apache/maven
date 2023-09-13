@@ -53,7 +53,6 @@ import org.codehaus.plexus.util.StringUtils;
  * The domain-specific model merger for the Maven POM, overriding generic code from parent class when necessary with
  * more adapted algorithms.
  *
- * @author Benjamin Bentmann
  */
 public class MavenModelMerger extends MavenMerger {
 

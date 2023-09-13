@@ -27,7 +27,6 @@ import java.util.Objects;
 /**
  * Wraps an ordinary {@link File} as a source.
  *
- * @author Benjamin Bentmann
  */
 public class FileSource implements Source {
     private final File file;

@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * Test sorting projects by dependencies.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 class ProjectSorterTest {
     private Parent createParent(MavenProject project) {

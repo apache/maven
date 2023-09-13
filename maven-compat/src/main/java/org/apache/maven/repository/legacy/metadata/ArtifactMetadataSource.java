@@ -28,7 +28,6 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
  * Provides some metadata operations, like querying the remote repository for a list of versions available for an
  * artifact.
  *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  */
 @Deprecated
 public interface ArtifactMetadataSource {

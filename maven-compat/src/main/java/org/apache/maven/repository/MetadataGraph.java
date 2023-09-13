@@ -24,9 +24,9 @@ import java.util.Collection;
 /**
  * This is the main graph data structure used by the RepositorySystem to present tree and graph objects.
  *
- * @author Oleg Gusakov
  *
  */
+@Deprecated
 public class MetadataGraph {
     /** all graph nodes */
     Collection<MetadataGraphNode> nodes;

@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import static java.util.Objects.requireNonNull;
 
 /**
- * @author jdcasey
  */
 public class MojoLogWrapper implements Log {
     private final Logger logger;

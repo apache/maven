@@ -40,6 +40,7 @@ import org.eclipse.aether.version.VersionScheme;
 /**
  * MavenResolverModule
  */
+@Deprecated
 public final class MavenResolverModule extends AbstractModule {
 
     @Override

@@ -23,9 +23,8 @@ import org.apache.maven.artifact.resolver.ResolutionNode;
 /**
  * Determines which version of an artifact to use when there are conflicting declarations.
  *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  */
+@Deprecated
 public interface ConflictResolver {
     String ROLE = ConflictResolver.class.getName();
 

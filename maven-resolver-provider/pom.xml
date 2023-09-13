@@ -79,6 +79,7 @@ under the License.
     <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
+      <classifier>classes</classifier>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -90,6 +91,10 @@ under the License.
           <artifactId>guava</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

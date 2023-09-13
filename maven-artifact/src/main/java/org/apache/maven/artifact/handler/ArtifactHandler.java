@@ -25,7 +25,6 @@ package org.apache.maven.artifact.handler;
  * dependencies transitively</li>
  * </ul>
  *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
 public interface ArtifactHandler {
     @Deprecated

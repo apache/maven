@@ -24,7 +24,6 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 
 /**
  * a private contract between the toolchains plugin and the components.
- * @author mkleint
  */
 public interface ToolchainPrivate extends Toolchain {
 

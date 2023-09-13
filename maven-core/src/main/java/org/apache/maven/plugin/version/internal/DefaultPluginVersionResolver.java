@@ -68,7 +68,6 @@ import org.slf4j.LoggerFactory;
  * Resolves a version for a plugin.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

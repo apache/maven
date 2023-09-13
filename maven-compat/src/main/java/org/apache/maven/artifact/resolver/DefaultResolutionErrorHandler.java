@@ -26,10 +26,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultResolutionErrorHandler implements ResolutionErrorHandler {
 
     public void throwErrors(ArtifactResolutionRequest request, ArtifactResolutionResult result)

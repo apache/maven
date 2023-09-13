@@ -23,7 +23,6 @@ import org.apache.maven.model.Model;
 /**
  * Checks the model for missing or invalid values.
  *
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 @Deprecated
 public interface ModelValidator {

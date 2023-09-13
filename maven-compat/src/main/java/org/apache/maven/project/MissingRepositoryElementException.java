@@ -23,6 +23,7 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 /**
  * Error constructing an artifact repository.
  */
+@Deprecated
 public class MissingRepositoryElementException extends InvalidRepositoryException {
 
     public MissingRepositoryElementException(String message, String repositoryId) {

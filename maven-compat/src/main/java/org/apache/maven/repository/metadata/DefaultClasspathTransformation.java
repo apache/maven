@@ -31,11 +31,11 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
 /**
  * default implementation of the metadata classpath transformer
  *
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultClasspathTransformation implements ClasspathTransformation {
     @Inject
     GraphConflictResolver conflictResolver;

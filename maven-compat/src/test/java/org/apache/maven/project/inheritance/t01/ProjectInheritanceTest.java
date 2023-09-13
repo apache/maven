@@ -29,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * we are testing to make sure that elements stated in a model are
  * not clobbered by the same elements elsewhere in the lineage.
  *
- * @author Jason van Zyl
  */
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------

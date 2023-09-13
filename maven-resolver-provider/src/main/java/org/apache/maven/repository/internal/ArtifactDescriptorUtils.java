@@ -29,14 +29,13 @@ import org.eclipse.aether.repository.RepositoryPolicy;
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
  * of the public API. In particular, this class can be changed or deleted without prior notice.
  *
- * @author Benjamin Bentmann
  */
 public class ArtifactDescriptorUtils {
 
     public static Artifact toPomArtifact(Artifact artifact) {
         Artifact pomArtifact = artifact;
 
-        if (pomArtifact.getClassifier().length() > 0 || !"pom".equals(pomArtifact.getExtension())) {
+        if (!pomArtifact.getClassifier().isEmpty() || !"pom".equals(pomArtifact.getExtension())) {
             pomArtifact =
                     new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), "pom", artifact.getVersion());
         }

@@ -26,8 +26,6 @@ import org.apache.maven.execution.MavenSession;
 /**
  * Public API for a toolchain-aware plugin to get expected toolchain instance.
  *
- * @author mkleint
- * @author Robert Scholte
  * @since 2.0.9
  */
 public interface ToolchainManager {

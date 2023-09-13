@@ -18,6 +18,7 @@
  */
 package org.apache.maven.model.building;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
@@ -29,7 +30,6 @@ import org.apache.maven.model.locator.ModelLocator;
 
 /**
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 class DefaultTransformerContext implements TransformerContext {
@@ -46,6 +46,11 @@ class DefaultTransformerContext implements TransformerContext {
         private volatile Model model;
 
         Holder() {}
+
+        Holder(Model model) {
+            this.model = Objects.requireNonNull(model);
+            this.set = true;
+        }
 
         public static Model deref(Holder holder) {
             return holder != null ? holder.get() : null;
@@ -101,7 +106,8 @@ class DefaultTransformerContext implements TransformerContext {
 
     @Override
     public Path locate(Path path) {
-        return modelLocator.locatePom(path.toFile()).toPath();
+        File file = modelLocator.locateExistingPom(path.toFile());
+        return file != null ? file.toPath() : null;
     }
 
     static class GAKey {

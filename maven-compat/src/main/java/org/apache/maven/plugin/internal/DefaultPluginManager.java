@@ -61,10 +61,10 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultPluginManager implements PluginManager {
 
     private final PlexusContainer container;

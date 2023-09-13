@@ -31,7 +31,6 @@ import org.slf4j.Logger;
  * Default abstract toolchain implementation, to be used as base class for any toolchain implementation
  * to avoid rewriting usual code.
  *
- * @author mkleint
  * @since 2.0.9
  */
 public abstract class DefaultToolchain // should have been AbstractToolchain...

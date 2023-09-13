@@ -29,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@link OrArtifactFilter}.
  *
- * @author Benjamin Bentmann
  */
 class OrArtifactFilterTest {
 

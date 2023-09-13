@@ -18,7 +18,7 @@ under the License.
 -->
 
 <project>
-    <modelVersion>4.0.1</modelVersion>
+    <modelVersion>4.9.1</modelVersion>
     <groupId>tests.project</groupId>
     <artifactId>future-model-version</artifactId>
     <version>1</version>

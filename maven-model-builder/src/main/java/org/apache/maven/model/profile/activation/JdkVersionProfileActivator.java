@@ -37,7 +37,6 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 /**
  * Determines profile activation based on the version of the current Java runtime.
  *
- * @author Benjamin Bentmann
  * @see Activation#getJdk()
  */
 @Named("jdk-version")

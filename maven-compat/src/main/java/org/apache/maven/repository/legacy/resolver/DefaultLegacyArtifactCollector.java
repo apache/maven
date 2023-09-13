@@ -57,11 +57,10 @@ import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 import org.codehaus.plexus.logging.Logger;
 
 /**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @author Jason van Zyl
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
 
     @Inject

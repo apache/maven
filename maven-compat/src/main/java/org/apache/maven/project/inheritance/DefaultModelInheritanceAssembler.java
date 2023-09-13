@@ -29,6 +29,7 @@ import org.apache.maven.model.Model;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultModelInheritanceAssembler implements ModelInheritanceAssembler {
     @Override
     public void assembleModelInheritance(Model child, Model parent, String childPathAdjustment) {

@@ -26,7 +26,6 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
  * Builds the toolchains model from a previously configured filesystem path to the toolchains file.
  * <strong>Note:</strong> This is an internal component whose interface can change without prior notice.
  *
- * @author Benjamin Bentmann
  * @deprecated use {@link org.apache.maven.toolchain.building.ToolchainsBuilder} instead
  */
 @Deprecated

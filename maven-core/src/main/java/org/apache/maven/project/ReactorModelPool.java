@@ -32,8 +32,6 @@ import org.apache.maven.model.Model;
  * Holds all Models that are known to the reactor. This allows the project builder to resolve imported Models from the
  * reactor when building another project's effective model.
  *
- * @author Benjamin Bentmann
- * @author Robert Scholte
  */
 class ReactorModelPool {
     private final Map<GAKey, Set<Model>> modelsByGa = new HashMap<>();

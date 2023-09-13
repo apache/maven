@@ -30,9 +30,11 @@ import org.eclipse.aether.installation.InstallRequest;
 /**
  * Maven GAV level metadata generator factory.
  */
-@Named("snapshot")
+@Named(SnapshotMetadataGeneratorFactory.NAME)
 @Singleton
 public class SnapshotMetadataGeneratorFactory implements MetadataGeneratorFactory {
+    public static final String NAME = "snapshot";
+
     @Override
     public MetadataGenerator newInstance(RepositorySystemSession session, InstallRequest request) {
         return new LocalSnapshotMetadataGenerator(session, request);

@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.maven.lifecycle.internal.ProjectSegment;
 
 /**
- * @author Kristian Rosenvold
  */
 public class CompletionServiceStub implements CompletionService<ProjectSegment> {
     List<FutureTask<ProjectSegment>> projectBuildFutureTasks = Collections.synchronizedList(new ArrayList<>());

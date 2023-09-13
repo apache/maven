@@ -21,9 +21,8 @@ package org.apache.maven.reporting;
 /**
  * An exception occurring during the execution of a Maven report.
  *
- * @author Brett Porter
- * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  */
+@Deprecated
 public class MavenReportException extends Exception {
     public MavenReportException(String msg) {
         super(msg);

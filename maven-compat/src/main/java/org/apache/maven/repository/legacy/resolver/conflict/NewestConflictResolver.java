@@ -29,12 +29,12 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  * Resolves conflicting artifacts by always selecting the <em>newest</em> declaration. Newest is defined as the
  * declaration whose version is greater according to <code>ArtifactVersion.compareTo</code>.
  *
- * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @see ArtifactVersion#compareTo
  * @since 3.0
  */
 @Named("newest")
 @Singleton
+@Deprecated
 public class NewestConflictResolver implements ConflictResolver {
     // ConflictResolver methods -----------------------------------------------
 

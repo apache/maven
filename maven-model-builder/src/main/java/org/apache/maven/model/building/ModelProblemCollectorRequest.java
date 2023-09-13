@@ -27,7 +27,6 @@ import org.apache.maven.model.building.ModelProblem.Version;
 /**
  * Class to wrap request parameters to ModelProblemCollector.addProblem
  *
- * @author mkleint
  */
 public final class ModelProblemCollectorRequest {
 

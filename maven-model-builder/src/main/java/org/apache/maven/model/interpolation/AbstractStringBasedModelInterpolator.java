@@ -49,7 +49,6 @@ import org.codehaus.plexus.interpolation.ValueSource;
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
  *
- * @author jdcasey Created on Feb 3, 2005
  */
 public abstract class AbstractStringBasedModelInterpolator implements ModelInterpolator {
     private static final String PREFIX_PROJECT = "project.";

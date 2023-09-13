@@ -40,9 +40,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Starts the build life cycle
  *
- * @author Jason van Zyl
- * @author Benjamin Bentmann
- * @author Kristian Rosenvold
  */
 @Named
 @Singleton

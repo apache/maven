@@ -18,17 +18,11 @@
  */
 package org.apache.maven.model.inheritance;
 
-import javax.xml.stream.XMLStreamReader;
-
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 import org.apache.maven.api.model.Model;
-import org.apache.maven.model.building.AbstractModelSourceTransformer;
 import org.apache.maven.model.building.SimpleProblemCollector;
-import org.apache.maven.model.building.TransformerContext;
-import org.apache.maven.model.building.TransformerException;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelWriter;
@@ -41,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author Hervé Boutemy
  */
 class DefaultInheritanceAssemblerTest {
     private DefaultModelReader reader;
@@ -52,13 +45,7 @@ class DefaultInheritanceAssemblerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        reader = new DefaultModelReader(new AbstractModelSourceTransformer() {
-            @Override
-            public XMLStreamReader transform(XMLStreamReader parser, Path pomFile, TransformerContext context)
-                    throws IOException, TransformerException {
-                return null;
-            }
-        });
+        reader = new DefaultModelReader(null);
         writer = new DefaultModelWriter();
         assembler = new DefaultInheritanceAssembler();
     }

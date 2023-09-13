@@ -45,6 +45,7 @@ import org.codehaus.plexus.logging.Logger;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultUpdateCheckManager extends AbstractLogEnabled implements UpdateCheckManager {
 
     private static final String ERROR_KEY_SUFFIX = ".error";
