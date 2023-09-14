@@ -61,7 +61,7 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.ModelCacheFactory;
-import org.codehaus.plexus.util.Os;
+import org.apache.maven.utils.Os;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
@@ -507,7 +507,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     continue;
                 }
 
-                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                if (Os.IS_WINDOWS) {
                     // we don't canonicalize on unix to avoid interfering with symlinks
                     try {
                         moduleFile = moduleFile.getCanonicalFile();

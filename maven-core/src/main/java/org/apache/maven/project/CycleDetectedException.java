@@ -16,18 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven;
+package org.apache.maven.project;
 
-import org.apache.maven.project.CycleDetectedException;
+import java.util.List;
 
-/**
- */
-public class ProjectCycleException extends BuildFailureException {
-    public ProjectCycleException(String message) {
+public class CycleDetectedException extends Exception {
+    private final List<String> cycle;
+
+    public CycleDetectedException(String message, List<String> cycle) {
         super(message);
+        this.cycle = cycle;
     }
 
-    public ProjectCycleException(String message, CycleDetectedException cause) {
-        super(message, cause);
+    public List<String> getCycle() {
+        return cycle;
+    }
+
+    @Override
+    public String getMessage() {
+        return super.getMessage() + " " + String.join(" --> ", cycle);
     }
 }
