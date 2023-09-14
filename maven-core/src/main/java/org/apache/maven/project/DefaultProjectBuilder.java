@@ -285,7 +285,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             try {
                 request.setRootDirectory(session.getRootDirectory());
             } catch (IllegalStateException e) {
-                // can happen if root directory can not be found, just ignore
+                // can happen if root directory cannot be found, just ignore
             }
         }
 
