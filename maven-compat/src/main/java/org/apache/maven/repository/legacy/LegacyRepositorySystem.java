@@ -73,7 +73,6 @@ import org.apache.maven.wagon.proxy.ProxyUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
@@ -475,7 +474,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
             repository.setId(mirror.getId());
             repository.setUrl(mirror.getUrl());
 
-            if (StringUtils.isNotEmpty(mirror.getLayout())) {
+            if (mirror.getLayout() != null && !mirror.getLayout().isEmpty()) {
                 repository.setLayout(getLayout(mirror.getLayout()));
             }
 
@@ -557,7 +556,8 @@ public class LegacyRepositorySystem implements RepositorySystem {
         if (proxies != null && repository.getProtocol() != null) {
             for (org.apache.maven.settings.Proxy proxy : proxies) {
                 if (proxy.isActive() && repository.getProtocol().equalsIgnoreCase(proxy.getProtocol())) {
-                    if (StringUtils.isNotEmpty(proxy.getNonProxyHosts())) {
+                    if (proxy.getNonProxyHosts() != null
+                            && !proxy.getNonProxyHosts().isEmpty()) {
                         ProxyInfo pi = new ProxyInfo();
                         pi.setNonProxyHosts(proxy.getNonProxyHosts());
 

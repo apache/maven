@@ -18,22 +18,6 @@
  */
 package org.apache.maven.model.v4;
 
-/*
- * Copyright The Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
@@ -46,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.InputSource;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -75,13 +58,13 @@ public class Xpp3DomPerfTest {
     }
 
     @Benchmark
-    public int readWithXpp3(AdditionState state) throws IOException, XmlPullParserException {
+    public int readWithXpp3(AdditionState state) throws IOException {
         int i = 0;
         for (Path pom : state.poms) {
             try (InputStream is = Files.newInputStream(pom)) {
                 new MavenXpp3ReaderEx().read(is, true, new InputSource("id", pom.toString()));
                 i++;
-            } catch (XmlPullParserException e) {
+            } catch (XMLStreamException e) {
                 throw new RuntimeException("Error parsing: " + pom, e);
             }
         }

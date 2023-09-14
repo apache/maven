@@ -23,8 +23,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
@@ -38,7 +38,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * <p>
@@ -71,8 +70,14 @@ public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegme
 
         List<String> tasks = session.getGoals();
 
-        if ((tasks == null || tasks.isEmpty()) && !StringUtils.isEmpty(rootProject.getDefaultGoal())) {
-            tasks = Arrays.asList(StringUtils.split(rootProject.getDefaultGoal()));
+        if ((tasks == null || tasks.isEmpty())
+                && (rootProject.getDefaultGoal() != null
+                        && !rootProject.getDefaultGoal().isEmpty())) {
+            StringTokenizer tokenizer = new StringTokenizer(rootProject.getDefaultGoal());
+            tasks = new ArrayList<>();
+            while (tokenizer.hasMoreTokens()) {
+                tasks.add(tokenizer.nextToken());
+            }
         }
 
         return calculateTaskSegments(session, tasks);

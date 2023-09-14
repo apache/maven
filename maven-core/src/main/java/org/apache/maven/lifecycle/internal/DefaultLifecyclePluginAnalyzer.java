@@ -42,7 +42,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -208,7 +207,7 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
     private GoalSpec parseGoalSpec(String goalSpec) {
         GoalSpec gs = new GoalSpec();
 
-        String[] p = StringUtils.split(goalSpec.trim(), ":");
+        String[] p = goalSpec.trim().split(":");
 
         if (p.length == 3) {
             // <groupId>:<artifactId>:<goal>

@@ -38,7 +38,6 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  */
@@ -117,7 +116,7 @@ public class SnapshotTransformation extends AbstractVersionTransformation {
         if (snapshot != null) {
             if (snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0) {
                 String newVersion = snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
-                version = StringUtils.replace(baseVersion, Artifact.SNAPSHOT_VERSION, newVersion);
+                version = baseVersion.replace(Artifact.SNAPSHOT_VERSION, newVersion);
             } else {
                 version = baseVersion;
             }

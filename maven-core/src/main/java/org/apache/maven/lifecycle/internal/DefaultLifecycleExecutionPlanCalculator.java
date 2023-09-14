@@ -60,7 +60,6 @@ import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -317,8 +316,10 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 if (parameterConfiguration != null) {
                     Map<String, String> attributes = new HashMap<>(parameterConfiguration.getAttributes());
 
-                    if (StringUtils.isEmpty(parameterConfiguration.getAttribute("implementation"))
-                            && StringUtils.isNotEmpty(parameter.getImplementation())) {
+                    String attributeForImplementation = parameterConfiguration.getAttribute("implementation");
+                    String parameterForImplementation = parameter.getImplementation();
+                    if ((attributeForImplementation == null || attributeForImplementation.isEmpty())
+                            && ((parameterForImplementation != null) && !parameterForImplementation.isEmpty())) {
                         attributes.put("implementation", parameter.getImplementation());
                     }
 
@@ -376,7 +377,8 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
 
             List<MojoExecution> forkedExecutions;
 
-            if (StringUtils.isNotEmpty(mojoDescriptor.getExecutePhase())) {
+            if (mojoDescriptor.getExecutePhase() != null
+                    && !mojoDescriptor.getExecutePhase().isEmpty()) {
                 forkedExecutions =
                         calculateForkedLifecycle(mojoExecution, session, forkedProject, alreadyPlannedExecutions);
             } else {

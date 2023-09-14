@@ -19,12 +19,12 @@
 package org.apache.maven.cli.logging;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
 import org.apache.maven.cli.logging.impl.UnsupportedSlf4jBindingConfiguration;
-import org.codehaus.plexus.util.PropertyUtils;
 import org.slf4j.ILoggerFactory;
 
 /**
@@ -47,8 +47,14 @@ public class Slf4jConfigurationFactory {
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
                 try {
-                    Properties conf = PropertyUtils.loadProperties(resource.openStream());
-                    String impl = conf.getProperty(slf4jBinding);
+                    InputStream is = resource.openStream();
+                    final Properties properties = new Properties();
+                    if (is != null) {
+                        try (InputStream in = is) {
+                            properties.load(in);
+                        }
+                    }
+                    String impl = properties.getProperty(slf4jBinding);
                     if (impl != null) {
                         return (Slf4jConfiguration) Class.forName(impl).newInstance();
                     }
