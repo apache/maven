@@ -216,7 +216,7 @@ class ReflectionValueExtractor {
             return null;
         }
         if (value instanceof Map) {
-            return ((Map) value).get(key);
+            return ((Map<?, ?>) value).get(key);
         }
 
         String message = String.format(
@@ -244,7 +244,7 @@ class ReflectionValueExtractor {
 
         if (value instanceof List) {
             try {
-                return ((List) value).get(index);
+                return ((List<?>) value).get(index);
             } catch (IndexOutOfBoundsException e) {
                 return null;
             }

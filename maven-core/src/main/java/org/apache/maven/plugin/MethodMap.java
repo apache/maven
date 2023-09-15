@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class MethodMap {
     private static final int MORE_SPECIFIC = 0;
@@ -91,18 +93,10 @@ class MethodMap {
             return null;
         }
 
-        int l = args.length;
-        Class[] classes = new Class[l];
-
-        for (int i = 0; i < l; ++i) {
-            Object arg = args[i];
-
-            /*
-             * if we are careful down below, a null argument goes in there so we can know that the null was passed to
-             * the method
-             */
-            classes[i] = arg == null ? null : arg.getClass();
-        }
+        Class<?>[] classes = Stream.of(args)
+                // a null class means that null was passed to the method
+                .map(arg -> arg == null ? null : arg.getClass())
+                .toArray(Class<?>[]::new);
 
         return getMostSpecific(methodList, classes);
     }
@@ -112,7 +106,7 @@ class MethodMap {
      */
     public static class AmbiguousException extends Exception {}
 
-    private static Method getMostSpecific(List<Method> methods, Class[] classes) throws AmbiguousException {
+    private static Method getMostSpecific(List<Method> methods, Class<?>[] classes) throws AmbiguousException {
         LinkedList<Method> applicables = getApplicables(methods, classes);
 
         if (applicables.isEmpty()) {
@@ -128,10 +122,10 @@ class MethodMap {
          * contain exactly one method, (the most specific method) otherwise we have ambiguity.
          */
 
-        LinkedList<Method> maximals = new LinkedList<Method>();
+        LinkedList<Method> maximals = new LinkedList<>();
 
         for (Method app : applicables) {
-            Class[] appArgs = app.getParameterTypes();
+            Class<?>[] appArgs = app.getParameterTypes();
             boolean lessSpecific = false;
 
             for (Iterator<Method> maximal = maximals.iterator(); !lessSpecific && maximal.hasNext(); ) {
@@ -181,7 +175,7 @@ class MethodMap {
      * @return MORE_SPECIFIC if c1 is more specific than c2, LESS_SPECIFIC if c1 is less specific than c2, INCOMPARABLE
      *         if they are incomparable.
      */
-    private static int moreSpecific(Class[] c1, Class[] c2) {
+    private static int moreSpecific(Class<?>[] c1, Class<?>[] c2) {
         boolean c1MoreSpecific = false;
         boolean c2MoreSpecific = false;
 
@@ -223,17 +217,10 @@ class MethodMap {
      * @return a list that contains only applicable methods (number of formal and actual arguments matches, and argument
      *         types are assignable to formal types through a method invocation conversion).
      */
-    private static LinkedList<Method> getApplicables(List<Method> methods, Class[] classes) {
-        LinkedList<Method> list = new LinkedList<Method>();
-
-        for (Object method1 : methods) {
-            Method method = (Method) method1;
-
-            if (isApplicable(method, classes)) {
-                list.add(method);
-            }
-        }
-        return list;
+    private static LinkedList<Method> getApplicables(List<Method> methods, Class<?>[] classes) {
+        return methods.stream()
+                .filter(method -> isApplicable(method, classes))
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     /**
@@ -243,8 +230,8 @@ class MethodMap {
      * @param classes The arguments
      * @return true if the method applies to the parameter types
      */
-    private static boolean isApplicable(Method method, Class[] classes) {
-        Class[] methodArgs = method.getParameterTypes();
+    private static boolean isApplicable(Method method, Class<?>[] classes) {
+        Class<?>[] methodArgs = method.getParameterTypes();
 
         if (methodArgs.length != classes.length) {
             return false;
@@ -272,7 +259,7 @@ class MethodMap {
      *         its corresponding object type or an object type of a primitive type that can be converted to the formal
      *         type.
      */
-    private static boolean isMethodInvocationConvertible(Class formal, Class actual) {
+    private static boolean isMethodInvocationConvertible(Class<?> formal, Class<?> actual) {
         /*
          * if it's a null, it means the arg was null
          */
@@ -347,7 +334,7 @@ class MethodMap {
      * @return true if either formal type is assignable from actual type, or formal and actual are both primitive types
      *         and actual can be subject to widening conversion to formal.
      */
-    private static boolean isStrictMethodInvocationConvertible(Class formal, Class actual) {
+    private static boolean isStrictMethodInvocationConvertible(Class<?> formal, Class<?> actual) {
         /*
          * we shouldn't get a null into, but if so
          */
