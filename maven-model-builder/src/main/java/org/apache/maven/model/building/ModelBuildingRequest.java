@@ -19,6 +19,7 @@
 package org.apache.maven.model.building;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -356,4 +357,8 @@ public interface ModelBuildingRequest {
     TransformerContextBuilder getTransformerContextBuilder();
 
     ModelBuildingRequest setTransformerContextBuilder(TransformerContextBuilder contextBuilder);
+
+    Path getRootDirectory();
+
+    ModelBuildingRequest setRootDirectory(Path rootDirectory);
 }

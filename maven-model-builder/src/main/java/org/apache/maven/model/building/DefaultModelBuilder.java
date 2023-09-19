@@ -67,6 +67,7 @@ import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.interpolation.ModelVersionProcessor;
 import org.apache.maven.model.io.ModelParseException;
+import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.management.DependencyManagementInjector;
 import org.apache.maven.model.management.PluginManagementInjector;
 import org.apache.maven.model.normalization.ModelNormalizer;
@@ -1028,6 +1029,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Map<String, Object> options = new HashMap<>(3);
             options.put(ModelProcessor.IS_STRICT, strict);
             options.put(ModelProcessor.SOURCE, modelSource);
+            options.put(ModelReader.ROOT_DIRECTORY, request.getRootDirectory());
 
             InputSource source;
             if (request.isLocationTracking()) {
