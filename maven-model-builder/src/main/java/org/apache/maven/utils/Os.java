@@ -46,6 +46,9 @@ public class Os {
      */
     public static final String OS_FAMILY;
 
+    /**
+     * Boolean indicating if the running OS is a Windows system.
+     */
     public static final boolean IS_WINDOWS;
 
     /**
@@ -122,8 +125,11 @@ public class Os {
     private static final String PATH_SEP = System.getProperty("path.separator");
 
     static {
+        // Those two public constants are initialized here, as they need all the private constants
+        // above to be initialized first, but the code style imposes the public constants to be
+        // defined above the private ones...
         OS_FAMILY = getOsFamily();
-        IS_WINDOWS = isWindowsFamily();
+        IS_WINDOWS = isFamily(FAMILY_WINDOWS);
     }
 
     private Os() {}
@@ -205,9 +211,5 @@ public class Os {
                 .filter(Os::isFamily)
                 .findFirst()
                 .orElse(null);
-    }
-
-    private static boolean isWindowsFamily() {
-        return isFamily(FAMILY_WINDOWS);
     }
 }
