@@ -260,6 +260,7 @@ class ExecutionEventLoggerTest {
 
     private static MavenProject generateMavenProject(String projectName) {
         MavenProject project = mock(MavenProject.class);
+        when(project.getGroupId()).thenReturn("org.apache.maven");
         when(project.getPackaging()).thenReturn("jar");
         when(project.getVersion()).thenReturn("3.5.4-SNAPSHOT");
         when(project.getName()).thenReturn(projectName);
