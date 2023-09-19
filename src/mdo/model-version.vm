@@ -138,7 +138,7 @@ public class ${className} {
         #end
         #foreach ( $field in $classToFields.get( $class ) )
             #if ( $field.isManyMultiplicity() )
-                #if ( $classToFields.containsKey( $model.getClass( $field.type ) ) )
+                #if ( $classToFields.containsKey( $field.toClass ) )
             $pfx ${var}.get${Helper.capitalise($field.name)}().stream().anyMatch(this::is_${v}) // ${class.name} : ${field.name}
                 #else
             $pfx !${var}.get${Helper.capitalise($field.name)}().isEmpty() // ${class.name} : ${field.name}
@@ -175,6 +175,10 @@ public class ${className} {
 
     private boolean has(List<?> list) {
         return !list.isEmpty();
+    }
+
+    private boolean has(XmlNode node) {
+        return node != null;
     }
 
 }

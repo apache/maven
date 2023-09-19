@@ -427,7 +427,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
             ((DefaultPlexusContainer) container)
                     .discoverComponents(
-                            pluginRealm, new SessionScopeModule(container), new MojoExecutionScopeModule(container));
+                            pluginRealm,
+                            new SessionScopeModule(container),
+                            new MojoExecutionScopeModule(container),
+                            new PluginConfigurationModule(plugin.getDelegate()));
         } catch (ComponentLookupException | CycleDetectedInComponentGraphException e) {
             throw new PluginContainerException(
                     plugin,
