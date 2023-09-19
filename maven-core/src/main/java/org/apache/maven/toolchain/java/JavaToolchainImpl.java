@@ -24,7 +24,7 @@ import java.nio.file.Paths;
 
 import org.apache.maven.toolchain.DefaultToolchain;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.util.Os;
+import org.apache.maven.utils.Os;
 import org.slf4j.Logger;
 
 /**
@@ -64,7 +64,7 @@ public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain
     private static Path findTool(String toolName, Path installDir) {
         Path bin = installDir.resolve("bin"); // NOI18N
         if (Files.isDirectory(bin)) {
-            if (Os.isFamily("windows")) { // NOI18N
+            if (Os.IS_WINDOWS) {
                 Path tool = bin.resolve(toolName + ".exe");
                 if (Files.exists(tool)) {
                     return tool;
