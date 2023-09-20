@@ -345,7 +345,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         buffer.append("<packaging>").append(artifact.getType()).append("</packaging>");
         buffer.append("</project>");
 
-        return new StringModelSource(buffer, artifact.getId());
+        return new StringModelSource(buffer.toString(), artifact.getId());
     }
 
     @Override
@@ -355,24 +355,15 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
         List<InterimResult> interimResults = new ArrayList<>();
 
-        ReactorModelPool.Builder poolBuilder = new ReactorModelPool.Builder();
-        final ReactorModelPool modelPool = poolBuilder.build();
+        ReactorModelPool pool = new ReactorModelPool();
 
-        InternalConfig config = new InternalConfig(request, modelPool, modelBuilder.newTransformerContextBuilder());
+        InternalConfig config = new InternalConfig(request, pool, modelBuilder.newTransformerContextBuilder());
 
         Map<File, MavenProject> projectIndex = new HashMap<>(256);
 
         // phase 1: get file Models from the reactor.
         boolean noErrors = build(
-                results,
-                interimResults,
-                projectIndex,
-                pomFiles,
-                new LinkedHashSet<>(),
-                true,
-                recursive,
-                config,
-                poolBuilder);
+                results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive, config, pool);
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
@@ -414,22 +405,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             boolean root,
             boolean recursive,
             InternalConfig config,
-            ReactorModelPool.Builder poolBuilder) {
+            ReactorModelPool pool) {
         boolean noErrors = true;
 
         for (File pomFile : pomFiles) {
             aggregatorFiles.add(pomFile);
 
             if (!build(
-                    results,
-                    interimResults,
-                    projectIndex,
-                    pomFile,
-                    aggregatorFiles,
-                    root,
-                    recursive,
-                    config,
-                    poolBuilder)) {
+                    results, interimResults, projectIndex, pomFile, aggregatorFiles, root, recursive, config, pool)) {
                 noErrors = false;
             }
 
@@ -449,7 +432,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             boolean isRoot,
             boolean recursive,
             InternalConfig config,
-            ReactorModelPool.Builder poolBuilder) {
+            ReactorModelPool pool) {
         boolean noErrors = true;
 
         MavenProject project = new MavenProject();
@@ -483,7 +466,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
         Model model = request.getFileModel();
 
-        poolBuilder.put(model.getPomFile().toPath(), model);
+        pool.put(model.getPomFile().toPath(), model);
 
         InterimResult interimResult = new InterimResult(pomFile, request, result, listener, isRoot);
         interimResults.add(interimResult);
@@ -563,7 +546,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     false,
                     recursive,
                     config,
-                    poolBuilder)) {
+                    pool)) {
                 noErrors = false;
             }
         }
