@@ -27,30 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code Dependency}.
  *
- * @author Benjamin Bentmann
  */
-public class DependencyTest {
+class DependencyTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new Dependency().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new Dependency().equals(null));
 
         new Dependency().equals(new Dependency());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         Dependency thing = new Dependency();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new Dependency().toString());
     }
 }

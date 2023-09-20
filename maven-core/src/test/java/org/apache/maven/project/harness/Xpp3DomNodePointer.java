@@ -30,7 +30,6 @@ import org.apache.maven.api.xml.XmlNode;
 /**
  * A node pointer for JXPath to support <code>Xpp3Dom</code>.
  *
- * @author Benjamin Bentmann
  */
 class Xpp3DomNodePointer extends NodePointer {
 

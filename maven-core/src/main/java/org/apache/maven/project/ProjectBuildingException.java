@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 
 /**
- * @author Jason van Zyl
  */
 public class ProjectBuildingException extends Exception {
     private final String projectId;
@@ -72,6 +71,7 @@ public class ProjectBuildingException extends Exception {
     /**
      * @deprecated use {@link #getPomFile()}
      */
+    @Deprecated
     public String getPomLocation() {
         if (getPomFile() != null) {
             return getPomFile().getAbsolutePath();

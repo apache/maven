@@ -26,7 +26,6 @@ import org.eclipse.aether.graph.DependencyNode;
 /**
  * The result of a project dependency resolution.
  *
- * @author Benjamin Bentmann
  */
 public interface DependencyResolutionResult {
 

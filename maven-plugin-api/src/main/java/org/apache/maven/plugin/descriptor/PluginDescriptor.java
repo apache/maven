@@ -18,36 +18,37 @@
  */
 package org.apache.maven.plugin.descriptor;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
-import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;
+import org.apache.maven.plugin.lifecycle.io.LifecycleMappingsStaxReader;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * @author Jason van Zyl
  */
 public class PluginDescriptor extends ComponentSetDescriptor implements Cloneable {
 
     private static final String LIFECYCLE_DESCRIPTOR = "META-INF/maven/lifecycle.xml";
+
+    private static final Pattern PATTERN_FILTER_1 = Pattern.compile("-?(maven|plugin)-?");
 
     private String groupId;
 
@@ -166,7 +167,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         if ("maven-plugin-plugin".equals(artifactId)) {
             return "plugin";
         } else {
-            return artifactId.replaceAll("-?maven-?", "").replaceAll("-?plugin-?", "");
+            return PATTERN_FILTER_1.matcher(artifactId).replaceAll("");
         }
     }
 
@@ -324,12 +325,12 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         this.pluginArtifact = pluginArtifact;
     }
 
-    public Lifecycle getLifecycleMapping(String lifecycleId) throws IOException, XmlPullParserException {
+    public Lifecycle getLifecycleMapping(String lifecycleId) throws IOException, XMLStreamException {
         if (lifecycleMappings == null) {
             LifecycleConfiguration lifecycleConfiguration;
 
-            try (Reader reader = ReaderFactory.newXmlReader(getDescriptorStream(LIFECYCLE_DESCRIPTOR))) {
-                lifecycleConfiguration = new LifecycleMappingsXpp3Reader().read(reader);
+            try (InputStream input = getDescriptorStream(LIFECYCLE_DESCRIPTOR)) {
+                lifecycleConfiguration = new LifecycleMappingsStaxReader().read(input);
             }
 
             lifecycleMappings = new HashMap<>();
@@ -355,7 +356,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
                 throw new IllegalStateException(e);
             }
         } else {
-            return new FileInputStream(new File(pluginFile, descriptor));
+            return Files.newInputStream(new File(pluginFile, descriptor).toPath());
         }
     }
 

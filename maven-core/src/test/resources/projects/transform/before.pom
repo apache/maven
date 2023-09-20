@@ -19,10 +19,11 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.1.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd"
+         root="true">
+  <modelVersion>4.1.0</modelVersion>
 
   <groupId>test</groupId>
   <artifactId>test</artifactId>
@@ -46,6 +47,23 @@ under the License.
             <target xml:space="preserve">  1.5  </target>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ear-plugin</artifactId>
+          <version>3.3.0</version>
+          <configuration>
+            <modules>
+              <module>
+                <test>test</test>
+              </module>
+              <jarModule>
+                <groupId>artifactGroupId</groupId>
+                <artifactId>artifactId</artifactId>
+                <uri>APP-INF/lib/anotherName-1.2.3.jar</uri>
+              </jarModule>
+            </modules>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -58,12 +76,25 @@ under the License.
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <configuration>
+          <modules>
+            <webModule>
+              <groupId>artifactGroupId</groupId>
+              <artifactId>artifactId</artifactId>
+              <excluded>true</excluded>
+            </webModule>
+          </modules>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
   <profiles>
     <profile>
-      <id>default</id>
+      <id>default-active</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>

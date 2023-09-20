@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-alpha-8-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-core</artifactId>
@@ -73,15 +73,15 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model-transform</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
       <artifactId>maven-resolver-provider</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-spi</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
@@ -100,20 +100,18 @@ under the License.
       <artifactId>maven-resolver-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-shared-utils</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.inject</artifactId>
+      <classifier>no_asm</classifier>
     </dependency>
     <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
+      <classifier>classes</classifier>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -129,16 +127,12 @@ under the License.
     </dependency>
     <!-- Plexus -->
     <dependency>
-      <groupId>org.apache.maven</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-classworlds</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -333,6 +327,21 @@ under the License.
               <exclude>org.apache.maven.toolchain.DefaultToolchain#DefaultToolchain(org.apache.maven.toolchain.model.ToolchainModel,org.codehaus.plexus.logging.Logger):CONSTRUCTOR_REMOVED</exclude>
               <exclude>org.apache.maven.toolchain.DefaultToolchain#DefaultToolchain(org.apache.maven.toolchain.model.ToolchainModel,java.lang.String,org.codehaus.plexus.logging.Logger):CONSTRUCTOR_REMOVED</exclude>
               <exclude>org.apache.maven.toolchain.DefaultToolchainManager#logger</exclude>
+              <!-- classes moved to maven-compat -->
+              <exclude>org.apache.maven.plugin.PluginManager</exclude>
+              <exclude>org.apache.maven.repository.ArtifactDoesNotExistException</exclude>
+              <exclude>org.apache.maven.repository.ArtifactTransferEvent</exclude>
+              <exclude>org.apache.maven.repository.ArtifactTransferFailedException</exclude>
+              <exclude>org.apache.maven.repository.ArtifactTransferListener</exclude>
+              <exclude>org.apache.maven.repository.ArtifactTransferResource</exclude>
+              <exclude>org.apache.maven.repository.DelegatingLocalArtifactRepository</exclude>
+              <exclude>org.apache.maven.repository.LocalArtifactRepository</exclude>
+              <exclude>org.apache.maven.repository.LocalRepositoryNotAccessibleException</exclude>
+              <exclude>org.apache.maven.repository.RepositorySystem</exclude>
+              <exclude>org.apache.maven.settings.DefaultMavenSettingsBuilder</exclude>
+              <exclude>org.apache.maven.settings.MavenSettingsBuilder</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchainsBuilder</exclude>
+              <exclude>org.apache.maven.toolchain.ToolchainsBuilder</exclude>
             </excludes>
           </parameter>
         </configuration>

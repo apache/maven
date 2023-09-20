@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
@@ -33,23 +34,58 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.building.SettingsProblemCollector;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
- * @author Milos Kleint
  */
 @Named
 @Singleton
 public class DefaultSettingsValidator implements SettingsValidator {
 
-    private static final String ID_REGEX = "[A-Za-z0-9_\\-.]+";
+    private static final String ID = "[\\w.-]+";
+    private static final Pattern ID_REGEX = Pattern.compile(ID);
 
-    private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
-
-    private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
+    private static final String ILLEGAL_REPO_ID_CHARS = "\\/:\"<>|?*"; // ILLEGAL_FS_CHARS
 
     @Override
     public void validate(Settings settings, SettingsProblemCollector problems) {
+        validate(settings, false, problems);
+    }
+
+    @Override
+    public void validate(Settings settings, boolean isProjectSettings, SettingsProblemCollector problems) {
+        if (isProjectSettings) {
+            String msgS = "is not supported on project settings.";
+            String msgP = "are not supported on project settings.";
+            if (settings.getLocalRepository() != null
+                    && !settings.getLocalRepository().isEmpty()) {
+                addViolation(problems, Severity.WARNING, "localRepository", null, msgS);
+            }
+            if (settings.getInteractiveMode() != null && !settings.getInteractiveMode()) {
+                addViolation(problems, Severity.WARNING, "interactiveMode", null, msgS);
+            }
+            if (settings.isOffline()) {
+                addViolation(problems, Severity.WARNING, "offline", null, msgS);
+            }
+            if (!settings.getProxies().isEmpty()) {
+                addViolation(problems, Severity.WARNING, "proxies", null, msgP);
+            }
+            if (settings.isUsePluginRegistry()) {
+                addViolation(problems, Severity.WARNING, "usePluginRegistry", null, msgS);
+            }
+            List<Server> servers = settings.getServers();
+            for (int i = 0; i < servers.size(); i++) {
+                Server server = servers.get(i);
+                String serverField = "servers.server[" + i + "]";
+                validateStringEmpty(problems, serverField + ".username", server.getUsername(), msgS);
+                validateStringEmpty(problems, serverField + ".password", server.getPassword(), msgS);
+                validateStringEmpty(problems, serverField + ".privateKey", server.getPrivateKey(), msgS);
+                validateStringEmpty(problems, serverField + ".passphrase", server.getPassphrase(), msgS);
+                validateStringEmpty(problems, serverField + ".filePermissions", server.getFilePermissions(), msgS);
+                validateStringEmpty(
+                        problems, serverField + ".directoryPermissions", server.getDirectoryPermissions(), msgS);
+            }
+        }
+
         if (settings.isUsePluginRegistry()) {
             addViolation(problems, Severity.WARNING, "usePluginRegistry", null, "is deprecated and has no effect.");
         }
@@ -58,18 +94,17 @@ public class DefaultSettingsValidator implements SettingsValidator {
 
         if (pluginGroups != null) {
             for (int i = 0; i < pluginGroups.size(); i++) {
-                String pluginGroup = pluginGroups.get(i).trim();
+                String pluginGroup = pluginGroups.get(i);
 
-                if (StringUtils.isBlank(pluginGroup)) {
-                    addViolation(
-                            problems, Severity.ERROR, "pluginGroups.pluginGroup[" + i + "]", null, "must not be empty");
-                } else if (!pluginGroup.matches(ID_REGEX)) {
+                validateStringNotEmpty(problems, "pluginGroups.pluginGroup[" + i + "]", pluginGroup, null);
+
+                if (!ID_REGEX.matcher(pluginGroup).matches()) {
                     addViolation(
                             problems,
                             Severity.ERROR,
                             "pluginGroups.pluginGroup[" + i + "]",
                             null,
-                            "must denote a valid group id and match the pattern " + ID_REGEX);
+                            "must denote a valid group id and match the pattern " + ID);
                 }
             }
         }
@@ -159,6 +194,17 @@ public class DefaultSettingsValidator implements SettingsValidator {
                             "must be unique but found duplicate proxy with id " + proxy.getId());
                 }
                 validateStringNotEmpty(problems, "proxies.proxy.host", proxy.getHost(), proxy.getId());
+
+                try {
+                    Integer.parseInt(proxy.getPortString());
+                } catch (NumberFormatException e) {
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            "proxies.proxy[" + proxy.getId() + "].port",
+                            null,
+                            "must be a valid integer but found '" + proxy.getPortString() + "'");
+                }
             }
         }
     }
@@ -208,6 +254,25 @@ public class DefaultSettingsValidator implements SettingsValidator {
     // ----------------------------------------------------------------------
     // Field validation
     // ----------------------------------------------------------------------
+
+    /**
+     * Asserts:
+     * <p/>
+     * <ul>
+     * <li><code>string.length == null</code>
+     * <li><code>string.length == 0</code>
+     * </ul>
+     */
+    private static boolean validateStringEmpty(
+            SettingsProblemCollector problems, String fieldName, String string, String message) {
+        if (string == null || string.length() == 0) {
+            return true;
+        }
+
+        addViolation(problems, Severity.WARNING, fieldName, null, message);
+
+        return false;
+    }
 
     /**
      * Asserts:

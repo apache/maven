@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
@@ -33,7 +32,6 @@ import org.eclipse.aether.transfer.TransferResource;
 /**
  * Console download progress meter.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
@@ -96,7 +94,8 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         StringBuilder status = new StringBuilder();
 
         if (printResourceNames) {
-            status.append(StringUtils.substringAfterLast(resourceName, "/"));
+            int idx = resourceName.lastIndexOf('/');
+            status.append(idx < 0 ? resourceName : resourceName.substring(idx + 1));
             status.append(" (");
         }
 

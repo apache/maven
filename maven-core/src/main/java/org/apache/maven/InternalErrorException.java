@@ -21,7 +21,6 @@ package org.apache.maven;
 /**
  * Signals an internal error in Maven itself, e.g. a programming bug.
  *
- * @author Benjamin Bentmann
  */
 public class InternalErrorException extends MavenExecutionException {
 

@@ -45,7 +45,6 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.plugin.version.PluginVersionResult;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryListener;
@@ -68,7 +67,6 @@ import org.slf4j.LoggerFactory;
  * Resolves a version for a plugin.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
@@ -100,8 +98,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
         PluginVersionResult result = resolveFromProject(request);
 
         if (result == null) {
-            ConcurrentMap<Key, PluginVersionResult> cache =
-                    getCache(request.getRepositorySession().getData());
+            ConcurrentMap<Key, PluginVersionResult> cache = getCache(request);
             Key key = getKey(request);
             result = cache.get(key);
 
@@ -169,10 +166,10 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
         String version = null;
         ArtifactRepository repo = null;
 
-        if (StringUtils.isNotEmpty(versions.releaseVersion)) {
+        if (versions.releaseVersion != null && !versions.releaseVersion.isEmpty()) {
             version = versions.releaseVersion;
             repo = versions.releaseRepository;
-        } else if (StringUtils.isNotEmpty(versions.latestVersion)) {
+        } else if (versions.latestVersion != null && !versions.latestVersion.isEmpty()) {
             version = versions.latestVersion;
             repo = versions.latestRepository;
         }
@@ -301,15 +298,21 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     private void mergeMetadata(Versions versions, Metadata source, ArtifactRepository repository) {
         Versioning versioning = source.getVersioning();
         if (versioning != null) {
-            String timestamp = StringUtils.clean(versioning.getLastUpdated());
+            String timestamp = versioning.getLastUpdated() == null
+                    ? ""
+                    : versioning.getLastUpdated().trim();
 
-            if (StringUtils.isNotEmpty(versioning.getRelease()) && timestamp.compareTo(versions.releaseTimestamp) > 0) {
+            if (versioning.getRelease() != null
+                    && !versioning.getRelease().isEmpty()
+                    && timestamp.compareTo(versions.releaseTimestamp) > 0) {
                 versions.releaseVersion = versioning.getRelease();
                 versions.releaseTimestamp = timestamp;
                 versions.releaseRepository = repository;
             }
 
-            if (StringUtils.isNotEmpty(versioning.getLatest()) && timestamp.compareTo(versions.latestTimestamp) > 0) {
+            if (versioning.getLatest() != null
+                    && !versioning.getLatest().isEmpty()
+                    && timestamp.compareTo(versions.latestTimestamp) > 0) {
                 versions.latestVersion = versioning.getLatest();
                 versions.latestTimestamp = timestamp;
                 versions.latestRepository = repository;
@@ -354,16 +357,10 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     }
 
     @SuppressWarnings("unchecked")
-    private ConcurrentMap<Key, PluginVersionResult> getCache(SessionData data) {
-        ConcurrentMap<Key, PluginVersionResult> cache = (ConcurrentMap<Key, PluginVersionResult>) data.get(CACHE_KEY);
-        while (cache == null) {
-            cache = new ConcurrentHashMap<>(256);
-            if (data.set(CACHE_KEY, null, cache)) {
-                break;
-            }
-            cache = (ConcurrentMap<Key, PluginVersionResult>) data.get(CACHE_KEY);
-        }
-        return cache;
+    private ConcurrentMap<Key, PluginVersionResult> getCache(PluginVersionRequest request) {
+        SessionData data = request.getRepositorySession().getData();
+        return (ConcurrentMap<Key, PluginVersionResult>)
+                data.computeIfAbsent(CACHE_KEY, () -> new ConcurrentHashMap<>(256));
     }
 
     private static Key getKey(PluginVersionRequest request) {

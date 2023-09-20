@@ -21,7 +21,6 @@ package org.apache.maven.settings.building;
 /**
  * Collects problems that are encountered during settings building.
  *
- * @author Benjamin Bentmann
  */
 public interface SettingsProblemCollector {
 

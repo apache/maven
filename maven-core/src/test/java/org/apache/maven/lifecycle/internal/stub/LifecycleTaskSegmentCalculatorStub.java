@@ -35,7 +35,6 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 
 /**
- * @author Kristian Rosenvold
  */
 public class LifecycleTaskSegmentCalculatorStub extends DefaultLifecycleTaskSegmentCalculator {
     public static final String clean = "clean";

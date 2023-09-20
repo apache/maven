@@ -27,41 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code Developer}.
  *
- * @author Benjamin Bentmann
  */
-public class DeveloperTest {
+class DeveloperTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new Developer().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new Developer().equals(null));
 
         new Developer().equals(new Developer());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         Developer thing = new Developer();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new Developer().toString());
-    }
-
-    public void testToStringNotNonsense() {
-        Developer dev = new Developer();
-        dev.setName("Maven Tester");
-        dev.setEmail("tester@acme.localdomain");
-        dev.setId("20220118");
-
-        String s = dev.toString();
-
-        assert "Developer {id=20220118, Contributor {name=Maven Tester, email=tester@acme.localdomain}}".equals(s) : s;
     }
 }

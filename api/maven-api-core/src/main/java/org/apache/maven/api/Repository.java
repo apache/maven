@@ -25,13 +25,18 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * A repository holds artifacts.
  *
- * @since 4.0
+ * @since 4.0.0
  * @see RemoteRepository
  * @see LocalRepository
  */
 @Experimental
 @Immutable
 public interface Repository {
+
+    /**
+     * The reserved id for Maven Central
+     */
+    String CENTRAL_ID = "central";
 
     /**
      * Gets the identifier of this repository.

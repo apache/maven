@@ -25,7 +25,6 @@ import org.apache.maven.project.MavenProject;
 /**
  * Describes the interdependencies between projects in the reactor.
  *
- * @author Benjamin Bentmann
  * @since 3.0-alpha
  */
 public interface ProjectDependencyGraph {

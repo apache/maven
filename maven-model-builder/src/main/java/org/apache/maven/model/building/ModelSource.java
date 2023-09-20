@@ -26,7 +26,6 @@ import org.apache.maven.building.Source;
  * This interface does not support loading of parent POM(s) from the same backing store, integrators are strongly
  * encouraged to implement {@link ModelSource2} instead of implementing this interface directly.
  *
- * @author Benjamin Bentmann
  * @see ModelSource2
  * @deprecated instead use {@link Source}
  */

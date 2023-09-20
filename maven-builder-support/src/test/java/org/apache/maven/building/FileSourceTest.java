@@ -27,17 +27,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class FileSourceTest {
+class FileSourceTest {
 
     @Test
-    public void testFileSource() {
+    void testFileSource() {
         NullPointerException e = assertThrows(
                 NullPointerException.class, () -> new FileSource(null), "Should fail, since you must specify a file");
         assertEquals("file cannot be null", e.getMessage());
     }
 
     @Test
-    public void testGetInputStream() throws Exception {
+    void testGetInputStream() throws Exception {
         File txtFile = new File("target/test-classes/source.txt");
         FileSource source = new FileSource(txtFile);
 
@@ -49,14 +49,14 @@ public class FileSourceTest {
     }
 
     @Test
-    public void testGetLocation() {
+    void testGetLocation() {
         File txtFile = new File("target/test-classes/source.txt");
         FileSource source = new FileSource(txtFile);
         assertEquals(txtFile.getAbsolutePath(), source.getLocation());
     }
 
     @Test
-    public void testGetFile() {
+    void testGetFile() {
         File txtFile = new File("target/test-classes/source.txt");
         FileSource source = new FileSource(txtFile);
         assertEquals(txtFile.getAbsoluteFile(), source.getFile());

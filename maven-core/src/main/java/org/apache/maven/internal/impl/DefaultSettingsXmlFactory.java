@@ -28,15 +28,15 @@ import java.io.Writer;
 import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
+import org.apache.maven.api.settings.InputSource;
 import org.apache.maven.api.settings.Settings;
-import org.apache.maven.settings.v4.SettingsXpp3Reader;
-import org.apache.maven.settings.v4.SettingsXpp3Writer;
+import org.apache.maven.settings.v4.SettingsStaxReader;
+import org.apache.maven.settings.v4.SettingsStaxWriter;
 
 @Named
 @Singleton
@@ -52,14 +52,14 @@ public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
         try {
             InputSource source = null;
             if (request.getModelId() != null || request.getLocation() != null) {
-                source = new InputSource(request.getModelId(), request.getLocation());
+                source = new InputSource(request.getLocation());
             }
-            SettingsXpp3Reader xml = new SettingsXpp3Reader();
+            SettingsStaxReader xml = new SettingsStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
             if (reader != null) {
-                return xml.read(reader, request.isStrict());
+                return xml.read(reader, request.isStrict(), source);
             } else {
-                return xml.read(inputStream, request.isStrict());
+                return xml.read(inputStream, request.isStrict(), source);
             }
         } catch (Exception e) {
             throw new XmlReaderException("Unable to read settings", e);
@@ -77,9 +77,9 @@ public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
         }
         try {
             if (writer != null) {
-                new SettingsXpp3Writer().write(writer, content);
+                new SettingsStaxWriter().write(writer, content);
             } else {
-                new SettingsXpp3Writer().write(outputStream, content);
+                new SettingsStaxWriter().write(outputStream, content);
             }
         } catch (Exception e) {
             throw new XmlWriterException("Unable to write settings", e);

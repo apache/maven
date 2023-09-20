@@ -22,7 +22,6 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 
 /**
- * @author Benjamin Bentmann
  */
 public class DefaultDependencyResolutionRequest implements DependencyResolutionRequest {
 

@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  * ArtifactDeployer
  */
+@Deprecated
 public interface ArtifactDeployer {
     String ROLE = ArtifactDeployer.class.getName();
 

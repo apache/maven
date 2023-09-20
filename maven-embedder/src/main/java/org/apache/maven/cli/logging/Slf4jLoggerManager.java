@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
  * {@link org.codehaus.plexus.logging.LoggerManager},
  * ignoring Plexus logger API parts that are not classical and probably not really used.
  *
- * @author Jason van Zyl
  * @since 3.1
  */
 public class Slf4jLoggerManager implements LoggerManager {

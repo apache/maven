@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -60,9 +60,6 @@ import org.slf4j.LoggerFactory;
  * </p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Jason van Zyl
- * @author Kristian Rosenvold (extracted class)
  */
 @Named
 public class LifecycleDependencyResolver {
@@ -76,30 +73,33 @@ public class LifecycleDependencyResolver {
 
     private final ProjectArtifactsCache projectArtifactsCache;
 
+    private final MessageBuilderFactory messageBuilderFactory;
+
     @Inject
     public LifecycleDependencyResolver(
             ProjectDependenciesResolver dependenciesResolver,
             ProjectArtifactFactory artifactFactory,
             EventSpyDispatcher eventSpyDispatcher,
-            ProjectArtifactsCache projectArtifactsCache) {
+            ProjectArtifactsCache projectArtifactsCache,
+            MessageBuilderFactory messageBuilderFactory) {
         this.dependenciesResolver = dependenciesResolver;
         this.artifactFactory = artifactFactory;
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.projectArtifactsCache = projectArtifactsCache;
+        this.messageBuilderFactory = messageBuilderFactory;
     }
 
     public static List<MavenProject> getProjects(MavenProject project, MavenSession session, boolean aggregator) {
-        if (aggregator) {
-            return getProjectAndSubModules(project).collect(Collectors.toList());
+        if (aggregator && project.getCollectedProjects() != null) {
+            // get the unsorted list of wanted projects
+            Set<MavenProject> projectAndSubmodules = new HashSet<>(project.getCollectedProjects());
+            projectAndSubmodules.add(project);
+            return session.getProjects().stream() // sorted all
+                    .filter(projectAndSubmodules::contains)
+                    .collect(Collectors.toList()); // sorted and filtered to what we need
         } else {
             return Collections.singletonList(project);
         }
-    }
-
-    private static Stream<MavenProject> getProjectAndSubModules(MavenProject project) {
-        return Stream.concat(
-                Stream.of(project),
-                project.getCollectedProjects().stream().flatMap(LifecycleDependencyResolver::getProjectAndSubModules));
     }
 
     public void resolveProjectDependencies(
@@ -255,7 +255,7 @@ public class LifecycleDependencyResolver {
 
                 logger.warn("Try running the build up to the lifecycle phase \"package\"");
             } else {
-                throw new LifecycleExecutionException(null, project, e);
+                throw new LifecycleExecutionException(messageBuilderFactory, null, project, e);
             }
         }
 

@@ -40,9 +40,11 @@ package org.apache.maven.settings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.ActivationFile;
+import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.settings.Activation;
 import org.apache.maven.api.settings.ActivationOS;
 import org.apache.maven.api.settings.ActivationProperty;
@@ -55,7 +57,6 @@ import org.apache.maven.settings.v4.SettingsMerger;
 /**
  * Several convenience methods to handle settings
  *
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  */
 public final class SettingsUtilsV4 {
 
@@ -168,14 +169,18 @@ public final class SettingsUtilsV4 {
                     org.apache.maven.api.model.Activation.newBuilder();
 
             activation.activeByDefault(settingsActivation.isActiveByDefault());
+            activation.location("activeByDefault", toLocation(settingsActivation.getLocation("activeByDefault")));
 
             activation.jdk(settingsActivation.getJdk());
+            activation.location("jdk", toLocation(settingsActivation.getLocation("jdk")));
 
             ActivationProperty settingsProp = settingsActivation.getProperty();
             if (settingsProp != null) {
                 activation.property(org.apache.maven.api.model.ActivationProperty.newBuilder()
                         .name(settingsProp.getName())
                         .value(settingsProp.getValue())
+                        .location("name", toLocation(settingsProp.getLocation("name")))
+                        .location("value", toLocation(settingsProp.getLocation("value")))
                         .build());
             }
 
@@ -186,6 +191,10 @@ public final class SettingsUtilsV4 {
                         .family(settingsOs.getFamily())
                         .name(settingsOs.getName())
                         .version(settingsOs.getVersion())
+                        .location("arch", toLocation(settingsOs.getLocation("arch")))
+                        .location("family", toLocation(settingsOs.getLocation("family")))
+                        .location("name", toLocation(settingsOs.getLocation("name")))
+                        .location("version", toLocation(settingsOs.getLocation("version")))
                         .build());
             }
 
@@ -194,6 +203,8 @@ public final class SettingsUtilsV4 {
                 activation.file(ActivationFile.newBuilder()
                         .exists(settingsFile.getExists())
                         .missing(settingsFile.getMissing())
+                        .location("exists", toLocation(settingsFile.getLocation("exists")))
+                        .location("missing", toLocation(settingsFile.getLocation("missing")))
                         .build());
             }
 
@@ -201,6 +212,7 @@ public final class SettingsUtilsV4 {
         }
 
         profile.properties(settingsProfile.getProperties());
+        profile.location("properties", toLocation(settingsProfile.getLocation("properties")));
 
         List<Repository> repos = settingsProfile.getRepositories();
         if (repos != null) {
@@ -233,6 +245,11 @@ public final class SettingsUtilsV4 {
         repo.name(settingsRepo.getName());
         repo.url(settingsRepo.getUrl());
 
+        repo.location("id", toLocation(settingsRepo.getLocation("id")));
+        repo.location("layout", toLocation(settingsRepo.getLocation("layout")));
+        repo.location("name", toLocation(settingsRepo.getLocation("name")));
+        repo.location("url", toLocation(settingsRepo.getLocation("url")));
+
         if (settingsRepo.getSnapshots() != null) {
             repo.snapshots(convertRepositoryPolicy(settingsRepo.getSnapshots()));
         }
@@ -253,6 +270,9 @@ public final class SettingsUtilsV4 {
                 .enabled(Boolean.toString(settingsPolicy.isEnabled()))
                 .updatePolicy(settingsPolicy.getUpdatePolicy())
                 .checksumPolicy(settingsPolicy.getChecksumPolicy())
+                .location("enabled", toLocation(settingsPolicy.getLocation("enabled")))
+                .location("updatePolicy", toLocation(settingsPolicy.getLocation("updatePolicy")))
+                .location("checksumPolicy", toLocation(settingsPolicy.getLocation("checksumPolicy")))
                 .build();
         return policy;
     }
@@ -296,5 +316,21 @@ public final class SettingsUtilsV4 {
             return null;
         }
         return new org.apache.maven.settings.Settings(settings.getDelegate());
+    }
+
+    private static org.apache.maven.api.model.InputLocation toLocation(
+            org.apache.maven.api.settings.InputLocation location) {
+        if (location != null) {
+            org.apache.maven.api.settings.InputSource source = location.getSource();
+            Map<Object, InputLocation> locs = location.getLocations().entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> toLocation(e.getValue())));
+            return new org.apache.maven.api.model.InputLocation(
+                    location.getLineNumber(),
+                    location.getColumnNumber(),
+                    source != null ? new org.apache.maven.api.model.InputSource("", source.getLocation()) : null,
+                    locs);
+        } else {
+            return null;
+        }
     }
 }

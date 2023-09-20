@@ -46,7 +46,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
-public class DefaultToolchainsBuilderTest {
+class DefaultToolchainsBuilderTest {
     private static final String LS = System.lineSeparator();
 
     @Spy
@@ -59,7 +59,7 @@ public class DefaultToolchainsBuilderTest {
     private DefaultToolchainsBuilder toolchainBuilder;
 
     @BeforeEach
-    public void onSetup() {
+    void onSetup() {
         MockitoAnnotations.initMocks(this);
 
         Map<String, String> envVarMap = new HashMap<>();
@@ -69,7 +69,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testBuildEmptyRequest() throws Exception {
+    void testBuildEmptyRequest() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
         assertNotNull(result.getEffectiveToolchains());
@@ -78,7 +78,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testBuildRequestWithUserToolchains() throws Exception {
+    void testBuildRequestWithUserToolchains() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource(new StringSource(""));
 
@@ -110,7 +110,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testBuildRequestWithGlobalToolchains() throws Exception {
+    void testBuildRequestWithGlobalToolchains() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource(new StringSource(""));
 
@@ -142,7 +142,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testBuildRequestWithBothToolchains() throws Exception {
+    void testBuildRequestWithBothToolchains() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource(new StringSource(""));
         request.setUserToolchainsSource(new StringSource(""));
@@ -194,7 +194,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testStrictToolchainsParseException() throws Exception {
+    void testStrictToolchainsParseException() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource(new StringSource(""));
         ToolchainsParseException parseException = new ToolchainsParseException("MESSAGE", 4, 2);
@@ -213,7 +213,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testIOException() throws Exception {
+    void testIOException() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource(new StringSource("", "LOCATION"));
         IOException ioException = new IOException("MESSAGE");
@@ -232,7 +232,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testEnvironmentVariablesAreInterpolated() throws Exception {
+    void testEnvironmentVariablesAreInterpolated() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource(new StringSource(""));
 
@@ -271,7 +271,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testNonExistingEnvironmentVariablesAreNotInterpolated() throws Exception {
+    void testNonExistingEnvironmentVariablesAreNotInterpolated() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource(new StringSource(""));
 
@@ -300,7 +300,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testEnvironmentVariablesWithSpecialCharactersAreInterpolated() throws Exception {
+    void testEnvironmentVariablesWithSpecialCharactersAreInterpolated() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource(new StringSource(""));
 

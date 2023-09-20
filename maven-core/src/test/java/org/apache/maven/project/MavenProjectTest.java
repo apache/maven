@@ -35,10 +35,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MavenProjectTest extends AbstractMavenProjectTestCase {
+class MavenProjectTest extends AbstractMavenProjectTestCase {
 
     @Test
-    public void testShouldInterpretChildPathAdjustmentBasedOnModulePaths() throws IOException {
+    void testShouldInterpretChildPathAdjustmentBasedOnModulePaths() throws IOException {
         Model parentModel = new Model();
         parentModel.addModule("../child");
 
@@ -63,7 +63,7 @@ public class MavenProjectTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testIdentityProtoInheritance() {
+    void testIdentityProtoInheritance() {
         Parent parent = new Parent();
 
         parent.setGroupId("test-group");
@@ -86,7 +86,7 @@ public class MavenProjectTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testEmptyConstructor() {
+    void testEmptyConstructor() {
         MavenProject project = new MavenProject();
 
         assertEquals(
@@ -96,7 +96,7 @@ public class MavenProjectTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testClone() throws Exception {
+    void testClone() throws Exception {
         File f = getFileForClasspathResource("canonical-pom.xml");
         MavenProject projectToClone = getProject(f);
 
@@ -108,7 +108,7 @@ public class MavenProjectTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testCloneWithDependencyManagement() throws Exception {
+    void testCloneWithDependencyManagement() throws Exception {
         File f = getFileForClasspathResource("dependencyManagement-pom.xml");
         MavenProject projectToClone = getProjectWithDependencies(f);
         DependencyManagement dep = projectToClone.getDependencyManagement();
@@ -130,7 +130,7 @@ public class MavenProjectTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testGetModulePathAdjustment() throws IOException {
+    void testGetModulePathAdjustment() throws IOException {
         Model moduleModel = new Model();
 
         MavenProject module = new MavenProject(moduleModel);
@@ -148,7 +148,7 @@ public class MavenProjectTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testCloneWithDistributionManagement() throws Exception {
+    void testCloneWithDistributionManagement() throws Exception {
 
         File f = getFileForClasspathResource("distributionManagement-pom.xml");
         MavenProject projectToClone = getProject(f);
@@ -159,7 +159,7 @@ public class MavenProjectTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testCloneWithActiveProfile() throws Exception {
+    void testCloneWithActiveProfile() throws Exception {
 
         File f = getFileForClasspathResource("withActiveByDefaultProfile-pom.xml");
         MavenProject projectToClone = getProject(f);
@@ -180,7 +180,7 @@ public class MavenProjectTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testCloneWithBaseDir() throws Exception {
+    void testCloneWithBaseDir() throws Exception {
         File f = getFileForClasspathResource("canonical-pom.xml");
         MavenProject projectToClone = getProject(f);
         projectToClone.setPomFile(new File(new File(f.getParentFile(), "target"), "flattened.xml"));
@@ -191,7 +191,7 @@ public class MavenProjectTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testUndefinedOutputDirectory() throws Exception {
+    void testUndefinedOutputDirectory() throws Exception {
         MavenProject p = new MavenProject();
         assertNoNulls(p.getCompileClasspathElements());
         assertNoNulls(p.getSystemClasspathElements());
@@ -200,7 +200,7 @@ public class MavenProjectTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testAddDotFile() {
+    void testAddDotFile() {
         MavenProject project = new MavenProject();
 
         File basedir = new File(System.getProperty("java.io.tmpdir"));

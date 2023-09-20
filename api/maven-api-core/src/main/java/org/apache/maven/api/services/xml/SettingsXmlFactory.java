@@ -24,7 +24,7 @@ import org.apache.maven.api.settings.Settings;
 /**
  * Reads and writes a {@link Settings} object to/from XML.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface SettingsXmlFactory extends XmlFactory<Settings> {}

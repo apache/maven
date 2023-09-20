@@ -25,7 +25,6 @@ import org.apache.maven.model.Model;
  * or a simple string message. In addition, a problem carries a hint about its source, e.g. the POM file that exhibits
  * the problem.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultModelProblem implements ModelProblem {
 

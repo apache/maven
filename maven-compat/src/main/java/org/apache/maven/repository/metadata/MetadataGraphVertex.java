@@ -23,8 +23,8 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
 /**
  * metadata graph vertice - just a wrapper around artifact's metadata
  *
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  */
+@Deprecated
 public class MetadataGraphVertex implements Comparable<MetadataGraphVertex> {
     ArtifactMetadata md;
 

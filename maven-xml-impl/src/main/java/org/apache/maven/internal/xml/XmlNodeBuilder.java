@@ -18,6 +18,9 @@
  */
 package org.apache.maven.internal.xml;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -26,20 +29,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ctc.wstx.stax.WstxInputFactory;
 import org.apache.maven.api.xml.XmlNode;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- *
+ * All methods in this class attempt to fully parse the XML.
+ * The caller is responsible for closing {@code InputStream} and {@code Reader} arguments.
  */
 public class XmlNodeBuilder {
     private static final boolean DEFAULT_TRIM = true;
 
     public static XmlNodeImpl build(Reader reader) throws XmlPullParserException, IOException {
-        return build(reader, null);
+        return build(reader, (InputLocationBuilder) null);
     }
 
     /**
@@ -61,18 +65,9 @@ public class XmlNodeBuilder {
 
     public static XmlNodeImpl build(InputStream is, String encoding, boolean trim)
             throws XmlPullParserException, IOException {
-        try {
-            final XmlPullParser parser = new MXParser();
-            parser.setInput(is, encoding);
-
-            final XmlNodeImpl node = build(parser, trim);
-            is.close();
-            is = null;
-
-            return node;
-        } finally {
-            IOUtil.close(is);
-        }
+        XmlPullParser parser = new MXParser();
+        parser.setInput(is, encoding);
+        return build(parser, trim);
     }
 
     public static XmlNodeImpl build(Reader reader, boolean trim) throws XmlPullParserException, IOException {
@@ -90,18 +85,9 @@ public class XmlNodeBuilder {
      */
     public static XmlNodeImpl build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
-        try {
-            final XmlPullParser parser = new MXParser();
-            parser.setInput(reader);
-
-            final XmlNodeImpl node = build(parser, trim, locationBuilder);
-            reader.close();
-            reader = null;
-
-            return node;
-        } finally {
-            IOUtil.close(reader);
-        }
+        XmlPullParser parser = new MXParser();
+        parser.setInput(reader);
+        return build(parser, trim, locationBuilder);
     }
 
     public static XmlNodeImpl build(XmlPullParser parser) throws XmlPullParserException, IOException {
@@ -173,6 +159,90 @@ public class XmlNodeBuilder {
         throw new IllegalStateException("End of document found before returning to 0 depth");
     }
 
+    public static XmlNodeImpl build(Reader reader, InputLocationBuilderStax locationBuilder) throws XMLStreamException {
+        XMLStreamReader parser = WstxInputFactory.newFactory().createXMLStreamReader(reader);
+        return build(parser, DEFAULT_TRIM, locationBuilder);
+    }
+
+    public static XmlNodeImpl build(XMLStreamReader parser) throws XMLStreamException {
+        return build(parser, DEFAULT_TRIM, null);
+    }
+
+    public static XmlNodeImpl build(XMLStreamReader parser, InputLocationBuilderStax locationBuilder)
+            throws XMLStreamException {
+        return build(parser, DEFAULT_TRIM, locationBuilder);
+    }
+
+    public static XmlNodeImpl build(XMLStreamReader parser, boolean trim, InputLocationBuilderStax locationBuilder)
+            throws XMLStreamException {
+        boolean spacePreserve = false;
+        String name = null;
+        String value = null;
+        Object location = null;
+        Map<String, String> attrs = null;
+        List<XmlNode> children = null;
+        int eventType = parser.getEventType();
+        int lastStartTag = -1;
+        while (eventType != XMLStreamReader.END_DOCUMENT) {
+            if (eventType == XMLStreamReader.START_ELEMENT) {
+                lastStartTag = parser.getLocation().getLineNumber() * 1000
+                        + parser.getLocation().getColumnNumber();
+                if (name == null) {
+                    int namespacesSize = parser.getNamespaceCount();
+                    name = parser.getLocalName();
+                    String pfx = parser.getPrefix();
+                    if (pfx != null && !pfx.isEmpty()) {
+                        name = pfx + ":" + name;
+                    }
+                    location = locationBuilder != null ? locationBuilder.toInputLocation(parser) : null;
+                    int attributesSize = parser.getAttributeCount();
+                    if (attributesSize > 0 || namespacesSize > 0) {
+                        attrs = new HashMap<>();
+                        for (int i = 0; i < namespacesSize; i++) {
+                            String prefix = parser.getNamespacePrefix(i);
+                            String namespace = parser.getNamespaceURI(i);
+                            attrs.put("xmlns:" + prefix, namespace);
+                        }
+                        for (int i = 0; i < attributesSize; i++) {
+                            String aname = parser.getAttributeLocalName(i);
+                            String avalue = parser.getAttributeValue(i);
+                            String apfx = parser.getAttributePrefix(i);
+                            if (apfx != null && !apfx.isEmpty()) {
+                                aname = apfx + ":" + aname;
+                            }
+                            attrs.put(aname, avalue);
+                            spacePreserve = spacePreserve || ("xml:space".equals(aname) && "preserve".equals(avalue));
+                        }
+                    }
+                } else {
+                    if (children == null) {
+                        children = new ArrayList<>();
+                    }
+                    XmlNode child = build(parser, trim, locationBuilder);
+                    children.add(child);
+                }
+            } else if (eventType == XMLStreamReader.CHARACTERS || eventType == XMLStreamReader.CDATA) {
+                String text = parser.getText();
+                value = value != null ? value + text : text;
+            } else if (eventType == XMLStreamReader.END_ELEMENT) {
+                boolean emptyTag = lastStartTag
+                        == parser.getLocation().getLineNumber() * 1000
+                                + parser.getLocation().getColumnNumber();
+                if (value != null && trim && !spacePreserve) {
+                    value = value.trim();
+                }
+                return new XmlNodeImpl(
+                        name,
+                        children == null ? (value != null ? value : emptyTag ? null : "") : null,
+                        attrs,
+                        children,
+                        location);
+            }
+            eventType = parser.next();
+        }
+        throw new IllegalStateException("End of document found before returning to 0 depth");
+    }
+
     /**
      * Input location builder interface, to be implemented to choose how to store data.
      *
@@ -180,5 +250,9 @@ public class XmlNodeBuilder {
      */
     public interface InputLocationBuilder {
         Object toInputLocation(XmlPullParser parser);
+    }
+
+    public interface InputLocationBuilderStax {
+        Object toInputLocation(XMLStreamReader parser);
     }
 }

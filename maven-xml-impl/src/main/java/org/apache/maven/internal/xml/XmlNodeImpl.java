@@ -225,14 +225,14 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
             String value = dominant.getValue();
             Object location = dominant.getInputLocation();
-            Map<String, String> attrs = null;
+            Map<String, String> attrs = dominant.getAttributes();
             List<XmlNode> children = null;
 
             for (Map.Entry<String, String> attr : recessive.getAttributes().entrySet()) {
                 String key = attr.getKey();
-                if (isEmpty(dominant.getAttribute(key)) && !SELF_COMBINATION_MODE_ATTRIBUTE.equals(key)) {
-                    if (attrs == null) {
-                        attrs = new HashMap<>();
+                if (isEmpty(attrs.get(key))) {
+                    if (attrs == dominant.getAttributes()) {
+                        attrs = new HashMap<>(attrs);
                     }
                     attrs.put(key, attr.getValue());
                 }
@@ -243,9 +243,21 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                 if (childMergeOverride != null) {
                     mergeChildren = childMergeOverride;
                 } else {
-                    String childMergeMode = dominant.getAttribute(CHILDREN_COMBINATION_MODE_ATTRIBUTE);
+                    String childMergeMode = attrs.get(CHILDREN_COMBINATION_MODE_ATTRIBUTE);
                     if (CHILDREN_COMBINATION_APPEND.equals(childMergeMode)) {
                         mergeChildren = false;
+                    }
+                }
+
+                Map<String, Iterator<XmlNode>> commonChildren = new HashMap<>();
+                Set<String> names =
+                        recessive.getChildren().stream().map(XmlNode::getName).collect(Collectors.toSet());
+                for (String name : names) {
+                    List<XmlNode> dominantChildren = dominant.getChildren().stream()
+                            .filter(n -> n.getName().equals(name))
+                            .collect(Collectors.toList());
+                    if (dominantChildren.size() > 0) {
+                        commonChildren.put(name, dominantChildren.iterator());
                     }
                 }
 
@@ -285,19 +297,6 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                     }
 
                     if (mergeChildren && childDom != null) {
-                        Map<String, Iterator<XmlNode>> commonChildren = new HashMap<>();
-                        Set<String> names = recessive.getChildren().stream()
-                                .map(XmlNode::getName)
-                                .collect(Collectors.toSet());
-                        for (String name : names) {
-                            List<XmlNode> dominantChildren = dominant.getChildren().stream()
-                                    .filter(n -> n.getName().equals(name))
-                                    .collect(Collectors.toList());
-                            if (dominantChildren.size() > 0) {
-                                commonChildren.put(name, dominantChildren.iterator());
-                            }
-                        }
-
                         String name = recessiveChild.getName();
                         Iterator<XmlNode> it =
                                 commonChildren.computeIfAbsent(name, n1 -> Stream.of(dominant.getChildren().stream()
@@ -345,14 +344,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                 }
             }
 
-            if (value != null || attrs != null || children != null) {
-                if (attrs != null) {
-                    Map<String, String> nattrs = attrs;
-                    attrs = new HashMap<>(dominant.getAttributes());
-                    attrs.putAll(nattrs);
-                } else {
-                    attrs = dominant.getAttributes();
-                }
+            if (value != null || attrs != dominant.getAttributes() || children != null) {
                 if (children == null) {
                     children = dominant.getChildren();
                 }

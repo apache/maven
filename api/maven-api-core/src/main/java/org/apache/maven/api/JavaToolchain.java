@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * A specific {@link Toolchain} dedicated for Java.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface JavaToolchain extends Toolchain {

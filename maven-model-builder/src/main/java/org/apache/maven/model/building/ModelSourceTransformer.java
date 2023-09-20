@@ -18,19 +18,16 @@
  */
 package org.apache.maven.model.building;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.apache.maven.model.Model;
 
 /**
  * The ModelSourceTransformer is a way to transform the local pom while streaming the input.
  *
- * The {@link #transform(XmlPullParser, Path, TransformerContext)} method uses a Path on purpose, to ensure the
+ * The {@link #transform(Path, TransformerContext, Model)} method uses a Path on purpose, to ensure the
  * local pom is the original source.
  *
- * @author Robert Scholte
- * @author Guillaume Nodet
  * @since 4.0.0
  */
 public interface ModelSourceTransformer {
@@ -38,10 +35,8 @@ public interface ModelSourceTransformer {
      *
      * @param pomFile the pom file, cannot be null
      * @param context the context, cannot be null
-     * @return the InputStream for the ModelReader
-     * @throws IOException if an I/O error occurs
+     * @param  model the model to transform
      * @throws TransformerException if the transformation fails
      */
-    XmlPullParser transform(XmlPullParser parser, Path pomFile, TransformerContext context)
-            throws IOException, TransformerException;
+    void transform(Path pomFile, TransformerContext context, Model model) throws TransformerException;
 }

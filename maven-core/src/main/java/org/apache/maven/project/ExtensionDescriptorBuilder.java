@@ -18,25 +18,25 @@
  */
 package org.apache.maven.project;
 
-import java.io.BufferedInputStream;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import com.ctc.wstx.stax.WstxInputFactory;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.XmlNodeBuilder;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Creates an extension descriptor from some XML stream.
  *
- * @author Benjamin Bentmann
  */
 public class ExtensionDescriptorBuilder {
 
@@ -71,7 +71,7 @@ public class ExtensionDescriptorBuilder {
             File pluginXml = new File(extensionJar, getExtensionDescriptorLocation());
 
             if (pluginXml.canRead()) {
-                try (InputStream is = new BufferedInputStream(new FileInputStream(pluginXml))) {
+                try (InputStream is = Files.newInputStream(pluginXml.toPath())) {
                     extensionDescriptor = build(is);
                 }
             }
@@ -88,8 +88,9 @@ public class ExtensionDescriptorBuilder {
 
         XmlNode dom;
         try {
-            dom = XmlNodeBuilder.build(ReaderFactory.newXmlReader(is));
-        } catch (XmlPullParserException e) {
+            XMLStreamReader reader = WstxInputFactory.newFactory().createXMLStreamReader(is);
+            dom = XmlNodeBuilder.build(reader);
+        } catch (XMLStreamException e) {
             throw new IOException(e.getMessage(), e);
         }
 

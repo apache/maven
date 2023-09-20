@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * The Exception class throw by the {@link ToolchainManager}.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class ToolchainManagerException extends MavenException {

@@ -21,8 +21,6 @@ package org.apache.maven.toolchain;
 /**
  * Toolchain interface.
  *
- * @author Milos Kleint
- * @author Jason van Zyl
  * @since 2.0.9
  */
 public interface Toolchain {

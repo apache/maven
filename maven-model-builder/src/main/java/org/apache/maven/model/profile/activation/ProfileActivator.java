@@ -25,7 +25,6 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 /**
  * Determines whether a profile should be activated.
  *
- * @author Benjamin Bentmann
  */
 public interface ProfileActivator {
 

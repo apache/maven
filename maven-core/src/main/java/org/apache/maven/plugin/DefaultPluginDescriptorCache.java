@@ -46,7 +46,6 @@ import org.eclipse.aether.repository.WorkspaceRepository;
  * prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

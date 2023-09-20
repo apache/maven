@@ -24,27 +24,17 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.feature.Features;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -69,10 +59,10 @@ import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.building.TransformerContextBuilder;
 import org.apache.maven.model.resolution.ModelResolver;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.codehaus.plexus.util.Os;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
@@ -91,6 +81,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultProjectBuilder implements ProjectBuilder {
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ModelBuilder modelBuilder;
     private final ModelProcessor modelProcessor;
@@ -100,6 +91,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     private final RemoteRepositoryManager repositoryManager;
     private final ProjectDependenciesResolver dependencyResolver;
     private final ModelCacheFactory modelCacheFactory;
+
+    private final RootLocator rootLocator;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -111,7 +104,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             RepositorySystem repoSystem,
             RemoteRepositoryManager repositoryManager,
             ProjectDependenciesResolver dependencyResolver,
-            ModelCacheFactory modelCacheFactory) {
+            ModelCacheFactory modelCacheFactory,
+            RootLocator rootLocator) {
         this.modelBuilder = modelBuilder;
         this.modelProcessor = modelProcessor;
         this.projectBuildingHelper = projectBuildingHelper;
@@ -120,6 +114,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         this.repositoryManager = repositoryManager;
         this.dependencyResolver = dependencyResolver;
         this.modelCacheFactory = modelCacheFactory;
+        this.rootLocator = rootLocator;
     }
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
@@ -127,7 +122,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
     @Override
     public ProjectBuildingResult build(File pomFile, ProjectBuildingRequest request) throws ProjectBuildingException {
-        return build(pomFile, new FileModelSource(pomFile), new InternalConfig(request, null, null));
+        InternalConfig config = new InternalConfig(request, null, modelBuilder.newTransformerContextBuilder());
+        return build(pomFile, new FileModelSource(pomFile), config);
     }
 
     @Override
@@ -156,11 +152,17 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
                 DefaultModelBuildingListener listener =
                         new DefaultModelBuildingListener(project, projectBuildingHelper, projectBuildingRequest);
+
                 request.setModelBuildingListener(listener);
 
                 request.setPomFile(pomFile);
                 request.setModelSource(modelSource);
                 request.setLocationTracking(true);
+
+                if (pomFile != null) {
+                    project.setRootDirectory(
+                            rootLocator.findRoot(pomFile.getParentFile().toPath()));
+                }
 
                 ModelBuildingResult result;
                 try {
@@ -268,6 +270,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             request.setModelCache(modelCacheFactory.createCache(config.session));
         }
         request.setTransformerContextBuilder(config.transformerContextBuilder);
+        DefaultSession session = (DefaultSession) config.session.getData().get(DefaultSession.class);
+        if (session != null) {
+            try {
+                request.setRootDirectory(session.getRootDirectory());
+            } catch (IllegalStateException e) {
+                // can happen if root directory cannot be found, just ignore
+            }
+        }
 
         return request;
     }
@@ -381,7 +391,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             Thread.currentThread().setContextClassLoader(oldContextClassLoader);
         }
 
-        if (Features.buildConsumer(request.getUserProperties()).isActive()) {
+        if (Features.buildConsumer(request.getUserProperties())) {
             request.getRepositorySession()
                     .getData()
                     .set(TransformerContext.KEY, config.transformerContextBuilder.build());
@@ -445,6 +455,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         MavenProject project = new MavenProject();
         project.setFile(pomFile);
 
+        project.setRootDirectory(rootLocator.findRoot(pomFile.getParentFile().toPath()));
+
         ModelBuildingRequest request = getModelBuildingRequest(config)
                 .setPomFile(pomFile)
                 .setTwoPhaseBuilding(true)
@@ -469,7 +481,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             noErrors = false;
         }
 
-        Model model = result.getFileModel();
+        Model model = request.getFileModel();
 
         poolBuilder.put(model.getPomFile().toPath(), model);
 
@@ -480,21 +492,17 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             File basedir = pomFile.getParentFile();
             List<File> moduleFiles = new ArrayList<>();
             for (String module : model.getModules()) {
-                if (StringUtils.isEmpty(module)) {
+                if (module == null || module.isEmpty()) {
                     continue;
                 }
 
                 module = module.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-                File moduleFile = new File(basedir, module);
+                File moduleFile = modelProcessor.locateExistingPom(new File(basedir, module));
 
-                if (moduleFile.isDirectory()) {
-                    moduleFile = modelProcessor.locatePom(moduleFile);
-                }
-
-                if (!moduleFile.isFile()) {
+                if (moduleFile == null) {
                     ModelProblem problem = new DefaultModelProblem(
-                            "Child module " + moduleFile + " of " + pomFile + " does not exist",
+                            "Child module " + module + " of " + pomFile + " does not exist",
                             ModelProblem.Severity.ERROR,
                             ModelProblem.Version.BASE,
                             model,
@@ -730,7 +738,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         if (extensions != null) {
             for (Extension ext : extensions) {
                 String version;
-                if (StringUtils.isEmpty(ext.getVersion())) {
+                if (ext.getVersion() == null || ext.getVersion().isEmpty()) {
                     version = "RELEASE";
                 } else {
                     version = ext.getVersion();
@@ -812,7 +820,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 && project.getDistributionManagement().getRepository() != null) {
             try {
                 DeploymentRepository r = project.getDistributionManagement().getRepository();
-                if (!StringUtils.isEmpty(r.getId()) && !StringUtils.isEmpty(r.getUrl())) {
+                if (r.getId() != null
+                        && !r.getId().isEmpty()
+                        && r.getUrl() != null
+                        && !r.getUrl().isEmpty()) {
                     ArtifactRepository repo = MavenRepositorySystem.buildArtifactRepository(r);
                     repositorySystem.injectProxy(projectBuildingRequest.getRepositorySession(), Arrays.asList(repo));
                     repositorySystem.injectAuthentication(
@@ -830,7 +841,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 && project.getDistributionManagement().getSnapshotRepository() != null) {
             try {
                 DeploymentRepository r = project.getDistributionManagement().getSnapshotRepository();
-                if (!StringUtils.isEmpty(r.getId()) && !StringUtils.isEmpty(r.getUrl())) {
+                if (r.getId() != null
+                        && !r.getId().isEmpty()
+                        && r.getUrl() != null
+                        && !r.getUrl().isEmpty()) {
                     ArtifactRepository repo = MavenRepositorySystem.buildArtifactRepository(r);
                     repositorySystem.injectProxy(projectBuildingRequest.getRepositorySession(), Arrays.asList(repo));
                     repositorySystem.injectAuthentication(
@@ -959,8 +973,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             this.modelPool = modelPool;
             this.transformerContextBuilder = transformerContextBuilder;
 
-            session = LegacyLocalRepositoryManager.overlay(
-                    request.getLocalRepository(), request.getRepositorySession(), repoSystem);
+            session = RepositoryUtils.overlay(request.getLocalRepository(), request.getRepositorySession(), repoSystem);
             repositories = RepositoryUtils.toRepos(request.getRemoteRepositories());
         }
     }

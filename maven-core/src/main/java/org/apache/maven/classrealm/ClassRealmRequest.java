@@ -24,7 +24,6 @@ import java.util.Map;
 /**
  * Describes the requirements for a new class realm.
  *
- * @author Benjamin Bentmann
  */
 public interface ClassRealmRequest {
 

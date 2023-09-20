@@ -19,7 +19,6 @@
 package org.apache.maven.internal.impl;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
@@ -150,7 +149,17 @@ public class DefaultSession extends AbstractSession {
     @Nonnull
     @Override
     public Path getExecutionRootDirectory() {
-        return Paths.get(mavenSession.getRequest().getBaseDirectory());
+        return getTopDirectory();
+    }
+
+    @Override
+    public Path getRootDirectory() {
+        return mavenSession.getRequest().getRootDirectory();
+    }
+
+    @Override
+    public Path getTopDirectory() {
+        return mavenSession.getRequest().getTopDirectory();
     }
 
     @Nonnull

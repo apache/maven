@@ -35,7 +35,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable
@@ -89,7 +89,7 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
                 .version(dependency.getVersion().asString())
                 .classifier(dependency.getClassifier())
                 .extension(dependency.getExtension())
-                .type(dependency.getType().getName())
+                .type(dependency.getType().getId())
                 .scope(dependency.getScope().id())
                 .optional(dependency.isOptional())
                 .build();

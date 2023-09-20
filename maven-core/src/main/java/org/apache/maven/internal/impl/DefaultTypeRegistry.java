@@ -52,7 +52,7 @@ public class DefaultTypeRegistry implements TypeRegistry {
         boolean addedToClasspath = handler.isAddedToClasspath();
         return new Type() {
             @Override
-            public String getName() {
+            public String getId() {
                 return id;
             }
 

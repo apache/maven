@@ -27,7 +27,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * An XML writer request.
  *
- * @since 4.0
+ * @since 4.0.0
  * @param <T> the object type to read
  */
 @Experimental

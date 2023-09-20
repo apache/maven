@@ -25,7 +25,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles injection of plugin management into the model.
  *
- * @author Benjamin Bentmann
  */
 public interface PluginManagementInjector {
 

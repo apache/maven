@@ -34,7 +34,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * @author Kristian Rosenvold
  */
 public class DefaultLifecyclesStub {
     public static DefaultLifecycles createDefaultLifecycles() throws ComponentLookupException {

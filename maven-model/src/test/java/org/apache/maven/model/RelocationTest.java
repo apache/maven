@@ -27,30 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code Relocation}.
  *
- * @author Benjamin Bentmann
  */
-public class RelocationTest {
+class RelocationTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new Relocation().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new Relocation().equals(null));
 
         new Relocation().equals(new Relocation());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         Relocation thing = new Relocation();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new Relocation().toString());
     }
 }

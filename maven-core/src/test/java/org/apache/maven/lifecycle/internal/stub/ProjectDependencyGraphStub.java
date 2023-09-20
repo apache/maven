@@ -55,7 +55,6 @@ import org.apache.maven.project.MavenProject;
  * Z depends on C
  * </p>
  *
- * @author Kristian Rosenvold
  */
 public class ProjectDependencyGraphStub implements ProjectDependencyGraph {
     public static final MavenProject A = new MavenProject();

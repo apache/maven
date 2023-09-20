@@ -31,18 +31,18 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class DefaultBuildResumptionAnalyzerTest {
+class DefaultBuildResumptionAnalyzerTest {
     private final DefaultBuildResumptionAnalyzer analyzer = new DefaultBuildResumptionAnalyzer();
 
     private MavenExecutionResult executionResult;
 
     @BeforeEach
-    public void before() {
+    void before() {
         executionResult = new DefaultMavenExecutionResult();
     }
 
     @Test
-    public void resumeFromGetsDetermined() {
+    void resumeFromGetsDetermined() {
         MavenProject projectA = createSucceededMavenProject("A");
         MavenProject projectB = createFailedMavenProject("B");
         executionResult.setTopologicallySortedProjects(asList(projectA, projectB));
@@ -54,7 +54,7 @@ public class DefaultBuildResumptionAnalyzerTest {
     }
 
     @Test
-    public void resumeFromIsIgnoredWhenFirstProjectFails() {
+    void resumeFromIsIgnoredWhenFirstProjectFails() {
         MavenProject projectA = createFailedMavenProject("A");
         MavenProject projectB = createMavenProject("B");
         executionResult.setTopologicallySortedProjects(asList(projectA, projectB));
@@ -65,7 +65,7 @@ public class DefaultBuildResumptionAnalyzerTest {
     }
 
     @Test
-    public void projectsSucceedingAfterFailedProjectsAreExcluded() {
+    void projectsSucceedingAfterFailedProjectsAreExcluded() {
         MavenProject projectA = createSucceededMavenProject("A");
         MavenProject projectB = createFailedMavenProject("B");
         MavenProject projectC = createSucceededMavenProject("C");
@@ -78,7 +78,7 @@ public class DefaultBuildResumptionAnalyzerTest {
     }
 
     @Test
-    public void projectsDependingOnFailedProjectsAreNotExcluded() {
+    void projectsDependingOnFailedProjectsAreNotExcluded() {
         MavenProject projectA = createSucceededMavenProject("A");
         MavenProject projectB = createFailedMavenProject("B");
         MavenProject projectC = createSkippedMavenProject("C");
@@ -92,7 +92,7 @@ public class DefaultBuildResumptionAnalyzerTest {
     }
 
     @Test
-    public void projectsFailingAfterAnotherFailedProjectAreNotExcluded() {
+    void projectsFailingAfterAnotherFailedProjectAreNotExcluded() {
         MavenProject projectA = createSucceededMavenProject("A");
         MavenProject projectB = createFailedMavenProject("B");
         MavenProject projectC = createSucceededMavenProject("C");

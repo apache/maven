@@ -28,9 +28,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  *
  *
- * @author Oleg Gusakov
  *
  */
+@Deprecated
 public class MetadataResolutionRequest {
     private MavenArtifactMetadata mad;
 

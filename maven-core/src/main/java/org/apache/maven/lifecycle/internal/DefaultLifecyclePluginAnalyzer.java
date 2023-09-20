@@ -42,7 +42,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,10 +52,6 @@ import static java.util.Objects.requireNonNull;
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Jason van Zyl
- * @author jdcasey
- * @author Kristian Rosenvold (extracted class only)
  */
 @Singleton
 @Named
@@ -212,7 +207,7 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
     private GoalSpec parseGoalSpec(String goalSpec) {
         GoalSpec gs = new GoalSpec();
 
-        String[] p = StringUtils.split(goalSpec.trim(), ":");
+        String[] p = goalSpec.trim().split(":");
 
         if (p.length == 3) {
             // <groupId>:<artifactId>:<goal>

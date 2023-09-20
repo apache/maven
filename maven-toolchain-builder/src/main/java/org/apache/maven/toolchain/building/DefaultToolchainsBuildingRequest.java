@@ -23,7 +23,6 @@ import org.apache.maven.building.Source;
 /**
  * Collects toolchains that control building of effective toolchains.
  *
- * @author Robert Scholte
  * @since 3.3.0
  */
 public class DefaultToolchainsBuildingRequest implements ToolchainsBuildingRequest {

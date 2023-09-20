@@ -1,0 +1,9 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+
+    <parent>
+        <groupId>org.apache.maven.ut</groupId>
+        <artifactId>parent</artifactId>
+    </parent>
+    <artifactId>dep</artifactId>
+
+</project>

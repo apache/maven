@@ -18,9 +18,18 @@
  */
 package org.apache.maven.repository.legacy;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,12 +55,9 @@ import org.apache.maven.wagon.observers.ChecksumObserver;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.util.ConfigUtils;
 
@@ -62,7 +68,9 @@ import org.eclipse.aether.util.ConfigUtils;
 /**
  * Manages <a href="https://maven.apache.org/wagon">Wagon</a> related operations in Maven.
  */
-@Component(role = WagonManager.class)
+@Named
+@Singleton
+@Deprecated
 public class DefaultWagonManager implements WagonManager {
 
     private static final String[] CHECKSUM_IDS = {"md5", "sha1"};
@@ -72,16 +80,16 @@ public class DefaultWagonManager implements WagonManager {
      */
     private static final String[] CHECKSUM_ALGORITHMS = {"MD5", "SHA-1"};
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
-    @Requirement
+    @Inject
     private UpdateCheckManager updateCheckManager;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
     //
@@ -449,7 +457,11 @@ public class DefaultWagonManager implements WagonManager {
             // then we will use a brute force copy and delete the temporary file.
             if (!temp.renameTo(destination)) {
                 try {
-                    FileUtils.copyFile(temp, destination);
+                    Files.copy(
+                            temp.toPath(),
+                            destination.toPath(),
+                            StandardCopyOption.REPLACE_EXISTING,
+                            StandardCopyOption.COPY_ATTRIBUTES);
 
                     if (!temp.delete()) {
                         temp.deleteOnExit();
@@ -529,7 +541,9 @@ public class DefaultWagonManager implements WagonManager {
                 // TODO shouldn't need a file intermediary - improve wagon to take a stream
                 File temp = File.createTempFile("maven-artifact", null);
                 temp.deleteOnExit();
-                FileUtils.fileWrite(temp.getAbsolutePath(), "UTF-8", sums.get(extension));
+                byte[] bytes = sums.get(extension).getBytes(StandardCharsets.UTF_8);
+                Files.write(
+                        Paths.get(temp.getAbsolutePath()), bytes, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
 
                 temporaryFiles.add(temp);
                 wagon.put(temp, remotePath + "." + extension);
@@ -608,8 +622,8 @@ public class DefaultWagonManager implements WagonManager {
             File tempChecksumFile = new File(tempDestination + checksumFileExtension + ".tmp");
             tempChecksumFile.deleteOnExit();
             wagon.get(remotePath + checksumFileExtension, tempChecksumFile);
-
-            String expectedChecksum = FileUtils.fileRead(tempChecksumFile, "UTF-8");
+            byte[] bytes = Files.readAllBytes(tempChecksumFile.toPath());
+            String expectedChecksum = new String(bytes, StandardCharsets.UTF_8);
 
             // remove whitespaces at the end
             expectedChecksum = expectedChecksum.trim();
@@ -632,7 +646,12 @@ public class DefaultWagonManager implements WagonManager {
                 if (checksumFile.exists()) {
                     checksumFile.delete(); // ignore if failed as we will overwrite
                 }
-                FileUtils.copyFile(tempChecksumFile, checksumFile);
+                Files.copy(
+                        tempChecksumFile.toPath(),
+                        checksumFile.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING,
+                        StandardCopyOption.COPY_ATTRIBUTES);
+
                 if (!tempChecksumFile.delete()) {
                     tempChecksumFile.deleteOnExit();
                 }

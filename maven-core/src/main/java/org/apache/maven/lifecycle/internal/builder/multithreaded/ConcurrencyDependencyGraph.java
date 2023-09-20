@@ -36,7 +36,6 @@ import org.apache.maven.project.MavenProject;
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Kristian Rosenvold
  */
 public class ConcurrencyDependencyGraph {
 
@@ -68,6 +67,10 @@ public class ConcurrencyDependencyGraph {
                     .isEmpty()) {
                 result.add(projectBuild.getProject());
             }
+        }
+        if (result.isEmpty() && projectBuilds.size() > 0) {
+            // Must return at least one project
+            result.add(projectBuilds.get(0).getProject());
         }
         return new ArrayList<>(result);
     }

@@ -23,7 +23,6 @@ import java.io.File;
 /**
  * Exception that occurs when the project list contains duplicate projects instead of ignoring one.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class DuplicateProjectException extends Exception {
     private final String projectId;
@@ -35,6 +34,7 @@ public class DuplicateProjectException extends Exception {
     /**
      * @deprecated use {@link #DuplicateProjectException(String, File, File, String)}
      */
+    @Deprecated
     public DuplicateProjectException(String message) {
         this(null, null, null, message);
     }
@@ -42,6 +42,7 @@ public class DuplicateProjectException extends Exception {
     /**
      * @deprecated use {@link #DuplicateProjectException(String, File, File, String)}
      */
+    @Deprecated
     public DuplicateProjectException(String message, Exception e) {
         super(message, e);
         this.projectId = null;

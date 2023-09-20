@@ -40,10 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test cases for the default {@code ModelResolver} implementation.
  *
- * @author Christian Schulte
  * @since 3.5.0
  */
-public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
+final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
 
     /**
      * Creates a new {@code DefaultModelResolverTest} instance.
@@ -53,7 +52,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Parent parent = Parent.newBuilder()
                 .groupId("ut.simple")
                 .artifactId("artifact")
@@ -65,11 +64,11 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
                 () -> newModelResolver().resolveModel(parent, new AtomicReference<>()),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertNotNull(e.getMessage());
-        assertTrue(e.getMessage().startsWith("Could not find artifact ut.simple:artifact:pom:0 in repo"));
+        assertTrue(e.getMessage().contains("Could not find artifact ut.simple:artifact:pom:0 in repo"));
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Parent parent = Parent.newBuilder()
                 .groupId("ut.simple")
                 .artifactId("artifact")
@@ -85,7 +84,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Parent parent = Parent.newBuilder()
                 .groupId("ut.simple")
                 .artifactId("artifact")
@@ -100,7 +99,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
+    void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
         final Parent parent = Parent.newBuilder()
                 .groupId("ut.simple")
                 .artifactId("artifact")
@@ -112,7 +111,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
+    void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
         final Parent parent = Parent.newBuilder()
                 .groupId("ut.simple")
                 .artifactId("artifact")
@@ -126,7 +125,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Dependency dependency = Dependency.newBuilder()
                 .groupId("ut.simple")
                 .artifactId("artifact")
@@ -138,11 +137,11 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
                 () -> newModelResolver().resolveModel(dependency, new AtomicReference<>()),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertNotNull(e.getMessage());
-        assertTrue(e.getMessage().startsWith("Could not find artifact ut.simple:artifact:pom:0 in repo"));
+        assertTrue(e.getMessage().contains("Could not find artifact ut.simple:artifact:pom:0 in repo"));
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Dependency dependency = Dependency.newBuilder()
                 .groupId("ut.simple")
                 .artifactId("artifact")
@@ -157,8 +156,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound()
-            throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Dependency dependency = Dependency.newBuilder()
                 .groupId("ut.simple")
                 .artifactId("artifact")
@@ -173,7 +171,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
+    void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
         final Dependency dependency = Dependency.newBuilder()
                 .groupId("ut.simple")
                 .artifactId("artifact")
@@ -185,7 +183,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
+    void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
         final Dependency dependency = Dependency.newBuilder()
                 .groupId("ut.simple")
                 .artifactId("artifact")

@@ -18,6 +18,8 @@
  */
 package org.apache.maven.internal.impl;
 
+import javax.annotation.Priority;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -27,32 +29,35 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.shared.utils.logging.MessageUtils;
 
 @Experimental
 @Named
 @Singleton
+@Priority(-1)
 public class DefaultMessageBuilderFactory implements MessageBuilderFactory {
+
+    @Inject
+    public DefaultMessageBuilderFactory() {}
 
     @Override
     public boolean isColorEnabled() {
-        return MessageUtils.isColorEnabled();
+        return false;
     }
 
     @Override
     public int getTerminalWidth() {
-        return MessageUtils.getTerminalWidth();
+        return -1;
     }
 
     @Override
     @Nonnull
     public MessageBuilder builder() {
-        return new DefaultMessageBuilder(MessageUtils.buffer());
+        return new DefaultMessageBuilder();
     }
 
     @Override
     @Nonnull
     public MessageBuilder builder(@Nonnull StringBuilder stringBuilder) {
-        return new DefaultMessageBuilder(MessageUtils.buffer(Objects.requireNonNull(stringBuilder)));
+        return new DefaultMessageBuilder(Objects.requireNonNull(stringBuilder));
     }
 }

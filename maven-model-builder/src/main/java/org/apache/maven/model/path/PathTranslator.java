@@ -23,7 +23,6 @@ import java.io.File;
 /**
  * Resolves relative paths against a specific base directory.
  *
- * @author Jason van Zyl
  */
 public interface PathTranslator {
 

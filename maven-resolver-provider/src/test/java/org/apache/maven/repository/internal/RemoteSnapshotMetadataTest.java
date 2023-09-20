@@ -25,6 +25,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -34,17 +35,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RemoteSnapshotMetadataTest {
+class RemoteSnapshotMetadataTest {
     private Locale defaultLocale;
 
+    private static final Pattern DATE_FILTER = Pattern.compile("\\..*");
+
     @BeforeEach
-    public void setLocaleToUseBuddhistCalendar() {
+    void setLocaleToUseBuddhistCalendar() {
         defaultLocale = Locale.getDefault();
         Locale.setDefault(new Locale("th", "TH"));
     }
 
     @AfterEach
-    public void restoreLocale() {
+    void restoreLocale() {
         Locale.setDefault(defaultLocale);
     }
 
@@ -56,17 +59,16 @@ public class RemoteSnapshotMetadataTest {
     }
 
     @Test
-    public void gregorianCalendarIsUsed() {
+    void gregorianCalendarIsUsed() {
         String dateBefore = gregorianDate();
 
-        RemoteSnapshotMetadata metadata =
-                new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), false, new Date());
+        RemoteSnapshotMetadata metadata = new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), new Date());
         metadata.merge(new Metadata());
 
         String dateAfter = gregorianDate();
 
         String ts = metadata.metadata.getVersioning().getSnapshot().getTimestamp();
-        String datePart = ts.replaceAll("\\..*", "");
+        String datePart = DATE_FILTER.matcher(ts).replaceAll("");
 
         /* Allow for this test running across midnight */
         Set<String> expected = new HashSet<>(Arrays.asList(dateBefore, dateAfter));

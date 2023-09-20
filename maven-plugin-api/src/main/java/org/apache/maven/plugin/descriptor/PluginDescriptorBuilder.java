@@ -18,22 +18,24 @@
  */
 package org.apache.maven.plugin.descriptor;
 
-import java.io.IOException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.ctc.wstx.stax.WstxInputFactory;
 import org.apache.maven.internal.xml.XmlNodeBuilder;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * @author Jason van Zyl
  */
 public class PluginDescriptorBuilder {
     public PluginDescriptor build(Reader reader) throws PlexusConfigurationException {
@@ -42,6 +44,10 @@ public class PluginDescriptorBuilder {
 
     public PluginDescriptor build(Reader reader, String source) throws PlexusConfigurationException {
         return build(source, buildConfiguration(reader));
+    }
+
+    public PluginDescriptor build(InputStream input, String source) throws PlexusConfigurationException {
+        return build(source, buildConfiguration(input));
     }
 
     private PluginDescriptor build(String source, PlexusConfiguration c) throws PlexusConfigurationException {
@@ -369,8 +375,18 @@ public class PluginDescriptorBuilder {
 
     public PlexusConfiguration buildConfiguration(Reader configuration) throws PlexusConfigurationException {
         try {
-            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeBuilder.build(configuration));
-        } catch (IOException | XmlPullParserException e) {
+            XMLStreamReader reader = WstxInputFactory.newFactory().createXMLStreamReader(configuration);
+            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeBuilder.build(reader, true, null));
+        } catch (XMLStreamException e) {
+            throw new PlexusConfigurationException(e.getMessage(), e);
+        }
+    }
+
+    public PlexusConfiguration buildConfiguration(InputStream configuration) throws PlexusConfigurationException {
+        try {
+            XMLStreamReader reader = WstxInputFactory.newFactory().createXMLStreamReader(configuration);
+            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeBuilder.build(reader, true, null));
+        } catch (XMLStreamException e) {
             throw new PlexusConfigurationException(e.getMessage(), e);
         }
     }

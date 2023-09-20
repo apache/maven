@@ -32,8 +32,6 @@ import org.apache.maven.project.MavenProject;
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Kristian Rosenvold (class extract only)
  */
 // TODO From a concurrency perspective, this class is not good. The combination of mutable/immutable state is not nice
 public class DependencyContext {

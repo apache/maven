@@ -1,0 +1,3 @@
+Copyright (c) 2008 FasterXML LLC info@fasterxml.com
+
+This source code is licensed under standard BSD license, which is compatible with all Free and Open Software (OSS) licenses.

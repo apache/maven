@@ -18,7 +18,6 @@
  */
 package org.apache.maven.project;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,8 +32,6 @@ import org.apache.maven.model.Model;
  * Holds all Models that are known to the reactor. This allows the project builder to resolve imported Models from the
  * reactor when building another project's effective model.
  *
- * @author Benjamin Bentmann
- * @author Robert Scholte
  */
 class ReactorModelPool {
     private final Map<GAKey, Set<Model>> modelsByGa = new HashMap<>();
@@ -58,23 +55,6 @@ class ReactorModelPool {
                             "Multiple modules with key " + a.getGroupId() + ':' + a.getArtifactId());
                 })
                 .orElse(null);
-    }
-
-    /**
-     * Find model by path, useful when location the parent by relativePath
-     *
-     * @param path
-     * @return the matching model or {@code null}
-     * @since 4.0.0
-     */
-    public Model get(Path path) {
-        final Path pomFile;
-        if (Files.isDirectory(path)) {
-            pomFile = path.resolve("pom.xml");
-        } else {
-            pomFile = path;
-        }
-        return modelsByPath.get(pomFile);
     }
 
     private String getVersion(Model model) {

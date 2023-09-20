@@ -28,7 +28,7 @@ import java.util.function.Supplier;
  * convenience, to enable developers to pass things like <code>java.lang.StringBuffer</code> directly into the logger,
  * rather than formatting first by calling <code>toString()</code>.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 public interface Log {
     /**

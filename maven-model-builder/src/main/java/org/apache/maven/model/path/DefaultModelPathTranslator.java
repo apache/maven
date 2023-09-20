@@ -37,7 +37,6 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 /**
  * Resolves relative paths within a model against a specific base directory.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton

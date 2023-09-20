@@ -20,12 +20,9 @@ package org.apache.maven.artifact.versioning;
 
 import java.util.StringTokenizer;
 
-import static org.apache.commons.lang3.math.NumberUtils.isDigits;
-
 /**
  * Default implementation of artifact versioning.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class DefaultArtifactVersion implements ArtifactVersion {
     private Integer majorVersion;
@@ -166,6 +163,19 @@ public class DefaultArtifactVersion implements ArtifactVersion {
                 buildNumber = null;
             }
         }
+    }
+
+    private static boolean isDigits(String cs) {
+        if (cs == null || cs.isEmpty()) {
+            return false;
+        }
+        final int sz = cs.length();
+        for (int i = 0; i < sz; i++) {
+            if (!Character.isDigit(cs.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static Integer getNextIntegerToken(StringTokenizer tok) {

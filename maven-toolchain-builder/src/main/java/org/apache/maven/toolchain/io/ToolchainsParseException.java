@@ -23,7 +23,6 @@ import java.io.IOException;
 /**
  * Signals a failure to parse the toolchains due to invalid syntax (e.g. non well formed XML or unknown elements).
  *
- * @author Robert Scholte
  * @since 3.3.0
  */
 public class ToolchainsParseException extends IOException {

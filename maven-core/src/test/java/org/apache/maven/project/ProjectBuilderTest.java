@@ -19,6 +19,8 @@
 package org.apache.maven.project;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,14 +55,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
+class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/project-builder";
     }
 
     @Test
-    public void testSystemScopeDependencyIsPresentInTheCompileClasspathElements() throws Exception {
+    void testSystemScopeDependencyIsPresentInTheCompileClasspathElements() throws Exception {
         File pom = getProject("it0063");
 
         Properties eps = new Properties();
@@ -76,7 +78,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testBuildFromModelSource() throws Exception {
+    void testBuildFromModelSource() throws Exception {
         File pomFile = new File("src/test/resources/projects/modelsource/module01/pom.xml");
         MavenSession mavenSession = createMavenSession(pomFile);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -90,7 +92,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testVersionlessManagedDependency() throws Exception {
+    void testVersionlessManagedDependency() throws Exception {
         File pomFile = new File("src/test/resources/projects/versionless-managed-dependency.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -103,11 +105,11 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 e.getResults(),
                 contains(projectBuildingResultWithProblemMessage(
                         "'dependencies.dependency.version' for org.apache.maven.its:a:jar is missing")));
-        assertThat(e.getResults(), contains(projectBuildingResultWithLocation(17, 9)));
+        assertThat(e.getResults(), contains(projectBuildingResultWithLocation(5, 9)));
     }
 
     @Test
-    public void testResolveDependencies() throws Exception {
+    void testResolveDependencies() throws Exception {
         File pomFile = new File("src/test/resources/projects/basic-resolveDependencies.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -141,7 +143,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testDontResolveDependencies() throws Exception {
+    void testDontResolveDependencies() throws Exception {
         File pomFile = new File("src/test/resources/projects/basic-resolveDependencies.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -163,7 +165,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testReadModifiedPoms(@TempDir Path tempDir) throws Exception {
+    void testReadModifiedPoms(@TempDir Path tempDir) throws Exception {
         // TODO a similar test should be created to test the dependency management (basically all usages
         // of DefaultModelBuilder.getCache() are affected by MNG-6530
 
@@ -178,18 +180,18 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         projectBuilder.build(child, configuration);
         // modify parent
         File parent = new File(tempDir.toFile(), "pom.xml");
-        String parentContent = FileUtils.readFileToString(parent, "UTF-8");
-        parentContent = parentContent.replaceAll(
+        String parentContent = new String(Files.readAllBytes(parent.toPath()), StandardCharsets.UTF_8);
+        parentContent = parentContent.replace(
                 "<packaging>pom</packaging>",
                 "<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>");
-        FileUtils.write(parent, parentContent, "UTF-8");
+        Files.write(parent.toPath(), parentContent.getBytes(StandardCharsets.UTF_8));
         // re-build pom with modified parent
         ProjectBuildingResult result = projectBuilder.build(child, configuration);
         assertThat(result.getProject().getProperties(), hasKey((Object) "addedProperty"));
     }
 
     @Test
-    public void testReadErroneousMavenProjectContainsReference() throws Exception {
+    void testReadErroneousMavenProjectContainsReference() throws Exception {
         File pomFile = new File("src/test/resources/projects/artifactMissingVersion.xml").getAbsoluteFile();
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -221,18 +223,18 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testReadInvalidPom() throws Exception {
+    void testReadInvalidPom() throws Exception {
         File pomFile = new File("src/test/resources/projects/badPom.xml").getAbsoluteFile();
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
-        configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
         configuration.setRepositorySession(mavenSession.getRepositorySession());
         org.apache.maven.project.ProjectBuilder projectBuilder =
                 getContainer().lookup(org.apache.maven.project.ProjectBuilder.class);
 
         // single project build entry point
         Exception ex = assertThrows(Exception.class, () -> projectBuilder.build(pomFile, configuration));
-        assertThat(ex.getMessage(), containsString("expected START_TAG or END_TAG not TEXT"));
+        assertThat(ex.getMessage(), containsString("Received non-all-whitespace CHARACTERS or CDATA event"));
 
         // multi projects build entry point
         ProjectBuildingException pex = assertThrows(
@@ -243,11 +245,12 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertThat(pex.getResults().get(0).getProblems().size(), greaterThan(0));
         assertThat(
                 pex.getResults(),
-                contains(projectBuildingResultWithProblemMessage("expected START_TAG or END_TAG not TEXT")));
+                contains(projectBuildingResultWithProblemMessage(
+                        "Received non-all-whitespace CHARACTERS or CDATA event in nextTag()")));
     }
 
     @Test
-    public void testReadParentAndChildWithRegularVersionSetParentFile() throws Exception {
+    void testReadParentAndChildWithRegularVersionSetParentFile() throws Exception {
         List<File> toRead = new ArrayList<>(2);
         File parentPom = getProject("MNG-6723");
         toRead.add(parentPom);
@@ -300,7 +303,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testBuildProperties() throws Exception {
+    void testBuildProperties() throws Exception {
         File file = new File(getProject("MNG-6716").getParentFile(), "project/pom.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -316,7 +319,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testPropertyInPluginManagementGroupId() throws Exception {
+    void testPropertyInPluginManagementGroupId() throws Exception {
         File pom = getProject("MNG-6983");
 
         MavenSession session = createMavenSession(pom);
@@ -328,7 +331,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testBuildFromModelSourceResolvesBasedir() throws Exception {
+    void testBuildFromModelSourceResolvesBasedir() throws Exception {
         File pomFile = new File("src/test/resources/projects/modelsourcebasedir/pom.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -351,7 +354,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testLocationTrackingResolution() throws Exception {
+    void testLocationTrackingResolution() throws Exception {
         File pom = getProject("MNG-7648");
 
         MavenSession session = createMavenSession(pom);

@@ -26,7 +26,6 @@ import org.apache.maven.settings.Settings;
 /**
  * Collects the output of the settings builder.
  *
- * @author Benjamin Bentmann
  */
 class DefaultSettingsBuildingResult implements SettingsBuildingResult {
 

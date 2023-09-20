@@ -27,25 +27,19 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
- * @author Hervé Boutemy
  */
 abstract class MavenSnapshotMetadata extends MavenMetadata {
     static final String SNAPSHOT = "SNAPSHOT";
 
     protected final Collection<Artifact> artifacts = new ArrayList<>();
 
-    protected final boolean legacyFormat;
-
-    protected MavenSnapshotMetadata(Metadata metadata, File file, boolean legacyFormat, Date timestamp) {
+    protected MavenSnapshotMetadata(Metadata metadata, File file, Date timestamp) {
         super(metadata, file, timestamp);
-        this.legacyFormat = legacyFormat;
     }
 
-    protected static Metadata createRepositoryMetadata(Artifact artifact, boolean legacyFormat) {
+    protected static Metadata createRepositoryMetadata(Artifact artifact) {
         Metadata metadata = new Metadata();
-        if (!legacyFormat) {
-            metadata.setModelVersion("1.1.0");
-        }
+        metadata.setModelVersion("1.1.0");
         metadata.setGroupId(artifact.getGroupId());
         metadata.setArtifactId(artifact.getArtifactId());
         metadata.setVersion(artifact.getBaseVersion());
@@ -69,18 +63,22 @@ abstract class MavenSnapshotMetadata extends MavenMetadata {
         return classifier + ':' + extension;
     }
 
+    @Override
     public String getGroupId() {
         return metadata.getGroupId();
     }
 
+    @Override
     public String getArtifactId() {
         return metadata.getArtifactId();
     }
 
+    @Override
     public String getVersion() {
         return metadata.getVersion();
     }
 
+    @Override
     public Nature getNature() {
         return Nature.SNAPSHOT;
     }

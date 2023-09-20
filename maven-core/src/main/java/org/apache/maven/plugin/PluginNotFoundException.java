@@ -28,7 +28,6 @@ import org.apache.maven.model.Plugin;
 /**
  * Exception occurring trying to resolve a plugin.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class PluginNotFoundException extends AbstractArtifactResolutionException {
     private Plugin plugin;

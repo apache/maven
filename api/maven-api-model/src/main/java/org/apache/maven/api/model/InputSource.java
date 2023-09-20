@@ -19,6 +19,11 @@
 package org.apache.maven.api.model;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Class InputSource.
@@ -27,10 +32,18 @@ public class InputSource implements Serializable {
 
     private final String modelId;
     private final String location;
+    private final List<InputSource> inputs;
 
     public InputSource(String modelId, String location) {
         this.modelId = modelId;
         this.location = location;
+        this.inputs = null;
+    }
+
+    public InputSource(Collection<InputSource> inputs) {
+        this.modelId = null;
+        this.location = null;
+        this.inputs = ImmutableCollections.copy(inputs);
     }
 
     /**
@@ -52,7 +65,37 @@ public class InputSource implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InputSource that = (InputSource) o;
+        return Objects.equals(modelId, that.modelId)
+                && Objects.equals(location, that.location)
+                && Objects.equals(inputs, that.inputs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modelId, location, inputs);
+    }
+
+    Stream<InputSource> sources() {
+        return inputs != null ? inputs.stream() : Stream.of(this);
+    }
+
+    @Override
     public String toString() {
+        if (inputs != null) {
+            return inputs.stream().map(InputSource::toString).collect(Collectors.joining(", ", "merged[", "]"));
+        }
         return getModelId() + " " + getLocation();
+    }
+
+    public static InputSource merge(InputSource src1, InputSource src2) {
+        return new InputSource(Stream.concat(src1.sources(), src2.sources()).collect(Collectors.toSet()));
     }
 }

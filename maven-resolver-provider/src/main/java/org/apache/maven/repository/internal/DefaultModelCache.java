@@ -29,7 +29,6 @@ import org.eclipse.aether.RepositorySystemSession;
 /**
  * A model builder cache backed by the repository system cache.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultModelCache implements ModelCache {
 
@@ -63,10 +62,12 @@ public class DefaultModelCache implements ModelCache {
         put(new SourceCacheKey(path, tag), data);
     }
 
+    @Override
     public Object get(String groupId, String artifactId, String version, String tag) {
         return get(new GavCacheKey(groupId, artifactId, version, tag));
     }
 
+    @Override
     public void put(String groupId, String artifactId, String version, String tag, Object data) {
         put(new GavCacheKey(groupId, artifactId, version, tag), data);
     }

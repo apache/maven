@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * <a href="/ref/3.0.4/maven-core/lifecycles.html">Lifecycle phases</a>.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public enum LifecyclePhase {

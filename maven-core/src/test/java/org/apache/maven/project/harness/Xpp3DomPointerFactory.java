@@ -28,7 +28,6 @@ import org.apache.maven.api.xml.XmlNode;
 /**
  * A node pointer factory for JXPath to support <code>Xpp3Dom</code>.
  *
- * @author Benjamin Bentmann
  */
 public class Xpp3DomPointerFactory implements NodePointerFactory {
 

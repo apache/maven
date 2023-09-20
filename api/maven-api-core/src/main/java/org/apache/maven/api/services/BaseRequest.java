@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Base class for requests.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 abstract class BaseRequest {

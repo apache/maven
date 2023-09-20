@@ -22,13 +22,13 @@ import java.io.File;
 import java.net.URI;
 
 import org.apache.maven.building.FileSource;
+import org.apache.maven.model.locator.ModelLocator;
 
 /**
  * Wraps an ordinary {@link File} as a model source.
  *
- * @author Benjamin Bentmann
  */
-public class FileModelSource extends FileSource implements ModelSource2 {
+public class FileModelSource extends FileSource implements ModelSource3 {
 
     /**
      * Creates a new model source backed by the specified file.
@@ -51,18 +51,15 @@ public class FileModelSource extends FileSource implements ModelSource2 {
     }
 
     @Override
-    public ModelSource2 getRelatedSource(String relPath) {
+    public ModelSource3 getRelatedSource(ModelLocator locator, String relPath) {
         relPath = relPath.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-        File relatedPom = new File(getFile().getParentFile(), relPath);
+        File path = new File(getFile().getParentFile(), relPath);
 
-        if (relatedPom.isDirectory()) {
-            // TODO figure out how to reuse ModelLocator.locatePom(File) here
-            relatedPom = new File(relatedPom, "pom.xml");
-        }
+        File relatedPom = locator.locateExistingPom(path);
 
-        if (relatedPom.isFile() && relatedPom.canRead()) {
-            return new FileModelSource(new File(relatedPom.toURI().normalize()));
+        if (relatedPom != null) {
+            return new FileModelSource(relatedPom.toPath().normalize().toFile());
         }
 
         return null;

@@ -28,18 +28,19 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.model.path.DefaultPathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
+import org.apache.maven.model.root.RootLocator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests {@link FileProfileActivator}.
  *
- * @author Ravil Galeyev
  */
-public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator> {
+class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator> {
 
     @TempDir
     Path tempDir;
@@ -49,9 +50,10 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     @BeforeEach
     @Override
     void setUp() throws Exception {
-        activator = new FileProfileActivator(new ProfileActivationFilePathInterpolator(new DefaultPathTranslator()));
+        activator = new FileProfileActivator(
+                new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), bd -> true));
 
-        context.setProjectDirectory(new File(tempDir.toString()));
+        context.setProjectDirectory(tempDir.toFile());
 
         File file = new File(tempDir.resolve("file.txt").toString());
         if (!file.createNewFile()) {
@@ -60,7 +62,27 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     }
 
     @Test
-    public void testIsActiveNoFile() {
+    void testRootDirectoryWithNull() {
+        context.setProjectDirectory(null);
+
+        IllegalStateException e = assertThrows(
+                IllegalStateException.class,
+                () -> assertActivation(false, newExistsProfile("${rootDirectory}"), context));
+        assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
+    }
+
+    @Test
+    void testRootDirectory() {
+        assertActivation(false, newExistsProfile("${rootDirectory}/someFile.txt"), context);
+        assertActivation(true, newMissingProfile("${rootDirectory}/someFile.txt"), context);
+        assertActivation(true, newExistsProfile("${rootDirectory}"), context);
+        assertActivation(true, newExistsProfile("${rootDirectory}/" + "file.txt"), context);
+        assertActivation(false, newMissingProfile("${rootDirectory}"), context);
+        assertActivation(false, newMissingProfile("${rootDirectory}/" + "file.txt"), context);
+    }
+
+    @Test
+    void testIsActiveNoFile() {
         assertActivation(false, newExistsProfile(null), context);
         assertActivation(false, newExistsProfile("someFile.txt"), context);
         assertActivation(false, newExistsProfile("${basedir}/someFile.txt"), context);
@@ -71,7 +93,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     }
 
     @Test
-    public void testIsActiveExistsFileExists() {
+    void testIsActiveExistsFileExists() {
         assertActivation(true, newExistsProfile("file.txt"), context);
         assertActivation(true, newExistsProfile("${basedir}"), context);
         assertActivation(true, newExistsProfile("${basedir}/" + "file.txt"), context);
@@ -82,7 +104,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     }
 
     @Test
-    public void testIsActiveExistsLeavesFileUnchanged() {
+    void testIsActiveExistsLeavesFileUnchanged() {
         Profile profile = newExistsProfile("file.txt");
         assertEquals("file.txt", profile.getActivation().getFile().getExists());
 

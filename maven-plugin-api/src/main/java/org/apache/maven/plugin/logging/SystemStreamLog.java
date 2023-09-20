@@ -24,7 +24,6 @@ import java.io.StringWriter;
 /**
  * Logger with "standard" output and error output stream.
  *
- * @author jdcasey
  *
  * @deprecated Use SLF4J directly
  */

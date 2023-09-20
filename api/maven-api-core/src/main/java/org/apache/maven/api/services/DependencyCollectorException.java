@@ -24,7 +24,7 @@ import org.apache.maven.api.annotations.Experimental;
  * Thrown in case of bad artifact descriptors, version ranges or other
  * issues encountered during calculation of the dependency graph.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class DependencyCollectorException extends MavenException {

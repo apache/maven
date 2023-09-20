@@ -31,7 +31,6 @@ import org.apache.maven.project.MavenProject;
 /**
  * Provides a sub view of another dependency graph.
  *
- * @author Benjamin Bentmann
  */
 class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
 

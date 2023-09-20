@@ -30,12 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * @author Kristian Rosenvold
  */
-public class MavenExecutionPlanTest {
+class MavenExecutionPlanTest {
 
     @Test
-    public void testFindLastInPhase() throws Exception {
+    void testFindLastInPhase() throws Exception {
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan();
 
         ExecutionPlanItem expected = plan.findLastInPhase("package");
@@ -45,7 +44,7 @@ public class MavenExecutionPlanTest {
     }
 
     @Test
-    public void testThreadSafeMojos() throws Exception {
+    void testThreadSafeMojos() throws Exception {
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan();
         final Set<Plugin> unSafePlugins = plan.getNonThreadSafePlugins();
         // There is only a single threadsafe plugin here...
@@ -53,7 +52,7 @@ public class MavenExecutionPlanTest {
     }
 
     @Test
-    public void testFindLastWhenFirst() throws Exception {
+    void testFindLastWhenFirst() throws Exception {
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan();
 
         ExecutionPlanItem beerPhase = plan.findLastInPhase(
@@ -62,7 +61,7 @@ public class MavenExecutionPlanTest {
     }
 
     @Test
-    public void testFindLastInPhaseMisc() throws Exception {
+    void testFindLastInPhaseMisc() throws Exception {
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan();
 
         assertNull(plan.findLastInPhase("pacXkage"));

@@ -30,7 +30,6 @@ import org.apache.maven.project.MavenProject;
  * Contains status information that is global to an entire reactor build.
  *
  * @since 3.0
- * @author <a href="mailto:kristian.rosenvold@gmail.com">Kristian Rosenvold</a>
  */
 public class ReactorBuildStatus {
     private final ProjectDependencyGraph projectDependencyGraph;

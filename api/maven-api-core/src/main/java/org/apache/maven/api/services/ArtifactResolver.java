@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Resolves the artifact, i.e download the file when required and attach it to the artifact
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface ArtifactResolver extends Service {

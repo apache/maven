@@ -28,7 +28,6 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 
 /**
- * @author Benjamin Bentmann
  */
 class DefaultDependencyResolutionResult implements DependencyResolutionResult {
 

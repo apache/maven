@@ -23,7 +23,6 @@ import org.apache.maven.project.MavenProject;
 /**
  * Summarizes the result of a successful project build in the reactor.
  *
- * @author Benjamin Bentmann
  */
 public class BuildSuccess extends BuildSummary {
 

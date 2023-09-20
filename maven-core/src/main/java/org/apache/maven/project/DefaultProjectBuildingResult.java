@@ -27,7 +27,6 @@ import org.apache.maven.model.building.ModelProblem;
 /**
  * Collects the output of the project builder.
  *
- * @author Benjamin Bentmann
  */
 class DefaultProjectBuildingResult implements ProjectBuildingResult {
 

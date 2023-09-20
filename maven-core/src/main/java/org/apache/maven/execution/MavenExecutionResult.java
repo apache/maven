@@ -24,7 +24,6 @@ import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 
 /**
- * @author Jason van Zyl
  */
 public interface MavenExecutionResult {
     MavenExecutionResult setProject(MavenProject project);

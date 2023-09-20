@@ -19,13 +19,13 @@
 package org.apache.maven.artifact.repository.metadata;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.metadata.AbstractMetadata;
 import org.eclipse.aether.metadata.MergeableMetadata;
@@ -35,8 +35,8 @@ import org.eclipse.aether.metadata.Metadata;
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
  * of the public API. In particular, this class can be changed or deleted without prior notice.
  *
- * @author Benjamin Bentmann
  */
+@Deprecated
 public final class MetadataBridge extends AbstractMetadata implements MergeableMetadata {
 
     private ArtifactMetadata metadata;
@@ -50,7 +50,8 @@ public final class MetadataBridge extends AbstractMetadata implements MergeableM
     public void merge(File current, File result) throws RepositoryException {
         try {
             if (current.exists()) {
-                FileUtils.copyFile(current, result);
+                Files.createDirectories(result.toPath().getParent());
+                Files.copy(current.toPath(), result.toPath());
             }
             ArtifactRepository localRepo = new MetadataRepository(result);
             metadata.storeInLocalRepository(localRepo, localRepo);

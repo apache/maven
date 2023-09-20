@@ -36,6 +36,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -56,7 +57,6 @@ import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.SessionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,9 +67,6 @@ import org.slf4j.LoggerFactory;
  * </p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
- * @author Jason van Zyl
- * @author Benjamin Bentmann
- * @author Kristian Rosenvold
  * @since 3.0
  */
 @Named
@@ -87,6 +84,8 @@ public class MojoExecutor {
 
     private final Provider<MojosExecutionStrategy> mojosExecutionStrategy;
 
+    private final MessageBuilderFactory messageBuilderFactory;
+
     private final Map<Thread, MojoDescriptor> mojos = new ConcurrentHashMap<>();
 
     @Inject
@@ -95,12 +94,14 @@ public class MojoExecutor {
             MavenPluginManager mavenPluginManager,
             LifecycleDependencyResolver lifeCycleDependencyResolver,
             ExecutionEventCatapult eventCatapult,
-            Provider<MojosExecutionStrategy> mojosExecutionStrategy) {
+            Provider<MojosExecutionStrategy> mojosExecutionStrategy,
+            MessageBuilderFactory messageBuilderFactory) {
         this.pluginManager = pluginManager;
         this.mavenPluginManager = mavenPluginManager;
         this.lifeCycleDependencyResolver = lifeCycleDependencyResolver;
         this.eventCatapult = eventCatapult;
         this.mojosExecutionStrategy = mojosExecutionStrategy;
+        this.messageBuilderFactory = messageBuilderFactory;
     }
 
     public DependencyContext newDependencyContext(MavenSession session, List<MojoExecution> mojoExecutions) {
@@ -126,7 +127,7 @@ public class MojoExecutor {
     private Collection<String> toScopes(String classpath) {
         Collection<String> scopes = Collections.emptyList();
 
-        if (StringUtils.isNotEmpty(classpath)) {
+        if (classpath != null && !classpath.isEmpty()) {
             if (Artifact.SCOPE_COMPILE.equals(classpath)) {
                 scopes = Arrays.asList(Artifact.SCOPE_COMPILE, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_PROVIDED);
             } else if (Artifact.SCOPE_RUNTIME.equals(classpath)) {
@@ -186,7 +187,7 @@ public class MojoExecutor {
         try {
             mavenPluginManager.checkPrerequisites(mojoDescriptor.getPluginDescriptor());
         } catch (PluginIncompatibleException e) {
-            throw new LifecycleExecutionException(mojoExecution, session.getCurrentProject(), e);
+            throw new LifecycleExecutionException(messageBuilderFactory, mojoExecution, session.getCurrentProject(), e);
         }
 
         if (mojoDescriptor.isProjectRequired() && !session.getRequest().isProjectPresent()) {
@@ -194,14 +195,15 @@ public class MojoExecutor {
                     "Goal requires a project to execute" + " but there is no POM in this directory ("
                             + session.getExecutionRootDirectory() + ")."
                             + " Please verify you invoked Maven from the correct directory.");
-            throw new LifecycleExecutionException(mojoExecution, null, cause);
+            throw new LifecycleExecutionException(messageBuilderFactory, mojoExecution, null, cause);
         }
 
         if (mojoDescriptor.isOnlineRequired() && session.isOffline()) {
             if (MojoExecution.Source.CLI.equals(mojoExecution.getSource())) {
                 Throwable cause = new IllegalStateException(
                         "Goal requires online mode for execution" + " but Maven is currently offline.");
-                throw new LifecycleExecutionException(mojoExecution, session.getCurrentProject(), cause);
+                throw new LifecycleExecutionException(
+                        messageBuilderFactory, mojoExecution, session.getCurrentProject(), cause);
             } else {
                 eventCatapult.fire(ExecutionEvent.Type.MojoSkipped, session, mojoExecution);
 
@@ -274,16 +276,8 @@ public class MojoExecutor {
         @SuppressWarnings({"unchecked", "rawtypes"})
         private OwnerReentrantLock getProjectLock(MavenSession session) {
             SessionData data = session.getRepositorySession().getData();
-            // TODO: when resolver 1.7.3 is released, the code below should be changed to
-            // TODO: Map<MavenProject, Lock> locks = ( Map ) ((Map) data).computeIfAbsent(
-            // TODO:         ProjectLock.class, l -> new ConcurrentHashMap<>() );
-            Map<MavenProject, OwnerReentrantLock> locks = (Map) data.get(ProjectLock.class);
-            // initialize the value if not already done (in case of a concurrent access) to the method
-            if (locks == null) {
-                // the call to data.set(k, null, v) is effectively a call to data.putIfAbsent(k, v)
-                data.set(ProjectLock.class, null, new ConcurrentHashMap<>());
-                locks = (Map) data.get(ProjectLock.class);
-            }
+            Map<MavenProject, OwnerReentrantLock> locks =
+                    (Map) data.computeIfAbsent(ProjectLock.class, ConcurrentHashMap::new);
             return locks.computeIfAbsent(session.getCurrentProject(), p -> new OwnerReentrantLock());
         }
     }
@@ -338,7 +332,8 @@ public class MojoExecutor {
                     | PluginManagerException
                     | PluginConfigurationException
                     | MojoExecutionException e) {
-                throw new LifecycleExecutionException(mojoExecution, session.getCurrentProject(), e);
+                throw new LifecycleExecutionException(
+                        messageBuilderFactory, mojoExecution, session.getCurrentProject(), e);
             }
 
             eventCatapult.fire(ExecutionEvent.Type.MojoSucceeded, session, mojoExecution);
@@ -398,10 +393,10 @@ public class MojoExecutor {
         String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();
 
         List<String> scopes = new ArrayList<>(2);
-        if (StringUtils.isNotEmpty(scopeToCollect)) {
+        if (scopeToCollect != null && !scopeToCollect.isEmpty()) {
             scopes.add(scopeToCollect);
         }
-        if (StringUtils.isNotEmpty(scopeToResolve)) {
+        if (scopeToResolve != null && !scopeToResolve.isEmpty()) {
             scopes.add(scopeToResolve);
         }
 

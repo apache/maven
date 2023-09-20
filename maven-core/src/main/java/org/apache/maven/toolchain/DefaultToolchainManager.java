@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import static java.util.Objects.requireNonNull;
 
 /**
- * @author mkleint
  */
 @Named
 @Singleton

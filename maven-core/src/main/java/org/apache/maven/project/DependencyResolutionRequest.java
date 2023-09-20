@@ -24,7 +24,6 @@ import org.eclipse.aether.graph.DependencyFilter;
 /**
  * A request to resolve the dependencies of a project.
  *
- * @author Benjamin Bentmann
  */
 public interface DependencyResolutionRequest {
 

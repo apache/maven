@@ -21,9 +21,9 @@ package org.apache.maven.repository.legacy.resolver.conflict;
 /**
  * Indicates that a specified conflict resolver implementation could not be found.
  *
- * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @since 3.0
  */
+@Deprecated
 public class ConflictResolverNotFoundException extends Exception {
     // constants --------------------------------------------------------------
 

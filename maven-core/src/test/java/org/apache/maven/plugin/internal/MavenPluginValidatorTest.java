@@ -34,9 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author Michael Simacek
  */
-public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
+class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private MavenPluginValidator mavenPluginValidator;
 
@@ -45,7 +44,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     }
 
     @Test
-    public void testValidate() {
+    void testValidate() {
         Artifact plugin = new DefaultArtifact(
                 "org.apache.maven.its.plugins",
                 "maven-it-plugin",
@@ -64,7 +63,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     }
 
     @Test
-    public void testInvalidGroupId() {
+    void testInvalidGroupId() {
         Artifact plugin = new DefaultArtifact(
                 "org.apache.maven.its.plugins",
                 "maven-it-plugin",
@@ -83,7 +82,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     }
 
     @Test
-    public void testInvalidArtifactId() {
+    void testInvalidArtifactId() {
         Artifact plugin = new DefaultArtifact(
                 "org.apache.maven.its.plugins",
                 "maven-it-plugin",
@@ -102,7 +101,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     }
 
     @Test
-    public void testInvalidVersion() {
+    void testInvalidVersion() {
         Artifact plugin = new DefaultArtifact(
                 "org.apache.maven.its.plugins",
                 "maven-it-plugin",

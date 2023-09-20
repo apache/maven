@@ -34,11 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class DefaultToolchainTest {
+class DefaultToolchainTest {
     private final Logger logger = mock(Logger.class);
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
     }
 
@@ -61,14 +61,14 @@ public class DefaultToolchainTest {
     }
 
     @Test
-    public void testGetModel() {
+    void testGetModel() {
         ToolchainModel model = new ToolchainModel();
         DefaultToolchain toolchain = newDefaultToolchain(model);
         assertEquals(model, toolchain.getModel());
     }
 
     @Test
-    public void testGetType() {
+    void testGetType() {
         ToolchainModel model = new ToolchainModel();
         DefaultToolchain toolchain = newDefaultToolchain(model, "TYPE");
         assertEquals("TYPE", toolchain.getType());
@@ -79,14 +79,14 @@ public class DefaultToolchainTest {
     }
 
     @Test
-    public void testGetLogger() {
+    void testGetLogger() {
         ToolchainModel model = new ToolchainModel();
         DefaultToolchain toolchain = newDefaultToolchain(model);
         assertEquals(logger, toolchain.getLog());
     }
 
     @Test
-    public void testMissingRequirementProperty() {
+    void testMissingRequirementProperty() {
         ToolchainModel model = new ToolchainModel();
         model.setType("TYPE");
         DefaultToolchain toolchain = newDefaultToolchain(model);
@@ -96,7 +96,7 @@ public class DefaultToolchainTest {
     }
 
     @Test
-    public void testNonMatchingRequirementProperty() {
+    void testNonMatchingRequirementProperty() {
         ToolchainModel model = new ToolchainModel();
         model.setType("TYPE");
         DefaultToolchain toolchain = newDefaultToolchain(model);
@@ -107,7 +107,7 @@ public class DefaultToolchainTest {
     }
 
     @Test
-    public void testEquals() {
+    void testEquals() {
         ToolchainModel tm1 = new ToolchainModel();
         tm1.setType("jdk");
         tm1.addProvide("version", "1.5");

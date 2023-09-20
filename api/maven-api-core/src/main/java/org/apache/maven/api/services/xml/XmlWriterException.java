@@ -24,7 +24,7 @@ import org.apache.maven.api.services.MavenException;
 /**
  * An exception thrown during the writing of an xml file.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class XmlWriterException extends MavenException {

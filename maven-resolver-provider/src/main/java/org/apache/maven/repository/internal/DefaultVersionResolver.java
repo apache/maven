@@ -23,9 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,8 +36,7 @@ import java.util.Objects;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -64,7 +63,6 @@ import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.util.ConfigUtils;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
@@ -94,6 +92,7 @@ public class DefaultVersionResolver implements VersionResolver {
     }
 
     @SuppressWarnings("checkstyle:methodlength")
+    @Override
     public VersionResult resolveVersion(RepositorySystemSession session, VersionRequest request)
             throws VersionResolutionException {
         RequestTrace trace = RequestTrace.newChild(request.getTrace(), request);
@@ -211,7 +210,7 @@ public class DefaultVersionResolver implements VersionResolver {
                 }
             }
 
-            if (StringUtils.isEmpty(result.getVersion())) {
+            if (result.getVersion() == null || result.getVersion().isEmpty()) {
                 throw new VersionResolutionException(result);
             }
         }
@@ -245,9 +244,10 @@ public class DefaultVersionResolver implements VersionResolver {
                     syncContext.acquire(null, Collections.singleton(metadata));
 
                     if (metadata.getFile() != null && metadata.getFile().exists()) {
-                        try (InputStream in = new FileInputStream(metadata.getFile())) {
-                            versioning =
-                                    new MetadataXpp3Reader().read(in, false).getVersioning();
+                        try (InputStream in =
+                                Files.newInputStream(metadata.getFile().toPath())) {
+                            versioning = new Versioning(
+                                    new MetadataStaxReader().read(in, false).getVersioning());
 
                             /*
                             NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
@@ -296,16 +296,16 @@ public class DefaultVersionResolver implements VersionResolver {
 
     private void merge(
             Artifact artifact, Map<String, VersionInfo> infos, Versioning versioning, ArtifactRepository repository) {
-        if (StringUtils.isNotEmpty(versioning.getRelease())) {
+        if (versioning.getRelease() != null && !versioning.getRelease().isEmpty()) {
             merge(RELEASE, infos, versioning.getLastUpdated(), versioning.getRelease(), repository);
         }
 
-        if (StringUtils.isNotEmpty(versioning.getLatest())) {
+        if (versioning.getLatest() != null && !versioning.getLatest().isEmpty()) {
             merge(LATEST, infos, versioning.getLastUpdated(), versioning.getLatest(), repository);
         }
 
         for (SnapshotVersion sv : versioning.getSnapshotVersions()) {
-            if (StringUtils.isNotEmpty(sv.getVersion())) {
+            if (sv.getVersion() != null && !sv.getVersion().isEmpty()) {
                 String key = getKey(sv.getClassifier(), sv.getExtension());
                 merge(SNAPSHOT + key, infos, sv.getUpdated(), sv.getVersion(), repository);
             }
@@ -352,7 +352,7 @@ public class DefaultVersionResolver implements VersionResolver {
     }
 
     private String getKey(String classifier, String extension) {
-        return StringUtils.clean(classifier) + ':' + StringUtils.clean(extension);
+        return (classifier == null ? "" : classifier.trim()) + ':' + (extension == null ? "" : extension.trim());
     }
 
     private ArtifactRepository getRepository(

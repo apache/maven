@@ -24,15 +24,18 @@ import java.util.Properties;
 /**
  * Collects settings that control building of effective settings.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultSettingsBuildingRequest implements SettingsBuildingRequest {
 
     private File globalSettingsFile;
 
+    private File projectSettingsFile;
+
     private File userSettingsFile;
 
     private SettingsSource globalSettingsSource;
+
+    private SettingsSource projectSettingsSource;
 
     private SettingsSource userSettingsSource;
 
@@ -60,6 +63,30 @@ public class DefaultSettingsBuildingRequest implements SettingsBuildingRequest {
     @Override
     public DefaultSettingsBuildingRequest setGlobalSettingsSource(SettingsSource globalSettingsSource) {
         this.globalSettingsSource = globalSettingsSource;
+
+        return this;
+    }
+
+    @Override
+    public File getProjectSettingsFile() {
+        return projectSettingsFile;
+    }
+
+    @Override
+    public DefaultSettingsBuildingRequest setProjectSettingsFile(File projectSettingsFile) {
+        this.projectSettingsFile = projectSettingsFile;
+
+        return this;
+    }
+
+    @Override
+    public SettingsSource getProjectSettingsSource() {
+        return projectSettingsSource;
+    }
+
+    @Override
+    public DefaultSettingsBuildingRequest setProjectSettingsSource(SettingsSource projectSettingsSource) {
+        this.projectSettingsSource = projectSettingsSource;
 
         return this;
     }

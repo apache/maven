@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,7 +69,6 @@ import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -82,7 +82,6 @@ import org.slf4j.helpers.MessageFormatter;
 import static java.util.stream.Collectors.toSet;
 
 /**
- * @author Jason van Zyl
  */
 @Named
 @Singleton
@@ -204,7 +203,7 @@ public class DefaultMaven implements Maven {
 
         try {
             validateLocalRepository(request);
-        } catch (LocalRepositoryNotAccessibleException e) {
+        } catch (IOException e) {
             return addExceptionToResult(result, e);
         }
 
@@ -327,7 +326,7 @@ public class DefaultMaven implements Maven {
             }
         } finally {
             try {
-                afterSessionEnd(session.getProjects(), session);
+                afterSessionEnd(session);
             } catch (MavenExecutionException e) {
                 return addExceptionToResult(result, e);
             }
@@ -339,7 +338,7 @@ public class DefaultMaven implements Maven {
     private void setupWorkspaceReader(MavenSession session, DefaultRepositorySystemSession repoSession)
             throws ComponentLookupException {
         // Desired order of precedence for workspace readers before querying the local artifact repositories
-        List<WorkspaceReader> workspaceReaders = new ArrayList<>();
+        Set<WorkspaceReader> workspaceReaders = new LinkedHashSet<>();
         // 1) Reactor workspace reader
         WorkspaceReader reactorReader = container.lookup(WorkspaceReader.class, ReactorReader.HINT);
         workspaceReaders.add(reactorReader);
@@ -349,55 +348,34 @@ public class DefaultMaven implements Maven {
             workspaceReaders.add(repoWorkspaceReader);
         }
         // 3) .. n) Project-scoped workspace readers
-        for (WorkspaceReader workspaceReader :
-                getProjectScopedExtensionComponents(session.getProjects(), WorkspaceReader.class)) {
-            if (workspaceReaders.contains(workspaceReader)) {
-                continue;
-            }
-            workspaceReaders.add(workspaceReader);
-        }
+        workspaceReaders.addAll(getProjectScopedExtensionComponents(session.getProjects(), WorkspaceReader.class));
         repoSession.setWorkspaceReader(MavenChainedWorkspaceReader.of(workspaceReaders));
     }
 
     private void afterSessionStart(MavenSession session) throws MavenExecutionException {
-        // CHECKSTYLE_OFF: LineLength
-        for (AbstractMavenLifecycleParticipant listener :
-                getExtensionComponents(Collections.emptyList(), AbstractMavenLifecycleParticipant.class))
-        // CHECKSTYLE_ON: LineLength
-        {
-            listener.afterSessionStart(session);
-        }
+        callListeners(session, AbstractMavenLifecycleParticipant::afterSessionStart);
     }
 
     private void afterProjectsRead(MavenSession session) throws MavenExecutionException {
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            // CHECKSTYLE_OFF: LineLength
-            for (AbstractMavenLifecycleParticipant listener :
-                    getExtensionComponents(session.getProjects(), AbstractMavenLifecycleParticipant.class))
-            // CHECKSTYLE_ON: LineLength
-            {
-                Thread.currentThread().setContextClassLoader(listener.getClass().getClassLoader());
-
-                listener.afterProjectsRead(session);
-            }
-        } finally {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
-        }
+        callListeners(session, AbstractMavenLifecycleParticipant::afterProjectsRead);
     }
 
-    private void afterSessionEnd(Collection<MavenProject> projects, MavenSession session)
-            throws MavenExecutionException {
+    private void afterSessionEnd(MavenSession session) throws MavenExecutionException {
+        callListeners(session, AbstractMavenLifecycleParticipant::afterSessionEnd);
+    }
+
+    @FunctionalInterface
+    interface ListenerMethod {
+        void run(AbstractMavenLifecycleParticipant listener, MavenSession session) throws MavenExecutionException;
+    }
+
+    private void callListeners(MavenSession session, ListenerMethod method) throws MavenExecutionException {
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            // CHECKSTYLE_OFF: LineLength
             for (AbstractMavenLifecycleParticipant listener :
-                    getExtensionComponents(projects, AbstractMavenLifecycleParticipant.class))
-            // CHECKSTYLE_ON: LineLength
-            {
+                    getExtensionComponents(session.getProjects(), AbstractMavenLifecycleParticipant.class)) {
                 Thread.currentThread().setContextClassLoader(listener.getClass().getClassLoader());
-
-                listener.afterSessionEnd(session);
+                method.run(listener, session);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(originalClassLoader);
@@ -429,7 +407,7 @@ public class DefaultMaven implements Maven {
         return repositorySessionFactory.newRepositorySession(request);
     }
 
-    private void validateLocalRepository(MavenExecutionRequest request) throws LocalRepositoryNotAccessibleException {
+    private void validateLocalRepository(MavenExecutionRequest request) throws IOException {
         File localRepoDir = request.getLocalRepositoryPath();
 
         logger.debug("Using local repository at " + localRepoDir);
@@ -437,7 +415,7 @@ public class DefaultMaven implements Maven {
         localRepoDir.mkdirs();
 
         if (!localRepoDir.isDirectory()) {
-            throw new LocalRepositoryNotAccessibleException("Could not create local repository at " + localRepoDir);
+            throw new IOException("Could not create local repository at " + localRepoDir);
         }
     }
 
@@ -457,6 +435,9 @@ public class DefaultMaven implements Maven {
     }
 
     protected <T> Collection<T> getProjectScopedExtensionComponents(Collection<MavenProject> projects, Class<T> role) {
+        if (projects == null) {
+            return Collections.emptyList();
+        }
 
         Collection<T> foundComponents = new LinkedHashSet<>();
         Collection<ClassLoader> scannedRealms = new HashSet<>();
@@ -514,7 +495,7 @@ public class DefaultMaven implements Maven {
      * @return A {@link Set} of profile identifiers, never {@code null}.
      */
     private Set<String> getAllProfiles(MavenSession session) {
-        final Model superPomModel = superPomProvider.getSuperModel("4.0.0");
+        final Model superPomModel = superPomProvider.getSuperModel("4.0.0").getDelegate();
         final Set<MavenProject> projectsIncludingParents = new HashSet<>();
         for (MavenProject project : session.getProjects()) {
             boolean isAdded = projectsIncludingParents.add(project);

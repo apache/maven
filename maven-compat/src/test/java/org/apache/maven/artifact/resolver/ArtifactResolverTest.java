@@ -50,9 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 // the layout used for a particular artifact type.
 
 /**
- * @author Jason van Zyl
  */
-public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
+class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     @Inject
     private ArtifactResolver artifactResolver;
 
@@ -79,7 +78,7 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    public void testResolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository() throws Exception {
+    void testResolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository() throws Exception {
         Artifact a = createLocalArtifact("a", "1.0");
 
         artifactResolver.resolve(a, remoteRepositories(), localRepository());
@@ -88,9 +87,8 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    public void
-            testResolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepository()
-                    throws Exception {
+    void testResolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepository()
+            throws Exception {
         Artifact b = createRemoteArtifact("b", "1.0-SNAPSHOT");
         deleteLocalArtifact(b);
         artifactResolver.resolve(b, remoteRepositories(), localRepository());
@@ -104,7 +102,7 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    public void testTransitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository() throws Exception {
+    void testTransitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository() throws Exception {
         Artifact g = createLocalArtifact("g", "1.0");
 
         Artifact h = createLocalArtifact("h", "1.0");
@@ -126,7 +124,7 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    public void
+    void
             testTransitiveResolutionWhereAllArtifactsAreNotPresentInTheLocalRepositoryAndMustBeRetrievedFromTheRemoteRepository()
                     throws Exception {
         Artifact i = createRemoteArtifact("i", "1.0-SNAPSHOT");
@@ -152,7 +150,7 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    public void testResolutionFailureWhenArtifactNotPresentInRemoteRepository() throws Exception {
+    void testResolutionFailureWhenArtifactNotPresentInRemoteRepository() throws Exception {
         Artifact k = createArtifact("k", "1.0");
 
         assertThrows(
@@ -162,7 +160,7 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    public void testResolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood() throws Exception {
+    void testResolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood() throws Exception {
         Artifact l = createRemoteArtifact("l", "1.0-SNAPSHOT");
         deleteLocalArtifact(l);
 
@@ -187,7 +185,7 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    public void testTransitiveResolutionOrder() throws Exception {
+    void testTransitiveResolutionOrder() throws Exception {
         Artifact m = createLocalArtifact("m", "1.0");
 
         Artifact n = createLocalArtifact("n", "1.0");

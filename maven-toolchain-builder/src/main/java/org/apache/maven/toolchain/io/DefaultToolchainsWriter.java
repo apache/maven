@@ -20,6 +20,7 @@ package org.apache.maven.toolchain.io;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -27,13 +28,11 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.toolchain.model.PersistedToolchains;
-import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Writer;
+import org.apache.maven.toolchain.v4.MavenToolchainsStaxWriter;
 
 /**
  * Handles serialization of toolchains into the default textual format.
  *
- * @author Mike Mol
- * @author Martin Kanters
  */
 @Named
 @Singleton
@@ -45,7 +44,9 @@ public class DefaultToolchainsWriter implements ToolchainsWriter {
         Objects.requireNonNull(toolchains, "toolchains cannot be null");
 
         try (Writer out = output) {
-            new MavenToolchainsXpp3Writer().write(out, toolchains.getDelegate());
+            new MavenToolchainsStaxWriter().write(out, toolchains.getDelegate());
+        } catch (XMLStreamException e) {
+            throw new IOException("Error writing toolchains", e);
         }
     }
 }

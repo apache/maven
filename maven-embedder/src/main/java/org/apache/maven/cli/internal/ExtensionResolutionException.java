@@ -23,7 +23,6 @@ import org.apache.maven.cli.internal.extension.model.CoreExtension;
 /**
  * Exception occurring trying to resolve a plugin.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class ExtensionResolutionException extends Exception {
 

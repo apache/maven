@@ -23,7 +23,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.apache.commons.lang3.Validate;
+import org.apache.maven.cli.jansi.MessageUtils;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -33,6 +33,10 @@ import org.eclipse.aether.transfer.TransferResource;
  * AbstractMavenTransferListener
  */
 public abstract class AbstractMavenTransferListener extends AbstractTransferListener {
+
+    private static final String ESC = "\u001B";
+    private static final String ANSI_DARK_SET = ESC + "[90m";
+    private static final String ANSI_DARK_RESET = ESC + "[0m";
 
     // CHECKSTYLE_OFF: LineLength
     /**
@@ -100,7 +104,9 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
             public abstract String symbol();
 
             public static ScaleUnit getScaleUnit(long size) {
-                Validate.isTrue(size >= 0L, "file size cannot be negative: %s", size);
+                if (size < 0L) {
+                    throw new IllegalArgumentException("file size cannot be negative: " + size);
+                }
 
                 if (size >= GIGABYTE.bytes()) {
                     return GIGABYTE;
@@ -132,7 +138,9 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
         @SuppressWarnings("checkstyle:magicnumber")
         public String format(long size, ScaleUnit unit, boolean omitSymbol) {
-            Validate.isTrue(size >= 0L, "file size cannot be negative: %s", size);
+            if (size < 0L) {
+                throw new IllegalArgumentException("file size cannot be negative: " + size);
+            }
 
             if (unit == null) {
                 unit = ScaleUnit.getScaleUnit(size);
@@ -157,12 +165,13 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         }
 
         public String formatProgress(long progressedSize, long size) {
-            Validate.isTrue(progressedSize >= 0L, "progressed file size cannot be negative: %s", progressedSize);
-            Validate.isTrue(
-                    size < 0L || progressedSize <= size,
-                    "progressed file size cannot be greater than size: %s > %s",
-                    progressedSize,
-                    size);
+            if (progressedSize < 0L) {
+                throw new IllegalArgumentException("progressed file size cannot be negative: " + size);
+            }
+            if (size >= 0 && progressedSize > size) {
+                throw new IllegalArgumentException(
+                        "progressed file size cannot be greater than size: " + progressedSize + " > " + size);
+            }
 
             if (size >= 0L && progressedSize != size) {
                 ScaleUnit unit = ScaleUnit.getScaleUnit(size);
@@ -184,14 +193,18 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
     @Override
     public void transferInitiated(TransferEvent event) {
+        String darkOn = MessageUtils.isColorEnabled() ? ANSI_DARK_SET : "";
+        String darkOff = MessageUtils.isColorEnabled() ? ANSI_DARK_RESET : "";
+
         String action = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();
         StringBuilder message = new StringBuilder();
-        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
-        message.append(": ");
-        message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
+        message.append(darkOn).append(action).append(' ').append(direction).append(' ');
+        message.append(darkOff).append(resource.getRepositoryId());
+        message.append(darkOn).append(": ").append(resource.getRepositoryUrl());
+        message.append(darkOff).append(resource.getResourceName());
 
         out.println(message.toString());
     }
@@ -206,6 +219,9 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
     @Override
     public void transferSucceeded(TransferEvent event) {
+        String darkOn = MessageUtils.isColorEnabled() ? ANSI_DARK_SET : "";
+        String darkOff = MessageUtils.isColorEnabled() ? ANSI_DARK_RESET : "";
+
         String action = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
@@ -214,10 +230,11 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         StringBuilder message = new StringBuilder();
-        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
-        message.append(": ");
-        message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
-        message.append(" (").append(format.format(contentLength));
+        message.append(action).append(darkOn).append(' ').append(direction).append(' ');
+        message.append(darkOff).append(resource.getRepositoryId());
+        message.append(darkOn).append(": ").append(resource.getRepositoryUrl());
+        message.append(darkOff).append(resource.getResourceName());
+        message.append(darkOn).append(" (").append(format.format(contentLength));
 
         long duration = System.currentTimeMillis() - resource.getTransferStartTime();
         if (duration > 0L) {
@@ -225,7 +242,7 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
             message.append(" at ").append(format.format((long) bytesPerSecond)).append("/s");
         }
 
-        message.append(')');
+        message.append(')').append(darkOff);
         out.println(message.toString());
     }
 }

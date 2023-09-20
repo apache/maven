@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -44,7 +43,7 @@ public class MavenPluginJavaPrerequisiteChecker implements MavenPluginPrerequisi
     @Override
     public void accept(PluginDescriptor pluginDescriptor) {
         String requiredJavaVersion = pluginDescriptor.getRequiredJavaVersion();
-        if (StringUtils.isNotBlank(requiredJavaVersion)) {
+        if (requiredJavaVersion != null && !requiredJavaVersion.isEmpty()) {
             String currentJavaVersion = System.getProperty("java.version");
             if (!matchesVersion(requiredJavaVersion, currentJavaVersion)) {
                 throw new IllegalStateException("Required Java version " + requiredJavaVersion

@@ -21,7 +21,6 @@ package org.apache.maven.plugin;
 /**
  * Base exception.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public abstract class AbstractMojoExecutionException extends Exception {
     protected Object source;

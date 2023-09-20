@@ -28,17 +28,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class UrlSourceTest {
+class UrlSourceTest {
 
     @Test
-    public void testUrlSource() {
+    void testUrlSource() {
         NullPointerException e = assertThrows(
                 NullPointerException.class, () -> new UrlSource(null), "Should fail, since you must specify a url");
         assertEquals("url cannot be null", e.getMessage());
     }
 
     @Test
-    public void testGetInputStream() throws Exception {
+    void testGetInputStream() throws Exception {
         URL txtFile = new File("target/test-classes/source.txt").toURI().toURL();
         UrlSource source = new UrlSource(txtFile);
         try (InputStream is = source.getInputStream();
@@ -48,7 +48,7 @@ public class UrlSourceTest {
     }
 
     @Test
-    public void testGetLocation() throws Exception {
+    void testGetLocation() throws Exception {
         URL txtFile = new File("target/test-classes/source.txt").toURI().toURL();
         UrlSource source = new UrlSource(txtFile);
         assertEquals(txtFile.toExternalForm(), source.getLocation());

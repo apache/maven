@@ -27,8 +27,8 @@ import org.apache.maven.artifact.Artifact;
 /**
  * Apply multiple filters, accepting an artifact if at least one of the filters accepts it.
  *
- * @author Benjamin Bentmann
  */
+@Deprecated
 public class OrArtifactFilter implements ArtifactFilter {
 
     private Set<ArtifactFilter> filters;

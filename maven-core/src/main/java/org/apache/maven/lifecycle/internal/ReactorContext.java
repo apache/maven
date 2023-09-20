@@ -24,8 +24,6 @@ import org.apache.maven.execution.MavenExecutionResult;
  * Context that is fixed for the entire reactor build.
  *
  * @since 3.0
- * @author Jason van Zyl
- * @author Kristian Rosenvold
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 public class ReactorContext {
