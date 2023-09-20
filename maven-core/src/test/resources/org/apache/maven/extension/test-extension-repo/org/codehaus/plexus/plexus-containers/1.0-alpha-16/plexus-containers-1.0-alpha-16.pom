@@ -23,7 +23,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version4.13.1</version>
+      <version>4.13.1</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
