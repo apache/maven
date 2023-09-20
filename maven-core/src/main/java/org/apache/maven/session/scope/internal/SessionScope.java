@@ -18,6 +18,7 @@
  */
 package org.apache.maven.session.scope.internal;
 
+import java.lang.reflect.InvocationHandler;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,12 @@ import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.implementation.InvocationHandlerAdapter;
+import net.bytebuddy.matcher.ElementMatchers;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
 
 /**
  * SessionScope
@@ -59,6 +66,8 @@ public class SessionScope implements Scope {
         }
     }
 
+    private final Objenesis objenesis = new ObjenesisStd();
+    private final ByteBuddy byteBuddy = new ByteBuddy();
     private final List<ScopeState> values = new CopyOnWriteArrayList<>();
 
     public void enter() {
@@ -89,7 +98,24 @@ public class SessionScope implements Scope {
 
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
         // Lazy evaluating provider
-        return () -> getScopeState().scope(key, unscoped).get();
+        if (values.isEmpty()) {
+            Class<T> superType = (Class<T>) key.getTypeLiteral().getRawType();
+            Provider<T> scoped = () -> getScopeState().scope(key, unscoped).get();
+            InvocationHandler dispatcher = (proxy, method, args) -> {
+                method.setAccessible(true);
+                return method.invoke(scoped.get(), args);
+            };
+            Class<? extends T> enhanced = byteBuddy
+                    .subclass(superType)
+                    .method(ElementMatchers.any())
+                    .intercept(InvocationHandlerAdapter.of(dispatcher))
+                    .make()
+                    .load(superType.getClassLoader(), ClassLoadingStrategy.Default.INJECTION)
+                    .getLoaded();
+            return () -> objenesis.newInstance(enhanced);
+        } else {
+            return () -> getScopeState().scope(key, unscoped).get();
+        }
     }
 
     /**
