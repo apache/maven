@@ -28,17 +28,15 @@ Environment Variable Prerequisites
 -----------------------------------------------------------------------------
 #>
 
-# set title
-$Host.UI.RawUI.WindowTitle = (Get-Variable MyInvocation -Scope Script).Value.InvocationName
-
 if (-not $env:MAVEN_SKIP_RC) {
   if (Test-Path -Path $env:PROGRAMDATA\mavenrc.ps1 -PathType Leaf) { &$env:PROGRAMDATA"\mavenrc.ps1" $args }
   if (Test-Path -Path $env:USERPROFILE\mavenrc.ps1 -PathType Leaf) { &$env:USERPROFILE"\mavenrc.ps1" $args }
 }
 
 if (-not (Test-path $env:JAVA_HOME)) {
-  $JAVACMD = (get-command java).Source 
-  if (-not $JAVACMD) {
+  try {
+    $JAVACMD = (get-command java).Source
+  } catch {
     Write-Error -ErrorAction Stop -Message "The $env:JAVA_HOME has not been set, JAVA_HOME environment variable is not defined correctly, so Apache Maven cannot be started."
   }
 }
@@ -85,8 +83,10 @@ function IsNotRoot {
   param (
     [String] $path
   )
+  $root_path_base_name = ((get-item $path).Root.BaseName
+  $path_base_name = ((get-item $path).BaseName
 
-  return -not $path.endsWith(":\")
+  return $root_path_base_name -ne $path_base_name
 }
 
 function RetrieveContentsJvmConfig {
@@ -97,9 +97,9 @@ function RetrieveContentsJvmConfig {
   $jvm_location = $path + "\.mvn\jvm.config"
 
   if (Test-Path $jvm_location) {
-    return $env:MAVEN_OPTS + (Get-Content $jvm_location).Replace("`n", "").Replace("`r", "");
+    return $env:MAVEN_OPTS + " " + -Join (Get-Content $jvm_location)
   }
-  return $env:MAVEN_OPTS;
+  return $env:MAVEN_OPTS
 }
 
 $basedir = ""

@@ -32,7 +32,7 @@ MAVEN_DEBUG_ADDRESS (Optional) Set the debug address. Default value is localhost
 $Host.UI.RawUI.WindowTitle = $MyInvocation.MyCommand
 
 if (-not $env:MAVEN_DEBUG_ADDRESS ) {
-    $env:MAVEN_DEBUG_ADDRESS = "localhost:8000"
+  $env:MAVEN_DEBUG_ADDRESS = "8000"
 }
 
 $env:MAVEN_DEBUG_OPTS = "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=$env:MAVEN_DEBUG_ADDRESS"
