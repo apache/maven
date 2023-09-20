@@ -45,21 +45,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * <p>ReflectionValueExtractorTest class.</p>
+ * ReflectionValueExtractorTest class.
  */
 public class ReflectionValueExtractorTest {
     private Project project;
 
     /**
      * <p>setUp.</p>
-     *
-     * @throws Exception if any.
      */
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         Dependency dependency1 = new Dependency();
         dependency1.setArtifactId("dep1");
         Dependency dependency2 = new Dependency();
@@ -114,7 +111,7 @@ public class ReflectionValueExtractorTest {
         // Dependencies
         // ----------------------------------------------------------------------
 
-        List dependencies = (List) ReflectionValueExtractor.evaluate("project.dependencies", project);
+        List<?> dependencies = (List) ReflectionValueExtractor.evaluate("project.dependencies", project);
 
         assertNotNull(dependencies);
 
@@ -129,11 +126,11 @@ public class ReflectionValueExtractorTest {
 
         assertNotNull(dependency);
 
-        assertTrue("dep1".equals(dependency.getArtifactId()));
+        assertEquals("dep1", dependency.getArtifactId());
 
         String artifactId = (String) ReflectionValueExtractor.evaluate("project.dependencies[1].artifactId", project);
 
-        assertTrue("dep2".equals(artifactId));
+        assertEquals("dep2", artifactId);
 
         // Array
 
@@ -141,11 +138,11 @@ public class ReflectionValueExtractorTest {
 
         assertNotNull(dependency);
 
-        assertTrue("dep1".equals(dependency.getArtifactId()));
+        assertEquals("dep1", dependency.getArtifactId());
 
         artifactId = (String) ReflectionValueExtractor.evaluate("project.dependenciesAsArray[1].artifactId", project);
 
-        assertTrue("dep2".equals(artifactId));
+        assertEquals("dep2", artifactId);
 
         // Map
 
@@ -153,11 +150,11 @@ public class ReflectionValueExtractorTest {
 
         assertNotNull(dependency);
 
-        assertTrue("dep1".equals(dependency.getArtifactId()));
+        assertEquals("dep1", dependency.getArtifactId());
 
         artifactId = (String) ReflectionValueExtractor.evaluate("project.dependenciesAsMap(dep2).artifactId", project);
 
-        assertTrue("dep2".equals(artifactId));
+        assertEquals("dep2", artifactId);
 
         // ----------------------------------------------------------------------
         // Build
@@ -417,7 +414,7 @@ public class ReflectionValueExtractorTest {
 
         private Scm scm;
 
-        private List dependencies = new ArrayList();
+        private List<Dependency> dependencies = new ArrayList<>();
 
         private Build build;
 
@@ -427,7 +424,7 @@ public class ReflectionValueExtractorTest {
 
         private String version;
 
-        private Map<String, Artifact> artifactMap = new HashMap<String, Artifact>();
+        private Map<String, Artifact> artifactMap = new HashMap<>();
         private String description;
 
         public void setModelVersion(String modelVersion) {
@@ -474,7 +471,7 @@ public class ReflectionValueExtractorTest {
             return groupId;
         }
 
-        public List getDependencies() {
+        public List<Dependency> getDependencies() {
             return dependencies;
         }
 
@@ -495,13 +492,12 @@ public class ReflectionValueExtractorTest {
         }
 
         public Dependency[] getDependenciesAsArray() {
-            return (Dependency[]) getDependencies().toArray(new Dependency[0]);
+            return getDependencies().toArray(new Dependency[0]);
         }
 
-        public Map getDependenciesAsMap() {
-            Map ret = new HashMap();
-            for (Object o : getDependencies()) {
-                Dependency dep = (Dependency) o;
+        public Map<String, Dependency> getDependenciesAsMap() {
+            Map<String, Dependency> ret = new HashMap<>();
+            for (Dependency dep : getDependencies()) {
                 ret.put(dep.getArtifactId(), dep);
             }
             return ret;

@@ -30,19 +30,10 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.plugin.MethodMap.AmbiguousException;
 
 /**
- * <p>Using simple dotted expressions to extract the values from an Object instance,
- * For example we might want to extract a value like: <code>project.build.sourceDirectory</code></p>
- * <p>The implementation supports indexed, nested and mapped properties similar to the JSP way.</p>
- *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- *
- * @see <a href="http://struts.apache.org/1.x/struts-taglib/indexedprops.html">
- * http://struts.apache.org/1.x/struts-taglib/indexedprops.html</a>
+ * Using simple dotted expressions to extract the values from an Object instance using JSP-like expressions
+ * such as {@code project.build.sourceDirectory}.
  */
-public class ReflectionValueExtractor {
-    private static final Class<?>[] CLASS_ARGS = new Class[0];
-
+class ReflectionValueExtractor {
     private static final Object[] OBJECT_ARGS = new Object[0];
 
     /**
@@ -227,18 +218,7 @@ public class ReflectionValueExtractor {
         }
 
         if (value instanceof Map) {
-            Object[] localParams = new Object[] {key};
-            ClassMap classMap = getClassMap(value.getClass());
-            try {
-                Method method = classMap.findMethod("get", localParams);
-                return method.invoke(value, localParams);
-            } catch (AmbiguousException e) {
-                throw new IntrospectionException(e);
-            } catch (IllegalAccessException e) {
-                throw new IntrospectionException(e);
-            } catch (InvocationTargetException e) {
-                throw new IntrospectionException(e.getTargetException());
-            }
+            return ((Map) value).get(key);
         }
 
         final String message = String.format(
@@ -260,28 +240,10 @@ public class ReflectionValueExtractor {
             }
 
             if (value instanceof List) {
-                ClassMap classMap = getClassMap(value.getClass());
-                // use get method on List interface
-                Object[] localParams = new Object[] {index};
-                Method method = null;
-                try {
-                    method = classMap.findMethod("get", localParams);
-                    return method.invoke(value, localParams);
-                } catch (AmbiguousException e) {
-                    throw new IntrospectionException(e);
-                } catch (IllegalAccessException e) {
-                    throw new IntrospectionException(e);
-                }
+                return ((List) value).get(index);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
             return null;
-        } catch (InvocationTargetException e) {
-            // catch array index issues gracefully, otherwise release
-            if (e.getCause() instanceof IndexOutOfBoundsException) {
-                return null;
-            }
-
-            throw new IntrospectionException(e.getTargetException());
         }
 
         final String message = String.format(
@@ -301,13 +263,13 @@ public class ReflectionValueExtractor {
         String methodBase = Character.toTitleCase(property.charAt(0)) + property.substring(1);
         String methodName = "get" + methodBase;
         try {
-            Method method = classMap.findMethod(methodName, CLASS_ARGS);
+            Method method = classMap.findMethod(methodName);
 
             if (method == null) {
                 // perhaps this is a boolean property??
                 methodName = "is" + methodBase;
 
-                method = classMap.findMethod(methodName, CLASS_ARGS);
+                method = classMap.findMethod(methodName);
             }
 
             if (method == null) {
@@ -317,9 +279,7 @@ public class ReflectionValueExtractor {
             return method.invoke(value, OBJECT_ARGS);
         } catch (InvocationTargetException e) {
             throw new IntrospectionException(e.getTargetException());
-        } catch (AmbiguousException e) {
-            throw new IntrospectionException(e);
-        } catch (IllegalAccessException e) {
+        } catch (AmbiguousException | IllegalAccessException e) {
             throw new IntrospectionException(e);
         }
     }

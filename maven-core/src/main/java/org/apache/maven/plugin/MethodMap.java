@@ -26,14 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
- * @author <a href="mailto:Christoph.Reck@dlr.de">Christoph Reck</a>
- * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
- *
- */
 class MethodMap {
     private static final int MORE_SPECIFIC = 0;
 
@@ -77,7 +69,6 @@ class MethodMap {
     }
 
     /**
-     * <p>
      * Find a method.  Attempts to find the
      * most specific applicable method using the
      * algorithm described in the JLS section
@@ -89,13 +80,10 @@ class MethodMap {
      * type (say) java.lang.Integer, it will not be able
      * to decide between a method that takes int and a
      * method that takes java.lang.Integer as a parameter.
-     * </p>
-     * <p/>
      * <p>
      * This turns out to be a relatively rare case
      * where this is needed - however, functionality
      * like this is needed.
-     * </p>
      *
      * @param methodName name of method
      * @param args       the actual arguments with which the method is called
@@ -116,11 +104,8 @@ class MethodMap {
 
         for (int i = 0; i < l; ++i) {
             Object arg = args[i];
-
-            /*
-             * if we are careful down below, a null argument goes in there
-             * so we can know that the null was passed to the method
-             */
+            // if we are careful down below, a null argument goes in there
+            // so we can know that the null was passed to the method
             classes[i] = arg == null ? null : arg.getClass();
         }
 
@@ -147,12 +132,9 @@ class MethodMap {
             return applicables.getFirst();
         }
 
-        /*
-         * This list will contain the maximally specific methods. Hopefully at
-         * the end of the below loop, the list will contain exactly one method,
-         * (the most specific method) otherwise we have ambiguity.
-         */
-
+        // This list will contain the maximally specific methods. Hopefully at
+        // the end of the below loop, the list will contain exactly one method,
+        // (the most specific method) otherwise we have ambiguity.
         LinkedList<Method> maximals = new LinkedList<>();
 
         for (Method app : applicables) {
@@ -164,22 +146,16 @@ class MethodMap {
 
                 switch (moreSpecific(appArgs, max.getParameterTypes())) {
                     case MORE_SPECIFIC:
-                        /*
-                         * This method is more specific than the previously
-                         * known maximally specific, so remove the old maximum.
-                         */
-
+                        // This method is more specific than the previously
+                        // known maximally specific, so remove the old maximum.
                         maximal.remove();
                         break;
 
                     case LESS_SPECIFIC:
-                        /*
-                         * This method is less specific than some of the
-                         * currently known maximally specific methods, so we
-                         * won't add it into the set of maximally specific
-                         * methods
-                         */
-
+                        // This method is less specific than some of the
+                        // currently known maximally specific methods, so we
+                        // won't add it into the set of maximally specific
+                        // methods
                         lessSpecific = true;
                         break;
 
@@ -222,11 +198,8 @@ class MethodMap {
 
         if (c1MoreSpecific) {
             if (c2MoreSpecific) {
-                /*
-                 *  Incomparable due to cross-assignable arguments (i.e.
-                 * foo(String, Object) vs. foo(Object, String))
-                 */
-
+                // Incomparable due to cross-assignable arguments (i.e.
+                // foo(String, Object) vs. foo(Object, String))
                 return INCOMPARABLE;
             }
 
@@ -237,11 +210,8 @@ class MethodMap {
             return LESS_SPECIFIC;
         }
 
-        /*
-         * Incomparable due to non-related arguments (i.e.
-         * foo(Runnable) vs. foo(Serializable))
-         */
-
+        // Incomparable due to non-related arguments (i.e.
+        // foo(Runnable) vs. foo(Serializable))
         return INCOMPARABLE;
     }
 
@@ -308,26 +278,18 @@ class MethodMap {
      *         the formal type.
      */
     private static boolean isMethodInvocationConvertible(Class<?> formal, Class<?> actual) {
-        /*
-         * if it's a null, it means the arg was null
-         */
+        // if it's a null, it means the arg was null
         if (actual == null && !formal.isPrimitive()) {
             return true;
         }
 
-        /*
-         *  Check for identity or widening reference conversion
-         */
-
+        // Check for identity or widening reference conversion
         if (actual != null && formal.isAssignableFrom(actual)) {
             return true;
         }
 
-        /*
-         * Check for boxing with widening primitive conversion. Note that
-         * actual parameters are never primitives.
-         */
-
+        // Check for boxing with widening primitive conversion. Note that
+        // actual parameters are never primitives.
         if (formal.isPrimitive()) {
             if (formal == Boolean.TYPE && actual == Boolean.class) {
                 return true;
@@ -388,25 +350,17 @@ class MethodMap {
      *         subject to widening conversion to formal.
      */
     private static boolean isStrictMethodInvocationConvertible(Class<?> formal, Class<?> actual) {
-        /*
-         * we shouldn't get a null into, but if so
-         */
+        // we shouldn't get a null into, but if so
         if (actual == null && !formal.isPrimitive()) {
             return true;
         }
 
-        /*
-         *  Check for identity or widening reference conversion
-         */
-
+        // Check for identity or widening reference conversion
         if (formal.isAssignableFrom(actual)) {
             return true;
         }
 
-        /*
-         *  Check for widening primitive conversion.
-         */
-
+        // Check for widening primitive conversion.
         if (formal.isPrimitive()) {
             if (formal == Short.TYPE && (actual == Byte.TYPE)) {
                 return true;
