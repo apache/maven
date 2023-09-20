@@ -746,7 +746,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         problems.setRootModel(inputModel);
 
         ModelData resultData = new ModelData(request.getModelSource(), inputModel);
-        ModelData superData = new ModelData(null, getSuperModel());
+        String superModelVersion = inputModel.getModelVersion() != null ? inputModel.getModelVersion() : "4.0.0";
+        ModelData superData = new ModelData(null, getSuperModel(superModelVersion));
 
         // profile activation
         DefaultProfileActivationContext profileActivationContext = getProfileActivationContext(request);
@@ -1605,8 +1606,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 modelSource, parentModel, parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
     }
 
-    private Model getSuperModel() {
-        return superPomProvider.getSuperModel("4.0.0");
+    private Model getSuperModel(String modelVersion) {
+        return superPomProvider.getSuperModel(modelVersion);
     }
 
     private void importDependencyManagement(

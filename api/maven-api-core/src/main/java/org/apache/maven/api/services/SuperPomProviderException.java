@@ -18,24 +18,26 @@
  */
 package org.apache.maven.api.services;
 
-import org.apache.maven.api.Service;
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.model.Model;
-
 /**
- * Provides the super POM that all models implicitly inherit from.
+ * Exceptions thrown by the {@link SuperPomProvider} service.
+ *
+ * @since 4.0.0
  */
-@Experimental
-public interface SuperPomProvider extends Service {
+public class SuperPomProviderException extends MavenException {
 
-    /**
-     * Gets the super POM for the specified model version.
-     *
-     * @param version The model version to retrieve the super POM for (e.g. "4.0.0"), must not be {@code null}.
-     * @return The super POM, never {@code null}.
-     * @throws SuperPomProviderException if the super POM could not be retrieved
-     */
-    @Nonnull
-    Model getSuperPom(@Nonnull String version);
+    public SuperPomProviderException() {
+        super();
+    }
+
+    public SuperPomProviderException(String message) {
+        super(message);
+    }
+
+    public SuperPomProviderException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public SuperPomProviderException(Throwable cause) {
+        super(cause);
+    }
 }

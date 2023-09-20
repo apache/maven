@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.model.Model;
@@ -44,7 +46,7 @@ public class DefaultSuperPomProvider implements SuperPomProvider {
     /**
      * The cached super POM, lazily created.
      */
-    private Model superModel;
+    private static final Map<String, Model> SUPER_MODELS = new ConcurrentHashMap<>();
 
     @Inject
     public DefaultSuperPomProvider(ModelProcessor modelProcessor) {
@@ -53,8 +55,8 @@ public class DefaultSuperPomProvider implements SuperPomProvider {
 
     @Override
     public Model getSuperModel(String version) {
-        if (superModel == null) {
-            String resource = "/org/apache/maven/model/pom-" + version + ".xml";
+        return SUPER_MODELS.computeIfAbsent(Objects.requireNonNull(version), v -> {
+            String resource = "/org/apache/maven/model/pom-" + v + ".xml";
 
             InputStream is = getClass().getResourceAsStream(resource);
 
@@ -65,23 +67,21 @@ public class DefaultSuperPomProvider implements SuperPomProvider {
 
             try {
                 Map<String, Object> options = new HashMap<>(2);
-                options.put("xml:4.0.0", "xml:4.0.0");
+                options.put("xml:" + version, "xml:" + version);
 
-                String modelId = "org.apache.maven:maven-model-builder:"
+                String modelId = "org.apache.maven:maven-model-builder:" + version + "-"
                         + this.getClass().getPackage().getImplementationVersion() + ":super-pom";
                 InputSource inputSource = new InputSource(
                         modelId, getClass().getResource(resource).toExternalForm());
                 options.put(ModelProcessor.INPUT_SOURCE, new org.apache.maven.model.InputSource(inputSource));
 
-                superModel = modelProcessor.read(is, options);
+                return modelProcessor.read(is, options);
             } catch (IOException e) {
                 throw new IllegalStateException(
                         "The super POM " + resource + " is damaged"
                                 + ", please verify the integrity of your Maven installation",
                         e);
             }
-        }
-
-        return superModel;
+        });
     }
 }

@@ -495,6 +495,7 @@ public class DefaultMaven implements Maven {
      * @return A {@link Set} of profile identifiers, never {@code null}.
      */
     private Set<String> getAllProfiles(MavenSession session) {
+        // TODO: which version of super pom should we use here ?
         final Model superPomModel = superPomProvider.getSuperModel("4.0.0").getDelegate();
         final Set<MavenProject> projectsIncludingParents = new HashSet<>();
         for (MavenProject project : session.getProjects()) {

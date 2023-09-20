@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.SuperPomProvider;
+import org.apache.maven.api.services.SuperPomProviderException;
 
 @Named
 @Singleton
@@ -38,6 +39,10 @@ public class DefaultSuperPomProvider implements SuperPomProvider {
 
     @Override
     public Model getSuperPom(String version) {
-        return provider.getSuperModel(version).getDelegate();
+        try {
+            return provider.getSuperModel(version).getDelegate();
+        } catch (IllegalStateException e) {
+            throw new SuperPomProviderException("Could not retrieve super pom " + version, e);
+        }
     }
 }
