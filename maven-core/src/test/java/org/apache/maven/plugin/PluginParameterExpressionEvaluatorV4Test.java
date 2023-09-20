@@ -21,7 +21,6 @@ package org.apache.maven.plugin;
 import javax.inject.Inject;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -388,7 +387,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     void testRootDirectoryWithNull() throws Exception {
         ExpressionEvaluator ee = createExpressionEvaluator(createDefaultProject(), null, new Properties());
         Exception e = assertThrows(Exception.class, () -> ee.evaluate("${session.rootDirectory}"));
-        e = assertInstanceOf(InvocationTargetException.class, e.getCause());
+        e = assertInstanceOf(IntrospectionException.class, e.getCause());
         e = assertInstanceOf(IllegalStateException.class, e.getCause());
         assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
     }
