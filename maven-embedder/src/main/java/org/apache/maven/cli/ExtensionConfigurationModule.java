@@ -25,14 +25,20 @@ import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
+import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
+import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 
 class ExtensionConfigurationModule implements Module {
 
     private final CoreExtensionEntry extension;
+    private final CliRequest cliRequest;
 
-    ExtensionConfigurationModule(CoreExtensionEntry extension) {
+    ExtensionConfigurationModule(CoreExtensionEntry extension, CliRequest cliRequest) {
         this.extension = extension;
+        this.cliRequest = cliRequest;
     }
 
     @Override
@@ -42,12 +48,38 @@ class ExtensionConfigurationModule implements Module {
             if (configuration == null) {
                 configuration = new XmlNodeImpl("configuration");
             }
+            configuration = new Interpolator().transform(configuration);
+
             binder.bind(XmlNode.class)
                     .annotatedWith(Names.named(extension.getKey()))
                     .toInstance(configuration);
             binder.bind(PlexusConfiguration.class)
                     .annotatedWith(Names.named(extension.getKey()))
                     .toInstance(XmlPlexusConfiguration.toPlexusConfiguration(configuration));
+        }
+    }
+
+    class Interpolator extends MavenTransformer {
+        final StringSearchInterpolator interpolator;
+
+        Interpolator() {
+            super(null);
+            interpolator = new StringSearchInterpolator();
+            interpolator.setCacheAnswers(true);
+            interpolator.addValueSource(new PropertiesBasedValueSource(cliRequest.userProperties));
+            interpolator.addValueSource(new PropertiesBasedValueSource(cliRequest.systemProperties));
+        }
+
+        public XmlNode transform(XmlNode node) {
+            return super.transform(node);
+        }
+
+        protected String transform(String str) {
+            try {
+                return interpolator.interpolate(str);
+            } catch (InterpolationException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

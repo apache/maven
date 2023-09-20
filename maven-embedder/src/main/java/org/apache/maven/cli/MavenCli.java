@@ -695,7 +695,7 @@ public class MavenCli {
                     extension.getClassRealm(),
                     new SessionScopeModule(container),
                     new MojoExecutionScopeModule(container),
-                    new ExtensionConfigurationModule(extension));
+                    new ExtensionConfigurationModule(extension, cliRequest));
         }
 
         customizeContainer(container);
