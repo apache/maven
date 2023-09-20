@@ -25,21 +25,16 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -660,7 +655,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     @Override
     public DefaultTransformerContextBuilder newTransformerContextBuilder() {
-        return new DefaultTransformerContextBuilder();
+        return new DefaultTransformerContextBuilder(this);
     }
 
     @Override
@@ -1021,7 +1016,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (request.getTransformerContextBuilder() instanceof DefaultTransformerContextBuilder) {
                 DefaultTransformerContextBuilder contextBuilder =
                         (DefaultTransformerContextBuilder) request.getTransformerContextBuilder();
-                contextBuilder.putSource(getGroupId(model), model.getArtifactId(), modelSource);
+                contextBuilder.putSource(getGroupId(model), model.getArtifactId(), (FileModelSource) modelSource);
             }
         }
 
@@ -1128,7 +1123,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         return model;
     }
 
-    private Model readRawModel(ModelBuildingRequest request, DefaultModelProblemCollector problems)
+    Model readRawModel(ModelBuildingRequest request, DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         ModelSource modelSource = request.getModelSource();
 
@@ -1169,7 +1164,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         return cachedData != null ? cachedData.getModel() : null;
     }
 
-    private String getGroupId(Model model) {
+    String getGroupId(Model model) {
         return getGroupId(model.getDelegate());
     }
 
@@ -1906,127 +1901,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    /**
-     * Builds up the transformer context.
-     * After the buildplan is ready, the build()-method returns the immutable context useful during distribution.
-     * This is an inner class, as it must be able to call readRawModel()
-     *
-     * @since 4.0.0
-     */
-    private class DefaultTransformerContextBuilder implements TransformerContextBuilder {
-        private final DefaultTransformerContext context = new DefaultTransformerContext(modelProcessor);
-
-        private final Map<DefaultTransformerContext.GAKey, Set<Source>> mappedSources = new ConcurrentHashMap<>(64);
-
-        /**
-         * If an interface could be extracted, DefaultModelProblemCollector should be ModelProblemCollectorExt
-         *
-         * @param request
-         * @param collector
-         * @return
-         */
-        @Override
-        public TransformerContext initialize(ModelBuildingRequest request, ModelProblemCollector collector) {
-            // We must assume the TransformerContext was created using this.newTransformerContextBuilder()
-            DefaultModelProblemCollector problems = (DefaultModelProblemCollector) collector;
-            return new TransformerContext() {
-                @Override
-                public Path locate(Path path) {
-                    File file = modelProcessor.locateExistingPom(path.toFile());
-                    return file != null ? file.toPath() : null;
-                }
-
-                @Override
-                public String getUserProperty(String key) {
-                    return context.userProperties.computeIfAbsent(
-                            key, k -> request.getUserProperties().getProperty(key));
-                }
-
-                @Override
-                public Model getRawModel(String gId, String aId) {
-                    return context.modelByGA
-                            .computeIfAbsent(
-                                    new DefaultTransformerContext.GAKey(gId, aId),
-                                    k -> new DefaultTransformerContext.Holder())
-                            .computeIfAbsent(() -> findRawModel(gId, aId));
-                }
-
-                @Override
-                public Model getRawModel(Path path) {
-                    return context.modelByPath
-                            .computeIfAbsent(path, k -> new DefaultTransformerContext.Holder())
-                            .computeIfAbsent(() -> findRawModel(path));
-                }
-
-                private Model findRawModel(String groupId, String artifactId) {
-                    Source source = getSource(groupId, artifactId);
-                    if (source != null) {
-                        try {
-                            ModelBuildingRequest gaBuildingRequest =
-                                    new DefaultModelBuildingRequest(request).setModelSource((ModelSource) source);
-                            Model model = readRawModel(gaBuildingRequest, problems);
-                            if (source instanceof FileModelSource) {
-                                Path path = ((FileModelSource) source).getFile().toPath();
-                                context.modelByPath
-                                        .computeIfAbsent(path, k -> new DefaultTransformerContext.Holder())
-                                        .computeIfAbsent(() -> model);
-                            }
-                            return model;
-                        } catch (ModelBuildingException e) {
-                            // gathered with problem collector
-                        }
-                    }
-                    return null;
-                }
-
-                private Model findRawModel(Path p) {
-                    if (!Files.isRegularFile(p)) {
-                        throw new IllegalArgumentException("Not a regular file: " + p);
-                    }
-
-                    DefaultModelBuildingRequest req = new DefaultModelBuildingRequest(request)
-                            .setPomFile(p.toFile())
-                            .setModelSource(new FileModelSource(p.toFile()));
-
-                    try {
-                        Model model = readRawModel(req, problems);
-                        DefaultTransformerContext.GAKey key =
-                                new DefaultTransformerContext.GAKey(getGroupId(model), model.getArtifactId());
-                        context.modelByGA
-                                .computeIfAbsent(key, k -> new DefaultTransformerContext.Holder())
-                                .computeIfAbsent(() -> model);
-                        return model;
-                    } catch (ModelBuildingException e) {
-                        // gathered with problem collector
-                    }
-                    return null;
-                }
-            };
-        }
-
-        @Override
-        public TransformerContext build() {
-            return context;
-        }
-
-        public Source getSource(String groupId, String artifactId) {
-            Set<Source> sources = mappedSources.get(new DefaultTransformerContext.GAKey(groupId, artifactId));
-            if (sources == null) {
-                return null;
-            }
-            return sources.stream()
-                    .reduce((a, b) -> {
-                        throw new IllegalStateException(String.format(
-                                "No unique Source for %s:%s: %s and %s",
-                                groupId, artifactId, a.getLocation(), b.getLocation()));
-                    })
-                    .orElse(null);
-        }
-
-        public void putSource(String groupId, String artifactId, Source source) {
-            mappedSources
-                    .computeIfAbsent(new DefaultTransformerContext.GAKey(groupId, artifactId), k -> new HashSet<>())
-                    .add(source);
-        }
+    ModelProcessor getModelProcessor() {
+        return modelProcessor;
     }
 }
