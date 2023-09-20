@@ -47,11 +47,11 @@ import org.apache.maven.model.merge.MavenModelMerger;
 @Singleton
 public class DefaultInheritanceAssembler implements InheritanceAssembler {
 
-    private InheritanceModelMerger merger = new InheritanceModelMerger();
-
     private static final String CHILD_DIRECTORY = "child-directory";
 
     private static final String CHILD_DIRECTORY_PROPERTY = "project.directory";
+
+    private final InheritanceModelMerger merger = new InheritanceModelMerger();
 
     @Override
     public Model assembleModelInheritance(
