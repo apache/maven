@@ -44,11 +44,27 @@ public interface PluginDescriptorCache {
         // marker interface for cache keys
     }
 
+    @FunctionalInterface
+    interface PluginDescriptorSupplier {
+        PluginDescriptor load()
+                throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException;
+    }
+
     Key createKey(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session);
 
     void put(Key key, PluginDescriptor pluginDescriptor);
 
     PluginDescriptor get(Key key);
+
+    default PluginDescriptor get(Key key, PluginDescriptorSupplier supplier)
+            throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException {
+        PluginDescriptor pd = get(key);
+        if (pd == null) {
+            pd = supplier.load();
+            put(key, pd);
+        }
+        return pd;
+    }
 
     void flush();
 }

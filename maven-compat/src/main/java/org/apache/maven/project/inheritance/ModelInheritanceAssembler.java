@@ -23,7 +23,6 @@ import org.apache.maven.model.Model;
 
 /**
  * @author Jason van Zyl
- * @deprecated
  */
 @Deprecated
 public interface ModelInheritanceAssembler {

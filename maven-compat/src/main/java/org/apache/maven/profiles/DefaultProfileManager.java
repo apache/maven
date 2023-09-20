@@ -64,6 +64,7 @@ public class DefaultProfileManager implements ProfileManager {
      * @deprecated without passing in the system properties, the SystemPropertiesProfileActivator will not work
      *             correctly in embedded environments.
      */
+    @Deprecated
     public DefaultProfileManager(PlexusContainer container) {
         this(container, null);
     }

@@ -112,11 +112,12 @@ public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements M
                 basedir = System.getProperty("user.dir");
             }
 
-            basedir = basedir.replaceAll("\\\\", "/");
-            basedir = basedir.replaceAll("\\$", "\\\\\\$");
+            basedir = basedir.replace("\\", "/");
+            basedir = basedir.replace("$", "\\$");
 
-            path = pathPattern.replaceAll("\\$\\{" + basedirSysProp + "\\}", basedir);
-            path = path.replaceAll("\\\\", "/");
+            // basedirSysProp is non regexp and basedir too
+            path = pathPattern.replace("${" + basedirSysProp + "}", basedir);
+            path = path.replace("\\", "/");
             // ---------------------------------------------------------------------------------
             // I'm not sure if this last regexp was really intended to disallow the usage of
             // network paths as user.home directory. Unfortunately it did. I removed it and

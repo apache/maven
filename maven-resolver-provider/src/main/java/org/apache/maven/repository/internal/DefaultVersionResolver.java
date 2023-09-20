@@ -86,12 +86,13 @@ public class DefaultVersionResolver implements VersionResolver, Service {
 
     private RepositoryEventDispatcher repositoryEventDispatcher;
 
+    @Deprecated
     public DefaultVersionResolver() {
         // enable no-arg constructor
     }
 
     @Inject
-    DefaultVersionResolver(
+    public DefaultVersionResolver(
             MetadataResolver metadataResolver,
             SyncContextFactory syncContextFactory,
             RepositoryEventDispatcher repositoryEventDispatcher) {
@@ -100,6 +101,7 @@ public class DefaultVersionResolver implements VersionResolver, Service {
         setRepositoryEventDispatcher(repositoryEventDispatcher);
     }
 
+    @Deprecated
     public void initService(ServiceLocator locator) {
         setMetadataResolver(locator.getService(MetadataResolver.class));
         setSyncContextFactory(locator.getService(SyncContextFactory.class));
@@ -123,6 +125,7 @@ public class DefaultVersionResolver implements VersionResolver, Service {
     }
 
     @SuppressWarnings("checkstyle:methodlength")
+    @Override
     public VersionResult resolveVersion(RepositorySystemSession session, VersionRequest request)
             throws VersionResolutionException {
         RequestTrace trace = RequestTrace.newChild(request.getTrace(), request);

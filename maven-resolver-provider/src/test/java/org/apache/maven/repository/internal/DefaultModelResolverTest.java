@@ -56,7 +56,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
             fail("Expected 'UnresolvableModelException' not thrown.");
         } catch (final UnresolvableModelException e) {
             assertNotNull(e.getMessage());
-            assertTrue(e.getMessage().startsWith("Could not find artifact ut.simple:artifact:pom:0 in repo"));
+            assertTrue(e.getMessage().contains("Could not find artifact ut.simple:artifact:pom:0 in repo"));
         }
     }
 
@@ -119,7 +119,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
             fail("Expected 'UnresolvableModelException' not thrown.");
         } catch (final UnresolvableModelException e) {
             assertNotNull(e.getMessage());
-            assertTrue(e.getMessage().startsWith("Could not find artifact ut.simple:artifact:pom:0 in repo"));
+            assertTrue(e.getMessage().contains("Could not find artifact ut.simple:artifact:pom:0 in repo"));
         }
     }
 

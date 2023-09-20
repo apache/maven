@@ -33,8 +33,8 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Test cases for the project {@code ModelResolver} implementation.
@@ -62,7 +62,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
             fail("Expected 'UnresolvableModelException' not thrown.");
         } catch (final UnresolvableModelException e) {
             assertNotNull(e.getMessage());
-            assertThat(e.getMessage(), startsWith("Could not find artifact org.apache:apache:pom:0 in central"));
+            assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
         }
     }
 
@@ -125,7 +125,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
             fail("Expected 'UnresolvableModelException' not thrown.");
         } catch (final UnresolvableModelException e) {
             assertNotNull(e.getMessage());
-            assertThat(e.getMessage(), startsWith("Could not find artifact org.apache:apache:pom:0 in central"));
+            assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
         }
     }
 

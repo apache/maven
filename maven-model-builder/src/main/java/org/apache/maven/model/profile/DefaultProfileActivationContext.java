@@ -197,7 +197,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         if (projectProperties != null) {
             this.projectProperties = projectProperties.entrySet().stream()
                     .collect(collectingAndThen(
-                            toMap(k -> String.valueOf(k.getKey()), v -> String.valueOf(v)),
+                            toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue())),
                             Collections::unmodifiableMap));
         } else {
             this.projectProperties = Collections.emptyMap();

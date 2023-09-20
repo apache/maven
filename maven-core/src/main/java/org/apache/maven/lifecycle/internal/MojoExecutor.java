@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -275,22 +274,9 @@ public class MojoExecutor {
         @SuppressWarnings({"unchecked", "rawtypes"})
         private OwnerReentrantLock getProjectLock(MavenSession session) {
             SessionData data = session.getRepositorySession().getData();
-            ConcurrentMap<MavenProject, OwnerReentrantLock> locks = (ConcurrentMap) data.get(ProjectLock.class);
-            // initialize the value if not already done (in case of a concurrent access) to the method
-            if (locks == null) {
-                // the call to data.set(k, null, v) is effectively a call to data.putIfAbsent(k, v)
-                data.set(ProjectLock.class, null, new ConcurrentHashMap<>());
-                locks = (ConcurrentMap) data.get(ProjectLock.class);
-            }
-            OwnerReentrantLock acquiredProjectLock = locks.get(session.getCurrentProject());
-            if (acquiredProjectLock == null) {
-                acquiredProjectLock = new OwnerReentrantLock();
-                OwnerReentrantLock prev = locks.putIfAbsent(session.getCurrentProject(), acquiredProjectLock);
-                if (prev != null) {
-                    acquiredProjectLock = prev;
-                }
-            }
-            return acquiredProjectLock;
+            Map<MavenProject, OwnerReentrantLock> locks =
+                    (Map) data.computeIfAbsent(ProjectLock.class, ConcurrentHashMap::new);
+            return locks.computeIfAbsent(session.getCurrentProject(), p -> new OwnerReentrantLock());
         }
     }
 

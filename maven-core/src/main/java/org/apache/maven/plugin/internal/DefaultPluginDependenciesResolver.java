@@ -78,6 +78,9 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
     @Requirement
     private RepositorySystem repoSystem;
 
+    @Requirement
+    private List<MavenPluginDependenciesValidator> dependenciesValidators;
+
     private Artifact toArtifact(Plugin plugin, RepositorySystemSession session) {
         return new DefaultArtifact(
                 plugin.getGroupId(),
@@ -102,6 +105,10 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                     new ArtifactDescriptorRequest(pluginArtifact, repositories, REPOSITORY_CONTEXT);
             request.setTrace(trace);
             ArtifactDescriptorResult result = repoSystem.readArtifactDescriptor(pluginSession, request);
+
+            for (MavenPluginDependenciesValidator dependenciesValidator : dependenciesValidators) {
+                dependenciesValidator.validate(session, pluginArtifact, result);
+            }
 
             pluginArtifact = result.getArtifact();
 

@@ -58,8 +58,10 @@ import static java.util.stream.Collectors.toMap;
 class ReactorReader implements MavenWorkspaceReader {
     public static final String HINT = "reactor";
 
-    private static final Collection<String> COMPILE_PHASE_TYPES =
-            Arrays.asList("jar", "ejb-client", "war", "rar", "ejb3", "par", "sar", "wsr", "har", "app-client");
+    public static final String PROJECT_LOCAL_REPO = "project-local-repo";
+
+    private static final Collection<String> COMPILE_PHASE_TYPES = new HashSet<>(
+            Arrays.asList("jar", "ejb-client", "war", "rar", "ejb3", "par", "sar", "wsr", "har", "app-client"));
 
     private final MavenSession session;
     private final Map<String, MavenProject> projectsByGAV;

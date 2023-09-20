@@ -49,10 +49,20 @@ public class TestRepositoryConnector implements RepositoryConnector {
 
     public TestRepositoryConnector(RemoteRepository repository) {
         this.repository = repository;
-        try {
-            basedir = FileUtils.toFile(new URL(repository.getUrl()));
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException(e);
+        String repositoryUrl = repository.getUrl();
+        if (repositoryUrl.contains("${")) {
+            // the repository url contains unresolved properties and getting the basedir is not possible
+            // in JDK 20+ 'new URL(string)' will fail if the string contains a curly brace
+            this.basedir = null;
+        } else {
+            try {
+                URL url = new URL(repository.getUrl());
+                if ("file".equals(url.getProtocol())) {
+                    basedir = new File(url.getPath());
+                }
+            } catch (MalformedURLException e) {
+                throw new IllegalStateException(e);
+            }
         }
     }
 

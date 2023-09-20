@@ -18,27 +18,30 @@
  */
 package org.apache.maven.plugin.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.shared.utils.logging.MessageUtils;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Print warnings if deprecated mojo or parameters of plugin are used in configuration.
  *
  * @author Slawomir Jaranowski
  */
-@Component(role = MavenPluginConfigurationValidator.class)
-class DeprecatedPluginValidator extends AbstractMavenPluginParametersValidator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DeprecatedPluginValidator.class);
+@Singleton
+@Named
+class DeprecatedPluginValidator extends AbstractMavenPluginDescriptorSourcedParametersValidator {
 
-    @Override
-    protected Logger getLogger() {
-        return LOGGER;
+    @Inject
+    DeprecatedPluginValidator(PluginValidationManager pluginValidationManager) {
+        super(pluginValidationManager);
     }
 
     @Override
@@ -47,45 +50,55 @@ class DeprecatedPluginValidator extends AbstractMavenPluginParametersValidator {
     }
 
     @Override
-    public void validate(
+    protected void doValidate(
+            MavenSession mavenSession,
             MojoDescriptor mojoDescriptor,
+            Class<?> mojoClass,
             PlexusConfiguration pomConfiguration,
             ExpressionEvaluator expressionEvaluator) {
-        if (!LOGGER.isWarnEnabled()) {
-            return;
-        }
-
         if (mojoDescriptor.getDeprecated() != null) {
-            logDeprecatedMojo(mojoDescriptor);
+            pluginValidationManager.reportPluginMojoValidationIssue(
+                    PluginValidationManager.IssueLocality.INTERNAL,
+                    mavenSession,
+                    mojoDescriptor,
+                    mojoClass,
+                    logDeprecatedMojo(mojoDescriptor));
         }
 
-        if (mojoDescriptor.getParameters() == null) {
-            return;
+        if (mojoDescriptor.getParameters() != null) {
+            mojoDescriptor.getParameters().stream()
+                    .filter(parameter -> parameter.getDeprecated() != null)
+                    .filter(Parameter::isEditable)
+                    .forEach(parameter -> checkParameter(
+                            mavenSession, mojoDescriptor, mojoClass, parameter, pomConfiguration, expressionEvaluator));
         }
-
-        mojoDescriptor.getParameters().stream()
-                .filter(parameter -> parameter.getDeprecated() != null)
-                .filter(Parameter::isEditable)
-                .forEach(parameter -> checkParameter(parameter, pomConfiguration, expressionEvaluator));
     }
 
     private void checkParameter(
-            Parameter parameter, PlexusConfiguration pomConfiguration, ExpressionEvaluator expressionEvaluator) {
+            MavenSession mavenSession,
+            MojoDescriptor mojoDescriptor,
+            Class<?> mojoClass,
+            Parameter parameter,
+            PlexusConfiguration pomConfiguration,
+            ExpressionEvaluator expressionEvaluator) {
         PlexusConfiguration config = pomConfiguration.getChild(parameter.getName(), false);
 
         if (isValueSet(config, expressionEvaluator)) {
-            logParameter(parameter);
+            pluginValidationManager.reportPluginMojoValidationIssue(
+                    PluginValidationManager.IssueLocality.INTERNAL,
+                    mavenSession,
+                    mojoDescriptor,
+                    mojoClass,
+                    formatParameter(parameter));
         }
     }
 
-    private void logDeprecatedMojo(MojoDescriptor mojoDescriptor) {
-        String message = MessageUtils.buffer()
+    private String logDeprecatedMojo(MojoDescriptor mojoDescriptor) {
+        return MessageUtils.buffer()
                 .warning("Goal '")
                 .warning(mojoDescriptor.getGoal())
                 .warning("' is deprecated: ")
                 .warning(mojoDescriptor.getDeprecated())
                 .toString();
-
-        LOGGER.warn(message);
     }
 }

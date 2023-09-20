@@ -68,7 +68,7 @@ public class JdkPrefixProfileActivator extends DetectedProfileActivator {
     }
 
     private String convertJdkToMavenVersion(String jdk) {
-        return jdk.replaceAll("_", "-");
+        return jdk.replace("_", "-");
     }
 
     protected String getJdkVersion() {

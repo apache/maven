@@ -108,7 +108,7 @@ public class DefaultProfileInjector implements ProfileInjector {
                             pending = new ArrayList<>();
                         }
                     } else {
-                        pending.add(element);
+                        pending.add(element.clone());
                     }
                 }
 
@@ -145,7 +145,7 @@ public class DefaultProfileInjector implements ProfileInjector {
                     if (existing != null) {
                         mergePluginExecution(existing, element, sourceDominant, context);
                     } else {
-                        merged.put(key, element);
+                        merged.put(key, element.clone());
                     }
                 }
 
@@ -170,7 +170,7 @@ public class DefaultProfileInjector implements ProfileInjector {
                     Object key = getReportPluginKey(element);
                     ReportPlugin existing = merged.get(key);
                     if (existing == null) {
-                        merged.put(key, element);
+                        merged.put(key, element.clone());
                     } else {
                         mergeReportPlugin(existing, element, sourceDominant, context);
                     }
@@ -199,7 +199,7 @@ public class DefaultProfileInjector implements ProfileInjector {
                     if (existing != null) {
                         mergeReportSet(existing, element, sourceDominant, context);
                     } else {
-                        merged.put(key, element);
+                        merged.put(key, element.clone());
                     }
                 }
 

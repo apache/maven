@@ -20,6 +20,7 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 import java.util.Collections;
 
 import org.apache.maven.artifact.Artifact;
@@ -38,7 +39,7 @@ public class TestProjectBuilder extends DefaultProjectBuilder {
             try {
                 artifact.setFile(ProjectClasspathTest.getFileForClasspathResource(
                         ProjectClasspathTest.dir + "transitive-" + scope + "-dep.xml"));
-            } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException | URISyntaxException e) {
                 throw new IllegalStateException("Missing test POM for " + artifact);
             }
         }

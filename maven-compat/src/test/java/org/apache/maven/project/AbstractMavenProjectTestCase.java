@@ -20,7 +20,6 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
@@ -92,7 +91,8 @@ public abstract class AbstractMavenProjectTestCase extends PlexusTestCase {
         return markerFile.getAbsoluteFile().getParentFile();
     }
 
-    protected static File getFileForClasspathResource(String resource) throws FileNotFoundException {
+    protected static File getFileForClasspathResource(String resource)
+            throws FileNotFoundException, URISyntaxException {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
 
         URL resourceUrl = cloader.getResource(resource);
@@ -101,7 +101,7 @@ public abstract class AbstractMavenProjectTestCase extends PlexusTestCase {
             throw new FileNotFoundException("Unable to find: " + resource);
         }
 
-        return new File(URI.create(resourceUrl.toString().replaceAll(" ", "%20")));
+        return new File(resourceUrl.toURI());
     }
 
     protected ArtifactRepository getLocalRepository() throws Exception {

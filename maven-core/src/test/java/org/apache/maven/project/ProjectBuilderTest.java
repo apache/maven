@@ -161,7 +161,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
             // modify parent
             File parent = new File(tempDir.toFile(), "pom.xml");
             String parentContent = FileUtils.readFileToString(parent, "UTF-8");
-            parentContent = parentContent.replaceAll(
+            parentContent = parentContent.replace(
                     "<packaging>pom</packaging>",
                     "<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>");
             FileUtils.write(parent, parentContent, "UTF-8");

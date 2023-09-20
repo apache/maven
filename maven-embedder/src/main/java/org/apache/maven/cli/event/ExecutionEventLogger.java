@@ -19,6 +19,7 @@
 package org.apache.maven.cli.event;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
@@ -296,8 +297,12 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             File currentPom = project.getFile();
             if (currentPom != null) {
                 MavenSession session = event.getSession();
-                File rootBasedir = session.getTopLevelProject().getBasedir();
-                logger.info("  from " + rootBasedir.toPath().relativize(currentPom.toPath()));
+                Path topLevelBasedir = session.getTopLevelProject().getBasedir().toPath();
+                Path current = currentPom.toPath().toAbsolutePath().normalize();
+                if (current.startsWith(topLevelBasedir)) {
+                    current = topLevelBasedir.relativize(current);
+                }
+                logger.info("  from " + current);
             }
 
             // ----------[ packaging ]----------

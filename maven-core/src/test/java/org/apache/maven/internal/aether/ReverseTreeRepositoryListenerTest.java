@@ -52,11 +52,26 @@ public class ReverseTreeRepositoryListenerTest {
         when(nonLocalReposioryArtifact.getFile()).thenReturn(new File("something/completely/different"));
 
         assertThat(
-                ReverseTreeRepositoryListener.isLocalRepositoryArtifact(session, localRepositoryArtifact),
+                ReverseTreeRepositoryListener.isLocalRepositoryArtifactOrMissing(session, localRepositoryArtifact),
                 equalTo(true));
         assertThat(
-                ReverseTreeRepositoryListener.isLocalRepositoryArtifact(session, nonLocalReposioryArtifact),
+                ReverseTreeRepositoryListener.isLocalRepositoryArtifactOrMissing(session, nonLocalReposioryArtifact),
                 equalTo(false));
+    }
+
+    @Test
+    public void isMissingArtifactTest() {
+        File baseDir = new File("local/repository");
+        LocalRepository localRepository = new LocalRepository(baseDir);
+        RepositorySystemSession session = mock(RepositorySystemSession.class);
+        when(session.getLocalRepository()).thenReturn(localRepository);
+
+        Artifact localRepositoryArtifact = mock(Artifact.class);
+        when(localRepositoryArtifact.getFile()).thenReturn(null);
+
+        assertThat(
+                ReverseTreeRepositoryListener.isLocalRepositoryArtifactOrMissing(session, localRepositoryArtifact),
+                equalTo(true));
     }
 
     @Test

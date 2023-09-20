@@ -64,6 +64,7 @@ import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -96,6 +97,7 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -164,29 +166,33 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     @Requirement
     private List<MavenPluginConfigurationValidator> configurationValidators;
 
+    @Requirement
+    private PluginValidationManager pluginValidationManager;
+
     private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
 
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
-    public synchronized PluginDescriptor getPluginDescriptor(
+    public PluginDescriptor getPluginDescriptor(
             Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException {
         PluginDescriptorCache.Key cacheKey = pluginDescriptorCache.createKey(plugin, repositories, session);
 
-        PluginDescriptor pluginDescriptor = pluginDescriptorCache.get(cacheKey);
-
-        if (pluginDescriptor == null) {
+        PluginDescriptor pluginDescriptor = pluginDescriptorCache.get(cacheKey, () -> {
             org.eclipse.aether.artifact.Artifact artifact =
                     pluginDependenciesResolver.resolve(plugin, repositories, session);
 
             Artifact pluginArtifact = RepositoryUtils.toArtifact(artifact);
 
-            pluginDescriptor = extractPluginDescriptor(pluginArtifact, plugin);
+            PluginDescriptor descriptor = extractPluginDescriptor(pluginArtifact, plugin);
 
-            pluginDescriptor.setRequiredMavenVersion(artifact.getProperty("requiredMavenVersion", null));
+            if (StringUtils.isBlank(descriptor.getRequiredMavenVersion())) {
+                // only take value from underlying POM if plugin descriptor has no explicit Maven requirement
+                descriptor.setRequiredMavenVersion(artifact.getProperty("requiredMavenVersion", null));
+            }
 
-            pluginDescriptorCache.put(cacheKey, pluginDescriptor);
-        }
+            return descriptor;
+        });
 
         pluginDescriptor.setPlugin(plugin);
 
@@ -289,7 +295,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         }
     }
 
-    public synchronized void setupPluginRealm(
+    public void setupPluginRealm(
             PluginDescriptor pluginDescriptor,
             MavenSession session,
             ClassLoader parent,
@@ -330,19 +336,17 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                     project.getRemotePluginRepositories(),
                     session.getRepositorySession());
 
-            PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get(cacheKey);
-
-            if (cacheRecord != null) {
-                pluginDescriptor.setClassRealm(cacheRecord.getRealm());
-                pluginDescriptor.setArtifacts(new ArrayList<>(cacheRecord.getArtifacts()));
-                for (ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents()) {
-                    componentDescriptor.setRealm(cacheRecord.getRealm());
-                }
-            } else {
+            PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get(cacheKey, () -> {
                 createPluginRealm(pluginDescriptor, session, parent, foreignImports, filter);
 
-                cacheRecord = pluginRealmCache.put(
-                        cacheKey, pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts());
+                return new PluginRealmCache.CacheRecord(
+                        pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts());
+            });
+
+            pluginDescriptor.setClassRealm(cacheRecord.getRealm());
+            pluginDescriptor.setArtifacts(new ArrayList<>(cacheRecord.getArtifacts()));
+            for (ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents()) {
+                componentDescriptor.setRealm(cacheRecord.getRealm());
             }
 
             pluginRealmCache.register(project, cacheKey, cacheRecord);
@@ -541,6 +545,15 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 ((Mojo) mojo).setLog(new DefaultLog(mojoLogger));
             }
 
+            if (mojo instanceof Contextualizable) {
+                pluginValidationManager.reportPluginMojoValidationIssue(
+                        PluginValidationManager.IssueLocality.EXTERNAL,
+                        session,
+                        mojoDescriptor,
+                        mojo.getClass(),
+                        "Mojo implements `Contextualizable` interface from Plexus Container, which is EOL.");
+            }
+
             Xpp3Dom dom = mojoExecution.getConfiguration();
 
             PlexusConfiguration pomConfiguration;
@@ -554,7 +567,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(session, mojoExecution);
 
             for (MavenPluginConfigurationValidator validator : configurationValidators) {
-                validator.validate(mojoDescriptor, pomConfiguration, expressionEvaluator);
+                validator.validate(session, mojoDescriptor, mojo.getClass(), pomConfiguration, expressionEvaluator);
             }
 
             populateMojoExecutionFields(

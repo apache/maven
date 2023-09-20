@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>3.9.1-SNAPSHOT</version>
+    <version>3.9.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>apache-maven</artifactId>
@@ -274,6 +274,7 @@ under the License.
           <plugin>
             <groupId>net.nicoulaj.maven.plugins</groupId>
             <artifactId>checksum-maven-plugin</artifactId>
+            <version>1.11</version>
             <executions>
               <execution>
                 <id>source-release-checksum</id>

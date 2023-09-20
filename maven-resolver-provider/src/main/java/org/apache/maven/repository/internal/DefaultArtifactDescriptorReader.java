@@ -88,12 +88,16 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
     private ModelCacheFactory modelCacheFactory;
 
+    private final ArtifactDescriptorReaderDelegate artifactDescriptorReaderDelegate =
+            new ArtifactDescriptorReaderDelegate();
+
+    @Deprecated
     public DefaultArtifactDescriptorReader() {
         // enable no-arg constructor
     }
 
     @Inject
-    DefaultArtifactDescriptorReader(
+    public DefaultArtifactDescriptorReader(
             RemoteRepositoryManager remoteRepositoryManager,
             VersionResolver versionResolver,
             VersionRangeResolver versionRangeResolver,
@@ -110,6 +114,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         setModelCacheFactory(modelCacheFactory);
     }
 
+    @Deprecated
     public void initService(ServiceLocator locator) {
         setRemoteRepositoryManager(locator.getService(RemoteRepositoryManager.class));
         setVersionResolver(locator.getService(VersionResolver.class));
@@ -162,6 +167,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         return this;
     }
 
+    @Override
     public ArtifactDescriptorResult readArtifactDescriptor(
             RepositorySystemSession session, ArtifactDescriptorRequest request) throws ArtifactDescriptorException {
         ArtifactDescriptorResult result = new ArtifactDescriptorResult(request);
@@ -173,7 +179,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                     (ArtifactDescriptorReaderDelegate) config.get(ArtifactDescriptorReaderDelegate.class.getName());
 
             if (delegate == null) {
-                delegate = new ArtifactDescriptorReaderDelegate();
+                delegate = artifactDescriptorReaderDelegate;
             }
 
             delegate.populateResult(session, result, model);

@@ -20,6 +20,7 @@ package org.apache.maven.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Helper class to format multiline messages to the console
@@ -28,6 +29,8 @@ public class MultilineMessageHelper {
 
     private static final int DEFAULT_MAX_SIZE = 65;
     private static final char BOX_CHAR = '*';
+
+    private static final Pattern S_FILTER = Pattern.compile("\\s+");
 
     public static String separatorLine() {
         StringBuilder sb = new StringBuilder(DEFAULT_MAX_SIZE);
@@ -47,7 +50,7 @@ public class MultilineMessageHelper {
         // lines
         for (String line : lines) {
             sb.setLength(0);
-            String[] words = line.split("\\s+");
+            String[] words = S_FILTER.split(line);
             for (String word : words) {
                 if (sb.length() >= remainder - word.length() - (sb.length() > 0 ? 1 : 0)) {
                     repeat(sb, ' ', remainder - sb.length());

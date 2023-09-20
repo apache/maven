@@ -39,6 +39,7 @@ import org.eclipse.aether.impl.guice.AetherModule;
 /**
  * MavenResolverModule
  */
+@Deprecated
 public final class MavenResolverModule extends AbstractModule {
 
     @Override

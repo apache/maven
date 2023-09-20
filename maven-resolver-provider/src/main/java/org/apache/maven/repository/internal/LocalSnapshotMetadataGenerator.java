@@ -52,6 +52,7 @@ class LocalSnapshotMetadataGenerator implements MetadataGenerator {
         snapshots = new LinkedHashMap<>();
     }
 
+    @Override
     public Collection<? extends Metadata> prepare(Collection<? extends Artifact> artifacts) {
         for (Artifact artifact : artifacts) {
             if (artifact.isSnapshot()) {
@@ -68,10 +69,12 @@ class LocalSnapshotMetadataGenerator implements MetadataGenerator {
         return Collections.emptyList();
     }
 
+    @Override
     public Artifact transformArtifact(Artifact artifact) {
         return artifact;
     }
 
+    @Override
     public Collection<? extends Metadata> finish(Collection<? extends Artifact> artifacts) {
         return snapshots.values();
     }

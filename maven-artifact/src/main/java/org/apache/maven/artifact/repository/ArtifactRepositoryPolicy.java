@@ -25,7 +25,9 @@ import java.util.Date;
  * Describes a set of policies for a repository to use under certain conditions.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @deprecated Avoid use of this type, if you need access to local repository use repository system session instead.
  */
+@Deprecated
 public class ArtifactRepositoryPolicy {
     public static final String UPDATE_POLICY_NEVER = "never";
 

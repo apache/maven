@@ -40,6 +40,7 @@ public class InvalidProjectModelException extends ProjectBuildingException {
      * @param validationResult
      * @deprecated use {@link File} constructor for pomLocation
      */
+    @Deprecated
     public InvalidProjectModelException(
             String projectId, String pomLocation, String message, ModelValidationResult validationResult) {
         this(projectId, message, new File(pomLocation), validationResult);
@@ -58,6 +59,7 @@ public class InvalidProjectModelException extends ProjectBuildingException {
      * @param message
      * @deprecated use {@link File} constructor for pomLocation
      */
+    @Deprecated
     public InvalidProjectModelException(String projectId, String pomLocation, String message) {
         this(projectId, message, new File(pomLocation));
     }

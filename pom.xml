@@ -23,12 +23,12 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>39</version>
+    <version>40</version>
     <relativePath />
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.9.1-SNAPSHOT</version>
+  <version>3.9.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -124,28 +124,33 @@ under the License.
   </distributionManagement>
 
   <properties>
-    <maven.version>3.0.5</maven.version>
     <javaVersion>8</javaVersion>
-    <classWorldsVersion>2.6.0</classWorldsVersion>
-    <commonsCliVersion>1.4</commonsCliVersion>
+    <minimalMavenBuildVersion>3.5.4</minimalMavenBuildVersion>
+
+    <sisuVersion>0.3.5</sisuVersion>
+    <classWorldsVersion>2.7.0</classWorldsVersion>
+    <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsIoVersion>2.11.0</commonsIoVersion>
-    <commonsLangVersion>3.8.1</commonsLangVersion>
+    <commonsLangVersion>3.12.0</commonsLangVersion>
     <junitVersion>4.13.2</junitVersion>
-    <mockitoVersion>2.21.0</mockitoVersion>
+    <hamcrestVersion>2.2</hamcrestVersion>
+    <mockitoVersion>4.11.0</mockitoVersion>
+    <!-- plexus 2.1.1 is broken, no new release exists yet (nor will exist) -->
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
-    <plexusUtilsVersion>3.4.2</plexusUtilsVersion>
+    <!-- Blocked by 3.4.0+ changes, see MNG-7710 -->
+    <plexusUtilsVersion>3.5.1</plexusUtilsVersion>
     <guiceVersion>5.1.0</guiceVersion>
-    <guavaVersion>30.1-jre</guavaVersion>
+    <guavaVersion>32.0.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <resolverVersion>1.9.4</resolverVersion>
+    <resolverVersion>1.9.14</resolverVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
-    <xmlunitVersion>2.2.1</xmlunitVersion>
-    <powermockVersion>1.7.4</powermockVersion>
+    <xmlunitVersion>2.9.1</xmlunitVersion>
+    <powermockVersion>2.0.9</powermockVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <!-- Control the name of the distribution and information output by mvn -->
     <distributionId>apache-maven</distributionId>
@@ -154,7 +159,7 @@ under the License.
     <maven.site.path>ref/3-LATEST</maven.site.path>
     <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
     <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
-    <project.build.outputTimestamp>2023-01-31T09:58:16Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2023-07-26T09:38:46Z</project.build.outputTimestamp>
   </properties>
 
   <!--bootstrap-start-comment-->
@@ -363,7 +368,7 @@ under the License.
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.2.11</version>
+        <version>1.2.12</version>
         <optional>true</optional>
       </dependency>
       <!--  Wagon -->
@@ -423,6 +428,17 @@ under the License.
         <artifactId>maven-resolver-transport-wagon</artifactId>
         <version>${resolverVersion}</version>
       </dependency>
+      <!-- HttpClient: used by Wagon and Resolver-Http -->
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore</artifactId>
+        <version>4.4.16</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.5.14</version>
+      </dependency>
       <!--  Commons -->
       <dependency>
         <groupId>commons-cli</groupId>
@@ -475,12 +491,32 @@ under the License.
         <artifactId>xmlunit-core</artifactId>
         <version>${xmlunitVersion}</version>
         <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.xmlunit</groupId>
         <artifactId>xmlunit-matchers</artifactId>
         <version>${xmlunitVersion}</version>
         <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.powermock</groupId>
@@ -489,14 +525,20 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-core</artifactId>
-        <version>1.3</version>
+        <artifactId>hamcrest</artifactId>
+        <version>${hamcrestVersion}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-library</artifactId>
-        <version>1.3</version>
+        <artifactId>hamcrest-core</artifactId>
+        <version>${hamcrestVersion}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junitVersion}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
@@ -506,9 +548,13 @@ under the License.
   <!--bootstrap-start-comment-->
   <dependencies>
     <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junitVersion}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -577,11 +623,6 @@ under the License.
             </execution>
           </executions>
         </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>1.4</version>
-        </plugin>
         <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
@@ -607,13 +648,23 @@ under the License.
             </lifecycleMappingMetadata>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>3.4.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>buildnumber-maven-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <version>1.21</version>
+        <version>1.23</version>
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>

@@ -28,7 +28,10 @@ import org.apache.maven.repository.Proxy;
 /**
  * Abstraction of an artifact repository. Artifact repositories can be remote, local, or even build reactor or
  * IDE workspace.
+ *
+ * @deprecated Avoid use of this type, if you need access to local repository use repository system classes instead.
  */
+@Deprecated
 public interface ArtifactRepository {
     String pathOf(Artifact artifact);
 
