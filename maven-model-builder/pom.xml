@@ -167,6 +167,9 @@ under the License.
               <exclude>org.apache.maven.model.profile.activation.FileProfileActivator#setProfileActivationFilePathInterpolator(org.apache.maven.model.path.ProfileActivationFilePathInterpolator):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.profile.activation.FileProfileActivator#FileProfileActivator():CONSTRUCTOR_REMOVED</exclude>
               <exclude>org.apache.maven.model.profile.DefaultProfileInjector</exclude>
+              <exclude>org.apache.maven.model.profile.ProfileInjector#injectProfile(org.apache.maven.api.model.Model,org.apache.maven.api.model.Profile,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.profile.ProfileInjector#injectProfiles(org.apache.maven.api.model.Model,java.util.List,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.profile.ProfileSelector#getActiveProfilesV4(java.util.Collection,org.apache.maven.model.profile.ProfileActivationContext,org.apache.maven.model.building.ModelProblemCollector):METHOD_NEW_DEFAULT</exclude>
               <exclude>org.apache.maven.model.resolution.InvalidRepositoryException#getRepository():METHOD_RETURN_TYPE_CHANGED</exclude>
               <exclude>org.apache.maven.model.resolution.InvalidRepositoryException#InvalidRepositoryException(java.lang.String,org.apache.maven.model.Repository,java.lang.Throwable):CONSTRUCTOR_REMOVED</exclude>
               <exclude>org.apache.maven.model.resolution.InvalidRepositoryException#InvalidRepositoryException(java.lang.String,org.apache.maven.model.Repository):CONSTRUCTOR_REMOVED</exclude>
