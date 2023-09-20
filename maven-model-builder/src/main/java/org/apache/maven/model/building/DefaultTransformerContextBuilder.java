@@ -28,8 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultTransformerContext.GAKey;
 import org.apache.maven.model.building.DefaultTransformerContext.Holder;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
-import org.codehaus.plexus.util.dag.DAG;
 
 /**
  * Builds up the transformer context.
@@ -39,7 +37,7 @@ import org.codehaus.plexus.util.dag.DAG;
  * @since 4.0.0
  */
 class DefaultTransformerContextBuilder implements TransformerContextBuilder {
-    private final DAG dag = new DAG();
+    private final Graph dag = new Graph();
     private final DefaultModelBuilder defaultModelBuilder;
     private final DefaultTransformerContext context;
 
@@ -134,10 +132,10 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
     private boolean addEdge(Path from, Path p, DefaultModelProblemCollector problems) {
         try {
             synchronized (dag) {
-                dag.addEdge(from.toString(), p.toString());
+                dag.addEdge(dag.addVertex(from.toString()), dag.addVertex(p.toString()));
             }
             return true;
-        } catch (CycleDetectedException e) {
+        } catch (Graph.CycleDetectedException e) {
             problems.add(new DefaultModelProblem(
                     "Cycle detected between models at " + from + " and " + p,
                     ModelProblem.Severity.FATAL,

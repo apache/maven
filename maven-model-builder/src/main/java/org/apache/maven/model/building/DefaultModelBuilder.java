@@ -25,15 +25,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Function;
@@ -48,7 +40,6 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.building.Source;
 import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -58,7 +49,6 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
@@ -713,7 +703,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             profileActivationContext.setUserProperties(profileProps);
         }
 
-        profileActivationContext.setProjectProperties(inputModel.getProperties());
+        profileActivationContext.setProjectProperties(inputModel.getDelegate().getProperties());
         problems.setSource(inputModel);
         List<Profile> activePomProfiles =
                 profileSelector.getActiveProfiles(inputModel.getProfiles(), profileActivationContext, problems);
@@ -742,6 +732,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         Model inputModel = readRawModel(request, problems);
+        if (problems.hasFatalErrors()) {
+            throw problems.newModelBuildingException();
+        }
 
         problems.setRootModel(inputModel);
 
@@ -777,50 +770,43 @@ public class DefaultModelBuilder implements ModelBuilder {
             String modelId = currentData.getId();
             result.addModelId(modelId);
 
-            Model rawModel = currentData.getModel();
-            result.setRawModel(modelId, rawModel);
-
-            profileActivationContext.setProjectProperties(rawModel.getProperties());
-            problems.setSource(rawModel);
-            List<Profile> activePomProfiles =
-                    profileSelector.getActiveProfiles(rawModel.getProfiles(), profileActivationContext, problems);
-            result.setActivePomProfiles(modelId, activePomProfiles);
-
-            Model tmpModel = rawModel.clone();
-
-            problems.setSource(tmpModel);
+            Model model = currentData.getModel();
+            result.setRawModel(modelId, model);
+            problems.setSource(model);
+            org.apache.maven.api.model.Model modelv4 = model.getDelegate();
 
             // model normalization
-            tmpModel = new Model(modelNormalizer.mergeDuplicates(tmpModel.getDelegate(), request, problems));
+            modelv4 = modelNormalizer.mergeDuplicates(modelv4, request, problems);
 
-            profileActivationContext.setProjectProperties(tmpModel.getProperties());
+            // profile activation
+            profileActivationContext.setProjectProperties(modelv4.getProperties());
 
-            Map<String, Activation> interpolatedActivations =
-                    getInterpolatedActivations(rawModel, profileActivationContext, problems);
-            injectProfileActivations(tmpModel, interpolatedActivations);
+            List<org.apache.maven.api.model.Profile> interpolatedProfiles =
+                    interpolateActivations(modelv4.getProfiles(), profileActivationContext, problems);
 
             // profile injection
-            for (Profile activeProfile : result.getActivePomProfiles(modelId)) {
-                profileInjector.injectProfile(tmpModel, activeProfile, request, problems);
-            }
-
+            List<org.apache.maven.api.model.Profile> activePomProfiles =
+                    profileSelector.getActiveProfilesV4(interpolatedProfiles, profileActivationContext, problems);
+            result.setActivePomProfiles(
+                    modelId, activePomProfiles.stream().map(Profile::new).collect(Collectors.toList()));
+            modelv4 = profileInjector.injectProfiles(modelv4, activePomProfiles, request, problems);
             if (currentData == resultData) {
                 for (Profile activeProfile : activeExternalProfiles) {
-                    profileInjector.injectProfile(tmpModel, activeProfile, request, problems);
+                    modelv4 = profileInjector.injectProfile(modelv4, activeProfile.getDelegate(), request, problems);
                 }
-                result.setEffectiveModel(tmpModel);
             }
 
-            lineage.add(tmpModel);
+            lineage.add(new Model(modelv4));
 
             if (currentData == superData) {
                 break;
             }
 
-            configureResolver(request.getModelResolver(), tmpModel, problems);
+            // add repositories specified by the current model so that we can resolve the parent
+            configureResolver(request.getModelResolver(), modelv4, problems, false);
 
-            ModelData parentData =
-                    readParent(currentData.getModel(), currentData.getSource(), request, result, problems);
+            // we pass a cloned model, so that resolving the parent version does not affect the returned model
+            ModelData parentData = readParent(new Model(modelv4), currentData.getSource(), request, problems);
 
             if (parentData == null) {
                 currentData = superData;
@@ -840,7 +826,22 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        problems.setSource(result.getRawModel());
+        Model tmpModel = lineage.get(0);
+
+        // inject interpolated activations
+        List<org.apache.maven.api.model.Profile> interpolated =
+                interpolateActivations(tmpModel.getDelegate().getProfiles(), profileActivationContext, problems);
+        if (interpolated != tmpModel.getDelegate().getProfiles()) {
+            tmpModel.update(tmpModel.getDelegate().withProfiles(interpolated));
+        }
+
+        // inject external profile into current model
+        tmpModel.update(profileInjector.injectProfiles(
+                tmpModel.getDelegate(),
+                activeExternalProfiles.stream().map(Profile::getDelegate).collect(Collectors.toList()),
+                request,
+                problems));
+
         checkPluginVersions(lineage, request, problems);
 
         // inheritance assembly
@@ -860,44 +861,76 @@ public class DefaultModelBuilder implements ModelBuilder {
         result.setEffectiveModel(resultModel);
 
         // Now the fully interpolated model is available: reconfigure the resolver
-        configureResolver(request.getModelResolver(), resultModel, problems, true);
+        configureResolver(request.getModelResolver(), resultModel.getDelegate(), problems, true);
 
         return resultModel;
     }
 
-    private Map<String, Activation> getInterpolatedActivations(
-            Model rawModel, DefaultProfileActivationContext context, DefaultModelProblemCollector problems) {
-        Map<String, Activation> interpolatedActivations = getProfileActivations(rawModel, true);
-        for (Activation activation : interpolatedActivations.values()) {
-            if (activation.getFile() != null) {
-                replaceWithInterpolatedValue(activation.getFile(), context, problems);
+    private List<org.apache.maven.api.model.Profile> interpolateActivations(
+            List<org.apache.maven.api.model.Profile> profiles,
+            DefaultProfileActivationContext context,
+            DefaultModelProblemCollector problems) {
+        List<org.apache.maven.api.model.Profile> newProfiles = null;
+        for (int index = 0; index < profiles.size(); index++) {
+            org.apache.maven.api.model.Profile profile = profiles.get(index);
+            org.apache.maven.api.model.Activation activation = profile.getActivation();
+            if (activation != null) {
+                org.apache.maven.api.model.ActivationFile file = activation.getFile();
+                if (file != null) {
+                    String oldExists = file.getExists();
+                    if (isNotEmpty(oldExists)) {
+                        try {
+                            String newExists = interpolate(oldExists, context);
+                            if (!Objects.equals(oldExists, newExists)) {
+                                if (newProfiles == null) {
+                                    newProfiles = new ArrayList<>(profiles);
+                                }
+                                newProfiles.set(
+                                        index, profile.withActivation(activation.withFile(file.withExists(newExists))));
+                            }
+                        } catch (InterpolationException e) {
+                            addInterpolationProblem(problems, file, oldExists, e, "exists");
+                        }
+                    } else {
+                        String oldMissing = file.getMissing();
+                        if (isNotEmpty(oldMissing)) {
+                            try {
+                                String newMissing = interpolate(oldMissing, context);
+                                if (!Objects.equals(oldMissing, newMissing)) {
+                                    if (newProfiles == null) {
+                                        newProfiles = new ArrayList<>(profiles);
+                                    }
+                                    newProfiles.set(
+                                            index,
+                                            profile.withActivation(activation.withFile(file.withMissing(newMissing))));
+                                }
+                            } catch (InterpolationException e) {
+                                addInterpolationProblem(problems, file, oldMissing, e, "missing");
+                            }
+                        }
+                    }
+                }
             }
         }
-        return interpolatedActivations;
+        return newProfiles != null ? newProfiles : profiles;
     }
 
-    private void replaceWithInterpolatedValue(
-            ActivationFile activationFile, ProfileActivationContext context, DefaultModelProblemCollector problems) {
-        try {
-            if (isNotEmpty(activationFile.getExists())) {
-                String path = activationFile.getExists();
-                String absolutePath = profileActivationFilePathInterpolator.interpolate(path, context);
-                activationFile.setExists(absolutePath);
-            } else if (isNotEmpty(activationFile.getMissing())) {
-                String path = activationFile.getMissing();
-                String absolutePath = profileActivationFilePathInterpolator.interpolate(path, context);
-                activationFile.setMissing(absolutePath);
-            }
-        } catch (InterpolationException e) {
-            String path =
-                    isNotEmpty(activationFile.getExists()) ? activationFile.getExists() : activationFile.getMissing();
+    private static void addInterpolationProblem(
+            DefaultModelProblemCollector problems,
+            org.apache.maven.api.model.ActivationFile file,
+            String path,
+            InterpolationException e,
+            String locationKey) {
+        problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                .setMessage("Failed to interpolate file location " + path + ": " + e.getMessage())
+                .setLocation(Optional.ofNullable(file.getLocation(locationKey))
+                        .map(InputLocation::new)
+                        .orElse(null))
+                .setException(e));
+    }
 
-            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
-                    .setMessage("Failed to interpolate file location " + path + ": " + e.getMessage())
-                    .setLocation(
-                            activationFile.getLocation(isNotEmpty(activationFile.getExists()) ? "exists" : "missing"))
-                    .setException(e));
-        }
+    private String interpolate(String path, ProfileActivationContext context) throws InterpolationException {
+        return isNotEmpty(path) ? profileActivationFilePathInterpolator.interpolate(path, context) : path;
     }
 
     private static boolean isNotEmpty(String string) {
@@ -908,6 +941,15 @@ public class DefaultModelBuilder implements ModelBuilder {
     public ModelBuildingResult build(final ModelBuildingRequest request, final ModelBuildingResult result)
             throws ModelBuildingException {
         return build(request, result, new LinkedHashSet<>());
+    }
+
+    public Model buildRawModel(final ModelBuildingRequest request) throws ModelBuildingException {
+        DefaultModelProblemCollector problems = new DefaultModelProblemCollector(new DefaultModelBuildingResult());
+        Model model = readRawModel(request, problems);
+        if (hasModelErrors(problems)) {
+            throw problems.newModelBuildingException();
+        }
+        return model;
     }
 
     private ModelBuildingResult build(
@@ -1127,41 +1169,49 @@ public class DefaultModelBuilder implements ModelBuilder {
             throws ModelBuildingException {
         ModelSource modelSource = request.getModelSource();
 
-        ModelData cachedData = cache(request.getModelCache(), modelSource, ModelCacheTag.RAW, () -> {
-            Model rawModel;
-            if (Features.buildConsumer(request.getUserProperties()) && modelSource instanceof FileModelSource) {
-                rawModel = readFileModel(request, problems);
-                File pomFile = ((FileModelSource) modelSource).getFile();
+        ModelData modelData = cache(
+                request.getModelCache(),
+                modelSource,
+                ModelCacheTag.RAW,
+                () -> doReadRawModel(modelSource, request, problems));
 
-                try {
-                    if (request.getTransformerContextBuilder() != null) {
-                        TransformerContext context =
-                                request.getTransformerContextBuilder().initialize(request, problems);
-                        transformer.transform(pomFile.toPath(), context, rawModel);
-                    }
-                } catch (TransformerException e) {
-                    problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V40).setException(e));
+        return modelData.getModel();
+    }
+
+    private ModelData doReadRawModel(
+            ModelSource modelSource, ModelBuildingRequest request, DefaultModelProblemCollector problems)
+            throws ModelBuildingException {
+        Model rawModel;
+        if (Features.buildConsumer(request.getUserProperties()) && modelSource instanceof FileModelSource) {
+            rawModel = readFileModel(request, problems);
+            File pomFile = ((FileModelSource) modelSource).getFile();
+
+            try {
+                if (request.getTransformerContextBuilder() != null) {
+                    TransformerContext context =
+                            request.getTransformerContextBuilder().initialize(request, problems);
+                    transformer.transform(pomFile.toPath(), context, rawModel);
                 }
-            } else if (request.getFileModel() == null) {
-                rawModel = readFileModel(request, problems);
-            } else {
-                rawModel = request.getFileModel().clone();
+            } catch (TransformerException e) {
+                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V40).setException(e));
             }
+        } else if (request.getFileModel() == null) {
+            rawModel = readFileModel(request, problems);
+        } else {
+            rawModel = request.getFileModel().clone();
+        }
 
-            modelValidator.validateRawModel(rawModel, request, problems);
+        modelValidator.validateRawModel(rawModel, request, problems);
 
-            if (hasFatalErrors(problems)) {
-                throw problems.newModelBuildingException();
-            }
+        if (hasFatalErrors(problems)) {
+            throw problems.newModelBuildingException();
+        }
 
-            String groupId = getGroupId(rawModel);
-            String artifactId = rawModel.getArtifactId();
-            String version = getVersion(rawModel);
+        String groupId = getGroupId(rawModel);
+        String artifactId = rawModel.getArtifactId();
+        String version = getVersion(rawModel);
 
-            ModelData modelData = new ModelData(modelSource, rawModel, groupId, artifactId, version);
-            return modelData;
-        });
-        return cachedData != null ? cachedData.getModel() : null;
+        return new ModelData(modelSource, rawModel, groupId, artifactId, version);
     }
 
     String getGroupId(Model model) {
@@ -1204,31 +1254,21 @@ public class DefaultModelBuilder implements ModelBuilder {
         return context;
     }
 
-    private void configureResolver(ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems) {
-        configureResolver(modelResolver, model, problems, false);
-    }
-
     private void configureResolver(
             ModelResolver modelResolver,
-            Model model,
+            org.apache.maven.api.model.Model model,
             DefaultModelProblemCollector problems,
             boolean replaceRepositories) {
-        if (modelResolver == null) {
-            return;
-        }
-
-        problems.setSource(model);
-
-        List<Repository> repositories = model.getRepositories();
-
-        for (Repository repository : repositories) {
-            try {
-                modelResolver.addRepository(repository, replaceRepositories);
-            } catch (InvalidRepositoryException e) {
-                problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
-                        .setMessage("Invalid repository " + repository.getId() + ": " + e.getMessage())
-                        .setLocation(repository.getLocation(""))
-                        .setException(e));
+        if (modelResolver != null) {
+            for (org.apache.maven.api.model.Repository repository : model.getRepositories()) {
+                try {
+                    modelResolver.addRepository(repository, replaceRepositories);
+                } catch (InvalidRepositoryException e) {
+                    problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                            .setMessage("Invalid repository " + repository.getId() + ": " + e.getMessage())
+                            .setLocation(new InputLocation(repository.getLocation("")))
+                            .setException(e));
+                }
             }
         }
     }
@@ -1353,19 +1393,15 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private ModelData readParent(
-            Model childModel,
-            Source childSource,
-            ModelBuildingRequest request,
-            ModelBuildingResult result,
-            DefaultModelProblemCollector problems)
+            Model childModel, Source childSource, ModelBuildingRequest request, DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         ModelData parentData = null;
 
         Parent parent = childModel.getParent();
         if (parent != null) {
-            parentData = readParentLocally(childModel, childSource, request, result, problems);
+            parentData = readParentLocally(childModel, childSource, request, problems);
             if (parentData == null) {
-                parentData = readParentExternally(childModel, request, result, problems);
+                parentData = readParentExternally(childModel, request, problems);
             }
 
             Model parentModel = parentData.getModel();
@@ -1381,11 +1417,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private ModelData readParentLocally(
-            Model childModel,
-            Source childSource,
-            ModelBuildingRequest request,
-            ModelBuildingResult result,
-            DefaultModelProblemCollector problems)
+            Model childModel, Source childSource, ModelBuildingRequest request, DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         final Parent parent = childModel.getParent();
         final ModelSource2 candidateSource;
@@ -1524,10 +1556,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private ModelData readParentExternally(
-            Model childModel,
-            ModelBuildingRequest request,
-            ModelBuildingResult result,
-            DefaultModelProblemCollector problems)
+            Model childModel, ModelBuildingRequest request, DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         problems.setSource(childModel);
 
@@ -1701,12 +1730,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
-        org.apache.maven.api.model.DependencyManagement importMgmt =
-                cache(request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, () -> {
-                    DependencyManagement importMgmtV3 = doLoadDependencyManagement(
-                            model, request, problems, dependency, groupId, artifactId, version, importIds);
-                    return importMgmtV3 != null ? importMgmtV3.getDelegate() : null;
-                });
+        org.apache.maven.api.model.DependencyManagement importMgmt = cache(
+                request.getModelCache(),
+                groupId,
+                artifactId,
+                version,
+                ModelCacheTag.IMPORT,
+                () -> doLoadDependencyManagement(
+                        model, request, problems, dependency, groupId, artifactId, version, importIds));
 
         // [MNG-5600] Dependency management import should support exclusions.
         List<Exclusion> exclusions = dependency.getDelegate().getExclusions();
@@ -1732,7 +1763,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
-    private DependencyManagement doLoadDependencyManagement(
+    private org.apache.maven.api.model.DependencyManagement doLoadDependencyManagement(
             Model model,
             ModelBuildingRequest request,
             DefaultModelProblemCollector problems,
@@ -1810,7 +1841,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         if (importMgmt == null) {
             importMgmt = new DependencyManagement();
         }
-        return importMgmt;
+        return importMgmt.getDelegate();
     }
 
     private static <T> T cache(
@@ -1863,8 +1894,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model model,
             ModelBuildingRequest request,
             ModelProblemCollector problems,
-            ModelBuildingEventCatapult catapult)
-            throws ModelBuildingException {
+            ModelBuildingEventCatapult catapult) {
         ModelBuildingListener listener = request.getModelBuildingListener();
 
         if (listener != null) {
