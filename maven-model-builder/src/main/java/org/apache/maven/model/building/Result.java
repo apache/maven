@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,16 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static java.util.Collections.singleton;
-import static org.apache.maven.model.building.ModelProblem.Severity.ERROR;
-import static org.apache.maven.model.building.ModelProblem.Severity.FATAL;
+package org.apache.maven.model.building;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import static java.util.Collections.singleton;
+import static org.apache.maven.model.building.ModelProblem.Severity.ERROR;
+import static org.apache.maven.model.building.ModelProblem.Severity.FATAL;
 
 /**
  * There are various forms of results that are represented by this class:
@@ -38,20 +37,17 @@ import java.util.List;
  * </ol>
  * Could encode these variants as subclasses, but kept in one for now
  *
- * @author bbusjaeger
  * @param <T> the model type
  */
-public class Result<T>
-{
+public class Result<T> {
 
     /**
      * Success without warnings
      *
      * @param model
      */
-    public static <T> Result<T> success( T model )
-    {
-        return success( model, Collections.emptyList() );
+    public static <T> Result<T> success(T model) {
+        return success(model, Collections.emptyList());
     }
 
     /**
@@ -60,10 +56,9 @@ public class Result<T>
      * @param model
      * @param problems
      */
-    public static <T> Result<T> success( T model, Iterable<? extends ModelProblem> problems )
-    {
-        assert !hasErrors( problems );
-        return new Result<>( false, model, problems );
+    public static <T> Result<T> success(T model, Iterable<? extends ModelProblem> problems) {
+        assert !hasErrors(problems);
+        return new Result<>(false, model, problems);
     }
 
     /**
@@ -72,19 +67,16 @@ public class Result<T>
      * @param model
      * @param results
      */
-    public static <T> Result<T> success( T model, Result<?>... results )
-    {
+    public static <T> Result<T> success(T model, Result<?>... results) {
         final List<ModelProblem> problemsList = new ArrayList<>();
 
-        for ( Result<?> result1 : results )
-        {
-            for ( ModelProblem modelProblem : result1.getProblems() )
-            {
-                problemsList.add( modelProblem );
+        for (Result<?> result1 : results) {
+            for (ModelProblem modelProblem : result1.getProblems()) {
+                problemsList.add(modelProblem);
             }
         }
 
-        return success( model, problemsList );
+        return success(model, problemsList);
     }
 
     /**
@@ -92,34 +84,28 @@ public class Result<T>
      *
      * @param problems
      */
-    public static <T> Result<T> error( Iterable<? extends ModelProblem> problems )
-    {
-        return error( null, problems );
+    public static <T> Result<T> error(Iterable<? extends ModelProblem> problems) {
+        return error(null, problems);
     }
 
-    public static <T> Result<T> error( T model )
-    {
-        return error( model, Collections.emptyList() );
+    public static <T> Result<T> error(T model) {
+        return error(model, Collections.emptyList());
     }
 
-    public static <T> Result<T> error( Result<?> result )
-    {
-        return error( result.getProblems() );
+    public static <T> Result<T> error(Result<?> result) {
+        return error(result.getProblems());
     }
 
-    public static <T> Result<T> error( Result<?>... results )
-    {
-        final List<ModelProblem> problemsList = new ArrayList<>( );
+    public static <T> Result<T> error(Result<?>... results) {
+        final List<ModelProblem> problemsList = new ArrayList<>();
 
-        for ( Result<?> result1 : results )
-        {
-            for ( ModelProblem modelProblem : result1.getProblems( ) )
-            {
-                problemsList.add( modelProblem );
+        for (Result<?> result1 : results) {
+            for (ModelProblem modelProblem : result1.getProblems()) {
+                problemsList.add(modelProblem);
             }
         }
 
-        return error( problemsList );
+        return error(problemsList);
     }
 
     /**
@@ -128,9 +114,8 @@ public class Result<T>
      * @param model
      * @param problems
      */
-    public static <T> Result<T> error( T model, Iterable<? extends ModelProblem> problems )
-    {
-        return new Result<>( true, model, problems );
+    public static <T> Result<T> error(T model, Iterable<? extends ModelProblem> problems) {
+        return new Result<>(true, model, problems);
     }
 
     /**
@@ -139,9 +124,8 @@ public class Result<T>
      * @param model
      * @param problems
      */
-    public static <T> Result<T> newResult( T model, Iterable<? extends ModelProblem> problems )
-    {
-        return new Result<>( hasErrors( problems ), model, problems );
+    public static <T> Result<T> newResult(T model, Iterable<? extends ModelProblem> problems) {
+        return new Result<>(hasErrors(problems), model, problems);
     }
 
     /**
@@ -151,9 +135,8 @@ public class Result<T>
      * @param result
      * @param problem
      */
-    public static <T> Result<T> addProblem( Result<T> result, ModelProblem problem )
-    {
-        return addProblems( result, singleton( problem ) );
+    public static <T> Result<T> addProblem(Result<T> result, ModelProblem problem) {
+        return addProblems(result, singleton(problem));
     }
 
     /**
@@ -162,32 +145,26 @@ public class Result<T>
      * @param result
      * @param problems
      */
-    public static <T> Result<T> addProblems( Result<T> result, Iterable<? extends ModelProblem> problems )
-    {
+    public static <T> Result<T> addProblems(Result<T> result, Iterable<? extends ModelProblem> problems) {
         Collection<ModelProblem> list = new ArrayList<>();
-        for ( ModelProblem item : problems )
-        {
-            list.add( item );
+        for (ModelProblem item : problems) {
+            list.add(item);
         }
-        for ( ModelProblem item : result.getProblems() )
-        {
-            list.add( item );
+        for (ModelProblem item : result.getProblems()) {
+            list.add(item);
         }
-        return new Result<>( result.hasErrors() || hasErrors( problems ), result.get(), list );
+        return new Result<>(result.hasErrors() || hasErrors(problems), result.get(), list);
     }
 
-    public static <T> Result<T> addProblems( Result<T> result, Result<?>... results )
-    {
+    public static <T> Result<T> addProblems(Result<T> result, Result<?>... results) {
         final List<ModelProblem> problemsList = new ArrayList<>();
 
-        for ( Result<?> result1 : results )
-        {
-            for ( ModelProblem modelProblem : result1.getProblems( ) )
-            {
-                problemsList.add( modelProblem );
+        for (Result<?> result1 : results) {
+            for (ModelProblem modelProblem : result1.getProblems()) {
+                problemsList.add(modelProblem);
             }
         }
-        return addProblems( result, problemsList );
+        return addProblems(result, problemsList);
     }
 
     /**
@@ -195,36 +172,29 @@ public class Result<T>
      *
      * @param results
      */
-    public static <T> Result<Iterable<T>> newResultSet( Iterable<? extends Result<? extends T>> results )
-    {
+    public static <T> Result<Iterable<T>> newResultSet(Iterable<? extends Result<? extends T>> results) {
         boolean hasErrors = false;
         List<T> modelsList = new ArrayList<>();
         List<ModelProblem> problemsList = new ArrayList<>();
 
-        for ( Result<? extends T> result : results )
-        {
-            modelsList.add( result.get() );
+        for (Result<? extends T> result : results) {
+            modelsList.add(result.get());
 
-            for ( ModelProblem modelProblem : result.getProblems() )
-            {
-                problemsList.add( modelProblem );
+            for (ModelProblem modelProblem : result.getProblems()) {
+                problemsList.add(modelProblem);
             }
 
-            if ( result.hasErrors() )
-            {
+            if (result.hasErrors()) {
                 hasErrors = true;
             }
         }
-        return new Result<>( hasErrors, ( Iterable<T> ) modelsList, problemsList );
+        return new Result<>(hasErrors, (Iterable<T>) modelsList, problemsList);
     }
 
     // helper to determine if problems contain error
-    private static boolean hasErrors( Iterable<? extends ModelProblem> problems )
-    {
-        for ( ModelProblem input : problems )
-        {
-            if ( input.getSeverity().equals( ERROR ) || input.getSeverity().equals( FATAL ) )
-            {
+    private static boolean hasErrors(Iterable<? extends ModelProblem> problems) {
+        for (ModelProblem input : problems) {
+            if (input.getSeverity().equals(ERROR) || input.getSeverity().equals(FATAL)) {
                 return true;
             }
         }
@@ -234,32 +204,27 @@ public class Result<T>
     /**
      * Class definition
      */
-
     private final boolean errors;
 
     private final T value;
 
     private final Iterable<? extends ModelProblem> problems;
 
-    private Result( boolean errors, T model, Iterable<? extends ModelProblem> problems )
-    {
+    private Result(boolean errors, T model, Iterable<? extends ModelProblem> problems) {
         this.errors = errors;
         this.value = model;
         this.problems = problems;
     }
 
-    public Iterable<? extends ModelProblem> getProblems()
-    {
+    public Iterable<? extends ModelProblem> getProblems() {
         return problems;
     }
 
-    public T get()
-    {
+    public T get() {
         return value;
     }
 
-    public boolean hasErrors()
-    {
+    public boolean hasErrors() {
         return errors;
     }
 }

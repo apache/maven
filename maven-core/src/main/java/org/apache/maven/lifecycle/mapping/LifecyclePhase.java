@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.mapping;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.mapping;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,104 +16,77 @@ package org.apache.maven.lifecycle.mapping;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.mapping;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.codehaus.plexus.util.StringUtils;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Mojo (goals) bindings to a lifecycle phase.
  *
  * @see LifecycleMojo
  */
-public class LifecyclePhase
-{
+public class LifecyclePhase {
 
     private List<LifecycleMojo> mojos;
 
-    public LifecyclePhase()
-    {
+    public LifecyclePhase() {}
+
+    public LifecyclePhase(String goals) {
+        set(goals);
     }
 
-    public LifecyclePhase( String goals )
-    {
-        set( goals );
-    }
-
-    public List<LifecycleMojo> getMojos()
-    {
+    public List<LifecycleMojo> getMojos() {
         return mojos;
     }
 
-    public void setMojos( List<LifecycleMojo> mojos )
-    {
+    public void setMojos(List<LifecycleMojo> mojos) {
         this.mojos = mojos;
     }
 
-    public void set( String goals )
-    {
+    public void set(String goals) {
         mojos = new ArrayList<>();
 
-        if ( StringUtils.isNotEmpty( goals ) )
-        {
-            String[] mojoGoals = StringUtils.split( goals, "," );
-
-            for ( String mojoGoal: mojoGoals )
-            {
-                LifecycleMojo lifecycleMojo = new LifecycleMojo();
-                lifecycleMojo.setGoal( mojoGoal.trim() );
-                mojos.add( lifecycleMojo );
-            }
+        if (goals != null && !goals.isEmpty()) {
+            String[] mojoGoals = goals.split(",");
+            mojos = Arrays.stream(mojoGoals).map(fromGoalIntoLifecycleMojo).collect(Collectors.toList());
         }
     }
 
+    private final Function<String, LifecycleMojo> fromGoalIntoLifecycleMojo = s -> {
+        LifecycleMojo lifecycleMojo = new LifecycleMojo();
+        lifecycleMojo.setGoal(s.trim());
+        return lifecycleMojo;
+    };
+
     @Override
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        List<LifecycleMojo> mojos = getMojos();
-        if ( mojos != null )
-        {
-            for ( LifecycleMojo mojo: mojos )
-            {
-                if ( first )
-                {
-                    first = false;
-                }
-                else
-                {
-                    sb.append( ',' );
-                }
-                sb.append( mojo.getGoal() );
-            }
-        }
-        return sb.toString();
+    public String toString() {
+        return Optional.ofNullable(getMojos()).orElse(Collections.emptyList()).stream()
+                .map(LifecycleMojo::getGoal)
+                .collect(Collectors.joining(","));
     }
 
     @Deprecated
-    public static Map<String, String> toLegacyMap( Map<String, LifecyclePhase> lifecyclePhases )
-    {
-        if ( lifecyclePhases == null )
-        {
+    public static Map<String, String> toLegacyMap(Map<String, LifecyclePhase> lifecyclePhases) {
+        if (lifecyclePhases == null) {
             return null;
         }
 
-        if ( lifecyclePhases.isEmpty() )
-        {
+        if (lifecyclePhases.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, String> phases = new LinkedHashMap<>();
-        for ( Map.Entry<String, LifecyclePhase> e: lifecyclePhases.entrySet() )
-        {
-            phases.put( e.getKey(), e.getValue().toString() );
+        for (Map.Entry<String, LifecyclePhase> e : lifecyclePhases.entrySet()) {
+            phases.put(e.getKey(), e.getValue().toString());
         }
         return phases;
     }
-
 }

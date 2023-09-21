@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
@@ -26,10 +25,7 @@ import org.eclipse.aether.repository.WorkspaceReader;
 /**
  * MavenWorkspaceReader
  */
-public interface MavenWorkspaceReader
-    extends WorkspaceReader
-{
+public interface MavenWorkspaceReader extends WorkspaceReader {
 
-    Model findModel( Artifact artifact );
-
+    Model findModel(Artifact artifact);
 }

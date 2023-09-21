@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -51,18 +50,14 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 @Named
 @SessionScoped
-public class DefaultProjectManager implements ProjectManager
-{
+public class DefaultProjectManager implements ProjectManager {
 
     private final Session session;
     private final ArtifactManager artifactManager;
     private final PlexusContainer container;
 
     @Inject
-    public DefaultProjectManager( Session session,
-                                  ArtifactManager artifactManager,
-                                  PlexusContainer container )
-    {
+    public DefaultProjectManager(Session session, ArtifactManager artifactManager, PlexusContainer container) {
         this.session = session;
         this.artifactManager = artifactManager;
         this.container = container;
@@ -70,115 +65,98 @@ public class DefaultProjectManager implements ProjectManager
 
     @Nonnull
     @Override
-    public Optional<Path> getPath( Project project )
-    {
+    public Optional<Path> getPath(Project project) {
         // TODO: apiv4
-        throw new UnsupportedOperationException( "Not implemented yet" );
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Nonnull
     @Override
-    public Collection<Artifact> getAttachedArtifacts( Project project )
-    {
-        AbstractSession session = ( (DefaultProject ) project ).getSession();
-        Collection<Artifact> attached = getMavenProject( project ).getAttachedArtifacts().stream()
-                .map( RepositoryUtils::toArtifact )
-                .map( session::getArtifact )
-                .collect( Collectors.toList() );
-        return Collections.unmodifiableCollection( attached );
+    public Collection<Artifact> getAttachedArtifacts(Project project) {
+        AbstractSession session = ((DefaultProject) project).getSession();
+        Collection<Artifact> attached = getMavenProject(project).getAttachedArtifacts().stream()
+                .map(RepositoryUtils::toArtifact)
+                .map(session::getArtifact)
+                .collect(Collectors.toList());
+        return Collections.unmodifiableCollection(attached);
     }
 
     @Override
-    public void attachArtifact( Project project, Artifact artifact, Path path )
-    {
-        getMavenProject( project ).addAttachedArtifact(
-                RepositoryUtils.toArtifact( ( ( DefaultProject ) project ).getSession().toArtifact( artifact ) ) );
-        artifactManager.setPath( artifact, path );
+    public void attachArtifact(Project project, Artifact artifact, Path path) {
+        getMavenProject(project)
+                .addAttachedArtifact(RepositoryUtils.toArtifact(
+                        ((DefaultProject) project).getSession().toArtifact(artifact)));
+        artifactManager.setPath(artifact, path);
     }
 
     @Override
-    public List<String> getCompileSourceRoots( Project project )
-    {
-        List<String> roots = getMavenProject( project ).getCompileSourceRoots();
-        return Collections.unmodifiableList( roots );
+    public List<String> getCompileSourceRoots(Project project) {
+        List<String> roots = getMavenProject(project).getCompileSourceRoots();
+        return Collections.unmodifiableList(roots);
     }
 
     @Override
-    public void addCompileSourceRoot( Project project, String sourceRoot )
-    {
-        List<String> roots = getMavenProject( project ).getCompileSourceRoots();
-        roots.add( sourceRoot );
+    public void addCompileSourceRoot(Project project, String sourceRoot) {
+        List<String> roots = getMavenProject(project).getCompileSourceRoots();
+        roots.add(sourceRoot);
     }
 
     @Override
-    public List<String> getTestCompileSourceRoots( Project project )
-    {
-        List<String> roots = getMavenProject( project ).getTestCompileSourceRoots();
-        return Collections.unmodifiableList( roots );
+    public List<String> getTestCompileSourceRoots(Project project) {
+        List<String> roots = getMavenProject(project).getTestCompileSourceRoots();
+        return Collections.unmodifiableList(roots);
     }
 
     @Override
-    public void addTestCompileSourceRoot( Project project, String sourceRoot )
-    {
-        List<String> roots = getMavenProject( project ).getTestCompileSourceRoots();
-        roots.add( sourceRoot );
+    public void addTestCompileSourceRoot(Project project, String sourceRoot) {
+        List<String> roots = getMavenProject(project).getTestCompileSourceRoots();
+        roots.add(sourceRoot);
     }
 
     @Override
-    public List<RemoteRepository> getRepositories( Project project )
-    {
+    public List<RemoteRepository> getRepositories(Project project) {
         // TODO: apiv4
-        throw new UnsupportedOperationException( "Not implemented yet" );
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
-    public List<Artifact> getResolvedDependencies( Project project, ResolutionScope scope )
-    {
-        Collection<String> toResolve = toScopes( scope );
-        try
-        {
+    public List<Artifact> getResolvedDependencies(Project project, ResolutionScope scope) {
+        Collection<String> toResolve = toScopes(scope);
+        try {
             LifecycleDependencyResolver lifecycleDependencyResolver =
-                    container.lookup( LifecycleDependencyResolver.class );
+                    container.lookup(LifecycleDependencyResolver.class);
             Set<org.apache.maven.artifact.Artifact> artifacts = lifecycleDependencyResolver.resolveProjectArtifacts(
-                    getMavenProject( project ),
+                    getMavenProject(project),
                     toResolve,
                     toResolve,
-                    ( ( DefaultSession ) session ).getMavenSession(),
+                    ((DefaultSession) session).getMavenSession(),
                     false,
-                    Collections.emptySet()
-            );
+                    Collections.emptySet());
             return artifacts.stream()
-                .map( RepositoryUtils::toArtifact )
-                .map( ( ( DefaultSession ) session )::getArtifact )
-                .collect( Collectors.toList() );
-        }
-        catch ( LifecycleExecutionException | ComponentLookupException e )
-        {
-            throw new MavenException( "Unable to resolve project dependencies", e );
+                    .map(RepositoryUtils::toArtifact)
+                    .map(((DefaultSession) session)::getArtifact)
+                    .collect(Collectors.toList());
+        } catch (LifecycleExecutionException | ComponentLookupException e) {
+            throw new MavenException("Unable to resolve project dependencies", e);
         }
     }
 
     @Override
-    public Node getCollectedDependencies( Project project, ResolutionScope scope )
-    {
+    public Node getCollectedDependencies(Project project, ResolutionScope scope) {
         // TODO: apiv4
-        throw new UnsupportedOperationException( "Not implemented yet" );
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
-    public void setProperty( Project project, String key, String value )
-    {
-        getMavenProject( project ).getProperties().setProperty( key, value );
+    public void setProperty(Project project, String key, String value) {
+        getMavenProject(project).getProperties().setProperty(key, value);
     }
 
-    private MavenProject getMavenProject( Project project )
-    {
-        return ( ( DefaultProject ) project ).getProject();
+    private MavenProject getMavenProject(Project project) {
+        return ((DefaultProject) project).getProject();
     }
 
-    private Collection<String> toScopes( ResolutionScope scope )
-    {
-        return scope.scopes().stream().map( Scope::id ).collect( Collectors.toList() );
+    private Collection<String> toScopes(ResolutionScope scope) {
+        return scope.scopes().stream().map(Scope::id).collect(Collectors.toList());
     }
-
 }

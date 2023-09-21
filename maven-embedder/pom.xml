@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,14 +17,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-3-SNAPSHOT</version>
+    <version>4.0.0-alpha-8-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-embedder</artifactId>
@@ -75,16 +73,13 @@ under the License.
       <artifactId>maven-resolver-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-shared-utils</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-slf4j-wrapper</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
+      <classifier>classes</classifier>
       <exclusions>
         <!-- MNG-7068 Active dependency management for Google Guice / Google Guava. Excludes of Guava are managed in parent POM -->
         <exclusion>
@@ -108,10 +103,6 @@ under the License.
     <dependency>
       <groupId>javax.annotation</groupId>
       <artifactId>javax.annotation-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -153,17 +144,18 @@ under the License.
       <artifactId>commons-cli</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
+      <groupId>org.fusesource.jansi</groupId>
+      <artifactId>jansi</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.fusesource.jansi</groupId>
-      <artifactId>jansi</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -187,7 +179,25 @@ under the License.
           <models>
             <model>src/main/mdo/core-extensions.mdo</model>
           </models>
+          <templates>
+            <template>model.vm</template>
+            <template>reader-stax.vm</template>
+            <template>writer-stax.vm</template>
+          </templates>
+          <params>
+            <param>packageModelV4=org.apache.maven.cli.internal.extension.model</param>
+            <param>packageToolV4=org.apache.maven.cli.internal.extension.io</param>
+          </params>
+          <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>
         </configuration>
+        <executions>
+          <execution>
+            <id>modello</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

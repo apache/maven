@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -27,10 +26,8 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles profile injection into the model.
  *
- * @author Benjamin Bentmann
  */
-public interface ProfileInjector
-{
+public interface ProfileInjector {
 
     /**
      * Merges values from the specified profile into the given model. Implementations are expected to keep the profile
@@ -41,6 +38,5 @@ public interface ProfileInjector
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void injectProfile( Model model, Profile profile, ModelBuildingRequest request, ModelProblemCollector problems );
-
+    void injectProfile(Model model, Profile profile, ModelBuildingRequest request, ModelProblemCollector problems);
 }

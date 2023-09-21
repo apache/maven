@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.manager;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven.artifact.manager;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.manager;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.List;
 
@@ -38,62 +41,54 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.proxy.ProxyInfo;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 /**
  * Manages <a href="https://maven.apache.org/wagon">Wagon</a> related operations in Maven.
  */
-@Component( role = WagonManager.class )
-public class DefaultWagonManager
-    extends org.apache.maven.repository.legacy.DefaultWagonManager
-    implements WagonManager
-{
+@Named
+@Singleton
+@Deprecated
+public class DefaultWagonManager extends org.apache.maven.repository.legacy.DefaultWagonManager
+        implements WagonManager {
 
     // NOTE: This must use a different field name than in the super class or IoC has no chance to inject the loggers
-    @Requirement
+    @Inject
     private Logger log;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
-    @Requirement
+    @Inject
     private SettingsDecrypter settingsDecrypter;
 
-    @Requirement
+    @Inject
     private MirrorSelector mirrorSelector;
 
-    @Requirement
+    @Inject
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
-    public AuthenticationInfo getAuthenticationInfo( String id )
-    {
+    public AuthenticationInfo getAuthenticationInfo(String id) {
         MavenSession session = legacySupport.getSession();
 
-        if ( session != null && id != null )
-        {
+        if (session != null && id != null) {
             MavenExecutionRequest request = session.getRequest();
 
-            if ( request != null )
-            {
+            if (request != null) {
                 List<Server> servers = request.getServers();
 
-                if ( servers != null )
-                {
-                    for ( Server server : servers )
-                    {
-                        if ( id.equalsIgnoreCase( server.getId() ) )
-                        {
-                            SettingsDecryptionResult result = settingsDecrypter.decrypt(
-                                    new DefaultSettingsDecryptionRequest( server ) );
+                if (servers != null) {
+                    for (Server server : servers) {
+                        if (id.equalsIgnoreCase(server.getId())) {
+                            SettingsDecryptionResult result =
+                                    settingsDecrypter.decrypt(new DefaultSettingsDecryptionRequest(server));
                             server = result.getServer();
 
                             AuthenticationInfo authInfo = new AuthenticationInfo();
-                            authInfo.setUserName( server.getUsername() );
-                            authInfo.setPassword( server.getPassword() );
-                            authInfo.setPrivateKey( server.getPrivateKey() );
-                            authInfo.setPassphrase( server.getPassphrase() );
+                            authInfo.setUserName(server.getUsername());
+                            authInfo.setPassword(server.getPassword());
+                            authInfo.setPrivateKey(server.getPrivateKey());
+                            authInfo.setPassphrase(server.getPassphrase());
 
                             return authInfo;
                         }
@@ -103,38 +98,32 @@ public class DefaultWagonManager
         }
 
         // empty one to prevent NPE
-       return new AuthenticationInfo();
+        return new AuthenticationInfo();
     }
 
-    public ProxyInfo getProxy( String protocol )
-    {
+    public ProxyInfo getProxy(String protocol) {
         MavenSession session = legacySupport.getSession();
 
-        if ( session != null && protocol != null )
-        {
+        if (session != null && protocol != null) {
             MavenExecutionRequest request = session.getRequest();
 
-            if ( request != null )
-            {
+            if (request != null) {
                 List<Proxy> proxies = request.getProxies();
 
-                if ( proxies != null )
-                {
-                    for ( Proxy proxy : proxies )
-                    {
-                        if ( proxy.isActive() && protocol.equalsIgnoreCase( proxy.getProtocol() ) )
-                        {
-                            SettingsDecryptionResult result = settingsDecrypter.decrypt(
-                                    new DefaultSettingsDecryptionRequest( proxy ) );
+                if (proxies != null) {
+                    for (Proxy proxy : proxies) {
+                        if (proxy.isActive() && protocol.equalsIgnoreCase(proxy.getProtocol())) {
+                            SettingsDecryptionResult result =
+                                    settingsDecrypter.decrypt(new DefaultSettingsDecryptionRequest(proxy));
                             proxy = result.getProxy();
 
                             ProxyInfo proxyInfo = new ProxyInfo();
-                            proxyInfo.setHost( proxy.getHost() );
-                            proxyInfo.setType( proxy.getProtocol() );
-                            proxyInfo.setPort( proxy.getPort() );
-                            proxyInfo.setNonProxyHosts( proxy.getNonProxyHosts() );
-                            proxyInfo.setUserName( proxy.getUsername() );
-                            proxyInfo.setPassword( proxy.getPassword() );
+                            proxyInfo.setHost(proxy.getHost());
+                            proxyInfo.setType(proxy.getProtocol());
+                            proxyInfo.setPort(proxy.getPort());
+                            proxyInfo.setNonProxyHosts(proxy.getNonProxyHosts());
+                            proxyInfo.setUserName(proxy.getUsername());
+                            proxyInfo.setPassword(proxy.getPassword());
 
                             return proxyInfo;
                         }
@@ -146,40 +135,34 @@ public class DefaultWagonManager
         return null;
     }
 
-    public void getArtifact( Artifact artifact, ArtifactRepository repository )
-        throws TransferFailedException, ResourceDoesNotExistException
-    {
-        getArtifact( artifact, repository, null, false );
+    public void getArtifact(Artifact artifact, ArtifactRepository repository)
+            throws TransferFailedException, ResourceDoesNotExistException {
+        getArtifact(artifact, repository, null, false);
     }
 
-    public void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories )
-        throws TransferFailedException, ResourceDoesNotExistException
-    {
-        getArtifact( artifact, remoteRepositories, null, false );
+    public void getArtifact(Artifact artifact, List<ArtifactRepository> remoteRepositories)
+            throws TransferFailedException, ResourceDoesNotExistException {
+        getArtifact(artifact, remoteRepositories, null, false);
     }
 
     @Deprecated
-    public ArtifactRepository getMirrorRepository( ArtifactRepository repository )
-    {
+    public ArtifactRepository getMirrorRepository(ArtifactRepository repository) {
 
-        Mirror mirror = mirrorSelector.getMirror( repository, legacySupport.getSession().getSettings().getMirrors() );
+        Mirror mirror = mirrorSelector.getMirror(
+                repository, legacySupport.getSession().getSettings().getMirrors());
 
-        if ( mirror != null )
-        {
+        if (mirror != null) {
             String id = mirror.getId();
-            if ( id == null )
-            {
+            if (id == null) {
                 // TODO this should be illegal in settings.xml
                 id = repository.getId();
             }
 
-            log.debug( "Using mirror: " + mirror.getUrl() + " (id: " + id + ")" );
+            log.debug("Using mirror: " + mirror.getUrl() + " (id: " + id + ")");
 
-            repository = artifactRepositoryFactory.createArtifactRepository( id, mirror.getUrl(),
-                                                                     repository.getLayout(), repository.getSnapshots(),
-                                                                     repository.getReleases() );
+            repository = artifactRepositoryFactory.createArtifactRepository(
+                    id, mirror.getUrl(), repository.getLayout(), repository.getSnapshots(), repository.getReleases());
         }
         return repository;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -32,11 +31,10 @@ import org.apache.maven.api.model.Model;
  * Interface representing a Maven project.
  * Projects can be built using the {@link org.apache.maven.api.services.ProjectBuilder} service.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
-public interface Project
-{
+public interface Project {
 
     @Nonnull
     String getGroupId();
@@ -57,8 +55,7 @@ public interface Project
     Model getModel();
 
     @Nonnull
-    default Build getBuild()
-    {
+    default Build getBuild() {
         Build build = getModel().getBuild();
         return build != null ? build : Build.newInstance();
     }
@@ -74,9 +71,8 @@ public interface Project
     Optional<Path> getPomPath();
 
     @Nonnull
-    default Optional<Path> getBasedir()
-    {
-        return getPomPath().map( Path::getParent );
+    default Optional<Path> getBasedir() {
+        return getPomPath().map(Path::getParent);
     }
 
     @Nonnull
@@ -86,12 +82,48 @@ public interface Project
     List<DependencyCoordinate> getManagedDependencies();
 
     @Nonnull
-    default String getId()
-    {
+    default String getId() {
         return getModel().getId();
     }
 
+    /**
+     * @deprecated use {@link #isTopProject()} instead
+     */
+    @Deprecated
     boolean isExecutionRoot();
+
+    /**
+     * Returns a boolean indicating if the project is the top level project for
+     * this reactor build.  The top level project may be different from the
+     * {@code rootDirectory}, especially if a subtree of the project is being
+     * built, either because Maven has been launched in a subdirectory or using
+     * a {@code -f} option.
+     *
+     * @return {@code true} if the project is the top level project for this build
+     */
+    boolean isTopProject();
+
+    /**
+     * Returns a boolean indicating if the project is a root project,
+     * meaning that the {@link #getRootDirectory()} and {@link #getBasedir()}
+     * points to the same directory, and that either {@link Model#isRoot()}
+     * is {@code true} or that {@code basedir} contains a {@code .mvn} child
+     * directory.
+     *
+     * @return {@code true} if the project is the root project
+     * @see Model#isRoot()
+     */
+    boolean isRootProject();
+
+    /**
+     * Gets the root directory of the project, which is the parent directory
+     * containing the {@code .mvn} directory or flagged with {@code root="true"}.
+     *
+     * @throws IllegalStateException if the root directory could not be found
+     * @see Session#getRootDirectory()
+     */
+    @Nonnull
+    Path getRootDirectory();
 
     @Nonnull
     Optional<Project> getParent();
@@ -101,5 +133,4 @@ public interface Project
 
     @Nonnull
     List<RemoteRepository> getRemotePluginRepositories();
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,17 +16,15 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 import java.util.List;
 
 /**
  * Collects problems that are encountered during settings building.
  *
- * @author Benjamin Bentmann
- * @author Robert Scholte
  */
-public interface ProblemCollector
-{
+public interface ProblemCollector {
 
     /**
      * Adds the specified problem.
@@ -40,7 +36,7 @@ public interface ProblemCollector
      * @param column The one-based index of the column containing the problem or {@code -1} if unknown.
      * @param cause The cause of the problem, may be {@code null}.
      */
-    void add( Problem.Severity severity, String message, int line, int column, Exception cause );
+    void add(Problem.Severity severity, String message, int line, int column, Exception cause);
 
     /**
      * The next messages will be bound to this source. When calling this method again, previous messages keep
@@ -48,12 +44,11 @@ public interface ProblemCollector
      *
      * @param source a source
      */
-    void setSource( String source );
+    void setSource(String source);
 
     /**
      *
      * @return the collected Problems, never {@code null}
      */
     List<Problem> getProblems();
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.logwrapper;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,56 +16,49 @@ package org.apache.maven.logwrapper;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.slf4j.event.Level;
+package org.apache.maven.logwrapper;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.event.Level;
+
 /**
  * Responsible for keeping state of whether the threshold of the --fail-on-severity flag has been hit.
  */
-public class LogLevelRecorder
-{
+public class LogLevelRecorder {
     private static final Map<String, Level> ACCEPTED_LEVELS = new HashMap<>();
-    static
-    {
-        ACCEPTED_LEVELS.put( "WARN", Level.WARN );
-        ACCEPTED_LEVELS.put( "WARNING", Level.WARN );
-        ACCEPTED_LEVELS.put( "ERROR", Level.ERROR );
+
+    static {
+        ACCEPTED_LEVELS.put("WARN", Level.WARN);
+        ACCEPTED_LEVELS.put("WARNING", Level.WARN);
+        ACCEPTED_LEVELS.put("ERROR", Level.ERROR);
     }
 
     private final Level logThreshold;
     private boolean metThreshold = false;
 
-    public LogLevelRecorder( String threshold )
-    {
-        logThreshold = determineThresholdLevel( threshold );
+    public LogLevelRecorder(String threshold) {
+        logThreshold = determineThresholdLevel(threshold);
     }
 
-    private Level determineThresholdLevel( String input )
-    {
-        final Level result = ACCEPTED_LEVELS.get( input );
-        if ( result == null )
-        {
+    private Level determineThresholdLevel(String input) {
+        final Level result = ACCEPTED_LEVELS.get(input);
+        if (result == null) {
             String message = String.format(
-                    "%s is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.",
-                    input );
-            throw new IllegalArgumentException( message );
+                    "%s is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.", input);
+            throw new IllegalArgumentException(message);
         }
         return result;
     }
 
-    public void record( Level logLevel )
-    {
-        if ( !metThreshold && logLevel.toInt() >= logThreshold.toInt() )
-        {
+    public void record(Level logLevel) {
+        if (!metThreshold && logLevel.toInt() >= logThreshold.toInt()) {
             metThreshold = true;
         }
     }
 
-    public boolean metThreshold()
-    {
+    public boolean metThreshold() {
         return metThreshold;
     }
 }

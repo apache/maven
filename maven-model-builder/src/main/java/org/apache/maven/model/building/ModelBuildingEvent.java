@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,15 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import org.apache.maven.model.Model;
 
 /**
  * Holds data relevant for a model building event.
  *
- * @author Benjamin Bentmann
  */
-public interface ModelBuildingEvent
-{
+public interface ModelBuildingEvent {
 
     /**
      * Gets the model being built. The precise state of this model depends on the event being fired.
@@ -49,5 +46,4 @@ public interface ModelBuildingEvent
      * @return The container used to collect problems that were encountered, never {@code null}.
      */
     ModelProblemCollector getProblems();
-
 }

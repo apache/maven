@@ -1,5 +1,3 @@
-package org.apache.maven.model.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,17 +16,15 @@ package org.apache.maven.model.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.io;
 
 import java.io.IOException;
 
 /**
  * Signals a failure to parse the POM due to invalid syntax (e.g. non well formed XML or unknown elements).
  *
- * @author Benjamin Bentmann
  */
-public class ModelParseException
-    extends IOException
-{
+public class ModelParseException extends IOException {
 
     /**
      * The one-based index of the line containing the error.
@@ -47,9 +43,8 @@ public class ModelParseException
      * @param lineNumber The one-based index of the line containing the error or {@code -1} if unknown.
      * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
      */
-    public ModelParseException( String message, int lineNumber, int columnNumber )
-    {
-        super( message );
+    public ModelParseException(String message, int lineNumber, int columnNumber) {
+        super(message);
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }
@@ -62,10 +57,9 @@ public class ModelParseException
      * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
      * @param cause The nested cause of this error, may be {@code null}.
      */
-    public ModelParseException( String message, int lineNumber, int columnNumber, Throwable cause )
-    {
-        super( message );
-        initCause( cause );
+    public ModelParseException(String message, int lineNumber, int columnNumber, Throwable cause) {
+        super(message);
+        initCause(cause);
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }
@@ -75,8 +69,7 @@ public class ModelParseException
      *
      * @return The one-based index of the line containing the error or a non-positive value if unknown.
      */
-    public int getLineNumber()
-    {
+    public int getLineNumber() {
         return lineNumber;
     }
 
@@ -85,9 +78,7 @@ public class ModelParseException
      *
      * @return The one-based index of the column containing the error or non-positive value if unknown.
      */
-    public int getColumnNumber()
-    {
+    public int getColumnNumber() {
         return columnNumber;
     }
-
 }

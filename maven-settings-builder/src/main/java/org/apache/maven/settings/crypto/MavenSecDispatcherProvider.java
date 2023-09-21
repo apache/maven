@@ -1,5 +1,3 @@
-package org.apache.maven.settings.crypto;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,40 +16,33 @@ package org.apache.maven.settings.crypto;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.Map;
+package org.apache.maven.settings.crypto;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import java.util.Map;
+
 import org.sonatype.plexus.components.cipher.PlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.PasswordDecryptor;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 
-@Named( "maven" )
+@Named("maven")
 @Singleton
-public final class MavenSecDispatcherProvider
-    implements Provider<SecDispatcher>
-{
+public final class MavenSecDispatcherProvider implements Provider<SecDispatcher> {
     private final SecDispatcher secDispatcher;
 
     @Inject
-    public MavenSecDispatcherProvider( final PlexusCipher plexusCipher,
-                                       final Map<String, PasswordDecryptor> decryptors )
-    {
-        this.secDispatcher = new DefaultSecDispatcher(
-            plexusCipher,
-            decryptors,
-            "~/.m2/settings-security.xml"
-        );
+    public MavenSecDispatcherProvider(
+            final PlexusCipher plexusCipher, final Map<String, PasswordDecryptor> decryptors) {
+        this.secDispatcher = new DefaultSecDispatcher(plexusCipher, decryptors, "~/.m2/settings-security.xml");
     }
 
     @Override
-    public SecDispatcher get()
-    {
+    public SecDispatcher get() {
         return secDispatcher;
     }
 }

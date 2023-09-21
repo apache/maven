@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.mapping;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.mapping;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.mapping;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.mapping;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -26,8 +25,7 @@ import java.util.Map;
 /**
  * Lifecycle definition for a packaging (multiple packagings share the same lifecycle id = usually "default").
  */
-public class Lifecycle
-{
+public class Lifecycle {
     /**
      * Field id
      */
@@ -41,16 +39,14 @@ public class Lifecycle
     /**
      * Method getId
      */
-    public String getId()
-    {
+    public String getId() {
         return this.id;
     }
 
     /**
      * Method getLifecyclePhases
      */
-    public Map<String, LifecyclePhase> getLifecyclePhases()
-    {
+    public Map<String, LifecyclePhase> getLifecyclePhases() {
         return this.lifecyclePhases;
     }
 
@@ -59,8 +55,7 @@ public class Lifecycle
      *
      * @param id
      */
-    public void setId( String id )
-    {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -69,41 +64,34 @@ public class Lifecycle
      *
      * @param lifecyclePhases
      */
-    public void setLifecyclePhases( Map<String, LifecyclePhase> lifecyclePhases )
-    {
+    public void setLifecyclePhases(Map<String, LifecyclePhase> lifecyclePhases) {
         this.lifecyclePhases = lifecyclePhases;
     }
 
     @Deprecated
-    public Map<String, String> getPhases()
-    {
+    public Map<String, String> getPhases() {
         Map<String, LifecyclePhase> lphases = getLifecyclePhases();
-        if ( lphases == null )
-        {
+        if (lphases == null) {
             return null;
         }
 
-        if ( lphases.isEmpty() )
-        {
+        if (lphases.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, String> phases = new LinkedHashMap<>();
-        for ( Map.Entry<String, LifecyclePhase> e: lphases.entrySet() )
-        {
-            phases.put( e.getKey(), e.getValue().toString() );
+        for (Map.Entry<String, LifecyclePhase> e : lphases.entrySet()) {
+            phases.put(e.getKey(), e.getValue().toString());
         }
         return phases;
     }
 
     @Deprecated
-    public void setPhases( Map<String, String> phases )
-    {
+    public void setPhases(Map<String, String> phases) {
         Map<String, LifecyclePhase> lphases = new LinkedHashMap<>();
-        for ( Map.Entry<String, String> e: phases.entrySet() )
-        {
-            lphases.put( e.getKey(), new LifecyclePhase( e.getValue() ) );
+        for (Map.Entry<String, String> e : phases.entrySet()) {
+            lphases.put(e.getKey(), new LifecyclePhase(e.getValue()));
         }
-        setLifecyclePhases( lphases );
+        setLifecyclePhases(lphases);
     }
 }

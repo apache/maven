@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,17 +16,17 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
 
 /**
  * Helper class to convert a metadata Graph into some form of a classpath
  *
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
-public interface ClasspathTransformation
-{
+@Deprecated
+public interface ClasspathTransformation {
     String ROLE = ClasspathTransformation.class.getName();
 
     /**
@@ -41,6 +39,6 @@ public interface ClasspathTransformation
      * @return Collection of metadata objects in the linked subgraph of the graph which
      *             contains the graph.getEntry() vertice
      */
-    ClasspathContainer transform( MetadataGraph dirtyGraph, ArtifactScopeEnum scope, boolean resolve )
-        throws MetadataGraphTransformationException;
+    ClasspathContainer transform(MetadataGraph dirtyGraph, ArtifactScopeEnum scope, boolean resolve)
+            throws MetadataGraphTransformationException;
 }

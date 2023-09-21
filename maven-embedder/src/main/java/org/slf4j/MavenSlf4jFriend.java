@@ -1,5 +1,3 @@
-package org.slf4j;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,18 +16,17 @@ package org.slf4j;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.slf4j;
 
 /**
  * Utility for Maven to access Slf4j internals through package access.
  * Use with precaution, since this is not normally intended for production use.
  */
-public class MavenSlf4jFriend
-{
+public class MavenSlf4jFriend {
     /**
      * Reset Slf4j internal state.
      */
-    public static void reset()
-    {
+    public static void reset() {
         LoggerFactory.reset();
     }
 }

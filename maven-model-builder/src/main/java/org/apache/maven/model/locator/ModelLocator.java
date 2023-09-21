@@ -1,5 +1,3 @@
-package org.apache.maven.model.locator;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,15 @@ package org.apache.maven.model.locator;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.locator;
 
 import java.io.File;
 
 /**
  * Locates a POM file within a project base directory.
  *
- * @author Benjamin Bentmann
  */
-public interface ModelLocator
-{
+public interface ModelLocator {
 
     /**
      * Locates the POM file within the specified project directory. In case the given project directory does not exist
@@ -39,6 +36,15 @@ public interface ModelLocator
      *            null}.
      * @return The path to the (possibly non-existent) POM file, never {@code null}.
      */
-    File locatePom( File projectDirectory );
+    File locatePom(File projectDirectory);
 
+    /**
+     * Returns the file containing the pom or null if a pom can not be found at the given file or in the given directory.
+     */
+    default File locateExistingPom(File project) {
+        if (project == null || project.isDirectory()) {
+            project = locatePom(project);
+        }
+        return project.isFile() ? project : null;
+    }
 }

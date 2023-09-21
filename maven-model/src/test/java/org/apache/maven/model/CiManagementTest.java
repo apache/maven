@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,36 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code CiManagement}.
  *
- * @author Benjamin Bentmann
  */
-public class CiManagementTest
-{
+class CiManagementTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    void testHashCodeNullSafe() {
         new CiManagement().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new CiManagement().equals( null ) );
+    void testEqualsNullSafe() {
+        assertFalse(new CiManagement().equals(null));
 
-        new CiManagement().equals( new CiManagement() );
+        new CiManagement().equals(new CiManagement());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    void testEqualsIdentity() {
         CiManagement thing = new CiManagement();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new CiManagement().toString() );
+    void testToStringNullSafe() {
+        assertNotNull(new CiManagement().toString());
     }
-
 }

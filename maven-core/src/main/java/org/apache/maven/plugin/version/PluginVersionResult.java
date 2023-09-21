@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.version;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.version;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.version;
 
 import org.eclipse.aether.repository.ArtifactRepository;
 
@@ -25,10 +24,8 @@ import org.eclipse.aether.repository.ArtifactRepository;
  * Describes the result of a plugin version resolution request.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
-public interface PluginVersionResult
-{
+public interface PluginVersionResult {
 
     /**
      * The resolved plugin version.
@@ -43,5 +40,4 @@ public interface PluginVersionResult
      * @return The repository from which the plugin version was resolved, never {@code null}.
      */
     ArtifactRepository getRepository();
-
 }

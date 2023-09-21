@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.annotations;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.annotations;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -31,15 +30,14 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Used if your Mojo needs to fork a <a href="/ref/3.0.4/maven-core/lifecycles.html">lifecycle</a>.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Documented
-@Retention( RetentionPolicy.CLASS )
-@Target( ElementType.TYPE )
+@Retention(RetentionPolicy.CLASS)
+@Target(ElementType.TYPE)
 @Inherited
-public @interface Execute
-{
+public @interface Execute {
     /**
      * Lifecycle phase to fork. Note that specifying a phase overrides specifying a goal.
      * For custom lifecycle phase ids use {@link #customPhase()} instead.

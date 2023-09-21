@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.annotations;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.annotations;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -32,15 +31,14 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * This annotation will mark your class as a Mojo (ie. goal in a Maven plugin).
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Documented
-@Retention( RetentionPolicy.CLASS )
-@Target( ElementType.TYPE )
+@Retention(RetentionPolicy.CLASS)
+@Target(ElementType.TYPE)
 @Inherited
-public @interface Mojo
-{
+public @interface Mojo {
     /**
      * goal name (required).
      * @return the goal name
@@ -61,7 +59,7 @@ public @interface Mojo
 
     /**
      * the required dependency collection scope.
-     * @return the required dependency collection scope 
+     * @return the required dependency collection scope
      */
     ResolutionScope requiresDependencyCollection() default ResolutionScope.NONE;
 
@@ -94,5 +92,4 @@ public @interface Mojo
      * @return the configurator bean name
      */
     String configurator() default "";
-
 }

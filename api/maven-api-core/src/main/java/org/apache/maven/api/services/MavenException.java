@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,34 +16,28 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
 
 /**
  * Base class for all maven exceptions.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
-public class MavenException extends RuntimeException
-{
-    public MavenException()
-    {
+public class MavenException extends RuntimeException {
+    public MavenException() {}
+
+    public MavenException(String message) {
+        super(message);
     }
 
-    public MavenException( String message )
-    {
-        super( message );
+    public MavenException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public MavenException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public MavenException(Throwable cause) {
+        super(cause);
     }
-
-    public MavenException( Throwable cause )
-    {
-        super( cause );
-    }
-
 }

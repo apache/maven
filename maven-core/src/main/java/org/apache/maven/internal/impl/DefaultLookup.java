@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,66 +32,48 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 @Named
 @Singleton
-public class DefaultLookup implements Lookup
-{
+public class DefaultLookup implements Lookup {
 
     private final PlexusContainer container;
 
     @Inject
-    public DefaultLookup( PlexusContainer container )
-    {
+    public DefaultLookup(PlexusContainer container) {
         this.container = container;
     }
 
     @Override
-    public <T> T lookup( Class<T> type )
-    {
-        try
-        {
-            return container.lookup( type );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new LookupException( e );
+    public <T> T lookup(Class<T> type) {
+        try {
+            return container.lookup(type);
+        } catch (ComponentLookupException e) {
+            throw new LookupException(e);
         }
     }
 
     @Override
-    public <T> T lookup( Class<T> type, String name )
-    {
-        try
-        {
-            return container.lookup( type, name );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new LookupException( e );
+    public <T> T lookup(Class<T> type, String name) {
+        try {
+            return container.lookup(type, name);
+        } catch (ComponentLookupException e) {
+            throw new LookupException(e);
         }
     }
 
     @Override
-    public <T> List<T> lookupList( Class<T> type )
-    {
-        try
-        {
-            return container.lookupList( type );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new LookupException( e );
+    public <T> List<T> lookupList(Class<T> type) {
+        try {
+            return container.lookupList(type);
+        } catch (ComponentLookupException e) {
+            throw new LookupException(e);
         }
     }
 
     @Override
-    public <T> Map<String, T> lookupMap( Class<T> type )
-    {
-        try
-        {
-            return container.lookupMap( type );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new LookupException( e );
+    public <T> Map<String, T> lookupMap(Class<T> type) {
+        try {
+            return container.lookupMap(type);
+        } catch (ComponentLookupException e) {
+            throw new LookupException(e);
         }
     }
 }

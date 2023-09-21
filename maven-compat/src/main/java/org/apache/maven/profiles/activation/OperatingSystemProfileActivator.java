@@ -1,5 +1,3 @@
-package org.apache.maven.profiles.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.profiles.activation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.profiles.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.profiles.activation;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationOS;
@@ -28,137 +27,107 @@ import org.codehaus.plexus.util.Os;
  * OperatingSystemProfileActivator
  */
 @Deprecated
-public class OperatingSystemProfileActivator
-    implements ProfileActivator
-{
+public class OperatingSystemProfileActivator implements ProfileActivator {
 
-    public boolean canDetermineActivation( Profile profile )
-    {
+    public boolean canDetermineActivation(Profile profile) {
         Activation activation = profile.getActivation();
         return activation != null && activation.getOs() != null;
     }
 
-    public boolean isActive( Profile profile )
-    {
+    public boolean isActive(Profile profile) {
         Activation activation = profile.getActivation();
         ActivationOS os = activation.getOs();
 
-        boolean result = ensureAtLeastOneNonNull( os );
+        boolean result = ensureAtLeastOneNonNull(os);
 
-        if ( result && os.getFamily() != null )
-        {
-            result = determineFamilyMatch( os.getFamily() );
+        if (result && os.getFamily() != null) {
+            result = determineFamilyMatch(os.getFamily());
         }
-        if ( result && os.getName() != null )
-        {
-            result = determineNameMatch( os.getName() );
+        if (result && os.getName() != null) {
+            result = determineNameMatch(os.getName());
         }
-        if ( result && os.getArch() != null )
-        {
-            result = determineArchMatch( os.getArch() );
+        if (result && os.getArch() != null) {
+            result = determineArchMatch(os.getArch());
         }
-        if ( result && os.getVersion() != null )
-        {
-            result = determineVersionMatch( os.getVersion() );
+        if (result && os.getVersion() != null) {
+            result = determineVersionMatch(os.getVersion());
         }
         return result;
     }
 
-    private boolean ensureAtLeastOneNonNull( ActivationOS os )
-    {
+    private boolean ensureAtLeastOneNonNull(ActivationOS os) {
         return os.getArch() != null || os.getFamily() != null || os.getName() != null || os.getVersion() != null;
     }
 
-    private boolean determineVersionMatch( String version )
-    {
+    private boolean determineVersionMatch(String version) {
         String test = version;
         boolean reverse = false;
 
-        if ( test.startsWith( "!" ) )
-        {
+        if (test.startsWith("!")) {
             reverse = true;
-            test = test.substring( 1 );
+            test = test.substring(1);
         }
 
-        boolean result = Os.isVersion( test );
+        boolean result = Os.isVersion(test);
 
-        if ( reverse )
-        {
+        if (reverse) {
             return !result;
-        }
-        else
-        {
+        } else {
             return result;
         }
     }
 
-    private boolean determineArchMatch( String arch )
-    {
+    private boolean determineArchMatch(String arch) {
         String test = arch;
         boolean reverse = false;
 
-        if ( test.startsWith( "!" ) )
-        {
+        if (test.startsWith("!")) {
             reverse = true;
-            test = test.substring( 1 );
+            test = test.substring(1);
         }
 
-        boolean result = Os.isArch( test );
+        boolean result = Os.isArch(test);
 
-        if ( reverse )
-        {
+        if (reverse) {
             return !result;
-        }
-        else
-        {
+        } else {
             return result;
         }
     }
 
-    private boolean determineNameMatch( String name )
-    {
+    private boolean determineNameMatch(String name) {
         String test = name;
         boolean reverse = false;
 
-        if ( test.startsWith( "!" ) )
-        {
+        if (test.startsWith("!")) {
             reverse = true;
-            test = test.substring( 1 );
+            test = test.substring(1);
         }
 
-        boolean result = Os.isName( test );
+        boolean result = Os.isName(test);
 
-        if ( reverse )
-        {
+        if (reverse) {
             return !result;
-        }
-        else
-        {
+        } else {
             return result;
         }
     }
 
-    private boolean determineFamilyMatch( String family )
-    {
+    private boolean determineFamilyMatch(String family) {
         String test = family;
         boolean reverse = false;
 
-        if ( test.startsWith( "!" ) )
-        {
+        if (test.startsWith("!")) {
             reverse = true;
-            test = test.substring( 1 );
+            test = test.substring(1);
         }
 
-        boolean result = Os.isFamily( test );
+        boolean result = Os.isFamily(test);
 
-        if ( reverse )
-        {
+        if (reverse) {
             return !result;
-        }
-        else
-        {
+        } else {
             return result;
         }
     }
-
 }

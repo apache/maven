@@ -1,5 +1,3 @@
-package org.apache.maven.settings.crypto;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.settings.crypto;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.crypto;
 
 import java.util.List;
 
@@ -27,10 +26,8 @@ import org.apache.maven.settings.Server;
 /**
  * Collects parameters that control the decryption of settings.
  *
- * @author Benjamin Bentmann
  */
-public interface SettingsDecryptionRequest
-{
+public interface SettingsDecryptionRequest {
 
     /**
      * Gets the servers whose passwords should be decrypted.
@@ -45,7 +42,7 @@ public interface SettingsDecryptionRequest
      * @param servers The servers to decrypt, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    SettingsDecryptionRequest setServers( List<Server> servers );
+    SettingsDecryptionRequest setServers(List<Server> servers);
 
     /**
      * Gets the proxies whose passwords should be decrypted.
@@ -60,6 +57,5 @@ public interface SettingsDecryptionRequest
      * @param proxies The proxies to decrypt, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    SettingsDecryptionRequest setProxies( List<Proxy> proxies );
-
+    SettingsDecryptionRequest setProxies(List<Proxy> proxies);
 }

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,19 +17,19 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>37</version>
+    <!-- please also update in maven-bom -->
+    <version>40</version>
     <relativePath />
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>4.0.0-alpha-3-SNAPSHOT</version>
+  <version>4.0.0-alpha-8-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -40,88 +39,9 @@ under the License.
     publication, and distribution publication are all controlled from
     the declarative file. Maven can be extended by plugins to utilise a
     number of other development tools for reporting or the build
-    process.
-  </description>
+    process.</description>
   <url>https://maven.apache.org/ref/${project.version}/</url>
   <inceptionYear>2001</inceptionYear>
-
-  <properties>
-    <javaVersion>8</javaVersion>
-    <classWorldsVersion>2.6.0</classWorldsVersion>
-    <commonsCliVersion>1.5.0</commonsCliVersion>
-    <commonsIoVersion>2.11.0</commonsIoVersion>
-    <commonsLangVersion>3.12.0</commonsLangVersion>
-    <junitVersion>5.8.1</junitVersion>
-    <mockitoVersion>3.2.0</mockitoVersion>
-    <plexusVersion>2.1.0</plexusVersion>
-    <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
-    <plexusUtilsVersion>4.0.0-alpha-3-SNAPSHOT</plexusUtilsVersion>
-    <plexusUtilsVersionEmbedded>3.4.2</plexusUtilsVersionEmbedded>
-    <guiceVersion>5.1.0</guiceVersion>
-    <guavaVersion>30.1-jre</guavaVersion>
-    <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
-    <wagonVersion>3.5.2</wagonVersion>
-    <securityDispatcherVersion>2.0</securityDispatcherVersion>
-    <cipherVersion>2.0</cipherVersion>
-    <jxpathVersion>1.3</jxpathVersion>
-    <resolverVersion>1.8.2</resolverVersion>
-    <slf4jVersion>1.7.36</slf4jVersion>
-    <xmlunitVersion>2.6.4</xmlunitVersion>
-    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
-    <!-- Control the name of the distribution and information output by mvn -->
-    <distributionId>apache-maven</distributionId>
-    <distributionShortName>Maven</distributionShortName>
-    <distributionName>Apache Maven</distributionName>
-    <maven.site.path>ref/4-LATEST</maven.site.path>
-    <project.build.outputTimestamp>2022-10-14T23:41:39Z</project.build.outputTimestamp>
-  </properties>
-
-  <modules>
-    <module>maven-bom</module>
-    <module>maven-plugin-api</module>
-    <module>maven-builder-support</module>
-    <module>maven-model</module>
-    <module>maven-model-builder</module>
-    <module>maven-model-transform</module>
-    <module>api</module>
-    <module>maven-xml-impl</module>
-    <module>plexus-utils</module>
-    <module>maven-core</module>
-    <module>maven-settings</module>
-    <module>maven-settings-builder</module>
-    <module>maven-artifact</module>
-    <module>maven-resolver-provider</module>
-    <module>maven-repository-metadata</module>
-    <module>maven-slf4j-provider</module>
-    <module>maven-slf4j-wrapper</module>
-    <module>maven-embedder</module>
-    <module>maven-compat</module>
-    <module>apache-maven</module> <!-- rename to apache-maven/maven.pom after RAT-268 -->
-    <module>maven-toolchain-model</module>
-    <module>maven-toolchain-builder</module>
-  </modules>
-
-  <scm>
-    <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
-    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
-    <tag>maven-4.0.0-alpha-1</tag>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>https://issues.apache.org/jira/browse/MNG</url>
-  </issueManagement>
-  <ciManagement>
-    <system>Jenkins</system>
-    <url>https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/</url>
-  </ciManagement>
-  <distributionManagement>
-    <downloadUrl>https://maven.apache.org/download.html</downloadUrl>
-    <site>
-      <id>apache.website</id>
-      <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
-    </site>
-  </distributionManagement>
 
   <contributors>
     <contributor>
@@ -179,6 +99,85 @@ under the License.
     </contributor>
   </contributors>
 
+  <modules>
+    <module>maven-bom</module>
+    <module>maven-plugin-api</module>
+    <module>maven-builder-support</module>
+    <module>maven-model</module>
+    <module>maven-model-builder</module>
+    <module>api</module>
+    <module>maven-xml-impl</module>
+    <module>maven-core</module>
+    <module>maven-settings</module>
+    <module>maven-settings-builder</module>
+    <module>maven-artifact</module>
+    <module>maven-resolver-provider</module>
+    <module>maven-repository-metadata</module>
+    <module>maven-slf4j-provider</module>
+    <module>maven-slf4j-wrapper</module>
+    <module>maven-embedder</module>
+    <module>maven-compat</module>
+    <module>apache-maven</module>
+    <!-- rename to apache-maven/maven.pom after RAT-268 -->
+    <module>maven-toolchain-model</module>
+    <module>maven-toolchain-builder</module>
+  </modules>
+
+  <scm>
+    <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
+    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
+    <tag>maven-4.0.0-alpha-3</tag>
+    <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
+  </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>https://issues.apache.org/jira/browse/MNG</url>
+  </issueManagement>
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/</url>
+  </ciManagement>
+  <distributionManagement>
+    <site>
+      <id>apache.website</id>
+      <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
+    </site>
+    <downloadUrl>https://maven.apache.org/download.html</downloadUrl>
+  </distributionManagement>
+
+  <properties>
+    <javaVersion>8</javaVersion>
+    <classWorldsVersion>2.6.0</classWorldsVersion>
+    <commonsCliVersion>1.5.0</commonsCliVersion>
+    <commonsIoVersion>2.11.0</commonsIoVersion>
+    <commonsLangVersion>3.12.0</commonsLangVersion>
+    <junitVersion>5.9.1</junitVersion>
+    <mockitoVersion>4.11.0</mockitoVersion>
+    <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
+    <plexusUtilsVersion>4.0.0</plexusUtilsVersion>
+    <plexusXmlVersion>4.0.1</plexusXmlVersion>
+    <guiceVersion>5.1.0</guiceVersion>
+    <guavaVersion>32.0.1-jre</guavaVersion>
+    <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
+    <wagonVersion>3.5.3</wagonVersion>
+    <securityDispatcherVersion>2.0</securityDispatcherVersion>
+    <cipherVersion>2.0</cipherVersion>
+    <jxpathVersion>1.3</jxpathVersion>
+    <resolverVersion>1.9.14</resolverVersion>
+    <sisuVersion>0.9.0.M2</sisuVersion>
+    <asmVersion>9.5</asmVersion>
+    <slf4jVersion>1.7.36</slf4jVersion>
+    <xmlunitVersion>2.6.4</xmlunitVersion>
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <maven.baseline>3.8.7</maven.baseline>
+    <!-- Control the name of the distribution and information output by mvn -->
+    <distributionId>apache-maven</distributionId>
+    <distributionShortName>Maven</distributionShortName>
+    <distributionName>Apache Maven</distributionName>
+    <maven.site.path>ref/4-LATEST</maven.site.path>
+    <project.build.outputTimestamp>2023-06-24T08:52:55Z</project.build.outputTimestamp>
+  </properties>
+
   <!--bootstrap-start-comment-->
   <dependencyManagement>
     <!--bootstrap-end-comment-->
@@ -205,14 +204,20 @@ under the License.
       <!--bootstrap-end-comment-->
       <!--  Plexus -->
       <dependency>
-        <groupId>org.apache.maven</groupId>
+        <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
         <version>${plexusUtilsVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-xml</artifactId>
+        <version>${plexusXmlVersion}</version>
       </dependency>
       <dependency>
         <groupId>com.google.inject</groupId>
         <artifactId>guice</artifactId>
         <version>${guiceVersion}</version>
+        <classifier>classes</classifier>
         <exclusions>
           <exclusion>
             <groupId>com.google.guava</groupId>
@@ -263,9 +268,15 @@ under the License.
         <artifactId>org.eclipse.sisu.plexus</artifactId>
         <version>${sisuVersion}</version>
         <exclusions>
-          <exclusion> <!-- Way too easy to conflict with plugins to be in Maven and leak in plugins -->
+          <exclusion>
+            <!-- Way too easy to conflict with plugins to be in Maven and leak in plugins -->
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
+          </exclusion>
+          <!-- we use the no_asm classifier for sisu.inject -->
+          <exclusion>
+            <groupId>org.eclipse.sisu</groupId>
+            <artifactId>org.eclipse.sisu.inject</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -273,6 +284,12 @@ under the License.
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
         <version>${sisuVersion}</version>
+        <classifier>no_asm</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm</artifactId>
+        <version>${asmVersion}</version>
       </dependency>
       <dependency>
         <groupId>javax.inject</groupId>
@@ -286,11 +303,6 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-annotations</artifactId>
-        <version>${plexusVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
         <version>${classWorldsVersion}</version>
       </dependency>
@@ -298,18 +310,6 @@ under the License.
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-interpolation</artifactId>
         <version>${plexusInterpolationVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.shared</groupId>
-        <artifactId>maven-shared-utils</artifactId>
-        <version>3.3.4</version>
-        <exclusions>
-          <!-- We use org.apache.maven.shared.utils.logging only in Maven Core -->
-          <exclusion>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.fusesource.jansi</groupId>
@@ -348,13 +348,6 @@ under the License.
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http</artifactId>
         <version>${wagonVersion}</version>
-        <exclusions>
-          <!-- Not used at all -->
-          <exclusion>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <!--  Repository -->
       <dependency>
@@ -414,11 +407,6 @@ under the License.
         <version>${jxpathVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>${commonsLangVersion}</version>
-      </dependency>
-      <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-sec-dispatcher</artifactId>
         <version>${securityDispatcherVersion}</version>
@@ -429,10 +417,14 @@ under the License.
         <version>${cipherVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>${mockitoVersion}</version>
-        <scope>test</scope>
+        <groupId>com.fasterxml.woodstox</groupId>
+        <artifactId>woodstox-core</artifactId>
+        <version>6.5.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>stax2-api</artifactId>
+        <version>4.2.1</version>
       </dependency>
       <dependency>
         <groupId>org.xmlunit</groupId>
@@ -473,8 +465,15 @@ under the License.
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <type>pom</type>
         <version>${junitVersion}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-bom</artifactId>
+        <version>${mockitoVersion}</version>
+        <type>pom</type>
         <scope>import</scope>
       </dependency>
     </dependencies>
@@ -500,41 +499,6 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>modello-plugin-velocity</artifactId>
-          <version>${project.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.1.2</version>
-          <dependencies>
-            <dependency>
-              <groupId>com.puppycrawl.tools</groupId>
-              <artifactId>checkstyle</artifactId>
-              <version>8.41.1</version>
-            </dependency>
-            <dependency>
-              <groupId>org.apache.maven.shared</groupId>
-              <artifactId>maven-shared-resources</artifactId>
-              <version>3</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-metadata</artifactId>
-          <version>${plexusVersion}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>generate-metadata</goal>
-                <goal>generate-test-metadata</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
@@ -557,26 +521,47 @@ under the License.
           <executions>
             <execution>
               <id>modello-site-docs</id>
-              <phase>pre-site</phase>
               <goals>
                 <goal>xdoc</goal>
                 <goal>xsd</goal>
               </goals>
+              <phase>pre-site</phase>
             </execution>
+          </executions>
+        </plugin>
+        <!-- enforce backwards compatibility -->
+        <plugin>
+          <groupId>com.github.siom79.japicmp</groupId>
+          <artifactId>japicmp-maven-plugin</artifactId>
+          <version>0.17.2</version>
+          <executions>
             <execution>
-              <id>modello</id>
               <goals>
-                <goal>java</goal>
-                <goal>xpp3-reader</goal>
-                <goal>xpp3-writer</goal>
+                <goal>cmp</goal>
               </goals>
+              <phase>verify</phase>
+              <configuration>
+                <parameter>
+                  <!-- baseline is 3.8.6 for Maven 4 -->
+                  <oldVersionPattern>${maven.baseline}</oldVersionPattern>
+                  <breakBuildOnBinaryIncompatibleModifications>true</breakBuildOnBinaryIncompatibleModifications>
+                  <onlyBinaryIncompatible>true</onlyBinaryIncompatible>
+                  <!-- don't include subpackages -->
+                  <includeExclusively>true</includeExclusively>
+                </parameter>
+              </configuration>
             </execution>
           </executions>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>3.4.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>1.4</version>
+          <version>3.2.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -584,7 +569,7 @@ under the License.
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <version>1.21</version>
+        <version>1.23</version>
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
@@ -595,10 +580,10 @@ under the License.
         <executions>
           <execution>
             <id>check-java-compat</id>
-            <phase>process-classes</phase>
             <goals>
               <goal>check</goal>
             </goals>
+            <phase>process-classes</phase>
           </execution>
         </executions>
       </plugin>
@@ -634,7 +619,6 @@ under the License.
                 <!--
                   ! Excluded the license files itself cause they do not have have a license of themselves.
                 -->
-                <exclude>src/main/appended-resources/licenses/MIT-slf4j-api-1.7.30.txt</exclude>
                 <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
                 <exclude>src/main/appended-resources/licenses/unrecognized-aopalliance-1.0.txt</exclude>
                 <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
@@ -648,11 +632,11 @@ under the License.
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
           <execution>
+            <id>ensure-no-sonatype-cipher-and-sec-dispatcher</id>
             <goals>
               <goal>enforce</goal>
             </goals>
             <phase>validate</phase>
-            <id>ensure-no-sonatype-cipher-and-sec-dispatcher</id>
             <configuration>
               <rules>
                 <bannedDependencies>
@@ -660,24 +644,13 @@ under the License.
                     <exclude>org.sonatype.plexus:plexus-sec-dispatcher</exclude>
                     <exclude>org.sonatype.plexus:plexus-cipher</exclude>
                   </excludes>
-                  <message>
-                    ensure no more org.sonatype.plexus:plexus-cipher and org.sonatype.plexus:plexus-sec-dispatcher.
-                  </message>
+                  <message>ensure no more org.sonatype.plexus:plexus-cipher and org.sonatype.plexus:plexus-sec-dispatcher.</message>
                 </bannedDependencies>
               </rules>
               <fail>true</fail>
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <violationSeverity>info</violationSeverity>
-          <violationIgnore>JavadocVariable,JavadocMethod,HiddenField</violationIgnore>
-<!--          <suppressionsLocation>${maven.multiModuleProjectDirectory}/build/checkstyle-suppressions.xml</suppressionsLocation>-->
-        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -722,10 +695,10 @@ under the License.
             <reportSets>
               <reportSet>
                 <id>aggregate</id>
-                <inherited>false</inherited>
                 <reports>
                   <report>aggregate</report>
                 </reports>
+                <inherited>false</inherited>
               </reportSet>
             </reportSets>
           </plugin>
@@ -735,10 +708,10 @@ under the License.
             <reportSets>
               <reportSet>
                 <id>aggregate</id>
-                <inherited>false</inherited>
                 <reports>
                   <report>aggregate</report>
                 </reports>
+                <inherited>false</inherited>
               </reportSet>
             </reportSets>
           </plugin>

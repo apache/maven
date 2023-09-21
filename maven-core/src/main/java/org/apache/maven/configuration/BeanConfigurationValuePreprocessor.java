@@ -1,5 +1,3 @@
-package org.apache.maven.configuration;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,14 @@ package org.apache.maven.configuration;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration;
 
 /**
  * Preprocesses a value from a bean configuration before the bean configurator unmarshals it into a bean property. A
  * common use case for such preprocessing is the evaluation of variables within the configuration value.
  *
- * @author Benjamin Bentmann
  */
-public interface BeanConfigurationValuePreprocessor
-{
+public interface BeanConfigurationValuePreprocessor {
 
     /**
      * Preprocesses the specified bean configuration value. The optional type provided to this method is a hint (not a
@@ -39,7 +36,5 @@ public interface BeanConfigurationValuePreprocessor
      * @return The processed configuration value or {@code null} if none.
      * @throws BeanConfigurationException If an error occurred while preprocessing the value.
      */
-    Object preprocessValue( String value, Class<?> type )
-        throws BeanConfigurationException;
-
+    Object preprocessValue(String value, Class<?> type) throws BeanConfigurationException;
 }

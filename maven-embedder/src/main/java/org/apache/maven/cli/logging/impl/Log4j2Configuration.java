@@ -1,5 +1,3 @@
-package org.apache.maven.cli.logging.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,24 +16,20 @@ package org.apache.maven.cli.logging.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.logging.impl;
 
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 
 /**
  * Configuration for slf4j-log4j2.
  *
- * @author Hervé Boutemy
  * @since 3.1.0
  */
-public class Log4j2Configuration
-    extends BaseSlf4jConfiguration
-{
+public class Log4j2Configuration extends BaseSlf4jConfiguration {
     @Override
-    public void setRootLoggerLevel( Level level )
-    {
+    public void setRootLoggerLevel(Level level) {
         String value;
-        switch ( level )
-        {
+        switch (level) {
             case DEBUG:
                 value = "debug";
                 break;
@@ -48,12 +42,11 @@ public class Log4j2Configuration
                 value = "error";
                 break;
         }
-        System.setProperty( "maven.logging.root.level", value );
+        System.setProperty("maven.logging.root.level", value);
     }
 
     @Override
-    public void activate()
-    {
+    public void activate() {
         // no op
     }
 }

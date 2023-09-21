@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,24 +16,29 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.model.Dependency;
 
 /**
- * An artifact's{@code Type} represents a known kind of artifacts.
- * Such types are often associated to an extension and possibly
- * a classifier, for example {@code java-source} has a {@code jar}
- * extension and a {@code sources} classifier.
- * It is also used to determine if a given dependency should be
- * included in the classpath or if its transitive dependencies should.
+ * A dependency's {@code Type} is uniquely identified by a {@code String},
+ * and semantically represents a known <i>kind</i> of dependency.
+ * <p>
+ * It provides information about the file type (or extension) of the associated artifact,
+ * its default classifier, and how the artifact will be used in the build when creating
+ * classpaths.
+ * <p>
+ * For example, the type {@code java-source} has a {@code jar} extension and a
+ * {@code sources} classifier. The artifact and its dependencies should be added
+ * to the classpath.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable
-public interface Type
-{
+public interface Type {
 
     String POM = "pom";
     String JAR = "jar";
@@ -45,28 +48,43 @@ public interface Type
     String TEST_JAR = "test-jar";
 
     /**
-     * Returns the dependency type name.
+     * Returns the dependency type id.
+     * The id uniquely identifies this <i>dependency type</i>.
      *
-     * @return the type name
+     * @return the id of this type
      */
-    String getName();
+    String getId();
 
     /**
-     * Get the file extension associated to the file represented by the dependency type.
+     * Get the file extension of artifacts of this type.
      *
      * @return the file extension
      */
     String getExtension();
 
     /**
-     * Get the classifier associated to the dependency type.
+     * Get the default classifier associated to the dependency type.
+     * The default classifier can be overridden when specifying
+     * the {@link Dependency#getClassifier()}.
      *
-     * @return the classifier
+     * @return the default classifier
      */
     String getClassifier();
 
-    boolean isIncludesDependencies();
-
+    /**
+     * Specifies if the artifact contains java classes and should be
+     * added to the classpath.
+     *
+     * @return if the artifact should be added to the classpath
+     */
     boolean isAddedToClasspath();
 
+    /**
+     * Specifies if the artifact already embeds its own dependencies.
+     * This is the case for JEE packages or similar artifacts such as
+     * WARs, EARs, etc.
+     *
+     * @return if the artifact's dependencies are included in the artifact
+     */
+    boolean isIncludesDependencies();
 }

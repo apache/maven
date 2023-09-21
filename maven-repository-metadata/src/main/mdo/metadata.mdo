@@ -19,7 +19,7 @@ under the License.
 
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
-  xsd.namespace="http://maven.apache.org/METADATA/${version}"
+  xml.namespace="http://maven.apache.org/METADATA/${version}"
   xml.schemaLocation="https://maven.apache.org/xsd/repository-metadata-${version}.xsd">
   <id>repository-metadata</id>
   <name>Metadata</name>
@@ -35,11 +35,11 @@ under the License.
     </default>
   </defaults>
   <classes>
-    <class rootElement="true" java.clone="deep">
+    <class rootElement="true" xml.tagName="metadata" java.clone="deep">
       <name>Metadata</name>
       <version>1.0.0+</version>
       <fields>
-        <field xml.attribute="true">
+        <field xml.attribute="true" xml.tagName="modelVersion">
           <name>modelVersion</name>
           <version>1.1.0+</version>
           <type>String</type>
@@ -74,10 +74,7 @@ under the License.
         <field xdoc.separator="blank">
           <name>plugins</name>
           <version>1.0.0+</version>
-          <description>The set of plugins when this directory represents a "groupId" (deprecated)</description>
-          <annotations>
-            <annotation>@Deprecated</annotation>
-          </annotations>
+          <description>The set of plugins when this directory represents a "groupId".</description>
           <association>
             <type>Plugin</type>
             <multiplicity>*</multiplicity>
@@ -86,7 +83,7 @@ under the License.
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <code><![CDATA[
     private String getSnapshotVersionKey( SnapshotVersion sv )
     {
@@ -299,7 +296,7 @@ under the License.
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <code><![CDATA[
     public void updateTimestamp()
     {
@@ -383,10 +380,7 @@ under the License.
     <class java.clone="deep">
       <name>Plugin</name>
       <version>1.0.0+</version>
-      <description>Mapping information for a single plugin within this group (deprecated).</description>
-      <annotations>
-        <annotation>@Deprecated</annotation>
-      </annotations>
+      <description>Mapping information for a single plugin within this group.</description>
       <comment>NOTE: plugin version is _NOT_ included here, since it is resolved using a separate algorithm in plugins' artifact.</comment>
       <fields>
         <field>

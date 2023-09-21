@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
 
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -28,13 +27,10 @@ import org.apache.maven.plugin.MojoExecution;
  * public for technical reasons, it is not part of the public API. In particular, this interface can be changed or
  * deleted without prior notice.
  *
- * @author Benjamin Bentmann
  */
-public interface ExecutionEventCatapult
-{
+public interface ExecutionEventCatapult {
 
-    void fire( ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution );
+    void fire(ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution);
 
-    void fire( ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution, Exception exception );
-
+    void fire(ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution, Exception exception);
 }

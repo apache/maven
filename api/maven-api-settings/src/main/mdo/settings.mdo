@@ -53,6 +53,7 @@
           <code>
             <![CDATA[
     public static final String USER_LEVEL = "user-level";
+    public static final String PROJECT_LEVEL = "project-level";
     public static final String GLOBAL_LEVEL = "global-level";
 
     private String sourceLevel = USER_LEVEL;
@@ -64,9 +65,9 @@
         {
             throw new IllegalStateException( "Cannot reset sourceLevel attribute; it is already set to: " + sourceLevel );
         }
-        else if ( !( USER_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel ) ) )
+        else if ( !( USER_LEVEL.equals( sourceLevel ) || PROJECT_LEVEL.equals( sourceLevel )  || GLOBAL_LEVEL.equals( sourceLevel ) ) )
         {
-            throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "}" );
+            throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + PROJECT_LEVEL + "," + GLOBAL_LEVEL + "}" );
         }
         else
         {
@@ -223,6 +224,39 @@
           </association>
         </field>
         <field xdoc.separator="blank">
+          <name>repositories</name>
+          <version>1.3.0+</version>
+          <description>
+            <![CDATA[
+            The lists of the remote repositories.
+            ]]>
+          </description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>pluginRepositories</name>
+          <version>1.3.0+</version>
+          <description>
+            <![CDATA[
+            The lists of the remote repositories for discovering plugins.
+            ]]>
+          </description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <comment>
+            <![CDATA[
+            This may be removed or relocated in the near
+            future. It is undecided whether plugins really need a remote
+            repository set of their own.
+            ]]>
+          </comment>
+        </field>
+        <field xdoc.separator="blank">
           <name>profiles</name>
           <version>1.0.0+</version>
           <description>
@@ -265,7 +299,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.3.0</version>
           <code>
             <![CDATA[
     public Boolean getInteractiveMode()
@@ -425,17 +459,17 @@
         The <code>&lt;proxy&gt;</code> element contains informations required to a proxy settings.
         ]]></description>
       <fields>
-        <field>
-          <name>active</name>
+        <field xml.tagName="active">
+          <name>activeString</name>
           <version>1.0.0+</version>
           <required>false</required>
           <defaultValue>true</defaultValue>
           <description>
-            <![CDATA[
-            Whether this proxy configuration is the active one.
-            ]]>
+            Whether this proxy configuration is the active one. Note: While the type of this field
+            is {@code String} for technical reasons, the semantic type is actually {@code boolean}.
+            @see #isActive()
           </description>
-          <type>boolean</type>
+          <type>String</type>
         </field>
         <field>
           <name>protocol</name>
@@ -468,15 +502,15 @@
           </description>
           <type>String</type>
         </field>
-        <field>
-          <name>port</name>
+        <field xml.tagName="port">
+          <name>portString</name>
           <version>1.0.0+</version>
           <description>
-            <![CDATA[
-            The proxy port.
-            ]]>
+            The proxy port. Note: While the type of this field is {@code String} for technical
+            reasons, the semantic type is actually {@code int}.
+            @see #getPort()
           </description>
-          <type>int</type>
+          <type>String</type>
           <defaultValue>8080</defaultValue>
         </field>
         <field>
@@ -501,6 +535,57 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0/1.3.0</version>
+          <code>
+    public boolean isActive() {
+        return (getActiveString() != null) ? Boolean.parseBoolean(getActiveString()) : true;
+    }
+
+    public void setActive(boolean active) {
+        setActiveString(String.valueOf(active));
+    }
+
+    public int getPort() {
+        return (getPortString() != null) ? Integer.parseInt(getPortString()) : 8080;
+    }
+
+    public void setPort(int port) {
+        setPortString(String.valueOf(port));
+    }
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>2.0.0+</version>
+          <code>
+    /**
+     * Indicates if this proxy is active.
+     * To allow interpolation of this field, this method lazily parses
+     * the {@link #getActiveString()} value as a boolean and defaults to {@code true}
+     * if not set.
+     *
+     * @return a boolean indicating if this proxy is active
+     */
+    public boolean isActive() {
+        return (getActiveString() != null) ? Boolean.parseBoolean(getActiveString()) : true;
+    }
+
+    /**
+     * Returns the port to use for this proxy.
+     * To allow interpolation of this field, this method lazily parses
+     * the {@link #getPortString()} value as an integer and defaults to {@code 8080}
+     * if not set.
+     *
+     * @return an integer indicating the port to use for this proxy
+     */
+    public int getPort() {
+        return (getPortString() != null) ? Integer.parseInt(getPortString()) : 8080;
+    }
+
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Server</name>
@@ -815,6 +900,7 @@
     <class java.clone="deep">
       <name>RepositoryBase</name>
       <version>1.0.0+</version>
+      <superClass>IdentifiableBase</superClass>
       <description>
         <![CDATA[
         Repository contains the information needed
@@ -822,16 +908,6 @@
         ]]>
       </description>
       <fields>
-        <field>
-          <name>id</name>
-          <version>1.0.0+</version>
-          <description>
-            <![CDATA[
-            A unique identifier for a repository.
-            ]]>
-          </description>
-          <type>String</type>
-        </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
@@ -865,7 +941,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <code>
             <![CDATA[
     /**
@@ -920,7 +996,7 @@
       <!-- prevent Modello generation of an incorrect equals method. Could be avoided by using <identity/> tags to mark ID as the only identity field -->
       <codeSegments>
         <codeSegment>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <code>
             <![CDATA[
     /**
@@ -1079,5 +1155,55 @@
       </fields>
     </class>
     <!-- /BuildProfile support -->
+    <class locationTracker="locations">
+      <name>InputLocation</name>
+      <version>2.0.0+</version>
+      <fields>
+        <!-- line, column and source fields are auto-generated by Modello -->
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>2.0.0+</version>
+          <code>
+            <![CDATA[
+
+    @Override
+    public String toString() {
+        return getLineNumber() + " : " + getColumnNumber() + ", " + getSource();
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class sourceTracker="source">
+      <name>InputSource</name>
+      <version>2.0.0+</version>
+      <fields>
+        <field>
+          <name>location</name>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            The path/URL of the settings definition or {@code null} if unknown.
+            ]]>
+          </description>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>2.0.0+</version>
+          <code>
+            <![CDATA[
+    @Override
+    public String toString() {
+        return getLocation();
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
   </classes>
 </model>

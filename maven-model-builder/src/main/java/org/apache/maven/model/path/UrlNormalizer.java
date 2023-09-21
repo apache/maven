@@ -1,5 +1,3 @@
-package org.apache.maven.model.path;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.path;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,15 +16,14 @@ package org.apache.maven.model.path;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.path;
 
 /**
  * Normalizes a URL to remove the ugly parent references "../" that got potentially inserted by URL adjustment during
  * model inheritance.
  *
- * @author Benjamin Bentmann
  */
-public interface UrlNormalizer
-{
+public interface UrlNormalizer {
 
     /**
      * Normalizes the specified URL.
@@ -34,6 +31,5 @@ public interface UrlNormalizer
      * @param url The URL to normalize, may be {@code null}.
      * @return The normalized URL or {@code null} if the input was {@code null}.
      */
-    String normalize( String url );
-
+    String normalize(String url);
 }

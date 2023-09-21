@@ -176,7 +176,7 @@
             </fields>
             <codeSegments>
             <codeSegment>
-              <version>1.1.0+</version>
+              <version>1.2.0+</version>
               <comment>Generated hashCode() and equals() based on identifier also calls its super, which breaks comparison</comment>
               <code>
                 <![CDATA[

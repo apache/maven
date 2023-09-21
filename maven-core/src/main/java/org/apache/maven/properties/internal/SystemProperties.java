@@ -1,5 +1,3 @@
-package org.apache.maven.properties.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,20 +16,19 @@ package org.apache.maven.properties.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.properties.internal;
 
 import java.util.Properties;
 
 /**
  * @since 3.2.3
  */
-public class SystemProperties
-{
+public class SystemProperties {
     /**
      * Thread-safe System.properties copy implementation.
      */
-    public static void addSystemProperties( Properties props )
-    {
-        props.putAll( getSystemProperties() );
+    public static void addSystemProperties(Properties props) {
+        props.putAll(getSystemProperties());
     }
 
     /**
@@ -39,9 +36,8 @@ public class SystemProperties
      *
      * @return {@link System#getProperties()} obtained in a thread-safe manner.
      */
-    public static Properties getSystemProperties()
-    {
-        return copyProperties( System.getProperties() );
+    public static Properties getSystemProperties() {
+        return copyProperties(System.getProperties());
     }
 
     /**
@@ -49,15 +45,12 @@ public class SystemProperties
      * @param properties Properties to copy.
      * @return Copy of the given properties.
      */
-    public static Properties copyProperties( Properties properties )
-    {
+    public static Properties copyProperties(Properties properties) {
         final Properties copyProperties = new Properties();
         // guard against modification/removal of keys in the given properties (MNG-5670, MNG-6053, MNG-6105)
-        synchronized ( properties )
-        {
-            copyProperties.putAll( properties );
+        synchronized (properties) {
+            copyProperties.putAll(properties);
         }
         return copyProperties;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,11 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,101 +29,95 @@ import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
- * @author jdcasey
  */
-@Component( role = ArtifactRepositoryFactory.class )
-public class DefaultArtifactRepositoryFactory
-    implements ArtifactRepositoryFactory
-{
+@Named
+@Singleton
+@Deprecated
+public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFactory {
 
-    @Requirement
+    @Inject
     private org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory factory;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
-    @Requirement
-    private RepositorySystem repositorySystem;
+    @Inject
+    private PlexusContainer container;
 
-    public ArtifactRepositoryLayout getLayout( String layoutId )
-        throws UnknownRepositoryLayoutException
-    {
-        return factory.getLayout( layoutId );
+    public ArtifactRepositoryLayout getLayout(String layoutId) throws UnknownRepositoryLayoutException {
+        return factory.getLayout(layoutId);
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id, String url, String layoutId,
-                                                                  boolean uniqueVersion )
-        throws UnknownRepositoryLayoutException
-    {
-        return injectSession( factory.createDeploymentArtifactRepository( id, url, layoutId, uniqueVersion ), false );
+    public ArtifactRepository createDeploymentArtifactRepository(
+            String id, String url, String layoutId, boolean uniqueVersion) throws UnknownRepositoryLayoutException {
+        return injectSession(factory.createDeploymentArtifactRepository(id, url, layoutId, uniqueVersion), false);
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
-                                                                  ArtifactRepositoryLayout repositoryLayout,
-                                                                  boolean uniqueVersion )
-    {
-        return injectSession( factory.createDeploymentArtifactRepository( id, url, repositoryLayout, uniqueVersion ),
-                              false );
+    public ArtifactRepository createDeploymentArtifactRepository(
+            String id, String url, ArtifactRepositoryLayout repositoryLayout, boolean uniqueVersion) {
+        return injectSession(
+                factory.createDeploymentArtifactRepository(id, url, repositoryLayout, uniqueVersion), false);
     }
 
-    public ArtifactRepository createArtifactRepository( String id, String url, String layoutId,
-                                                        ArtifactRepositoryPolicy snapshots,
-                                                        ArtifactRepositoryPolicy releases )
-        throws UnknownRepositoryLayoutException
-    {
-        return injectSession( factory.createArtifactRepository( id, url, layoutId, snapshots, releases ), true );
+    public ArtifactRepository createArtifactRepository(
+            String id,
+            String url,
+            String layoutId,
+            ArtifactRepositoryPolicy snapshots,
+            ArtifactRepositoryPolicy releases)
+            throws UnknownRepositoryLayoutException {
+        return injectSession(factory.createArtifactRepository(id, url, layoutId, snapshots, releases), true);
     }
 
-    public ArtifactRepository createArtifactRepository( String id, String url,
-                                                        ArtifactRepositoryLayout repositoryLayout,
-                                                        ArtifactRepositoryPolicy snapshots,
-                                                        ArtifactRepositoryPolicy releases )
-    {
-        return injectSession( factory.createArtifactRepository( id, url, repositoryLayout, snapshots, releases ),
-                              true );
-
+    public ArtifactRepository createArtifactRepository(
+            String id,
+            String url,
+            ArtifactRepositoryLayout repositoryLayout,
+            ArtifactRepositoryPolicy snapshots,
+            ArtifactRepositoryPolicy releases) {
+        return injectSession(factory.createArtifactRepository(id, url, repositoryLayout, snapshots, releases), true);
     }
 
-    public void setGlobalUpdatePolicy( String updatePolicy )
-    {
-        factory.setGlobalUpdatePolicy( updatePolicy );
+    public void setGlobalUpdatePolicy(String updatePolicy) {
+        factory.setGlobalUpdatePolicy(updatePolicy);
     }
 
-    public void setGlobalChecksumPolicy( String checksumPolicy )
-    {
-        factory.setGlobalChecksumPolicy( checksumPolicy );
+    public void setGlobalChecksumPolicy(String checksumPolicy) {
+        factory.setGlobalChecksumPolicy(checksumPolicy);
     }
 
-    private ArtifactRepository injectSession( ArtifactRepository repository, boolean mirrors )
-    {
+    private ArtifactRepository injectSession(ArtifactRepository repository, boolean mirrors) {
         RepositorySystemSession session = legacySupport.getRepositorySession();
 
-        if ( session != null && repository != null && !isLocalRepository( repository ) )
-        {
-            List<ArtifactRepository> repositories = Arrays.asList( repository );
+        if (session != null && repository != null && !isLocalRepository(repository)) {
+            List<ArtifactRepository> repositories = Arrays.asList(repository);
 
-            if ( mirrors )
-            {
-                repositorySystem.injectMirror( session, repositories );
+            RepositorySystem repositorySystem;
+            try {
+                repositorySystem = container.lookup(RepositorySystem.class);
+            } catch (ComponentLookupException e) {
+                throw new IllegalStateException("Unable to lookup " + RepositorySystem.class.getName());
             }
 
-            repositorySystem.injectProxy( session, repositories );
+            if (mirrors) {
+                repositorySystem.injectMirror(session, repositories);
+            }
 
-            repositorySystem.injectAuthentication( session, repositories );
+            repositorySystem.injectProxy(session, repositories);
+
+            repositorySystem.injectAuthentication(session, repositories);
         }
 
         return repository;
     }
 
-    private boolean isLocalRepository( ArtifactRepository repository )
-    {
+    private boolean isLocalRepository(ArtifactRepository repository) {
         // unfortunately, the API doesn't allow to tell a remote repo and the local repo apart...
-        return "local".equals( repository.getId() );
+        return "local".equals(repository.getId());
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,36 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code Profile}.
  *
- * @author Benjamin Bentmann
  */
-public class ProfileTest
-{
+class ProfileTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    void testHashCodeNullSafe() {
         new Profile().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Profile().equals( null ) );
+    void testEqualsNullSafe() {
+        assertFalse(new Profile().equals(null));
 
-        new Profile().equals( new Profile() );
+        new Profile().equals(new Profile());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    void testEqualsIdentity() {
         Profile thing = new Profile();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Profile().toString() );
+    void testToStringNullSafe() {
+        assertNotNull(new Profile().toString());
     }
-
 }

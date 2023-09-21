@@ -1,5 +1,3 @@
-package org.apache.maven.cli;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,8 +16,10 @@ package org.apache.maven.cli;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
@@ -30,8 +30,7 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 /**
  * CliRequest
  */
-public class CliRequest
-{
+public class CliRequest {
     String[] args;
 
     CommandLine commandLine;
@@ -41,6 +40,10 @@ public class CliRequest
     String workingDirectory;
 
     File multiModuleProjectDirectory;
+
+    Path rootDirectory;
+
+    Path topDirectory;
 
     boolean verbose;
 
@@ -54,70 +57,65 @@ public class CliRequest
 
     MavenExecutionRequest request;
 
-    CliRequest( String[] args, ClassWorld classWorld )
-    {
+    CliRequest(String[] args, ClassWorld classWorld) {
         this.args = args;
         this.classWorld = classWorld;
         this.request = new DefaultMavenExecutionRequest();
     }
 
-    public String[] getArgs()
-    {
+    public String[] getArgs() {
         return args;
     }
 
-    public CommandLine getCommandLine()
-    {
+    public CommandLine getCommandLine() {
         return commandLine;
     }
 
-    public ClassWorld getClassWorld()
-    {
+    public ClassWorld getClassWorld() {
         return classWorld;
     }
 
-    public String getWorkingDirectory()
-    {
+    public String getWorkingDirectory() {
         return workingDirectory;
     }
 
-    public File getMultiModuleProjectDirectory()
-    {
+    public File getMultiModuleProjectDirectory() {
         return multiModuleProjectDirectory;
     }
 
-    public boolean isVerbose()
-    {
+    public boolean isVerbose() {
         return verbose;
     }
 
-    public boolean isQuiet()
-    {
+    public boolean isQuiet() {
         return quiet;
     }
 
-    public boolean isShowErrors()
-    {
+    public boolean isShowErrors() {
         return showErrors;
     }
 
-    public Properties getUserProperties()
-    {
+    public Properties getUserProperties() {
         return userProperties;
     }
 
-    public Properties getSystemProperties()
-    {
+    public Properties getSystemProperties() {
         return systemProperties;
     }
 
-    public MavenExecutionRequest getRequest()
-    {
+    public MavenExecutionRequest getRequest() {
         return request;
     }
 
-    public void setUserProperties( Properties properties )
-    {
-        this.userProperties.putAll( properties );
+    public void setUserProperties(Properties properties) {
+        this.userProperties.putAll(properties);
+    }
+
+    public Path getRootDirectory() {
+        return rootDirectory;
+    }
+
+    public Path getTopDirectory() {
+        return topDirectory;
     }
 }

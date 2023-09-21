@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,17 +16,15 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import org.apache.maven.model.Model;
 
 /**
  * Holds data relevant for a model building event.
  *
- * @author Benjamin Bentmann
  */
-class DefaultModelBuildingEvent
-    implements ModelBuildingEvent
-{
+class DefaultModelBuildingEvent implements ModelBuildingEvent {
 
     private Model model;
 
@@ -36,29 +32,24 @@ class DefaultModelBuildingEvent
 
     private final ModelProblemCollector problems;
 
-    DefaultModelBuildingEvent( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
-    {
+    DefaultModelBuildingEvent(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
         this.model = model;
         this.request = request;
         this.problems = problems;
     }
 
     @Override
-    public Model getModel()
-    {
+    public Model getModel() {
         return model;
     }
 
     @Override
-    public ModelBuildingRequest getRequest()
-    {
+    public ModelBuildingRequest getRequest() {
         return request;
     }
 
     @Override
-    public ModelProblemCollector getProblems()
-    {
+    public ModelProblemCollector getProblems() {
         return problems;
     }
-
 }

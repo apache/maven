@@ -1,5 +1,3 @@
-package org.apache.maven.model.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,51 +16,43 @@ package org.apache.maven.model.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.plugin;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Handles expansion of general report plugin configuration into individual report sets.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
-public class DefaultReportConfigurationExpander
-        implements ReportConfigurationExpander
-{
+public class DefaultReportConfigurationExpander implements ReportConfigurationExpander {
 
     @Override
-    public void expandPluginConfiguration( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
-    {
+    public void expandPluginConfiguration(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
         Reporting reporting = model.getReporting();
 
-        if ( reporting != null )
-        {
-            for ( ReportPlugin reportPlugin : reporting.getPlugins() )
-            {
-                Xpp3Dom parentDom = (Xpp3Dom) reportPlugin.getConfiguration();
+        if (reporting != null) {
+            for (ReportPlugin reportPlugin : reporting.getPlugins()) {
+                XmlNode parentDom = reportPlugin.getDelegate().getConfiguration();
 
-                if ( parentDom != null )
-                {
-                    for ( ReportSet execution : reportPlugin.getReportSets() )
-                    {
-                        Xpp3Dom childDom = (Xpp3Dom) execution.getConfiguration();
-                        childDom = Xpp3Dom.mergeXpp3Dom( childDom, new Xpp3Dom( parentDom ) );
-                        execution.setConfiguration( childDom );
+                if (parentDom != null) {
+                    for (ReportSet execution : reportPlugin.getReportSets()) {
+                        XmlNode childDom = execution.getDelegate().getConfiguration();
+                        childDom = XmlNode.merge(childDom, parentDom);
+                        execution.update(execution.getDelegate().withConfiguration(childDom));
                     }
                 }
             }
         }
     }
-
 }

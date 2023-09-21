@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.annotations;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.annotations;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -33,15 +32,14 @@ import org.apache.maven.api.annotations.Experimental;
  * <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/MavenPluginManager.html">
  * <code>MavenPluginManager.getConfiguredMojo(...)</code></a>.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Documented
-@Retention( RetentionPolicy.CLASS )
-@Target( { ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER } )
+@Retention(RetentionPolicy.CLASS)
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 @Inherited
-public @interface Component
-{
+public @interface Component {
     /**
      * role of the component to inject.
      * @return the role

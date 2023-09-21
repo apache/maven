@@ -1,5 +1,3 @@
-package org.apache.maven.configuration.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.configuration.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration.internal;
 
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
@@ -33,91 +32,68 @@ import org.eclipse.sisu.plexus.CompositeBeanHelper;
  * An enhanced {@link ObjectWithFieldsConverter} leveraging the {@link TypeAwareExpressionEvaluator}
  * interface.
  */
-class EnhancedConfigurationConverter
-        extends ObjectWithFieldsConverter
-{
-    protected Object fromExpression( final PlexusConfiguration configuration, final ExpressionEvaluator evaluator,
-                                     final Class<?> type )
-            throws ComponentConfigurationException
-    {
+class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
+    protected Object fromExpression(
+            final PlexusConfiguration configuration, final ExpressionEvaluator evaluator, final Class<?> type)
+            throws ComponentConfigurationException {
         String value = configuration.getValue();
-        try
-        {
+        try {
             Object result = null;
-            if ( null != value && value.length() > 0 )
-            {
-                if ( evaluator instanceof TypeAwareExpressionEvaluator )
-                {
-                    result = ( (TypeAwareExpressionEvaluator) evaluator ).evaluate( value, type );
-                }
-                else
-                {
-                    result = evaluator.evaluate( value );
+            if (null != value && value.length() > 0) {
+                if (evaluator instanceof TypeAwareExpressionEvaluator) {
+                    result = ((TypeAwareExpressionEvaluator) evaluator).evaluate(value, type);
+                } else {
+                    result = evaluator.evaluate(value);
                 }
             }
-            if ( null == result && configuration.getChildCount() == 0 )
-            {
-                value = configuration.getAttribute( "default-value" );
-                if ( null != value && value.length() > 0 )
-                {
-                    if ( evaluator instanceof TypeAwareExpressionEvaluator )
-                    {
-                        result = ( (TypeAwareExpressionEvaluator) evaluator ).evaluate( value, type );
-                    }
-                    else
-                    {
-                        result = evaluator.evaluate( value );
+            if (null == result && configuration.getChildCount() == 0) {
+                value = configuration.getAttribute("default-value");
+                if (null != value && value.length() > 0) {
+                    if (evaluator instanceof TypeAwareExpressionEvaluator) {
+                        result = ((TypeAwareExpressionEvaluator) evaluator).evaluate(value, type);
+                    } else {
+                        result = evaluator.evaluate(value);
                     }
                 }
             }
-            failIfNotTypeCompatible( result, type, configuration );
+            failIfNotTypeCompatible(result, type, configuration);
             return result;
-        }
-        catch ( final ExpressionEvaluationException e )
-        {
-            final String reason =
-                    String.format( "Cannot evaluate expression '%s' for configuration entry '%s'", value,
-                            configuration.getName() );
+        } catch (final ExpressionEvaluationException e) {
+            final String reason = String.format(
+                    "Cannot evaluate expression '%s' for configuration entry '%s'", value, configuration.getName());
 
-            throw new ComponentConfigurationException( configuration, reason, e );
+            throw new ComponentConfigurationException(configuration, reason, e);
         }
     }
 
-
-    public Object fromConfiguration( final ConverterLookup lookup, final PlexusConfiguration configuration,
-                                     final Class<?> type, final Class<?> enclosingType, final ClassLoader loader,
-                                     final ExpressionEvaluator evaluator, final ConfigurationListener listener )
-            throws ComponentConfigurationException
-    {
-        final Object value = fromExpression( configuration, evaluator, type );
-        if ( type.isInstance( value ) )
-        {
+    public Object fromConfiguration(
+            final ConverterLookup lookup,
+            final PlexusConfiguration configuration,
+            final Class<?> type,
+            final Class<?> enclosingType,
+            final ClassLoader loader,
+            final ExpressionEvaluator evaluator,
+            final ConfigurationListener listener)
+            throws ComponentConfigurationException {
+        final Object value = fromExpression(configuration, evaluator, type);
+        if (type.isInstance(value)) {
             return value;
         }
-        try
-        {
-            final Class<?> implType = getClassForImplementationHint( type, configuration, loader );
-            if ( null == value && implType.isInterface() && configuration.getChildCount() == 0 )
-            {
+        try {
+            final Class<?> implType = getClassForImplementationHint(type, configuration, loader);
+            if (null == value && implType.isInterface() && configuration.getChildCount() == 0) {
                 return null; // nothing to process
             }
-            final Object bean = instantiateObject( implType );
-            if ( null == value )
-            {
-                processConfiguration( lookup, bean, loader, configuration, evaluator, listener );
-            }
-            else
-            {
-                new CompositeBeanHelper( lookup, loader, evaluator, listener )
-                        .setDefault( bean, value, configuration );
+            final Object bean = instantiateObject(implType);
+            if (null == value) {
+                processConfiguration(lookup, bean, loader, configuration, evaluator, listener);
+            } else {
+                new CompositeBeanHelper(lookup, loader, evaluator, listener).setDefault(bean, value, configuration);
             }
             return bean;
-        }
-        catch ( final ComponentConfigurationException e )
-        {
-            if ( null == e.getFailedConfiguration() )
-            {
-                e.setFailedConfiguration( configuration );
+        } catch (final ComponentConfigurationException e) {
+            if (null == e.getFailedConfiguration()) {
+                e.setFailedConfiguration(configuration);
             }
             throw e;
         }

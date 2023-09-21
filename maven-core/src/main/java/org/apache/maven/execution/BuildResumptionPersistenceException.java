@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,14 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 /**
  * This exception will be thrown when something fails while persisting build resumption data.
  * @see BuildResumptionDataRepository#persistResumptionData
  */
-public class BuildResumptionPersistenceException extends Exception
-{
-    public BuildResumptionPersistenceException( String message, Throwable cause )
-    {
-        super( message, cause );
+public class BuildResumptionPersistenceException extends Exception {
+    public BuildResumptionPersistenceException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

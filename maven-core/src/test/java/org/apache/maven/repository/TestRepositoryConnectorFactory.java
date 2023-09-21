@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,23 +28,17 @@ import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.transfer.NoRepositoryConnectorException;
 
 /**
- * @author Benjamin Bentmann
  */
-@Named( "test" )
+@Named("test")
 @Singleton
-public class TestRepositoryConnectorFactory
-    implements RepositoryConnectorFactory
-{
+public class TestRepositoryConnectorFactory implements RepositoryConnectorFactory {
 
-    public RepositoryConnector newInstance( RepositorySystemSession session, RemoteRepository repository )
-        throws NoRepositoryConnectorException
-    {
-        return new TestRepositoryConnector( repository );
+    public RepositoryConnector newInstance(RepositorySystemSession session, RemoteRepository repository)
+            throws NoRepositoryConnectorException {
+        return new TestRepositoryConnector(repository);
     }
 
-    public float getPriority()
-    {
+    public float getPriority() {
         return 0;
     }
-
 }

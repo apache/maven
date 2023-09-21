@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -26,6 +25,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -35,47 +35,43 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RemoteSnapshotMetadataTest
-{
+class RemoteSnapshotMetadataTest {
     private Locale defaultLocale;
 
+    private static final Pattern DATE_FILTER = Pattern.compile("\\..*");
+
     @BeforeEach
-    public void setLocaleToUseBuddhistCalendar()
-    {
+    void setLocaleToUseBuddhistCalendar() {
         defaultLocale = Locale.getDefault();
-        Locale.setDefault( new Locale( "th", "TH" ) );
+        Locale.setDefault(new Locale("th", "TH"));
     }
 
     @AfterEach
-    public void restoreLocale()
-    {
-        Locale.setDefault( defaultLocale );
+    void restoreLocale() {
+        Locale.setDefault(defaultLocale);
     }
 
-    static String gregorianDate()
-    {
-        SimpleDateFormat df = new SimpleDateFormat( "yyyyMMdd" );
-        df.setCalendar( new GregorianCalendar() );
-        df.setTimeZone( RemoteSnapshotMetadata.DEFAULT_SNAPSHOT_TIME_ZONE );
-        return df.format( new Date() );
+    static String gregorianDate() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+        df.setCalendar(new GregorianCalendar());
+        df.setTimeZone(RemoteSnapshotMetadata.DEFAULT_SNAPSHOT_TIME_ZONE);
+        return df.format(new Date());
     }
 
     @Test
-    public void gregorianCalendarIsUsed()
-    {
+    void gregorianCalendarIsUsed() {
         String dateBefore = gregorianDate();
 
-        RemoteSnapshotMetadata metadata = new RemoteSnapshotMetadata(
-                new DefaultArtifact( "a:b:1-SNAPSHOT" ), false, new Date() );
-        metadata.merge( new Metadata() );
+        RemoteSnapshotMetadata metadata = new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), new Date());
+        metadata.merge(new Metadata());
 
         String dateAfter = gregorianDate();
 
         String ts = metadata.metadata.getVersioning().getSnapshot().getTimestamp();
-        String datePart = ts.replaceAll( "\\..*", "" );
+        String datePart = DATE_FILTER.matcher(ts).replaceAll("");
 
         /* Allow for this test running across midnight */
-        Set<String> expected = new HashSet<>( Arrays.asList( dateBefore, dateAfter ) );
-        assertTrue( expected.contains( datePart ), "Expected " + datePart + " to be in " + expected );
+        Set<String> expected = new HashSet<>(Arrays.asList(dateBefore, dateAfter));
+        assertTrue(expected.contains(datePart), "Expected " + datePart + " to be in " + expected);
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.version;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.version;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.version;
 
 import java.util.List;
 
@@ -29,10 +28,8 @@ import org.eclipse.aether.repository.RemoteRepository;
  * Collects settings required to resolve the version for a plugin.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
-public interface PluginVersionRequest
-{
+public interface PluginVersionRequest {
 
     /**
      * Gets the group id of the plugin.
@@ -47,7 +44,7 @@ public interface PluginVersionRequest
      * @param groupId The group id of the plugin.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setGroupId( String groupId );
+    PluginVersionRequest setGroupId(String groupId);
 
     /**
      * Gets the artifact id of the plugin.
@@ -62,7 +59,7 @@ public interface PluginVersionRequest
      * @param artifactId The artifact id of the plugin.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setArtifactId( String artifactId );
+    PluginVersionRequest setArtifactId(String artifactId);
 
     /**
      * Gets the POM whose build plugins are to be scanned for the version.
@@ -79,7 +76,7 @@ public interface PluginVersionRequest
      *            plugin repositories.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setPom( Model pom );
+    PluginVersionRequest setPom(Model pom);
 
     /**
      * Gets the remote repositories to use.
@@ -95,7 +92,7 @@ public interface PluginVersionRequest
      * @param repositories The remote repositories to use.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setRepositories( List<RemoteRepository> repositories );
+    PluginVersionRequest setRepositories(List<RemoteRepository> repositories);
 
     /**
      * Gets the session to use for repository access.
@@ -110,6 +107,5 @@ public interface PluginVersionRequest
      * @param repositorySession The repository session to use.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setRepositorySession( RepositorySystemSession repositorySession );
-
+    PluginVersionRequest setRepositorySession(RepositorySystemSession repositorySession);
 }

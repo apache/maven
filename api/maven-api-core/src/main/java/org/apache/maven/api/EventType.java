@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,17 +16,17 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 
 /**
  * The possible types of execution events.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
-public enum EventType
-{
+public enum EventType {
     PROJECT_DISCOVERY_STARTED,
     SESSION_STARTED,
     SESSION_ENDED,

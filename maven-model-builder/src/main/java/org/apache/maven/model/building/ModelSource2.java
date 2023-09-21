@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.net.URI;
 
@@ -31,9 +30,7 @@ import java.net.URI;
  * ModelSource2 instances are cached in {@link ModelBuildingRequest#getModelCache()}. Implementations must guarantee
  * that the connection to the backing store remains active until request's {@link ModelCache} is discarded or flushed.
  */
-public interface ModelSource2
-    extends ModelSource
-{
+public interface ModelSource2 extends ModelSource {
     /**
      * Returns model source identified by a path relative to this model source POM. Implementation <strong>MUST</strong>
      * be able to accept <code>relPath</code> parameter values that
@@ -47,7 +44,7 @@ public interface ModelSource2
      * @param relPath is the path of the requested model source relative to this model source POM.
      * @return related model source or <code>null</code> if no such model source.
      */
-    ModelSource2 getRelatedSource( String relPath );
+    ModelSource2 getRelatedSource(String relPath);
 
     /**
      * Returns location of the POM, never <code>null</code>.

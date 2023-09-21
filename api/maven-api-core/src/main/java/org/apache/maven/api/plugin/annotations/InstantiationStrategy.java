@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.annotations;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,31 +16,29 @@ package org.apache.maven.api.plugin.annotations;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.annotations;
 
 import org.apache.maven.api.annotations.Experimental;
 
 /**
  * Component instantiation strategy.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
-public enum InstantiationStrategy
-{
-    PER_LOOKUP( "per-lookup" ),
-    SINGLETON( "singleton" ),
-    KEEP_ALIVE( "keep-alive" ),
-    POOLABLE( "poolable" );
+public enum InstantiationStrategy {
+    PER_LOOKUP("per-lookup"),
+    SINGLETON("singleton"),
+    KEEP_ALIVE("keep-alive"),
+    POOLABLE("poolable");
 
     private final String id;
 
-    InstantiationStrategy( String id )
-    {
+    InstantiationStrategy(String id) {
         this.id = id;
     }
 
-    public String id()
-    {
+    public String id() {
         return this.id;
     }
 }

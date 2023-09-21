@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.mapping;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.mapping;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.mapping;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.mapping;
 
 import java.util.List;
 import java.util.Map;
@@ -25,8 +24,7 @@ import java.util.Map;
 /**
  * LifecycleMapping
  */
-public interface LifecycleMapping
-{
+public interface LifecycleMapping {
 
     @Deprecated
     String ROLE = LifecycleMapping.class.getName();
@@ -34,9 +32,8 @@ public interface LifecycleMapping
     Map<String, Lifecycle> getLifecycles();
 
     @Deprecated
-    List<String> getOptionalMojos( String lifecycle );
+    List<String> getOptionalMojos(String lifecycle);
 
     @Deprecated
-    Map<String, String> getPhases( String lifecycle );
-
+    Map<String, String> getPhases(String lifecycle);
 }

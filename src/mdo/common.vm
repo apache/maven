@@ -1,0 +1,33 @@
+#*
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+*#
+#
+#if ( "${isMavenModel}" == "true" )
+##
+## The following loop code is required in order to change the type of the
+## pomFile attribute to a java.nio.file.Path.  Modello does not support this
+## type and loading a model with such a type would fail the Modello validation.
+##
+#foreach ( $field in $model.getClass("Model", $version).allFields )
+  #if ( $field.name == "pomFile" )
+    #set ( $dummy = $field.setType("java.nio.file.Path") )
+  #end
+#end
+#set ( $locationTracking = true )
+#end
+#

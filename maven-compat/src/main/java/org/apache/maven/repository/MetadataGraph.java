@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,32 +24,28 @@ import java.util.Collection;
 /**
  * This is the main graph data structure used by the RepositorySystem to present tree and graph objects.
  *
- * @author Oleg Gusakov
  *
  */
-public class MetadataGraph
-{
+@Deprecated
+public class MetadataGraph {
     /** all graph nodes */
     Collection<MetadataGraphNode> nodes;
 
     /** entry point for tree-like structures */
     MetadataGraphNode entry;
 
-    public MetadataGraph( MetadataGraphNode entry )
-    {
+    public MetadataGraph(MetadataGraphNode entry) {
         this();
 
         this.entry = entry;
     }
 
-    public MetadataGraph()
-    {
-        nodes = new ArrayList<>( 64 );
+    public MetadataGraph() {
+        nodes = new ArrayList<>(64);
     }
 
-    public void addNode( MetadataGraphNode node )
-    {
-        nodes.add( node );
+    public void addNode(MetadataGraphNode node) {
+        nodes.add(node);
     }
 
     /**
@@ -58,34 +53,29 @@ public class MetadataGraph
      *
      * @param md
      */
-    public MetadataGraphNode findNode( MavenArtifactMetadata md )
-    {
-        for ( MetadataGraphNode mgn : nodes )
-        {
-            if ( mgn.metadata.equals( md ) )
-            {
+    public MetadataGraphNode findNode(MavenArtifactMetadata md) {
+        for (MetadataGraphNode mgn : nodes) {
+            if (mgn.metadata.equals(md)) {
                 return mgn;
             }
         }
 
-        MetadataGraphNode node = new MetadataGraphNode( md );
-        addNode( node );
+        MetadataGraphNode node = new MetadataGraphNode(md);
+        addNode(node);
         return node;
     }
 
     /**
      * getter
      */
-    public MetadataGraphNode getEntry()
-    {
+    public MetadataGraphNode getEntry() {
         return entry;
     }
 
     /**
      * getter
      */
-    public Collection<MetadataGraphNode> getNodes()
-    {
+    public Collection<MetadataGraphNode> getNodes() {
         return nodes;
     }
 }
