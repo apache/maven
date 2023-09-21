@@ -28,22 +28,20 @@ Environment Variable Prerequisites
 -----------------------------------------------------------------------------
 #>
 
-# set title
-$Host.UI.RawUI.WindowTitle = (Get-Variable MyInvocation -Scope Script).Value.InvocationName
-
 if (-not $env:MAVEN_SKIP_RC) {
   if (Test-Path -Path $env:PROGRAMDATA\mavenrc.ps1 -PathType Leaf) { &$env:PROGRAMDATA"\mavenrc.ps1" $args }
   if (Test-Path -Path $env:USERPROFILE\mavenrc.ps1 -PathType Leaf) { &$env:USERPROFILE"\mavenrc.ps1" $args }
 }
 
 if (-not (Test-path $env:JAVA_HOME)) {
-  $JAVACMD = (get-command java).Source 
-  if (-not $JAVACMD) {
+  try {
+    $JAVACMD = (get-command java).Source
+  } catch {
     Write-Error -ErrorAction Stop -Message "The $env:JAVA_HOME has not been set, JAVA_HOME environment variable is not defined correctly, so Apache Maven cannot be started."
   }
 }
 else {
-  $JAVACMD = $env:JAVA_HOME + "\bin\java.exe"
+  $JAVACMD = Join-Path $env:JAVA_HOME bin java.exe
 }
 
 if (-not (Test-Path $JAVACMD)) {

@@ -1,5 +1,5 @@
 # check mvn home
-$MAVEN_HOME = (Get-Item $PSScriptRoot"\..")
+$MAVEN_HOME = (Get-Item $PSScriptRoot).Parent
 
 # check if maven command exists
 if (-not (Test-path "$MAVEN_HOME\bin\mvn.ps1")) {

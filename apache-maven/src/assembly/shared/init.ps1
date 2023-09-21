@@ -24,8 +24,10 @@ function IsNotRoot {
   param (
     [String] $path
   )
+  $root_path_base_name = ((get-item $path).Root.BaseName
+  $path_base_name = ((get-item $path).BaseName
 
-  return -not $path.endsWith(":\")
+  return $root_path_base_name -ne $path_base_name
 }
 
 function RetrieveContentsJvmConfig {
@@ -36,9 +38,9 @@ function RetrieveContentsJvmConfig {
   $jvm_location = $path + "\.mvn\jvm.config"
 
   if (Test-Path $jvm_location) {
-    return $env:MAVEN_OPTS + (Get-Content $jvm_location).Replace("`n", "").Replace("`r", "");
+    return $env:MAVEN_OPTS + " " + -Join (Get-Content $jvm_location)
   }
-  return $env:MAVEN_OPTS;
+  return $env:MAVEN_OPTS
 }
 
 $basedir = ""
