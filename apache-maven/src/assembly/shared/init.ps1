@@ -35,10 +35,10 @@ function RetrieveContentsJvmConfig {
     [String] $path
   )
 
-  $jvm_location = $path + "\.mvn\jvm.config"
+  $jvm_config = $path + "\.mvn\jvm.config"
 
-  if (Test-Path $jvm_location) {
-    return $env:MAVEN_OPTS + " " + -Join (Get-Content $jvm_location)
+  if (Test-Path $jvm_config) {
+    return $env:MAVEN_OPTS + " " + -Join (Get-Content $jvm_config)
   }
   return $env:MAVEN_OPTS
 }
