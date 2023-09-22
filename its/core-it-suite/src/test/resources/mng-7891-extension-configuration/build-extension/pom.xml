@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
+  <groupId>org.apache.maven.its.mng7891</groupId>
+  <artifactId>build-extension</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.its.mng7891</groupId>
+        <artifactId>extension</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <messages>
+            <sessionStart>The session has just started at ${maven.build.timestamp}</sessionStart>
+            <projectsRead>All projects are read now! The build will start and the user has passed -DuserValue=${userValue} on the commandline</projectsRead>
+          </messages>
+        </configuration>
+      </extension>
+    </extensions>
+  </build>
+</project>
