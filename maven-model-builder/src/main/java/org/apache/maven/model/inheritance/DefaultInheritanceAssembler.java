@@ -37,23 +37,21 @@ import org.apache.maven.api.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Handles inheritance of model values.
  *
- * @author Benjamin Bentmann
  */
 @SuppressWarnings({"checkstyle:methodname"})
 @Named
 @Singleton
 public class DefaultInheritanceAssembler implements InheritanceAssembler {
 
-    private InheritanceModelMerger merger = new InheritanceModelMerger();
-
     private static final String CHILD_DIRECTORY = "child-directory";
 
     private static final String CHILD_DIRECTORY_PROPERTY = "project.directory";
+
+    private final InheritanceModelMerger merger = new InheritanceModelMerger();
 
     @Override
     public Model assembleModelInheritance(
@@ -137,10 +135,17 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
             Object childDirectory = context.get(CHILD_DIRECTORY);
             Object childPathAdjustment = context.get(CHILD_PATH_ADJUSTMENT);
 
-            if (StringUtils.isBlank(parentUrl)
-                    || childDirectory == null
-                    || childPathAdjustment == null
-                    || !appendPath) {
+            boolean isBlankParentUrl = true;
+
+            if (parentUrl != null) {
+                for (int i = 0; i < parentUrl.length(); i++) {
+                    if (!Character.isWhitespace(parentUrl.charAt(i))) {
+                        isBlankParentUrl = false;
+                    }
+                }
+            }
+
+            if (isBlankParentUrl || childDirectory == null || childPathAdjustment == null || !appendPath) {
                 return parentUrl;
             }
 

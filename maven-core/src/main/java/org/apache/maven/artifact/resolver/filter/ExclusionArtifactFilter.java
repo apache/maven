@@ -18,8 +18,13 @@
  */
 package org.apache.maven.artifact.resolver.filter;
 
+import java.lang.reflect.Proxy;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Exclusion;
@@ -28,37 +33,42 @@ import org.apache.maven.model.Exclusion;
  * Filter to exclude from a list of artifact patterns.
  */
 public class ExclusionArtifactFilter implements ArtifactFilter {
-    private static final String WILDCARD = "*";
 
     private final List<Exclusion> exclusions;
+    private final List<Predicate<Artifact>> predicates;
 
     public ExclusionArtifactFilter(List<Exclusion> exclusions) {
         this.exclusions = exclusions;
-    }
-
-    private Predicate<Exclusion> sameArtifactId(Artifact artifact) {
-        return exclusion -> exclusion.getArtifactId().equals(artifact.getArtifactId());
-    }
-
-    private Predicate<Exclusion> sameGroupId(Artifact artifact) {
-        return exclusion -> exclusion.getGroupId().equals(artifact.getGroupId());
-    }
-
-    private Predicate<Exclusion> groupIdIsWildcard = exclusion -> WILDCARD.equals(exclusion.getGroupId());
-
-    private Predicate<Exclusion> artifactIdIsWildcard = exclusion -> WILDCARD.equals(exclusion.getArtifactId());
-
-    private Predicate<Exclusion> groupIdAndArtifactIdIsWildcard = groupIdIsWildcard.and(artifactIdIsWildcard);
-
-    private Predicate<Exclusion> exclude(Artifact artifact) {
-        return groupIdAndArtifactIdIsWildcard
-                .or(groupIdIsWildcard.and(sameArtifactId(artifact)))
-                .or(artifactIdIsWildcard.and(sameGroupId(artifact)))
-                .or(sameGroupId(artifact).and(sameArtifactId(artifact)));
+        this.predicates =
+                exclusions.stream().map(ExclusionArtifactFilter::toPredicate).collect(Collectors.toList());
     }
 
     @Override
     public boolean include(Artifact artifact) {
-        return !exclusions.stream().anyMatch(exclude(artifact));
+        return predicates.stream().noneMatch(p -> p.test(artifact));
+    }
+
+    private static Predicate<Artifact> toPredicate(Exclusion exclusion) {
+        PathMatcher groupId = FileSystems.getDefault().getPathMatcher("glob:" + exclusion.getGroupId());
+        PathMatcher artifactId = FileSystems.getDefault().getPathMatcher("glob:" + exclusion.getArtifactId());
+        Predicate<Artifact> predGroupId = a -> groupId.matches(createPathProxy(a.getGroupId()));
+        Predicate<Artifact> predArtifactId = a -> artifactId.matches(createPathProxy(a.getArtifactId()));
+        return predGroupId.and(predArtifactId);
+    }
+
+    /**
+     * In order to reuse the glob matcher from the filesystem, we need
+     * to create Path instances.  Those are only used with the toString method.
+     * This hack works because the only system-dependent thing is the path
+     * separator which should not be part of the groupId or artifactId.
+     */
+    private static Path createPathProxy(String value) {
+        return (Path) Proxy.newProxyInstance(
+                ExclusionArtifactFilter.class.getClassLoader(), new Class[] {Path.class}, (proxy1, method, args) -> {
+                    if ("toString".equals(method.getName())) {
+                        return value;
+                    }
+                    throw new UnsupportedOperationException();
+                });
     }
 }

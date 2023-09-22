@@ -19,6 +19,7 @@
 package org.apache.maven.execution;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import java.util.Properties;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.properties.internal.SystemProperties;
@@ -43,7 +45,6 @@ import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.transfer.TransferListener;
 
 /**
- * @author Jason van Zyl
  */
 public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
@@ -88,6 +89,8 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private File userSettingsFile;
 
+    private File projectSettingsFile;
+
     private File globalSettingsFile;
 
     private File userToolchainsFile;
@@ -101,6 +104,10 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     private File multiModuleProjectDirectory;
 
     private File basedir;
+
+    private Path rootDirectory;
+
+    private Path topDirectory;
 
     private List<String> goals;
 
@@ -837,6 +844,18 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     }
 
     @Override
+    public File getProjectSettingsFile() {
+        return projectSettingsFile;
+    }
+
+    @Override
+    public MavenExecutionRequest setProjectSettingsFile(File projectSettingsFile) {
+        this.projectSettingsFile = projectSettingsFile;
+
+        return this;
+    }
+
+    @Override
     public File getGlobalSettingsFile() {
         return globalSettingsFile;
     }
@@ -1051,14 +1070,41 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         return this;
     }
 
+    @Deprecated
     @Override
     public void setMultiModuleProjectDirectory(File directory) {
         this.multiModuleProjectDirectory = directory;
     }
 
+    @Deprecated
     @Override
     public File getMultiModuleProjectDirectory() {
         return multiModuleProjectDirectory;
+    }
+
+    @Override
+    public Path getRootDirectory() {
+        if (rootDirectory == null) {
+            throw new IllegalStateException(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
+        }
+        return rootDirectory;
+    }
+
+    @Override
+    public MavenExecutionRequest setRootDirectory(Path rootDirectory) {
+        this.rootDirectory = rootDirectory;
+        return this;
+    }
+
+    @Override
+    public Path getTopDirectory() {
+        return topDirectory;
+    }
+
+    @Override
+    public MavenExecutionRequest setTopDirectory(Path topDirectory) {
+        this.topDirectory = topDirectory;
+        return this;
     }
 
     @Override

@@ -24,7 +24,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * A version usually parsed using the {@link org.apache.maven.api.services.VersionParser} service.
  *
- * @since 4.0
+ * @since 4.0.0
  * @see org.apache.maven.api.services.VersionParser#parseVersion(String)
  * @see org.apache.maven.api.Session#parseVersion(String)
  */

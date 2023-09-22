@@ -43,7 +43,7 @@ public class DefaultArtifact implements Artifact {
                 + getArtifactId()
                 + ':'
                 + getExtension()
-                + (getClassifier().length() > 0 ? ":" + getClassifier() : "")
+                + (getClassifier().isEmpty() ? "" : ":" + getClassifier())
                 + ':'
                 + getVersion();
     }

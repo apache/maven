@@ -26,7 +26,6 @@ import org.apache.maven.plugin.MojoFailureException;
  * project instance, so we can wrap the {@link MojoFailureException} with context
  * information including projectId that caused the failure.
  *
- * @author jdcasey
  *
  */
 public class ProjectBuildFailureException extends BuildFailureException {

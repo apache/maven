@@ -43,9 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * anywhere else in the lineage. We are just making sure that values
  * down in the lineage are bubbling up where they should.
  *
- * @author Jason van Zyl
  */
-public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
+class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p4 inherits from p3
@@ -61,7 +60,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    public void testProjectInheritance() throws Exception {
+    void testProjectInheritance() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         System.out.println("Local repository is at: " + localRepo.getAbsolutePath());

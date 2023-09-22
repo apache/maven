@@ -18,18 +18,18 @@
  */
 package org.apache.maven.toolchain.java;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.maven.toolchain.DefaultToolchain;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.Os;
+import org.apache.maven.utils.Os;
 import org.slf4j.Logger;
 
 /**
  * JDK toolchain implementation.
  *
- * @author Milos Kleint
  * @since 2.0.9, renamed from DefaultJavaToolChain in 3.2.4
  */
 public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain {
@@ -54,25 +54,24 @@ public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain
     }
 
     public String findTool(String toolName) {
-        File toRet = findTool(toolName, new File(FileUtils.normalize(getJavaHome())));
+        Path toRet = findTool(toolName, Paths.get(getJavaHome()).normalize());
         if (toRet != null) {
-            return toRet.getAbsolutePath();
+            return toRet.toAbsolutePath().toString();
         }
         return null;
     }
 
-    private static File findTool(String toolName, File installDir) {
-        File bin = new File(installDir, "bin"); // NOI18N
-        if (bin.exists()) {
-            boolean isWindows = Os.isFamily("windows"); // NOI18N
-            if (isWindows) {
-                File tool = new File(bin, toolName + ".exe");
-                if (tool.exists()) {
+    private static Path findTool(String toolName, Path installDir) {
+        Path bin = installDir.resolve("bin"); // NOI18N
+        if (Files.isDirectory(bin)) {
+            if (Os.IS_WINDOWS) {
+                Path tool = bin.resolve(toolName + ".exe");
+                if (Files.exists(tool)) {
                     return tool;
                 }
             }
-            File tool = new File(bin, toolName);
-            if (tool.exists()) {
+            Path tool = bin.resolve(toolName);
+            if (Files.exists(tool)) {
                 return tool;
             }
         }

@@ -22,7 +22,6 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 
 /**
  *
- * @author Robert Scholte
  * @since 3.2.4
  */
 public class MavenToolchainMerger {

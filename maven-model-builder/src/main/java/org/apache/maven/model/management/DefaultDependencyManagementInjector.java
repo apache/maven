@@ -38,7 +38,6 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles injection of dependency management into the model.
  *
- * @author Benjamin Bentmann
  */
 @SuppressWarnings({"checkstyle:methodname"})
 @Named

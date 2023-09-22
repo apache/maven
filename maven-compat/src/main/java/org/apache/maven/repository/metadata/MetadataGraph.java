@@ -29,9 +29,9 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
 /**
  * maven dependency metadata graph
  *
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
+@Deprecated
 public class MetadataGraph {
     public static final int DEFAULT_VERTICES = 32;
     public static final int DEFAULT_EDGES = 64;

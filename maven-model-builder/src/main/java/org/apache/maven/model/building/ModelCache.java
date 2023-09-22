@@ -27,8 +27,6 @@ import org.apache.maven.building.Source;
  * identify of a model. The tag allows for further classification of the associated data on the sole discretion of the
  * model builder.
  *
- * @author Benjamin Bentmann
- * @author Robert Scholte
  */
 public interface ModelCache {
     /**

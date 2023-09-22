@@ -27,30 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code ActivationOS}.
  *
- * @author Benjamin Bentmann
  */
-public class ActivationOSTest {
+class ActivationOSTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new ActivationOS().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new ActivationOS().equals(null));
 
         new ActivationOS().equals(new ActivationOS());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         ActivationOS thing = new ActivationOS();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new ActivationOS().toString());
     }
 }

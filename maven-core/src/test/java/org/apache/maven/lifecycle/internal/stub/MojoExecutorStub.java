@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
@@ -40,14 +41,13 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 
 /**
- * @author Kristian Rosenvold
  */
 public class MojoExecutorStub extends MojoExecutor { // This is being lazy instead of making interface
 
     public final List<MojoExecution> executions = Collections.synchronizedList(new ArrayList<>());
 
     public MojoExecutorStub() {
-        super(null, null, null, null, null);
+        super(null, null, null, null, null, null);
     }
 
     public MojoExecutorStub(
@@ -55,8 +55,15 @@ public class MojoExecutorStub extends MojoExecutor { // This is being lazy inste
             MavenPluginManager mavenPluginManager,
             LifecycleDependencyResolver lifeCycleDependencyResolver,
             ExecutionEventCatapult eventCatapult,
-            Provider<MojosExecutionStrategy> mojosExecutionStrategy) {
-        super(pluginManager, mavenPluginManager, lifeCycleDependencyResolver, eventCatapult, mojosExecutionStrategy);
+            Provider<MojosExecutionStrategy> mojosExecutionStrategy,
+            MessageBuilderFactory messageBuilderFactory) {
+        super(
+                pluginManager,
+                mavenPluginManager,
+                lifeCycleDependencyResolver,
+                eventCatapult,
+                mojosExecutionStrategy,
+                messageBuilderFactory);
     }
 
     @Override

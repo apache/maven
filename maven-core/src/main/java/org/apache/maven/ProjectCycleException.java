@@ -18,10 +18,9 @@
  */
 package org.apache.maven;
 
-import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.apache.maven.project.CycleDetectedException;
 
 /**
- * @author jdcasey
  */
 public class ProjectCycleException extends BuildFailureException {
     public ProjectCycleException(String message) {

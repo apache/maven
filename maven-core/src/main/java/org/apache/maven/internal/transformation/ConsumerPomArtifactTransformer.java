@@ -18,32 +18,36 @@
  */
 package org.apache.maven.internal.transformation;
 
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Writer;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.BiConsumer;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.apache.maven.feature.Features;
-import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
+import org.apache.maven.api.feature.Features;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.model.building.FileModelSource;
+import org.apache.maven.model.building.ModelBuilder;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelCache;
+import org.apache.maven.model.building.Result;
 import org.apache.maven.model.building.TransformerContext;
-import org.apache.maven.model.transform.RawToConsumerPomXMLFilterFactory;
-import org.apache.maven.model.transform.pull.XmlUtils;
+import org.apache.maven.model.v4.MavenModelVersion;
+import org.apache.maven.model.v4.MavenStaxWriter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
-import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
-import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.repository.internal.DefaultModelCache;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -59,111 +63,212 @@ import org.eclipse.aether.installation.InstallRequest;
 @Named("consumer-pom")
 public final class ConsumerPomArtifactTransformer {
 
+    private static final String BOM_PACKAGING = "bom";
+
+    public static final String POM_PACKAGING = "pom";
+
     private static final String CONSUMER_POM_CLASSIFIER = "consumer";
 
+    private static final String BUILD_POM_CLASSIFIER = "build";
+
+    private static final String NAMESPACE_FORMAT = "http://maven.apache.org/POM/%s";
+
+    private static final String SCHEMA_LOCATION_FORMAT = "https://maven.apache.org/xsd/maven-%s.xsd";
+
+    private final Set<Path> toDelete = new CopyOnWriteArraySet<>();
+
+    private final ModelBuilder modelBuilder;
+
+    @Inject
+    ConsumerPomArtifactTransformer(ModelBuilder modelBuilder) {
+        this.modelBuilder = modelBuilder;
+    }
+
     public void injectTransformedArtifacts(MavenProject project, RepositorySystemSession session) throws IOException {
-        if (isActive(session)) {
-            Path generatedFile;
-            String buildDirectory =
-                    project.getBuild() != null ? project.getBuild().getDirectory() : null;
-            if (buildDirectory == null) {
-                generatedFile = Files.createTempFile(CONSUMER_POM_CLASSIFIER, "pom");
-            } else {
-                Path buildDir = Paths.get(buildDirectory);
+        if (project.getFile() == null) {
+            // If there is no build POM there is no reason to inject artifacts for the consumer POM.
+            return;
+        }
+        if (Features.buildConsumer(session.getUserProperties())) {
+            Path buildDir =
+                    project.getBuild() != null ? Paths.get(project.getBuild().getDirectory()) : null;
+            if (buildDir != null) {
                 Files.createDirectories(buildDir);
-                generatedFile = Files.createTempFile(buildDir, CONSUMER_POM_CLASSIFIER, "pom");
             }
-            project.addAttachedArtifact(new ConsumerPomArtifact(project, generatedFile, session));
+            Path consumer = buildDir != null
+                    ? Files.createTempFile(buildDir, CONSUMER_POM_CLASSIFIER + "-", ".pom")
+                    : Files.createTempFile(CONSUMER_POM_CLASSIFIER + "-", ".pom");
+            deferDeleteFile(consumer);
+
+            project.addAttachedArtifact(createConsumerPomArtifact(project, consumer, session));
+        } else if (project.getModel().isRoot()) {
+            throw new IllegalStateException(
+                    "The use of the root attribute on the model requires the buildconsumer feature to be active");
+        }
+    }
+
+    public ConsumerPomArtifact createConsumerPomArtifact(
+            MavenProject project, Path consumer, RepositorySystemSession session) {
+        return new ConsumerPomArtifact(project, consumer, session);
+    }
+
+    private void deferDeleteFile(Path generatedFile) {
+        toDelete.add(generatedFile.toAbsolutePath());
+    }
+
+    @PreDestroy
+    private void doDeleteFiles() {
+        for (Path file : toDelete) {
+            try {
+                Files.delete(file);
+            } catch (IOException e) {
+                // ignore, we did our best...
+            }
         }
     }
 
     public InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
-        if (isActive(session) && consumerPomPresent(request.getArtifacts())) {
+        if (Features.buildConsumer(session.getUserProperties()) && consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));
         }
         return request;
     }
 
     public DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request) {
-        if (isActive(session) && consumerPomPresent(request.getArtifacts())) {
+        if (Features.buildConsumer(session.getUserProperties()) && consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));
         }
         return request;
     }
 
-    private boolean isActive(RepositorySystemSession session) {
-        return Features.buildConsumer(session.getUserProperties()).isActive();
-    }
-
     private boolean consumerPomPresent(Collection<Artifact> artifacts) {
-        return artifacts.stream().anyMatch(a -> CONSUMER_POM_CLASSIFIER.equals(a.getClassifier()));
+        return artifacts.stream()
+                .anyMatch(a -> "pom".equals(a.getExtension()) && CONSUMER_POM_CLASSIFIER.equals(a.getClassifier()));
     }
 
     private Collection<Artifact> replacePom(Collection<Artifact> artifacts) {
-        ArrayList<Artifact> result = new ArrayList<>(artifacts.size());
+        Artifact consumer = null;
+        Artifact main = null;
         for (Artifact artifact : artifacts) {
-            if (CONSUMER_POM_CLASSIFIER.equals(artifact.getClassifier())) {
-                // if under CONSUMER_POM_CLASSIFIER, move it to "" classifier
-                DefaultArtifact remapped = new DefaultArtifact(
-                        artifact.getGroupId(),
-                        artifact.getArtifactId(),
-                        "",
-                        artifact.getExtension(),
-                        artifact.getVersion(),
-                        artifact.getProperties(),
-                        artifact.getFile());
-                result.add(remapped);
-            } else if ("".equals(artifact.getClassifier())
-                            && (artifact.getExtension().equals("pom"))
-                    || artifact.getExtension().startsWith("pom.")) {
-                // skip POM and POM subordinates
-                continue;
-            } else {
-                // everything else: add as is
-                result.add(artifact);
+            if ("pom".equals(artifact.getExtension())) {
+                if (CONSUMER_POM_CLASSIFIER.equals(artifact.getClassifier())) {
+                    consumer = artifact;
+                } else if ("".equals(artifact.getClassifier())) {
+                    main = artifact;
+                }
             }
         }
-        return result;
+        if (main != null && consumer != null) {
+            ArrayList<Artifact> result = new ArrayList<>(artifacts);
+            result.remove(main);
+            result.remove(consumer);
+            result.add(new DefaultArtifact(
+                    consumer.getGroupId(),
+                    consumer.getArtifactId(),
+                    "",
+                    consumer.getExtension(),
+                    consumer.getVersion(),
+                    consumer.getProperties(),
+                    consumer.getFile()));
+            result.add(new DefaultArtifact(
+                    main.getGroupId(),
+                    main.getArtifactId(),
+                    BUILD_POM_CLASSIFIER,
+                    main.getExtension(),
+                    main.getVersion(),
+                    main.getProperties(),
+                    main.getFile()));
+            artifacts = result;
+        }
+        return artifacts;
     }
 
     /**
      * Consumer POM is transformed from original POM.
      */
-    private static class ConsumerPomArtifact extends TransformedArtifact {
+    class ConsumerPomArtifact extends TransformedArtifact {
 
-        private ConsumerPomArtifact(MavenProject mavenProject, Path target, RepositorySystemSession session) {
+        private MavenProject project;
+        private RepositorySystemSession session;
+
+        ConsumerPomArtifact(MavenProject mavenProject, Path target, RepositorySystemSession session) {
             super(
                     new ProjectArtifact(mavenProject),
                     () -> mavenProject.getFile().toPath(),
                     CONSUMER_POM_CLASSIFIER,
                     "pom",
-                    target,
-                    transformer(session));
+                    target);
+            this.project = mavenProject;
+            this.session = session;
         }
 
-        private static BiConsumer<Path, Path> transformer(RepositorySystemSession session) {
-            TransformerContext context = (TransformerContext) session.getData().get(TransformerContext.KEY);
-            return (src, dest) -> {
-                try (InputStream inputStream = transform(src, context)) {
-                    Files.createDirectories(dest.getParent());
-                    Files.copy(inputStream, dest, StandardCopyOption.REPLACE_EXISTING);
-                } catch (XmlPullParserException | IOException e) {
+        @Override
+        public void transform(Path src, Path dest) {
+            Model model = project.getModel().getDelegate();
+            transform(src, dest, model);
+        }
+
+        void transform(Path src, Path dest, Model model) {
+            Model consumer = null;
+            String version;
+
+            // This is a bit of a hack, but all models are cached, so not sure why we'd need to parse it again
+            ModelCache cache = DefaultModelCache.newInstance(session);
+            Object modelData = cache.get(new FileModelSource(src.toFile()), "raw");
+            if (modelData != null) {
+                try {
+                    Method getModel = modelData.getClass().getMethod("getModel");
+                    getModel.setAccessible(true);
+                    org.apache.maven.model.Model cachedModel =
+                            (org.apache.maven.model.Model) getModel.invoke(modelData);
+                    consumer = cachedModel.getDelegate();
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            };
+            }
+
+            if (consumer == null) {
+                TransformerContext context =
+                        (TransformerContext) session.getData().get(TransformerContext.KEY);
+                Result<? extends org.apache.maven.model.Model> result = modelBuilder.buildRawModel(
+                        src.toFile(), ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, false, context);
+                if (result.hasErrors()) {
+                    throw new IllegalStateException(
+                            "Unable to build POM " + src,
+                            result.getProblems().iterator().next().getException());
+                }
+                consumer = result.get().getDelegate();
+            }
+
+            // raw to consumer transform
+            if (BOM_PACKAGING.equals(consumer.getPackaging())) {
+                consumer = consumer.withPackaging(POM_PACKAGING);
+            }
+            consumer = consumer.withRoot(false).withModules(null);
+            if (consumer.getParent() != null) {
+                consumer = consumer.withParent(consumer.getParent().withRelativePath(null));
+            }
+
+            if (!consumer.isPreserveModelVersion()) {
+                consumer = consumer.withPreserveModelVersion(false);
+                version = new MavenModelVersion().getModelVersion(consumer);
+                consumer = consumer.withModelVersion(version);
+            } else {
+                version = consumer.getModelVersion();
+            }
+
+            try {
+                Files.createDirectories(dest.getParent());
+                try (Writer w = Files.newBufferedWriter(dest)) {
+                    MavenStaxWriter writer = new MavenStaxWriter();
+                    writer.setNamespace(String.format(NAMESPACE_FORMAT, version));
+                    writer.setSchemaLocation(String.format(SCHEMA_LOCATION_FORMAT, version));
+                    writer.setAddLocationInformation(false);
+                    writer.write(w, consumer);
+                }
+            } catch (XMLStreamException | IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-    }
-
-    /**
-     * The actual transformation: visible for testing.
-     */
-    static InputStream transform(Path pomFile, TransformerContext context) throws IOException, XmlPullParserException {
-        XmlStreamReader reader = ReaderFactory.newXmlReader(Files.newInputStream(pomFile));
-        XmlPullParser parser = new MXParser(EntityReplacementMap.defaultEntityReplacementMap);
-        parser.setInput(reader);
-        parser = new RawToConsumerPomXMLFilterFactory(new DefaultBuildPomXMLFilterFactory(context, true))
-                .get(parser, pomFile);
-
-        return XmlUtils.writeDocument(reader, parser);
     }
 }

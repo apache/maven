@@ -38,10 +38,6 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Jason van Zyl
- * @author jdcasey
- * @author Kristian Rosenvold (extracted interface)
  */
 public interface LifecycleTaskSegmentCalculator {
     List<TaskSegment> calculateTaskSegments(MavenSession session)

@@ -49,14 +49,7 @@ public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4
      */
     @Override
     public Logger getLogger(String name) {
-        Logger simpleLogger = loggerMap.get(name);
-        if (simpleLogger != null) {
-            return simpleLogger;
-        } else {
-            Logger newInstance = getNewLoggingInstance(name);
-            Logger oldInstance = loggerMap.putIfAbsent(name, newInstance);
-            return oldInstance == null ? newInstance : oldInstance;
-        }
+        return loggerMap.computeIfAbsent(name, this::getNewLoggingInstance);
     }
 
     private Logger getNewLoggingInstance(String name) {

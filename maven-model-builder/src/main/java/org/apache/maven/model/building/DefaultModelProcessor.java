@@ -26,9 +26,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.spi.ModelParser;
+import org.apache.maven.api.spi.ModelParserException;
+import org.apache.maven.building.Source;
+import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.locator.ModelLocator;
 import org.eclipse.sisu.Typed;
@@ -63,32 +73,128 @@ import org.eclipse.sisu.Typed;
 @Typed(ModelProcessor.class)
 public class DefaultModelProcessor implements ModelProcessor {
 
-    private final ModelLocator locator;
-    private final ModelReader reader;
+    private final Collection<ModelParser> modelParsers;
+    private final ModelLocator modelLocator;
+    private final ModelReader modelReader;
 
     @Inject
-    public DefaultModelProcessor(ModelLocator locator, ModelReader reader) {
-        this.locator = locator;
-        this.reader = reader;
+    public DefaultModelProcessor(
+            Collection<ModelParser> modelParsers, ModelLocator modelLocator, ModelReader modelReader) {
+        this.modelParsers = modelParsers;
+        this.modelLocator = modelLocator;
+        this.modelReader = modelReader;
     }
 
     @Override
     public File locatePom(File projectDirectory) {
-        return locator.locatePom(projectDirectory);
+        return locatePom(projectDirectory.toPath()).toFile();
+    }
+
+    public Path locatePom(Path projectDirectory) {
+        // Note that the ModelProcessor#locatePom never returns null
+        // while the ModelParser#locatePom needs to return an existing path!
+        Path pom = modelParsers.stream()
+                .map(m -> m.locate(projectDirectory)
+                        .map(org.apache.maven.api.services.Source::getPath)
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseGet(
+                        () -> modelLocator.locatePom(projectDirectory.toFile()).toPath());
+        if (!pom.equals(projectDirectory) && !pom.getParent().equals(projectDirectory)) {
+            throw new IllegalArgumentException("The POM found does not belong to the given directory: " + pom);
+        }
+        return pom;
+    }
+
+    public File locateExistingPom(File projectDirectory) {
+        Path path = locateExistingPom(projectDirectory.toPath());
+        return path != null ? path.toFile() : null;
+    }
+
+    public Path locateExistingPom(Path projectDirectory) {
+        // Note that the ModelProcessor#locatePom never returns null
+        // while the ModelParser#locatePom needs to return an existing path!
+        Path pom = modelParsers.stream()
+                .map(m -> m.locate(projectDirectory).map(s -> s.getPath()).orElse(null))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseGet(() -> {
+                    File f = modelLocator.locateExistingPom(projectDirectory.toFile());
+                    return f != null ? f.toPath() : null;
+                });
+        if (pom != null && !pom.equals(projectDirectory) && !pom.getParent().equals(projectDirectory)) {
+            throw new IllegalArgumentException("The POM found does not belong to the given directory: " + pom);
+        }
+        return pom;
+    }
+
+    protected org.apache.maven.api.model.Model read(
+            Path pomFile, InputStream input, Reader reader, Map<String, ?> options) throws IOException {
+        Source source = (Source) options.get(ModelProcessor.SOURCE);
+        if (pomFile == null && source instanceof org.apache.maven.building.FileSource) {
+            pomFile = ((org.apache.maven.building.FileSource) source).getFile().toPath();
+        }
+        if (pomFile != null) {
+            Path projectDirectory = pomFile.getParent();
+            List<ModelParserException> exceptions = new ArrayList<>();
+            for (ModelParser parser : modelParsers) {
+                try {
+                    Optional<Model> model = parser.locateAndParse(projectDirectory, options);
+                    if (model.isPresent()) {
+                        return model.get().withPomFile(pomFile);
+                    }
+                } catch (ModelParserException e) {
+                    exceptions.add(e);
+                }
+            }
+            try {
+                return readXmlModel(pomFile, null, null, options);
+            } catch (IOException e) {
+                exceptions.forEach(e::addSuppressed);
+                throw e;
+            }
+        } else {
+            return readXmlModel(pomFile, input, reader, options);
+        }
+    }
+
+    private org.apache.maven.api.model.Model readXmlModel(
+            Path pomFile, InputStream input, Reader reader, Map<String, ?> options) throws IOException {
+        if (pomFile != null) {
+            return modelReader.read(pomFile.toFile(), options).getDelegate();
+        } else if (input != null) {
+            return modelReader.read(input, options).getDelegate();
+        } else {
+            return modelReader.read(reader, options).getDelegate();
+        }
     }
 
     @Override
-    public Model read(File input, Map<String, ?> options) throws IOException {
-        return reader.read(input, options);
+    public org.apache.maven.model.Model read(File file, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(file, "file cannot be null");
+        Path path = file.toPath();
+        org.apache.maven.api.model.Model model = read(path, null, null, options);
+        return new org.apache.maven.model.Model(model);
     }
 
     @Override
-    public Model read(Reader input, Map<String, ?> options) throws IOException {
-        return reader.read(input, options);
+    public org.apache.maven.model.Model read(InputStream input, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(input, "input cannot be null");
+        try (InputStream in = input) {
+            org.apache.maven.api.model.Model model = read(null, in, null, options);
+            return new org.apache.maven.model.Model(model);
+        } catch (ModelParserException e) {
+            throw new ModelParseException("Unable to read model: " + e, e.getLineNumber(), e.getColumnNumber(), e);
+        }
     }
 
     @Override
-    public Model read(InputStream input, Map<String, ?> options) throws IOException {
-        return reader.read(input, options);
+    public org.apache.maven.model.Model read(Reader reader, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(reader, "reader cannot be null");
+        try (Reader r = reader) {
+            org.apache.maven.api.model.Model model = read(null, null, r, options);
+            return new org.apache.maven.model.Model(model);
+        }
     }
 }

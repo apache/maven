@@ -26,7 +26,6 @@ import java.io.File;
 /**
  * Locates a POM file within a project base directory.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
@@ -34,6 +33,21 @@ public class DefaultModelLocator implements ModelLocator {
 
     @Override
     public File locatePom(File projectDirectory) {
-        return new File(projectDirectory, "pom.xml");
+        return projectDirectory != null ? projectDirectory : new File(".");
+    }
+
+    @Override
+    public File locateExistingPom(File project) {
+        if (project == null || project.isDirectory()) {
+            project = locatePom(project);
+        }
+        if (project.isDirectory()) {
+            File pom = new File(project, "pom.xml");
+            return pom.isFile() ? pom : null;
+        } else if (project.isFile()) {
+            return project;
+        } else {
+            return null;
+        }
     }
 }

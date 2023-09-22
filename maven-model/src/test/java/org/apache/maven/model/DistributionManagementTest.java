@@ -27,30 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code DistributionManagement}.
  *
- * @author Benjamin Bentmann
  */
-public class DistributionManagementTest {
+class DistributionManagementTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new DistributionManagement().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new DistributionManagement().equals(null));
 
         new DistributionManagement().equals(new DistributionManagement());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         DistributionManagement thing = new DistributionManagement();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new DistributionManagement().toString());
     }
 }

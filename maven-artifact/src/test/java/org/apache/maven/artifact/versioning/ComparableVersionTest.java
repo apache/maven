@@ -28,10 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test ComparableVersion.
  *
- * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
  */
 @SuppressWarnings("unchecked")
-public class ComparableVersionTest {
+class ComparableVersionTest {
     private ComparableVersion newComparable(String version) {
         ComparableVersion ret = new ComparableVersion(version);
         String canonical = ret.getCanonical();
@@ -101,6 +100,13 @@ public class ComparableVersionTest {
         assertEquals(c2, c1, "expected " + v2 + ".equals( " + v1 + " )");
     }
 
+    private void checkVersionsHaveSameOrder(String v1, String v2) {
+        ComparableVersion c1 = new ComparableVersion(v1);
+        ComparableVersion c2 = new ComparableVersion(v2);
+        assertEquals(0, c1.compareTo(c2), "expected " + v1 + " == " + v2);
+        assertEquals(0, c2.compareTo(c1), "expected " + v2 + " == " + v1);
+    }
+
     private void checkVersionsArrayEqual(String[] array) {
         // compare against each other (including itself)
         for (int i = 0; i < array.length; ++i)
@@ -115,17 +121,17 @@ public class ComparableVersionTest {
     }
 
     @Test
-    public void testVersionsQualifier() {
+    void testVersionsQualifier() {
         checkVersionsOrder(VERSIONS_QUALIFIER);
     }
 
     @Test
-    public void testVersionsNumber() {
+    void testVersionsNumber() {
         checkVersionsOrder(VERSIONS_NUMBER);
     }
 
     @Test
-    public void testVersionsEqual() {
+    void testVersionsEqual() {
         newComparable("1.0-alpha");
         checkVersionsEqual("1", "1");
         checkVersionsEqual("1", "1.0");
@@ -145,11 +151,6 @@ public class ComparableVersionTest {
         checkVersionsEqual("1x", "1.0.0-x");
         checkVersionsEqual("1.0x", "1-x");
         checkVersionsEqual("1.0.0x", "1-x");
-
-        // aliases
-        checkVersionsEqual("1ga", "1");
-        checkVersionsEqual("1release", "1");
-        checkVersionsEqual("1final", "1");
         checkVersionsEqual("1cr", "1rc");
 
         // special "aliases" a, b and m for alpha, beta and milestone
@@ -162,14 +163,6 @@ public class ComparableVersionTest {
         checkVersionsEqual("1A", "1a");
         checkVersionsEqual("1B", "1b");
         checkVersionsEqual("1M", "1m");
-        checkVersionsEqual("1Ga", "1");
-        checkVersionsEqual("1GA", "1");
-        checkVersionsEqual("1RELEASE", "1");
-        checkVersionsEqual("1release", "1");
-        checkVersionsEqual("1RELeaSE", "1");
-        checkVersionsEqual("1Final", "1");
-        checkVersionsEqual("1FinaL", "1");
-        checkVersionsEqual("1FINAL", "1");
         checkVersionsEqual("1Cr", "1Rc");
         checkVersionsEqual("1cR", "1rC");
         checkVersionsEqual("1m3", "1Milestone3");
@@ -178,7 +171,22 @@ public class ComparableVersionTest {
     }
 
     @Test
-    public void testVersionComparing() {
+    void testVersionsHaveSameOrderButAreNotEqual() {
+        checkVersionsHaveSameOrder("1ga", "1");
+        checkVersionsHaveSameOrder("1release", "1");
+        checkVersionsHaveSameOrder("1final", "1");
+        checkVersionsHaveSameOrder("1Ga", "1");
+        checkVersionsHaveSameOrder("1GA", "1");
+        checkVersionsHaveSameOrder("1RELEASE", "1");
+        checkVersionsHaveSameOrder("1release", "1");
+        checkVersionsHaveSameOrder("1RELeaSE", "1");
+        checkVersionsHaveSameOrder("1Final", "1");
+        checkVersionsHaveSameOrder("1FinaL", "1");
+        checkVersionsHaveSameOrder("1FINAL", "1");
+    }
+
+    @Test
+    void testVersionComparing() {
         checkVersionsOrder("1", "2");
         checkVersionsOrder("1.5", "2");
         checkVersionsOrder("1", "2.5");
@@ -209,13 +217,13 @@ public class ComparableVersionTest {
     }
 
     @Test
-    public void testLeadingZeroes() {
+    void testLeadingZeroes() {
         checkVersionsOrder("0.7", "2");
         checkVersionsOrder("0.2", "1.0.7");
     }
 
     @Test
-    public void testGetCanonical() {
+    void testGetCanonical() {
         // MNG-7700
         newComparable("0.x");
         newComparable("0-x");
@@ -236,7 +244,7 @@ public class ComparableVersionTest {
      * <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=226100">226100</a>
      */
     @Test
-    public void testMng5568() {
+    void testMng5568() {
         String a = "6.1.0";
         String b = "6.1.0rc3";
         String c = "6.1H.5-beta"; // this is the unusual version string, with 'H' in the middle
@@ -250,7 +258,7 @@ public class ComparableVersionTest {
      * Test <a href="https://jira.apache.org/jira/browse/MNG-6572">MNG-6572</a> optimization.
      */
     @Test
-    public void testMng6572() {
+    void testMng6572() {
         String a = "20190126.230843"; // resembles a SNAPSHOT
         String b = "1234567890.12345"; // 10 digit number
         String c = "123456789012345.1H.5-beta"; // 15 digit number
@@ -269,7 +277,7 @@ public class ComparableVersionTest {
      * (related to MNG-6572 optimization)
      */
     @Test
-    public void testVersionEqualWithLeadingZeroes() {
+    void testVersionEqualWithLeadingZeroes() {
         // versions with string lengths from 1 to 19
         String[] arr = new String[] {
             "0000000000000000001",
@@ -301,7 +309,7 @@ public class ComparableVersionTest {
      * (related to MNG-6572 optimization)
      */
     @Test
-    public void testVersionZeroEqualWithLeadingZeroes() {
+    void testVersionZeroEqualWithLeadingZeroes() {
         // versions with string lengths from 1 to 19
         String[] arr = new String[] {
             "0000000000000000000",
@@ -333,7 +341,7 @@ public class ComparableVersionTest {
      * for qualifiers that start with "-0.", which was showing A == C and B == C but A &lt; B.
      */
     @Test
-    public void testMng6964() {
+    void testMng6964() {
         String a = "1-0.alpha";
         String b = "1-0.beta";
         String c = "1";
@@ -344,7 +352,7 @@ public class ComparableVersionTest {
     }
 
     @Test
-    public void testLocaleIndependent() {
+    void testLocaleIndependent() {
         Locale orig = Locale.getDefault();
         Locale[] locales = {Locale.ENGLISH, new Locale("tr"), Locale.getDefault()};
         try {
@@ -358,7 +366,7 @@ public class ComparableVersionTest {
     }
 
     @Test
-    public void testReuse() {
+    void testReuse() {
         ComparableVersion c1 = new ComparableVersion("1");
         c1.parseVersion("2");
 
@@ -373,7 +381,7 @@ public class ComparableVersionTest {
      * 1.0.0.X1 &lt; 1.0.0-X2 for any string X
      */
     @Test
-    public void testMng7644() {
+    void testMng7644() {
         for (String x : new String[] {"abc", "alpha", "a", "beta", "b", "def", "milestone", "m", "RC"}) {
             // 1.0.0.X1 < 1.0.0-X2 for any string x
             checkVersionsOrder("1.0.0." + x + "1", "1.0.0-" + x + "2");
@@ -382,5 +390,16 @@ public class ComparableVersionTest {
             checkVersionsEqual("2-" + x, "2.0.0." + x); // previously ordered, now equals
             checkVersionsEqual("2.0." + x, "2.0.0." + x); // previously ordered, now equals
         }
+    }
+
+    @Test
+    public void testMng7714() {
+        ComparableVersion f = new ComparableVersion("1.0.final-redhat");
+        ComparableVersion sp1 = new ComparableVersion("1.0-sp1-redhat");
+        ComparableVersion sp2 = new ComparableVersion("1.0-sp-1-redhat");
+        ComparableVersion sp3 = new ComparableVersion("1.0-sp.1-redhat");
+        assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp1);
+        assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp2);
+        assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp3);
     }
 }

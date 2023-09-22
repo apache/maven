@@ -21,7 +21,9 @@ package org.apache.maven.model.interpolation;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,9 +35,11 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
+import org.apache.maven.model.root.RootLocator;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.ObjectBasedValueSource;
 import org.codehaus.plexus.interpolation.PrefixAwareRecursionInterceptor;
 import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
 import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
@@ -45,10 +49,12 @@ import org.codehaus.plexus.interpolation.ValueSource;
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
  *
- * @author jdcasey Created on Feb 3, 2005
  */
 public abstract class AbstractStringBasedModelInterpolator implements ModelInterpolator {
-    private static final List<String> PROJECT_PREFIXES = Collections.singletonList("project.");
+    private static final String PREFIX_PROJECT = "project.";
+    private static final String PREFIX_POM = "pom.";
+    private static final List<String> PROJECT_PREFIXES_3_1 = Arrays.asList(PREFIX_POM, PREFIX_PROJECT);
+    private static final List<String> PROJECT_PREFIXES_4_0 = Collections.singletonList(PREFIX_PROJECT);
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
 
@@ -74,10 +80,14 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
     private final PathTranslator pathTranslator;
     private final UrlNormalizer urlNormalizer;
 
+    private final RootLocator rootLocator;
+
     @Inject
-    public AbstractStringBasedModelInterpolator(PathTranslator pathTranslator, UrlNormalizer urlNormalizer) {
+    public AbstractStringBasedModelInterpolator(
+            PathTranslator pathTranslator, UrlNormalizer urlNormalizer, RootLocator rootLocator) {
         this.pathTranslator = pathTranslator;
         this.urlNormalizer = urlNormalizer;
+        this.rootLocator = rootLocator;
     }
 
     @Override
@@ -89,14 +99,40 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
         return new org.apache.maven.model.Model(interpolateModel(model.getDelegate(), projectDir, request, problems));
     }
 
+    protected List<String> getProjectPrefixes(ModelBuildingRequest config) {
+        return config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_4_0
+                ? PROJECT_PREFIXES_4_0
+                : PROJECT_PREFIXES_3_1;
+    }
+
     protected List<ValueSource> createValueSources(
-            final Model model, final File projectDir, final ModelBuildingRequest config) {
+            final Model model,
+            final File projectDir,
+            final ModelBuildingRequest config,
+            ModelProblemCollector problems) {
         Map<String, String> modelProperties = model.getProperties();
 
-        ValueSource projectPrefixValueSource = new PrefixedObjectValueSource(PROJECT_PREFIXES, model, false);
+        ValueSource projectPrefixValueSource;
+        ValueSource prefixlessObjectBasedValueSource;
+        if (config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_4_0) {
+            projectPrefixValueSource = new PrefixedObjectValueSource(PROJECT_PREFIXES_4_0, model, false);
+            prefixlessObjectBasedValueSource = new ObjectBasedValueSource(model);
+        } else {
+            projectPrefixValueSource = new PrefixedObjectValueSource(PROJECT_PREFIXES_3_1, model, false);
+            if (config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
+                projectPrefixValueSource =
+                        new ProblemDetectingValueSource(projectPrefixValueSource, PREFIX_POM, PREFIX_PROJECT, problems);
+            }
+
+            prefixlessObjectBasedValueSource = new ObjectBasedValueSource(model);
+            if (config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
+                prefixlessObjectBasedValueSource =
+                        new ProblemDetectingValueSource(prefixlessObjectBasedValueSource, "", PREFIX_PROJECT, problems);
+            }
+        }
 
         // NOTE: Order counts here!
-        List<ValueSource> valueSources = new ArrayList<>(8);
+        List<ValueSource> valueSources = new ArrayList<>(9);
 
         if (projectDir != null) {
             ValueSource basedirValueSource = new PrefixedValueSourceWrapper(
@@ -109,7 +145,7 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                             return null;
                         }
                     },
-                    PROJECT_PREFIXES,
+                    getProjectPrefixes(config),
                     true);
             valueSources.add(basedirValueSource);
 
@@ -127,11 +163,25 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                             return null;
                         }
                     },
-                    PROJECT_PREFIXES,
+                    getProjectPrefixes(config),
                     false);
             valueSources.add(baseUriValueSource);
             valueSources.add(new BuildTimestampValueSource(config.getBuildStartTime(), modelProperties));
         }
+
+        valueSources.add(new PrefixedValueSourceWrapper(
+                new AbstractValueSource(false) {
+                    @Override
+                    public Object getValue(String expression) {
+                        if ("rootDirectory".equals(expression)) {
+                            Path base = projectDir != null ? projectDir.toPath() : null;
+                            Path root = rootLocator.findMandatoryRoot(base);
+                            return root.toFile().getPath();
+                        }
+                        return null;
+                    }
+                },
+                getProjectPrefixes(config)));
 
         valueSources.add(projectPrefixValueSource);
 
@@ -148,6 +198,8 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
             }
         });
 
+        valueSources.add(prefixlessObjectBasedValueSource);
+
         return valueSources;
     }
 
@@ -156,14 +208,13 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
         List<InterpolationPostProcessor> processors = new ArrayList<>(2);
         if (projectDir != null) {
             processors.add(new PathTranslatingPostProcessor(
-                    PROJECT_PREFIXES, TRANSLATED_PATH_EXPRESSIONS,
-                    projectDir, pathTranslator));
+                    getProjectPrefixes(config), TRANSLATED_PATH_EXPRESSIONS, projectDir, pathTranslator));
         }
         processors.add(new UrlNormalizingPostProcessor(urlNormalizer));
         return processors;
     }
 
-    protected RecursionInterceptor createRecursionInterceptor() {
-        return new PrefixAwareRecursionInterceptor(PROJECT_PREFIXES);
+    protected RecursionInterceptor createRecursionInterceptor(ModelBuildingRequest config) {
+        return new PrefixAwareRecursionInterceptor(getProjectPrefixes(config));
     }
 }

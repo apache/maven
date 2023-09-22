@@ -23,7 +23,6 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * JdkPrefixProfileActivator
@@ -77,6 +76,7 @@ public class JdkPrefixProfileActivator extends DetectedProfileActivator {
 
     protected boolean canDetectActivation(Profile profile) {
         return profile.getActivation() != null
-                && StringUtils.isNotEmpty(profile.getActivation().getJdk());
+                && profile.getActivation().getJdk() != null
+                && !profile.getActivation().getJdk().isEmpty();
     }
 }

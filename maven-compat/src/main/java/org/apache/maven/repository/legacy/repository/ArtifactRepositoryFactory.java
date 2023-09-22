@@ -23,7 +23,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
-/** @author jdcasey */
+@Deprecated
 public interface ArtifactRepositoryFactory {
 
     String DEFAULT_LAYOUT_ID = "default";

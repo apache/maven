@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PlexusTest
-public class TestApi {
+class TestApi {
 
     Session session;
 

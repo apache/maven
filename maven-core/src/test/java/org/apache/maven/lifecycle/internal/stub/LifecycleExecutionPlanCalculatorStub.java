@@ -52,7 +52,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
- * @author Kristian Rosenvold
  */
 public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionPlanCalculator {
     // clean

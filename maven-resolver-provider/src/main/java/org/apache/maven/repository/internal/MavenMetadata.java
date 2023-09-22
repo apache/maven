@@ -18,26 +18,25 @@
  */
 package org.apache.maven.repository.internal;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.WriterFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
+import org.apache.maven.artifact.repository.metadata.io.MetadataStaxWriter;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.metadata.AbstractMetadata;
 import org.eclipse.aether.metadata.MergeableMetadata;
 
 /**
- * @author Benjamin Bentmann
  */
 abstract class MavenMetadata extends AbstractMetadata implements MergeableMetadata {
 
@@ -57,14 +56,17 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
         this.timestamp = timestamp;
     }
 
+    @Override
     public String getType() {
         return MAVEN_METADATA_XML;
     }
 
+    @Override
     public File getFile() {
         return file;
     }
 
+    @Override
     public void merge(File existing, File result) throws RepositoryException {
         Metadata recessive = read(existing);
 
@@ -75,6 +77,7 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
         merged = true;
     }
 
+    @Override
     public boolean isMerged() {
         return merged;
     }
@@ -86,24 +89,23 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
             return new Metadata();
         }
 
-        try (Reader reader = ReaderFactory.newXmlReader(metadataFile)) {
-            return new MetadataXpp3Reader().read(reader, false);
-        } catch (IOException e) {
-            throw new RepositoryException("Could not read metadata " + metadataFile + ": " + e.getMessage(), e);
-        } catch (XmlPullParserException e) {
+        try (InputStream input = Files.newInputStream(metadataFile.toPath())) {
+            return new Metadata(new MetadataStaxReader().read(input, false));
+        } catch (IOException | XMLStreamException e) {
             throw new RepositoryException("Could not parse metadata " + metadataFile + ": " + e.getMessage(), e);
         }
     }
 
     private void write(File metadataFile, Metadata metadata) throws RepositoryException {
         metadataFile.getParentFile().mkdirs();
-        try (Writer writer = WriterFactory.newXmlWriter(metadataFile)) {
-            new MetadataXpp3Writer().write(writer, metadata);
-        } catch (IOException e) {
+        try (OutputStream output = Files.newOutputStream(metadataFile.toPath())) {
+            new MetadataStaxWriter().write(output, metadata.getDelegate());
+        } catch (IOException | XMLStreamException e) {
             throw new RepositoryException("Could not write metadata " + metadataFile + ": " + e.getMessage(), e);
         }
     }
 
+    @Override
     public Map<String, String> getProperties() {
         return Collections.emptyMap();
     }

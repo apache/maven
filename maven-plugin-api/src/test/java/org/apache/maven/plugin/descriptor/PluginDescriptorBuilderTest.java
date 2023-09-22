@@ -25,7 +25,7 @@ import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,18 +37,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@link PluginDescriptorBuilder}.
  *
- * @author Benjamin Bentmann
  */
-public class PluginDescriptorBuilderTest {
+class PluginDescriptorBuilderTest {
 
     private PluginDescriptor build(String resource) throws IOException, PlexusConfigurationException {
-        Reader reader = ReaderFactory.newXmlReader(getClass().getResourceAsStream(resource));
+        Reader reader = new XmlStreamReader(getClass().getResourceAsStream(resource));
 
         return new PluginDescriptorBuilder().build(reader);
     }
 
     @Test
-    public void testBuildReader() throws Exception {
+    void testBuildReader() throws Exception {
         PluginDescriptor pd = build("/plugin.xml");
 
         assertEquals("org.apache.maven.plugins", pd.getGroupId());

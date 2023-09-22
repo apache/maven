@@ -25,7 +25,6 @@ import org.apache.maven.building.UrlSource;
 /**
  * Wraps an ordinary {@link URL} as a settings source.
  *
- * @author Benjamin Bentmann
  *
  * @deprecated instead use {@link UrlSource}
  */

@@ -23,7 +23,6 @@ import java.util.Objects;
 /**
  * Filter to only retain objects in the given artifactScope or better.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class ScopeArtifactFilter extends AbstractScopeArtifactFilter {
 

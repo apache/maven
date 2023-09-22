@@ -36,7 +36,7 @@ import org.apache.maven.api.annotations.Experimental;
  * container: this annotation is only effective on fields of the Mojo class itself, nested bean injection
  * requires Sisu or JSR330 annotations.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Documented

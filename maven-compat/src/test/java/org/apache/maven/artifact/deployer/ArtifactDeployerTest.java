@@ -21,13 +21,14 @@ package org.apache.maven.artifact.deployer;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.session.scope.internal.SessionScope;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
@@ -36,9 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
-public class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
+class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
     @Inject
     private ArtifactDeployer artifactDeployer;
 
@@ -50,7 +50,7 @@ public class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    public void testArtifactInstallation() throws Exception {
+    void testArtifactInstallation() throws Exception {
         sessionScope.enter();
         try {
             sessionScope.seed(MavenSession.class, mock(MavenSession.class));
@@ -60,14 +60,14 @@ public class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
             Artifact artifact = createArtifact("artifact", "1.0");
 
             File file = new File(artifactBasedir, "artifact-1.0.jar");
-            assertEquals("dummy", FileUtils.fileRead(file, "UTF-8").trim());
+            assertEquals("dummy", new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8).trim());
 
             artifactDeployer.deploy(file, artifact, remoteRepository(), localRepository());
 
             ArtifactRepository remoteRepository = remoteRepository();
             File deployedFile = new File(remoteRepository.getBasedir(), remoteRepository.pathOf(artifact));
             assertTrue(deployedFile.exists());
-            assertEquals("dummy", FileUtils.fileRead(deployedFile, "UTF-8").trim());
+            assertEquals("dummy", new String(Files.readAllBytes(deployedFile.toPath()), StandardCharsets.UTF_8).trim());
         } finally {
             sessionScope.exit();
         }

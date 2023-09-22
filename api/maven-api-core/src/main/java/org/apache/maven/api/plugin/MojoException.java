@@ -24,7 +24,7 @@ import org.apache.maven.api.services.MavenException;
 /**
  * An exception occurring during the execution of a plugin.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class MojoException extends MavenException {

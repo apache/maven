@@ -18,6 +18,7 @@
  */
 package org.apache.maven.profiles.activation;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.model.Activation;
@@ -29,8 +30,6 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * FileProfileActivator
@@ -61,17 +60,19 @@ public class FileProfileActivator extends DetectedProfileActivator implements Lo
             interpolator.addValueSource(new MapBasedValueSource(System.getProperties()));
 
             try {
-                if (StringUtils.isNotEmpty(fileString)) {
-                    fileString = StringUtils.replace(interpolator.interpolate(fileString, ""), "\\", "/");
-                    return FileUtils.fileExists(fileString);
+                if (fileString != null && !fileString.isEmpty()) {
+                    fileString = interpolator.interpolate(fileString, "").replace("\\", "/");
+                    File file = new File(fileString);
+                    return file.exists();
                 }
 
                 // check if the file is missing, if it is then the profile will be active
                 fileString = actFile.getMissing();
 
-                if (StringUtils.isNotEmpty(fileString)) {
-                    fileString = StringUtils.replace(interpolator.interpolate(fileString, ""), "\\", "/");
-                    return !FileUtils.fileExists(fileString);
+                if (fileString != null && !fileString.isEmpty()) {
+                    fileString = interpolator.interpolate(fileString, "").replace("\\", "/");
+                    File file = new File(fileString);
+                    return !file.exists();
                 }
             } catch (InterpolationException e) {
                 if (logger.isDebugEnabled()) {

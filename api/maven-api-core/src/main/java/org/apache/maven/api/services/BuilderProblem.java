@@ -27,7 +27,7 @@ import org.apache.maven.api.annotations.Nullable;
  * Describes a problem that was encountered during project building. A problem can either be an exception that was
  * thrown or a simple string message. In addition, a problem carries a hint about its source.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable
@@ -97,7 +97,7 @@ public interface BuilderProblem {
     /**
      * The different severity levels for a problem, in decreasing order.
      *
-     * @since 4.0
+     * @since 4.0.0
      */
     @Experimental
     enum Severity {

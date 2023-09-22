@@ -28,15 +28,18 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.shared.utils.logging.MessageUtils;
+import org.apache.maven.cli.jansi.MessageUtils;
 
 /**
- * @author Jason van Zyl
  */
 public class CLIManager {
     public static final char ALTERNATE_POM_FILE = 'f';
 
     public static final char BATCH_MODE = 'B';
+
+    public static final String NON_INTERACTIVE = "non-interactive";
+
+    public static final String FORCE_INTERACTIVE = "force-interactive";
 
     public static final char SET_USER_PROPERTY = 'D';
 
@@ -73,6 +76,8 @@ public class CLIManager {
     public static final char CHECKSUM_WARNING_POLICY = 'c';
 
     public static final char ALTERNATE_USER_SETTINGS = 's';
+
+    public static final String ALTERNATE_PROJECT_SETTINGS = "ps";
 
     public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
 
@@ -173,7 +178,16 @@ public class CLIManager {
                 .build());
         options.addOption(Option.builder(Character.toString(BATCH_MODE))
                 .longOpt("batch-mode")
-                .desc("Run in non-interactive (batch) mode (disables output color)")
+                .desc("Run in non-interactive mode. Alias for --non-interactive (kept for backwards compatability)")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(NON_INTERACTIVE)
+                .desc("Run in non-interactive mode. Alias for --batch-mode")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(FORCE_INTERACTIVE)
+                .desc(
+                        "Run in interactive mode. Overrides, if applicable, the CI environment variable and --non-interactive/--batch-mode options")
                 .build());
         options.addOption(Option.builder(SUPPRESS_SNAPSHOT_UPDATES)
                 .longOpt("no-snapshot-updates")
@@ -190,6 +204,11 @@ public class CLIManager {
         options.addOption(Option.builder(Character.toString(ALTERNATE_USER_SETTINGS))
                 .longOpt("settings")
                 .desc("Alternate path for the user settings file")
+                .hasArg()
+                .build());
+        options.addOption(Option.builder(ALTERNATE_PROJECT_SETTINGS)
+                .longOpt("project-settings")
+                .desc("Alternate path for the project settings file")
                 .hasArg()
                 .build());
         options.addOption(Option.builder(ALTERNATE_GLOBAL_SETTINGS)

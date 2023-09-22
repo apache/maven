@@ -31,7 +31,6 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
 /**
- * @author Kristian Rosenvold
  */
 public class BuildPluginManagerStub implements BuildPluginManager {
 

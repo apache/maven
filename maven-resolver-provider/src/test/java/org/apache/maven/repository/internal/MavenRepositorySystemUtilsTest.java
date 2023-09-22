@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class MavenRepositorySystemUtilsTest {
+class MavenRepositorySystemUtilsTest {
 
     @Test
-    public void testNewSession() {
+    void testNewSession() {
         RepositorySystemSession session = MavenRepositorySystemUtils.newSession();
         assertNotNull(session);
     }

@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
+class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
 
     private static final String INJECTED_ARTIFACT_ID = "injected";
 
@@ -95,7 +95,7 @@ public class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTes
     }
 
     @Test
-    public void testDependencyInjection() throws Exception {
+    void testDependencyInjection() throws Exception {
         PlexusContainer container = getContainer();
 
         ComponentDescriptor<? extends AbstractMavenLifecycleParticipant> cd =
@@ -122,7 +122,7 @@ public class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTes
     }
 
     @Test
-    public void testReactorDependencyInjection() throws Exception {
+    void testReactorDependencyInjection() throws Exception {
         List<String> reactorOrder =
                 getReactorOrder("lifecycle-participant-reactor-dependency-injection", InjectReactorDependency.class);
         assertEquals(Arrays.asList("parent", "module-b", "module-a"), reactorOrder);

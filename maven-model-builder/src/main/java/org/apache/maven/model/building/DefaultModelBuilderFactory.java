@@ -20,6 +20,7 @@ package org.apache.maven.model.building;
 
 import java.util.Arrays;
 
+import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
 import org.apache.maven.model.composition.DependencyManagementImporter;
@@ -64,6 +65,8 @@ import org.apache.maven.model.profile.activation.JdkVersionProfileActivator;
 import org.apache.maven.model.profile.activation.OperatingSystemProfileActivator;
 import org.apache.maven.model.profile.activation.ProfileActivator;
 import org.apache.maven.model.profile.activation.PropertyProfileActivator;
+import org.apache.maven.model.root.DefaultRootLocator;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.model.superpom.DefaultSuperPomProvider;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
@@ -71,13 +74,11 @@ import org.apache.maven.model.validation.ModelValidator;
 
 /**
  * A factory to create model builder instances when no dependency injection is available. <em>Note:</em> This class is
- * only meant as a utility for developers that want to employ the model builder outside of the Maven build system, Maven
+ * only meant as a utility for developers that want to employ the model builder outside the Maven build system, Maven
  * plugins should always acquire model builder instances via dependency injection. Developers might want to subclass
  * this factory to provide custom implementations for some of the components used by the model builder, or use the
  * builder API to inject custom instances.
  *
- * @author Benjamin Bentmann
- * @author Guillaume Nodet
  */
 public class DefaultModelBuilderFactory {
 
@@ -99,6 +100,9 @@ public class DefaultModelBuilderFactory {
     private ReportConfigurationExpander reportConfigurationExpander;
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private ModelVersionProcessor versionProcessor;
+    private ModelSourceTransformer transformer;
+
+    private RootLocator rootLocator;
 
     public DefaultModelBuilderFactory setModelProcessor(ModelProcessor modelProcessor) {
         this.modelProcessor = modelProcessor;
@@ -201,8 +205,22 @@ public class DefaultModelBuilderFactory {
         return this;
     }
 
+    public DefaultModelBuilderFactory setRootLocator(RootLocator rootLocator) {
+        this.rootLocator = rootLocator;
+        return this;
+    }
+
+    public DefaultModelBuilderFactory setTransformer(ModelSourceTransformer transformer) {
+        this.transformer = transformer;
+        return this;
+    }
+
     protected ModelProcessor newModelProcessor() {
-        return new DefaultModelProcessor(newModelLocator(), newModelReader());
+        return new DefaultModelProcessor(Arrays.asList(newModelParsers()), newModelLocator(), newModelReader());
+    }
+
+    protected ModelParser[] newModelParsers() {
+        return new ModelParser[0];
     }
 
     protected ModelLocator newModelLocator() {
@@ -227,7 +245,7 @@ public class DefaultModelBuilderFactory {
     }
 
     protected ProfileActivationFilePathInterpolator newProfileActivationFilePathInterpolator() {
-        return new ProfileActivationFilePathInterpolator(newPathTranslator());
+        return new ProfileActivationFilePathInterpolator(newPathTranslator(), newRootLocator());
     }
 
     protected UrlNormalizer newUrlNormalizer() {
@@ -238,10 +256,15 @@ public class DefaultModelBuilderFactory {
         return new DefaultPathTranslator();
     }
 
+    protected RootLocator newRootLocator() {
+        return new DefaultRootLocator();
+    }
+
     protected ModelInterpolator newModelInterpolator() {
         UrlNormalizer normalizer = newUrlNormalizer();
         PathTranslator pathTranslator = newPathTranslator();
-        return new StringVisitorModelInterpolator(pathTranslator, normalizer);
+        RootLocator rootLocator = newRootLocator();
+        return new StringVisitorModelInterpolator(pathTranslator, normalizer, rootLocator);
     }
 
     protected ModelVersionProcessor newModelVersionPropertiesProcessor() {
@@ -307,7 +330,7 @@ public class DefaultModelBuilderFactory {
     }
 
     private ModelSourceTransformer newModelSourceTransformer() {
-        return new DefaultModelSourceTransformer();
+        return new BuildModelSourceTransformer();
     }
 
     /**
@@ -336,7 +359,8 @@ public class DefaultModelBuilderFactory {
                 profileActivationFilePathInterpolator != null
                         ? profileActivationFilePathInterpolator
                         : newProfileActivationFilePathInterpolator(),
-                versionProcessor != null ? versionProcessor : newModelVersionPropertiesProcessor());
+                versionProcessor != null ? versionProcessor : newModelVersionPropertiesProcessor(),
+                transformer != null ? transformer : newModelSourceTransformer());
     }
 
     private static class StubLifecycleBindingsInjector implements LifecycleBindingsInjector {

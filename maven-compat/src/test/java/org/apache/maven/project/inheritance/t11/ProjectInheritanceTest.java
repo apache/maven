@@ -30,10 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * Verifies scope of root project is preserved regardless of parent dependency management.
  *
- * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  * @see <a href="https://issues.apache.org/jira/browse/MNG-2919">MNG-2919</a>
  */
-public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
+class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p1 inherits from p0
@@ -46,7 +45,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    public void testDependencyManagementDoesNotOverrideScopeOfCurrentArtifact() throws Exception {
+    void testDependencyManagementDoesNotOverrideScopeOfCurrentArtifact() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");

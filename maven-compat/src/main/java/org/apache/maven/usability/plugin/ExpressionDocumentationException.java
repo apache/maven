@@ -21,6 +21,7 @@ package org.apache.maven.usability.plugin;
 /**
  * ExpressionDocumentationException
  */
+@Deprecated
 public class ExpressionDocumentationException extends Exception {
     static final long serialVersionUID = 1;
 

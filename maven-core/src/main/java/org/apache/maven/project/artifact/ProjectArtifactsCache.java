@@ -31,9 +31,6 @@ import org.eclipse.aether.RepositorySystemSession;
  * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
  * prior notice.
  *
- * @author Igor Fedorenko
- * @author Benjamin Bentmann
- * @author Anton Tanasenko
  */
 public interface ProjectArtifactsCache {
 

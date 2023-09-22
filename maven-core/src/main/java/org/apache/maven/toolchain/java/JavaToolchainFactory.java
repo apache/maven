@@ -21,7 +21,9 @@ package org.apache.maven.toolchain.java;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -31,7 +33,6 @@ import org.apache.maven.toolchain.RequirementMatcherFactory;
 import org.apache.maven.toolchain.ToolchainFactory;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,6 @@ import org.slf4j.LoggerFactory;
  * This is a <code>ToolchainFactory</code> Plexus component registered with
  * <code>jdk</code> hint.
  *
- * @author mkleint
  * @since 2.0.9, renamed from <code>DefaultJavaToolchainFactory</code> in 3.2.4
  */
 @Named("jdk")
@@ -87,12 +87,12 @@ public class JavaToolchainFactory implements ToolchainFactory {
             throw new MisconfiguredToolchainException(
                     "Java toolchain without the " + JavaToolchainImpl.KEY_JAVAHOME + " configuration element.");
         }
-        File normal = new File(FileUtils.normalize(javahome.getValue()));
-        if (normal.exists()) {
-            jtc.setJavaHome(FileUtils.normalize(javahome.getValue()));
+        Path normal = Paths.get(javahome.getValue()).normalize();
+        if (Files.exists(normal)) {
+            jtc.setJavaHome(Paths.get(javahome.getValue()).normalize().toString());
         } else {
             throw new MisconfiguredToolchainException(
-                    "Non-existing JDK home configuration at " + normal.getAbsolutePath());
+                    "Non-existing JDK home configuration at " + normal.toAbsolutePath());
         }
 
         return jtc;

@@ -150,7 +150,10 @@ public class BootstrapCoreExtensionManager {
             }
         }
         return CoreExtensionEntry.discoverFrom(
-                realm, Collections.singleton(artifacts.get(0).getFile()));
+                realm,
+                Collections.singleton(artifacts.get(0).getFile()),
+                extension.getGroupId() + ":" + extension.getArtifactId(),
+                extension.getConfiguration());
     }
 
     private List<Artifact> resolveExtension(

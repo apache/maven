@@ -27,7 +27,6 @@ import org.eclipse.aether.RepositorySystemSession;
  * particular, this interface can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 public interface LegacySupport {
 

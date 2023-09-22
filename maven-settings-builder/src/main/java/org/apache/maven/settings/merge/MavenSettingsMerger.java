@@ -25,11 +25,8 @@ import java.util.Map;
 
 import org.apache.maven.settings.IdentifiableBase;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @author Benjamin Bentmann
  * @deprecated use {@link org.apache.maven.settings.v4.SettingsMerger}
  */
 @Deprecated
@@ -80,7 +77,8 @@ public class MavenSettingsMerger {
             }
         }
 
-        if (StringUtils.isEmpty(dominant.getLocalRepository())) {
+        if (dominant.getLocalRepository() == null
+                || dominant.getLocalRepository().isEmpty()) {
             dominant.setLocalRepository(recessive.getLocalRepository());
         }
 
@@ -88,6 +86,8 @@ public class MavenSettingsMerger {
         shallowMergeById(dominant.getServers(), recessive.getServers(), recessiveSourceLevel);
         shallowMergeById(dominant.getProxies(), recessive.getProxies(), recessiveSourceLevel);
         shallowMergeById(dominant.getProfiles(), recessive.getProfiles(), recessiveSourceLevel);
+        shallowMergeById(dominant.getRepositories(), recessive.getRepositories(), recessiveSourceLevel);
+        shallowMergeById(dominant.getPluginRepositories(), recessive.getPluginRepositories(), recessiveSourceLevel);
     }
 
     /**

@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * The local repository is used to cache artifacts downloaded from {@link RemoteRepository}
  * and to hold artifacts that have been build locally.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable

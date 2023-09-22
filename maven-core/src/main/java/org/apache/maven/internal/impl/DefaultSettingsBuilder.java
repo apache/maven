@@ -108,7 +108,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         @Override
         public InputStream getInputStream() throws IOException {
-            return source.getInputStream();
+            return source.openStream();
         }
 
         @Override

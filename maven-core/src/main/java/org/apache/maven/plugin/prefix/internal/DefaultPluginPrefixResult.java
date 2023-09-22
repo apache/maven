@@ -26,7 +26,6 @@ import org.eclipse.aether.repository.ArtifactRepository;
  * Describes the result of a plugin prefix resolution request.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 class DefaultPluginPrefixResult implements PluginPrefixResult {
 

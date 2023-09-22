@@ -20,23 +20,21 @@ package org.apache.maven.artifact.repository.metadata.io;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Handles deserialization of metadata from some kind of textual format like XML.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
@@ -45,16 +43,20 @@ public class DefaultMetadataReader implements MetadataReader {
     public Metadata read(File input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
 
-        return read(ReaderFactory.newXmlReader(input), options);
+        return read(Files.newInputStream(input.toPath()), options);
     }
 
     public Metadata read(Reader input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (Reader in = input) {
-            return new MetadataXpp3Reader().read(in, isStrict(options));
-        } catch (XmlPullParserException e) {
-            throw new MetadataParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+            return new Metadata(new MetadataStaxReader().read(in, isStrict(options)));
+        } catch (XMLStreamException e) {
+            throw new MetadataParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 
@@ -62,9 +64,13 @@ public class DefaultMetadataReader implements MetadataReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = input) {
-            return new MetadataXpp3Reader().read(in, isStrict(options));
-        } catch (XmlPullParserException e) {
-            throw new MetadataParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+            return new Metadata(new MetadataStaxReader().read(in, isStrict(options)));
+        } catch (XMLStreamException e) {
+            throw new MetadataParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 

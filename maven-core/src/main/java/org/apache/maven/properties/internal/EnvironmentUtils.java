@@ -22,7 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import org.codehaus.plexus.util.Os;
+import org.apache.maven.utils.Os;
 
 /**
  * Assists the project builder. <strong>Warning:</strong> This is an internal utility class that is only public for
@@ -30,7 +30,6 @@ import org.codehaus.plexus.util.Os;
  * prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 public class EnvironmentUtils {
 
@@ -48,7 +47,7 @@ public class EnvironmentUtils {
         if (props != null) {
             if (envVars == null) {
                 Properties tmp = new Properties();
-                boolean caseSensitive = !Os.isFamily(Os.FAMILY_WINDOWS);
+                boolean caseSensitive = !Os.IS_WINDOWS;
                 for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
                     String key = "env."
                             + (caseSensitive ? entry.getKey() : entry.getKey().toUpperCase(Locale.ENGLISH));

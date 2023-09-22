@@ -35,11 +35,10 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 /**
  * Processes events from the model builder while building the effective model for a {@link MavenProject} instance.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultModelBuildingListener extends AbstractModelBuildingListener {
 
-    private MavenProject project;
+    private final MavenProject project;
 
     private ProjectBuildingHelper projectBuildingHelper;
 

@@ -27,30 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code ReportPlugin}.
  *
- * @author Benjamin Bentmann
  */
-public class ReportPluginTest {
+class ReportPluginTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new ReportPlugin().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new ReportPlugin().equals(null));
 
         new ReportPlugin().equals(new ReportPlugin());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         ReportPlugin thing = new ReportPlugin();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new ReportPlugin().toString());
     }
 }

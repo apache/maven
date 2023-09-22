@@ -27,7 +27,6 @@ import org.apache.maven.project.MavenProject;
 /**
  * Collects basic settings to access the repository system.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultRepositoryRequest implements RepositoryRequest {
 

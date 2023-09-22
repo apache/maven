@@ -27,7 +27,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Service interface to parse {@link Version} and {@link VersionRange}.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface VersionParser extends Service {

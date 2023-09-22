@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-alpha-8-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-repository-metadata</artifactId>
@@ -33,8 +33,16 @@ under the License.
 
   <dependencies>
     <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <artifactId>maven-xml-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
@@ -49,19 +57,52 @@ under the License.
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
-          <version>1.1.0</version>
+          <version>1.2.0</version>
           <models>
             <model>src/main/mdo/metadata.mdo</model>
           </models>
+          <params>
+            <param>forcedIOModelVersion=1.1.0</param>
+            <param>packageModelV3=org.apache.maven.artifact.repository.metadata</param>
+            <param>packageModelV4=org.apache.maven.artifact.repository.metadata.v4</param>
+            <param>packageToolV4=org.apache.maven.artifact.repository.metadata.io</param>
+          </params>
+          <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>
         </configuration>
         <executions>
           <execution>
             <id>modello</id>
             <goals>
-              <goal>java</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xpp3-writer</goal>
+              <goal>velocity</goal>
             </goals>
+            <configuration>
+              <version>1.2.0</version>
+              <models>
+                <model>src/main/mdo/metadata.mdo</model>
+              </models>
+              <templates>
+                <template>model.vm</template>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
+              </templates>
+            </configuration>
+          </execution>
+          <execution>
+            <id>modello-v3</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <configuration>
+              <version>1.1.0</version>
+              <models>
+                <model>src/main/mdo/metadata.mdo</model>
+              </models>
+              <templates>
+                <template>model-v3.vm</template>
+                <template>reader.vm</template>
+                <template>writer.vm</template>
+              </templates>
+            </configuration>
           </execution>
         </executions>
       </plugin>

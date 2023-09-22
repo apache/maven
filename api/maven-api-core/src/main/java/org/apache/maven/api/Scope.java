@@ -25,7 +25,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Scope for a dependency
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public enum Scope {

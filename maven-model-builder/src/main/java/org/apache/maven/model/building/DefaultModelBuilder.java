@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,13 +39,15 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
+import org.apache.maven.api.feature.Features;
+import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.building.Source;
-import org.apache.maven.feature.Features;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
@@ -86,7 +87,6 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
-import org.apache.maven.model.v4.MavenMerger;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -97,12 +97,10 @@ import static org.apache.maven.model.building.Result.error;
 import static org.apache.maven.model.building.Result.newResult;
 
 /**
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
 public class DefaultModelBuilder implements ModelBuilder {
-    private final MavenMerger modelMerger = new FileToRawModelMerger();
 
     private final ModelProcessor modelProcessor;
     private final ModelValidator modelValidator;
@@ -122,6 +120,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final ReportConfigurationExpander reportConfigurationExpander;
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final ModelVersionProcessor versionProcessor;
+    private final ModelSourceTransformer transformer;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -143,7 +142,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             PluginConfigurationExpander pluginConfigurationExpander,
             ReportConfigurationExpander reportConfigurationExpander,
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
-            ModelVersionProcessor versionProcessor) {
+            ModelVersionProcessor versionProcessor,
+            ModelSourceTransformer transformer) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
         this.modelNormalizer = modelNormalizer;
@@ -162,6 +162,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.reportConfigurationExpander = reportConfigurationExpander;
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.versionProcessor = versionProcessor;
+        this.transformer = transformer;
     }
 
     /**
@@ -188,7 +189,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -215,7 +217,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -242,7 +245,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -269,7 +273,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -296,7 +301,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -323,7 +329,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -350,7 +357,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -377,7 +385,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -404,7 +413,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -431,7 +441,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -458,7 +469,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -486,7 +498,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -514,7 +527,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -541,7 +555,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -568,7 +583,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -595,7 +611,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -623,7 +640,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                versionProcessor);
+                versionProcessor,
+                transformer);
     }
 
     /**
@@ -656,7 +674,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         Model fileModel = readFileModel(request, problems);
 
         request.setFileModel(fileModel);
-        result.setFileModel(fileModel);
+        result.setFileModel(fileModel.clone());
 
         activateFileModel(request, result, problems);
 
@@ -950,16 +968,31 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     @Override
     public Result<? extends Model> buildRawModel(File pomFile, int validationLevel, boolean locationTracking) {
+        return buildRawModel(pomFile, validationLevel, locationTracking, null);
+    }
+
+    @Override
+    public Result<? extends Model> buildRawModel(
+            File pomFile, int validationLevel, boolean locationTracking, TransformerContext context) {
         final ModelBuildingRequest request = new DefaultModelBuildingRequest()
                 .setValidationLevel(validationLevel)
                 .setLocationTracking(locationTracking)
                 .setModelSource(new FileModelSource(pomFile));
-        final DefaultModelProblemCollector collector =
-                new DefaultModelProblemCollector(new DefaultModelBuildingResult());
+        DefaultModelProblemCollector problems = new DefaultModelProblemCollector(new DefaultModelBuildingResult());
         try {
-            return newResult(readFileModel(request, collector), collector.getProblems());
+            Model model = readFileModel(request, problems);
+
+            try {
+                if (transformer != null && context != null) {
+                    transformer.transform(pomFile.toPath(), context, model);
+                }
+            } catch (TransformerException e) {
+                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V40).setException(e));
+            }
+
+            return newResult(model, problems.getProblems());
         } catch (ModelBuildingException e) {
-            return error(collector.getProblems());
+            return error(problems.getProblems());
         }
     }
 
@@ -996,6 +1029,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Map<String, Object> options = new HashMap<>(3);
             options.put(ModelProcessor.IS_STRICT, strict);
             options.put(ModelProcessor.SOURCE, modelSource);
+            options.put(ModelReader.ROOT_DIRECTORY, request.getRootDirectory());
 
             InputSource source;
             if (request.isLocationTracking()) {
@@ -1033,11 +1067,13 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             if (source != null) {
                 try {
-                    org.apache.maven.api.model.InputSource v4src =
-                            model.getLocation("").getSource();
-                    Field field = InputSource.class.getDeclaredField("modelId");
-                    field.setAccessible(true);
-                    field.set(v4src, ModelProblemUtils.toId(model));
+                    org.apache.maven.api.model.InputLocation loc = model.getLocation("");
+                    org.apache.maven.api.model.InputSource v4src = loc != null ? loc.getSource() : null;
+                    if (v4src != null) {
+                        Field field = InputSource.class.getDeclaredField("modelId");
+                        field.setAccessible(true);
+                        field.set(v4src, ModelProblemUtils.toId(model));
+                    }
                 } catch (Throwable t) {
                     // TODO: use a lazy source ?
                     throw new IllegalStateException("Unable to set modelId on InputSource", t);
@@ -1091,26 +1127,17 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         Model rawModel;
-        if (Features.buildConsumer(request.getUserProperties()).isActive() && modelSource instanceof FileModelSource) {
+        if (Features.buildConsumer(request.getUserProperties()) && modelSource instanceof FileModelSource) {
             rawModel = readFileModel(request, problems);
             File pomFile = ((FileModelSource) modelSource).getFile();
 
-            TransformerContext context = null;
-            if (request.getTransformerContextBuilder() != null) {
-                context = request.getTransformerContextBuilder().initialize(request, problems);
-            }
-
             try {
-                // must implement TransformContext, but should use request to access properties/model cache
-                Model transformedFileModel = modelProcessor.read(
-                        pomFile, Collections.singletonMap(ModelReader.TRANSFORMER_CONTEXT, context));
-
-                // rawModel with locationTrackers, required for proper feedback during validations
-
-                // Apply enriched data
-                rawModel = new Model(
-                        modelMerger.merge(rawModel.getDelegate(), transformedFileModel.getDelegate(), false, null));
-            } catch (IOException e) {
+                if (request.getTransformerContextBuilder() != null) {
+                    TransformerContext context =
+                            request.getTransformerContextBuilder().initialize(request, problems);
+                    transformer.transform(pomFile.toPath(), context, rawModel);
+                }
+            } catch (TransformerException e) {
                 problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V40).setException(e));
             }
         } else if (request.getFileModel() == null) {
@@ -1359,7 +1386,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         final Parent parent = childModel.getParent();
-        final ModelSource candidateSource;
+        final ModelSource2 candidateSource;
         final Model candidateModel;
         final WorkspaceModelResolver resolver = request.getWorkspaceModelResolver();
         if (resolver == null) {
@@ -1476,7 +1503,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 || rawChildModelVersion.equals("${project.parent.version}");
     }
 
-    private ModelSource getParentPomFile(Model childModel, Source source) {
+    private ModelSource2 getParentPomFile(Model childModel, Source source) {
         if (!(source instanceof ModelSource2)) {
             return null;
         }
@@ -1487,7 +1514,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
-        return ((ModelSource2) source).getRelatedSource(parentPath);
+        if (source instanceof ModelSource3) {
+            return ((ModelSource3) source).getRelatedSource(modelProcessor, parentPath);
+        } else {
+            return ((ModelSource2) source).getRelatedSource(parentPath);
+        }
     }
 
     private ModelData readParentExternally(
@@ -1575,7 +1606,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private Model getSuperModel() {
-        return new Model(superPomProvider.getSuperModel("4.0.0"));
+        return superPomProvider.getSuperModel("4.0.0");
     }
 
     private void importDependencyManagement(
@@ -1598,7 +1629,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         for (Iterator<Dependency> it = depMgmt.getDependencies().iterator(); it.hasNext(); ) {
             Dependency dependency = it.next();
 
-            if (!"pom".equals(dependency.getType()) || !"import".equals(dependency.getScope())) {
+            if (!("pom".equals(dependency.getType()) && "import".equals(dependency.getScope()))
+                    || "bom".equals(dependency.getType())) {
                 continue;
             }
 
@@ -1678,7 +1710,27 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        // [MNG-5600] Dependency management import should support exclusions.
+        List<Exclusion> exclusions = dependency.getDelegate().getExclusions();
+        if (importMgmt != null && !exclusions.isEmpty()) {
+            // Dependency excluded from import.
+            List<org.apache.maven.api.model.Dependency> dependencies = importMgmt.getDependencies().stream()
+                    .filter(candidate -> exclusions.stream().noneMatch(exclusion -> match(exclusion, candidate)))
+                    .map(candidate -> candidate.withExclusions(exclusions))
+                    .collect(Collectors.toList());
+            importMgmt = importMgmt.withDependencies(dependencies);
+        }
+
         return importMgmt != null ? new DependencyManagement(importMgmt) : null;
+    }
+
+    private boolean match(Exclusion exclusion, org.apache.maven.api.model.Dependency candidate) {
+        return match(exclusion.getGroupId(), candidate.getGroupId())
+                && match(exclusion.getArtifactId(), candidate.getArtifactId());
+    }
+
+    private boolean match(String match, String text) {
+        return match.equals("*") || match.equals(text);
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
@@ -1838,11 +1890,10 @@ public class DefaultModelBuilder implements ModelBuilder {
      * After the buildplan is ready, the build()-method returns the immutable context useful during distribution.
      * This is an inner class, as it must be able to call readRawModel()
      *
-     * @author Robert Scholte
      * @since 4.0.0
      */
     private class DefaultTransformerContextBuilder implements TransformerContextBuilder {
-        private final DefaultTransformerContext context = new DefaultTransformerContext();
+        private final DefaultTransformerContext context = new DefaultTransformerContext(modelProcessor);
 
         private final Map<DefaultTransformerContext.GAKey, Set<Source>> mappedSources = new ConcurrentHashMap<>(64);
 
@@ -1858,6 +1909,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             // We must assume the TransformerContext was created using this.newTransformerContextBuilder()
             DefaultModelProblemCollector problems = (DefaultModelProblemCollector) collector;
             return new TransformerContext() {
+                @Override
+                public Path locate(Path path) {
+                    File file = modelProcessor.locateExistingPom(path.toFile());
+                    return file != null ? file.toPath() : null;
+                }
+
                 @Override
                 public String getUserProperty(String key) {
                     return context.userProperties.computeIfAbsent(

@@ -37,7 +37,6 @@ import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingResult;
-import org.codehaus.plexus.util.StringUtils;
 
 /*
 
@@ -190,11 +189,11 @@ public class DefaultExceptionHandler implements ExceptionHandler {
                     }
                 }
 
-                if (StringUtils.isEmpty(reference)) {
+                if (reference == null || reference.isEmpty()) {
                     reference = getReference(cause);
                 }
 
-                if (StringUtils.isEmpty(reference)) {
+                if (reference == null || reference.isEmpty()) {
                     reference = exception.getClass().getSimpleName();
                 }
             } else if (exception instanceof LifecycleExecutionException) {
@@ -204,7 +203,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
             }
         }
 
-        if (StringUtils.isNotEmpty(reference) && !reference.startsWith("http:")) {
+        if ((reference != null && !reference.isEmpty()) && !reference.startsWith("http:")) {
             reference = "http://cwiki.apache.org/confluence/display/MAVEN/" + reference;
         }
 
@@ -226,13 +225,15 @@ public class DefaultExceptionHandler implements ExceptionHandler {
     private String getMessage(String message, Throwable exception) {
         String fullMessage = (message != null) ? message : "";
 
-        for (Throwable t = exception; t != null; t = t.getCause()) {
+        // To break out of possible endless loop when getCause returns "this"
+        for (Throwable t = exception; t != null && t != t.getCause(); t = t.getCause()) {
             String exceptionMessage = t.getMessage();
 
             if (t instanceof AbstractMojoExecutionException) {
                 String longMessage = ((AbstractMojoExecutionException) t).getLongMessage();
-                if (StringUtils.isNotEmpty(longMessage)) {
-                    if (StringUtils.isEmpty(exceptionMessage) || longMessage.contains(exceptionMessage)) {
+                if (longMessage != null && !longMessage.isEmpty()) {
+                    if ((exceptionMessage == null || exceptionMessage.isEmpty())
+                            || longMessage.contains(exceptionMessage)) {
                         exceptionMessage = longMessage;
                     } else if (!exceptionMessage.contains(longMessage)) {
                         exceptionMessage = join(exceptionMessage, System.lineSeparator() + longMessage);
@@ -240,7 +241,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
                 }
             }
 
-            if (StringUtils.isEmpty(exceptionMessage)) {
+            if (exceptionMessage == null || exceptionMessage.isEmpty()) {
                 exceptionMessage = t.getClass().getSimpleName();
             }
 
@@ -257,12 +258,12 @@ public class DefaultExceptionHandler implements ExceptionHandler {
     private String join(String message1, String message2) {
         String message = "";
 
-        if (StringUtils.isNotEmpty(message1)) {
+        if (message1 != null && !message1.isEmpty()) {
             message = message1.trim();
         }
 
-        if (StringUtils.isNotEmpty(message2)) {
-            if (StringUtils.isNotEmpty(message)) {
+        if (message2 != null && !message2.isEmpty()) {
+            if (message != null && !message.isEmpty()) {
                 if (message.endsWith(".") || message.endsWith("!") || message.endsWith(":")) {
                     message += " ";
                 } else {

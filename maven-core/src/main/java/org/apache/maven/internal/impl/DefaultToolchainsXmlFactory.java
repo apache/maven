@@ -35,8 +35,8 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.api.toolchain.PersistedToolchains;
-import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
-import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Writer;
+import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
+import org.apache.maven.toolchain.v4.MavenToolchainsStaxWriter;
 
 @Named
 @Singleton
@@ -54,7 +54,7 @@ public class DefaultToolchainsXmlFactory implements ToolchainsXmlFactory {
             if (request.getModelId() != null || request.getLocation() != null) {
                 source = new InputSource(request.getModelId(), request.getLocation());
             }
-            MavenToolchainsXpp3Reader xml = new MavenToolchainsXpp3Reader();
+            MavenToolchainsStaxReader xml = new MavenToolchainsStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
             if (reader != null) {
                 return xml.read(reader, request.isStrict());
@@ -77,9 +77,9 @@ public class DefaultToolchainsXmlFactory implements ToolchainsXmlFactory {
         }
         try {
             if (writer != null) {
-                new MavenToolchainsXpp3Writer().write(writer, content);
+                new MavenToolchainsStaxWriter().write(writer, content);
             } else {
-                new MavenToolchainsXpp3Writer().write(outputStream, content);
+                new MavenToolchainsStaxWriter().write(outputStream, content);
             }
         } catch (Exception e) {
             throw new XmlWriterException("Unable to write toolchains", e);

@@ -31,15 +31,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.project.CycleDetectedException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectSorter;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
  * Describes the interdependencies between projects in the reactor.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultProjectDependencyGraph implements ProjectDependencyGraph {
 

@@ -30,9 +30,11 @@ import org.eclipse.aether.installation.InstallRequest;
 /**
  * Maven GA level metadata generator factory.
  */
-@Named("versions")
+@Named(VersionsMetadataGeneratorFactory.NAME)
 @Singleton
 public class VersionsMetadataGeneratorFactory implements MetadataGeneratorFactory {
+    public static final String NAME = "versions";
+
     @Override
     public MetadataGenerator newInstance(RepositorySystemSession session, InstallRequest request) {
         return new VersionsMetadataGenerator(session, request);

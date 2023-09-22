@@ -32,7 +32,6 @@ import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,9 +42,6 @@ import org.slf4j.LoggerFactory;
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Jason van Zyl
- * @author Kristian Rosenvold (extracted class only)
  */
 @Named
 @Singleton
@@ -137,12 +133,12 @@ public class LifecycleDebugLogger {
             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
             String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();
-            if (StringUtils.isNotEmpty(scopeToCollect)) {
+            if (scopeToCollect != null && !scopeToCollect.isEmpty()) {
                 scopesToCollect.add(scopeToCollect);
             }
 
             String scopeToResolve = mojoDescriptor.getDependencyResolutionRequired();
-            if (StringUtils.isNotEmpty(scopeToResolve)) {
+            if (scopeToResolve != null && !scopeToResolve.isEmpty()) {
                 scopesToResolve.add(scopeToResolve);
             }
         }

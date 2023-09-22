@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * and should only be used by a single thread.
  *
  * @see ThreadSafe
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Documented

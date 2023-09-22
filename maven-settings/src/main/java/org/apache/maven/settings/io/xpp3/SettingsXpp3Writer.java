@@ -24,6 +24,7 @@ import java.io.Writer;
 
 import org.apache.maven.settings.Settings;
 
+@Deprecated
 public class SettingsXpp3Writer {
     // --------------------------/
     // - Class/Member Variables -/

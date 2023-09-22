@@ -33,7 +33,6 @@ import org.apache.maven.lifecycle.internal.TaskSegment;
  * the the projects serially, but a {@link Builder} can employ any type of concurrency model to build the projects.
  * </p>
  * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice.
- * @author jvanzyl
  */
 public interface Builder {
     //

@@ -30,7 +30,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Deploys {@link Artifact}s to a {@link RemoteRepository}.
  *
- * @since 4.0
+ * @since 4.0.0
  * @see Session#deployArtifact(RemoteRepository, Artifact...)
  */
 @Experimental

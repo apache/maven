@@ -29,7 +29,6 @@ import org.apache.maven.artifact.Artifact;
 /**
  * Apply multiple filters.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class AndArtifactFilter implements ArtifactFilter {
     private Set<ArtifactFilter> filters;

@@ -21,18 +21,17 @@ package org.apache.maven.model.plugin;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Handles expansion of general report plugin configuration into individual report sets.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
@@ -44,13 +43,13 @@ public class DefaultReportConfigurationExpander implements ReportConfigurationEx
 
         if (reporting != null) {
             for (ReportPlugin reportPlugin : reporting.getPlugins()) {
-                Xpp3Dom parentDom = (Xpp3Dom) reportPlugin.getConfiguration();
+                XmlNode parentDom = reportPlugin.getDelegate().getConfiguration();
 
                 if (parentDom != null) {
                     for (ReportSet execution : reportPlugin.getReportSets()) {
-                        Xpp3Dom childDom = (Xpp3Dom) execution.getConfiguration();
-                        childDom = Xpp3Dom.mergeXpp3Dom(childDom, new Xpp3Dom(parentDom));
-                        execution.setConfiguration(childDom);
+                        XmlNode childDom = execution.getDelegate().getConfiguration();
+                        childDom = XmlNode.merge(childDom, parentDom);
+                        execution.update(execution.getDelegate().withConfiguration(childDom));
                     }
                 }
             }

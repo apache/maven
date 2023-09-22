@@ -28,7 +28,6 @@ import java.util.List;
  * possible before eventually failing to provide callers with rich error information. Use {@link #getProblems()} to
  * query the details of the failure.
  *
- * @author Benjamin Bentmann
  */
 public class SettingsBuildingException extends Exception {
 

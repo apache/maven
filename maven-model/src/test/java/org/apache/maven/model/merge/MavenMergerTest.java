@@ -33,14 +33,13 @@ import static org.hamcrest.Matchers.is;
 /**
  * MavenMerger is based on same instances, subclasses should override KeyComputer per type
  *
- * @author Robert Scholte
  *
  */
-public class MavenMergerTest {
+class MavenMergerTest {
     private MavenMerger mavenMerger = new MavenMerger();
 
     @Test
-    public void mergeArtifactId() {
+    void mergeArtifactId() {
         Model target = Model.newBuilder().artifactId("TARGET").build();
 
         Model source = Model.newBuilder().artifactId("SOURCE").build();
@@ -53,7 +52,7 @@ public class MavenMergerTest {
     }
 
     @Test
-    public void mergeSameContributors() {
+    void mergeSameContributors() {
         Contributor contributor =
                 Contributor.newBuilder().email("contributor@maven.apache.org").build();
 
@@ -69,7 +68,7 @@ public class MavenMergerTest {
     }
 
     @Test
-    public void mergeSameDependencies() {
+    void mergeSameDependencies() {
         Dependency dependency = Dependency.newBuilder()
                 .groupId("groupId")
                 .artifactId("artifactId")

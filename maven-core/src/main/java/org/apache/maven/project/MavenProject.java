@@ -21,6 +21,7 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.lifecycle.internal.DefaultProjectArtifactFactory;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -64,8 +66,8 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -104,6 +106,8 @@ public class MavenProject implements Cloneable {
     private File file;
 
     private File basedir;
+
+    private Path rootDirectory;
 
     private Set<Artifact> resolvedArtifacts;
 
@@ -1309,7 +1313,7 @@ public class MavenProject implements Cloneable {
     @Deprecated
     public Set<Artifact> createArtifacts(ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter filter)
             throws InvalidDependencyVersionException {
-        return MavenMetadataSource.createArtifacts(
+        return DefaultProjectArtifactFactory.createArtifacts(
                 artifactFactory, getModel().getDependencies(), inheritedScope, filter, this);
     }
 
@@ -1678,5 +1682,21 @@ public class MavenProject implements Cloneable {
     @Deprecated
     public void setProjectBuildingRequest(ProjectBuildingRequest projectBuildingRequest) {
         this.projectBuilderConfiguration = projectBuildingRequest;
+    }
+
+    /**
+     * @since 4.0.0
+     * @return the rootDirectory for this project
+     * @throws IllegalStateException if the rootDirectory cannot be found
+     */
+    public Path getRootDirectory() {
+        if (rootDirectory == null) {
+            throw new IllegalStateException(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
+        }
+        return rootDirectory;
+    }
+
+    public void setRootDirectory(Path rootDirectory) {
+        this.rootDirectory = rootDirectory;
     }
 }

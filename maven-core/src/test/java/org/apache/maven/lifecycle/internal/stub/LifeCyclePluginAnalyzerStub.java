@@ -27,7 +27,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 
 /**
- * @author Kristian Rosenvold
  */
 public class LifeCyclePluginAnalyzerStub implements LifeCyclePluginAnalyzer {
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles(String packaging) {

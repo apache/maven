@@ -24,7 +24,6 @@ import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.plugin.MojoExecution;
 
 /**
- * @author Benjamin Bentmann
  */
 public class ExecutionEventCatapultStub implements ExecutionEventCatapult {
 

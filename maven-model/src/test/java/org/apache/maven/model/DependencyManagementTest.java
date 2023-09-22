@@ -20,6 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,30 +28,46 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code DependencyManagement}.
  *
- * @author Benjamin Bentmann
  */
-public class DependencyManagementTest {
+class DependencyManagementTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new DependencyManagement().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new DependencyManagement().equals(null));
 
         new DependencyManagement().equals(new DependencyManagement());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         DependencyManagement thing = new DependencyManagement();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new DependencyManagement().toString());
+    }
+
+    @Test
+    void testDependencies() {
+        DependencyManagement dm = new DependencyManagement();
+        Dependency d1 = new Dependency();
+        d1.setGroupId("myGroupId");
+        assertNotNull(dm.getDependencies());
+        assertEquals(0, dm.getDependencies().size());
+        dm.addDependency(d1);
+        assertNotNull(dm.getDependencies());
+        assertEquals(1, dm.getDependencies().size());
+        dm.getDependencies().get(0).setArtifactId("myArtifactId");
+        assertEquals("myArtifactId", dm.getDependencies().get(0).getArtifactId());
+        dm.setDependencies(null);
+        assertNotNull(dm.getDependencies());
+        assertEquals(0, dm.getDependencies().size());
     }
 }

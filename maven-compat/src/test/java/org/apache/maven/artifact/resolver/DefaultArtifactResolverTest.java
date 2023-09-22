@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
+class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
     @Inject
     private ArtifactResolver artifactResolver;
 
@@ -49,7 +49,7 @@ public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCa
     }
 
     @Test
-    public void testMNG4738() throws Exception {
+    void testMNG4738() throws Exception {
         Artifact g = createLocalArtifact("g", "1.0");
         createLocalArtifact("h", "1.0");
         artifactResolver.resolveTransitively(
@@ -88,7 +88,7 @@ public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCa
     }
 
     @Test
-    public void testLookup() throws Exception {
+    void testLookup() throws Exception {
         ArtifactResolver resolver = getContainer().lookup(ArtifactResolver.class, "default");
     }
 }

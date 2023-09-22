@@ -21,26 +21,26 @@ package org.apache.maven.artifact.handler;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.List;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PlexusTest
-public class ArtifactHandlerTest {
+class ArtifactHandlerTest {
     @Inject
     PlexusContainer container;
 
     @Test
-    public void testAptConsistency() throws Exception {
+    void testAptConsistency() throws Exception {
         File apt = getTestFile("src/site/apt/artifact-handlers.apt");
 
-        List<String> lines = FileUtils.loadFile(apt);
+        List<String> lines = Files.readAllLines(apt.toPath());
 
         for (String line : lines) {
             if (line.startsWith("||")) {

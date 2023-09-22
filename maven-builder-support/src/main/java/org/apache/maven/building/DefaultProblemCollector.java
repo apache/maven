@@ -24,8 +24,6 @@ import java.util.List;
 /**
  * Collects problems that are encountered during settings building.
  *
- * @author Benjamin Bentmann
- * @author Robert Scholte
  */
 class DefaultProblemCollector implements ProblemCollector {
 

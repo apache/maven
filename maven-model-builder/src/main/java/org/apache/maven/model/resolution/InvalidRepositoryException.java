@@ -23,7 +23,6 @@ import org.apache.maven.api.model.Repository;
 /**
  * Signals an error when adding a repository to the model resolver.
  *
- * @author Benjamin Bentmann
  */
 public class InvalidRepositoryException extends Exception {
 

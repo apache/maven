@@ -18,29 +18,67 @@
  */
 package org.apache.maven.internal.transformation;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.building.DefaultModelBuilderFactory;
+import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.TransformerContext;
+import org.apache.maven.model.v4.MavenStaxReader;
+import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.SessionData;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.xmlunit.assertj.XmlAssert;
 
-public class ConsumerPomArtifactTransformerTest {
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+class ConsumerPomArtifactTransformerTest {
+
+    ModelBuilder modelBuilder = new DefaultModelBuilderFactory().newInstance();
+
     @Test
-    public void transform() throws Exception {
+    void transform() throws Exception {
+        RepositorySystemSession systemSessionMock = Mockito.mock(RepositorySystemSession.class);
+        SessionData sessionDataMock = Mockito.mock(SessionData.class);
+        when(systemSessionMock.getData()).thenReturn(sessionDataMock);
+        when(sessionDataMock.get(any())).thenReturn(new NoTransformerContext());
+
         Path beforePomFile =
                 Paths.get("src/test/resources/projects/transform/before.pom").toAbsolutePath();
         Path afterPomFile =
                 Paths.get("src/test/resources/projects/transform/after.pom").toAbsolutePath();
-
-        try (InputStream expected = Files.newInputStream(afterPomFile);
-                InputStream result =
-                        ConsumerPomArtifactTransformer.transform(beforePomFile, new NoTransformerContext())) {
-            XmlAssert.assertThat(result).and(expected).areIdentical();
+        Path tempFile = Files.createTempFile("", ".pom");
+        Files.delete(tempFile);
+        try (InputStream expected = Files.newInputStream(beforePomFile)) {
+            Model model = new Model(new MavenStaxReader().read(expected));
+            MavenProject project = new MavenProject(model);
+            ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer(modelBuilder);
+            t.createConsumerPomArtifact(project, tempFile, systemSessionMock)
+                    .transform(beforePomFile, tempFile, model.getDelegate());
         }
+        XmlAssert.assertThat(afterPomFile.toFile()).and(tempFile.toFile()).areIdentical();
+    }
+
+    @Test
+    void injectTransformedArtifactsWithoutPomShouldNotInjectAnyArtifacts() throws IOException {
+        MavenProject emptyProject = new MavenProject();
+
+        RepositorySystemSession systemSessionMock = Mockito.mock(RepositorySystemSession.class);
+        SessionData sessionDataMock = Mockito.mock(SessionData.class);
+        when(systemSessionMock.getData()).thenReturn(sessionDataMock);
+        when(sessionDataMock.get(any())).thenReturn(new NoTransformerContext());
+
+        new ConsumerPomArtifactTransformer(modelBuilder).injectTransformedArtifacts(emptyProject, systemSessionMock);
+
+        assertThat(emptyProject.getAttachedArtifacts()).isEmpty();
     }
 
     private static class NoTransformerContext implements TransformerContext {
@@ -51,12 +89,17 @@ public class ConsumerPomArtifactTransformerTest {
 
         @Override
         public Model getRawModel(String groupId, String artifactId) throws IllegalStateException {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public Model getRawModel(Path p) {
-            return null;
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Path locate(Path path) {
+            throw new UnsupportedOperationException();
         }
     }
 }

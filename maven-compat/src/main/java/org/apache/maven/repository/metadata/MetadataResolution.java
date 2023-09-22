@@ -24,9 +24,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  *
- * @author Jason van Zyl
  *
  */
+@Deprecated
 public class MetadataResolution {
     /** resolved MD  */
     private ArtifactMetadata artifactMetadata;

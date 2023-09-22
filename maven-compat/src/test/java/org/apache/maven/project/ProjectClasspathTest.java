@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class ProjectClasspathTest extends AbstractMavenProjectTestCase {
+class ProjectClasspathTest extends AbstractMavenProjectTestCase {
     static final String dir = "projects/scope/";
 
     @Override
@@ -51,7 +51,7 @@ public class ProjectClasspathTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testProjectClasspath() throws Exception {
+    void testProjectClasspath() throws Exception {
         File f = getFileForClasspathResource(dir + "project-with-scoped-dependencies.xml");
 
         MavenProject project = getProjectWithDependencies(f);

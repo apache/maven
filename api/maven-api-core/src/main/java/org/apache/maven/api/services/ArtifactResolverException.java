@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  *
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class ArtifactResolverException extends MavenException {

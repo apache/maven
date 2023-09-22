@@ -24,7 +24,6 @@ import org.codehaus.plexus.logging.Logger;
  * Adapt an SLF4J logger to a Plexus logger, ignoring Plexus logger API parts that are not classical and
  * probably not really used.
  *
- * @author Jason van Zyl
  * @since 3.1.0
  */
 public class Slf4jLogger implements Logger {

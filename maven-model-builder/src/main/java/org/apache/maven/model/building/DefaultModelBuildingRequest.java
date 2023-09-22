@@ -19,6 +19,7 @@
 package org.apache.maven.model.building;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +33,6 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 /**
  * Collects settings that control building of effective models.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultModelBuildingRequest implements ModelBuildingRequest {
     private Model fileModel;
@@ -71,6 +71,8 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
 
     private TransformerContextBuilder contextBuilder;
 
+    private Path rootDirectory;
+
     /**
      * Creates an empty request.
      */
@@ -99,6 +101,7 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
         setModelCache(request.getModelCache());
         setWorkspaceModelResolver(request.getWorkspaceModelResolver());
         setTransformerContextBuilder(request.getTransformerContextBuilder());
+        setRootDirectory(request.getRootDirectory());
     }
 
     @Override
@@ -369,6 +372,17 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
     @Override
     public ModelBuildingRequest setTransformerContextBuilder(TransformerContextBuilder contextBuilder) {
         this.contextBuilder = contextBuilder;
+        return this;
+    }
+
+    @Override
+    public Path getRootDirectory() {
+        return rootDirectory;
+    }
+
+    @Override
+    public ModelBuildingRequest setRootDirectory(Path rootDirectory) {
+        this.rootDirectory = rootDirectory;
         return this;
     }
 }

@@ -27,14 +27,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.cli.Option;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * Pseudo test to generate documentation fragment about supported CLI options. TODO such documentation generation code
  * should not be necessary as unit test but should be run during site generation (Velocity? Doxia macro?)
  */
-public class CLIManagerDocumentationTest {
+class CLIManagerDocumentationTest {
     private static final String LS = System.lineSeparator();
 
     private static class OptionComparator implements Comparator<Option> {
@@ -53,7 +53,7 @@ public class CLIManagerDocumentationTest {
         }
     }
 
-    public String getOptionsAsHtml() {
+    String getOptionsAsHtml() {
         StringBuilder sb = new StringBuilder(512);
         boolean a = true;
         sb.append(
@@ -86,8 +86,8 @@ public class CLIManagerDocumentationTest {
     }
 
     @Test
-    public void testOptionsAsHtml() throws IOException {
+    void testOptionsAsHtml() throws IOException {
         File options = new File("target/test-classes/options.html");
-        FileUtils.fileWrite(options, "UTF-8", getOptionsAsHtml());
+        FileUtils.write(options, getOptionsAsHtml(), "UTF-8");
     }
 }

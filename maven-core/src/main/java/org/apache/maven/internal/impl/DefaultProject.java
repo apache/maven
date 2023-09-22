@@ -130,6 +130,22 @@ public class DefaultProject implements Project {
     }
 
     @Override
+    public boolean isTopProject() {
+        return getBasedir().isPresent()
+                && getBasedir().get().equals(getSession().getTopDirectory());
+    }
+
+    @Override
+    public boolean isRootProject() {
+        return getBasedir().isPresent() && getBasedir().get().equals(getRootDirectory());
+    }
+
+    @Override
+    public Path getRootDirectory() {
+        return project.getRootDirectory();
+    }
+
+    @Override
     public Optional<Project> getParent() {
         MavenProject parent = project.getParent();
         return parent != null ? Optional.of(session.getProject(parent)) : Optional.empty();

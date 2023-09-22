@@ -24,7 +24,6 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
  * ClassRealmManagerDelegate is used to perform addition configuration of
  * class realms created by ClassRealmManager.
  *
- * @author igor
  */
 public interface ClassRealmManagerDelegate {
 

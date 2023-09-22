@@ -27,7 +27,6 @@ import org.apache.maven.execution.MavenSession;
  * <li>to store chosen toolchain into build context for later use by toolchain-aware plugins.</li>
  * </ol>
  *
- * @author mkleint
  * @since 2.0.9
  * @see ToolchainManager#getToolchainFromBuildContext(String, MavenSession)
  */

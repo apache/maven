@@ -22,7 +22,6 @@ package org.apache.maven.configuration;
  * Preprocesses a value from a bean configuration before the bean configurator unmarshals it into a bean property. A
  * common use case for such preprocessing is the evaluation of variables within the configuration value.
  *
- * @author Benjamin Bentmann
  */
 public interface BeanConfigurationValuePreprocessor {
 

@@ -30,7 +30,6 @@ import org.apache.maven.internal.xml.XmlNodeImpl;
 /**
  * An attribute iterator for JXPath to support <code>Xpp3Dom</code>.
  *
- * @author Benjamin Bentmann
  */
 class Xpp3DomAttributeIterator implements NodeIterator {
 

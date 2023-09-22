@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
+class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private DefaultBuildPluginManager pluginManager;
 
@@ -48,7 +48,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testPluginLoading() throws Exception {
+    void testPluginLoading() throws Exception {
         MavenSession session = createMavenSession(null);
         Plugin plugin = new Plugin();
         plugin.setGroupId("org.apache.maven.its.plugins");
@@ -60,7 +60,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testMojoDescriptorRetrieval() throws Exception {
+    void testMojoDescriptorRetrieval() throws Exception {
         MavenSession session = createMavenSession(null);
         String goal = "it";
         Plugin plugin = new Plugin();
@@ -97,7 +97,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     //      the plugin manager provides.
 
     @Test
-    public void testRemoteResourcesPlugin() throws Exception {
+    void testRemoteResourcesPlugin() throws Exception {
         // TODO turn an equivalent back on when the RR plugin is released.
 
         /*
@@ -147,7 +147,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testMojoConfigurationIsMergedCorrectly() throws Exception {}
+    void testMojoConfigurationIsMergedCorrectly() throws Exception {}
 
     /**
      * The case where the user wants to specify an alternate version of the underlying tool. Common case
@@ -155,28 +155,28 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
      * to use a specific version. We need to make sure the version that they specify takes precedence.
      */
     @Test
-    public void testMojoWhereInternallyStatedDependencyIsOverriddenByProject() throws Exception {}
+    void testMojoWhereInternallyStatedDependencyIsOverriddenByProject() throws Exception {}
 
     /**
      * The case where you have a plugin in the current build that you want to be used on projects in
      * the current build.
      */
     @Test
-    public void testMojoThatIsPresentInTheCurrentBuild() throws Exception {}
+    void testMojoThatIsPresentInTheCurrentBuild() throws Exception {}
 
     /**
      * This is the case where the Mojo wants to execute on every project and then do something at the end
      * with the results of each project.
      */
     @Test
-    public void testAggregatorMojo() throws Exception {}
+    void testAggregatorMojo() throws Exception {}
 
     /**
      * This is the case where a Mojo needs the lifecycle run to a certain phase before it can do
      * anything useful.
      */
     @Test
-    public void testMojoThatRequiresExecutionToAGivenPhaseBeforeExecutingItself() throws Exception {}
+    void testMojoThatRequiresExecutionToAGivenPhaseBeforeExecutingItself() throws Exception {}
 
     // test that mojo which does not require dependency resolution trigger no downloading of dependencies
 
@@ -185,7 +185,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     // test a build where projects use different versions of the same plugin
 
     @Test
-    public void testThatPluginDependencyThatHasSystemScopeIsResolved() throws Exception {
+    void testThatPluginDependencyThatHasSystemScopeIsResolved() throws Exception {
         MavenSession session = createMavenSession(getProject("project-contributing-system-scope-plugin-dep"));
         MavenProject project = session.getCurrentProject();
         Plugin plugin = project.getPlugin("org.apache.maven.its.plugins:maven-it-plugin");
@@ -225,7 +225,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testPluginRealmCache() throws Exception {
+    void testPluginRealmCache() throws Exception {
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
         repositoryRequest.setLocalRepository(getLocalRepository());
         repositoryRequest.setRemoteRepositories(getPluginArtifactRepositories());
@@ -264,7 +264,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testBuildExtensionsPluginLoading() throws Exception {
+    void testBuildExtensionsPluginLoading() throws Exception {
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
         repositoryRequest.setLocalRepository(getLocalRepository());
         repositoryRequest.setRemoteRepositories(getPluginArtifactRepositories());

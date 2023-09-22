@@ -18,20 +18,23 @@
  */
 package org.apache.maven.repository.legacy.resolver.conflict;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Resolves conflicting artifacts by always selecting the <em>newest</em> declaration. Newest is defined as the
  * declaration whose version is greater according to <code>ArtifactVersion.compareTo</code>.
  *
- * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @see ArtifactVersion#compareTo
  * @since 3.0
  */
-@Component(role = ConflictResolver.class, hint = "newest")
+@Named("newest")
+@Singleton
+@Deprecated
 public class NewestConflictResolver implements ConflictResolver {
     // ConflictResolver methods -----------------------------------------------
 

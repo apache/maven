@@ -36,7 +36,7 @@ import org.apache.maven.api.annotations.ThreadSafe;
  * <strong>Note:</strong> Actual implementations must be thread-safe.
  *
  * @see Session#getData()
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @ThreadSafe

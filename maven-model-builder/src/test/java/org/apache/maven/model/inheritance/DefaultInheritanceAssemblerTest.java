@@ -20,17 +20,12 @@ package org.apache.maven.model.inheritance;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 import org.apache.maven.api.model.Model;
-import org.apache.maven.model.building.AbstractModelSourceTransformer;
 import org.apache.maven.model.building.SimpleProblemCollector;
-import org.apache.maven.model.building.TransformerContext;
-import org.apache.maven.model.building.TransformerException;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelWriter;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.matchers.CompareMatcher;
@@ -40,9 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author Hervé Boutemy
  */
-public class DefaultInheritanceAssemblerTest {
+class DefaultInheritanceAssemblerTest {
     private DefaultModelReader reader;
 
     private ModelWriter writer;
@@ -50,14 +44,8 @@ public class DefaultInheritanceAssemblerTest {
     private InheritanceAssembler assembler;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        reader = new DefaultModelReader(new AbstractModelSourceTransformer() {
-            @Override
-            public XmlPullParser transform(XmlPullParser parser, Path pomFile, TransformerContext context)
-                    throws IOException, TransformerException {
-                return null;
-            }
-        });
+    void setUp() throws Exception {
+        reader = new DefaultModelReader(null);
         writer = new DefaultModelWriter();
         assembler = new DefaultInheritanceAssembler();
     }
@@ -71,7 +59,7 @@ public class DefaultInheritanceAssemblerTest {
     }
 
     @Test
-    public void testPluginConfiguration() throws Exception {
+    void testPluginConfiguration() throws Exception {
         testInheritance("plugin-configuration");
     }
 
@@ -81,7 +69,7 @@ public class DefaultInheritanceAssemblerTest {
      * @throws IOException Model read problem
      */
     @Test
-    public void testUrls() throws Exception {
+    void testUrls() throws Exception {
         testInheritance("urls");
     }
 
@@ -90,7 +78,7 @@ public class DefaultInheritanceAssemblerTest {
      * @throws IOException Model read problem
      */
     @Test
-    public void testFlatUrls() throws IOException {
+    void testFlatUrls() throws IOException {
         testInheritance("flat-urls");
     }
 
@@ -99,7 +87,7 @@ public class DefaultInheritanceAssemblerTest {
      * @throws Exception
      */
     @Test
-    public void testNoAppendUrls() throws Exception {
+    void testNoAppendUrls() throws Exception {
         testInheritance("no-append-urls");
     }
 
@@ -108,7 +96,7 @@ public class DefaultInheritanceAssemblerTest {
      * @throws Exception
      */
     @Test
-    public void testNoAppendUrls2() throws Exception {
+    void testNoAppendUrls2() throws Exception {
         testInheritance("no-append-urls2");
     }
 
@@ -117,7 +105,7 @@ public class DefaultInheritanceAssemblerTest {
      * @throws Exception
      */
     @Test
-    public void testNoAppendUrls3() throws Exception {
+    void testNoAppendUrls3() throws Exception {
         testInheritance("no-append-urls3");
     }
 
@@ -128,7 +116,7 @@ public class DefaultInheritanceAssemblerTest {
      * @throws IOException Model read problem
      */
     @Test
-    public void testFlatTrickyUrls() throws IOException {
+    void testFlatTrickyUrls() throws IOException {
         // parent references child with artifactId (which is not directory name)
         // then relative path calculation will fail during build from disk but success when calculated from repo
         try {
@@ -165,7 +153,7 @@ public class DefaultInheritanceAssemblerTest {
     }
 
     @Test
-    public void testWithEmptyUrl() throws IOException {
+    void testWithEmptyUrl() throws IOException {
         testInheritance("empty-urls", false);
     }
 
@@ -203,7 +191,7 @@ public class DefaultInheritanceAssemblerTest {
     }
 
     @Test
-    public void testModulePathNotArtifactId() throws IOException {
+    void testModulePathNotArtifactId() throws IOException {
         Model parent = getModel("module-path-not-artifactId-parent");
 
         Model child = getModel("module-path-not-artifactId-child");

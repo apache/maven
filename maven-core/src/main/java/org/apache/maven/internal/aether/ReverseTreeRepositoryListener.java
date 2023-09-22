@@ -18,15 +18,19 @@
  */
 package org.apache.maven.internal.aether;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.Plugin;
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositorySystemSession;
@@ -35,6 +39,10 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectStepData;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
 import static java.util.Objects.requireNonNull;
 
@@ -49,45 +57,131 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
     public void artifactResolved(RepositoryEvent event) {
         requireNonNull(event, "event cannot be null");
 
-        if (!isLocalRepositoryArtifact(event.getSession(), event.getArtifact())) {
+        if (!isLocalRepositoryArtifactOrMissing(event.getSession(), event.getArtifact())) {
             return;
         }
 
-        CollectStepData collectStepTrace = lookupCollectStepData(event.getTrace());
-        if (collectStepTrace == null) {
-            return;
+        RequestTrace trace = event.getTrace();
+
+        CollectStepData collectStepTrace = null;
+        ArtifactRequest artifactRequest = null;
+        ArtifactDescriptorRequest artifactDescriptorRequest = null;
+        Plugin plugin = null;
+
+        while (trace != null) {
+            Object data = trace.getData();
+            if (data instanceof CollectStepData) {
+                collectStepTrace = (CollectStepData) data;
+            } else if (data instanceof ArtifactDescriptorRequest) {
+                artifactDescriptorRequest = (ArtifactDescriptorRequest) data;
+            } else if (data instanceof ArtifactRequest) {
+                artifactRequest = (ArtifactRequest) data;
+            } else if (data instanceof Plugin) {
+                plugin = (Plugin) data;
+            }
+            trace = trace.getParent();
         }
 
-        Artifact resolvedArtifact = event.getArtifact();
-        Artifact nodeArtifact = collectStepTrace.getNode().getArtifact();
+        Path trackingDir;
+        boolean missing = event.getFile() == null;
+        if (missing) {
+            // missing artifact - let's track the path anyway
+            File dir = event.getSession().getLocalRepository().getBasedir();
+            dir = new File(
+                    dir, event.getSession().getLocalRepositoryManager().getPathForLocalArtifact(event.getArtifact()));
+            trackingDir = dir.getParentFile().toPath().resolve(".tracking");
+        } else {
+            trackingDir = event.getFile().getParentFile().toPath().resolve(".tracking");
+        }
 
-        if (isInScope(resolvedArtifact, nodeArtifact)) {
-            Dependency node = collectStepTrace.getNode();
-            ArrayList<String> trackingData = new ArrayList<>();
-            trackingData.add(node + " (" + collectStepTrace.getContext() + ")");
-            String indent = "";
-            ListIterator<DependencyNode> iter = collectStepTrace
-                    .getPath()
-                    .listIterator(collectStepTrace.getPath().size());
-            while (iter.hasPrevious()) {
-                DependencyNode curr = iter.previous();
+        String baseName;
+        String ext = missing ? ".miss" : ".dep";
+        Path trackingFile = null;
+
+        String indent = "";
+        ArrayList<String> trackingData = new ArrayList<>();
+
+        if (collectStepTrace == null && plugin != null) {
+            ext = ".plugin";
+            baseName = plugin.getGroupId() + "_" + plugin.getArtifactId() + "_" + plugin.getVersion();
+            trackingFile = trackingDir.resolve(baseName + ext);
+            if (Files.exists(trackingFile)) {
+                return;
+            }
+
+            if (event.getArtifact() != null) {
+                trackingData.add(indent + event.getArtifact());
                 indent += "  ";
-                trackingData.add(indent + curr + " (" + collectStepTrace.getContext() + ")");
             }
-            try {
-                Path trackingDir =
-                        resolvedArtifact.getFile().getParentFile().toPath().resolve(".tracking");
-                Files.createDirectories(trackingDir);
-                Path trackingFile = trackingDir.resolve(collectStepTrace
+            trackingData.add(indent + plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion());
+            indent += "  ";
+
+            InputLocation location = plugin.getLocation("");
+            if (location != null && location.getSource() != null) {
+                trackingData.add(indent + location.getSource().getModelId() + " (implicit)");
+                indent += "  ";
+            }
+        } else if (collectStepTrace != null) {
+            if (collectStepTrace.getPath().get(0).getArtifact() == null) {
+                return;
+            }
+            baseName = ArtifactIdUtils.toId(collectStepTrace.getPath().get(0).getArtifact())
+                    .replace(":", "_");
+            trackingFile = trackingDir.resolve(baseName + ext);
+            if (Files.exists(trackingFile)) {
+                return;
+            }
+
+            Artifact resolvedArtifact = event.getArtifact();
+            Artifact nodeArtifact = collectStepTrace.getNode().getArtifact();
+
+            if (isInScope(resolvedArtifact, nodeArtifact) || "pom".equals(resolvedArtifact.getExtension())) {
+                Dependency node = collectStepTrace.getNode();
+                trackingData.add(resolvedArtifact.toString());
+                indent += "  ";
+                trackingData.add(indent + node + " (" + collectStepTrace.getContext() + ")");
+                ListIterator<DependencyNode> iter = collectStepTrace
                         .getPath()
-                        .get(0)
-                        .getArtifact()
-                        .toString()
-                        .replace(":", "_"));
-                Files.write(trackingFile, trackingData, StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
+                        .listIterator(collectStepTrace.getPath().size());
+                while (iter.hasPrevious()) {
+                    DependencyNode curr = iter.previous();
+                    indent += "  ";
+                    trackingData.add(indent + curr + " (" + collectStepTrace.getContext() + ")");
+                }
             }
+        }
+
+        if (trackingFile == null) {
+            return;
+        }
+        try {
+            Files.createDirectories(trackingDir);
+
+            trackingData.add("");
+            if (!missing) {
+                if (event.getRepository() != null) {
+                    trackingData.add("Repository: " + event.getRepository());
+                }
+            } else {
+                List<RemoteRepository> repositories = new ArrayList<>();
+                if (artifactRequest != null && artifactRequest.getRepositories() != null) {
+                    repositories.addAll(artifactRequest.getRepositories());
+                } else if (artifactDescriptorRequest != null && artifactDescriptorRequest.getRepositories() != null) {
+                    repositories.addAll(artifactDescriptorRequest.getRepositories());
+                }
+                if (!repositories.isEmpty()) {
+                    trackingData.add("Configured repositories:");
+                    for (RemoteRepository r : repositories) {
+                        trackingData.add(" - " + r.getId() + " : " + r.getUrl());
+                    }
+                } else {
+                    trackingData.add("No repositories configured");
+                }
+            }
+
+            Files.write(trackingFile, trackingData, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -99,10 +193,11 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
      * <p>
      * Visible for testing.
      */
-    static boolean isLocalRepositoryArtifact(RepositorySystemSession session, Artifact artifact) {
-        return artifact.getFile()
-                .getPath()
-                .startsWith(session.getLocalRepository().getBasedir().getPath());
+    static boolean isLocalRepositoryArtifactOrMissing(RepositorySystemSession session, Artifact artifact) {
+        return artifact.getFile() == null
+                || artifact.getFile()
+                        .getPath()
+                        .startsWith(session.getLocalRepository().getBasedir().getPath());
     }
 
     /**
