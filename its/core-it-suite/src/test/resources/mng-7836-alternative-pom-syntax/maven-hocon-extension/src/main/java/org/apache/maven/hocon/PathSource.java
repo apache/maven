@@ -48,4 +48,9 @@ public class PathSource implements Source {
     public String getLocation() {
         return path.toString();
     }
+
+    @Override
+    public Source resolve(String s) {
+        return new PathSource(path.resolve(s));
+    }
 }
