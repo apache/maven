@@ -20,6 +20,7 @@ package org.apache.maven.model.building;
 
 import java.util.Arrays;
 
+import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
 import org.apache.maven.model.composition.DependencyManagementImporter;
@@ -215,7 +216,11 @@ public class DefaultModelBuilderFactory {
     }
 
     protected ModelProcessor newModelProcessor() {
-        return new DefaultModelProcessor(newModelLocator(), newModelReader());
+        return new DefaultModelProcessor(Arrays.asList(newModelParsers()), newModelLocator(), newModelReader());
+    }
+
+    protected ModelParser[] newModelParsers() {
+        return new ModelParser[0];
     }
 
     protected ModelLocator newModelLocator() {
