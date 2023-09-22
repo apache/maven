@@ -389,6 +389,11 @@ under the License.
         <version>${commonsCliVersion}</version>
       </dependency>
       <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commonsIoVersion}</version>
+      </dependency>
+      <dependency>
         <groupId>commons-jxpath</groupId>
         <artifactId>commons-jxpath</artifactId>
         <version>${jxpathVersion}</version>
