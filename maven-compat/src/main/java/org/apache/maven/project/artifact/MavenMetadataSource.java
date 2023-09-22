@@ -633,11 +633,19 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
 
                         if (artifact.getDependencyTrail() != null
                                 && artifact.getDependencyTrail().size() == 1) {
-                            logger.warn("While downloading " + pomArtifact.getGroupId() + ":"
-                                    + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message);
+                            logger.warn(
+                                    "While downloading {}:{}:{}{}",
+                                    pomArtifact.getGroupId(),
+                                    pomArtifact.getArtifactId(),
+                                    pomArtifact.getVersion(),
+                                    message);
                         } else {
-                            logger.debug("While downloading " + pomArtifact.getGroupId() + ":"
-                                    + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message);
+                            logger.debug(
+                                    "While downloading {}:{}:{}{}",
+                                    pomArtifact.getGroupId(),
+                                    pomArtifact.getArtifactId(),
+                                    pomArtifact.getVersion(),
+                                    message);
                         }
                     } else {
                         done = true;
