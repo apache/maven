@@ -34,8 +34,8 @@ class ModelBuildingExceptionTest {
                 new DefaultModelProblem("message2", ModelProblem.Severity.ERROR, null, "source", 0, 0, "modelId", null);
         String msg = ModelBuildingException.toMessage("modelId", Arrays.asList(pb1, pb2));
         assertEquals(
-                "2 problems were encountered while building the effective model for modelId\n"
-                        + "    - [ERROR] message1\n"
+                "2 problems were encountered while building the effective model for modelId" + System.lineSeparator()
+                        + "    - [ERROR] message1" + System.lineSeparator()
                         + "    - [ERROR] message2",
                 msg);
     }
