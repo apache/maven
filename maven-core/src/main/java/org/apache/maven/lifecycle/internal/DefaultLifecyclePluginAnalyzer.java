@@ -154,8 +154,10 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
                 GoalSpec gs = parseGoalSpec(mojo.getGoal());
 
                 if (gs == null) {
-                    logger.warn("Ignored invalid goal specification '" + mojo.getGoal()
-                            + "' from lifecycle mapping for phase " + phase);
+                    logger.warn(
+                            "Ignored invalid goal specification '{}' from lifecycle mapping for phase {}",
+                            mojo.getGoal(),
+                            phase);
                     continue;
                 }
 

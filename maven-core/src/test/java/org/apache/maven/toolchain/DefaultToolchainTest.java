@@ -92,7 +92,7 @@ class DefaultToolchainTest {
         DefaultToolchain toolchain = newDefaultToolchain(model);
 
         assertFalse(toolchain.matchesRequirements(Collections.singletonMap("name", "John Doe")));
-        verify(logger).debug("Toolchain type:TYPE{} is missing required property: name");
+        verify(logger).debug("Toolchain {} is missing required property: {}", toolchain, "name");
     }
 
     @Test
@@ -103,7 +103,7 @@ class DefaultToolchainTest {
         toolchain.addProvideToken("name", RequirementMatcherFactory.createExactMatcher("Jane Doe"));
 
         assertFalse(toolchain.matchesRequirements(Collections.singletonMap("name", "John Doe")));
-        verify(logger).debug("Toolchain type:TYPE{name = Jane Doe} doesn't match required property: name");
+        verify(logger).debug("Toolchain {} doesn't match required property: {}", toolchain, "name");
     }
 
     @Test

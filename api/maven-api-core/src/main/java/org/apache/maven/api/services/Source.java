@@ -72,4 +72,18 @@ public interface Source {
      */
     @Nonnull
     String getLocation();
+
+    /**
+     * Returns a new source identified by a relative path. Implementation <strong>MUST</strong>
+     * be able to accept <code>relative</code> parameter values that
+     * <ul>
+     * <li>use either / or \ file path separator,</li>
+     * <li>have .. parent directory references,</li>
+     * <li>point either at file or directory.</li>
+     * </ul>
+     *
+     * @param relative is the path of the requested source relative to this source
+     * @return related source or <code>null</code> if no such source
+     */
+    Source resolve(String relative);
 }

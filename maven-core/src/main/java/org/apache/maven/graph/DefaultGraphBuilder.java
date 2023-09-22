@@ -43,13 +43,13 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.Result;
+import org.apache.maven.project.CycleDetectedException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
 import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

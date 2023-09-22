@@ -23,8 +23,10 @@ import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
+import java.nio.file.Files;
 
+import org.apache.maven.api.settings.InputSource;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.Profile;
@@ -33,9 +35,8 @@ import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.settings.v4.SettingsStaxReader;
 import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
@@ -121,13 +122,10 @@ class PomConstructionWithSettingsTest {
     }
 
     private static Settings readSettingsFile(File settingsFile) throws IOException, XMLStreamException {
-        Settings settings = null;
-
-        try (Reader reader = new XmlStreamReader(settingsFile)) {
-            SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
-
-            settings = modelReader.read(reader);
+        try (InputStream is = Files.newInputStream(settingsFile.toPath())) {
+            SettingsStaxReader reader = new SettingsStaxReader();
+            InputSource source = new InputSource(settingsFile.toString());
+            return new Settings(reader.read(is, true, source));
         }
-        return settings;
     }
 }

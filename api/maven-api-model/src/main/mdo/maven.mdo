@@ -3281,6 +3281,12 @@
           <description>The version of the extension.</description>
           <type>String</type>
         </field>
+        <field>
+          <name>configuration</name>
+          <version>4.1.0+</version>
+          <description>The configuration of the extension.</description>
+          <type>DOM</type>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

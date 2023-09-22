@@ -63,6 +63,10 @@ import org.eclipse.aether.installation.InstallRequest;
 @Named("consumer-pom")
 public final class ConsumerPomArtifactTransformer {
 
+    private static final String BOM_PACKAGING = "bom";
+
+    public static final String POM_PACKAGING = "pom";
+
     private static final String CONSUMER_POM_CLASSIFIER = "consumer";
 
     private static final String BUILD_POM_CLASSIFIER = "build";
@@ -237,6 +241,9 @@ public final class ConsumerPomArtifactTransformer {
             }
 
             // raw to consumer transform
+            if (BOM_PACKAGING.equals(consumer.getPackaging())) {
+                consumer = consumer.withPackaging(POM_PACKAGING);
+            }
             consumer = consumer.withRoot(false).withModules(null);
             if (consumer.getParent() != null) {
                 consumer = consumer.withParent(consumer.getParent().withRelativePath(null));

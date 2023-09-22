@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
 
 /**
  * Handles deserialization of metadata from some kind of textual format like XML.
@@ -44,7 +43,7 @@ public class DefaultMetadataReader implements MetadataReader {
     public Metadata read(File input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
 
-        return read(new XmlStreamReader(Files.newInputStream(input.toPath())), options);
+        return read(Files.newInputStream(input.toPath()), options);
     }
 
     public Metadata read(Reader input, Map<String, ?> options) throws IOException {

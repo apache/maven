@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.ExtensionDescriptorBuilder;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -46,10 +47,21 @@ public class CoreExtensionEntry {
 
     private final Set<String> packages;
 
-    public CoreExtensionEntry(ClassRealm realm, Collection<String> artifacts, Collection<String> packages) {
+    private final String key;
+
+    private final XmlNode configuration;
+
+    public CoreExtensionEntry(
+            ClassRealm realm,
+            Collection<String> artifacts,
+            Collection<String> packages,
+            String key,
+            XmlNode configuration) {
         this.realm = realm;
         this.artifacts = Collections.unmodifiableSet(new HashSet<>(artifacts));
         this.packages = Collections.unmodifiableSet(new HashSet<>(packages));
+        this.key = key;
+        this.configuration = configuration;
     }
 
     /**
@@ -73,6 +85,21 @@ public class CoreExtensionEntry {
         return packages;
     }
 
+    /**
+     * The key that can must used to identify the configuration using the
+     * {@link javax.inject.Named} annotation.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Returns the configuration for this extension.
+     */
+    public XmlNode getConfiguration() {
+        return configuration;
+    }
+
     private static final ExtensionDescriptorBuilder BUILDER = new ExtensionDescriptorBuilder();
 
     public static CoreExtensionEntry discoverFrom(ClassRealm loader) {
@@ -93,10 +120,11 @@ public class CoreExtensionEntry {
             // exports descriptors are entirely optional
         }
 
-        return new CoreExtensionEntry(loader, artifacts, packages);
+        return new CoreExtensionEntry(loader, artifacts, packages, null, null);
     }
 
-    public static CoreExtensionEntry discoverFrom(ClassRealm loader, Collection<File> classpath) {
+    public static CoreExtensionEntry discoverFrom(
+            ClassRealm loader, Collection<File> classpath, String key, XmlNode configuration) {
         Set<String> artifacts = new LinkedHashSet<>();
         Set<String> packages = new LinkedHashSet<>();
 
@@ -112,6 +140,6 @@ public class CoreExtensionEntry {
             // exports descriptors are entirely optional
         }
 
-        return new CoreExtensionEntry(loader, artifacts, packages);
+        return new CoreExtensionEntry(loader, artifacts, packages, key, configuration);
     }
 }
