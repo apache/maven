@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -495,10 +496,12 @@ public class DefaultMaven implements Maven {
      * @return A {@link Set} of profile identifiers, never {@code null}.
      */
     private Set<String> getAllProfiles(MavenSession session) {
-        // TODO: which version of super pom should we use here ?
-        final Model superPomModel = superPomProvider.getSuperModel("4.0.0").getDelegate();
+        final Map<String, Model> superPomModels = new HashMap<>();
         final Set<MavenProject> projectsIncludingParents = new HashSet<>();
         for (MavenProject project : session.getProjects()) {
+            superPomModels.computeIfAbsent(
+                    project.getModelVersion(),
+                    v -> superPomProvider.getSuperModel(v).getDelegate());
             boolean isAdded = projectsIncludingParents.add(project);
             MavenProject parent = project.getParent();
             while (isAdded && parent != null) {
@@ -512,8 +515,9 @@ public class DefaultMaven implements Maven {
                 .map(Profile::getId);
         final Stream<String> settingsProfiles =
                 session.getSettings().getProfiles().stream().map(org.apache.maven.settings.Profile::getId);
-        final Stream<String> superPomProfiles =
-                superPomModel.getProfiles().stream().map(Profile::getId);
+        final Stream<String> superPomProfiles = superPomModels.values().stream()
+                .flatMap(p -> p.getProfiles().stream())
+                .map(Profile::getId);
 
         return Stream.of(projectProfiles, settingsProfiles, superPomProfiles)
                 .flatMap(Function.identity())
