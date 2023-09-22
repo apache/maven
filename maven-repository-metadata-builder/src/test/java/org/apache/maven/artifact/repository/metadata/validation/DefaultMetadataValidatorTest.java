@@ -107,8 +107,6 @@ class DefaultMetadataValidatorTest {
     @Test
     void testValidateGroupIdMetadata() {
         Metadata metadata = new Metadata();
-        List<Plugin> plugins = new ArrayList<>();
-        metadata.setPlugins(plugins);
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(metadata, Level.GROUP_ID, null, problems);
         assertEquals(0, problems.messages.size());
@@ -117,13 +115,13 @@ class DefaultMetadataValidatorTest {
         plugin.setArtifactId("myArtifactId");
         plugin.setName("myPluginName");
         plugin.setPrefix("mypluginprefix");
-        plugins.add(plugin);
+        metadata.getPlugins().add(plugin);
         problems = new SimpleProblemCollector();
         validator.validate(metadata, problems);
         assertEquals(0, problems.messages.size());
 
         plugin = new Plugin();
-        plugins.add(plugin);
+        metadata.getPlugins().add(plugin);
         problems = new SimpleProblemCollector();
         validator.validate(metadata, problems);
         assertEquals(3, problems.messages.size());
@@ -135,6 +133,7 @@ class DefaultMetadataValidatorTest {
                 problems.messages.get(2),
                 "'plugins.plugin.artifactId' on repository metadata level groupId is missing");
 
+        plugin = metadata.getPlugins().get(1);
         plugin.setArtifactId("myOtherArtifactId");
         problems = new SimpleProblemCollector();
         validator.validate(metadata, problems);
