@@ -48,6 +48,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
+import org.apache.maven.model.interpolation.reflection.IntrospectionException;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -469,11 +470,11 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         Path path = Paths.get("").toAbsolutePath();
 
         MavenSession mavenSession = createMavenSession(null);
-        mavenSession.getRequest().setBaseDirectory(path.toFile());
-        mavenSession.getRequest().setMultiModuleProjectDirectory(path.toFile());
+        mavenSession.getRequest().setTopDirectory(path);
+        mavenSession.getRequest().setRootDirectory(path);
 
         Object result = new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null)
-                .evaluate("${session.multiModuleProjectDirectory.uri}");
+                .evaluate("${session.rootDirectory.uri}");
         assertEquals(path.toUri(), result);
     }
 
@@ -482,11 +483,11 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         Path path = Paths.get("").toAbsolutePath();
 
         MavenSession mavenSession = createMavenSession(null);
-        mavenSession.getRequest().setBaseDirectory(path.toFile());
-        mavenSession.getRequest().setMultiModuleProjectDirectory(path.toFile());
+        mavenSession.getRequest().setTopDirectory(path);
+        mavenSession.getRequest().setRootDirectory(path);
 
         Object result = new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null)
-                .evaluate("${session.multiModuleProjectDirectory/target}");
+                .evaluate("${session.rootDirectory/target}");
         assertEquals(path.resolve("target"), result);
     }
 
@@ -495,19 +496,19 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         Path path = Paths.get("rép➜α").toAbsolutePath();
 
         MavenSession mavenSession = createMavenSession(null);
-        mavenSession.getRequest().setBaseDirectory(path.toFile());
-        mavenSession.getRequest().setMultiModuleProjectDirectory(path.toFile());
+        mavenSession.getRequest().setTopDirectory(path);
+        mavenSession.getRequest().setRootDirectory(path);
         DefaultModelBuildingRequest mbr = new DefaultModelBuildingRequest();
 
         PluginParameterExpressionEvaluatorV4 evaluator =
                 new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null);
 
         DefaultPlexusConfiguration configuration = new DefaultPlexusConfiguration("config");
-        configuration.addChild("uri", "${session.multiModuleProjectDirectory.uri}");
-        configuration.addChild("path", "${session.multiModuleProjectDirectory}");
-        configuration.addChild("uriString", "${session.multiModuleProjectDirectory.uri.string}");
-        configuration.addChild("uriAsciiString", "${session.multiModuleProjectDirectory.uri.ASCIIString}");
-        configuration.addChild("pathString", "${session.multiModuleProjectDirectory.string}");
+        configuration.addChild("uri", "${session.rootDirectory.uri}");
+        configuration.addChild("path", "${session.rootDirectory}");
+        configuration.addChild("uriString", "${session.rootDirectory.uri.string}");
+        configuration.addChild("uriAsciiString", "${session.rootDirectory.uri.ASCIIString}");
+        configuration.addChild("pathString", "${session.rootDirectory.string}");
 
         Mojo mojo = new Mojo();
         new EnhancedComponentConfigurator().configureComponent(mojo, configuration, evaluator, null);

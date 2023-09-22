@@ -21,6 +21,7 @@ package org.apache.maven.model.interpolation;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,9 +40,7 @@ import org.apache.maven.model.root.RootLocator;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
-import org.codehaus.plexus.interpolation.ObjectBasedValueSource;
 import org.codehaus.plexus.interpolation.PrefixAwareRecursionInterceptor;
-import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
 import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
 import org.codehaus.plexus.interpolation.ValueSource;
@@ -140,7 +139,11 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                         @Override
                         public Object getValue(String expression) {
                             if ("basedir".equals(expression)) {
-                                return projectDir.getAbsolutePath();
+                                return projectDir.getAbsoluteFile().toPath().toString();
+                            } else if (expression.startsWith("basedir.")) {
+                                Path basedir = projectDir.getAbsoluteFile().toPath();
+                                return new ObjectBasedValueSource(basedir)
+                                        .getValue(expression.substring("basedir.".length()));
                             }
                             return null;
                         }
@@ -159,6 +162,11 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                                         .toPath()
                                         .toUri()
                                         .toASCIIString();
+                            } else if (expression.startsWith("baseUri.")) {
+                                URI baseUri =
+                                        projectDir.getAbsoluteFile().toPath().toUri();
+                                return new ObjectBasedValueSource(baseUri)
+                                        .getValue(expression.substring("baseUri.".length()));
                             }
                             return null;
                         }
@@ -177,6 +185,11 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                             Path base = projectDir != null ? projectDir.toPath() : null;
                             Path root = rootLocator.findMandatoryRoot(base);
                             return root.toFile().getPath();
+                        } else if (expression.startsWith("rootDirectory.")) {
+                            Path base = projectDir != null ? projectDir.toPath() : null;
+                            Path root = rootLocator.findMandatoryRoot(base);
+                            return new ObjectBasedValueSource(root)
+                                    .getValue(expression.substring("rootDirectory.".length()));
                         }
                         return null;
                     }
