@@ -21,7 +21,6 @@ package org.apache.maven.plugin;
 import javax.inject.Inject;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -45,12 +44,12 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.CycleDetectedException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
@@ -375,7 +374,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     void testRootDirectoryWithNull() throws Exception {
         ExpressionEvaluator ee = createExpressionEvaluator(createDefaultProject(), null, new Properties());
         Exception e = assertThrows(Exception.class, () -> ee.evaluate("${session.rootDirectory}"));
-        e = assertInstanceOf(InvocationTargetException.class, e.getCause());
+        e = assertInstanceOf(IntrospectionException.class, e.getCause());
         e = assertInstanceOf(IllegalStateException.class, e.getCause());
         assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
     }

@@ -26,7 +26,7 @@ import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.codehaus.plexus.util.Os;
+import org.apache.maven.utils.Os;
 
 /**
  * Determines profile activation based on the operating system of the current runtime platform.
@@ -95,7 +95,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
             test = test.substring(1);
         }
 
-        boolean result = Os.isVersion(test);
+        boolean result = Os.OS_VERSION.equals(test);
 
         return reverse != result;
     }
@@ -109,7 +109,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
             test = test.substring(1);
         }
 
-        boolean result = Os.isArch(test);
+        boolean result = Os.OS_ARCH.equals(test);
 
         return reverse != result;
     }
@@ -123,7 +123,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
             test = test.substring(1);
         }
 
-        boolean result = Os.isName(test);
+        boolean result = Os.OS_NAME.equals(test);
 
         return reverse != result;
     }

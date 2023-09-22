@@ -18,7 +18,7 @@
  */
 package org.apache.maven;
 
-import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.apache.maven.project.CycleDetectedException;
 
 /**
  */

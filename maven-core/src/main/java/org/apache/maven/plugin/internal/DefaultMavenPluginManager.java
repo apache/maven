@@ -427,7 +427,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
             ((DefaultPlexusContainer) container)
                     .discoverComponents(
-                            pluginRealm, new SessionScopeModule(container), new MojoExecutionScopeModule(container));
+                            pluginRealm,
+                            new SessionScopeModule(container),
+                            new MojoExecutionScopeModule(container),
+                            new PluginConfigurationModule(plugin.getDelegate()));
         } catch (ComponentLookupException | CycleDetectedInComponentGraphException e) {
             throw new PluginContainerException(
                     plugin,
@@ -635,8 +638,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             ValidatingConfigurationListener validator =
                     new ValidatingConfigurationListener(mojo, mojoDescriptor, listener);
 
-            logger.debug("Configuring mojo execution '" + mojoDescriptor.getId() + ':' + executionId + "' with "
-                    + configuratorId + " configurator -->");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Configuring mojo execution '" + mojoDescriptor.getId() + ':' + executionId + "' with "
+                        + configuratorId + " configurator -->");
+            }
 
             configurator.configureComponent(mojo, configuration, expressionEvaluator, pluginRealm, validator);
 
@@ -746,10 +751,14 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 String goalExecId = mojoExecution.getGoal();
 
                 if (mojoExecution.getExecutionId() != null) {
-                    goalExecId += " {execution: " + mojoExecution.getExecutionId() + "}";
+                    logger.debug(
+                            "Error releasing mojo for {} {execution: {}}",
+                            goalExecId,
+                            mojoExecution.getExecutionId(),
+                            e);
+                } else {
+                    logger.debug("Error releasing mojo for {}", goalExecId, e);
                 }
-
-                logger.debug("Error releasing mojo for " + goalExecId, e);
             }
         }
     }

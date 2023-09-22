@@ -26,7 +26,7 @@ import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.maven.cli.jansi.MessageUtils;
-import org.codehaus.plexus.util.Os;
+import org.apache.maven.utils.Os;
 import org.slf4j.Logger;
 
 /**
