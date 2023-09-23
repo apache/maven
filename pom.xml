@@ -150,7 +150,7 @@ under the License.
     <classWorldsVersion>2.6.0</classWorldsVersion>
     <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsIoVersion>2.11.0</commonsIoVersion>
-    <junitVersion>5.9.1</junitVersion>
+    <junitVersion>5.10.0</junitVersion>
     <mockitoVersion>4.11.0</mockitoVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusXmlVersion>4.0.1</plexusXmlVersion>
@@ -476,7 +476,7 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
+      <artifactId>junit-jupiter-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
