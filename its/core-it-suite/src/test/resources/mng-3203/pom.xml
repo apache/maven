@@ -43,8 +43,8 @@
                 <execution>
                   <id>default-compile</id>
                   <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <includes>
                       <include>**/Diamond.java</include>
                     </includes>
@@ -70,7 +70,7 @@
                 <execution>
                   <id>default-compile</id>
                   <configuration>
-                    <release>7</release>
+                    <release>8</release>
                   </configuration>
                 </execution>
               </executions>
