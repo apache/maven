@@ -72,6 +72,7 @@ public class DefaultModelValidator
 {
 
     private static final Pattern CI_FRIENDLY_EXPRESSION = Pattern.compile( "\\$\\{(.+?)}" );
+    private static final Pattern EXPRESSION_PROJECT_NAME_PATTERN = Pattern.compile( "\\$\\{(project.+?)}" );
 
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
@@ -192,8 +193,7 @@ public class DefaultModelValidator
                                   "must be unique but found duplicate profile with id " + profile.getId(), profile );
                 }
 
-                validate30RawProfileActivation( problems, profile.getActivation(), profile.getId(),
-                                                prefix, "activation", request );
+                validate30RawProfileActivation( problems, profile.getActivation(), prefix );
 
                 validate20RawDependencies( problems, profile.getDependencies(), prefix, "dependencies.dependency.",
                                            request );
@@ -226,53 +226,49 @@ public class DefaultModelValidator
         }
     }
 
-    private void validate30RawProfileActivation( ModelProblemCollector problems, Activation activation,
-                                                 String sourceHint, String prefix, String fieldName,
-                                                 ModelBuildingRequest request )
+    private void validate30RawProfileActivation( ModelProblemCollector problems, Activation activation, String prefix )
     {
-        if ( activation == null )
-        {
+        if ( activation == null || activation.getFile() == null ) {
             return;
         }
 
         ActivationFile file = activation.getFile();
 
-        if ( file != null )
+        String path;
+        String location;
+
+        if ( StringUtils.isNotEmpty( file.getExists() ) )
         {
-            String path;
-            boolean missing;
+            path = file.getExists();
+            location = "exists";
+        }
+        else if ( StringUtils.isNotEmpty( file.getMissing() ) )
+        {
+            path = file.getMissing();
+            location = "missing";
+        }
+        else {
+            return;
+        }
 
-            if ( StringUtils.isNotEmpty( file.getExists() ) )
+        if ( hasProjectExpression( path ) )
+        {
+            Matcher matcher = EXPRESSION_PROJECT_NAME_PATTERN.matcher( path );
+            while ( matcher.find() )
             {
-                path = file.getExists();
-                missing = false;
-            }
-            else if ( StringUtils.isNotEmpty( file.getMissing() ) )
-            {
-                path = file.getMissing();
-                missing = true;
-            }
-            else
-            {
-                return;
-            }
-
-            if ( path.contains( "${project.basedir}" ) )
-            {
-                addViolation( problems, Severity.WARNING, Version.V30,
-                              prefix + fieldName + ( missing ? ".file.missing" : ".file.exists" ), null,
-                              "Failed to interpolate file location " + path + " for profile " + sourceHint
-                                  + ": ${project.basedir} expression not supported during profile activation, "
-                                  + "use ${basedir} instead",
-                              file.getLocation( missing ? "missing" : "exists" ) );
-            }
-            else if ( hasProjectExpression( path ) )
-            {
-                addViolation( problems, Severity.WARNING, Version.V30,
-                              prefix + fieldName + ( missing ? ".file.missing" : ".file.exists" ), null,
-                              "Failed to interpolate file location " + path + " for profile " + sourceHint
-                                  + ": ${project.*} expressions are not supported during profile activation",
-                              file.getLocation( missing ? "missing" : "exists" ) );
+                String propertyName = matcher.group( 0 );
+                if ( !"${project.basedir}".equals( propertyName ) )
+                {
+                    addViolation(
+                            problems,
+                            Severity.WARNING,
+                            Version.V30,
+                            prefix + "activation.file." + location,
+                            null,
+                            "Failed to interpolate file location " + path + ": " + propertyName
+                                    + " expressions are not supported during profile activation.",
+                            file.getLocation( location ) );
+                }
             }
         }
     }
