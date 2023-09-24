@@ -34,7 +34,9 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenIntegrationTestCase {
 
     public MavenITmng5608ProfileActivationWarningTest() {
-        super("(3.2.1,)");
+        // changed in https://issues.apache.org/jira/browse/MNG-7895
+        // TODO - consider a separate test
+        super("(3.2.1,4.0.0-alpha-8)");
     }
 
     @Test
