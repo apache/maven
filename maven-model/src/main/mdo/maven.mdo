@@ -2934,7 +2934,7 @@
         is the location of a file that needs to exist, and if it doesn't, the profile will be
         activated. On the other hand, <code>exists</code> will test for the existence of the file and if it is
         there, the profile will be activated.<br>
-        Variable interpolation for these file specifications is limited to <code>${basedir}</code>,
+        Variable interpolation for these file specifications is limited to <code>${project.basedir}</code>,
         system properties and user properties.]]></description>
       <fields>
         <field>
