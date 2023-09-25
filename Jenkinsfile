@@ -85,13 +85,13 @@ for (String os in runITsOses) {
                     dir(isUnix() ? 'test' : "c:\\mvn-it-${EXECUTOR_NUMBER}.tmp") {
                         def WORK_DIR=pwd()
                         try {
-                          echo "Checkout ITs from branch: ${env.BRANCH_NAME}"
+                          echo "Checkout ITs from branch: ${env.CHANGE_BRANCH}"
                           checkout([$class: 'GitSCM',
-                                  branches: [[name: env.BRANCH_NAME]],
+                                  branches: [[name: env.CHANGE_BRANCH]],
                                   extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
                                   userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])
                         } catch (Throwable e) {
-                          echo "Failure checkout ITs branch: ${env.BRANCH_NAME} - fallback master branch"
+                          echo "Failure checkout ITs branch: ${env.CHANGE_BRANCH} - fallback master branch"
                           checkout([$class: 'GitSCM',
                                   branches: [[name: "*/master"]],
                                   extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
