@@ -23,9 +23,6 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +30,6 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.Verifier;
 import org.junit.jupiter.api.BeforeAll;
@@ -51,32 +47,15 @@ public abstract class AbstractMavenIntegrationTestCase {
      */
     private static PrintStream out = System.out;
 
-    /**
-     * The format for elapsed time.
-     */
-    private static final DecimalFormat SECS_FORMAT =
-            new DecimalFormat("(0.0 s)", new DecimalFormatSymbols(Locale.ENGLISH));
-
-    /**
-     * The zero-based column index where to print the test result.
-     */
-    private static final int RESULT_COLUMN = 60;
-
-    private boolean skip;
-
-    private BrokenMavenVersionException invert;
-
     private static ArtifactVersion javaVersion;
 
     private ArtifactVersion mavenVersion;
 
-    private VersionRange versionRange;
-
-    private String matchPattern;
+    private final Pattern matchPattern;
 
     private String testName;
 
-    private static final String DEFAULT_MATCH_PATTERN = "(.*?)-(RC[0-9]+|SNAPSHOT|RC[0-9]+-SNAPSHOT)";
+    private static final Pattern DEFAULT_MATCH_PATTERN = Pattern.compile("(.*?)-(RC[0-9]+|SNAPSHOT|RC[0-9]+-SNAPSHOT)");
 
     protected static final String ALL_MAVEN_VERSIONS = "[2.0,)";
 
@@ -85,6 +64,10 @@ public abstract class AbstractMavenIntegrationTestCase {
     }
 
     protected AbstractMavenIntegrationTestCase(String versionRangeStr, String matchPattern) {
+        this(versionRangeStr, Pattern.compile(matchPattern));
+    }
+
+    protected AbstractMavenIntegrationTestCase(String versionRangeStr, Pattern matchPattern) {
         this.matchPattern = matchPattern;
 
         requiresMavenVersion(versionRangeStr);
@@ -97,12 +80,21 @@ public abstract class AbstractMavenIntegrationTestCase {
         }
     }
 
+    @BeforeEach
+    void setupContext(TestInfo testInfo) {
+        testName = testInfo.getTestMethod().get().getName();
+    }
+
+    protected String getName() {
+        return testName;
+    }
+
     /**
      * Gets the Java version used to run this test.
      *
      * @return The Java version, never <code>null</code>.
      */
-    private ArtifactVersion getJavaVersion() {
+    private static ArtifactVersion getJavaVersion() {
         if (javaVersion == null) {
             String version = System.getProperty("java.version");
             version = version.replaceAll("[_-]", ".");
@@ -153,95 +145,17 @@ public abstract class AbstractMavenIntegrationTestCase {
         try {
             versionRange = VersionRange.createFromVersionSpec(versionRangeStr);
         } catch (InvalidVersionSpecificationException e) {
-            throw (RuntimeException) new IllegalArgumentException("Invalid version range: " + versionRangeStr, e);
+            throw new IllegalArgumentException("Invalid version range: " + versionRangeStr, e);
         }
 
         ArtifactVersion version = getMavenVersion();
         if (version != null) {
             return versionRange.containsVersion(removePattern(version));
         } else {
-            out.println("WARNING: " + getITName() + ": version range '" + versionRange
+            out.println("WARNING: " + getName() + ": version range '" + versionRange
                     + "' supplied but no Maven version found - returning true for match check.");
 
             return true;
-        }
-    }
-
-    /**
-     * Can be called by version specific setUp calls
-     *
-     * @return
-     */
-    protected final boolean isSkipped() {
-        return skip;
-    }
-
-    protected void runTest() throws Throwable {
-        String testName = getTestName();
-
-        if (testName.startsWith("mng") || Character.isDigit(testName.charAt(0))) {
-            int mng = 4;
-            while (Character.isDigit(testName.charAt(mng))) {
-                mng++;
-            }
-            out.print(AnsiSupport.bold(testName.substring(0, mng)));
-            out.print(' ');
-            out.print(testName.substring(mng));
-        } else {
-            int index = testName.indexOf(' ');
-            if (index == -1) {
-                out.print(testName);
-            } else {
-                out.print(AnsiSupport.bold(testName.substring(0, index)));
-                out.print(testName.substring(index));
-            }
-            out.print('.');
-        }
-
-        out.print(pad(RESULT_COLUMN - testName.length()));
-        out.print(' ');
-
-        if (skip) {
-            out.println(AnsiSupport.warning("SKIPPED") + " - Maven version " + getMavenVersion() + " not in range "
-                    + versionRange);
-            return;
-        }
-
-        if ("true".equals(System.getProperty("useEmptyLocalRepository", "false"))) {
-            setupLocalRepo();
-        }
-
-        invert = null;
-        long milliseconds = System.currentTimeMillis();
-        try {
-            // TODO: JUNIT5
-            // super.runTest();
-            milliseconds = System.currentTimeMillis() - milliseconds;
-            if (invert != null) {
-                throw invert;
-            }
-            out.println(AnsiSupport.success("OK") + " " + formatTime(milliseconds));
-        } catch (UnsupportedJavaVersionException e) {
-            out.println(AnsiSupport.warning("SKIPPED") + " - Java version " + e.javaVersion + " not in range "
-                    + e.supportedRange);
-            return;
-        } catch (UnsupportedMavenVersionException e) {
-            out.println(AnsiSupport.warning("SKIPPED") + " - Maven version " + e.mavenVersion + " not in range "
-                    + e.supportedRange);
-            return;
-        } catch (BrokenMavenVersionException e) {
-            out.println(AnsiSupport.error("UNEXPECTED OK") + " - Maven version " + e.mavenVersion + " expected to fail "
-                    + formatTime(milliseconds));
-            fail("Expected failure when with Maven version " + e.mavenVersion);
-        } catch (Throwable t) {
-            milliseconds = System.currentTimeMillis() - milliseconds;
-            if (invert != null) {
-                out.println(AnsiSupport.success("EXPECTED FAIL") + " - Maven version " + invert.mavenVersion
-                        + " expected to fail " + formatTime(milliseconds));
-            } else {
-                out.println(AnsiSupport.error("FAILURE") + " " + formatTime(milliseconds));
-                throw t;
-            }
         }
     }
 
@@ -258,7 +172,7 @@ public abstract class AbstractMavenIntegrationTestCase {
         try {
             range = VersionRange.createFromVersionSpec(versionRange);
         } catch (InvalidVersionSpecificationException e) {
-            throw (RuntimeException) new IllegalArgumentException("Invalid version range: " + versionRange, e);
+            throw new IllegalArgumentException("Invalid version range: " + versionRange, e);
         }
 
         ArtifactVersion version = getJavaVersion();
@@ -280,7 +194,7 @@ public abstract class AbstractMavenIntegrationTestCase {
         try {
             range = VersionRange.createFromVersionSpec(versionRange);
         } catch (InvalidVersionSpecificationException e) {
-            throw (RuntimeException) new IllegalArgumentException("Invalid version range: " + versionRange, e);
+            throw new IllegalArgumentException("Invalid version range: " + versionRange, e);
         }
 
         ArtifactVersion version = getMavenVersion();
@@ -289,36 +203,8 @@ public abstract class AbstractMavenIntegrationTestCase {
                 throw new UnsupportedMavenVersionException(version, range);
             }
         } else {
-            out.println("WARNING: " + getITName() + ": version range '" + versionRange
+            out.println("WARNING: " + getName() + ": version range '" + versionRange
                     + "' supplied but no Maven version found - not skipping test.");
-        }
-    }
-
-    /**
-     * Inverts the execution of a test case for cases where we discovered a bug in the test case, have corrected the
-     * test case and shipped versions of Maven with a bug because of the faulty test case. This method allows the
-     * tests to continue passing against the historical releases as they historically would, as well as verifying that
-     * the test is no longer providing a false positive.
-     *
-     * @param versionRange
-     */
-    protected void failingMavenVersions(String versionRange) {
-        assertNull("Only call failingMavenVersions at most once per test", invert);
-        VersionRange range;
-        try {
-            range = VersionRange.createFromVersionSpec(versionRange);
-        } catch (InvalidVersionSpecificationException e) {
-            throw (RuntimeException) new IllegalArgumentException("Invalid version range: " + versionRange, e);
-        }
-
-        ArtifactVersion version = getMavenVersion();
-        if (version != null) {
-            if (range.containsVersion(removePattern(version))) {
-                invert = new BrokenMavenVersionException(version, range);
-            }
-        } else {
-            out.println("WARNING: " + getITName() + ": version range '" + versionRange
-                    + "' supplied but no Maven version found - not marking test as expected to fail.");
         }
     }
 
@@ -331,93 +217,22 @@ public abstract class AbstractMavenIntegrationTestCase {
         public void close() throws IOException {}
     }
 
-    private class UnsupportedJavaVersionException extends TestAbortedException {
-        @SuppressWarnings("checkstyle:visibilitymodifier")
-        public ArtifactVersion javaVersion;
-
-        @SuppressWarnings("checkstyle:visibilitymodifier")
-        public VersionRange supportedRange;
-
+    private static class UnsupportedJavaVersionException extends TestAbortedException {
         private UnsupportedJavaVersionException(ArtifactVersion javaVersion, VersionRange supportedRange) {
             super("Java version " + javaVersion + " not in range " + supportedRange);
-            this.javaVersion = javaVersion;
-            this.supportedRange = supportedRange;
         }
     }
 
-    private class UnsupportedMavenVersionException extends TestAbortedException {
-        @SuppressWarnings("checkstyle:visibilitymodifier")
-        public ArtifactVersion mavenVersion;
-
-        @SuppressWarnings("checkstyle:visibilitymodifier")
-        public VersionRange supportedRange;
-
+    private static class UnsupportedMavenVersionException extends TestAbortedException {
         private UnsupportedMavenVersionException(ArtifactVersion mavenVersion, VersionRange supportedRange) {
             super("Maven version " + mavenVersion + " not in range " + supportedRange);
-            this.mavenVersion = mavenVersion;
-            this.supportedRange = supportedRange;
         }
-    }
-
-    private class BrokenMavenVersionException extends RuntimeException {
-        @SuppressWarnings("checkstyle:visibilitymodifier")
-        public ArtifactVersion mavenVersion;
-
-        @SuppressWarnings("checkstyle:visibilitymodifier")
-        public VersionRange supportedRange;
-
-        private BrokenMavenVersionException(ArtifactVersion mavenVersion, VersionRange supportedRange) {
-            this.mavenVersion = mavenVersion;
-            this.supportedRange = supportedRange;
-        }
-    }
-
-    private String getITName() {
-        String simpleName = getClass().getName();
-        int idx = simpleName.lastIndexOf('.');
-        simpleName = idx >= 0 ? simpleName.substring(idx + 1) : simpleName;
-        simpleName = simpleName.startsWith("MavenIT") ? simpleName.substring("MavenIT".length()) : simpleName;
-        simpleName = simpleName.endsWith("Test") ? simpleName.substring(0, simpleName.length() - 4) : simpleName;
-        return simpleName;
-    }
-
-    private String getTestName() {
-        String className = getITName();
-        String methodName = getName();
-        if (methodName.startsWith("test")) {
-            methodName = methodName.substring(4);
-        }
-        return className + '.' + methodName + "()";
-    }
-
-    private String pad(int chars) {
-        StringBuilder buffer = new StringBuilder(128);
-        for (int i = 0; i < chars; i++) {
-            buffer.append('.');
-        }
-        return buffer.toString();
-    }
-
-    private String formatTime(long milliseconds) {
-        return SECS_FORMAT.format(milliseconds / 1000.0);
-    }
-
-    protected File setupLocalRepo() throws IOException {
-        String tempDirPath = System.getProperty("maven.it.tmpdir", System.getProperty("java.io.tmpdir"));
-        File localRepo = new File(tempDirPath, "local-repository/" + getITName());
-        if (localRepo.isDirectory()) {
-            FileUtils.deleteDirectory(localRepo);
-        }
-
-        System.setProperty("maven.repo.local", localRepo.getAbsolutePath());
-
-        return localRepo;
     }
 
     ArtifactVersion removePattern(ArtifactVersion version) {
         String v = version.toString();
 
-        Matcher m = Pattern.compile(matchPattern).matcher(v);
+        Matcher m = matchPattern.matcher(v);
 
         if (m.matches()) {
             return new DefaultArtifactVersion(m.group(1));
@@ -502,15 +317,6 @@ public abstract class AbstractMavenIntegrationTestCase {
         }
 
         return verifier;
-    }
-
-    @BeforeEach
-    void setupContext(TestInfo testInfo) {
-        testName = testInfo.getTestMethod().get().getName();
-    }
-
-    protected String getName() {
-        return testName;
     }
 
     public static void assertCanonicalFileEquals(String message, File expected, File actual) throws IOException {
