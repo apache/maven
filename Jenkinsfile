@@ -84,10 +84,20 @@ for (String os in runITsOses) {
                     // will not trample each other plus workaround for JENKINS-52657
                     dir(isUnix() ? 'test' : "c:\\mvn-it-${EXECUTOR_NUMBER}.tmp") {
                         def WORK_DIR=pwd()
-                        checkout([$class: 'GitSCM',
-                                branches: [[name: "*/master"]],
-                                extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
-                                userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])                        
+                        try {
+                          echo "Checkout ITs from branch: ${env.BRANCH_NAME}"
+                          checkout([$class: 'GitSCM',
+                                  branches: [[name: env.BRANCH_NAME]],
+                                  extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
+                                  userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])
+                        } catch (Throwable e) {
+                          echo "Failure checkout ITs branch: ${env.BRANCH_NAME} - fallback master branch"
+                          checkout([$class: 'GitSCM',
+                                  branches: [[name: "*/master"]],
+                                  extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
+                                  userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])
+                        }
+
                         if (isUnix()) {
                             sh "rm -rvf $WORK_DIR/dists $WORK_DIR/it-local-repo"
                         } else {
