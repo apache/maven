@@ -402,7 +402,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         mavenSession.getRequest().setRootDirectory(path);
 
         Object result = new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null)
-            .evaluate("${session.rootDirectory.uri}");
+                .evaluate("${session.rootDirectory.uri}");
         assertEquals(path.toUri(), result);
     }
 
@@ -415,7 +415,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         mavenSession.getRequest().setRootDirectory(path);
 
         Object result = new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null)
-            .evaluate("${session.rootDirectory/target}");
+                .evaluate("${session.rootDirectory/target}");
         assertEquals(path.resolve("target"), result);
     }
 
@@ -429,7 +429,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         DefaultModelBuildingRequest mbr = new DefaultModelBuildingRequest();
 
         PluginParameterExpressionEvaluatorV4 evaluator =
-            new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null);
+                new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null);
 
         DefaultPlexusConfiguration configuration = new DefaultPlexusConfiguration("config");
         configuration.addChild("uri", "${session.rootDirectory.uri}");
@@ -442,7 +442,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         new EnhancedComponentConfigurator().configureComponent(mojo, configuration, evaluator, null);
 
         assertEquals(
-            Objects.equals(path.toUri().toString(), path.toUri().toASCIIString()), !Os.isFamily(Os.FAMILY_WINDOWS));
+                Objects.equals(path.toUri().toString(), path.toUri().toASCIIString()), !Os.isFamily(Os.FAMILY_WINDOWS));
         assertEquals(mojo.uri, path.toUri());
         assertEquals(mojo.path, path);
         assertEquals(mojo.uriString, path.toUri().toString());
@@ -514,5 +514,4 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         String uriAsciiString;
         String pathString;
     }
-
 }

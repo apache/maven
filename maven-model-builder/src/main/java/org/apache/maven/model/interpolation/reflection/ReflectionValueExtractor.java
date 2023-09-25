@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.plugin;
+package org.apache.maven.model.interpolation.reflection;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -28,7 +28,7 @@ import java.util.WeakHashMap;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.plugin.MethodMap.AmbiguousException;
+import org.apache.maven.model.interpolation.reflection.MethodMap.AmbiguousException;
 
 /**
  * Using simple dotted expressions to extract the values from an Object instance using JSP-like expressions
@@ -37,7 +37,7 @@ import org.apache.maven.plugin.MethodMap.AmbiguousException;
  * In addition to usual getters using {@code getXxx} or {@code isXxx} suffixes, accessors
  * using {@code asXxx} or {@code toXxx} prefixes are also supported.
  */
-class ReflectionValueExtractor {
+public class ReflectionValueExtractor {
     private static final Object[] OBJECT_ARGS = new Object[0];
 
     /**
