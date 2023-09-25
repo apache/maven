@@ -36,7 +36,7 @@ public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenInt
     public MavenITmng5608ProfileActivationWarningTest() {
         // changed in https://issues.apache.org/jira/browse/MNG-7895
         // TODO - consider a separate test
-        super("(3.2.1,4.0.0-alpha-8)");
+        super("(3.2.1,3.9.4]");
     }
 
     @Test
