@@ -487,19 +487,6 @@ under the License.
   </dependencies>
   <!--bootstrap-end-comment-->
 
-  <repositories>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>maven-1991</id>
-      <url>https://repository.apache.org/content/repositories/maven-1991</url>
-    </repository>
-  </repositories>
-
   <build>
     <pluginManagement>
       <plugins>
