@@ -68,13 +68,34 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         buffer.append("Progress (").append(transfers.size()).append("): ");
 
         synchronized (transfers) {
+            FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+
             Iterator<Map.Entry<TransferResource, Long>> entries =
                     transfers.entrySet().iterator();
             while (entries.hasNext()) {
                 Map.Entry<TransferResource, Long> entry = entries.next();
                 long total = entry.getKey().getContentLength();
                 Long complete = entry.getValue();
-                buffer.append(getStatus(entry.getKey().getResourceName(), complete, total));
+
+                String resourceName = entry.getKey().getResourceName();
+
+                if (printResourceNames) {
+                    int idx = resourceName.lastIndexOf('/');
+
+                    if (idx < 0) {
+                        buffer.append(resourceName);
+                    } else {
+                        buffer.append(resourceName, idx + 1, resourceName.length());
+                    }
+                    buffer.append(" (");
+                }
+
+                buffer.append(format.formatProgress(complete, total));
+
+                if (printResourceNames) {
+                    buffer.append(")");
+                }
+
                 if (entries.hasNext()) {
                     buffer.append(" | ");
                 }
@@ -87,25 +108,6 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         buffer.append('\r');
         out.print(buffer);
         out.flush();
-    }
-
-    private String getStatus(String resourceName, long complete, long total) {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
-        StringBuilder status = new StringBuilder();
-
-        if (printResourceNames) {
-            int idx = resourceName.lastIndexOf('/');
-            status.append(idx < 0 ? resourceName : resourceName.substring(idx + 1));
-            status.append(" (");
-        }
-
-        status.append(format.formatProgress(complete, total));
-
-        if (printResourceNames) {
-            status.append(")");
-        }
-
-        return status.toString();
     }
 
     private void pad(StringBuilder buffer, int spaces) {
@@ -135,7 +137,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     private void overridePreviousTransfer(TransferEvent event) {
         if (lastLength > 0) {
-            StringBuilder buffer = new StringBuilder(128);
+            StringBuilder buffer = new StringBuilder(lastLength + 1);
             pad(buffer, lastLength);
             buffer.append('\r');
             out.print(buffer);
