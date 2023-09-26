@@ -400,10 +400,10 @@ public class MetadataGraph {
     // ------------------------------------------------------------------------
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(512);
         if (isEmpty()) {
             return "empty";
         }
+        StringBuilder sb = new StringBuilder(512);
         for (MetadataGraphVertex v : vertices) {
             sb.append("Vertex:  ").append(v.getMd().toString()).append('\n');
             List<MetadataGraphEdge> ins = getIncidentEdges(v);
