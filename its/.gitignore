@@ -15,3 +15,4 @@ jvz-*
 .checkstyle
 dependency-reduced-pom.xml
 .factorypath
+.java-version
