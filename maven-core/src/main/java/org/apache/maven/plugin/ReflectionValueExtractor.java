@@ -18,6 +18,8 @@
  */
 package org.apache.maven.plugin;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,7 +43,7 @@ class ReflectionValueExtractor {
      * This approach prevents permgen space overflows due to retention of discarded
      * classloaders.
      */
-    private static final Map<Class<?>, ClassMap> CLASS_MAPS = new WeakHashMap<>();
+    private static final Map<Class<?>, WeakReference<ClassMap>> CLASS_MAPS = new WeakHashMap<>();
 
     static final int EOF = -1;
 
@@ -285,12 +287,13 @@ class ReflectionValueExtractor {
     }
 
     private static ClassMap getClassMap(Class<?> clazz) {
-        ClassMap classMap = CLASS_MAPS.get(clazz);
+        Reference<ClassMap> ref = CLASS_MAPS.get(clazz);
+        ClassMap classMap = ref != null ? ref.get() : null;
 
         if (classMap == null) {
             classMap = new ClassMap(clazz);
 
-            CLASS_MAPS.put(clazz, classMap);
+            CLASS_MAPS.put(clazz, new WeakReference<>(classMap));
         }
 
         return classMap;
