@@ -814,4 +814,28 @@ class DefaultModelValidatorTest {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-basedir-expression.xml");
         assertViolations(result, 0, 0, 0);
     }
+
+    @Test
+    void profileActivationWithAllowedExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/profile-activation-file-with-allowed-expressions.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void profileActivationWithProjectExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/profile-activation-file-with-project-expressions.xml");
+        assertViolations(result, 0, 0, 2);
+
+        assertEquals(
+                "'profiles.profile[exists-project-version].activation.file.exists' "
+                        + "Failed to interpolate file location ${project.version}/test.txt: "
+                        + "${project.version} expressions are not supported during profile activation.",
+                result.getWarnings().get(0));
+
+        assertEquals(
+                "'profiles.profile[missing-project-version].activation.file.missing' "
+                        + "Failed to interpolate file location ${project.version}/test.txt: "
+                        + "${project.version} expressions are not supported during profile activation.",
+                result.getWarnings().get(1));
+    }
 }

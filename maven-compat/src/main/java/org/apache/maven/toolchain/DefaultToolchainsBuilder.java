@@ -51,7 +51,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
             }
 
         } else if (userToolchainsFile != null) {
-            logger.debug("Toolchains configuration was not found at " + userToolchainsFile);
+            logger.debug("Toolchains configuration was not found at {}", userToolchainsFile);
         }
 
         return toolchains;

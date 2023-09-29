@@ -16,33 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.lifecycle.providers.packaging;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.SuperPomProvider;
-import org.apache.maven.api.services.SuperPomProviderException;
-
-@Named
+/**
+ * {@code bom} packaging plugins bindings provider for {@code default} lifecycle.
+ */
+@Named("bom")
 @Singleton
-public class DefaultSuperPomProvider implements SuperPomProvider {
-
-    private final org.apache.maven.model.superpom.SuperPomProvider provider;
+public final class BomLifecycleMappingProvider extends AbstractLifecycleMappingProvider {
+    // START SNIPPET: bom
+    @SuppressWarnings("checkstyle:linelength")
+    private static final String[] BINDINGS = {
+        "install", "org.apache.maven.plugins:maven-install-plugin:" + INSTALL_PLUGIN_VERSION + ":install",
+        "deploy", "org.apache.maven.plugins:maven-deploy-plugin:" + DEPLOY_PLUGIN_VERSION + ":deploy"
+    };
+    // END SNIPPET: bom
 
     @Inject
-    public DefaultSuperPomProvider(org.apache.maven.model.superpom.SuperPomProvider provider) {
-        this.provider = provider;
-    }
-
-    @Override
-    public Model getSuperPom(String version) {
-        try {
-            return provider.getSuperModel(version).getDelegate();
-        } catch (IllegalStateException e) {
-            throw new SuperPomProviderException("Could not retrieve super pom " + version, e);
-        }
+    public BomLifecycleMappingProvider() {
+        super(BINDINGS);
     }
 }

@@ -16,33 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.artifact.handler.providers;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.SuperPomProvider;
-import org.apache.maven.api.services.SuperPomProviderException;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 
-@Named
+/**
+ * {@code bom} artifact handler provider.
+ */
+@Named("bom")
 @Singleton
-public class DefaultSuperPomProvider implements SuperPomProvider {
-
-    private final org.apache.maven.model.superpom.SuperPomProvider provider;
+public class BomArtifactHandlerProvider implements Provider<ArtifactHandler> {
+    private final ArtifactHandler artifactHandler;
 
     @Inject
-    public DefaultSuperPomProvider(org.apache.maven.model.superpom.SuperPomProvider provider) {
-        this.provider = provider;
+    public BomArtifactHandlerProvider() {
+        this.artifactHandler = new DefaultArtifactHandler("pom", null, null, null, null, false, "none", false);
     }
 
     @Override
-    public Model getSuperPom(String version) {
-        try {
-            return provider.getSuperModel(version).getDelegate();
-        } catch (IllegalStateException e) {
-            throw new SuperPomProviderException("Could not retrieve super pom " + version, e);
-        }
+    public ArtifactHandler get() {
+        return artifactHandler;
     }
 }

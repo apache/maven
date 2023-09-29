@@ -32,11 +32,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.stream.Collectors;
 
+import org.apache.maven.api.Repository;
 import org.apache.maven.api.feature.Features;
+import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.ModelBase;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -62,6 +68,10 @@ import org.eclipse.aether.installation.InstallRequest;
 @Singleton
 @Named("consumer-pom")
 public final class ConsumerPomArtifactTransformer {
+
+    private static final String BOM_PACKAGING = "bom";
+
+    public static final String POM_PACKAGING = "pom";
 
     private static final String CONSUMER_POM_CLASSIFIER = "consumer";
 
@@ -208,46 +218,67 @@ public final class ConsumerPomArtifactTransformer {
             Model consumer = null;
             String version;
 
-            // This is a bit of a hack, but all models are cached, so not sure why we'd need to parse it again
-            ModelCache cache = DefaultModelCache.newInstance(session);
-            Object modelData = cache.get(new FileModelSource(src.toFile()), "raw");
-            if (modelData != null) {
-                try {
-                    Method getModel = modelData.getClass().getMethod("getModel");
-                    getModel.setAccessible(true);
-                    org.apache.maven.model.Model cachedModel =
-                            (org.apache.maven.model.Model) getModel.invoke(modelData);
-                    consumer = cachedModel.getDelegate();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+            String packaging = model.getPackaging();
+            if (POM_PACKAGING.equals(packaging)) {
+                // This is a bit of a hack, but all models are cached, so not sure why we'd need to parse it again
+                ModelCache cache = DefaultModelCache.newInstance(session);
+                Object modelData = cache.get(new FileModelSource(src.toFile()), "raw");
+                if (modelData != null) {
+                    try {
+                        Method getModel = modelData.getClass().getMethod("getModel");
+                        getModel.setAccessible(true);
+                        org.apache.maven.model.Model cachedModel =
+                                (org.apache.maven.model.Model) getModel.invoke(modelData);
+                        consumer = cachedModel.getDelegate();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            }
 
-            if (consumer == null) {
-                TransformerContext context =
-                        (TransformerContext) session.getData().get(TransformerContext.KEY);
-                Result<? extends org.apache.maven.model.Model> result = modelBuilder.buildRawModel(
-                        src.toFile(), ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, false, context);
-                if (result.hasErrors()) {
-                    throw new IllegalStateException(
-                            "Unable to build POM " + src,
-                            result.getProblems().iterator().next().getException());
+                if (consumer == null) {
+                    TransformerContext context =
+                            (TransformerContext) session.getData().get(TransformerContext.KEY);
+                    Result<? extends org.apache.maven.model.Model> result = modelBuilder.buildRawModel(
+                            src.toFile(), ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, false, context);
+                    if (result.hasErrors()) {
+                        throw new IllegalStateException(
+                                "Unable to build POM " + src,
+                                result.getProblems().iterator().next().getException());
+                    }
+                    consumer = result.get().getDelegate();
                 }
-                consumer = result.get().getDelegate();
-            }
 
-            // raw to consumer transform
-            consumer = consumer.withRoot(false).withModules(null);
-            if (consumer.getParent() != null) {
-                consumer = consumer.withParent(consumer.getParent().withRelativePath(null));
-            }
+                // raw to consumer transform
+                consumer = consumer.withRoot(false).withModules(null);
+                if (consumer.getParent() != null) {
+                    consumer = consumer.withParent(consumer.getParent().withRelativePath(null));
+                }
 
-            if (!consumer.isPreserveModelVersion()) {
-                consumer = consumer.withPreserveModelVersion(false);
+                if (!consumer.isPreserveModelVersion()) {
+                    consumer = consumer.withPreserveModelVersion(false);
+                    version = new MavenModelVersion().getModelVersion(consumer);
+                    consumer = consumer.withModelVersion(version);
+                } else {
+                    version = consumer.getModelVersion();
+                }
+            } else {
+                Model.Builder builder = prune(
+                        Model.newBuilder(model, true)
+                                .preserveModelVersion(false)
+                                .root(false)
+                                .parent(null)
+                                .build(null),
+                        model);
+                boolean isBom = BOM_PACKAGING.equals(packaging);
+                if (isBom) {
+                    builder.packaging(POM_PACKAGING);
+                }
+                builder.profiles(model.getProfiles().stream()
+                        .map(p -> prune(Profile.newBuilder(p, true), p).build())
+                        .collect(Collectors.toList()));
+                consumer = builder.build();
                 version = new MavenModelVersion().getModelVersion(consumer);
                 consumer = consumer.withModelVersion(version);
-            } else {
-                version = consumer.getModelVersion();
             }
 
             try {
@@ -263,5 +294,27 @@ public final class ConsumerPomArtifactTransformer {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private static <T extends ModelBase.Builder> T prune(T builder, ModelBase model) {
+        builder.properties(null).reporting(null);
+        if (model.getDistributionManagement() != null
+                && model.getDistributionManagement().getRelocation() != null) {
+            // keep relocation only
+            builder.distributionManagement(DistributionManagement.newBuilder()
+                    .relocation(model.getDistributionManagement().getRelocation())
+                    .build());
+        }
+        // only keep repositories others than 'central'
+        builder.pluginRepositories(pruneRepositories(model.getPluginRepositories()));
+        builder.repositories(pruneRepositories(model.getRepositories()));
+        return builder;
+    }
+
+    private static List<org.apache.maven.api.model.Repository> pruneRepositories(
+            List<org.apache.maven.api.model.Repository> repositories) {
+        return repositories.stream()
+                .filter(r -> !Repository.CENTRAL_ID.equals(r.getId()))
+                .collect(Collectors.toList());
     }
 }

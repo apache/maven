@@ -174,7 +174,7 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                 int pathSeparator = expression.indexOf('/');
 
                 if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
+                    String pathExpression = expression.substring(0, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, session);
                     if (pathSeparator < expression.length() - 1) {
                         if (value instanceof Path) {
@@ -184,7 +184,7 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                         }
                     }
                 } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), session);
+                    value = ReflectionValueExtractor.evaluate(expression, session);
                 }
             } catch (Exception e) {
                 // TODO don't catch exception
@@ -206,7 +206,7 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                     value = ReflectionValueExtractor.evaluate(pathExpression, project);
                     value = value + expression.substring(pathSeparator);
                 } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), project);
+                    value = ReflectionValueExtractor.evaluate(expression, project);
                 }
             } catch (Exception e) {
                 // TODO don't catch exception
@@ -222,11 +222,11 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                 int pathSeparator = expression.indexOf('/');
 
                 if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
+                    String pathExpression = expression.substring(0, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, mojoExecution);
                     value = value + expression.substring(pathSeparator);
                 } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), mojoExecution);
+                    value = ReflectionValueExtractor.evaluate(expression, mojoExecution);
                 }
             } catch (Exception e) {
                 // TODO don't catch exception
@@ -242,11 +242,11 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                 PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
                 if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
+                    String pathExpression = expression.substring(0, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, pluginDescriptor);
                     value = value + expression.substring(pathSeparator);
                 } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), pluginDescriptor);
+                    value = ReflectionValueExtractor.evaluate(expression, pluginDescriptor);
                 }
             } catch (Exception e) {
                 throw new ExpressionEvaluationException(
@@ -259,11 +259,11 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                 int pathSeparator = expression.indexOf('/');
 
                 if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
+                    String pathExpression = expression.substring(0, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, session.getSettings());
                     value = value + expression.substring(pathSeparator);
                 } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), session.getSettings());
+                    value = ReflectionValueExtractor.evaluate(expression, session.getSettings());
                 }
             } catch (Exception e) {
                 // TODO don't catch exception

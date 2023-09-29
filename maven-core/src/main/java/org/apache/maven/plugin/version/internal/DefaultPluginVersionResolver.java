@@ -105,19 +105,29 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             if (result == null) {
                 result = resolveFromRepository(request);
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
-                            + " to " + result.getVersion() + " from repository " + result.getRepository());
-                }
+                logger.debug(
+                        "Resolved plugin version for {}:{} to {} from repository {}",
+                        request.getGroupId(),
+                        request.getArtifactId(),
+                        result.getVersion(),
+                        result.getRepository());
 
                 cache.putIfAbsent(key, result);
-            } else if (logger.isDebugEnabled()) {
-                logger.debug("Reusing cached resolved plugin version for " + request.getGroupId() + ":"
-                        + request.getArtifactId() + " to " + result.getVersion() + " from POM " + request.getPom());
+            } else {
+                logger.debug(
+                        "Reusing cached resolved plugin version for {}:{} to {} from POM {}",
+                        request.getGroupId(),
+                        request.getArtifactId(),
+                        result.getVersion(),
+                        request.getPom());
             }
-        } else if (logger.isDebugEnabled()) {
-            logger.debug("Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId() + " to "
-                    + result.getVersion() + " from POM " + request.getPom());
+        } else {
+            logger.debug(
+                    "Reusing cached resolved plugin version for {}:{} to {} from POM {}",
+                    request.getGroupId(),
+                    request.getArtifactId(),
+                    result.getVersion(),
+                    request.getPom());
         }
 
         return result;
@@ -242,7 +252,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             pluginDescriptor = pluginManager.getPluginDescriptor(
                     plugin, request.getRepositories(), request.getRepositorySession());
         } catch (PluginResolutionException e) {
-            logger.debug("Ignoring unresolvable plugin version " + version, e);
+            logger.debug("Ignoring unresolvable plugin version {}", version, e);
             return false;
         } catch (Exception e) {
             // ignore for now and delay failure to higher level processing
@@ -252,7 +262,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
         try {
             pluginManager.checkPrerequisites(pluginDescriptor);
         } catch (Exception e) {
-            logger.warn("Ignoring incompatible plugin version " + version, e);
+            logger.warn("Ignoring incompatible plugin version {}", version, e);
             return false;
         }
 

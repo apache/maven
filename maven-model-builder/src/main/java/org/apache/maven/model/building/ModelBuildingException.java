@@ -128,7 +128,8 @@ public class ModelBuildingException extends Exception {
         return null;
     }
 
-    private static String toMessage(String modelId, List<ModelProblem> problems) {
+    // Package protected for test
+    static String toMessage(String modelId, List<ModelProblem> problems) {
         StringWriter buffer = new StringWriter(1024);
 
         PrintWriter writer = new PrintWriter(buffer);
@@ -140,17 +141,17 @@ public class ModelBuildingException extends Exception {
             writer.print(" for ");
             writer.print(modelId);
         }
-        writer.println();
 
         for (ModelProblem problem : problems) {
-            writer.print("[");
+            writer.println();
+            writer.print("    - [");
             writer.print(problem.getSeverity());
             writer.print("] ");
             writer.print(problem.getMessage());
             String location = ModelProblemUtils.formatLocation(problem, modelId);
             if (!location.isEmpty()) {
                 writer.print(" @ ");
-                writer.println(location);
+                writer.print(location);
             }
         }
 

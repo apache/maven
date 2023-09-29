@@ -250,7 +250,7 @@ public class LifecycleDependencyResolver {
                         + " but seem to be part of the reactor:");
 
                 for (Dependency dependency : result.getUnresolvedDependencies()) {
-                    logger.warn("o " + dependency);
+                    logger.warn("o {}", dependency);
                 }
 
                 logger.warn("Try running the build up to the lifecycle phase \"package\"");
