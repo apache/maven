@@ -690,12 +690,22 @@ public class MavenCli {
 
         container.setLoggerManager(plexusLoggerManager);
 
+        AbstractValueSource extensionSource = new AbstractValueSource(false) {
+            @Override
+            public Object getValue(String expression) {
+                Object value = cliRequest.userProperties.getProperty(expression);
+                if (value == null) {
+                    value = cliRequest.systemProperties.getProperty(expression);
+                }
+                return value;
+            }
+        };
         for (CoreExtensionEntry extension : extensions) {
             container.discoverComponents(
                     extension.getClassRealm(),
                     new SessionScopeModule(container),
                     new MojoExecutionScopeModule(container),
-                    new ExtensionConfigurationModule(extension, cliRequest));
+                    new ExtensionConfigurationModule(extension, extensionSource));
         }
 
         customizeContainer(container);

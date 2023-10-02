@@ -27,18 +27,18 @@ import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 
 class ExtensionConfigurationModule implements Module {
 
     private final CoreExtensionEntry extension;
-    private final CliRequest cliRequest;
+    private final AbstractValueSource valueSource;
 
-    ExtensionConfigurationModule(CoreExtensionEntry extension, CliRequest cliRequest) {
+    ExtensionConfigurationModule(CoreExtensionEntry extension, AbstractValueSource valueSource) {
         this.extension = extension;
-        this.cliRequest = cliRequest;
+        this.valueSource = valueSource;
     }
 
     @Override
@@ -66,8 +66,7 @@ class ExtensionConfigurationModule implements Module {
             super(null);
             interpolator = new StringSearchInterpolator();
             interpolator.setCacheAnswers(true);
-            interpolator.addValueSource(new PropertiesBasedValueSource(cliRequest.userProperties));
-            interpolator.addValueSource(new PropertiesBasedValueSource(cliRequest.systemProperties));
+            interpolator.addValueSource(valueSource);
         }
 
         public XmlNode transform(XmlNode node) {
