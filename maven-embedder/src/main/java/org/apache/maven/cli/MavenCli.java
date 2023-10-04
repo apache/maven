@@ -360,11 +360,7 @@ public class MavenCli {
         // properties will be computed through the RootLocator found in the container.
         RootLocator rootLocator =
                 ServiceLoader.load(RootLocator.class).iterator().next();
-        Path rootDirectory = rootLocator.findRoot(topDirectory);
-        if (rootDirectory == null) {
-            System.err.println(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
-        }
-        cliRequest.rootDirectory = rootDirectory;
+        cliRequest.rootDirectory = rootLocator.findRoot(topDirectory);
 
         //
         // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
@@ -446,6 +442,10 @@ public class MavenCli {
                 System.out.println(CLIReportingUtils.showVersion());
             }
             throw new ExitException(0);
+        }
+
+        if (cliRequest.rootDirectory == null) {
+            slf4jLogger.debug(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
         }
     }
 
