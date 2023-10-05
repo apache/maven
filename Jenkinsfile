@@ -84,10 +84,21 @@ for (String os in runITsOses) {
                     // will not trample each other plus workaround for JENKINS-52657
                     dir(isUnix() ? 'test' : "c:\\mvn-it-${EXECUTOR_NUMBER}.tmp") {
                         def WORK_DIR=pwd()
-                        checkout([$class: 'GitSCM',
-                                branches: [[name: "*/master"]],
-                                extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
-                                userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])                        
+                        def ITS_BRANCH = env.CHANGE_BRANCH != null ? env.CHANGE_BRANCH :  env.BRANCH_NAME;
+                        try {
+                          echo "Checkout ITs from branch: ${ITS_BRANCH}"
+                          checkout([$class: 'GitSCM',
+                                  branches: [[name: ITS_BRANCH]],
+                                  extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
+                                  userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])
+                        } catch (Throwable e) {
+                          echo "Failure checkout ITs branch: ${ITS_BRANCH} - fallback maven-3.9.x branch"
+                          checkout([$class: 'GitSCM',
+                                  branches: [[name: "maven-3.9.x"]],
+                                  extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
+                                  userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])
+                        }
+
                         if (isUnix()) {
                             sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
                         } else {
