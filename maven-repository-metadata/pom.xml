@@ -99,8 +99,6 @@ under the License.
               </models>
               <templates>
                 <template>model-v3.vm</template>
-                <template>reader.vm</template>
-                <template>writer.vm</template>
               </templates>
             </configuration>
           </execution>
