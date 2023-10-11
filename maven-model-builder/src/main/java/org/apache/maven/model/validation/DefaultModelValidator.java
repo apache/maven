@@ -228,7 +228,8 @@ public class DefaultModelValidator
 
     private void validate30RawProfileActivation( ModelProblemCollector problems, Activation activation, String prefix )
     {
-        if ( activation == null || activation.getFile() == null ) {
+        if ( activation == null || activation.getFile() == null )
+        {
             return;
         }
 
@@ -247,7 +248,8 @@ public class DefaultModelValidator
             path = file.getMissing();
             location = "missing";
         }
-        else {
+        else
+        {
             return;
         }
 
