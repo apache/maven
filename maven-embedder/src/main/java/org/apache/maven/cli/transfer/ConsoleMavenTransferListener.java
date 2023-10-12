@@ -36,6 +36,7 @@ import org.eclipse.aether.transfer.TransferResource;
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
     private Map<TransferResource, Long> transfers = Collections.synchronizedMap(new LinkedHashMap<>());
+    private FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH); // use in a synchronized fashion
 
     private boolean printResourceNames;
     private int lastLength;
@@ -68,8 +69,6 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         buffer.append("Progress (").append(transfers.size()).append("): ");
 
         synchronized (transfers) {
-            FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
-
             Iterator<Map.Entry<TransferResource, Long>> entries =
                     transfers.entrySet().iterator();
             while (entries.hasNext()) {
