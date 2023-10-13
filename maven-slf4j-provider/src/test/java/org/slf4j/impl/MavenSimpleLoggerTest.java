@@ -24,6 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.apache.maven.cli.jline.MessageUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
@@ -31,6 +34,19 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 
 class MavenSimpleLoggerTest {
+
+    boolean colorEnabled;
+
+    @BeforeEach
+    void setup() {
+        colorEnabled = MessageUtils.isColorEnabled();
+        MessageUtils.setColorEnabled(false);
+    }
+
+    @AfterEach
+    void taerdown() {
+        MessageUtils.setColorEnabled(colorEnabled);
+    }
 
     @Test
     void includesCauseAndSuppressedExceptionsWhenWritingThrowables(TestInfo testInfo) throws Exception {

@@ -22,7 +22,7 @@ import java.io.PrintStream;
 
 import org.apache.maven.api.services.MessageBuilder;
 
-import static org.apache.maven.cli.jansi.MessageUtils.builder;
+import static org.apache.maven.cli.jline.MessageUtils.builder;
 
 /**
  * Logger for Maven, that support colorization of levels and stacktraces. This class implements 2 methods introduced in

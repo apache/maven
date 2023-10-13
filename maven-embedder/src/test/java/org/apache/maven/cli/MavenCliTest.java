@@ -35,7 +35,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
-import org.apache.maven.cli.jansi.MessageUtils;
+import org.apache.maven.cli.jline.MessageUtils;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
@@ -500,7 +500,7 @@ class MavenCliTest {
         String versionOut = new String(systemOut.toByteArray(), StandardCharsets.UTF_8);
 
         // then
-        assertEquals(MessageUtils.stripAnsiCodes(versionOut), versionOut);
+        assertEquals(stripAnsiCodes(versionOut), versionOut);
     }
 
     @Test
@@ -674,5 +674,9 @@ class MavenCliTest {
         project.setGroupId(groupId);
         project.setArtifactId(artifactId);
         return project;
+    }
+
+    static String stripAnsiCodes(String msg) {
+        return msg.replaceAll("\u001b\\[[;\\d]*[ -/]*[@-~]", "");
     }
 }

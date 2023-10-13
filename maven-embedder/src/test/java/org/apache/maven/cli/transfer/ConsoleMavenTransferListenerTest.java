@@ -26,6 +26,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.maven.cli.jline.JLineMessageBuilderFactory;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -48,6 +49,7 @@ class ConsoleMavenTransferListenerTest {
         Map<String, String> output = new ConcurrentHashMap<String, String>();
 
         ConsoleMavenTransferListener listener = new ConsoleMavenTransferListener(
+                new JLineMessageBuilderFactory(),
                 new PrintStream(System.out) {
 
                     @Override

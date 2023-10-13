@@ -58,8 +58,8 @@ import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
 import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
-import org.apache.maven.cli.jansi.JansiMessageBuilderFactory;
-import org.apache.maven.cli.jansi.MessageUtils;
+import org.apache.maven.cli.jline.JLineMessageBuilderFactory;
+import org.apache.maven.cli.jline.MessageUtils;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
@@ -188,7 +188,7 @@ public class MavenCli {
     // This supports painless invocation by the Verifier during embedded execution of the core ITs
     public MavenCli(ClassWorld classWorld) {
         this.classWorld = classWorld;
-        this.messageBuilderFactory = new JansiMessageBuilderFactory();
+        this.messageBuilderFactory = new JLineMessageBuilderFactory();
     }
 
     public static void main(String[] args) {
@@ -1676,7 +1676,7 @@ public class MavenCli {
     //
 
     protected TransferListener getConsoleTransferListener(boolean printResourceNames) {
-        return new ConsoleMavenTransferListener(System.out, printResourceNames);
+        return new ConsoleMavenTransferListener(messageBuilderFactory, System.out, printResourceNames);
     }
 
     protected TransferListener getBatchTransferListener() {
