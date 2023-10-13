@@ -18,29 +18,32 @@
  */
 package org.apache.maven.settings.io.xpp3;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.stream.StreamSource;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.v4.SettingsStaxReader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+/**
+ * @deprecated Maven 3 compatability - please use {@code org.apache.maven.api.services.xml.SettingsXmlFactory} from {@code maven-api-core}
+ * or {@link SettingsStaxReader}
+ */
 @Deprecated
 public class SettingsXpp3Reader {
-    private boolean addDefaultEntities = true;
 
-    private final ContentTransformer contentTransformer;
+    private final SettingsStaxReader delegate;
 
     public SettingsXpp3Reader() {
-        this((source, fieldName) -> source);
+        delegate = new SettingsStaxReader();
     }
 
     public SettingsXpp3Reader(ContentTransformer contentTransformer) {
-        this.contentTransformer = contentTransformer;
+        delegate = new SettingsStaxReader(contentTransformer::transform);
     }
 
     /**
@@ -49,89 +52,8 @@ public class SettingsXpp3Reader {
      * @return boolean
      */
     public boolean getAddDefaultEntities() {
-        return addDefaultEntities;
-    } // -- boolean getAddDefaultEntities()
-
-    /**
-     * @param reader a reader object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XMLStreamException XMLStreamException if
-     * any.
-     * @return Settings
-     */
-    public Settings read(Reader reader, boolean strict) throws IOException, XMLStreamException {
-        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
-        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-        XMLStreamReader parser = null;
-        try {
-            parser = factory.createXMLStreamReader(reader);
-        } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
-        return read(parser, strict);
-    } // -- Model read( Reader, boolean )
-
-    /**
-     * @param reader a reader object.
-     * @throws IOException IOException if any.
-     * @throws XMLStreamException XMLStreamException if
-     * any.
-     * @return Model
-     */
-    public Settings read(Reader reader) throws IOException, XMLStreamException {
-        return read(reader, true);
-    } // -- Model read( Reader )
-
-    /**
-     * Method read.
-     *
-     * @param in a in object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XMLStreamException XMLStreamException if
-     * any.
-     * @return Settings
-     */
-    public Settings read(InputStream in, boolean strict) throws IOException, XMLStreamException {
-        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
-        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-        StreamSource streamSource = new StreamSource(in, null);
-        XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
-        return read(parser, strict);
-    } // -- Model read( InputStream, boolean )
-
-    /**
-     * Method read.
-     *
-     * @param in a in object.
-     * @throws IOException IOException if any.
-     * @throws XMLStreamException XMLStreamException if
-     * any.
-     * @return Settings
-     */
-    public Settings read(InputStream in) throws IOException, XMLStreamException {
-        return read(in, true);
-    } // -- Model read( InputStream )
-
-    /**
-     * Method read.
-     *
-     * @param parser a parser object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XMLStreamException XMLStreamException if
-     * any.
-     * @return Settings
-     */
-    public Settings read(XMLStreamReader parser, boolean strict) throws IOException, XMLStreamException {
-        org.apache.maven.settings.v4.SettingsXpp3Reader reader = contentTransformer != null
-                ? new org.apache.maven.settings.v4.SettingsXpp3Reader(contentTransformer::transform)
-                : new org.apache.maven.settings.v4.SettingsXpp3Reader();
-        reader.setAddDefaultEntities(addDefaultEntities);
-        org.apache.maven.api.settings.Settings settings = reader.read(parser, strict);
-        return new Settings(settings);
-    } // -- Model read( XMLStreamReader, boolean )
+        return delegate.getAddDefaultEntities();
+    }
 
     /**
      * Sets the state of the "add default entities" flag.
@@ -139,8 +61,92 @@ public class SettingsXpp3Reader {
      * @param addDefaultEntities a addDefaultEntities object.
      */
     public void setAddDefaultEntities(boolean addDefaultEntities) {
-        this.addDefaultEntities = addDefaultEntities;
-    } // -- void setAddDefaultEntities( boolean )
+        delegate.setAddDefaultEntities(addDefaultEntities);
+    }
+
+    /**
+     * @param reader a reader object.
+     * @param strict a strict object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return Settings
+     */
+    public Settings read(Reader reader, boolean strict) throws IOException, XmlPullParserException {
+        try {
+            return new Settings(delegate.read(reader, strict, null));
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
+
+    /**
+     * @param reader a reader object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return Model
+     */
+    public Settings read(Reader reader) throws IOException, XmlPullParserException {
+        try {
+            return new Settings(delegate.read(reader));
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
+
+    /**
+     * Method read.
+     *
+     * @param in a in object.
+     * @param strict a strict object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return Settings
+     */
+    public Settings read(InputStream in, boolean strict) throws IOException, XmlPullParserException {
+        try {
+            return new Settings(delegate.read(in, strict, null));
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
+
+    /**
+     * Method read.
+     *
+     * @param in a in object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return Settings
+     */
+    public Settings read(InputStream in) throws IOException, XmlPullParserException {
+        try {
+            return new Settings(delegate.read(in));
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
+
+    /**
+     * Method read.
+     *
+     * @param parser a parser object.
+     * @param strict a strict object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return Settings
+     */
+    public Settings read(XMLStreamReader parser, boolean strict) throws IOException, XmlPullParserException {
+        try {
+            return new Settings(delegate.read(parser, strict, null));
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
 
     public interface ContentTransformer {
         /**
