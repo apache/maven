@@ -42,7 +42,7 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          java-version: 8
+          java-version: 11
           distribution: 'temurin'
           cache: 'maven'
 
@@ -61,7 +61,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [8, 11, 17]
+        java: [11, 17, 21]
 
       fail-fast: false
     runs-on: ${{ matrix.os }}
