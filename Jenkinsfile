@@ -58,9 +58,6 @@ node(jenkinsEnv.nodeSelection(osNode)) {
             } finally {
                 junit testResults: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml', allowEmptyResults: true
             }    
-            dir ('apache-maven/target') {
-                stash includes: 'apache-maven-bin.zip', name: 'maven-dist'
-            }
         }
     }
 }
@@ -84,6 +81,14 @@ for (String os in runITsOses) {
                     // will not trample each other plus workaround for JENKINS-52657
                     dir(isUnix() ? 'test' : "c:\\mvn-it-${EXECUTOR_NUMBER}.tmp") {
                         def WORK_DIR=pwd()
+                        dir ('maven') {
+                            checkout scm
+                            withEnv(["JAVA_HOME=${ tool "$jdkName" }",
+                                     "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
+                                     "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
+                                sh "mvn clean install -B -U -e -DskipTests -V -PversionlessMavenDist -Dmaven.repo.local=${WORK_DIR}/.repository"
+                            }
+                        }
                         def ITS_BRANCH = env.CHANGE_BRANCH != null ? env.CHANGE_BRANCH :  env.BRANCH_NAME;
                         try {
                           echo "Checkout ITs from branch: ${ITS_BRANCH}"
@@ -99,15 +104,6 @@ for (String os in runITsOses) {
                                   userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])
                         }
 
-                        if (isUnix()) {
-                            sh "rm -rvf $WORK_DIR/dists $WORK_DIR/it-local-repo"
-                        } else {
-                            bat "if exist it-local-repo rmdir /s /q it-local-repo"
-                            bat "if exist dists         rmdir /s /q dists"
-                        }
-                        dir('dists') {
-                          unstash 'maven-dist'
-                        }
                         try {
                             withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
