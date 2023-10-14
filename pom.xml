@@ -161,7 +161,7 @@ under the License.
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <resolverVersion>1.9.16</resolverVersion>
+    <resolverVersion>2.0.0-SNAPSHOT</resolverVersion>
     <sisuVersion>0.9.0.M2</sisuVersion>
     <asmVersion>9.5</asmVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
