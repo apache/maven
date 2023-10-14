@@ -18,8 +18,10 @@
  */
 package org.apache.maven.model.interpolation;
 
+import static java.util.Collections.emptyList;
+
 public class StringVisitorModelInterpolatorTest extends AbstractModelInterpolatorTest {
     protected ModelInterpolator createInterpolator() {
-        return new StringVisitorModelInterpolator(null, null, bd -> true);
+        return new StringVisitorModelInterpolator(null, null, bd -> true, emptyList());
     }
 }

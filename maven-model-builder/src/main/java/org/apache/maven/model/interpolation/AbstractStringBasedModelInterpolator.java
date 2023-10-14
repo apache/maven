@@ -79,15 +79,19 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
 
     private final PathTranslator pathTranslator;
     private final UrlNormalizer urlNormalizer;
-
     private final RootLocator rootLocator;
+    private final List<ValueSource> customValueSources;
 
     @Inject
     public AbstractStringBasedModelInterpolator(
-            PathTranslator pathTranslator, UrlNormalizer urlNormalizer, RootLocator rootLocator) {
+            PathTranslator pathTranslator,
+            UrlNormalizer urlNormalizer,
+            RootLocator rootLocator,
+            List<ValueSource> customValueSources) {
         this.pathTranslator = pathTranslator;
         this.urlNormalizer = urlNormalizer;
         this.rootLocator = rootLocator;
+        this.customValueSources = customValueSources;
     }
 
     @Override
@@ -199,6 +203,11 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
         });
 
         valueSources.add(prefixlessObjectBasedValueSource);
+
+        // don't override default behavior so append it
+        if (customValueSources != null && !customValueSources.isEmpty()) {
+            valueSources.addAll(customValueSources);
+        }
 
         return valueSources;
     }
