@@ -143,6 +143,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
             project.setPluginArtifactRepositories(request.getPluginArtifactRepositories());
             projects.add(project);
         }
+
         
         initRepoSession(configuration);
 
