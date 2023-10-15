@@ -144,6 +144,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
             projects.add(project);
         }
 
+        
         initRepoSession(configuration);
 
         MavenSession session = new MavenSession(
