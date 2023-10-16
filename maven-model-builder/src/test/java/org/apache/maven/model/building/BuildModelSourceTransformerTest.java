@@ -24,6 +24,7 @@ import java.beans.PropertyDescriptor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.maven.model.Model;
@@ -136,6 +137,10 @@ public class BuildModelSourceTransformerTest {
             }
             BeanInfo bean = Introspector.getBeanInfo(m1.getClass());
             for (PropertyDescriptor prop : bean.getPropertyDescriptors()) {
+                if (("first".equals(prop.getName()) || "last".equals(prop.getName()))
+                        && List.class.equals(prop.getReadMethod().getDeclaringClass())) {
+                    continue;
+                }
                 Object p1 = prop.getReadMethod().invoke(m1);
                 Object p2 = prop.getReadMethod().invoke(m2);
                 if (!equalsDeep(p1, p2)) {

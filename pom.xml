@@ -151,7 +151,7 @@ under the License.
     <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsIoVersion>2.11.0</commonsIoVersion>
     <junitVersion>5.10.0</junitVersion>
-    <mockitoVersion>4.11.0</mockitoVersion>
+    <mockitoVersion>5.2.0</mockitoVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusXmlVersion>4.0.1</plexusXmlVersion>
     <guiceVersion>5.1.0</guiceVersion>
@@ -468,6 +468,11 @@ under the License.
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy</artifactId>
+        <version>1.14.9</version>
+      </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
   </dependencyManagement>
@@ -490,6 +495,38 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
+        <!-- Remove when Parent 41 used -->
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>2.40.0</version>
+          <configuration>
+            <java>
+              <!-- orders of used formatters are important MPOM-376 -->
+              <!-- eg. palantir override importOrder, so should be first -->
+              <palantirJavaFormat>
+                <version>2.38.0</version>
+              </palantirJavaFormat>
+              <removeUnusedImports />
+              <importOrder>
+                <file>config/maven-eclipse-importorder.txt</file>
+              </importOrder>
+              <licenseHeader>
+                <file>config/maven-header-plain.txt</file>
+              </licenseHeader>
+            </java>
+            <pom>
+              <sortPom>
+                <expandEmptyElements>false</expandEmptyElements>
+                <!-- https://issues.apache.org/jira/browse/MRELEASE-1111 -->
+                <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
+              </sortPom>
+            </pom>
+            <upToDateChecking>
+              <enabled>true</enabled>
+            </upToDateChecking>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
@@ -638,6 +675,26 @@ under the License.
                   </excludes>
                   <message>ensure no more org.sonatype.plexus:plexus-cipher and org.sonatype.plexus:plexus-sec-dispatcher.</message>
                 </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+          <execution>
+            <id>enforce-bytecode-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[11,)</version>
+                </requireJavaVersion>
+                <enforceBytecodeVersion>
+                  <maxJdkVersion>${maven.compiler.target}</maxJdkVersion>
+                  <ignoredScopes>
+                    <ignoredScope>test</ignoredScope>
+                  </ignoredScopes>
+                </enforceBytecodeVersion>
               </rules>
               <fail>true</fail>
             </configuration>
