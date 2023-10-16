@@ -65,7 +65,7 @@ class MavenModelVersionTest {
     }
 
     @Test
-    void testV4V4ModelPriority() {
+    void testV4ModelPriority() {
         Model m = model.withBuild(Build.newInstance()
                 .withPlugins(Collections.singleton(Plugin.newInstance()
                         .withExecutions(Collections.singleton(
