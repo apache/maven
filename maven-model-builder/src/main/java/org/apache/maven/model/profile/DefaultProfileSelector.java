@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -47,7 +46,7 @@ public class DefaultProfileSelector implements ProfileSelector {
     private final List<ProfileActivator> activators;
 
     public DefaultProfileSelector() {
-        this.activators = Collections.emptyList();
+        this.activators = new ArrayList<>();
     }
 
     @Inject
