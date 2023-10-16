@@ -123,6 +123,15 @@ public class ${className} {
                     #end
                 #end
             #end
+            #if ( $class.superClass )
+                #if ( $classToFields.containsKey( $model.getClass( $class.superClass, $class.versionRange ) ) )
+                    #set ( $fields = $classToFields.get( $class ) )
+                    #if ( ! $fields )
+                        #set ( $fields = $LinkedHashSet.newInstance() )
+                        #set ( $dummy = $classToFields.put( $class, $fields ) )
+                    #end
+                #end
+            #end
         #end
     #end
     #foreach ( $class in $classToFields.keySet() )
@@ -131,7 +140,7 @@ public class ${className} {
         return ${var} != null && (
         #set ( $pfx = "  " )
         #if ( $class.superClass )
-            #if ( $classToFields.containsKey( $model.getClass( $class.superClass, $version ) ) )
+            #if ( $classToFields.containsKey( $model.getClass( $class.superClass, $class.versionRange ) ) )
             $pfx is_${v}((${class.superClass}) ${var})
                 #set ( $pfx = "||" )
             #end
