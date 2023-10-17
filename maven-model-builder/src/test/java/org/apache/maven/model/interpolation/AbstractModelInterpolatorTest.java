@@ -332,6 +332,30 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
+    void testRootDirectoryWithUri() throws Exception {
+        Path rootDirectory = Paths.get("myRootDirectory");
+
+        Model model = Model.newBuilder()
+                .version("3.8.1")
+                .artifactId("foo")
+                .repositories(Collections.singletonList(Repository.newBuilder()
+                        .url("${project.rootDirectory.uri}/temp-repo")
+                        .build()))
+                .build();
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model, rootDirectory.toFile(), createModelBuildingRequest(context), collector);
+        assertProblemFree(collector);
+
+        assertEquals(
+                rootDirectory.resolve("temp-repo").toUri().toString(),
+                (out.getRepositories().get(0)).getUrl());
+    }
+
+    @Test
     void testRootDirectoryWithNull() throws Exception {
         Model model = Model.newBuilder()
                 .version("3.8.1")
