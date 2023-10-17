@@ -18,6 +18,8 @@
  */
 package org.apache.maven.cli;
 
+import java.util.Arrays;
+
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
@@ -28,17 +30,17 @@ import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
+import org.codehaus.plexus.interpolation.ValueSource;
 
-class ExtensionConfigurationModule implements Module {
+public class ExtensionConfigurationModule implements Module {
 
     private final CoreExtensionEntry extension;
-    private final CliRequest cliRequest;
+    private final Iterable<ValueSource> valueSources;
 
-    ExtensionConfigurationModule(CoreExtensionEntry extension, CliRequest cliRequest) {
+    public ExtensionConfigurationModule(CoreExtensionEntry extension, ValueSource... valueSources) {
         this.extension = extension;
-        this.cliRequest = cliRequest;
+        this.valueSources = Arrays.asList(valueSources);
     }
 
     @Override
@@ -66,8 +68,7 @@ class ExtensionConfigurationModule implements Module {
             super(null);
             interpolator = new StringSearchInterpolator();
             interpolator.setCacheAnswers(true);
-            interpolator.addValueSource(new PropertiesBasedValueSource(cliRequest.userProperties));
-            interpolator.addValueSource(new PropertiesBasedValueSource(cliRequest.systemProperties));
+            valueSources.forEach(interpolator::addValueSource);
         }
 
         public XmlNode transform(XmlNode node) {
