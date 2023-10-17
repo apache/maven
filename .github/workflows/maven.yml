@@ -74,7 +74,7 @@ jobs:
         run: |
           set +e
           repo=maven-integration-testing
-          target_branch=master
+          target_branch=maven-3.9.x
           target_user=apache
           if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
             user=${PR_HEAD_LABEL%:*}
