@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -66,6 +67,9 @@ import org.apache.maven.model.v4.MavenModelVersion;
 @Named
 @Singleton
 public class DefaultModelValidator implements ModelValidator {
+
+    public static final List<String> VALID_MODEL_VERSIONS =
+            Collections.unmodifiableList(Arrays.asList("4.0.0", "4.1.0"));
 
     private static final Pattern EXPRESSION_NAME_PATTERN = Pattern.compile("\\$\\{(.+?)}");
     private static final Pattern EXPRESSION_PROJECT_NAME_PATTERN = Pattern.compile("\\$\\{(project.+?)}");
@@ -147,7 +151,7 @@ public class DefaultModelValidator implements ModelValidator {
             // The file pom may not contain the modelVersion yet, as it may be set later by the
             // ModelVersionXMLFilter.
             if (m.getModelVersion() != null && !m.getModelVersion().isEmpty()) {
-                validateModelVersion(problems, m.getModelVersion(), m, "4.0.0", "4.1.0");
+                validateModelVersion(problems, m.getModelVersion(), m, VALID_MODEL_VERSIONS);
             }
 
             validateStringNoExpression("groupId", problems, Severity.WARNING, Version.V20, m.getGroupId(), m);
@@ -261,7 +265,7 @@ public class DefaultModelValidator implements ModelValidator {
         // models without a version starting with 3.4.
         validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m);
 
-        validateModelVersion(problems, m.getModelVersion(), m, "4.0.0", "4.1.0");
+        validateModelVersion(problems, m.getModelVersion(), m, VALID_MODEL_VERSIONS);
 
         String minVersion = new MavenModelVersion().getModelVersion(m);
         if (m.getModelVersion() != null && compareModelVersions(minVersion, m.getModelVersion()) > 0) {
@@ -1478,14 +1482,12 @@ public class DefaultModelValidator implements ModelValidator {
 
     @SuppressWarnings("checkstyle:parameternumber")
     private boolean validateModelVersion(
-            ModelProblemCollector problems, String string, InputLocationTracker tracker, String... validVersions) {
+            ModelProblemCollector problems, String string, InputLocationTracker tracker, List<String> validVersions) {
         if (string == null || string.length() <= 0) {
             return true;
         }
 
-        List<String> values = Arrays.asList(validVersions);
-
-        if (values.contains(string)) {
+        if (validVersions.contains(string)) {
             return true;
         }
 
@@ -1504,8 +1506,8 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + string + "' is newer than the versions supported by this version of Maven: " + values
-                            + ". Building this project requires a newer version of Maven.",
+                    "of '" + string + "' is newer than the versions supported by this version of Maven: "
+                            + validVersions + ". Building this project requires a newer version of Maven.",
                     tracker);
 
         } else if (olderThanAll) {
@@ -1516,8 +1518,8 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + string + "' is older than the versions supported by this version of Maven: " + values
-                            + ". Building this project requires an older version of Maven.",
+                    "of '" + string + "' is older than the versions supported by this version of Maven: "
+                            + validVersions + ". Building this project requires an older version of Maven.",
                     tracker);
 
         } else {
@@ -1527,7 +1529,7 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "must be one of " + values + " but is '" + string + "'.",
+                    "must be one of " + validVersions + " but is '" + string + "'.",
                     tracker);
         }
 
