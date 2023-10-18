@@ -123,7 +123,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         verifier.deleteArtifacts("org.apache.maven.its.mng0553");
         verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
         verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
-        setUserHome(verifier, new File(testDir, "userhome"));
+        ItUtils.setUserHome(verifier, new File(testDir, "userhome"));
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -186,7 +186,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        setUserHome(verifier, new File(testDir, "userhome"));
+        ItUtils.setUserHome(verifier, new File(testDir, "userhome"));
         verifier.addCliArgument("--encrypt-master-password");
         verifier.addCliArgument("test");
         verifier.setLogFileName("log-emp.txt");
@@ -199,7 +199,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
 
         verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        setUserHome(verifier, new File(testDir, "userhome"));
+        ItUtils.setUserHome(verifier, new File(testDir, "userhome"));
         verifier.addCliArgument("--encrypt-password");
         verifier.addCliArgument("testpass");
         verifier.setLogFileName("log-ep.txt");
@@ -219,15 +219,5 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         }
 
         return null;
-    }
-
-    private void setUserHome(Verifier verifier, File home) {
-        // NOTE: We set the user.home directory instead of say settings.security to reflect Maven's normal behavior
-        String path = home.getAbsolutePath();
-        if (path.indexOf(' ') < 0) {
-            verifier.setEnvironmentVariable("MAVEN_OPTS", "-Duser.home=" + path);
-        } else {
-            verifier.setEnvironmentVariable("MAVEN_OPTS", "\"-Duser.home=" + path + "\"");
-        }
     }
 }

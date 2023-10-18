@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.Verifier;
@@ -26,19 +27,22 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
- * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6326">MNG-6326</a>:
- * check that Maven fails if it cannot load core extensions contributed by <code>.mvn/extensions.xml</code>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-7772">MNG-7772</a>:
+ * check that Maven fails if it cannot load core extensions contributed by <code>${user.home}/.m2/extensions.xml</code>.
  */
-public class MavenITmng6326CoreExtensionsNotFoundTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng6326CoreExtensionsNotFoundTest() {
-        super("[3.8.5,)");
+public class MavenITmng7772CoreExtensionsNotFoundTest extends AbstractMavenIntegrationTestCase {
+
+    public MavenITmng7772CoreExtensionsNotFoundTest() {
+        super("(4.0.0-alpha-7,)");
     }
 
     @Test
     public void testCoreExtensionsNotFound() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6326-core-extensions-not-found");
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7772-core-extensions-not-found");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        ItUtils.setUserHome(verifier, Paths.get(testDir.toPath().toString(), "home"));
+
         try {
             verifier.addCliArgument("validate");
             verifier.execute();

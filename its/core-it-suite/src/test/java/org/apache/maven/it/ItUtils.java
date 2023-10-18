@@ -18,10 +18,17 @@
  */
 package org.apache.maven.it;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+
+import org.apache.maven.shared.verifier.Verifier;
 
 /**
  * @author Benjamin Bentmann
@@ -55,5 +62,32 @@ class ItUtils {
         }
 
         return hash.toString();
+    }
+
+    public static String getLogContent(Verifier verifier) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Files.copy(Paths.get(verifier.getBasedir(), verifier.getLogFileName()), baos);
+        return baos.toString();
+    }
+
+    /**
+     * @see ItUtils#setUserHome(Verifier, Path)
+     */
+    public static void setUserHome(Verifier verifier, File file) {
+        setUserHome(verifier, file.toPath());
+    }
+
+    /**
+     * Note that this only has effect when fork mode is set to true.
+     * Please make sure to call {@link Verifier#setForkJvm(boolean)} and set it to true
+     */
+    public static void setUserHome(Verifier verifier, Path home) {
+        // NOTE: We set the user.home directory instead of say settings.security to reflect Maven's normal behavior
+        String path = home.toAbsolutePath().toString();
+        if (path.indexOf(' ') < 0) {
+            verifier.setEnvironmentVariable("MAVEN_OPTS", "-Duser.home=" + path);
+        } else {
+            verifier.setEnvironmentVariable("MAVEN_OPTS", "\"-Duser.home=" + path + "\"");
+        }
     }
 }
