@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.testing;
+package org.apache.maven.plugin.testing.junit5;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,23 +39,23 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.inject.internal.ProviderMethodsModule;
-import org.apache.maven.api.MojoExecution;
-import org.apache.maven.api.Project;
-import org.apache.maven.api.Session;
-import org.apache.maven.api.plugin.Log;
-import org.apache.maven.api.plugin.Mojo;
-import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.configuration.internal.EnhancedComponentConfigurator;
-import org.apache.maven.internal.impl.DefaultLog;
-import org.apache.maven.internal.xml.XmlNodeImpl;
+import org.apache.maven.api.plugin.testing.MojoTest;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
-import org.apache.maven.plugin.PluginParameterExpressionEvaluatorV4;
+import org.apache.maven.plugin.Mojo;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.testing.ConfigurationException;
+import org.apache.maven.plugin.testing.MojoLogWrapper;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.configurator.BasicComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
@@ -78,11 +78,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * JUnit extension to help testing Mojos. The extension should be automatically registered
- * by adding the {@link MojoTest} annotation on the test class.
+ * by adding the {@link org.apache.maven.api.plugin.testing.MojoTest} annotation on the test class.
  *
  * @see MojoTest
- * @see InjectMojo
- * @see MojoParameter
+ * @see org.apache.maven.api.plugin.testing.InjectMojo
+ * @see org.apache.maven.api.plugin.testing.MojoParameter
  */
 public class MojoExtension extends PlexusExtension implements ParameterResolver {
 
@@ -125,7 +125,7 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
         ((DefaultPlexusContainer) getContainer()).addPlexusInjector(Collections.emptyList(), binder -> {
             binder.install(ProviderMethodsModule.forObject(context.getRequiredTestInstance()));
             binder.requestInjection(context.getRequiredTestInstance());
-            binder.bind(Log.class).toInstance(new DefaultLog(LoggerFactory.getLogger("anonymous")));
+            binder.bind(Log.class).toInstance(new MojoLogWrapper(LoggerFactory.getLogger("anonymous")));
         });
 
         Map<Object, Object> map = getContainer().getContext().getContextData();
@@ -173,13 +173,18 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
             Path path = Paths.get(getBasedir()).resolve(pom);
             pomDom = Xpp3DomBuilder.build(ReaderFactory.newXmlReader(path.toFile()));
         }
-        XmlNode pluginConfiguration = extractPluginConfiguration(coord[1], pomDom);
+        Xpp3Dom pluginConfiguration = extractPluginConfiguration(coord[1], pomDom);
         if (!mojoParameters.isEmpty()) {
-            List<XmlNode> children = mojoParameters.stream()
-                    .map(mp -> new XmlNodeImpl(mp.name(), mp.value()))
+            List<Xpp3Dom> children = mojoParameters.stream()
+                    .map(mp -> {
+                        Xpp3Dom c = new Xpp3Dom(mp.name());
+                        c.setValue(mp.value());
+                        return c;
+                    })
                     .collect(Collectors.toList());
-            XmlNode config = new XmlNodeImpl("configuration", null, null, children, null);
-            pluginConfiguration = XmlNode.merge(config, pluginConfiguration);
+            Xpp3Dom config = new Xpp3Dom("configuration");
+            children.forEach(config::addChild);
+            pluginConfiguration = Xpp3Dom.mergeXpp3Dom(config, pluginConfiguration);
         }
         Mojo mojo = lookupMojo(coord, pluginConfiguration, descriptor);
         return mojo;
@@ -201,7 +206,7 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
     /**
      * lookup the mojo while we have all the relevent information
      */
-    protected Mojo lookupMojo(String[] coord, XmlNode pluginConfiguration, PluginDescriptor descriptor)
+    protected Mojo lookupMojo(String[] coord, Xpp3Dom pluginConfiguration, PluginDescriptor descriptor)
             throws Exception {
         // pluginkey = groupId : artifactId : version : goal
         Mojo mojo = lookup(Mojo.class, coord[0] + ":" + coord[1] + ":" + coord[2] + ":" + coord[3]);
@@ -214,27 +219,25 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
             }
         }
         if (pluginConfiguration != null) {
-            Session session = getContainer().lookup(Session.class);
-            Project project;
+            MavenSession session = getContainer().lookup(MavenSession.class);
+            MavenProject project;
             try {
-                project = getContainer().lookup(Project.class);
+                project = getContainer().lookup(MavenProject.class);
             } catch (ComponentLookupException e) {
                 project = null;
             }
-            org.apache.maven.plugin.MojoExecution mojoExecution;
+            MojoExecution mojoExecution;
             try {
-                MojoExecution me = getContainer().lookup(MojoExecution.class);
-                mojoExecution = new org.apache.maven.plugin.MojoExecution(
-                        new org.apache.maven.model.Plugin(me.getPlugin()), me.getGoal(), me.getExecutionId());
+                mojoExecution = getContainer().lookup(MojoExecution.class);
             } catch (ComponentLookupException e) {
                 mojoExecution = null;
             }
-            ExpressionEvaluator evaluator = new WrapEvaluator(
-                    getContainer(), new PluginParameterExpressionEvaluatorV4(session, project, mojoExecution));
-            ComponentConfigurator configurator = new EnhancedComponentConfigurator();
+            ExpressionEvaluator evaluator =
+                    new WrapEvaluator(getContainer(), new PluginParameterExpressionEvaluator(session, mojoExecution));
+            ComponentConfigurator configurator = new BasicComponentConfigurator();
             configurator.configureComponent(
                     mojo,
-                    new XmlPlexusConfiguration(new Xpp3Dom(pluginConfiguration)),
+                    new XmlPlexusConfiguration(pluginConfiguration),
                     evaluator,
                     getContainer().getContainerRealm());
         }
@@ -242,36 +245,29 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
         return mojo;
     }
 
-    private XmlNode finalizeConfig(XmlNode config, MojoDescriptor mojoDescriptor) {
-        List<XmlNode> children = new ArrayList<>();
+    private Xpp3Dom finalizeConfig(Xpp3Dom config, MojoDescriptor mojoDescriptor) {
+        List<Xpp3Dom> children = new ArrayList<>();
         if (mojoDescriptor != null && mojoDescriptor.getParameters() != null) {
-            XmlNode defaultConfiguration =
-                    MojoDescriptorCreator.convert(mojoDescriptor).getDom();
+            Xpp3Dom defaultConfiguration = MojoDescriptorCreator.convert(mojoDescriptor);
             for (Parameter parameter : mojoDescriptor.getParameters()) {
-                XmlNode parameterConfiguration = config.getChild(parameter.getName());
+                Xpp3Dom parameterConfiguration = config.getChild(parameter.getName());
                 if (parameterConfiguration == null) {
                     parameterConfiguration = config.getChild(parameter.getAlias());
                 }
-                XmlNode parameterDefaults = defaultConfiguration.getChild(parameter.getName());
-                parameterConfiguration = XmlNode.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
+                Xpp3Dom parameterDefaults = defaultConfiguration.getChild(parameter.getName());
+                parameterConfiguration = Xpp3Dom.mergeXpp3Dom(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 if (parameterConfiguration != null) {
-                    Map<String, String> attributes = new HashMap<>(parameterConfiguration.getAttributes());
                     if (isEmpty(parameterConfiguration.getAttribute("implementation"))
                             && !isEmpty(parameter.getImplementation())) {
-                        attributes.put("implementation", parameter.getImplementation());
+                        parameterConfiguration.setAttribute("implementation", parameter.getImplementation());
                     }
-                    parameterConfiguration = new XmlNodeImpl(
-                            parameter.getName(),
-                            parameterConfiguration.getValue(),
-                            attributes,
-                            parameterConfiguration.getChildren(),
-                            parameterConfiguration.getInputLocation());
-
                     children.add(parameterConfiguration);
                 }
             }
         }
-        return new XmlNodeImpl("configuration", null, null, children, null);
+        Xpp3Dom c = new Xpp3Dom("configuration");
+        children.forEach(c::addChild);
+        return c;
     }
 
     private boolean isEmpty(String str) {
@@ -286,7 +282,7 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
         return Stream.of(element.getChildren());
     }
 
-    public static XmlNode extractPluginConfiguration(String artifactId, Xpp3Dom pomDom) throws Exception {
+    public static Xpp3Dom extractPluginConfiguration(String artifactId, Xpp3Dom pomDom) throws Exception {
         Xpp3Dom pluginConfigurationElement = child(pomDom, "build")
                 .flatMap(buildElement -> child(buildElement, "plugins"))
                 .map(MojoExtension::children)
@@ -297,7 +293,7 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
                 .orElseThrow(
                         () -> new ConfigurationException("Cannot find a configuration element for a plugin with an "
                                 + "artifactId of " + artifactId + "."));
-        return pluginConfigurationElement.getDom();
+        return pluginConfigurationElement;
     }
 
     /**
@@ -316,7 +312,7 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
     /**
      * Convenience method to obtain the value of a variable on a mojo that might not have a getter.
      * <br>
-     * NOTE: the caller is responsible for casting to what the desired type is.
+     * Note: the caller is responsible for casting to what the desired type is.
      */
     public static Object getVariableValueFromObject(Object object, String variable) throws IllegalAccessException {
         Field field = ReflectionUtils.getFieldByNameIncludingSuperclasses(variable, object.getClass());
