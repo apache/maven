@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.plugin;
+package org.apache.maven.model.interpolation.reflection;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

@@ -28,6 +28,7 @@ import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.model.interpolation.reflection.ReflectionValueExtractor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
@@ -177,7 +178,13 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
                 if (pathSeparator > 0) {
                     String pathExpression = expression.substring(0, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, session);
-                    value = value + expression.substring(pathSeparator);
+                    if (pathSeparator < expression.length() - 1) {
+                        if (value instanceof Path) {
+                            value = ((Path) value).resolve(expression.substring(pathSeparator + 1));
+                        } else {
+                            value = value + expression.substring(pathSeparator);
+                        }
+                    }
                 } else {
                     value = ReflectionValueExtractor.evaluate(expression, session);
                 }
