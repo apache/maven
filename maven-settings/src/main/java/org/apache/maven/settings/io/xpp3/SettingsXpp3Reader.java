@@ -30,7 +30,7 @@ import org.apache.maven.settings.v4.SettingsStaxReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * @deprecated Maven 3 compatability - please use {@code org.apache.maven.api.services.xml.SettingsXmlFactory} from {@code maven-api-core}
+ * @deprecated Maven 3 compatibility - please use {@code org.apache.maven.api.services.xml.SettingsXmlFactory} from {@code maven-api-core}
  * or {@link SettingsStaxReader}
  */
 @Deprecated

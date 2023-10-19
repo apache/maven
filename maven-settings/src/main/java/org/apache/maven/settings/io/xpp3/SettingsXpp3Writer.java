@@ -28,7 +28,7 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.v4.SettingsStaxWriter;
 
 /**
- * @deprecated Maven 3 compatability - please use {@code org.apache.maven.api.services.xml.SettingsXmlFactory} from {@code maven-api-core}
+ * @deprecated Maven 3 compatibility - please use {@code org.apache.maven.api.services.xml.SettingsXmlFactory} from {@code maven-api-core}
  * or {@link SettingsStaxWriter}
  */
 @Deprecated
