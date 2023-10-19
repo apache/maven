@@ -377,7 +377,7 @@ public class ${className} {
             }
             serializer.writeEndElement();
 #if ( $locationTracking )
-            if (dom.getInputLocation() instanceof InputLocation && dom.getChildren().isEmpty()) {
+            if (addLocationInformation && dom.getInputLocation() instanceof InputLocation && dom.getChildren().isEmpty()) {
                 serializer.writeComment(toString((InputLocation) dom.getInputLocation()));
             }
 #end
