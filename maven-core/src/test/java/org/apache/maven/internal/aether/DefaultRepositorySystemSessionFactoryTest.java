@@ -33,6 +33,7 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.TransferListenerFactory;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
@@ -73,6 +74,9 @@ public class DefaultRepositorySystemSessionFactoryTest {
     @Inject
     protected RuntimeInformation information;
 
+    @Inject
+    protected TransferListenerFactory transferListenerFactory;
+
     @Test
     void isNoSnapshotUpdatesTest() throws InvalidRepositoryException {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
@@ -82,7 +86,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 settingsDecrypter,
                 eventSpyDispatcher,
                 mavenRepositorySystem,
-                information);
+                information,
+                transferListenerFactory);
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());
@@ -105,7 +110,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 settingsDecrypter,
                 eventSpyDispatcher,
                 mavenRepositorySystem,
-                information);
+                information,
+                transferListenerFactory);
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());
@@ -140,7 +146,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 settingsDecrypter,
                 eventSpyDispatcher,
                 mavenRepositorySystem,
-                information);
+                information,
+                transferListenerFactory);
 
         PlexusConfiguration plexusConfiguration = (PlexusConfiguration) systemSessionFactory
                 .newRepositorySession(request)
@@ -183,7 +190,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 settingsDecrypter,
                 eventSpyDispatcher,
                 mavenRepositorySystem,
-                information);
+                information,
+                transferListenerFactory);
 
         Map<String, String> headers = (Map<String, String>) systemSessionFactory
                 .newRepositorySession(request)
@@ -220,7 +228,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 settingsDecrypter,
                 eventSpyDispatcher,
                 mavenRepositorySystem,
-                information);
+                information,
+                transferListenerFactory);
 
         int connectionTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -261,7 +270,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 settingsDecrypter,
                 eventSpyDispatcher,
                 mavenRepositorySystem,
-                information);
+                information,
+                transferListenerFactory);
 
         int connectionTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -296,7 +306,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 settingsDecrypter,
                 eventSpyDispatcher,
                 mavenRepositorySystem,
-                information);
+                information,
+                transferListenerFactory);
 
         int requestTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -337,7 +348,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 settingsDecrypter,
                 eventSpyDispatcher,
                 mavenRepositorySystem,
-                information);
+                information,
+                transferListenerFactory);
 
         int requestTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -355,7 +367,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 settingsDecrypter,
                 eventSpyDispatcher,
                 mavenRepositorySystem,
-                information);
+                information,
+                transferListenerFactory);
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());

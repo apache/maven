@@ -16,52 +16,63 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.transfer;
+package org.apache.maven.internal.aether.transfer;
 
-import java.util.Locale;
-
-import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
 import org.eclipse.aether.transfer.AbstractTransferListener;
-import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Slf4jMavenTransferListener
+ * Listener that logs to {@link Logger}.
+ *
+ * TODO: just a stub, expand this fully.
  */
-public class Slf4jMavenTransferListener extends AbstractTransferListener {
+public final class Slf4jTransferListener extends AbstractTransferListener {
 
-    protected final Logger out;
+    private final boolean parallel;
 
-    public Slf4jMavenTransferListener() {
-        this.out = LoggerFactory.getLogger(Slf4jMavenTransferListener.class);
-    }
+    private final boolean colored;
 
-    // TODO should we deprecate?
-    public Slf4jMavenTransferListener(Logger out) {
-        this.out = out;
+    private final boolean logInitiated;
+
+    private final boolean logProgress;
+
+    private final boolean verbose;
+
+    private final Logger logger;
+
+    public Slf4jTransferListener(
+            boolean parallel, boolean colored, boolean logInitiated, boolean logProgress, boolean verbose) {
+        this.parallel = parallel;
+        this.colored = colored;
+        this.logInitiated = logInitiated;
+        this.logProgress = logProgress;
+        this.verbose = verbose;
+        this.logger = LoggerFactory.getLogger(Slf4jTransferListener.class);
     }
 
     @Override
     public void transferInitiated(TransferEvent event) {
-        String action = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
-        String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
+        if (logInitiated) {
+            String action = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
+            String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
-        TransferResource resource = event.getResource();
-        StringBuilder message = new StringBuilder();
-        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
-        message.append(": ");
-        message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
+            TransferResource resource = event.getResource();
+            StringBuilder message = new StringBuilder();
+            message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
+            message.append(": ");
+            message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
 
-        out.info(message.toString());
+            logger.info(message.toString());
+        }
     }
 
     @Override
-    public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
+    public void transferCorrupted(TransferEvent event) {
         TransferResource resource = event.getResource();
-        out.warn(
+        logger.warn(
                 "{} from {} for {}{}",
                 event.getException().getMessage(),
                 resource.getRepositoryId(),
@@ -75,22 +86,11 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();
-        long contentLength = event.getTransferredBytes();
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         StringBuilder message = new StringBuilder();
         message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
         message.append(": ");
         message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
-        message.append(" (").append(format.format(contentLength));
-
-        long duration = System.currentTimeMillis() - resource.getTransferStartTime();
-        if (duration > 0L) {
-            double bytesPerSecond = contentLength / (duration / 1000.0);
-            message.append(" at ").append(format.format((long) bytesPerSecond)).append("/s");
-        }
-
-        message.append(')');
-        out.info(message.toString());
+        logger.info(message.toString());
     }
 }

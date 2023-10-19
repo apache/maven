@@ -16,10 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.transfer;
+package org.apache.maven.execution;
 
-import org.eclipse.aether.transfer.AbstractTransferListener;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.transfer.TransferListener;
 
 /**
+ * Manager that provides new {@link org.eclipse.aether.transfer.TransferListener} instances based on passed
+ * in {@link TransferListenerConfiguration}.
+ *
+ * @since 4.0.0
  */
-public class QuietMavenTransferListener extends AbstractTransferListener {}
+public interface TransferListenerFactory {
+
+    /**
+     * Returns new instance of transfer listener based on non-{@code null} configuration.
+     */
+    TransferListener createTransferListener(
+            RepositorySystemSession session, TransferListenerConfiguration transferListenerConfiguration);
+}
