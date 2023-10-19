@@ -87,6 +87,7 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
+import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -747,6 +748,12 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         ModelData resultData = new ModelData(request.getModelSource(), inputModel);
         String superModelVersion = inputModel.getModelVersion() != null ? inputModel.getModelVersion() : "4.0.0";
+        if (!DefaultModelValidator.VALID_MODEL_VERSIONS.contains(superModelVersion)) {
+            // Maven 3.x is always using 4.0.0 version to load the supermodel, so
+            // do the same when loading a dependency.  The model validator will also
+            // check that field later.
+            superModelVersion = "4.0.0";
+        }
         ModelData superData = new ModelData(null, getSuperModel(superModelVersion));
 
         // profile activation

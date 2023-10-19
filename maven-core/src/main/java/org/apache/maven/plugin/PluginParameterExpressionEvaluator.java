@@ -19,9 +19,11 @@
 package org.apache.maven.plugin;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.interpolation.reflection.ReflectionValueExtractor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -174,7 +176,13 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                 if (pathSeparator > 0) {
                     String pathExpression = expression.substring(0, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, session);
-                    value = value + expression.substring(pathSeparator);
+                    if (pathSeparator < expression.length() - 1) {
+                        if (value instanceof Path) {
+                            value = ((Path) value).resolve(expression.substring(pathSeparator + 1));
+                        } else {
+                            value = value + expression.substring(pathSeparator);
+                        }
+                    }
                 } else {
                     value = ReflectionValueExtractor.evaluate(expression, session);
                 }

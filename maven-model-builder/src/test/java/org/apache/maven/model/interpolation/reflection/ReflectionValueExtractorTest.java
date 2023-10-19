@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.plugin;
+package org.apache.maven.model.interpolation.reflection;
 
 /*
  * Copyright The Codehaus Foundation.

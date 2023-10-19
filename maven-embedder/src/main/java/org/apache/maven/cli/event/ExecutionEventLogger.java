@@ -198,9 +198,9 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
         List<MavenProject> projects = session.getProjects();
 
-        for (MavenProject project : projects) {
-            StringBuilder buffer = new StringBuilder(128);
+        StringBuilder buffer = new StringBuilder(128);
 
+        for (MavenProject project : projects) {
             buffer.append(project.getName());
             buffer.append(' ');
 
@@ -243,6 +243,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             }
 
             logger.info(buffer.toString());
+            buffer.setLength(0);
         }
     }
 

@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.plugin;
+package org.apache.maven.model.interpolation.reflection;
 
-class IntrospectionException extends Exception {
+public class IntrospectionException extends Exception {
 
     /**
      *
