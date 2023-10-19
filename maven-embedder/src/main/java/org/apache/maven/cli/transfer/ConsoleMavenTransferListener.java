@@ -37,6 +37,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     private Map<TransferResource, Long> transfers = Collections.synchronizedMap(new LinkedHashMap<>());
     private FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH); // use in a synchronized fashion
+    private StringBuilder buffer = new StringBuilder(128); // use in a synchronized fashion
 
     private boolean printResourceNames;
     private int lastLength;
@@ -65,39 +66,36 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         TransferResource resource = event.getResource();
         transfers.put(resource, event.getTransferredBytes());
 
-        StringBuilder buffer = new StringBuilder(128);
         buffer.append("Progress (").append(transfers.size()).append("): ");
 
-        synchronized (transfers) {
-            Iterator<Map.Entry<TransferResource, Long>> entries =
-                    transfers.entrySet().iterator();
-            while (entries.hasNext()) {
-                Map.Entry<TransferResource, Long> entry = entries.next();
-                long total = entry.getKey().getContentLength();
-                Long complete = entry.getValue();
+        Iterator<Map.Entry<TransferResource, Long>> entries =
+                transfers.entrySet().iterator();
+        while (entries.hasNext()) {
+            Map.Entry<TransferResource, Long> entry = entries.next();
+            long total = entry.getKey().getContentLength();
+            Long complete = entry.getValue();
 
-                String resourceName = entry.getKey().getResourceName();
+            String resourceName = entry.getKey().getResourceName();
 
-                if (printResourceNames) {
-                    int idx = resourceName.lastIndexOf('/');
+            if (printResourceNames) {
+                int idx = resourceName.lastIndexOf('/');
 
-                    if (idx < 0) {
-                        buffer.append(resourceName);
-                    } else {
-                        buffer.append(resourceName, idx + 1, resourceName.length());
-                    }
-                    buffer.append(" (");
+                if (idx < 0) {
+                    buffer.append(resourceName);
+                } else {
+                    buffer.append(resourceName, idx + 1, resourceName.length());
                 }
+                buffer.append(" (");
+            }
 
-                buffer.append(format.formatProgress(complete, total));
+            buffer.append(format.formatProgress(complete, total));
 
-                if (printResourceNames) {
-                    buffer.append(")");
-                }
+            if (printResourceNames) {
+                buffer.append(")");
+            }
 
-                if (entries.hasNext()) {
-                    buffer.append(" | ");
-                }
+            if (entries.hasNext()) {
+                buffer.append(" | ");
             }
         }
 
@@ -107,6 +105,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         buffer.append('\r');
         out.print(buffer);
         out.flush();
+        buffer.setLength(0);
     }
 
     private void pad(StringBuilder buffer, int spaces) {
@@ -136,12 +135,12 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     private void overridePreviousTransfer(TransferEvent event) {
         if (lastLength > 0) {
-            StringBuilder buffer = new StringBuilder(lastLength + 1);
             pad(buffer, lastLength);
             buffer.append('\r');
             out.print(buffer);
             out.flush();
             lastLength = 0;
+            buffer.setLength(0);
         }
     }
 }
