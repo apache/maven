@@ -18,125 +18,53 @@
  */
 package org.apache.maven.model.io.xpp3;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.stream.StreamSource;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-public class MavenXpp3ReaderEx {
-    private boolean addDefaultEntities = true;
-
-    private final ContentTransformer contentTransformer;
+public class MavenXpp3ReaderEx extends MavenXpp3Reader {
 
     public MavenXpp3ReaderEx() {
-        this((source, fieldName) -> source);
+        this(null);
     }
 
     public MavenXpp3ReaderEx(ContentTransformer contentTransformer) {
-        this.contentTransformer = contentTransformer;
+        super(contentTransformer != null ? contentTransformer::transform : null, true);
     }
 
-    /**
-     * Returns the state of the "add default entities" flag.
-     *
-     * @return boolean
-     */
-    public boolean getAddDefaultEntities() {
-        return addDefaultEntities;
-    } // -- boolean getAddDefaultEntities()
-
-    /**
-     * @param reader a reader object
-     * @param strict a strict object
-     * @return Model
-     * @throws IOException            IOException if an I/O error occurs while reading from the underlying source
-     * @throws XMLStreamException XMLStreamException if an error occurs while parser xml
-     */
-    public Model read(Reader reader, boolean strict, InputSource source) throws IOException, XMLStreamException {
-        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
-        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-        try {
-            XMLStreamReader parser = factory.createXMLStreamReader(reader);
-            return read(parser, strict, source);
-        } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
-    } // -- Model read( Reader, boolean )
-
-    /**
-     * @param reader a reader object
-     * @return Model
-     * @throws IOException            IOException if an I/O error occurs while reading from the underlying source
-     * @throws XMLStreamException XMLStreamException if an error occurs while parser xml
-     */
-    public Model read(Reader reader, InputSource source) throws IOException, XMLStreamException {
-        return read(reader, true, source);
-    } // -- Model read( Reader )
-
-    /**
-     * Method read.
-     *
-     * @param in     a in object
-     * @param strict a strict object
-     * @return Model
-     * @throws IOException            IOException if an I/O error occurs while reading from the underlying source
-     * @throws XMLStreamException XMLStreamException if an error occurs while parser xml
-     */
-    public Model read(InputStream in, boolean strict, InputSource source) throws IOException, XMLStreamException {
-        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
-        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-        StreamSource streamSource = new StreamSource(in, null);
-        XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
-        return read(parser, strict, source);
-    } // -- Model read( InputStream, boolean )
-
-    /**
-     * Method read.
-     *
-     * @param in a in object
-     * @return Model
-     * @throws IOException            IOException if an I/O error occurs while reading from the underlying source
-     * @throws XMLStreamException XMLStreamException if an error occurs while parser xml
-     */
-    public Model read(InputStream in, InputSource source) throws IOException, XMLStreamException {
-        return read(in, true, source);
-    } // -- Model read( InputStream )
-
-    /**
-     * Method read.
-     *
-     * @param parser a parser object
-     * @param strict a strict object
-     * @return Model
-     * @throws IOException            IOException if an I/O error occurs while reading from the underlying source
-     * @throws XMLStreamException XMLStreamException if an error occurs while parser xml
-     */
-    public Model read(XMLStreamReader parser, boolean strict, InputSource source)
-            throws IOException, XMLStreamException {
-        org.apache.maven.model.v4.MavenXpp3ReaderEx reader = contentTransformer != null
-                ? new org.apache.maven.model.v4.MavenXpp3ReaderEx(contentTransformer::transform)
-                : new org.apache.maven.model.v4.MavenXpp3ReaderEx();
-        reader.setAddDefaultEntities(addDefaultEntities);
-        org.apache.maven.api.model.Model model = reader.read(
-                parser, strict, new org.apache.maven.api.model.InputSource(source.getModelId(), source.getLocation()));
-        return new Model(model);
+    @Override
+    public Model read(Reader reader, boolean strict, InputSource source) throws IOException, XmlPullParserException {
+        return super.read(reader, strict, source);
     }
 
-    /**
-     * Sets the state of the "add default entities" flag.
-     *
-     * @param addDefaultEntities a addDefaultEntities object
-     */
-    public void setAddDefaultEntities(boolean addDefaultEntities) {
-        this.addDefaultEntities = addDefaultEntities;
-    } // -- void setAddDefaultEntities( boolean )
+    @Override
+    public Model read(Reader reader, boolean strict) throws IOException, XmlPullParserException {
+        return super.read(reader, strict);
+    }
+
+    @Override
+    public Model read(Reader reader) throws IOException, XmlPullParserException {
+        return super.read(reader);
+    }
+
+    @Override
+    public Model read(InputStream in, boolean strict, InputSource source) throws IOException, XmlPullParserException {
+        return super.read(in, strict, source);
+    }
+
+    @Override
+    public Model read(InputStream in, boolean strict) throws IOException, XmlPullParserException {
+        return super.read(in, strict);
+    }
+
+    @Override
+    public Model read(InputStream in) throws IOException, XmlPullParserException {
+        return super.read(in);
+    }
 
     public interface ContentTransformer {
         /**

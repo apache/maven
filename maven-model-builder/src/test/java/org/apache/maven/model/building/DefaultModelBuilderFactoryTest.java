@@ -19,11 +19,12 @@
 package org.apache.maven.model.building;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.apache.maven.api.model.Model;
-import org.apache.maven.model.v4.MavenXpp3Reader;
+import org.apache.maven.model.v4.MavenStaxReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.Test;
 
@@ -93,8 +94,8 @@ class DefaultModelBuilderFactoryTest {
     }
 
     private static Model readPom(File file) throws Exception {
-        MavenXpp3Reader reader = new MavenXpp3Reader();
-
-        return reader.read(new FileInputStream(file));
+        try (InputStream is = Files.newInputStream(file.toPath())) {
+            return new MavenStaxReader().read(is);
+        }
     }
 }

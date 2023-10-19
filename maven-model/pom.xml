@@ -124,10 +124,6 @@ under the License.
               <templates>
                 <template>merger.vm</template>
                 <template>transformer.vm</template>
-                <template>reader-modified.vm</template>
-                <template>reader-ex.vm</template>
-                <template>writer.vm</template>
-                <template>writer-ex.vm</template>
                 <template>reader-stax.vm</template>
                 <template>writer-stax.vm</template>
                 <template>model-version.vm</template>
@@ -172,6 +168,7 @@ under the License.
               <exclude>org.apache.maven.model.Site#setChildSiteUrlInheritAppendPath(boolean):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.io.xpp3.MavenXpp3Reader#contentTransformer</exclude>
               <exclude>org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx#contentTransformer</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#stringFormatter</exclude>
               <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#toString(org.apache.maven.model.InputLocation):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#writeXpp3DomToSerializer(org.codehaus.plexus.util.xml.Xpp3Dom,org.codehaus.plexus.util.xml.pull.XmlSerializer):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.merge.ModelMerger</exclude>
