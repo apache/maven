@@ -19,6 +19,11 @@
 
 @REM How JvZ runs the ITs from a clean slate if it would be on Windows
 
+@REM In rare occasions, some ITs may depend on latest maven snapshots.
+@REM In such cases you need to:
+@REM  - build maven using `mvn install -PversionlessMavenDist -Dmaven.repo.local=[my-repo-local]`
+@REM  - run ITs using `mvn clean install -Prun-its,embedded -Dmaven.repo.local=[my-repo-local] -DmavenDistro=[maven-source-tree]/apache-maven/target/maven-bin.zip`
+
 mvn clean install -U -Prun-its,embedded -Dmaven.repo.local=%cd%\repo
 
 @REM If behind a proxy try this..
