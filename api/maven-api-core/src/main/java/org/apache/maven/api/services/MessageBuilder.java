@@ -206,4 +206,11 @@ public interface MessageBuilder {
      */
     @Nonnull
     String build();
+
+    /**
+     * Set the buffer length.
+     *
+     * @param length the new length
+     */
+    void setLength(int length);
 }

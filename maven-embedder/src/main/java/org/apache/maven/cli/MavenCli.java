@@ -497,19 +497,6 @@ public class MavenCli {
         cliRequest.quiet = !cliRequest.verbose && commandLine.hasOption(CLIManager.QUIET);
         cliRequest.showErrors = cliRequest.verbose || commandLine.hasOption(CLIManager.ERRORS);
 
-        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
-        Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(slf4jLoggerFactory);
-
-        if (cliRequest.verbose) {
-            cliRequest.request.setLoggingLevel(MavenExecutionRequest.LOGGING_LEVEL_DEBUG);
-            slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.DEBUG);
-        } else if (cliRequest.quiet) {
-            cliRequest.request.setLoggingLevel(MavenExecutionRequest.LOGGING_LEVEL_ERROR);
-            slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.ERROR);
-        }
-        // else fall back to default log level specified in conf
-        // see https://issues.apache.org/jira/browse/MNG-2570
-
         // LOG COLOR
         String styleColor = cliRequest.getUserProperties().getProperty(STYLE_COLOR_PROPERTY, "auto");
         styleColor = commandLine.getOptionValue(COLOR, styleColor);
@@ -527,6 +514,19 @@ public class MavenCli {
                 MessageUtils.setColorEnabled(false);
             }
         }
+
+        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
+        Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(slf4jLoggerFactory);
+
+        if (cliRequest.verbose) {
+            cliRequest.request.setLoggingLevel(MavenExecutionRequest.LOGGING_LEVEL_DEBUG);
+            slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.DEBUG);
+        } else if (cliRequest.quiet) {
+            cliRequest.request.setLoggingLevel(MavenExecutionRequest.LOGGING_LEVEL_ERROR);
+            slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.ERROR);
+        }
+        // else fall back to default log level specified in conf
+        // see https://issues.apache.org/jira/browse/MNG-2570
 
         // LOG STREAMS
         if (commandLine.hasOption(CLIManager.LOG_FILE)) {

@@ -154,4 +154,9 @@ public class DefaultMessageBuilder implements MessageBuilder {
     public String toString() {
         return build();
     }
+
+    @Override
+    public void setLength(int length) {
+        buffer.setLength(length);
+    }
 }

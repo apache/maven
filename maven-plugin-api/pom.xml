@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-8-SNAPSHOT</version>
+    <version>4.0.0-alpha-9-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-plugin-api</artifactId>
@@ -78,8 +78,6 @@ under the License.
             <configuration>
               <templates>
                 <template>model.vm</template>
-                <template>reader.vm</template>
-                <template>writer.vm</template>
                 <template>reader-stax.vm</template>
                 <template>writer-stax.vm</template>
               </templates>
@@ -87,7 +85,6 @@ under the License.
                 <param>packageModelV3=org.apache.maven.plugin.lifecycle</param>
                 <param>packageModelV4=org.apache.maven.plugin.lifecycle</param>
                 <param>packageToolV4=org.apache.maven.plugin.lifecycle.io</param>
-                <param>packageToolV4Xpp3=org.apache.maven.plugin.lifecycle.io.xpp3</param>
               </params>
             </configuration>
           </execution>
@@ -137,6 +134,8 @@ under the License.
               <exclude>org.apache.maven.plugin.lifecycle.Phase#setExecutions(java.util.List):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.plugin.lifecycle.Phase#setId(java.lang.String):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.plugin.lifecycle.Phase#Phase():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Writer</exclude>
             </excludes>
           </parameter>
         </configuration>
