@@ -433,7 +433,11 @@ public class ${className} {
         if (stringFormatter != null) {
             return stringFormatter.toString(location);
         }
-        return ' ' + location.getSource().toString() + ':' + location.getLineNumber() + ' ';
+        if (location.getSource() != null) {
+            return ' ' + location.getSource().toString() + ':' + location.getLineNumber() + ' ';
+        } else {
+            return " " + location.getLineNumber() + " ";
+        }
     } //-- String toString(InputLocation)
 #end
 

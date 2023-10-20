@@ -58,20 +58,6 @@ public class Xpp3DomPerfTest {
     }
 
     @Benchmark
-    public int readWithXpp3(AdditionState state) throws IOException {
-        int i = 0;
-        for (Path pom : state.poms) {
-            try (InputStream is = Files.newInputStream(pom)) {
-                new MavenXpp3ReaderEx().read(is, true, new InputSource("id", pom.toString()));
-                i++;
-            } catch (XMLStreamException e) {
-                throw new RuntimeException("Error parsing: " + pom, e);
-            }
-        }
-        return i;
-    }
-
-    @Benchmark
     public int readWithStax(AdditionState state) throws IOException, XMLStreamException {
         int i = 0;
         for (Path pom : state.poms) {
