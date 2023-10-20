@@ -18,8 +18,6 @@
  */
 package org.apache.maven.cli.transfer;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 /**
@@ -101,24 +99,19 @@ public class FileSizeFormat {
         }
     }
 
-    private DecimalFormat smallFormat;
-    private DecimalFormat largeFormat;
+    private StringBuilder builder;
 
-    public FileSizeFormat(Locale locale) {
-        smallFormat = new DecimalFormat("#0.0", new DecimalFormatSymbols(locale));
-        largeFormat = new DecimalFormat("###0", new DecimalFormatSymbols(locale));
+    public FileSizeFormat(Locale locale, StringBuilder builder) {
+        this.builder = builder;
     }
 
-    public String format(long size) {
-        return format(size, ScaleUnit.getScaleUnit(size));
-    }
-
-    public String getScaleSymbol(long size) {
-        return ScaleUnit.getScaleUnit(size).symbol();
+    public void format(long size) {
+        format(size, ScaleUnit.getScaleUnit(size));
+        builder.append(" ").append(ScaleUnit.getScaleUnit(size).symbol());
     }
 
     @SuppressWarnings("checkstyle:magicnumber")
-    private String format(long size, ScaleUnit unit) {
+    private void format(long size, ScaleUnit unit) {
         if (size < 0L) {
             throw new IllegalArgumentException("file size cannot be negative: " + size);
         }
@@ -126,17 +119,15 @@ public class FileSizeFormat {
         double scaledSize = (double) size / unit.bytes();
 
         if (unit == ScaleUnit.BYTE) {
-            return largeFormat.format(size);
-        }
-
-        if (scaledSize < 0.05 || scaledSize >= 10.0) {
-            return largeFormat.format(scaledSize);
+            builder.append(size);
+        } else if (scaledSize < 0.05d || scaledSize >= 10.0d) {
+            builder.append(Math.round(scaledSize));
         } else {
-            return smallFormat.format(scaledSize);
+            builder.append(Math.round(scaledSize * 10d) / 10d);
         }
     }
 
-    public void formatProgress(StringBuilder builder, long progressedSize, long size) {
+    public void formatProgress(long progressedSize, long size) {
         if (progressedSize < 0L) {
             throw new IllegalArgumentException("progressed file size cannot be negative: " + size);
         }
@@ -147,14 +138,15 @@ public class FileSizeFormat {
 
         if (size >= 0L && progressedSize != size) {
             ScaleUnit unit = ScaleUnit.getScaleUnit(size);
-            String formattedProgressedSize = format(progressedSize, unit);
-            String formattedSize = format(size, unit) + " " + unit.symbol();
-
-            builder.append(formattedProgressedSize).append("/").append(formattedSize);
+            format(progressedSize, unit);
+            builder.append("/");
+            format(size, unit);
+            builder.append(" ").append(unit.symbol());
         } else {
             ScaleUnit unit = ScaleUnit.getScaleUnit(progressedSize);
 
-            builder.append(format(progressedSize, unit)).append(" ").append(unit.symbol());
+            format(progressedSize, unit);
+            builder.append(" ").append(unit.symbol());
         }
     }
 }

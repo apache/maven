@@ -78,27 +78,22 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
-
         StringBuilder message = new StringBuilder();
+        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH, message);
+
         message.append(action).append(darkOn).append(' ').append(direction).append(' ');
         message.append(darkOff).append(resource.getRepositoryId());
         message.append(darkOn).append(": ").append(resource.getRepositoryUrl());
         message.append(darkOff).append(resource.getResourceName());
-        message.append(darkOn)
-                .append(" (")
-                .append(format.format(contentLength))
-                .append(" ")
-                .append(format.getScaleSymbol(contentLength));
+        message.append(darkOn).append(" (");
+        format.format(contentLength);
 
         long duration = System.currentTimeMillis() - resource.getTransferStartTime();
         if (duration > 0L) {
             double bytesPerSecond = contentLength / (duration / 1000.0);
-            message.append(" at ")
-                    .append(format.format((long) bytesPerSecond))
-                    .append(" ")
-                    .append(format.getScaleSymbol(contentLength))
-                    .append("/s");
+            message.append(" at ");
+            format.format((long) bytesPerSecond);
+            message.append("/s");
         }
 
         message.append(')').append(darkOff);

@@ -29,7 +29,8 @@ class FileSizeFormatTest {
 
     @Test
     void testNegativeSize() {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        StringBuilder builder = new StringBuilder();
+        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH, builder);
 
         long negativeSize = -100L;
         assertThrows(IllegalArgumentException.class, () -> format.format(negativeSize));
@@ -99,14 +100,16 @@ class FileSizeFormatTest {
     }
 
     private static String format(long size) {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
-        return format.format(size) + " " + format.getScaleSymbol(size);
+        StringBuilder builder = new StringBuilder();
+        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH, builder);
+        format.format(size);
+        return builder.toString();
     }
 
     private static String formatProgress(long progressedSize, long size) {
         StringBuilder builder = new StringBuilder();
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
-        format.formatProgress(builder, progressedSize, size);
+        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH, builder);
+        format.formatProgress(progressedSize, size);
         return builder.toString();
     }
 
