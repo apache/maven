@@ -25,6 +25,10 @@ import java.io.Writer;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 
+/**
+ * @deprecated Use MavenStaxWriter instead
+ */
+@Deprecated
 public class MavenXpp3WriterEx extends MavenXpp3Writer {
 
     // -----------/

@@ -26,6 +26,10 @@ import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+/**
+ * @deprecated Use MavenStaxReader instead
+ */
+@Deprecated
 public class MavenXpp3ReaderEx extends MavenXpp3Reader {
 
     public MavenXpp3ReaderEx() {

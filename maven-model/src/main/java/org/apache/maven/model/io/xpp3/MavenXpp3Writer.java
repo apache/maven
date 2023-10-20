@@ -28,6 +28,10 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.v4.MavenStaxWriter;
 
+/**
+ * @deprecated Use MavenStaxWriter instead
+ */
+@Deprecated
 public class MavenXpp3Writer {
     // --------------------------/
     // - Class/Member Variables -/
