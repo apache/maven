@@ -153,37 +153,41 @@ public final class ConsumerPomArtifactTransformer {
     }
 
     private Collection<Artifact> replacePom(Collection<Artifact> artifacts) {
-        Artifact consumer = null;
-        Artifact main = null;
+        List<Artifact> consumers = new ArrayList<>();
+        List<Artifact> mains = new ArrayList<>();
         for (Artifact artifact : artifacts) {
-            if ("pom".equals(artifact.getExtension())) {
+            if ("pom".equals(artifact.getExtension()) || artifact.getExtension().startsWith("pom.")) {
                 if (CONSUMER_POM_CLASSIFIER.equals(artifact.getClassifier())) {
-                    consumer = artifact;
+                    consumers.add(artifact);
                 } else if ("".equals(artifact.getClassifier())) {
-                    main = artifact;
+                    mains.add(artifact);
                 }
             }
         }
-        if (main != null && consumer != null) {
+        if (!mains.isEmpty() && !consumers.isEmpty()) {
             ArrayList<Artifact> result = new ArrayList<>(artifacts);
-            result.remove(main);
-            result.remove(consumer);
-            result.add(new DefaultArtifact(
-                    consumer.getGroupId(),
-                    consumer.getArtifactId(),
-                    "",
-                    consumer.getExtension(),
-                    consumer.getVersion(),
-                    consumer.getProperties(),
-                    consumer.getFile()));
-            result.add(new DefaultArtifact(
-                    main.getGroupId(),
-                    main.getArtifactId(),
-                    BUILD_POM_CLASSIFIER,
-                    main.getExtension(),
-                    main.getVersion(),
-                    main.getProperties(),
-                    main.getFile()));
+            for (Artifact main : mains) {
+                result.remove(main);
+                result.add(new DefaultArtifact(
+                        main.getGroupId(),
+                        main.getArtifactId(),
+                        BUILD_POM_CLASSIFIER,
+                        main.getExtension(),
+                        main.getVersion(),
+                        main.getProperties(),
+                        main.getFile()));
+            }
+            for (Artifact consumer : consumers) {
+                result.remove(consumer);
+                result.add(new DefaultArtifact(
+                        consumer.getGroupId(),
+                        consumer.getArtifactId(),
+                        "",
+                        consumer.getExtension(),
+                        consumer.getVersion(),
+                        consumer.getProperties(),
+                        consumer.getFile()));
+            }
             artifacts = result;
         }
         return artifacts;
