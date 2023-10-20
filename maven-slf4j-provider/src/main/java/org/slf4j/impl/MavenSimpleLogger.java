@@ -32,12 +32,11 @@ import static org.apache.maven.cli.jansi.MessageUtils.builder;
  */
 public class MavenSimpleLogger extends SimpleLogger {
 
-    private static final String TRACE_RENDERED_LEVEL = builder().trace("TRACE").build();
-    private static final String DEBUG_RENDERED_LEVEL = builder().debug("DEBUG").build();
-    private static final String INFO_RENDERED_LEVEL = builder().info("INFO").build();
-    private static final String WARN_RENDERED_LEVEL =
-            builder().warning("WARNING").build();
-    private static final String ERROR_RENDERED_LEVEL = builder().error("ERROR").build();
+    private final String traceRenderedLevel = builder().trace("TRACE").build();
+    private final String debugRenderedLevel = builder().debug("DEBUG").build();
+    private final String infoRenderedLevel = builder().info("INFO").build();
+    private final String warnRenderedLevel = builder().warning("WARNING").build();
+    private final String errorRenderedLevel = builder().error("ERROR").build();
 
     MavenSimpleLogger(String name) {
         super(name);
@@ -47,16 +46,16 @@ public class MavenSimpleLogger extends SimpleLogger {
     protected String renderLevel(int level) {
         switch (level) {
             case LOG_LEVEL_TRACE:
-                return TRACE_RENDERED_LEVEL;
+                return traceRenderedLevel;
             case LOG_LEVEL_DEBUG:
-                return DEBUG_RENDERED_LEVEL;
+                return debugRenderedLevel;
             case LOG_LEVEL_INFO:
-                return INFO_RENDERED_LEVEL;
+                return infoRenderedLevel;
             case LOG_LEVEL_WARN:
-                return WARN_RENDERED_LEVEL;
+                return warnRenderedLevel;
             case LOG_LEVEL_ERROR:
             default:
-                return ERROR_RENDERED_LEVEL;
+                return errorRenderedLevel;
         }
     }
 
@@ -75,18 +74,18 @@ public class MavenSimpleLogger extends SimpleLogger {
     }
 
     private void printStackTrace(Throwable t, PrintStream stream, String prefix) {
-        StringBuilder builder = new StringBuilder();
+        MessageBuilder builder = builder();
         for (StackTraceElement e : t.getStackTrace()) {
-            builder.append(prefix);
-            builder.append("    ");
-            builder(builder).strong("at");
-            builder.append(" ");
-            builder.append(e.getClassName());
-            builder.append(".");
-            builder.append(e.getMethodName());
-            builder.append(" (");
-            builder(builder).strong(getLocation(e));
-            builder.append(")");
+            builder.a(prefix);
+            builder.a("    ");
+            builder.strong("at");
+            builder.a(" ");
+            builder.a(e.getClassName());
+            builder.a(".");
+            builder.a(e.getMethodName());
+            builder.a(" (");
+            builder.strong(getLocation(e));
+            builder.a(")");
             stream.println(builder);
             builder.setLength(0);
         }
