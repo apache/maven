@@ -20,7 +20,6 @@ package org.apache.maven.cli.transfer;
 
 import java.util.Locale;
 
-import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -82,12 +81,19 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
         message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
         message.append(": ");
         message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
-        message.append(" (").append(format.format(contentLength));
+        message.append(" (")
+                .append(format.format(contentLength))
+                .append(" ")
+                .append(format.getScaleSymbol(contentLength));
 
         long duration = System.currentTimeMillis() - resource.getTransferStartTime();
         if (duration > 0L) {
             double bytesPerSecond = contentLength / (duration / 1000.0);
-            message.append(" at ").append(format.format((long) bytesPerSecond)).append("/s");
+            message.append(" at ")
+                    .append(format.format((long) bytesPerSecond))
+                    .append(" ")
+                    .append(format.getScaleSymbol(contentLength))
+                    .append("/s");
         }
 
         message.append(')');
