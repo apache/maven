@@ -240,7 +240,7 @@ public final class PlexusXmlBeanConverter implements PlexusBeanConverter {
         final Object bean = newImplementation(clazz);
 
         // build map of all known bean properties belonging to the chosen implementation
-        final Map<String, BeanProperty<Object>> propertyMap = new HashMap<String, BeanProperty<Object>>();
+        final Map<String, BeanProperty<Object>> propertyMap = new HashMap<>();
         for (final BeanProperty<Object> property : new BeanProperties(clazz)) {
             final String name = property.getName();
             if (!propertyMap.containsKey(name)) {

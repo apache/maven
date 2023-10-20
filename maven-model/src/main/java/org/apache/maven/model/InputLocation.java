@@ -192,7 +192,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
     public void setOtherLocation(Object key, InputLocation location) {
         if (location != null) {
             if (this.locations == null) {
-                this.locations = new java.util.LinkedHashMap<Object, InputLocation>();
+                this.locations = new java.util.LinkedHashMap<>();
             }
             this.locations.put(key, location);
         }
@@ -277,7 +277,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
         } else if (targetLocations == null) {
             locations = sourceLocations;
         } else {
-            locations = new java.util.LinkedHashMap<Object, InputLocation>();
+            locations = new java.util.LinkedHashMap<>();
             for (java.util.Iterator<Integer> it = indices.iterator(); it.hasNext(); ) {
                 InputLocation location;
                 Integer index = it.next();

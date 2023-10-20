@@ -145,7 +145,9 @@ public class MavenCli {
 
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
-    private static final String EXTENSIONS_FILENAME = ".mvn/extensions.xml";
+    private static final String EXTENSIONS_FILENAME = "extensions.xml";
+
+    private static final String MVN_EXTENSIONS_FILENAME = ".mvn/" + EXTENSIONS_FILENAME;
 
     private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
@@ -747,12 +749,17 @@ public class MavenCli {
             return Collections.emptyList();
         }
 
-        File extensionsFile = new File(cliRequest.multiModuleProjectDirectory, EXTENSIONS_FILENAME);
-        if (!extensionsFile.isFile()) {
-            return Collections.emptyList();
+        File extensionsFile = new File(cliRequest.multiModuleProjectDirectory, MVN_EXTENSIONS_FILENAME);
+        File userHomeExtensionsFile = new File(USER_MAVEN_CONFIGURATION_HOME, EXTENSIONS_FILENAME);
+
+        List<CoreExtension> extensions = new ArrayList<>();
+        if (extensionsFile.isFile()) {
+            extensions.addAll(readCoreExtensionsDescriptor(extensionsFile));
+        }
+        if (userHomeExtensionsFile.isFile()) {
+            extensions.addAll(readCoreExtensionsDescriptor(userHomeExtensionsFile));
         }
 
-        List<CoreExtension> extensions = readCoreExtensionsDescriptor(extensionsFile);
         if (extensions.isEmpty()) {
             return Collections.emptyList();
         }

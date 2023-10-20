@@ -140,18 +140,6 @@ public class DefaultSession extends AbstractSession {
         return mavenSession.getStartTime().toInstant();
     }
 
-    @Nonnull
-    @Override
-    public Path getMultiModuleProjectDirectory() {
-        return mavenSession.getRequest().getMultiModuleProjectDirectory().toPath();
-    }
-
-    @Nonnull
-    @Override
-    public Path getExecutionRootDirectory() {
-        return getTopDirectory();
-    }
-
     @Override
     public Path getRootDirectory() {
         return mavenSession.getRequest().getRootDirectory();

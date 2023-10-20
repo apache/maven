@@ -19,7 +19,6 @@
 package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -35,7 +34,9 @@ import org.eclipse.aether.transfer.TransferResource;
  */
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
-    private Map<TransferResource, Long> transfers = Collections.synchronizedMap(new LinkedHashMap<>());
+    private Map<TransferResource, Long> transfers = new LinkedHashMap<>();
+    private FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH); // use in a synchronized fashion
+    private StringBuilder buffer = new StringBuilder(128); // use in a synchronized fashion
 
     private boolean printResourceNames;
     private int lastLength;
@@ -64,20 +65,36 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         TransferResource resource = event.getResource();
         transfers.put(resource, event.getTransferredBytes());
 
-        StringBuilder buffer = new StringBuilder(128);
         buffer.append("Progress (").append(transfers.size()).append("): ");
 
-        synchronized (transfers) {
-            Iterator<Map.Entry<TransferResource, Long>> entries =
-                    transfers.entrySet().iterator();
-            while (entries.hasNext()) {
-                Map.Entry<TransferResource, Long> entry = entries.next();
-                long total = entry.getKey().getContentLength();
-                Long complete = entry.getValue();
-                buffer.append(getStatus(entry.getKey().getResourceName(), complete, total));
-                if (entries.hasNext()) {
-                    buffer.append(" | ");
+        Iterator<Map.Entry<TransferResource, Long>> entries =
+                transfers.entrySet().iterator();
+        while (entries.hasNext()) {
+            Map.Entry<TransferResource, Long> entry = entries.next();
+            long total = entry.getKey().getContentLength();
+            Long complete = entry.getValue();
+
+            String resourceName = entry.getKey().getResourceName();
+
+            if (printResourceNames) {
+                int idx = resourceName.lastIndexOf('/');
+
+                if (idx < 0) {
+                    buffer.append(resourceName);
+                } else {
+                    buffer.append(resourceName, idx + 1, resourceName.length());
                 }
+                buffer.append(" (");
+            }
+
+            buffer.append(format.formatProgress(complete, total));
+
+            if (printResourceNames) {
+                buffer.append(")");
+            }
+
+            if (entries.hasNext()) {
+                buffer.append(" | ");
             }
         }
 
@@ -87,25 +104,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         buffer.append('\r');
         out.print(buffer);
         out.flush();
-    }
-
-    private String getStatus(String resourceName, long complete, long total) {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
-        StringBuilder status = new StringBuilder();
-
-        if (printResourceNames) {
-            int idx = resourceName.lastIndexOf('/');
-            status.append(idx < 0 ? resourceName : resourceName.substring(idx + 1));
-            status.append(" (");
-        }
-
-        status.append(format.formatProgress(complete, total));
-
-        if (printResourceNames) {
-            status.append(")");
-        }
-
-        return status.toString();
+        buffer.setLength(0);
     }
 
     private void pad(StringBuilder buffer, int spaces) {
@@ -135,12 +134,12 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     private void overridePreviousTransfer(TransferEvent event) {
         if (lastLength > 0) {
-            StringBuilder buffer = new StringBuilder(128);
             pad(buffer, lastLength);
             buffer.append('\r');
             out.print(buffer);
             out.flush();
             lastLength = 0;
+            buffer.setLength(0);
         }
     }
 }

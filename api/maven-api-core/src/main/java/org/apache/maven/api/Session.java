@@ -101,20 +101,6 @@ public interface Session {
     @Nonnull
     Path getRootDirectory();
 
-    /**
-     * @deprecated use {@link #getRootDirectory()} instead
-     */
-    @Nonnull
-    @Deprecated
-    Path getMultiModuleProjectDirectory();
-
-    /**
-     * @deprecated use {@link #getTopDirectory()} instead
-     */
-    @Deprecated
-    @Nonnull
-    Path getExecutionRootDirectory();
-
     @Nonnull
     List<Project> getProjects();
 

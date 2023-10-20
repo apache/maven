@@ -25,24 +25,19 @@ import java.io.Writer;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 
-public class MavenXpp3WriterEx {
-    // --------------------------/
-    // - Class/Member Variables -/
-    // --------------------------/
-
-    /**
-     * Field fileComment.
-     */
-    private String fileComment = null;
-
-    /**
-     * Field stringFormatter.
-     */
-    protected InputLocation.StringFormatter stringFormatter;
+/**
+ * @deprecated Use MavenStaxWriter instead
+ */
+@Deprecated
+public class MavenXpp3WriterEx extends MavenXpp3Writer {
 
     // -----------/
     // - Methods -/
     // -----------/
+
+    public MavenXpp3WriterEx() {
+        super(true);
+    }
 
     /**
      * Method setFileComment.
@@ -50,7 +45,7 @@ public class MavenXpp3WriterEx {
      * @param fileComment a fileComment object.
      */
     public void setFileComment(String fileComment) {
-        this.fileComment = fileComment;
+        super.setFileComment(fileComment);
     } // -- void setFileComment( String )
 
     /**
@@ -59,7 +54,7 @@ public class MavenXpp3WriterEx {
      * @param stringFormatter
      */
     public void setStringFormatter(InputLocation.StringFormatter stringFormatter) {
-        this.stringFormatter = stringFormatter;
+        super.setStringFormatter(stringFormatter);
     } // -- void setStringFormatter( InputLocation.StringFormatter )
 
     /**
@@ -70,18 +65,7 @@ public class MavenXpp3WriterEx {
      * @throws IOException java.io.IOException if any.
      */
     public void write(Writer writer, Model model) throws IOException {
-        org.apache.maven.model.v4.MavenXpp3WriterEx xw = new org.apache.maven.model.v4.MavenXpp3WriterEx();
-        xw.setFileComment(fileComment);
-        xw.setStringFormatter(
-                stringFormatter != null
-                        ? new org.apache.maven.api.model.InputLocation.StringFormatter() {
-                            @Override
-                            public String toString(org.apache.maven.api.model.InputLocation location) {
-                                return stringFormatter.toString(new InputLocation(location));
-                            }
-                        }
-                        : null);
-        xw.write(writer, model.getDelegate());
+        super.write(writer, model);
     } // -- void write( Writer, Model )
 
     /**
@@ -92,8 +76,6 @@ public class MavenXpp3WriterEx {
      * @throws IOException java.io.IOException if any.
      */
     public void write(OutputStream stream, Model model) throws IOException {
-        org.apache.maven.model.v4.MavenXpp3WriterEx xw = new org.apache.maven.model.v4.MavenXpp3WriterEx();
-        xw.setFileComment(fileComment);
-        xw.write(stream, model.getDelegate());
+        super.write(stream, model);
     } // -- void write( OutputStream, Model )
 }

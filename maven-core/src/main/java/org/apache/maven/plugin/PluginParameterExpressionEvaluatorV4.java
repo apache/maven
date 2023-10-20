@@ -54,7 +54,7 @@ import org.codehaus.plexus.component.configurator.expression.TypeAwareExpression
  * <tr><td><code>settings</code></td>          <td></td>               <td>{@link Session#getSettings()}</td></tr>
  * <tr><td><code>settings.*</code></td>        <td></td>               <td></td></tr>
  * <tr><td><code>basedir</code></td>           <td></td>
- *                                 <td>{@link Session#getExecutionRootDirectory()} or
+ *                                 <td>{@link Session#getTopDirectory()} or
  *                                                 <code>System.getProperty( "user.dir" )</code> if null</td></tr>
  * <tr><td><code>mojoExecution</code></td>     <td></td>               <td>the actual {@link MojoExecution}</td></tr>
  * <tr><td><code>mojo</code></td>              <td>(since Maven 3)</td><td>same as <code>mojoExecution</code></td></tr>
@@ -112,7 +112,7 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
         }
 
         if (basedir == null) {
-            basedir = session.getExecutionRootDirectory();
+            basedir = session.getTopDirectory();
         }
 
         if (basedir == null) {
