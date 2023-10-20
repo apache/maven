@@ -26,12 +26,16 @@ import org.fusesource.jansi.Ansi;
 @Experimental
 public class JansiMessageBuilder implements MessageBuilder {
     private final Ansi ansi;
+    private StringBuilder sb;
 
+    @SuppressWarnings("magicnumber")
     public JansiMessageBuilder() {
+        this.sb = new StringBuilder(80);
         this.ansi = Ansi.ansi();
     }
 
     public JansiMessageBuilder(StringBuilder sb) {
+        this.sb = sb;
         this.ansi = Ansi.ansi(sb);
     }
 
@@ -158,5 +162,10 @@ public class JansiMessageBuilder implements MessageBuilder {
     @Override
     public String toString() {
         return build();
+    }
+
+    @Override
+    public void setLength(int length) {
+        sb.setLength(length);
     }
 }
