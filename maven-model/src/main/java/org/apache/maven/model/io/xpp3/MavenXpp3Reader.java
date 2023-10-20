@@ -70,12 +70,8 @@ public class MavenXpp3Reader {
 
     protected Model read(Reader reader, boolean strict, InputSource source) throws IOException, XmlPullParserException {
         try {
-            org.apache.maven.api.model.Model model = delegate.read(
-                    reader,
-                    strict,
-                    source != null
-                            ? new org.apache.maven.api.model.InputSource(source.getModelId(), source.getLocation())
-                            : null);
+            org.apache.maven.api.model.Model model =
+                    delegate.read(reader, strict, source != null ? source.toApiSource() : null);
             return new Model(model);
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
@@ -110,12 +106,8 @@ public class MavenXpp3Reader {
     protected Model read(InputStream is, boolean strict, InputSource source)
             throws IOException, XmlPullParserException {
         try {
-            org.apache.maven.api.model.Model model = delegate.read(
-                    is,
-                    strict,
-                    source != null
-                            ? new org.apache.maven.api.model.InputSource(source.getModelId(), source.getLocation())
-                            : null);
+            org.apache.maven.api.model.Model model =
+                    delegate.read(is, strict, source != null ? source.toApiSource() : null);
             return new Model(model);
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);

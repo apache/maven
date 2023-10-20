@@ -110,12 +110,7 @@ public class DefaultModelReader implements ModelReader {
             boolean strict = isStrict(options);
             MavenStaxReader mr = new MavenStaxReader();
             mr.setAddLocationInformation(source != null);
-            Model model = new Model(mr.read(
-                    parser,
-                    strict,
-                    source != null
-                            ? new org.apache.maven.api.model.InputSource(source.getModelId(), source.getLocation())
-                            : null));
+            Model model = new Model(mr.read(parser, strict, source != null ? source.toApiSource() : null));
             return model;
         } catch (XMLStreamException e) {
             Location location = e.getLocation();
@@ -139,10 +134,7 @@ public class DefaultModelReader implements ModelReader {
             boolean strict = isStrict(options);
             MavenStaxReader mr = new MavenStaxReader();
             mr.setAddLocationInformation(source != null);
-            Model model = new Model(mr.read(
-                    parser,
-                    strict,
-                    new org.apache.maven.api.model.InputSource(source.getModelId(), source.getLocation())));
+            Model model = new Model(mr.read(parser, strict, source != null ? source.toApiSource() : null));
             return model;
         } catch (XMLStreamException e) {
             Location location = e.getLocation();
