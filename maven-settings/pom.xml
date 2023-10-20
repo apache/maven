@@ -82,8 +82,6 @@ under the License.
               <templates>
                 <template>merger.vm</template>
                 <template>transformer.vm</template>
-                <template>reader.vm</template>
-                <template>writer.vm</template>
                 <template>reader-stax.vm</template>
                 <template>writer-stax.vm</template>
               </templates>
