@@ -590,7 +590,7 @@ public class DefaultModelValidator implements ModelValidator {
         for (Dependency dependency : dependencies) {
             String key = dependency.getManagementKey();
 
-            if ("import".equals(dependency.getScope())) {
+            if ("import".equals(dependency.getScope()) || "import-plugins".equals(dependency.getScope())) {
                 if (!"pom".equals(dependency.getType())) {
                     addViolation(
                             problems,
@@ -772,7 +772,8 @@ public class DefaultModelValidator implements ModelValidator {
                             "runtime",
                             "test",
                             "system",
-                            "import");
+                            "import",
+                            "import-plugins");
                 }
             }
         }

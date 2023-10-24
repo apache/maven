@@ -63,6 +63,8 @@ public interface Artifact extends Comparable<Artifact> {
 
     String SCOPE_IMPORT = "import"; // Used to import dependencyManagement dependencies
 
+    String SCOPE_IMPORT_PLUGINS = "import-plugins"; // Used to import pluginManagement plugins
+
     String getGroupId();
 
     String getArtifactId();

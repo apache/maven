@@ -63,6 +63,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
+import org.apache.maven.model.composition.PluginManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.interpolation.ModelVersionProcessor;
@@ -113,6 +114,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final InheritanceAssembler inheritanceAssembler;
     private final ProfileSelector profileSelector;
     private final ProfileInjector profileInjector;
+    private final PluginManagementImporter pluginManagementImporter;
     private final PluginManagementInjector pluginManagementInjector;
     private final DependencyManagementInjector dependencyManagementInjector;
     private final DependencyManagementImporter dependencyManagementImporter;
@@ -136,6 +138,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             InheritanceAssembler inheritanceAssembler,
             ProfileSelector profileSelector,
             ProfileInjector profileInjector,
+            PluginManagementImporter pluginManagementImporter,
             PluginManagementInjector pluginManagementInjector,
             DependencyManagementInjector dependencyManagementInjector,
             DependencyManagementImporter dependencyManagementImporter,
@@ -155,6 +158,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.inheritanceAssembler = inheritanceAssembler;
         this.profileSelector = profileSelector;
         this.profileInjector = profileInjector;
+        this.pluginManagementImporter = pluginManagementImporter;
         this.pluginManagementInjector = pluginManagementInjector;
         this.dependencyManagementInjector = dependencyManagementInjector;
         this.dependencyManagementImporter = dependencyManagementImporter;
@@ -183,6 +187,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -211,6 +216,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -239,6 +245,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -267,6 +274,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -295,6 +303,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -323,6 +332,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -351,6 +361,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -379,6 +390,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -407,6 +419,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -435,6 +448,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -463,6 +477,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -492,6 +507,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -521,6 +537,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -549,6 +566,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -577,6 +595,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -605,6 +624,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -634,6 +654,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inheritanceAssembler,
                 profileSelector,
                 profileInjector,
+                pluginManagementImporter,
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
@@ -925,6 +946,9 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         // model path translation
         modelPathTranslator.alignToBaseDirectory(resultModel, resultModel.getProjectDirectory(), request);
+
+        // plugin management import
+        importPluginManagement(resultModel, request, problems, imports);
 
         // plugin management injection
         pluginManagementInjector.injectManagement(resultModel, request, problems);
@@ -1617,6 +1641,48 @@ public class DefaultModelBuilder implements ModelBuilder {
         return superPomProvider.getSuperModel(modelVersion);
     }
 
+    private void importPluginManagement(
+            Model model,
+            ModelBuildingRequest request,
+            DefaultModelProblemCollector problems,
+            Collection<String> importIds) {
+        DependencyManagement depMgmt = model.getDependencyManagement();
+
+        if (depMgmt == null) {
+            return;
+        }
+
+        String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
+
+        importIds.add(importing);
+
+        List<org.apache.maven.api.model.PluginManagement> importMgmts = null;
+
+        for (Iterator<Dependency> it = depMgmt.getDependencies().iterator(); it.hasNext(); ) {
+            Dependency dependency = it.next();
+
+            if (!"pom".equals(dependency.getType()) || !"import-plugins".equals(dependency.getScope())) {
+                continue;
+            }
+
+            it.remove();
+
+            PluginManagement importMgmt = loadPluginManagement(model, request, problems, dependency, importIds);
+
+            if (importMgmt != null) {
+                if (importMgmts == null) {
+                    importMgmts = new ArrayList<>();
+                }
+
+                importMgmts.add(importMgmt.getDelegate());
+            }
+        }
+
+        importIds.remove(importing);
+
+        model.update(pluginManagementImporter.importManagement(model.getDelegate(), importMgmts, request, problems));
+    }
+
     private void importDependencyManagement(
             Model model,
             ModelBuildingRequest request,
@@ -1659,6 +1725,72 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         model.update(
                 dependencyManagementImporter.importManagement(model.getDelegate(), importMgmts, request, problems));
+    }
+
+    private PluginManagement loadPluginManagement(
+            Model model,
+            ModelBuildingRequest request,
+            DefaultModelProblemCollector problems,
+            Dependency dependency,
+            Collection<String> importIds) {
+        String groupId = dependency.getGroupId();
+        String artifactId = dependency.getArtifactId();
+        String version = dependency.getVersion();
+
+        if (groupId == null || groupId.length() <= 0) {
+            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                    .setMessage("'dependencyManagement.dependencies.dependency.groupId' for "
+                            + dependency.getManagementKey() + " is missing.")
+                    .setLocation(dependency.getLocation("")));
+            return null;
+        }
+        if (artifactId == null || artifactId.length() <= 0) {
+            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                    .setMessage("'dependencyManagement.dependencies.dependency.artifactId' for "
+                            + dependency.getManagementKey() + " is missing.")
+                    .setLocation(dependency.getLocation("")));
+            return null;
+        }
+        if (version == null || version.length() <= 0) {
+            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                    .setMessage("'dependencyManagement.dependencies.dependency.version' for "
+                            + dependency.getManagementKey() + " is missing.")
+                    .setLocation(dependency.getLocation("")));
+            return null;
+        }
+
+        String imported = groupId + ':' + artifactId + ':' + version;
+
+        if (importIds.contains(imported)) {
+            StringBuilder message =
+                    new StringBuilder("The dependencies of type=pom and with scope=import-plugins form a cycle: ");
+            for (String modelId : importIds) {
+                message.append(modelId).append(" -> ");
+            }
+            message.append(imported);
+            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE).setMessage(message.toString()));
+
+            return null;
+        }
+
+        org.apache.maven.api.model.PluginManagement importMgmt =
+                fromCache(request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT_PLUGINS);
+        if (importMgmt == null) {
+            PluginManagement importMgmtV3 = doLoadPluginManagement(
+                    model, request, problems, dependency, groupId, artifactId, version, importIds);
+            if (importMgmtV3 != null) {
+                importMgmt = importMgmtV3.getDelegate();
+                intoCache(
+                        request.getModelCache(),
+                        groupId,
+                        artifactId,
+                        version,
+                        ModelCacheTag.IMPORT_PLUGINS,
+                        importMgmt);
+            }
+        }
+
+        return importMgmt != null ? new PluginManagement(importMgmt) : null;
     }
 
     private DependencyManagement loadDependencyManagement(
@@ -1739,6 +1871,91 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private boolean match(String match, String text) {
         return match.equals("*") || match.equals(text);
+    }
+
+    @SuppressWarnings("checkstyle:parameternumber")
+    private PluginManagement doLoadPluginManagement(
+            Model model,
+            ModelBuildingRequest request,
+            DefaultModelProblemCollector problems,
+            Dependency dependency,
+            String groupId,
+            String artifactId,
+            String version,
+            Collection<String> importIds) {
+        PluginManagement importMgmt = null;
+        final WorkspaceModelResolver workspaceResolver = request.getWorkspaceModelResolver();
+        final ModelResolver modelResolver = request.getModelResolver();
+        if (workspaceResolver == null && modelResolver == null) {
+            throw new NullPointerException(String.format(
+                    "request.workspaceModelResolver and request.modelResolver cannot be null (parent POM %s and POM %s)",
+                    ModelProblemUtils.toId(groupId, artifactId, version), ModelProblemUtils.toSourceHint(model)));
+        }
+
+        Model importModel = null;
+        if (workspaceResolver != null) {
+            try {
+                importModel = workspaceResolver.resolveEffectiveModel(groupId, artifactId, version);
+            } catch (UnresolvableModelException e) {
+                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.BASE)
+                        .setMessage(e.getMessage())
+                        .setException(e));
+                return null;
+            }
+        }
+
+        // no workspace resolver or workspace resolver returned null (i.e. model not in workspace)
+        if (importModel == null) {
+            final ModelSource importSource;
+            try {
+                importSource = modelResolver.resolveModel(dependency);
+            } catch (UnresolvableModelException e) {
+                StringBuilder buffer = new StringBuilder(256);
+                buffer.append("Non-resolvable import POM");
+                if (!containsCoordinates(e.getMessage(), groupId, artifactId, version)) {
+                    buffer.append(' ').append(ModelProblemUtils.toId(groupId, artifactId, version));
+                }
+                buffer.append(": ").append(e.getMessage());
+
+                problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                        .setMessage(buffer.toString())
+                        .setLocation(dependency.getLocation(""))
+                        .setException(e));
+                return null;
+            }
+
+            final ModelBuildingResult importResult;
+            try {
+                ModelBuildingRequest importRequest = new DefaultModelBuildingRequest();
+                importRequest.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+                importRequest.setModelCache(request.getModelCache());
+                importRequest.setSystemProperties(request.getSystemProperties());
+                importRequest.setUserProperties(request.getUserProperties());
+                importRequest.setLocationTracking(request.isLocationTracking());
+
+                importRequest.setModelSource(importSource);
+                importRequest.setModelResolver(modelResolver.newCopy());
+
+                importResult = build(importRequest, importIds);
+            } catch (ModelBuildingException e) {
+                problems.addAll(e.getProblems());
+                return null;
+            }
+
+            problems.addAll(importResult.getProblems());
+
+            importModel = importResult.getEffectiveModel();
+        }
+
+        Build build = importModel.getBuild();
+        if (build != null) {
+            importMgmt = build.getPluginManagement();
+        }
+
+        if (importMgmt == null) {
+            importMgmt = new PluginManagement();
+        }
+        return importMgmt;
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
