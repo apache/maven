@@ -51,7 +51,7 @@ under the License.
               <goal>velocity</goal>
             </goals>
             <configuration>
-              <version>4.2.0</version>
+              <version>4.1.0</version>
               <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
               <models>
                 <model>src/main/mdo/maven.mdo</model>

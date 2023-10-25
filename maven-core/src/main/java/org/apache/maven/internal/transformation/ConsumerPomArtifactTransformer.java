@@ -107,7 +107,7 @@ public final class ConsumerPomArtifactTransformer {
             deferDeleteFile(consumer);
 
             project.addAttachedArtifact(createConsumerPomArtifact(project, consumer, session));
-        } else if (project.getModel().isRoot()) {
+        } else if (project.getModel().getDelegate().isRoot()) {
             throw new IllegalStateException(
                     "The use of the root attribute on the model requires the buildconsumer feature to be active");
         }

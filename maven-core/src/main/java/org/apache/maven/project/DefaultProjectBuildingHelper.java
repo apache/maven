@@ -151,7 +151,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
                 plugin.setGroupId(extension.getGroupId());
                 plugin.setArtifactId(extension.getArtifactId());
                 plugin.setVersion(extension.getVersion());
-                plugin.setConfiguration(extension.getConfiguration());
+                plugin.setConfiguration(extension.getDelegate().getConfiguration());
                 extensionPlugins.add(plugin);
             }
 

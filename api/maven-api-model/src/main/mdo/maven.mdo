@@ -56,6 +56,7 @@
     <ul>
       <li><a href="https://maven.apache.org/xsd/maven-v3_0_0.xsd">https://maven.apache.org/xsd/maven-v3_0_0.xsd</a> for Maven 1.1.</li>
       <li><a href="https://maven.apache.org/xsd/maven-4.0.0.xsd">https://maven.apache.org/xsd/maven-4.0.0.xsd</a> for Maven 2.0.</li>
+      <li><a href="https://maven.apache.org/xsd/maven-4.1.0.xsd">https://maven.apache.org/xsd/maven-4.1.0.xsd</a> for Maven 4.0.</li>
     </ul>
     ]]>
   </description>
@@ -80,7 +81,7 @@
 
         <field xml.transient="true">
           <name>pomFile</name>
-          <version>4.2.0+</version>
+          <version>4.1.0+</version>
           <required>false</required>
           <description>Originating POM file</description>
           <type>DOM</type> <!-- This is transformed to a File/Path in the template -->
@@ -387,7 +388,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0/4.1.0</version>
+          <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
     /**
@@ -460,7 +461,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.2.0+</version>
+          <version>4.1.0+</version>
           <code>
             <![CDATA[
     /**
@@ -650,7 +651,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0/4.1.0</version>
+          <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
     Map<String, Plugin> pluginMap;
@@ -688,7 +689,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.2.0+</version>
+          <version>4.1.0+</version>
           <code>
             <![CDATA[
     volatile Map<String, Plugin> pluginMap;
@@ -1295,7 +1296,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.0.0/4.1.0</version>
+          <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
     public void setOptional( boolean optional )
@@ -2093,7 +2094,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.0.0/4.1.0</version>
+          <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
     public void setFiltering( boolean filtering )
@@ -2279,7 +2280,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.0.0/4.1.0</version>
+          <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
     public void setEnabled( boolean enabled )
@@ -2499,7 +2500,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.0.0/4.1.0</version>
+          <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
     public void setExtensions(boolean extensions) {
@@ -2574,7 +2575,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.2.0+</version>
+          <version>4.1.0+</version>
           <code>
             <![CDATA[
     /**
@@ -2634,7 +2635,7 @@
         </field>
         <field xml.transient="true">
           <name>priority</name>
-          <version>4.0.0</version>
+          <version>4.0.0/4.0.99</version>
           <type>int</type>
           <description>
             <![CDATA[
@@ -2649,9 +2650,13 @@
           <name>priority</name>
           <version>4.1.0+</version>
           <type>int</type>
-          <description>The priority of this execution compared to other executions which are bound to the same phase.
+          <description>
+            <![CDATA[
+            The priority of this execution compared to other executions which are bound to the same phase.
             Executions derived from the default lifecycle have a negative priority by default so that they are executed
             before any custom plugin executions.
+            <br><b>Since</b>: Maven 4.0.0
+            ]]>
           </description>
         </field>
         <field>
@@ -2761,7 +2766,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.0.0/4.1.0</version>
+          <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
     public void setExcludeDefaults( boolean excludeDefaults )
@@ -2813,7 +2818,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0/4.1.0</version>
+          <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
     public static final String SOURCE_POM = "pom";
@@ -2841,7 +2846,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.2.0+</version>
+          <version>4.1.0+</version>
           <code>
             <![CDATA[
     public static final String SOURCE_POM = "pom";
@@ -3293,13 +3298,18 @@
         <field>
           <name>configuration</name>
           <version>4.1.0+</version>
-          <description>The configuration of the extension.</description>
+          <description>
+            <![CDATA[
+            The configuration of the extension.
+            <br><b>Since</b>: Maven 4.0.0
+            ]]>
+          </description>
           <type>DOM</type>
         </field>
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.2.0+</version>
+          <version>4.1.0+</version>
           <code>
             <![CDATA[
     /**
