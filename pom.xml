@@ -127,7 +127,7 @@ under the License.
     <javaVersion>8</javaVersion>
     <minimalMavenBuildVersion>3.5.4</minimalMavenBuildVersion>
 
-    <sisuVersion>0.3.5</sisuVersion>
+    <sisuVersion>0.9.0.M2</sisuVersion>
     <classWorldsVersion>2.7.0</classWorldsVersion>
     <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsIoVersion>2.11.0</commonsIoVersion>
