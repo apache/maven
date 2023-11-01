@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Scope;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
@@ -35,12 +36,17 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultDependency implements Dependency {
     private final AbstractSession session;
     private final org.eclipse.aether.graph.Dependency dependency;
+
+    private final DependencyProperties dependencyProperties;
+
     private final String key;
 
     public DefaultDependency(
             @Nonnull AbstractSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency) {
         this.session = nonNull(session, "session");
         this.dependency = nonNull(dependency, "dependency");
+        this.dependencyProperties =
+                new DefaultDependencyProperties(dependency.getArtifact().getProperties());
         this.key = getGroupId()
                 + ':'
                 + getArtifactId()
@@ -92,6 +98,11 @@ public class DefaultDependency implements Dependency {
                 .getArtifact()
                 .getProperty(ArtifactProperties.TYPE, dependency.getArtifact().getExtension());
         return session.getService(TypeRegistry.class).getType(type);
+    }
+
+    @Override
+    public DependencyProperties getProperties() {
+        return dependencyProperties;
     }
 
     @Override

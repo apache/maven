@@ -16,38 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api;
+package org.apache.maven.internal.impl.types;
 
-import org.apache.maven.api.annotations.Nonnull;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
-public interface Dependency extends Artifact {
+import org.apache.maven.api.Type;
+import org.apache.maven.internal.impl.DefaultDependencyProperties;
+import org.apache.maven.internal.impl.DefaultType;
 
-    /**
-     * The dependency type.
-     *
-     * @return the dependency type, never {@code null}
-     */
-    @Nonnull
-    Type getType();
+@Named(BomTypeProvider.NAME)
+@Singleton
+public class BomTypeProvider implements Provider<Type> {
+    public static final String NAME = "bom";
 
-    /**
-     * The dependency properties.
-     *
-     * @return the dependency properties, never {@code null}
-     */
-    @Nonnull
-    DependencyProperties getProperties();
+    private final Type type;
 
-    @Nonnull
-    Scope getScope();
+    public BomTypeProvider() {
+        this.type = new DefaultType(NAME, "none", "pom", null, new DefaultDependencyProperties());
+    }
 
-    boolean isOptional();
-
-    /**
-     * Creates a {@code DependencyCoordinate} based on this {@code Dependency}.
-     *
-     * @return a {@link DependencyCoordinate}
-     */
-    @Nonnull
-    DependencyCoordinate toCoordinate();
+    @Override
+    public Type get() {
+        return type;
+    }
 }

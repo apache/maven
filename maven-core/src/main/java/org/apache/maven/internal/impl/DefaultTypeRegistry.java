@@ -22,59 +22,74 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton
-public class DefaultTypeRegistry implements TypeRegistry {
+public class DefaultTypeRegistry implements TypeRegistry, ArtifactTypeRegistry {
+    private final Map<String, Type> types;
+
+    private final ConcurrentHashMap<String, Type> legacyTypes;
 
     private final ArtifactHandlerManager manager;
 
     @Inject
-    public DefaultTypeRegistry(ArtifactHandlerManager manager) {
+    public DefaultTypeRegistry(Map<String, Type> types, ArtifactHandlerManager manager) {
+        this.types = nonNull(types, "types");
+        this.legacyTypes = new ConcurrentHashMap<>();
         this.manager = nonNull(manager, "artifactHandlerManager");
     }
 
     @Override
     @Nonnull
     public Type getType(String id) {
-        // Copy data as the ArtifacHandler is not immutable, but Type should be.
-        ArtifactHandler handler = manager.getArtifactHandler(nonNull(id, "id"));
-        String extension = handler.getExtension();
-        String classifier = handler.getClassifier();
-        boolean includeDependencies = handler.isIncludesDependencies();
-        boolean addedToClasspath = handler.isAddedToClasspath();
-        return new Type() {
-            @Override
-            public String getId() {
-                return id;
-            }
+        nonNull(id, "null id");
+        Type type = types.get(id);
+        if (type != null) {
+            return type;
+        }
 
-            @Override
-            public String getExtension() {
-                return extension;
+        return legacyTypes.computeIfAbsent(id, k -> {
+            // Copy data as the ArtifactHandler is not immutable, but Type should be.
+            ArtifactHandler handler = manager.getArtifactHandler(id);
+            ArrayList<String> flags = new ArrayList<>();
+            if (handler.isAddedToClasspath()) {
+                flags.add(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
             }
+            if (handler.isIncludesDependencies()) {
+                flags.add(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
+            }
+            return new DefaultType(
+                    id,
+                    handler.getLanguage(),
+                    handler.getExtension(),
+                    handler.getClassifier(),
+                    new DefaultDependencyProperties(flags));
+        });
+    }
 
-            @Override
-            public String getClassifier() {
-                return classifier;
-            }
-
-            @Override
-            public boolean isIncludesDependencies() {
-                return includeDependencies;
-            }
-
-            @Override
-            public boolean isAddedToClasspath() {
-                return addedToClasspath;
-            }
-        };
+    @Override
+    public ArtifactType get(String typeId) {
+        Type type = getType(typeId);
+        if (type instanceof ArtifactType) {
+            return (ArtifactType) type;
+        }
+        if (type != null) {
+            return DefaultType.wrap(type);
+        }
+        return null;
     }
 }

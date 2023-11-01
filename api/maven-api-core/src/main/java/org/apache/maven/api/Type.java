@@ -51,14 +51,21 @@ public interface Type {
      * Returns the dependency type id.
      * The id uniquely identifies this <i>dependency type</i>.
      *
-     * @return the id of this type
+     * @return the id of this type, never {@code null}.
      */
     String getId();
 
     /**
+     * Returns the dependency type language.
+     *
+     * @return the language of this type, never {@code null}.
+     */
+    String getLanguage();
+
+    /**
      * Get the file extension of artifacts of this type.
      *
-     * @return the file extension
+     * @return the file extension, never {@code null}.
      */
     String getExtension();
 
@@ -67,7 +74,7 @@ public interface Type {
      * The default classifier can be overridden when specifying
      * the {@link Dependency#getClassifier()}.
      *
-     * @return the default classifier
+     * @return the default classifier, or {@code null}.
      */
     String getClassifier();
 
@@ -75,9 +82,21 @@ public interface Type {
      * Specifies if the artifact contains java classes and should be
      * added to the classpath.
      *
-     * @return if the artifact should be added to the classpath
+     * @return if the artifact should be added to the class path
      */
-    boolean isAddedToClasspath();
+    default boolean isAddedToClassPath() {
+        return getTypeProperties().checkFlag(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
+    }
+
+    /**
+     * Specifies if the artifact contains java classes and should be
+     * added to the module path.
+     *
+     * @return if the artifact should be added to the module path
+     */
+    default boolean isAddedToModulePath() {
+        return getTypeProperties().checkFlag(DependencyProperties.FLAG_MODULE_PATH_CONSTITUENT);
+    }
 
     /**
      * Specifies if the artifact already embeds its own dependencies.
@@ -86,5 +105,14 @@ public interface Type {
      *
      * @return if the artifact's dependencies are included in the artifact
      */
-    boolean isIncludesDependencies();
+    default boolean isIncludesDependencies() {
+        return getTypeProperties().checkFlag(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
+    }
+
+    /**
+     * Gets the default properties associated with this dependency type.
+     *
+     * @return the default properties, never {@code null}.
+     */
+    DependencyProperties getTypeProperties();
 }

@@ -19,6 +19,7 @@
 package org.apache.maven.repository.internal;
 
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
@@ -40,6 +41,8 @@ import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A utility class to assist in setting up a Maven-like repository system. <em>Note:</em> This component is meant to
  * assist those clients that employ the repository system outside of an IoC container, Maven plugins should instead
@@ -59,8 +62,37 @@ public final class MavenRepositorySystemUtils {
      * the session with authentication, mirror, proxy and other information required for your environment.
      *
      * @return The new repository system session, never {@code null}.
+     * @deprecated This method is deprecated.
      */
+    @Deprecated
     public static DefaultRepositorySystemSession newSession() {
+        DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
+        stereotypes.add(new DefaultArtifactType("pom"));
+        stereotypes.add(new DefaultArtifactType("maven-plugin", "jar", "", "java"));
+        stereotypes.add(new DefaultArtifactType("jar", "jar", "", "java"));
+        stereotypes.add(new DefaultArtifactType("ejb", "jar", "", "java"));
+        stereotypes.add(new DefaultArtifactType("ejb-client", "jar", "client", "java"));
+        stereotypes.add(new DefaultArtifactType("test-jar", "jar", "tests", "java"));
+        stereotypes.add(new DefaultArtifactType("javadoc", "jar", "javadoc", "java"));
+        stereotypes.add(new DefaultArtifactType("java-source", "jar", "sources", "java", false, false));
+        stereotypes.add(new DefaultArtifactType("war", "war", "", "java", false, true));
+        stereotypes.add(new DefaultArtifactType("ear", "ear", "", "java", false, true));
+        stereotypes.add(new DefaultArtifactType("rar", "rar", "", "java", false, true));
+        stereotypes.add(new DefaultArtifactType("par", "par", "", "java", false, true));
+        return newSession(stereotypes);
+    }
+
+    /**
+     * Creates a new Maven-like repository system session by initializing the session with values typical for
+     * Maven-based resolution. In more detail, this method configures settings relevant for the processing of dependency
+     * graphs, most other settings remain at their generic default value. Use the various setters to further configure
+     * the session with authentication, mirror, proxy and other information required for your environment.
+     *
+     * @return The new repository system session, never {@code null}.
+     * @since 4.0
+     */
+    public static DefaultRepositorySystemSession newSession(ArtifactTypeRegistry artifactTypeRegistry) {
+        requireNonNull(artifactTypeRegistry, "null artifactTypeRegistry");
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
 
         DependencyTraverser depTraverser = new FatArtifactTraverser();
@@ -80,21 +112,7 @@ public final class MavenRepositorySystemUtils {
                 new SimpleOptionalitySelector(), new JavaScopeDeriver());
         transformer = new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner());
         session.setDependencyGraphTransformer(transformer);
-
-        DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
-        stereotypes.add(new DefaultArtifactType("pom"));
-        stereotypes.add(new DefaultArtifactType("maven-plugin", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("jar", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("ejb", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("ejb-client", "jar", "client", "java"));
-        stereotypes.add(new DefaultArtifactType("test-jar", "jar", "tests", "java"));
-        stereotypes.add(new DefaultArtifactType("javadoc", "jar", "javadoc", "java"));
-        stereotypes.add(new DefaultArtifactType("java-source", "jar", "sources", "java", false, false));
-        stereotypes.add(new DefaultArtifactType("war", "war", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("ear", "ear", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("rar", "rar", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("par", "par", "", "java", false, true));
-        session.setArtifactTypeRegistry(stereotypes);
+        session.setArtifactTypeRegistry(artifactTypeRegistry);
 
         session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, true));
 
