@@ -31,7 +31,7 @@ import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.handler.manager.LegacyArtifactHandlerManager;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 
@@ -44,10 +44,10 @@ public class DefaultTypeRegistry implements TypeRegistry, ArtifactTypeRegistry {
 
     private final ConcurrentHashMap<String, Type> legacyTypes;
 
-    private final ArtifactHandlerManager manager;
+    private final LegacyArtifactHandlerManager manager;
 
     @Inject
-    public DefaultTypeRegistry(Map<String, Type> types, ArtifactHandlerManager manager) {
+    public DefaultTypeRegistry(Map<String, Type> types, LegacyArtifactHandlerManager manager) {
         this.types = nonNull(types, "types");
         this.legacyTypes = new ConcurrentHashMap<>();
         this.manager = nonNull(manager, "artifactHandlerManager");

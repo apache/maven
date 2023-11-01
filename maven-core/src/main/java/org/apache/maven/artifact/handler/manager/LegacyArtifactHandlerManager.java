@@ -22,55 +22,51 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.api.Type;
-import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  */
 @Named
 @Singleton
-public class DefaultArtifactHandlerManager implements ArtifactHandlerManager {
-    private final TypeRegistry typeRegistry;
+public class LegacyArtifactHandlerManager implements ArtifactHandlerManager {
 
-    private final ConcurrentHashMap<String, ArtifactHandler> handlers;
+    private final Map<String, ArtifactHandler> artifactHandlers;
+
+    private final Map<String, ArtifactHandler> allHandlers = new ConcurrentHashMap<>();
 
     @Inject
-    public DefaultArtifactHandlerManager(TypeRegistry typeRegistry) {
-        this.typeRegistry = requireNonNull(typeRegistry, "null typeRegistry");
-        this.handlers = new ConcurrentHashMap<>();
+    public LegacyArtifactHandlerManager(Map<String, ArtifactHandler> artifactHandlers) {
+        this.artifactHandlers = artifactHandlers;
     }
 
-    public ArtifactHandler getArtifactHandler(String id) {
-        return handlers.computeIfAbsent(id, k -> {
-            Type type = typeRegistry.getType(id);
-            return new DefaultArtifactHandler(
-                    id,
-                    type.getExtension(),
-                    type.getClassifier(),
-                    null,
-                    null,
-                    type.isIncludesDependencies(),
-                    type.getLanguage(),
-                    type.isAddedToClassPath());
-        });
+    public ArtifactHandler getArtifactHandler(String type) {
+        ArtifactHandler handler = allHandlers.get(type);
+
+        if (handler == null) {
+            handler = artifactHandlers.get(type);
+
+            if (handler == null) {
+                handler = new DefaultArtifactHandler(type);
+            } else {
+                allHandlers.put(type, handler);
+            }
+        }
+
+        return handler;
     }
 
     public void addHandlers(Map<String, ArtifactHandler> handlers) {
         // legacy support for maven-gpg-plugin:1.0
-        throw new IllegalArgumentException("you cannot do this anymore");
+        allHandlers.putAll(handlers);
     }
 
     @Deprecated
     public Set<String> getHandlerTypes() {
-        return Collections.emptySet();
+        return artifactHandlers.keySet();
     }
 }
