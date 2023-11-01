@@ -41,8 +41,9 @@ public class ProjectStub implements Project {
     private Model model = Model.newInstance();
     private Path basedir;
     private File pomPath;
-    private boolean executionRoot;
+    private boolean topProject;
     private Artifact artifact;
+    private Path rootDirectory;
 
     public void setModel(Model model) {
         this.model = model;
@@ -117,7 +118,7 @@ public class ProjectStub implements Project {
 
     @Override
     public boolean isExecutionRoot() {
-        return executionRoot;
+        return isTopProject();
     }
 
     @Override
@@ -133,6 +134,21 @@ public class ProjectStub implements Project {
     @Override
     public List<RemoteRepository> getRemotePluginRepositories() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public boolean isTopProject() {
+        return topProject;
+    }
+
+    @Override
+    public boolean isRootProject() {
+        return model.isRoot();
+    }
+
+    @Override
+    public Path getRootDirectory() {
+        return rootDirectory;
     }
 
     public void setGroupId(String groupId) {
@@ -163,11 +179,15 @@ public class ProjectStub implements Project {
         this.pomPath = pomPath;
     }
 
-    public void setExecutionRoot(boolean executionRoot) {
-        this.executionRoot = executionRoot;
+    public void setTopProject(boolean topProject) {
+        this.topProject = topProject;
     }
 
     public void setMavenModel(org.apache.maven.model.Model model) {
         this.model = model.getDelegate();
+    }
+
+    public void setRootDirectory(Path rootDirectory) {
+        this.rootDirectory = rootDirectory;
     }
 }

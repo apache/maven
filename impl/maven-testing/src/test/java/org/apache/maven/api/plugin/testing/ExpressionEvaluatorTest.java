@@ -89,7 +89,7 @@ public class ExpressionEvaluatorTest {
         Session session = SessionStub.getMockSession(LOCAL_REPO);
         doReturn(new Properties()).when(session).getSystemProperties();
         doReturn(new Properties()).when(session).getUserProperties();
-        doAnswer(iom -> Paths.get(MojoExtension.getBasedir())).when(session).getExecutionRootDirectory();
+        doAnswer(iom -> Paths.get(MojoExtension.getBasedir())).when(session).getRootDirectory();
         return session;
     }
 }

@@ -50,7 +50,7 @@ import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.internal.impl.DefaultModelXmlFactory;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.v4.MavenStaxReader;
 import org.mockito.ArgumentMatchers;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -185,9 +185,7 @@ public class SessionStub {
         when(projectBuilder.build(any(ProjectBuilderRequest.class))).then(iom -> {
             ProjectBuilderRequest request = iom.getArgument(0, ProjectBuilderRequest.class);
             ProjectBuilderResult result = mock(ProjectBuilderResult.class);
-            Model model = new MavenXpp3Reader()
-                    .read(request.getSource().get().getInputStream())
-                    .getDelegate();
+            Model model = new MavenStaxReader().read(request.getSource().get().openStream());
             ProjectStub projectStub = new ProjectStub();
             projectStub.setModel(model);
             ArtifactStub artifactStub = new ArtifactStub(
