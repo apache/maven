@@ -75,7 +75,9 @@ public final class ConsumerPomArtifactTransformer {
 
     private static final String CONSUMER_POM_CLASSIFIER = "consumer";
 
-    private static final String BUILD_POM_CLASSIFIER = "build";
+    private static final String BUILD_POM_CLASSIFIER = "build-pom";
+
+    private static final String BUILD_POM_EXTENSION = "xml";
 
     private static final String NAMESPACE_FORMAT = "http://maven.apache.org/POM/%s";
 
@@ -172,7 +174,7 @@ public final class ConsumerPomArtifactTransformer {
                         main.getGroupId(),
                         main.getArtifactId(),
                         BUILD_POM_CLASSIFIER,
-                        main.getExtension(),
+                        BUILD_POM_EXTENSION,
                         main.getVersion(),
                         main.getProperties(),
                         main.getFile()));
