@@ -37,6 +37,8 @@ import java.util.Properties;
 
 import com.google.inject.Module;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -53,7 +55,6 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -140,12 +141,14 @@ public abstract class AbstractMojoTestCase extends PlexusTestCase {
 
             PluginDescriptor pluginDescriptor = new PluginDescriptorBuilder().build(interpolationReader);
 
-            Artifact artifact = lookup(RepositorySystem.class)
-                    .createArtifact(
-                            pluginDescriptor.getGroupId(),
-                            pluginDescriptor.getArtifactId(),
-                            pluginDescriptor.getVersion(),
-                            ".jar");
+            Artifact artifact = new DefaultArtifact(
+                    pluginDescriptor.getGroupId(),
+                    pluginDescriptor.getArtifactId(),
+                    pluginDescriptor.getVersion(),
+                    null,
+                    "jar",
+                    null,
+                    new DefaultArtifactHandler("jar"));
 
             artifact.setFile(getPluginArtifactFile());
             pluginDescriptor.setPluginArtifact(artifact);
