@@ -32,5 +32,7 @@ public class ParametersMojo extends AbstractMojo {
     public String withPropertyAndDefault;
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {}
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        getLog().info("Plain value = " + plain);
+    }
 }

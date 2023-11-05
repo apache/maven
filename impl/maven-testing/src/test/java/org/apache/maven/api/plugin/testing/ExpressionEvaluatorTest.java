@@ -30,6 +30,8 @@ import org.apache.maven.api.plugin.testing.stubs.SessionStub;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 
@@ -59,6 +61,30 @@ public class ExpressionEvaluatorTest {
     @Test
     @InjectMojo(goal = COORDINATES, pom = CONFIG)
     public void testInjection(ExpressionEvaluatorMojo mojo) {
+        assertNotNull(mojo.basedir);
+        assertNotNull(mojo.workdir);
+        assertDoesNotThrow(mojo::execute);
+    }
+
+    @Test
+    @InjectMojo(goal = COORDINATES, pom = CONFIG)
+    @MojoParameter(name = "param", value = "paramValue")
+    public void testParam(ExpressionEvaluatorMojo mojo) {
+        assertNotNull(mojo.basedir);
+        assertNotNull(mojo.workdir);
+        assertEquals("paramValue", mojo.param);
+        assertDoesNotThrow(mojo::execute);
+    }
+
+    @Test
+    @InjectMojo(goal = COORDINATES, pom = CONFIG)
+    @MojoParameter(name = "param", value = "paramValue")
+    @MojoParameter(name = "param2", value = "param2Value")
+    public void testParams(ExpressionEvaluatorMojo mojo) {
+        assertNotNull(mojo.basedir);
+        assertNotNull(mojo.workdir);
+        assertEquals("paramValue", mojo.param);
+        assertEquals("param2Value", mojo.param2);
         assertDoesNotThrow(mojo::execute);
     }
 
@@ -67,6 +93,10 @@ public class ExpressionEvaluatorTest {
         private String basedir;
 
         private String workdir;
+
+        private String param;
+
+        private String param2;
 
         /** {@inheritDoc} */
         @Override

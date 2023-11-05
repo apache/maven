@@ -29,12 +29,16 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -100,7 +104,18 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
             InjectMojo injectMojo = parameterContext
                     .findAnnotation(InjectMojo.class)
                     .orElseGet(() -> parameterContext.getDeclaringExecutable().getAnnotation(InjectMojo.class));
-            List<MojoParameter> mojoParameters = parameterContext.findRepeatableAnnotations(MojoParameter.class);
+
+            Set<MojoParameter> mojoParameters =
+                    new HashSet<>(parameterContext.findRepeatableAnnotations(MojoParameter.class));
+
+            Optional.ofNullable(parameterContext.getDeclaringExecutable().getAnnotation(MojoParameter.class))
+                    .ifPresent(mojoParameters::add);
+
+            Optional.ofNullable(parameterContext.getDeclaringExecutable().getAnnotation(MojoParameters.class))
+                    .map(MojoParameters::value)
+                    .map(Arrays::asList)
+                    .ifPresent(mojoParameters::addAll);
+
             Class<?> holder = parameterContext.getTarget().get().getClass();
             PluginDescriptor descriptor = extensionContext
                     .getStore(ExtensionContext.Namespace.GLOBAL)
@@ -113,6 +128,7 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
+        // TODO provide protected setters in PlexusExtension
         Field field = PlexusExtension.class.getDeclaredField("basedir");
         field.setAccessible(true);
         field.set(null, getBasedir());
@@ -152,7 +168,10 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
     }
 
     private Mojo lookupMojo(
-            Class<?> holder, InjectMojo injectMojo, List<MojoParameter> mojoParameters, PluginDescriptor descriptor)
+            Class<?> holder,
+            InjectMojo injectMojo,
+            Collection<MojoParameter> mojoParameters,
+            PluginDescriptor descriptor)
             throws Exception {
         String goal = injectMojo.goal();
         String pom = injectMojo.pom();

@@ -29,12 +29,17 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -74,6 +79,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -100,7 +106,18 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
             InjectMojo injectMojo = parameterContext
                     .findAnnotation(InjectMojo.class)
                     .orElseGet(() -> parameterContext.getDeclaringExecutable().getAnnotation(InjectMojo.class));
-            List<MojoParameter> mojoParameters = parameterContext.findRepeatableAnnotations(MojoParameter.class);
+
+            Set<MojoParameter> mojoParameters =
+                    new HashSet<>(parameterContext.findRepeatableAnnotations(MojoParameter.class));
+
+            Optional.ofNullable(parameterContext.getDeclaringExecutable().getAnnotation(MojoParameter.class))
+                    .ifPresent(mojoParameters::add);
+
+            Optional.ofNullable(parameterContext.getDeclaringExecutable().getAnnotation(MojoParameters.class))
+                    .map(MojoParameters::value)
+                    .map(Arrays::asList)
+                    .ifPresent(mojoParameters::addAll);
+
             Class<?> holder = parameterContext.getTarget().get().getClass();
             PluginDescriptor descriptor = extensionContext
                     .getStore(ExtensionContext.Namespace.GLOBAL)
@@ -113,6 +130,7 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
+        // TODO provide protected setters in PlexusExtension
         Field field = PlexusExtension.class.getDeclaredField("basedir");
         field.setAccessible(true);
         field.set(null, getBasedir());
@@ -126,6 +144,8 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
             binder.install(ProviderMethodsModule.forObject(context.getRequiredTestInstance()));
             binder.requestInjection(context.getRequiredTestInstance());
             binder.bind(Log.class).toInstance(new MojoLogWrapper(LoggerFactory.getLogger("anonymous")));
+            binder.bind(MavenSession.class).toInstance(mockMavenSession());
+            binder.bind(MojoExecution.class).toInstance(mockMojoExecution());
         });
 
         Map<Object, Object> map = getContainer().getContext().getContextData();
@@ -147,12 +167,36 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
         }
     }
 
+    /**
+     * Default MojoExecution mock
+     *
+     * @return a MojoExecution mock
+     */
+    private MojoExecution mockMojoExecution() {
+        return Mockito.mock(MojoExecution.class);
+    }
+
+    /**
+     * Default MavenSession mock
+     *
+     * @return a MavenSession mock
+     */
+    private MavenSession mockMavenSession() {
+        MavenSession session = Mockito.mock(MavenSession.class);
+        Mockito.when(session.getUserProperties()).thenReturn(new Properties());
+        Mockito.when(session.getSystemProperties()).thenReturn(new Properties());
+        return session;
+    }
+
     protected String getPluginDescriptorLocation() {
         return "META-INF/maven/plugin.xml";
     }
 
     private Mojo lookupMojo(
-            Class<?> holder, InjectMojo injectMojo, List<MojoParameter> mojoParameters, PluginDescriptor descriptor)
+            Class<?> holder,
+            InjectMojo injectMojo,
+            Collection<MojoParameter> mojoParameters,
+            PluginDescriptor descriptor)
             throws Exception {
         String goal = injectMojo.goal();
         String pom = injectMojo.pom();
@@ -241,6 +285,8 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
                     evaluator,
                     getContainer().getContainerRealm());
         }
+
+        mojo.setLog(getContainer().lookup(Log.class));
 
         return mojo;
     }
