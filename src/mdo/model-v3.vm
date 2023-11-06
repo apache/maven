@@ -198,7 +198,7 @@ public class ${class.name}
                 update(getDelegate().with${cap}(null));
             }
         } else {
-            throw new IllegalArgumentException("Expected an Xpp3Dom object but received: " + ${field.name});
+            throw new IllegalArgumentException("Expected an Xpp3Dom object but received a " + ${field.name}.getClass() + ": " + ${field.name});
         }
       #elseif( $field.type == "java.util.Properties" )
         Map<String, String> map = ${field.name}.entrySet().stream()

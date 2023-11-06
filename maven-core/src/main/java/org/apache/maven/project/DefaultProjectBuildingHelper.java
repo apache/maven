@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -50,6 +51,7 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 import org.slf4j.Logger;
@@ -151,7 +153,10 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
                 plugin.setGroupId(extension.getGroupId());
                 plugin.setArtifactId(extension.getArtifactId());
                 plugin.setVersion(extension.getVersion());
-                plugin.setConfiguration(extension.getDelegate().getConfiguration());
+                XmlNode configuration = extension.getDelegate().getConfiguration();
+                if (configuration != null) {
+                    plugin.setConfiguration(new Xpp3Dom(configuration));
+                }
                 extensionPlugins.add(plugin);
             }
 
