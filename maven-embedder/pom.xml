@@ -195,6 +195,7 @@ under the License.
             <id>modello</id>
             <goals>
               <goal>velocity</goal>
+              <goal>xsd</goal>
             </goals>
           </execution>
         </executions>
