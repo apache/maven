@@ -111,6 +111,8 @@ public class DefaultRepositorySystemSessionFactory {
 
     private static final String MAVEN_RESOLVER_TRANSPORT_APACHE = "apache";
 
+    private static final String MAVEN_RESOLVER_TRANSPORT_JDK = "jdk";
+
     /**
      * This name for Apache HttpClient transport is deprecated.
      *
@@ -124,6 +126,8 @@ public class DefaultRepositorySystemSessionFactory {
     private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
 
     private static final String APACHE_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.HttpTransporterFactory";
+
+    private static final String JDK_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.JdkTransporterFactory";
 
     private static final String NATIVE_FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
 
@@ -330,6 +334,10 @@ public class DefaultRepositorySystemSessionFactory {
         Object transport = configProps.getOrDefault(MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
         if (MAVEN_RESOLVER_TRANSPORT_DEFAULT.equals(transport)) {
             // The "default" mode (user did not set anything) from now on defaults to AUTO
+        } else if (MAVEN_RESOLVER_TRANSPORT_JDK.equals(transport)) {
+            // Make sure (whatever extra priority is set) that resolver file/jdk is selected
+            configProps.put(NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+            configProps.put(JDK_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
         } else if (MAVEN_RESOLVER_TRANSPORT_APACHE.equals(transport)
                 || MAVEN_RESOLVER_TRANSPORT_NATIVE.equals(transport)) {
             if (MAVEN_RESOLVER_TRANSPORT_NATIVE.equals(transport)) {
