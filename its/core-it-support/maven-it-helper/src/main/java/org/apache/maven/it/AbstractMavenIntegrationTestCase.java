@@ -94,7 +94,7 @@ public abstract class AbstractMavenIntegrationTestCase {
      *
      * @return The Java version, never <code>null</code>.
      */
-    private static ArtifactVersion getJavaVersion() {
+    protected static ArtifactVersion getJavaVersion() {
         if (javaVersion == null) {
             String version = System.getProperty("java.version");
             version = version.replaceAll("[_-]", ".");

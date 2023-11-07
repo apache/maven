@@ -22,9 +22,12 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +41,11 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
     private HttpServer server;
 
     private int port;
+
+    private static final ArtifactVersion JDK_TRANSPORT_USABLE_ON_JDK_SINCE = new DefaultArtifactVersion("11");
+
+    private static final ArtifactVersion JDK_TRANSPORT_IN_MAVEN_SINCE =
+            new DefaultArtifactVersion("4.0.0-alpha-9-SNAPSHOT");
 
     public MavenITmng7470ResolverTransportTest() {
         super("[3.9.0,)");
@@ -99,11 +107,35 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     private static final String WAGON_LOG_SNIPPET = "[DEBUG] Using transporter WagonTransporter";
 
-    private static final String NATIVE_LOG_SNIPPET = "[DEBUG] Using transporter HttpTransporter";
+    private static final String APACHE_LOG_SNIPPET = "[DEBUG] Using transporter HttpTransporter";
+
+    private static final String JDK_LOG_SNIPPET = "[DEBUG] Using transporter JdkHttpTransporter";
+
+    /**
+     * Returns {@code true} if JDK HttpClient transport is usable (Java11 or better).
+     */
+    private boolean isJdkTransportUsable() {
+        return JDK_TRANSPORT_USABLE_ON_JDK_SINCE.compareTo(getJavaVersion()) < 1;
+    }
+
+    /**
+     * Returns {@code true} if JDK HttpClient transport is present in Maven (since 4.0.0-alpha-9, the Resovler 2.0.0
+     * upgrade).
+     */
+    private boolean isJdkTransportPresent() {
+        return JDK_TRANSPORT_IN_MAVEN_SINCE.compareTo(getMavenVersion()) < 1;
+    }
+
+    private String defaultLogSnippet() {
+        if (isJdkTransportUsable() && isJdkTransportPresent()) {
+            return JDK_LOG_SNIPPET;
+        }
+        return APACHE_LOG_SNIPPET;
+    }
 
     @Test
     public void testResolverTransportDefault() throws Exception {
-        performTest(null, NATIVE_LOG_SNIPPET);
+        performTest(null, defaultLogSnippet());
     }
 
     @Test
@@ -112,7 +144,13 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
     }
 
     @Test
-    public void testResolverTransportNative() throws Exception {
-        performTest("native", NATIVE_LOG_SNIPPET);
+    public void testResolverTransportApache() throws Exception {
+        performTest(isJdkTransportPresent() ? "apache" : "native", APACHE_LOG_SNIPPET);
+    }
+
+    @Test
+    public void testResolverTransportJdk() throws Exception {
+        Assumptions.assumeTrue(isJdkTransportUsable() && isJdkTransportPresent());
+        performTest("jdk", JDK_LOG_SNIPPET);
     }
 }

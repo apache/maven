@@ -117,6 +117,8 @@ public class MavenITmng5175WagonHttpTest extends AbstractMavenIntegrationTestCas
         verifier.addCliArgument("--errors");
         verifier.addCliArgument("-X");
         verifier.addCliArgument("validate");
+        verifier.addCliArgument(
+                "-Dmaven.resolver.transport=wagon"); // this tests Wagon integration and uses Wagon specific config
         verifier.execute();
 
         verifier.verifyTextInLog(

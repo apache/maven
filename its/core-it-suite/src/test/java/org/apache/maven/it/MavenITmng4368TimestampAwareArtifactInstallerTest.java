@@ -27,13 +27,14 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4368">MNG-4368</a>.
+ * Resolver 2.0.0 (in use since Maven 4.0.0-alpha-9) undoes this "smart" solution.
  *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractMavenIntegrationTestCase {
 
     public MavenITmng4368TimestampAwareArtifactInstallerTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-6,)");
+        super("[2.0.3,3.0-alpha-1),[3.0-alpha-6,4.0.0-alpha-8]");
     }
 
     /**
