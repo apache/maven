@@ -355,7 +355,8 @@ public class DefaultRepositorySystemSessionFactory {
         } else if (!MAVEN_RESOLVER_TRANSPORT_AUTO.equals(transport)) {
             throw new IllegalArgumentException("Unknown resolver transport '" + transport
                     + "'. Supported transports are: " + MAVEN_RESOLVER_TRANSPORT_WAGON + ", "
-                    + MAVEN_RESOLVER_TRANSPORT_APACHE + ", " + MAVEN_RESOLVER_TRANSPORT_AUTO);
+                    + MAVEN_RESOLVER_TRANSPORT_APACHE + ", " + MAVEN_RESOLVER_TRANSPORT_JDK + ", "
+                    + MAVEN_RESOLVER_TRANSPORT_AUTO);
         }
 
         session.setUserProperties(request.getUserProperties());
