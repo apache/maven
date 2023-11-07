@@ -387,7 +387,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
         IllegalArgumentException exception = assertThrowsExactly(
                 IllegalArgumentException.class, () -> systemSessionFactory.newRepositorySession(request));
         assertEquals(
-                "Unknown resolver transport 'illegal'. Supported transports are: wagon, apache, auto",
+                "Unknown resolver transport 'illegal'. Supported transports are: wagon, apache, jdk, auto",
                 exception.getMessage());
         properties.remove("maven.resolver.transport");
     }
