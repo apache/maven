@@ -60,7 +60,7 @@ public class BuildModelSourceTransformerTest {
                 .artifactId("ARTIFACTID")
                 .version("1.0-SNAPSHOT")
                 .build());
-        Mockito.when(context.getRawModel(root.resolve("pom.xml"))).thenReturn(parent);
+        Mockito.when(context.getRawModel(pomFile, root.resolve("pom.xml"))).thenReturn(parent);
         Mockito.when(context.locate(root)).thenReturn(root.resolve("pom.xml"));
         Model initial = new Model(org.apache.maven.api.model.Model.newBuilder()
                 .parent(org.apache.maven.api.model.Parent.newBuilder()
@@ -86,7 +86,7 @@ public class BuildModelSourceTransformerTest {
                 .artifactId("ARTIFACTID")
                 .version("1.0-SNAPSHOT")
                 .build());
-        Mockito.when(context.getRawModel("GROUPID", "ARTIFACTID")).thenReturn(dep);
+        Mockito.when(context.getRawModel(pomFile, "GROUPID", "ARTIFACTID")).thenReturn(dep);
         Model initial = new Model(org.apache.maven.api.model.Model.newBuilder()
                 .dependencies(Collections.singleton(org.apache.maven.api.model.Dependency.newBuilder()
                         .groupId("GROUPID")

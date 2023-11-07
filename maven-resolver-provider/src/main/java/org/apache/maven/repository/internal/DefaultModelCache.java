@@ -21,6 +21,7 @@ package org.apache.maven.repository.internal;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import org.apache.maven.building.Source;
 import org.apache.maven.model.building.ModelCache;
@@ -34,10 +35,10 @@ public class DefaultModelCache implements ModelCache {
 
     private static final String KEY = DefaultModelCache.class.getName();
 
-    private final Map<Object, Object> cache;
+    private final Map<Object, Supplier<?>> cache;
 
     public static ModelCache newInstance(RepositorySystemSession session) {
-        Map<Object, Object> cache;
+        Map<Object, Supplier<?>> cache;
         if (session.getCache() == null) {
             cache = new ConcurrentHashMap<>();
         } else {
@@ -50,7 +51,7 @@ public class DefaultModelCache implements ModelCache {
         return new DefaultModelCache(cache);
     }
 
-    private DefaultModelCache(Map<Object, Object> cache) {
+    private DefaultModelCache(Map<Object, Supplier<?>> cache) {
         this.cache = cache;
     }
 
@@ -73,11 +74,28 @@ public class DefaultModelCache implements ModelCache {
     }
 
     protected Object get(Object key) {
-        return cache.get(key);
+        Supplier<?> s = cache.get(key);
+        return s != null ? s.get() : null;
     }
 
     protected void put(Object key, Object data) {
-        cache.put(key, data);
+        cache.put(key, () -> data);
+    }
+
+    @Override
+    public Object computeIfAbsent(
+            String groupId, String artifactId, String version, String tag, Supplier<Supplier<?>> data) {
+        return computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), data);
+    }
+
+    @Override
+    public Object computeIfAbsent(Source path, String tag, Supplier<Supplier<?>> data) {
+        return computeIfAbsent(new SourceCacheKey(path, tag), data);
+    }
+
+    protected Object computeIfAbsent(Object key, Supplier<Supplier<?>> data) {
+        Supplier<?> s = cache.computeIfAbsent(key, k -> data.get());
+        return s != null ? s.get() : null;
     }
 
     static class GavCacheKey {

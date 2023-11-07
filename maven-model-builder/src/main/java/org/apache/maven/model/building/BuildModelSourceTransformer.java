@@ -71,7 +71,7 @@ class BuildModelSourceTransformer implements ModelSourceTransformer {
             String path = Optional.ofNullable(parent.getRelativePath()).orElse("..");
             if (version == null && !path.isEmpty()) {
                 Optional<RelativeProject> resolvedParent = resolveRelativePath(
-                        pomFile.getParent(), context, Paths.get(path), parent.getGroupId(), parent.getArtifactId());
+                        pomFile, context, Paths.get(path), parent.getGroupId(), parent.getArtifactId());
                 resolvedParent.ifPresent(relativeProject -> parent.setVersion(relativeProject.getVersion()));
             }
         }
@@ -99,7 +99,8 @@ class BuildModelSourceTransformer implements ModelSourceTransformer {
     void handleReactorDependencies(TransformerContext context, Model model) {
         for (Dependency dep : model.getDependencies()) {
             if (dep.getVersion() == null) {
-                Model depModel = context.getRawModel(dep.getGroupId(), dep.getArtifactId());
+                Model depModel =
+                        context.getRawModel(model.getDelegate().getPomFile(), dep.getGroupId(), dep.getArtifactId());
                 if (depModel != null) {
                     String v = depModel.getVersion();
                     if (v == null && depModel.getParent() != null) {
@@ -124,8 +125,8 @@ class BuildModelSourceTransformer implements ModelSourceTransformer {
     }
 
     protected Optional<RelativeProject> resolveRelativePath(
-            Path projectPath, TransformerContext context, Path relativePath, String groupId, String artifactId) {
-        Path pomPath = projectPath.resolve(relativePath).normalize();
+            Path pomFile, TransformerContext context, Path relativePath, String groupId, String artifactId) {
+        Path pomPath = pomFile.resolveSibling(relativePath).normalize();
         if (Files.isDirectory(pomPath)) {
             pomPath = context.locate(pomPath);
         }
@@ -134,7 +135,7 @@ class BuildModelSourceTransformer implements ModelSourceTransformer {
             return Optional.empty();
         }
 
-        Optional<RelativeProject> mappedProject = Optional.ofNullable(context.getRawModel(pomPath.normalize()))
+        Optional<RelativeProject> mappedProject = Optional.ofNullable(context.getRawModel(pomFile, pomPath.normalize()))
                 .map(BuildModelSourceTransformer::toRelativeProject);
 
         if (mappedProject.isPresent()) {

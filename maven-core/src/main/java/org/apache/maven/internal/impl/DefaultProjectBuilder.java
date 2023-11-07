@@ -150,10 +150,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         public String getLocation() {
                             StringBuilder buffer = new StringBuilder(256);
 
-                            if (getSource().length() > 0) {
-                                if (buffer.length() > 0) {
-                                    buffer.append(", ");
-                                }
+                            if (!getSource().isEmpty()) {
                                 buffer.append(getSource());
                             }
 
@@ -205,13 +202,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                                 public Node getRoot() {
                                     return session.getNode(r.getDependencyGraph());
                                 }
-
-                                //                                @Override
-                                //                                public List<ArtifactResolverResult>
-                                // getArtifactResults()
-                                //                                {
-                                //                                    return Collections.emptyList();
-                                //                                }
                             });
                 }
             };
