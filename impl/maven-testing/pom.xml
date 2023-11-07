@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven.plugin-testing</groupId>
     <artifactId>maven-plugin-testing</artifactId>
-    <version>4.0.0-alpha-2</version>
+    <version>4.0.0-alpha-3-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-plugin-testing-harness</artifactId>
