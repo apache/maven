@@ -79,6 +79,11 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends Abst
                     foundCause = true;
                     break;
                 }
+                // To be fixed with https://issues.apache.org/jira/browse/MRESOLVER-429
+                if (line.matches(".*ConnectException.*")) {
+                    foundCause = true;
+                    break;
+                }
                 if (line.matches(".*Connection to http://localhost:54312 refused.*")) {
                     foundCause = true;
                     break;
