@@ -50,11 +50,12 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.mockito.Mockito.mock;
 
 @PlexusTest
 public abstract class AbstractCoreMavenComponentTestCase {
@@ -149,7 +150,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
                 getContainer(), configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());
         session.setProjects(projects);
         session.setAllProjects(session.getProjects());
-        session.setSession(new DefaultSession(session, new DefaultRepositorySystem(), null, null, null, null));
+        session.setSession(new DefaultSession(session, mock(RepositorySystem.class), null, null, null, null));
 
         return session;
     }

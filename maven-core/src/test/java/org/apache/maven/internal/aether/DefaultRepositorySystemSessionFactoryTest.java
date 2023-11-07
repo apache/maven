@@ -362,7 +362,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
 
         // native
         Properties properties = new Properties();
-        properties.setProperty("maven.resolver.transport", "native");
+        properties.setProperty("maven.resolver.transport", "apache");
         request.setSystemProperties(properties);
         Map<String, Object> configProperties =
                 systemSessionFactory.newRepositorySession(request).getConfigProperties();
@@ -387,7 +387,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
         IllegalArgumentException exception = assertThrowsExactly(
                 IllegalArgumentException.class, () -> systemSessionFactory.newRepositorySession(request));
         assertEquals(
-                "Unknown resolver transport 'illegal'. Supported transports are: wagon, native, auto",
+                "Unknown resolver transport 'illegal'. Supported transports are: wagon, apache, jdk, auto",
                 exception.getMessage());
         properties.remove("maven.resolver.transport");
     }

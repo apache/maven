@@ -109,13 +109,25 @@ public class DefaultRepositorySystemSessionFactory {
 
     private static final String MAVEN_RESOLVER_TRANSPORT_WAGON = "wagon";
 
+    private static final String MAVEN_RESOLVER_TRANSPORT_APACHE = "apache";
+
+    private static final String MAVEN_RESOLVER_TRANSPORT_JDK = "jdk";
+
+    /**
+     * This name for Apache HttpClient transport is deprecated.
+     *
+     * @deprecated Renamed to {@link #MAVEN_RESOLVER_TRANSPORT_APACHE}
+     */
+    @Deprecated
     private static final String MAVEN_RESOLVER_TRANSPORT_NATIVE = "native";
 
     private static final String MAVEN_RESOLVER_TRANSPORT_AUTO = "auto";
 
     private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
 
-    private static final String NATIVE_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.HttpTransporterFactory";
+    private static final String APACHE_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.HttpTransporterFactory";
+
+    private static final String JDK_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.JdkTransporterFactory";
 
     private static final String NATIVE_FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
 
@@ -322,17 +334,29 @@ public class DefaultRepositorySystemSessionFactory {
         Object transport = configProps.getOrDefault(MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
         if (MAVEN_RESOLVER_TRANSPORT_DEFAULT.equals(transport)) {
             // The "default" mode (user did not set anything) from now on defaults to AUTO
-        } else if (MAVEN_RESOLVER_TRANSPORT_NATIVE.equals(transport)) {
-            // Make sure (whatever extra priority is set) that resolver native is selected
+        } else if (MAVEN_RESOLVER_TRANSPORT_JDK.equals(transport)) {
+            // Make sure (whatever extra priority is set) that resolver file/jdk is selected
             configProps.put(NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
-            configProps.put(NATIVE_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+            configProps.put(JDK_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+        } else if (MAVEN_RESOLVER_TRANSPORT_APACHE.equals(transport)
+                || MAVEN_RESOLVER_TRANSPORT_NATIVE.equals(transport)) {
+            if (MAVEN_RESOLVER_TRANSPORT_NATIVE.equals(transport)) {
+                logger.warn(
+                        "Transport name '{}' is DEPRECATED/RENAMED, use '{}' instead",
+                        MAVEN_RESOLVER_TRANSPORT_NATIVE,
+                        MAVEN_RESOLVER_TRANSPORT_APACHE);
+            }
+            // Make sure (whatever extra priority is set) that resolver file/apache is selected
+            configProps.put(NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+            configProps.put(APACHE_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
         } else if (MAVEN_RESOLVER_TRANSPORT_WAGON.equals(transport)) {
             // Make sure (whatever extra priority is set) that wagon is selected
             configProps.put(WAGON_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
         } else if (!MAVEN_RESOLVER_TRANSPORT_AUTO.equals(transport)) {
             throw new IllegalArgumentException("Unknown resolver transport '" + transport
                     + "'. Supported transports are: " + MAVEN_RESOLVER_TRANSPORT_WAGON + ", "
-                    + MAVEN_RESOLVER_TRANSPORT_NATIVE + ", " + MAVEN_RESOLVER_TRANSPORT_AUTO);
+                    + MAVEN_RESOLVER_TRANSPORT_APACHE + ", " + MAVEN_RESOLVER_TRANSPORT_JDK + ", "
+                    + MAVEN_RESOLVER_TRANSPORT_AUTO);
         }
 
         session.setUserProperties(request.getUserProperties());
