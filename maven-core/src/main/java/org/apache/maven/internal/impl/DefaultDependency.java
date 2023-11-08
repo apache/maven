@@ -101,7 +101,7 @@ public class DefaultDependency implements Dependency {
     }
 
     @Override
-    public DependencyProperties getProperties() {
+    public DependencyProperties getDependencyProperties() {
         return dependencyProperties;
     }
 

@@ -36,7 +36,7 @@ public interface Dependency extends Artifact {
      * @return the dependency properties, never {@code null}
      */
     @Nonnull
-    DependencyProperties getProperties();
+    DependencyProperties getDependencyProperties();
 
     @Nonnull
     Scope getScope();
