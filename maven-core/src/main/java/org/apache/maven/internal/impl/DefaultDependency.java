@@ -36,9 +36,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultDependency implements Dependency {
     private final AbstractSession session;
     private final org.eclipse.aether.graph.Dependency dependency;
-
     private final DependencyProperties dependencyProperties;
-
     private final String key;
 
     public DefaultDependency(
