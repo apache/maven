@@ -89,16 +89,6 @@ public interface Type {
     }
 
     /**
-     * Specifies if the artifact contains java classes and should be
-     * added to the module path.
-     *
-     * @return if the artifact should be added to the module path
-     */
-    default boolean isAddedToModulePath() {
-        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_MODULE_PATH_CONSTITUENT);
-    }
-
-    /**
      * Specifies if the artifact already embeds its own dependencies.
      * This is the case for JEE packages or similar artifacts such as
      * WARs, EARs, etc.

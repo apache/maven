@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
@@ -34,7 +35,12 @@ public class JavadocTypeProvider implements Provider<Type> {
     private final Type type;
 
     public JavadocTypeProvider() {
-        this.type = new DefaultType(NAME, "java", "jar", "javadoc", new DefaultDependencyProperties());
+        this.type = new DefaultType(
+                NAME,
+                "java",
+                "jar",
+                "javadoc",
+                new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
     }
 
     @Override

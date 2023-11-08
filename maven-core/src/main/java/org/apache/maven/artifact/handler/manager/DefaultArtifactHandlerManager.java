@@ -60,8 +60,7 @@ public class DefaultArtifactHandlerManager implements ArtifactHandlerManager {
                     null,
                     type.isIncludesDependencies(),
                     type.getLanguage(),
-                    // This is a hack here: legacy cannot distinguish between CP and MP
-                    type.isAddedToClassPath() || type.isAddedToModulePath());
+                    type.isAddedToClassPath()); // TODO: watch out for module path
         });
     }
 
