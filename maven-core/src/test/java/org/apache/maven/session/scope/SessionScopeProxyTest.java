@@ -35,7 +35,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PlexusTest
 @ExtendWith(MockitoExtension.class)
@@ -54,13 +57,19 @@ public class SessionScopeProxyTest {
     void testProxiedSessionScopedBean() throws ComponentLookupException {
         MySingletonBean bean = container.lookup(MySingletonBean.class);
         assertNotNull(bean);
+        assertNotNull(bean.anotherBean);
+        assertSame(bean.anotherBean.getClass(), AnotherBean.class);
         assertNotNull(bean.myBean);
+        assertNotSame(bean.myBean.getClass(), MySessionScopedBean.class);
+        assertTrue(MySessionScopedBean.class.isAssignableFrom(bean.myBean.getClass()));
 
         assertThrows(OutOfScopeException.class, () -> bean.myBean.getSession());
 
         sessionScope.enter();
         sessionScope.seed(Session.class, this.session);
         assertNotNull(bean.myBean.getSession());
+        assertNotNull(bean.myBean.getAnotherBean());
+        assertSame(bean.myBean.getAnotherBean().getClass(), AnotherBean.class);
     }
 
     @Named
@@ -68,7 +77,14 @@ public class SessionScopeProxyTest {
     static class MySingletonBean {
         @Inject
         MySessionScopedBean myBean;
+
+        @Inject
+        AnotherBean anotherBean;
     }
+
+    @Named
+    @Singleton
+    static class AnotherBean {}
 
     @Named
     @SessionScoped
@@ -76,8 +92,15 @@ public class SessionScopeProxyTest {
         @Inject
         Session session;
 
+        @Inject
+        AnotherBean anotherBean;
+
         public Session getSession() {
             return session;
+        }
+
+        public AnotherBean getAnotherBean() {
+            return anotherBean;
         }
     }
 }
