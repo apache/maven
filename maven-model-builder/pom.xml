@@ -142,6 +142,8 @@ under the License.
               <exclude>org.apache.maven.model.building.ModelCache#put(org.apache.maven.building.Source,java.lang.String,java.lang.Object):METHOD_NEW_DEFAULT</exclude>
               <exclude>org.apache.maven.model.building.ModelCache#put(org.apache.maven.building.Source,org.apache.maven.model.building.ModelCacheTag,java.lang.Object):METHOD_NEW_DEFAULT</exclude>
               <exclude>org.apache.maven.model.building.ModelCache#put(java.lang.String,java.lang.String,java.lang.String,org.apache.maven.model.building.ModelCacheTag,java.lang.Object):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.building.ModelCache#computeIfAbsent(java.lang.String,java.lang.String,java.lang.String,org.apache.maven.model.building.ModelCacheTag,java.util.function.Supplier):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.building.ModelCache#computeIfAbsent(org.apache.maven.building.Source,org.apache.maven.model.building.ModelCacheTag,java.util.function.Supplier):METHOD_NEW_DEFAULT</exclude>
               <exclude>org.apache.maven.model.composition.DependencyManagementImporter#importManagement(org.apache.maven.model.Model,java.util.List,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.composition.DefaultDependencyManagementImporter#importManagement(org.apache.maven.model.Model,java.util.List,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.inheritance.DefaultInheritanceAssembler</exclude>
@@ -165,6 +167,9 @@ under the License.
               <exclude>org.apache.maven.model.profile.activation.FileProfileActivator#setProfileActivationFilePathInterpolator(org.apache.maven.model.path.ProfileActivationFilePathInterpolator):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.profile.activation.FileProfileActivator#FileProfileActivator():CONSTRUCTOR_REMOVED</exclude>
               <exclude>org.apache.maven.model.profile.DefaultProfileInjector</exclude>
+              <exclude>org.apache.maven.model.profile.ProfileInjector#injectProfile(org.apache.maven.api.model.Model,org.apache.maven.api.model.Profile,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.profile.ProfileInjector#injectProfiles(org.apache.maven.api.model.Model,java.util.List,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.profile.ProfileSelector#getActiveProfilesV4(java.util.Collection,org.apache.maven.model.profile.ProfileActivationContext,org.apache.maven.model.building.ModelProblemCollector):METHOD_NEW_DEFAULT</exclude>
               <exclude>org.apache.maven.model.resolution.InvalidRepositoryException#getRepository():METHOD_RETURN_TYPE_CHANGED</exclude>
               <exclude>org.apache.maven.model.resolution.InvalidRepositoryException#InvalidRepositoryException(java.lang.String,org.apache.maven.model.Repository,java.lang.Throwable):CONSTRUCTOR_REMOVED</exclude>
               <exclude>org.apache.maven.model.resolution.InvalidRepositoryException#InvalidRepositoryException(java.lang.String,org.apache.maven.model.Repository):CONSTRUCTOR_REMOVED</exclude>

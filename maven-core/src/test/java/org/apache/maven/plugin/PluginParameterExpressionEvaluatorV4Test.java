@@ -61,7 +61,7 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.Os;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
@@ -75,6 +75,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  */
@@ -419,8 +420,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         mavenSession.setCurrentProject(project);
         mavenSession.getRequest().setRootDirectory(rootDirectory);
 
-        DefaultSession session =
-                new DefaultSession(mavenSession, new DefaultRepositorySystem(), null, null, null, null);
+        DefaultSession session = new DefaultSession(mavenSession, mock(RepositorySystem.class), null, null, null, null);
 
         MojoDescriptor mojo = new MojoDescriptor();
         mojo.setPluginDescriptor(pluginDescriptor);
@@ -458,7 +458,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     private DefaultSession newSession() throws Exception {
-        return new DefaultSession(newMavenSession(), new DefaultRepositorySystem(), null, null, null, null);
+        return new DefaultSession(newMavenSession(), mock(RepositorySystem.class), null, null, null, null);
     }
 
     private MavenSession newMavenSession() throws Exception {

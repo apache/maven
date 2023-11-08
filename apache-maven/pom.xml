@@ -80,13 +80,20 @@ under the License.
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-file</artifactId>
     </dependency>
+    <!-- HTTP/1.1, lowest priority, Java8+ (still must as some ITs force it) -->
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-transport-wagon</artifactId>
+    </dependency>
+    <!-- HTTP/1.1, medium priority, Java8+ -->
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-http</artifactId>
     </dependency>
+    <!-- HTTP/1.1 and HTTP/2, high priority, Java11+ -->
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-wagon</artifactId>
+      <artifactId>maven-resolver-transport-jdk</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
