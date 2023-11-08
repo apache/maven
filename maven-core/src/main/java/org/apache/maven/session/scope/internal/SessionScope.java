@@ -98,24 +98,26 @@ public class SessionScope implements Scope {
 
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
         // Lazy evaluating provider
-        if (values.isEmpty()) {
-            Class<T> superType = (Class<T>) key.getTypeLiteral().getRawType();
-            Provider<T> scoped = () -> getScopeState().scope(key, unscoped).get();
-            InvocationHandler dispatcher = (proxy, method, args) -> {
-                method.setAccessible(true);
-                return method.invoke(scoped.get(), args);
-            };
-            Class<? extends T> enhanced = byteBuddy
-                    .subclass(superType)
-                    .method(ElementMatchers.any())
-                    .intercept(InvocationHandlerAdapter.of(dispatcher))
-                    .make()
-                    .load(superType.getClassLoader(), ClassLoadingStrategy.Default.INJECTION)
-                    .getLoaded();
-            return () -> objenesis.newInstance(enhanced);
-        } else {
-            return () -> getScopeState().scope(key, unscoped).get();
-        }
+        return () -> {
+            if (values.isEmpty()) {
+                Class<T> superType = (Class<T>) key.getTypeLiteral().getRawType();
+                Provider<T> scoped = () -> getScopeState().scope(key, unscoped).get();
+                InvocationHandler dispatcher = (proxy, method, args) -> {
+                    method.setAccessible(true);
+                    return method.invoke(scoped.get(), args);
+                };
+                Class<? extends T> enhanced = byteBuddy
+                        .subclass(superType)
+                        .method(ElementMatchers.any())
+                        .intercept(InvocationHandlerAdapter.of(dispatcher))
+                        .make()
+                        .load(superType.getClassLoader(), ClassLoadingStrategy.Default.INJECTION)
+                        .getLoaded();
+                return objenesis.newInstance(enhanced);
+            } else {
+                return getScopeState().scope(key, unscoped).get();
+            }
+        };
     }
 
     /**
