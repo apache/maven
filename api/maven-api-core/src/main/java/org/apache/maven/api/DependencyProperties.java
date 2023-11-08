@@ -43,26 +43,6 @@ public interface DependencyProperties {
     String FLAG_CLASS_PATH_CONSTITUENT = "classPathConstituent";
 
     /**
-     * Boolean flag telling that dependency is meant to be placed on module path.
-     */
-    String FLAG_MODULE_PATH_CONSTITUENT = "modulePathConstituent";
-
-    /**
-     * Boolean flag telling that dependency is meant to be used as Java Agent.
-     */
-    String FLAG_IS_JAVA_AGENT = "isJavaAgent";
-
-    /**
-     * Boolean flag telling that dependency is meant to be used as Java Annotation Processor.
-     */
-    String FLAG_IS_JAVA_ANNOTATION_PROCESSOR = "isJavaAnnotationProcessor";
-
-    /**
-     * Boolean flag telling that dependency is meant to be used as Java Doclet.
-     */
-    String FLAG_IS_JAVA_DOCLET = "isJavaDoclet";
-
-    /**
      * Returns immutable "map view" of all the properties.
      */
     Map<String, String> asMap();

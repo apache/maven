@@ -27,16 +27,20 @@ import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
-@Named(JavaAgentTypeProvider.NAME)
+@Named(EjbClientTypeProvider.NAME)
 @Singleton
-public class JavaAgentTypeProvider implements Provider<Type> {
-    public static final String NAME = "agent";
+public class EjbClientTypeProvider implements Provider<Type> {
+    public static final String NAME = "ejb-client";
 
     private final Type type;
 
-    public JavaAgentTypeProvider() {
+    public EjbClientTypeProvider() {
         this.type = new DefaultType(
-                NAME, "java", "jar", null, new DefaultDependencyProperties(DependencyProperties.FLAG_IS_JAVA_AGENT));
+                NAME,
+                "java",
+                "jar",
+                "client",
+                new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
     }
 
     @Override

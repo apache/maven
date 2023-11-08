@@ -27,20 +27,20 @@ import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
-@Named(JavaAnnotationProcessorTypeProvider.NAME)
+@Named(RarTypeProvider.NAME)
 @Singleton
-public class JavaAnnotationProcessorTypeProvider implements Provider<Type> {
-    public static final String NAME = "annotation-processor";
+public class RarTypeProvider implements Provider<Type> {
+    public static final String NAME = "rar";
 
     private final Type type;
 
-    public JavaAnnotationProcessorTypeProvider() {
+    public RarTypeProvider() {
         this.type = new DefaultType(
                 NAME,
                 "java",
-                "jar",
+                "rar",
                 null,
-                new DefaultDependencyProperties(DependencyProperties.FLAG_IS_JAVA_ANNOTATION_PROCESSOR));
+                new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
     }
 
     @Override

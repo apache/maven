@@ -85,7 +85,7 @@ public interface Type {
      * @return if the artifact should be added to the class path
      */
     default boolean isAddedToClassPath() {
-        return getTypeProperties().checkFlag(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
+        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
     }
 
     /**
@@ -95,7 +95,7 @@ public interface Type {
      * @return if the artifact should be added to the module path
      */
     default boolean isAddedToModulePath() {
-        return getTypeProperties().checkFlag(DependencyProperties.FLAG_MODULE_PATH_CONSTITUENT);
+        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_MODULE_PATH_CONSTITUENT);
     }
 
     /**
@@ -106,7 +106,7 @@ public interface Type {
      * @return if the artifact's dependencies are included in the artifact
      */
     default boolean isIncludesDependencies() {
-        return getTypeProperties().checkFlag(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
+        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
     }
 
     /**
@@ -114,5 +114,5 @@ public interface Type {
      *
      * @return the default properties, never {@code null}.
      */
-    DependencyProperties getTypeProperties();
+    DependencyProperties getDependencyProperties();
 }

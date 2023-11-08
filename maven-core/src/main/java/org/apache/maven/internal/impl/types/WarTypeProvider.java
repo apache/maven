@@ -27,20 +27,20 @@ import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
-@Named(ModuleTypeProvider.NAME)
+@Named(WarTypeProvider.NAME)
 @Singleton
-public class ModuleTypeProvider implements Provider<Type> {
-    public static final String NAME = "module";
+public class WarTypeProvider implements Provider<Type> {
+    public static final String NAME = "war";
 
     private final Type type;
 
-    public ModuleTypeProvider() {
+    public WarTypeProvider() {
         this.type = new DefaultType(
                 NAME,
                 "java",
-                "jar",
+                "war",
                 null,
-                new DefaultDependencyProperties(DependencyProperties.FLAG_MODULE_PATH_CONSTITUENT));
+                new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
     }
 
     @Override

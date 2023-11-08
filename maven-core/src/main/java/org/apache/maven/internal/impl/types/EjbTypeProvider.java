@@ -27,22 +27,20 @@ import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
-@Named(FatModuleTypeProvider.NAME)
+@Named(EjbTypeProvider.NAME)
 @Singleton
-public class FatModuleTypeProvider implements Provider<Type> {
-    public static final String NAME = "fatmodule";
+public class EjbTypeProvider implements Provider<Type> {
+    public static final String NAME = "ejb";
 
     private final Type type;
 
-    public FatModuleTypeProvider() {
+    public EjbTypeProvider() {
         this.type = new DefaultType(
                 NAME,
                 "java",
                 "jar",
                 null,
-                new DefaultDependencyProperties(
-                        DependencyProperties.FLAG_MODULE_PATH_CONSTITUENT,
-                        DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
+                new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
     }
 
     @Override

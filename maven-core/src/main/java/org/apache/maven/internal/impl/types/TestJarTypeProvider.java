@@ -27,16 +27,20 @@ import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
-@Named(JavaDocletTypeProvider.NAME)
+@Named(TestJarTypeProvider.NAME)
 @Singleton
-public class JavaDocletTypeProvider implements Provider<Type> {
-    public static final String NAME = "doclet";
+public class TestJarTypeProvider implements Provider<Type> {
+    public static final String NAME = "test-jar";
 
     private final Type type;
 
-    public JavaDocletTypeProvider() {
+    public TestJarTypeProvider() {
         this.type = new DefaultType(
-                NAME, "java", "jar", null, new DefaultDependencyProperties(DependencyProperties.FLAG_IS_JAVA_DOCLET));
+                NAME,
+                "java",
+                "jar",
+                "tests",
+                new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
     }
 
     @Override

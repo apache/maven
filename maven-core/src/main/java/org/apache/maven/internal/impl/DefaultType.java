@@ -33,29 +33,33 @@ public class DefaultType implements Type, ArtifactType {
 
     private final String classifier;
 
-    private final DependencyProperties typeProperties;
+    private final DependencyProperties dependencyProperties;
 
     public DefaultType(
-            String id, String language, String extension, String classifier, DependencyProperties typeProperties) {
+            String id,
+            String language,
+            String extension,
+            String classifier,
+            DependencyProperties dependencyProperties) {
         nonNull(id, "null id");
         nonNull(language, "null language");
         this.extension = nonNull(extension, "null extension");
         this.classifier = classifier;
-        nonNull(typeProperties, "null typeProperties");
-        HashMap<String, String> props = new HashMap<>(typeProperties.asMap());
+        nonNull(dependencyProperties, "null dependencyProperties");
+        HashMap<String, String> props = new HashMap<>(dependencyProperties.asMap());
         props.put(ArtifactProperties.TYPE, id);
         props.put(ArtifactProperties.LANGUAGE, language);
-        this.typeProperties = new DefaultDependencyProperties(props);
+        this.dependencyProperties = new DefaultDependencyProperties(props);
     }
 
     @Override
     public String getId() {
-        return typeProperties.asMap().get(ArtifactProperties.TYPE);
+        return dependencyProperties.asMap().get(ArtifactProperties.TYPE);
     }
 
     @Override
     public String getLanguage() {
-        return typeProperties.asMap().get(ArtifactProperties.LANGUAGE);
+        return dependencyProperties.asMap().get(ArtifactProperties.LANGUAGE);
     }
 
     @Override
@@ -69,17 +73,21 @@ public class DefaultType implements Type, ArtifactType {
     }
 
     @Override
-    public DependencyProperties getTypeProperties() {
-        return typeProperties;
+    public DependencyProperties getDependencyProperties() {
+        return dependencyProperties;
     }
 
     @Override
     public Map<String, String> getProperties() {
-        return getTypeProperties().asMap();
+        return getDependencyProperties().asMap();
     }
 
     static ArtifactType wrap(Type type) {
         return new DefaultType(
-                type.getId(), type.getLanguage(), type.getExtension(), type.getClassifier(), type.getTypeProperties());
+                type.getId(),
+                type.getLanguage(),
+                type.getExtension(),
+                type.getClassifier(),
+                type.getDependencyProperties());
     }
 }
