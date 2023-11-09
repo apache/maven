@@ -21,6 +21,7 @@ package org.apache.maven.internal.aether;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -52,8 +53,6 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.LocalRepository;
-import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
@@ -68,8 +67,6 @@ import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * @since 3.3.0
@@ -90,7 +87,9 @@ public class DefaultRepositorySystemSessionFactory {
      * Default: {@code true}, will ignore availability from tail local repositories.
      *
      * @since 3.9.0
+     * @deprecated Use {@link ChainedLocalRepositoryManager#IGNORE_TAIL_AVAILABILITY} instead.
      */
+    @Deprecated
     private static final String MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY = "maven.repo.local.tail.ignoreAvailability";
 
     /**
@@ -183,6 +182,12 @@ public class DefaultRepositorySystemSessionFactory {
         // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
         configProps.putAll(request.getSystemProperties());
         configProps.putAll(request.getUserProperties());
+
+        // we need to "translate" this
+        if (configProps.containsKey(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY)) {
+            configProps.put(ChainedLocalRepositoryManager.IGNORE_TAIL_AVAILABILITY, Boolean.parseBoolean((String)
+                    configProps.get(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY)));
+        }
 
         session.setOffline(request.isOffline());
         session.setChecksumPolicy(request.getGlobalChecksumPolicy());
@@ -368,7 +373,8 @@ public class DefaultRepositorySystemSessionFactory {
 
         session.setRepositoryListener(eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger)));
 
-        boolean recordReverseTree = ConfigUtils.getBoolean(session, false, MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE);
+        boolean recordReverseTree = configProps.containsKey(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE)
+                && ConfigUtils.getBoolean(session, false, MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE);
         if (recordReverseTree) {
             session.setRepositoryListener(new ChainedRepositoryListener(
                     session.getRepositoryListener(), new ReverseTreeRepositoryListener()));
@@ -382,37 +388,21 @@ public class DefaultRepositorySystemSessionFactory {
         mavenRepositorySystem.injectProxy(session, request.getPluginArtifactRepositories());
         mavenRepositorySystem.injectAuthentication(session, request.getPluginArtifactRepositories());
 
-        setUpLocalRepositoryManager(request, session);
+        ArrayList<File> paths = new ArrayList<>();
+        paths.add(new File(request.getLocalRepository().getBasedir()));
+        String localRepoTail = (String) configProps.get(MAVEN_REPO_LOCAL_TAIL);
+        if (localRepoTail != null) {
+            Arrays.stream(localRepoTail.split(","))
+                    .filter(p -> p != null && !p.trim().isEmpty())
+                    .map(File::new)
+                    .forEach(paths::add);
+        }
+        session.withLocalRepository(paths);
 
         return session;
     }
 
-    private void setUpLocalRepositoryManager(
-            MavenExecutionRequest request, RepositorySystemSession.SessionBuilder session) {
-        LocalRepository localRepo =
-                new LocalRepository(request.getLocalRepository().getBasedir());
-
-        LocalRepositoryManager lrm = repoSystem.newLocalRepositoryManager(session, localRepo);
-
-        String localRepoTail = ConfigUtils.getString(session, null, MAVEN_REPO_LOCAL_TAIL);
-        if (localRepoTail != null) {
-            boolean ignoreTailAvailability =
-                    ConfigUtils.getBoolean(session, true, MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY);
-            List<LocalRepositoryManager> tail = new ArrayList<>();
-            List<String> paths = Arrays.stream(localRepoTail.split(","))
-                    .filter(p -> p != null && !p.trim().isEmpty())
-                    .collect(toList());
-            for (String path : paths) {
-                tail.add(repoSystem.newLocalRepositoryManager(session, new LocalRepository(path)));
-            }
-            session.setLocalRepositoryManager(new ChainedLocalRepositoryManager(lrm, tail, ignoreTailAvailability));
-        } else {
-            session.setLocalRepositoryManager(lrm);
-        }
-    }
-
     private Map<?, ?> getPropertiesFromRequestedProfiles(MavenExecutionRequest request) {
-
         HashSet<String> activeProfileId =
                 new HashSet<>(request.getProfileActivation().getRequiredActiveProfileIds());
         activeProfileId.addAll(request.getProfileActivation().getOptionalActiveProfileIds());
