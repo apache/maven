@@ -77,20 +77,20 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
         long contentLength = event.getTransferredBytes();
         StringBuilder message = new StringBuilder();
 
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH, message);
+        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
         message.append(": ");
         message.append(resource.getRepositoryUrl())
                 .append(resource.getResourceName())
                 .append(" (");
-        format.format(contentLength);
+        format.format(message, contentLength);
 
         long duration = System.currentTimeMillis() - resource.getTransferStartTime();
         if (duration > 0L) {
             double bytesPerSecond = contentLength / (duration / 1000.0);
             message.append(" at ");
-            format.format((long) bytesPerSecond);
+            format.format(message, (long) bytesPerSecond);
             message.append("/s");
         }
 

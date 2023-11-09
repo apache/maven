@@ -99,19 +99,21 @@ public class FileSizeFormat {
         }
     }
 
-    private StringBuilder builder;
+    public FileSizeFormat(Locale locale) {}
 
-    public FileSizeFormat(Locale locale, StringBuilder builder) {
-        this.builder = builder;
+    public String format(long size) {
+        StringBuilder sb = new StringBuilder();
+        format(sb, size);
+        return sb.toString();
     }
 
-    public void format(long size) {
-        format(size, ScaleUnit.getScaleUnit(size));
+    public void format(StringBuilder builder, long size) {
+        format(builder, size, ScaleUnit.getScaleUnit(size));
         builder.append(" ").append(ScaleUnit.getScaleUnit(size).symbol());
     }
 
     @SuppressWarnings("checkstyle:magicnumber")
-    private void format(long size, ScaleUnit unit) {
+    private void format(StringBuilder builder, long size, ScaleUnit unit) {
         if (size < 0L) {
             throw new IllegalArgumentException("file size cannot be negative: " + size);
         }
@@ -127,7 +129,13 @@ public class FileSizeFormat {
         }
     }
 
-    public void formatProgress(long progressedSize, long size) {
+    public String formatProgress(long progressedSize, long size) {
+        StringBuilder sb = new StringBuilder();
+        formatProgress(sb, progressedSize, size);
+        return sb.toString();
+    }
+
+    public void formatProgress(StringBuilder builder, long progressedSize, long size) {
         if (progressedSize < 0L) {
             throw new IllegalArgumentException("progressed file size cannot be negative: " + size);
         }
@@ -138,14 +146,14 @@ public class FileSizeFormat {
 
         if (size >= 0L && progressedSize != size) {
             ScaleUnit unit = ScaleUnit.getScaleUnit(size);
-            format(progressedSize, unit);
+            format(builder, progressedSize, unit);
             builder.append("/");
-            format(size, unit);
+            format(builder, size, unit);
             builder.append(" ").append(unit.symbol());
         } else {
             ScaleUnit unit = ScaleUnit.getScaleUnit(progressedSize);
 
-            format(progressedSize, unit);
+            format(builder, progressedSize, unit);
             builder.append(" ").append(unit.symbol());
         }
     }
