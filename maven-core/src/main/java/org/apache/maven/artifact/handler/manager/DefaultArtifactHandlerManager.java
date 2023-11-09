@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,7 +58,7 @@ public class DefaultArtifactHandlerManager implements ArtifactHandlerManager {
                     null,
                     null,
                     type.isIncludesDependencies(),
-                    type.getLanguage(),
+                    "none",
                     type.isAddedToClassPath()); // TODO: watch out for module path
         });
     }

@@ -36,11 +36,7 @@ public class JarTypeProvider implements Provider<Type> {
 
     public JarTypeProvider() {
         this.type = new DefaultType(
-                NAME,
-                "java",
-                "jar",
-                null,
-                new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
+                NAME, "jar", null, new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
     }
 
     @Override

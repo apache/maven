@@ -36,11 +36,7 @@ public class RarTypeProvider implements Provider<Type> {
 
     public RarTypeProvider() {
         this.type = new DefaultType(
-                NAME,
-                "java",
-                "rar",
-                null,
-                new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
+                NAME, "rar", null, new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
     }
 
     @Override

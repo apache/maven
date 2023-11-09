@@ -79,7 +79,8 @@ class ArtifactHandlerTest {
                 // Packaging/Directory is Maven1 remnant!!!
                 // assertEquals(handler.getPackaging(), packaging, type + " packaging");
                 assertEquals(handler.getClassifier(), classifier, type + " classifier");
-                assertEquals(handler.getLanguage(), language, type + " language");
+                // Language is unused
+                // assertEquals(handler.getLanguage(), language, type + " language");
                 assertEquals(
                         handler.isAddedToClasspath() ? "true" : null, addedToClasspath, type + " addedToClasspath");
                 assertEquals(

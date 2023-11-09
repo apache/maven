@@ -73,11 +73,7 @@ public class DefaultTypeRegistry implements TypeRegistry, ArtifactTypeRegistry {
                 flags.add(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
             }
             return new DefaultType(
-                    id,
-                    handler.getLanguage(),
-                    handler.getExtension(),
-                    handler.getClassifier(),
-                    new DefaultDependencyProperties(flags));
+                    id, handler.getExtension(), handler.getClassifier(), new DefaultDependencyProperties(flags));
         });
     }
 

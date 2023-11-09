@@ -37,7 +37,6 @@ public class EjbClientTypeProvider implements Provider<Type> {
     public EjbClientTypeProvider() {
         this.type = new DefaultType(
                 NAME,
-                "java",
                 "jar",
                 "client",
                 new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));

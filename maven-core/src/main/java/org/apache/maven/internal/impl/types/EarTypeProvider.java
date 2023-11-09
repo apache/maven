@@ -36,11 +36,7 @@ public class EarTypeProvider implements Provider<Type> {
 
     public EarTypeProvider() {
         this.type = new DefaultType(
-                NAME,
-                "java",
-                "ear",
-                null,
-                new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
+                NAME, "ear", null, new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
     }
 
     @Override

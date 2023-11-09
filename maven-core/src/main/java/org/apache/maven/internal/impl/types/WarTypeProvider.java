@@ -36,11 +36,7 @@ public class WarTypeProvider implements Provider<Type> {
 
     public WarTypeProvider() {
         this.type = new DefaultType(
-                NAME,
-                "java",
-                "war",
-                null,
-                new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
+                NAME, "war", null, new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
     }
 
     @Override
