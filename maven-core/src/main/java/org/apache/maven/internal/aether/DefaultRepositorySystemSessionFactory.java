@@ -184,7 +184,12 @@ public class DefaultRepositorySystemSessionFactory {
 
         // we need to "translate" this
         if (configProps.containsKey(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY)) {
-            configProps.put(ChainedLocalRepositoryManager.IGNORE_TAIL_AVAILABILITY,
+            logger.warn(
+                    "Do not use {}, switch to {}",
+                    MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY,
+                    ChainedLocalRepositoryManager.IGNORE_TAIL_AVAILABILITY);
+            configProps.put(
+                    ChainedLocalRepositoryManager.IGNORE_TAIL_AVAILABILITY,
                     configProps.get(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY));
         }
 
@@ -396,7 +401,7 @@ public class DefaultRepositorySystemSessionFactory {
                     .map(File::new)
                     .forEach(paths::add);
         }
-        session.withLocalRepository(paths);
+        session.withLocalRepositoryBasedir(paths);
 
         return session;
     }
