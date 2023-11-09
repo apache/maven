@@ -27,7 +27,7 @@ import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
-@Named( ParTypeProvider.NAME)
+@Named(ParTypeProvider.NAME)
 @Singleton
 public class ParTypeProvider implements Provider<Type> {
     public static final String NAME = "par";
