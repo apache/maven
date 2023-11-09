@@ -51,12 +51,12 @@ import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
-import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
@@ -128,7 +128,7 @@ public class DefaultRepositorySystemSessionFactory {
 
     private static final String JDK_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.JdkTransporterFactory";
 
-    private static final String NATIVE_FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
+    private static final String FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
 
     private static final String RESOLVER_MAX_PRIORITY = String.valueOf(Float.MAX_VALUE);
 
@@ -168,9 +168,8 @@ public class DefaultRepositorySystemSessionFactory {
     }
 
     @SuppressWarnings("checkstyle:methodLength")
-    public RepositorySystemSession.SessionBuilder newRepositorySession(MavenExecutionRequest request) {
-        RepositorySystemSession.SessionBuilder session =
-                MavenRepositorySystemUtils.newSession(repoSystem.createSessionBuilder());
+    public SessionBuilder newRepositorySession(MavenExecutionRequest request) {
+        SessionBuilder session = MavenRepositorySystemUtils.newSession(repoSystem.createSessionBuilder());
         session.setCache(request.getRepositoryCache());
 
         Map<Object, Object> configProps = new LinkedHashMap<>();
@@ -185,8 +184,8 @@ public class DefaultRepositorySystemSessionFactory {
 
         // we need to "translate" this
         if (configProps.containsKey(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY)) {
-            configProps.put(ChainedLocalRepositoryManager.IGNORE_TAIL_AVAILABILITY, Boolean.parseBoolean((String)
-                    configProps.get(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY)));
+            configProps.put(ChainedLocalRepositoryManager.IGNORE_TAIL_AVAILABILITY,
+                    configProps.get(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY));
         }
 
         session.setOffline(request.isOffline());
@@ -342,7 +341,7 @@ public class DefaultRepositorySystemSessionFactory {
             // The "default" mode (user did not set anything) from now on defaults to AUTO
         } else if (MAVEN_RESOLVER_TRANSPORT_JDK.equals(transport)) {
             // Make sure (whatever extra priority is set) that resolver file/jdk is selected
-            configProps.put(NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+            configProps.put(FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
             configProps.put(JDK_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
         } else if (MAVEN_RESOLVER_TRANSPORT_APACHE.equals(transport)
                 || MAVEN_RESOLVER_TRANSPORT_NATIVE.equals(transport)) {
@@ -353,7 +352,7 @@ public class DefaultRepositorySystemSessionFactory {
                         MAVEN_RESOLVER_TRANSPORT_APACHE);
             }
             // Make sure (whatever extra priority is set) that resolver file/apache is selected
-            configProps.put(NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+            configProps.put(FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
             configProps.put(APACHE_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
         } else if (MAVEN_RESOLVER_TRANSPORT_WAGON.equals(transport)) {
             // Make sure (whatever extra priority is set) that wagon is selected
@@ -371,14 +370,14 @@ public class DefaultRepositorySystemSessionFactory {
 
         session.setTransferListener(request.getTransferListener());
 
-        session.setRepositoryListener(eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger)));
+        RepositoryListener repositoryListener = eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger));
 
         boolean recordReverseTree = configProps.containsKey(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE)
-                && ConfigUtils.getBoolean(session, false, MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE);
+                && Boolean.parseBoolean((String) configProps.get(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE));
         if (recordReverseTree) {
-            session.setRepositoryListener(new ChainedRepositoryListener(
-                    session.getRepositoryListener(), new ReverseTreeRepositoryListener()));
+            repositoryListener = new ChainedRepositoryListener(repositoryListener, new ReverseTreeRepositoryListener());
         }
+        session.setRepositoryListener(repositoryListener);
 
         mavenRepositorySystem.injectMirror(request.getRemoteRepositories(), request.getMirrors());
         mavenRepositorySystem.injectProxy(session, request.getRemoteRepositories());
