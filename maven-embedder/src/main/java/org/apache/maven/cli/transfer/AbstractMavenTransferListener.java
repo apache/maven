@@ -78,9 +78,9 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
-        StringBuilder message = new StringBuilder();
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
+        StringBuilder message = new StringBuilder();
         message.append(action).append(darkOn).append(' ').append(direction).append(' ');
         message.append(darkOff).append(resource.getRepositoryId());
         message.append(darkOn).append(": ").append(resource.getRepositoryUrl());
