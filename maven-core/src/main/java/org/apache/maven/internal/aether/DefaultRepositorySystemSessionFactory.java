@@ -56,6 +56,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
@@ -174,8 +175,13 @@ public class DefaultRepositorySystemSessionFactory {
         this.runtimeInformation = runtimeInformation;
     }
 
+    @Deprecated
+    public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
+        return newRepositorySessionBuilder(request).build();
+    }
+
     @SuppressWarnings("checkstyle:methodLength")
-    public SessionBuilder newRepositorySession(MavenExecutionRequest request) {
+    public SessionBuilder newRepositorySessionBuilder(MavenExecutionRequest request) {
         SessionBuilder session = MavenRepositorySystemUtils.newSession(repoSystem.createSessionBuilder());
         session.setCache(request.getRepositoryCache());
 

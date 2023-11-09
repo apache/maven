@@ -92,8 +92,9 @@ public class BootstrapCoreExtensionManager {
     public List<CoreExtensionEntry> loadCoreExtensions(
             MavenExecutionRequest request, Set<String> providedArtifacts, List<CoreExtension> extensions)
             throws Exception {
-        try (CloseableSession repoSession =
-                repositorySystemSessionFactory.newRepositorySession(request).build()) {
+        try (CloseableSession repoSession = repositorySystemSessionFactory
+                .newRepositorySessionBuilder(request)
+                .build()) {
             List<RemoteRepository> repositories = RepositoryUtils.toRepos(request.getPluginArtifactRepositories());
             Interpolator interpolator = createInterpolator(request);
 

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Session;
@@ -51,13 +52,13 @@ import org.eclipse.aether.RepositorySystemSession;
  *
  */
 public class MavenSession implements Cloneable {
-    private MavenExecutionRequest request;
+    private final MavenExecutionRequest request;
 
-    private MavenExecutionResult result;
+    private final MavenExecutionResult result;
 
-    private RepositorySystemSession repositorySession;
+    private final AtomicReference<RepositorySystemSession> repositorySession;
 
-    private Properties executionProperties;
+    private final Properties executionProperties;
 
     private ThreadLocal<MavenProject> currentProject = new ThreadLocal<>();
 
@@ -88,6 +89,13 @@ public class MavenSession implements Cloneable {
     @SuppressWarnings("checkstyle:linelength")
     private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Object>>>
             pluginContextsByProjectAndPluginKey = new ConcurrentHashMap<>();
+
+    /**
+     * For internal use only.
+     */
+    public void swapRepositorySystemSession(RepositorySystemSession repositorySystemSession) {
+        this.repositorySession.set(repositorySystemSession);
+    }
 
     public void setProjects(List<MavenProject> projects) {
         if (!projects.isEmpty()) {
@@ -257,7 +265,7 @@ public class MavenSession implements Cloneable {
     }
 
     public RepositorySystemSession getRepositorySession() {
-        return repositorySession;
+        return repositorySession.get();
     }
 
     private Map<String, MavenProject> projectMap;
@@ -304,7 +312,11 @@ public class MavenSession implements Cloneable {
         this.request = request;
         this.result = result;
         this.settings = adaptSettings(request);
-        this.repositorySession = repositorySession;
+        this.repositorySession = new AtomicReference<>(repositorySession);
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
     }
 
     @Deprecated
@@ -363,6 +375,8 @@ public class MavenSession implements Cloneable {
         this.request.setGoals(goals);
         this.request.setBaseDirectory((executionRootDir != null) ? new File(executionRootDir) : null);
         this.request.setStartTime(startTime);
+        this.result = null;
+        this.repositorySession = new AtomicReference<>(null);
     }
 
     @Deprecated
@@ -375,7 +389,12 @@ public class MavenSession implements Cloneable {
         this.request = request;
         this.result = result;
         this.settings = adaptSettings(request);
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
         setProjects(projects);
+        this.repositorySession = new AtomicReference<>(null);
     }
 
     /**
@@ -431,12 +450,6 @@ public class MavenSession implements Cloneable {
      */
     @Deprecated
     public Properties getExecutionProperties() {
-        if (executionProperties == null) {
-            executionProperties = new Properties();
-            executionProperties.putAll(request.getSystemProperties());
-            executionProperties.putAll(request.getUserProperties());
-        }
-
         return executionProperties;
     }
 
