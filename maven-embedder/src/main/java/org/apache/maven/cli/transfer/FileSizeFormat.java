@@ -31,7 +31,7 @@ import java.util.Locale;
  *      href="https://en.wikipedia.org/wiki/Octet_%28computing%29">https://en.wikipedia.org/wiki/Octet_(computing)</a>
  */
 public class FileSizeFormat {
-    enum ScaleUnit {
+    public enum ScaleUnit {
         BYTE {
             @Override
             public long bytes() {
@@ -102,20 +102,34 @@ public class FileSizeFormat {
     public FileSizeFormat(Locale locale) {}
 
     public String format(long size) {
+        return format(size, null);
+    }
+
+    public String format(long size, ScaleUnit unit) {
+        return format(size, unit, false);
+    }
+
+    public String format(long size, ScaleUnit unit, boolean omitSymbol) {
         StringBuilder sb = new StringBuilder();
-        format(sb, size);
+        format(sb, size, unit, omitSymbol);
         return sb.toString();
     }
 
     public void format(StringBuilder builder, long size) {
-        format(builder, size, ScaleUnit.getScaleUnit(size));
-        builder.append(" ").append(ScaleUnit.getScaleUnit(size).symbol());
+        format(builder, size, null, false);
+    }
+
+    public void format(StringBuilder builder, long size, ScaleUnit unit) {
+        format(builder, size, unit, false);
     }
 
     @SuppressWarnings("checkstyle:magicnumber")
-    private void format(StringBuilder builder, long size, ScaleUnit unit) {
+    private void format(StringBuilder builder, long size, ScaleUnit unit, boolean omitSymbol) {
         if (size < 0L) {
             throw new IllegalArgumentException("file size cannot be negative: " + size);
+        }
+        if (unit == null) {
+            unit = ScaleUnit.getScaleUnit(size);
         }
 
         double scaledSize = (double) size / unit.bytes();
@@ -126,6 +140,10 @@ public class FileSizeFormat {
             builder.append(Math.round(scaledSize));
         } else {
             builder.append(Math.round(scaledSize * 10d) / 10d);
+        }
+
+        if (!omitSymbol) {
+            builder.append(" ").append(unit.symbol());
         }
     }
 
@@ -146,15 +164,13 @@ public class FileSizeFormat {
 
         if (size >= 0L && progressedSize != size) {
             ScaleUnit unit = ScaleUnit.getScaleUnit(size);
-            format(builder, progressedSize, unit);
+            format(builder, progressedSize, unit, true);
             builder.append("/");
-            format(builder, size, unit);
-            builder.append(" ").append(unit.symbol());
+            format(builder, size, unit, false);
         } else {
             ScaleUnit unit = ScaleUnit.getScaleUnit(progressedSize);
 
-            format(builder, progressedSize, unit);
-            builder.append(" ").append(unit.symbol());
+            format(builder, progressedSize, unit, false);
         }
     }
 }
