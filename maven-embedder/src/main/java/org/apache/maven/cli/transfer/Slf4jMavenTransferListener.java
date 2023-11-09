@@ -75,7 +75,6 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
 
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
-
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         StringBuilder message = new StringBuilder();
