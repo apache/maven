@@ -60,11 +60,13 @@ public final class MavenRepositorySystemUtils {
      * Maven-based resolution. In more detail, this method configures settings relevant for the processing of dependency
      * graphs, most other settings remain at their generic default value. Use the various setters to further configure
      * the session with authentication, mirror, proxy and other information required for your environment.
+     * <p>
+     * This method is meant for third-party integrators to create "maven like session" without having all the Maven
+     * bits on classpath (just completing Resolver with Maven models). Maven itself does NOT and should NOT use this
+     * method anymore, but the {@link #newSession(ArtifactTypeRegistry)} instead.
      *
      * @return The new repository system session, never {@code null}.
-     * @deprecated This method is deprecated.
      */
-    @Deprecated
     public static DefaultRepositorySystemSession newSession() {
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
         stereotypes.add(new DefaultArtifactType("pom"));
