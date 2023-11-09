@@ -54,15 +54,25 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         message.style(STYLE).append(": ").append(resource.getRepositoryUrl());
         message.resetStyle().append(resource.getResourceName());
 
-        out.println(message.toString());
+        println(message);
     }
 
     @Override
     public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
+        transferCorrupted(new StringBuilder(), event);
+    }
+
+    protected void transferCorrupted(StringBuilder message, TransferEvent event) throws TransferCancelledException {
         TransferResource resource = event.getResource();
         // TODO This needs to be colorized
-        out.println("[WARNING] " + event.getException().getMessage() + " from " + resource.getRepositoryId() + " for "
-                + resource.getRepositoryUrl() + resource.getResourceName());
+        message.append("[WARNING] ")
+                .append(event.getException().getMessage())
+                .append(" from ")
+                .append(resource.getRepositoryId())
+                .append(" for ")
+                .append(resource.getRepositoryUrl())
+                .append(resource.getResourceName());
+        println(message);
     }
 
     @Override
@@ -90,6 +100,15 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         }
 
         message.append(')').resetStyle();
-        out.println(message.toString());
+        println(message);
+    }
+
+    protected void println(Object message) {
+        out.println(message);
+    }
+
+    protected void printAndFlush(Object message) {
+        out.print(message);
+        out.flush();
     }
 }

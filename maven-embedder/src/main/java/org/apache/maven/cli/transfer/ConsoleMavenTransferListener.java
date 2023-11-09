@@ -19,10 +19,11 @@
 package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.eclipse.aether.transfer.TransferCancelledException;
@@ -35,11 +36,12 @@ import org.eclipse.aether.transfer.TransferResource;
  */
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
-    private Map<TransferResource, Long> transfers = new LinkedHashMap<>();
-    private FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH); // use in a synchronized fashion
-    private StringBuilder buffer = new StringBuilder(128); // use in a synchronized fashion
+    private final Map<TransferResource, Long> transfers =
+            new ConcurrentSkipListMap<>(Comparator.comparing(TransferResource::getResourceName));
+    private final FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+    private final ThreadLocal<StringBuilder> buffers = ThreadLocal.withInitial(() -> new StringBuilder(128));
 
-    private boolean printResourceNames;
+    private final boolean printResourceNames;
     private int lastLength;
 
     public ConsoleMavenTransferListener(
@@ -49,26 +51,27 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     }
 
     @Override
-    public synchronized void transferInitiated(TransferEvent event) {
-        overridePreviousTransfer(event);
-
-        super.transferInitiated(event);
+    public void transferInitiated(TransferEvent event) {
+        StringBuilder buffer = buffers.get();
+        overridePreviousTransfer(buffer);
+        transferInitiated(buffer, event);
+        buffer.setLength(0);
     }
 
     @Override
-    public synchronized void transferCorrupted(TransferEvent event) throws TransferCancelledException {
-        overridePreviousTransfer(event);
-
-        super.transferCorrupted(event);
+    public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
+        StringBuilder buffer = buffers.get();
+        overridePreviousTransfer(buffer);
+        transferCorrupted(buffer, event);
+        buffer.setLength(0);
     }
 
     @Override
-    public synchronized void transferProgressed(TransferEvent event) throws TransferCancelledException {
-        TransferResource resource = event.getResource();
-        transfers.put(resource, event.getTransferredBytes());
+    public void transferProgressed(TransferEvent event) throws TransferCancelledException {
+        transfers.put(event.getResource(), event.getTransferredBytes());
 
+        StringBuilder buffer = buffers.get();
         buffer.append("Progress (").append(transfers.size()).append("): ");
-
         Iterator<Map.Entry<TransferResource, Long>> entries =
                 transfers.entrySet().iterator();
         while (entries.hasNext()) {
@@ -80,7 +83,6 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
             if (printResourceNames) {
                 int idx = resourceName.lastIndexOf('/');
-
                 if (idx < 0) {
                     buffer.append(resourceName);
                 } else {
@@ -88,18 +90,35 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
                 }
                 buffer.append(" (");
             }
-
             format.formatProgress(buffer, complete, total);
-
             if (printResourceNames) {
                 buffer.append(")");
             }
-
             if (entries.hasNext()) {
                 buffer.append(" | ");
             }
         }
 
+        overridePreviousTransfer(buffer);
+    }
+
+    @Override
+    public void transferSucceeded(TransferEvent event) {
+        transfers.remove(event.getResource());
+        StringBuilder buffer = buffers.get();
+        overridePreviousTransfer(buffer);
+        transferSucceeded(buffer, event);
+        buffer.setLength(0);
+    }
+
+    @Override
+    public void transferFailed(TransferEvent event) {
+        transfers.remove(event.getResource());
+        StringBuilder buffer = buffers.get();
+        overridePreviousTransfer(buffer);
+    }
+
+    protected synchronized void overridePreviousTransfer(StringBuilder buffer) {
         int pad = lastLength - buffer.length();
         lastLength = buffer.length();
         pad(buffer, pad);
@@ -109,39 +128,16 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         buffer.setLength(0);
     }
 
+    protected synchronized void println(Object message) {
+        out.println(message);
+    }
+
     private void pad(StringBuilder buffer, int spaces) {
         String block = "                                        ";
         while (spaces > 0) {
             int n = Math.min(spaces, block.length());
             buffer.append(block, 0, n);
             spaces -= n;
-        }
-    }
-
-    @Override
-    public synchronized void transferSucceeded(TransferEvent event) {
-        transfers.remove(event.getResource());
-        overridePreviousTransfer(event);
-
-        super.transferSucceeded(event);
-    }
-
-    @Override
-    public synchronized void transferFailed(TransferEvent event) {
-        transfers.remove(event.getResource());
-        overridePreviousTransfer(event);
-
-        super.transferFailed(event);
-    }
-
-    private void overridePreviousTransfer(TransferEvent event) {
-        if (lastLength > 0) {
-            pad(buffer, lastLength);
-            buffer.append('\r');
-            out.print(buffer);
-            out.flush();
-            lastLength = 0;
-            buffer.setLength(0);
         }
     }
 }
