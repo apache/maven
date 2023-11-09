@@ -185,7 +185,7 @@ public class DefaultRepositorySystemSessionFactory {
         // we need to "translate" this
         if (configProps.containsKey(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY)) {
             logger.warn(
-                    "Do not use {}, switch to {}",
+                    "User property {} is DEPRECATED, switch to {}",
                     MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY,
                     ChainedLocalRepositoryManager.IGNORE_TAIL_AVAILABILITY);
             configProps.put(
