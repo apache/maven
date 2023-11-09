@@ -24,6 +24,7 @@ import javax.inject.Named;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -34,6 +35,8 @@ import java.util.stream.Collectors;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -54,6 +57,10 @@ import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
+import org.eclipse.aether.repository.AuthenticationContext;
+import org.eclipse.aether.repository.AuthenticationSelector;
+import org.eclipse.aether.repository.ProxySelector;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
@@ -384,13 +391,13 @@ public class DefaultRepositorySystemSessionFactory {
         }
         session.setRepositoryListener(repositoryListener);
 
-        mavenRepositorySystem.injectMirror(request.getRemoteRepositories(), request.getMirrors());
-        mavenRepositorySystem.injectProxy(session, request.getRemoteRepositories());
-        mavenRepositorySystem.injectAuthentication(session, request.getRemoteRepositories());
+        injectMirror(request.getRemoteRepositories(), request.getMirrors());
+        injectProxy(proxySelector, request.getRemoteRepositories());
+        injectAuthentication(authSelector, request.getRemoteRepositories());
 
-        mavenRepositorySystem.injectMirror(request.getPluginArtifactRepositories(), request.getMirrors());
-        mavenRepositorySystem.injectProxy(session, request.getPluginArtifactRepositories());
-        mavenRepositorySystem.injectAuthentication(session, request.getPluginArtifactRepositories());
+        injectMirror(request.getPluginArtifactRepositories(), request.getMirrors());
+        injectProxy(proxySelector, request.getPluginArtifactRepositories());
+        injectAuthentication(authSelector, request.getPluginArtifactRepositories());
 
         ArrayList<File> paths = new ArrayList<>();
         paths.add(new File(request.getLocalRepository().getBasedir()));
@@ -401,7 +408,7 @@ public class DefaultRepositorySystemSessionFactory {
                     .map(File::new)
                     .forEach(paths::add);
         }
-        session.withLocalRepositoryBasedir(paths);
+        session.withLocalRepositoryBaseDirectories(paths);
 
         return session;
     }
@@ -423,5 +430,96 @@ public class DefaultRepositorySystemSessionFactory {
         version = version.isEmpty() ? version : "/" + version;
         return "Apache-Maven" + version + " (Java " + System.getProperty("java.version") + "; "
                 + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")";
+    }
+
+    private void injectMirror(List<ArtifactRepository> repositories, List<Mirror> mirrors) {
+        if (repositories != null && mirrors != null) {
+            for (ArtifactRepository repository : repositories) {
+                Mirror mirror = MavenRepositorySystem.getMirror(repository, mirrors);
+                injectMirror(repository, mirror);
+            }
+        }
+    }
+
+    private void injectMirror(ArtifactRepository repository, Mirror mirror) {
+        if (mirror != null) {
+            ArtifactRepository original = MavenRepositorySystem.createArtifactRepository(
+                    repository.getId(),
+                    repository.getUrl(),
+                    repository.getLayout(),
+                    repository.getSnapshots(),
+                    repository.getReleases());
+
+            repository.setMirroredRepositories(Collections.singletonList(original));
+
+            repository.setId(mirror.getId());
+            repository.setUrl(mirror.getUrl());
+
+            if (mirror.getLayout() != null && !mirror.getLayout().isEmpty()) {
+                repository.setLayout(original.getLayout());
+            }
+
+            repository.setBlocked(mirror.isBlocked());
+        }
+    }
+
+    private void injectProxy(ProxySelector selector, List<ArtifactRepository> repositories) {
+        if (repositories != null && selector != null) {
+            for (ArtifactRepository repository : repositories) {
+                repository.setProxy(getProxy(selector, repository));
+            }
+        }
+    }
+
+    private org.apache.maven.repository.Proxy getProxy(ProxySelector selector, ArtifactRepository repository) {
+        if (selector != null) {
+            RemoteRepository repo = RepositoryUtils.toRepo(repository);
+            org.eclipse.aether.repository.Proxy proxy = selector.getProxy(repo);
+            if (proxy != null) {
+                org.apache.maven.repository.Proxy p = new org.apache.maven.repository.Proxy();
+                p.setHost(proxy.getHost());
+                p.setProtocol(proxy.getType());
+                p.setPort(proxy.getPort());
+                if (proxy.getAuthentication() != null) {
+                    repo = new RemoteRepository.Builder(repo).setProxy(proxy).build();
+                    AuthenticationContext authCtx = AuthenticationContext.forProxy(null, repo);
+                    p.setUserName(authCtx.get(AuthenticationContext.USERNAME));
+                    p.setPassword(authCtx.get(AuthenticationContext.PASSWORD));
+                    p.setNtlmDomain(authCtx.get(AuthenticationContext.NTLM_DOMAIN));
+                    p.setNtlmHost(authCtx.get(AuthenticationContext.NTLM_WORKSTATION));
+                    authCtx.close();
+                }
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public void injectAuthentication(AuthenticationSelector selector, List<ArtifactRepository> repositories) {
+        if (repositories != null && selector != null) {
+            for (ArtifactRepository repository : repositories) {
+                repository.setAuthentication(getAuthentication(selector, repository));
+            }
+        }
+    }
+
+    private Authentication getAuthentication(AuthenticationSelector selector, ArtifactRepository repository) {
+        if (selector != null) {
+            RemoteRepository repo = RepositoryUtils.toRepo(repository);
+            org.eclipse.aether.repository.Authentication auth = selector.getAuthentication(repo);
+            if (auth != null) {
+                repo = new RemoteRepository.Builder(repo)
+                        .setAuthentication(auth)
+                        .build();
+                AuthenticationContext authCtx = AuthenticationContext.forRepository(null, repo);
+                Authentication result = new Authentication(
+                        authCtx.get(AuthenticationContext.USERNAME), authCtx.get(AuthenticationContext.PASSWORD));
+                result.setPrivateKey(authCtx.get(AuthenticationContext.PRIVATE_KEY_PATH));
+                result.setPassphrase(authCtx.get(AuthenticationContext.PRIVATE_KEY_PASSPHRASE));
+                authCtx.close();
+                return result;
+            }
+        }
+        return null;
     }
 }
