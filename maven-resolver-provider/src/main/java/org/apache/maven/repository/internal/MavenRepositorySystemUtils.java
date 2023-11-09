@@ -19,7 +19,7 @@
 package org.apache.maven.repository.internal;
 
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
@@ -110,7 +110,7 @@ public final class MavenRepositorySystemUtils {
      *
      * @return The new repository system session, never {@code null}.
      */
-    public static RepositorySystemSession.SessionBuilder newSession(RepositorySystemSession.SessionBuilder session) {
+    public static SessionBuilder newSession(SessionBuilder session) {
         DependencyTraverser depTraverser = new FatArtifactTraverser();
         session.setDependencyTraverser(depTraverser);
 

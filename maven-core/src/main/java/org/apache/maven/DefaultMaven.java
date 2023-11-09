@@ -75,6 +75,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,8 +215,7 @@ public class DefaultMaven implements Maven {
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        try (RepositorySystemSession.CloseableRepositorySystemSession closeableSession =
-                newRepositorySession(request).build()) {
+        try (CloseableSession closeableSession = newRepositorySession(request).build()) {
             DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(closeableSession);
             MavenSession session = new MavenSession(container, repoSession, request, result);
             session.setSession(defaultSessionFactory.getSession(session));
