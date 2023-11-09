@@ -21,6 +21,7 @@ package org.apache.maven.cli.transfer;
 import java.io.PrintStream;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -36,101 +37,159 @@ import org.eclipse.aether.transfer.TransferResource;
  */
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
-    private final Map<TransferResource, Long> transfers =
+    public static final int MIN_DELAY_BETWEEN_UPDATES = 50;
+    private final Map<TransferResource, TransferEvent> transfers =
             new ConcurrentSkipListMap<>(Comparator.comparing(TransferResource::getResourceName));
     private final FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
     private final ThreadLocal<StringBuilder> buffers = ThreadLocal.withInitial(() -> new StringBuilder(128));
 
     private final boolean printResourceNames;
     private int lastLength;
+    private final Object lock = new Object();
+    private final Thread updater;
 
     public ConsoleMavenTransferListener(
             MessageBuilderFactory messageBuilderFactory, PrintStream out, boolean printResourceNames) {
         super(messageBuilderFactory, out);
         this.printResourceNames = printResourceNames;
+        updater = new Thread(this::update);
+        updater.setDaemon(true);
+        updater.start();
     }
 
     @Override
     public void transferInitiated(TransferEvent event) {
-        StringBuilder buffer = buffers.get();
-        overridePreviousTransfer(buffer);
-        transferInitiated(buffer, event);
-        buffer.setLength(0);
+        transfers.put(event.getResource(), event);
+        synchronized (lock) {
+            lock.notifyAll();
+        }
     }
 
     @Override
     public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
-        StringBuilder buffer = buffers.get();
-        overridePreviousTransfer(buffer);
-        transferCorrupted(buffer, event);
-        buffer.setLength(0);
+        transfers.put(event.getResource(), event);
+        synchronized (lock) {
+            lock.notifyAll();
+        }
     }
 
     @Override
     public void transferProgressed(TransferEvent event) throws TransferCancelledException {
-        transfers.put(event.getResource(), event.getTransferredBytes());
-
-        StringBuilder buffer = buffers.get();
-        buffer.append("Progress (").append(transfers.size()).append("): ");
-        Iterator<Map.Entry<TransferResource, Long>> entries =
-                transfers.entrySet().iterator();
-        while (entries.hasNext()) {
-            Map.Entry<TransferResource, Long> entry = entries.next();
-            long total = entry.getKey().getContentLength();
-            Long complete = entry.getValue();
-
-            String resourceName = entry.getKey().getResourceName();
-
-            if (printResourceNames) {
-                int idx = resourceName.lastIndexOf('/');
-                if (idx < 0) {
-                    buffer.append(resourceName);
-                } else {
-                    buffer.append(resourceName, idx + 1, resourceName.length());
-                }
-                buffer.append(" (");
-            }
-            format.formatProgress(buffer, complete, total);
-            if (printResourceNames) {
-                buffer.append(")");
-            }
-            if (entries.hasNext()) {
-                buffer.append(" | ");
-            }
+        transfers.put(event.getResource(), event);
+        synchronized (lock) {
+            lock.notifyAll();
         }
-
-        overridePreviousTransfer(buffer);
     }
 
     @Override
     public void transferSucceeded(TransferEvent event) {
-        transfers.remove(event.getResource());
-        StringBuilder buffer = buffers.get();
-        overridePreviousTransfer(buffer);
-        transferSucceeded(buffer, event);
-        buffer.setLength(0);
+        transfers.put(event.getResource(), event);
+        synchronized (lock) {
+            if (transfers.size() == 1) {
+                doUpdate();
+            } else {
+                lock.notifyAll();
+            }
+        }
     }
 
     @Override
     public void transferFailed(TransferEvent event) {
-        transfers.remove(event.getResource());
+        transfers.put(event.getResource(), event);
+        synchronized (lock) {
+            if (transfers.size() == 1) {
+                doUpdate();
+            } else {
+                lock.notifyAll();
+            }
+        }
+    }
+
+    void update() {
+        synchronized (lock) {
+            try {
+                long t0 = System.currentTimeMillis();
+                while (true) {
+                    lock.wait(100);
+                    long t1 = System.currentTimeMillis();
+                    if (t1 - t0 > MIN_DELAY_BETWEEN_UPDATES) {
+                        doUpdate();
+                        t0 = t1;
+                    }
+                }
+            } catch (InterruptedException e) {
+                // ignore
+            }
+        }
+    }
+
+    void doUpdate() {
         StringBuilder buffer = buffers.get();
-        overridePreviousTransfer(buffer);
+
+        Map<TransferResource, TransferEvent> transfers = new LinkedHashMap<>(this.transfers);
+        for (Iterator<Map.Entry<TransferResource, TransferEvent>> it =
+                        transfers.entrySet().iterator();
+                it.hasNext(); ) {
+            Map.Entry<TransferResource, TransferEvent> entry = it.next();
+            TransferEvent event = entry.getValue();
+            TransferEvent.EventType type = event.getType();
+            if (type == TransferEvent.EventType.INITIATED) {
+                transferInitiated(buffer, event);
+            } else if (type == TransferEvent.EventType.SUCCEEDED) {
+                transferSucceeded(buffer, event);
+            } else if (type == TransferEvent.EventType.PROGRESSED) {
+                continue;
+            }
+            it.remove();
+            this.transfers.compute(entry.getKey(), (r, e) -> (e == event ? null : e));
+            if (buffer.length() > 0) {
+                if (lastLength > 0) {
+                    pad(buffer, lastLength - buffer.length());
+                    lastLength = 0;
+                }
+                out.println(buffer);
+                buffer.setLength(0);
+            }
+        }
+        if (!transfers.isEmpty()) {
+            for (Map.Entry<TransferResource, TransferEvent> entry : transfers.entrySet()) {
+                TransferEvent event = entry.getValue();
+                if (buffer.length() == 0) {
+                    buffer.append("Progress (").append(transfers.size()).append("): ");
+                } else {
+                    buffer.append(" | ");
+                }
+                long total = entry.getKey().getContentLength();
+                long complete = event.getTransferredBytes();
+                String resourceName = entry.getKey().getResourceName();
+                if (printResourceNames) {
+                    int idx = resourceName.lastIndexOf('/');
+                    if (idx < 0) {
+                        buffer.append(resourceName);
+                    } else {
+                        buffer.append(resourceName, idx + 1, resourceName.length());
+                    }
+                    buffer.append(" (");
+                }
+                format.formatProgress(buffer, complete, total);
+                if (printResourceNames) {
+                    buffer.append(")");
+                }
+            }
+            if (lastLength > 0) {
+                int l = buffer.length();
+                pad(buffer, lastLength - l);
+                lastLength = l;
+            }
+            buffer.append('\r');
+            out.print(buffer);
+            out.flush();
+            buffer.setLength(0);
+        }
     }
 
-    protected synchronized void overridePreviousTransfer(StringBuilder buffer) {
-        int pad = lastLength - buffer.length();
-        lastLength = buffer.length();
-        pad(buffer, pad);
-        buffer.append('\r');
-        out.print(buffer);
-        out.flush();
-        buffer.setLength(0);
-    }
-
-    protected synchronized void println(Object message) {
-        out.println(message);
-    }
+    @Override
+    protected void println(Object message) {}
 
     private void pad(StringBuilder buffer, int spaces) {
         String block = "                                        ";

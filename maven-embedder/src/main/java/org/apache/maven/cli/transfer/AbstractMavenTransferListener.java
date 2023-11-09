@@ -106,9 +106,4 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
     protected void println(Object message) {
         out.println(message);
     }
-
-    protected void printAndFlush(Object message) {
-        out.print(message);
-        out.flush();
-    }
 }
