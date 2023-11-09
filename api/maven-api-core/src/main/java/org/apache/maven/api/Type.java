@@ -20,6 +20,8 @@ package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Dependency;
 
 /**
@@ -53,6 +55,7 @@ public interface Type {
      *
      * @return the id of this type, never {@code null}.
      */
+    @Nonnull
     String getId();
 
     /**
@@ -67,6 +70,7 @@ public interface Type {
      *
      * @return the file extension, never {@code null}.
      */
+    @Nonnull
     String getExtension();
 
     /**
@@ -76,6 +80,7 @@ public interface Type {
      *
      * @return the default classifier, or {@code null}.
      */
+    @Nullable
     String getClassifier();
 
     /**

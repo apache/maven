@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Dependency properties supported by Maven Core.
@@ -45,10 +46,11 @@ public interface DependencyProperties {
     /**
      * Returns immutable "map view" of all the properties.
      */
+    @Nonnull
     Map<String, String> asMap();
 
     /**
      * Returns {@code true} if given flag is {@code true}.
      */
-    boolean checkFlag(String flag);
+    boolean checkFlag(@Nonnull String flag);
 }

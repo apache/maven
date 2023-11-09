@@ -51,13 +51,14 @@ public class DefaultDependencyProperties implements DependencyProperties {
         this.properties = nonNull(properties, "properties can not be null");
     }
 
+    @Nonnull
     @Override
     public Map<String, String> asMap() {
         return properties;
     }
 
     @Override
-    public boolean checkFlag(String flag) {
+    public boolean checkFlag(@Nonnull String flag) {
         nonNull(flag, "null flag");
         return Boolean.parseBoolean(properties.getOrDefault(flag, ""));
     }

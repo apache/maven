@@ -65,12 +65,11 @@ public class DefaultArtifactHandlerManager implements ArtifactHandlerManager {
     }
 
     public void addHandlers(Map<String, ArtifactHandler> handlers) {
-        // legacy support for maven-gpg-plugin:1.0
-        throw new IllegalArgumentException("you cannot do this anymore");
+        throw new UnsupportedOperationException("Adding handlers programmatically is not supported anymore");
     }
 
     @Deprecated
     public Set<String> getHandlerTypes() {
-        return Collections.emptySet();
+        throw new UnsupportedOperationException("Querying handlers programmatically is not supported anymore");
     }
 }
