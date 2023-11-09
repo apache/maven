@@ -174,7 +174,6 @@ under the License.
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2023-10-20T19:20:23Z</project.build.outputTimestamp>
-    <byteBuddyVersion>1.14.9</byteBuddyVersion>
   </properties>
 
   <!--bootstrap-start-comment-->
@@ -282,11 +281,6 @@ under the License.
       <dependency>
         <groupId>org.ow2.asm</groupId>
         <artifactId>asm</artifactId>
-        <version>${asmVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.ow2.asm</groupId>
-        <artifactId>asm-commons</artifactId>
         <version>${asmVersion}</version>
       </dependency>
       <dependency>
@@ -478,11 +472,6 @@ under the License.
         <version>${mockitoVersion}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>net.bytebuddy</groupId>
-        <artifactId>byte-buddy</artifactId>
-        <version>${byteBuddyVersion}</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
