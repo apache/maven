@@ -152,8 +152,6 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final EventSpyDispatcher eventSpyDispatcher;
 
-    private final MavenRepositorySystem mavenRepositorySystem;
-
     private final RuntimeInformation runtimeInformation;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -164,14 +162,12 @@ public class DefaultRepositorySystemSessionFactory {
             @Nullable @Named("ide") WorkspaceReader workspaceRepository,
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
-            MavenRepositorySystem mavenRepositorySystem,
             RuntimeInformation runtimeInformation) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.workspaceRepository = workspaceRepository;
         this.settingsDecrypter = settingsDecrypter;
         this.eventSpyDispatcher = eventSpyDispatcher;
-        this.mavenRepositorySystem = mavenRepositorySystem;
         this.runtimeInformation = runtimeInformation;
     }
 
