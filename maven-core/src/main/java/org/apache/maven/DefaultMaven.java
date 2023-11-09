@@ -214,8 +214,9 @@ public class DefaultMaven implements Maven {
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        try {
-            DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) newRepositorySession(request);
+        try (RepositorySystemSession.CloseableRepositorySystemSession closeableSession =
+                newRepositorySession(request).build()) {
+            DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(closeableSession);
             MavenSession session = new MavenSession(container, repoSession, request, result);
             session.setSession(defaultSessionFactory.getSession(session));
 
@@ -404,7 +405,7 @@ public class DefaultMaven implements Maven {
         }
     }
 
-    public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
+    public RepositorySystemSession.SessionBuilder newRepositorySession(MavenExecutionRequest request) {
         return repositorySessionFactory.newRepositorySession(request);
     }
 

@@ -50,8 +50,8 @@ import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.eclipse.aether.ConfigurationProperties;
-import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.RepositoryPolicy;
@@ -169,8 +169,9 @@ public class DefaultRepositorySystemSessionFactory {
     }
 
     @SuppressWarnings("checkstyle:methodLength")
-    public DefaultRepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+    public RepositorySystemSession.SessionBuilder newRepositorySession(MavenExecutionRequest request) {
+        RepositorySystemSession.SessionBuilder session =
+                MavenRepositorySystemUtils.newSession(repoSystem.createSessionBuilder());
         session.setCache(request.getRepositoryCache());
 
         Map<Object, Object> configProps = new LinkedHashMap<>();
@@ -386,7 +387,8 @@ public class DefaultRepositorySystemSessionFactory {
         return session;
     }
 
-    private void setUpLocalRepositoryManager(MavenExecutionRequest request, DefaultRepositorySystemSession session) {
+    private void setUpLocalRepositoryManager(
+            MavenExecutionRequest request, RepositorySystemSession.SessionBuilder session) {
         LocalRepository localRepo =
                 new LocalRepository(request.getLocalRepository().getBasedir());
 
