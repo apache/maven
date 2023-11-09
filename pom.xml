@@ -175,7 +175,6 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2023-10-20T19:20:23Z</project.build.outputTimestamp>
     <byteBuddyVersion>1.14.9</byteBuddyVersion>
-    <objenesisVersion>3.3</objenesisVersion>
   </properties>
 
   <!--bootstrap-start-comment-->
@@ -484,16 +483,6 @@ under the License.
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy</artifactId>
         <version>${byteBuddyVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.bytebuddy</groupId>
-        <artifactId>byte-buddy-dep</artifactId>
-        <version>${byteBuddyVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.objenesis</groupId>
-        <artifactId>objenesis</artifactId>
-        <version>${objenesisVersion}</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->

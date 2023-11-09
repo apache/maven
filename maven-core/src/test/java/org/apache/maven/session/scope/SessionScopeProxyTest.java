@@ -29,6 +29,7 @@ import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.testing.PlexusTest;
+import org.eclipse.sisu.Typed;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -55,13 +56,16 @@ public class SessionScopeProxyTest {
 
     @Test
     void testProxiedSessionScopedBean() throws ComponentLookupException {
+        ComponentLookupException e =
+                assertThrows(ComponentLookupException.class, () -> container.lookup(MySingletonBean2.class));
+        assertTrue(e.getMessage().matches("[\\s\\S]*: Can not set .* field .* to [\\s\\S]*"));
+
         MySingletonBean bean = container.lookup(MySingletonBean.class);
         assertNotNull(bean);
         assertNotNull(bean.anotherBean);
         assertSame(bean.anotherBean.getClass(), AnotherBean.class);
         assertNotNull(bean.myBean);
         assertNotSame(bean.myBean.getClass(), MySessionScopedBean.class);
-        assertTrue(MySessionScopedBean.class.isAssignableFrom(bean.myBean.getClass()));
 
         assertThrows(OutOfScopeException.class, () -> bean.myBean.getSession());
 
@@ -73,33 +77,54 @@ public class SessionScopeProxyTest {
     }
 
     @Named
-    @Singleton
     static class MySingletonBean {
         @Inject
-        MySessionScopedBean myBean;
+        @Named("scoped")
+        BeanItf myBean;
 
         @Inject
-        AnotherBean anotherBean;
+        @Named("another")
+        BeanItf2 anotherBean;
     }
 
     @Named
-    @Singleton
-    static class AnotherBean {}
+    static class MySingletonBean2 {
+        @Inject
+        @Named("scoped")
+        MySessionScopedBean myBean;
 
-    @Named
+        @Inject
+        @Named("another")
+        BeanItf2 anotherBean;
+    }
+
+    interface BeanItf {
+        Session getSession();
+
+        BeanItf2 getAnotherBean();
+    }
+
+    interface BeanItf2 {}
+
+    @Named("another")
+    @Singleton
+    static class AnotherBean implements BeanItf2 {}
+
+    @Named("scoped")
     @SessionScoped
-    static class MySessionScopedBean {
+    @Typed(BeanItf.class)
+    static class MySessionScopedBean implements BeanItf {
         @Inject
         Session session;
 
         @Inject
-        AnotherBean anotherBean;
+        BeanItf2 anotherBean;
 
         public Session getSession() {
             return session;
         }
 
-        public AnotherBean getAnotherBean() {
+        public BeanItf2 getAnotherBean() {
             return anotherBean;
         }
     }

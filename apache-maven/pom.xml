@@ -113,10 +113,6 @@ under the License.
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm</artifactId>
     </dependency>
-    <dependency>
-      <groupId>net.bytebuddy</groupId>
-      <artifactId>byte-buddy-dep</artifactId>
-    </dependency>
   </dependencies>
 
   <pluginRepositories>
