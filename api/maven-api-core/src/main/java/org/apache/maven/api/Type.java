@@ -109,5 +109,6 @@ public interface Type {
      *
      * @return the default properties, never {@code null}.
      */
+    @Nonnull
     DependencyProperties getDependencyProperties();
 }
