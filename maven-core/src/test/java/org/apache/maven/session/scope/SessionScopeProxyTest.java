@@ -112,7 +112,7 @@ public class SessionScopeProxyTest {
 
     @Named("scoped")
     @SessionScoped
-    @Typed(BeanItf.class)
+    @Typed
     static class MySessionScopedBean implements BeanItf {
         @Inject
         Session session;

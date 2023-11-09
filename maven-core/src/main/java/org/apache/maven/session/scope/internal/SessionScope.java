@@ -117,6 +117,9 @@ public class SessionScope implements Scope {
                 try {
                     Class<?>[] value =
                             (Class<?>[]) annotationType.getMethod("value").invoke(a);
+                    if (value.length == 0) {
+                        value = superType.getInterfaces();
+                    }
                     List<Class<?>> nonInterfaces =
                             Stream.of(value).filter(c -> !c.isInterface()).collect(Collectors.toList());
                     if (!nonInterfaces.isEmpty()) {
