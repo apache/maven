@@ -473,6 +473,11 @@ under the License.
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy</artifactId>
+        <version>1.14.9</version>
+      </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
   </dependencyManagement>
