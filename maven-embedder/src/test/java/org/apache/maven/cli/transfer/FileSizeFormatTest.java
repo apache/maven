@@ -20,8 +20,7 @@ package org.apache.maven.cli.transfer;
 
 import java.util.Locale;
 
-import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
-import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat.ScaleUnit;
+import org.apache.maven.cli.transfer.FileSizeFormat.ScaleUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
