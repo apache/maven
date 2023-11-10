@@ -32,6 +32,8 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.LegacyArtifactHandlerManager;
+import org.apache.maven.eventspy.AbstractEventSpy;
+import org.apache.maven.execution.ExecutionEvent;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 
@@ -39,7 +41,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton
-public class DefaultTypeRegistry implements TypeRegistry, ArtifactTypeRegistry {
+public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistry, ArtifactTypeRegistry {
     private final Map<String, Type> types;
 
     private final ConcurrentHashMap<String, Type> usedTypes;
@@ -54,6 +56,17 @@ public class DefaultTypeRegistry implements TypeRegistry, ArtifactTypeRegistry {
         this.usedTypes = new ConcurrentHashMap<>();
         this.legacyTypes = new ConcurrentHashMap<>();
         this.manager = nonNull(manager, "artifactHandlerManager");
+    }
+
+    @Override
+    public void onEvent(Object event) {
+        if (event instanceof ExecutionEvent) {
+            ExecutionEvent executionEvent = (ExecutionEvent) event;
+            if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
+                usedTypes.clear();
+                legacyTypes.clear();
+            }
+        }
     }
 
     @Override

@@ -27,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.eventspy.AbstractEventSpy;
+import org.apache.maven.execution.ExecutionEvent;
 
 import static java.util.Objects.requireNonNull;
 
@@ -34,8 +36,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Named
 @Singleton
-public class LegacyArtifactHandlerManager {
-
+public class LegacyArtifactHandlerManager extends AbstractEventSpy {
     private final Map<String, ArtifactHandler> artifactHandlers;
 
     private final Map<String, ArtifactHandler> allHandlers = new ConcurrentHashMap<>();
@@ -43,6 +44,16 @@ public class LegacyArtifactHandlerManager {
     @Inject
     public LegacyArtifactHandlerManager(Map<String, ArtifactHandler> artifactHandlers) {
         this.artifactHandlers = requireNonNull(artifactHandlers);
+    }
+
+    @Override
+    public void onEvent(Object event) {
+        if (event instanceof ExecutionEvent) {
+            ExecutionEvent executionEvent = (ExecutionEvent) event;
+            if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
+                allHandlers.clear();
+            }
+        }
     }
 
     public ArtifactHandler getArtifactHandler(String type) {
