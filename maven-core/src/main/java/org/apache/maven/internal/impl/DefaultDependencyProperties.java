@@ -39,7 +39,8 @@ public class DefaultDependencyProperties implements DependencyProperties {
         this(Arrays.asList(flags));
     }
 
-    public DefaultDependencyProperties(Collection<String> flags) {
+    public DefaultDependencyProperties(@Nonnull Collection<String> flags) {
+        nonNull(flags, "null flags");
         HashMap<String, String> map = new HashMap<>();
         for (String flag : flags) {
             map.put(flag, Boolean.TRUE.toString());
@@ -48,7 +49,7 @@ public class DefaultDependencyProperties implements DependencyProperties {
     }
 
     public DefaultDependencyProperties(@Nonnull Map<String, String> properties) {
-        this.properties = nonNull(properties, "properties can not be null");
+        this.properties = Collections.unmodifiableMap(nonNull(properties, "null properties"));
     }
 
     @Nonnull
