@@ -87,7 +87,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
                 buffer.append(" (");
             }
 
-            buffer.append(format.formatProgress(complete, total));
+            format.formatProgress(buffer, complete, total);
 
             if (printResourceNames) {
                 buffer.append(")");
