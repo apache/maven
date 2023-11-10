@@ -23,17 +23,18 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  */
 @Named
 @Singleton
-public class LegacyArtifactHandlerManager implements ArtifactHandlerManager {
+public class LegacyArtifactHandlerManager {
 
     private final Map<String, ArtifactHandler> artifactHandlers;
 
@@ -41,32 +42,20 @@ public class LegacyArtifactHandlerManager implements ArtifactHandlerManager {
 
     @Inject
     public LegacyArtifactHandlerManager(Map<String, ArtifactHandler> artifactHandlers) {
-        this.artifactHandlers = artifactHandlers;
+        this.artifactHandlers = requireNonNull(artifactHandlers);
     }
 
     public ArtifactHandler getArtifactHandler(String type) {
+        requireNonNull(type, "null type");
         ArtifactHandler handler = allHandlers.get(type);
-
         if (handler == null) {
             handler = artifactHandlers.get(type);
-
             if (handler == null) {
                 handler = new DefaultArtifactHandler(type);
             } else {
                 allHandlers.put(type, handler);
             }
         }
-
         return handler;
-    }
-
-    public void addHandlers(Map<String, ArtifactHandler> handlers) {
-        // legacy support for maven-gpg-plugin:1.0
-        allHandlers.putAll(handlers);
-    }
-
-    @Deprecated
-    public Set<String> getHandlerTypes() {
-        return artifactHandlers.keySet();
     }
 }
