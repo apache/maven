@@ -30,6 +30,8 @@ import org.apache.maven.api.Type;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.eventspy.AbstractEventSpy;
+import org.apache.maven.execution.ExecutionEvent;
 
 import static java.util.Objects.requireNonNull;
 
@@ -37,19 +39,29 @@ import static java.util.Objects.requireNonNull;
  */
 @Named
 @Singleton
-public class DefaultArtifactHandlerManager implements ArtifactHandlerManager {
+public class DefaultArtifactHandlerManager extends AbstractEventSpy implements ArtifactHandlerManager {
     private final TypeRegistry typeRegistry;
 
-    private final ConcurrentHashMap<String, ArtifactHandler> handlers;
+    private final ConcurrentHashMap<String, ArtifactHandler> allHandlers;
 
     @Inject
     public DefaultArtifactHandlerManager(TypeRegistry typeRegistry) {
         this.typeRegistry = requireNonNull(typeRegistry, "null typeRegistry");
-        this.handlers = new ConcurrentHashMap<>();
+        this.allHandlers = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public void onEvent(Object event) {
+        if (event instanceof ExecutionEvent ) {
+            ExecutionEvent executionEvent = (ExecutionEvent) event;
+            if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
+                allHandlers.clear();
+            }
+        }
     }
 
     public ArtifactHandler getArtifactHandler(String id) {
-        return handlers.computeIfAbsent(id, k -> {
+        return allHandlers.computeIfAbsent(id, k -> {
             Type type = typeRegistry.getType(id);
             return new DefaultArtifactHandler(
                     id,
