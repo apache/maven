@@ -42,6 +42,8 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultTypeRegistry implements TypeRegistry, ArtifactTypeRegistry {
     private final Map<String, Type> types;
 
+    private final ConcurrentHashMap<String, Type> usedTypes;
+
     private final ConcurrentHashMap<String, Type> legacyTypes;
 
     private final LegacyArtifactHandlerManager manager;
@@ -49,6 +51,7 @@ public class DefaultTypeRegistry implements TypeRegistry, ArtifactTypeRegistry {
     @Inject
     public DefaultTypeRegistry(Map<String, Type> types, LegacyArtifactHandlerManager manager) {
         this.types = nonNull(types, "types");
+        this.usedTypes = new ConcurrentHashMap<>();
         this.legacyTypes = new ConcurrentHashMap<>();
         this.manager = nonNull(manager, "artifactHandlerManager");
     }
@@ -57,23 +60,28 @@ public class DefaultTypeRegistry implements TypeRegistry, ArtifactTypeRegistry {
     @Nonnull
     public Type getType(String id) {
         nonNull(id, "null id");
-        Type type = types.get(id);
-        if (type != null) {
+        return usedTypes.computeIfAbsent(id, i -> {
+            Type type = types.get(id);
+            if (type == null) {
+                // legacy types ALWAYS return type (AHM never returns null)
+                type = legacyTypes.computeIfAbsent(id, k -> {
+                    // Copy data as the ArtifactHandler is not immutable, but Type should be.
+                    ArtifactHandler handler = manager.getArtifactHandler(id);
+                    ArrayList<String> flags = new ArrayList<>();
+                    if (handler.isAddedToClasspath()) {
+                        flags.add(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
+                    }
+                    if (handler.isIncludesDependencies()) {
+                        flags.add(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
+                    }
+                    return new DefaultType(
+                            id,
+                            handler.getExtension(),
+                            handler.getClassifier(),
+                            new DefaultDependencyProperties(flags));
+                });
+            }
             return type;
-        }
-
-        return legacyTypes.computeIfAbsent(id, k -> {
-            // Copy data as the ArtifactHandler is not immutable, but Type should be.
-            ArtifactHandler handler = manager.getArtifactHandler(id);
-            ArrayList<String> flags = new ArrayList<>();
-            if (handler.isAddedToClasspath()) {
-                flags.add(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
-            }
-            if (handler.isIncludesDependencies()) {
-                flags.add(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
-            }
-            return new DefaultType(
-                    id, handler.getExtension(), handler.getClassifier(), new DefaultDependencyProperties(flags));
         });
     }
 
