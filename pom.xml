@@ -764,13 +764,13 @@ under the License.
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <systemProperties combine.children="append">
+              <systemPropertyVariables combine.children="append">
                 <property>
                   <!-- Pass this through to the tests (if set!) to have them pick the right repository -->
                   <name>maven.repo.local</name>
                   <value>${maven.repo.local}</value>
                 </property>
-              </systemProperties>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>
