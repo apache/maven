@@ -151,7 +151,7 @@ under the License.
     <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsIoVersion>2.11.0</commonsIoVersion>
     <junitVersion>5.10.1</junitVersion>
-    <mockitoVersion>5.2.0</mockitoVersion>
+    <mockitoVersion>5.7.0</mockitoVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusXmlVersion>4.0.1</plexusXmlVersion>
     <guiceVersion>5.1.0</guiceVersion>
