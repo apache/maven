@@ -150,7 +150,7 @@ under the License.
     <classWorldsVersion>2.6.0</classWorldsVersion>
     <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsIoVersion>2.11.0</commonsIoVersion>
-    <junitVersion>5.10.0</junitVersion>
+    <junitVersion>5.10.1</junitVersion>
     <mockitoVersion>5.2.0</mockitoVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusXmlVersion>4.0.1</plexusXmlVersion>
