@@ -24,7 +24,7 @@ under the License.
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
     <!-- please also update in maven-bom -->
-    <version>40</version>
+    <version>41</version>
     <relativePath />
   </parent>
 
