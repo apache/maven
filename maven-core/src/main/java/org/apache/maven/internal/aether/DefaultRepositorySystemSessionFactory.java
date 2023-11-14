@@ -31,12 +31,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.internal.impl.DefaultTypeRegistry;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.ModelBase;
@@ -150,7 +150,7 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final RuntimeInformation runtimeInformation;
 
-    private final DefaultTypeRegistry defaultTypeRegistry;
+    private final TypeRegistry typeRegistry;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -162,7 +162,7 @@ public class DefaultRepositorySystemSessionFactory {
             EventSpyDispatcher eventSpyDispatcher,
             MavenRepositorySystem mavenRepositorySystem,
             RuntimeInformation runtimeInformation,
-            DefaultTypeRegistry defaultTypeRegistry) {
+            TypeRegistry typeRegistry) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.workspaceRepository = workspaceRepository;
@@ -170,12 +170,13 @@ public class DefaultRepositorySystemSessionFactory {
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.runtimeInformation = runtimeInformation;
-        this.defaultTypeRegistry = defaultTypeRegistry;
+        this.typeRegistry = typeRegistry;
     }
 
     @SuppressWarnings("checkstyle:methodLength")
     public DefaultRepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession(defaultTypeRegistry);
+        DefaultRepositorySystemSession session =
+                MavenRepositorySystemUtils.newSession(new TypeRegistryAdapter(typeRegistry));
         session.setCache(request.getRepositoryCache());
 
         Map<Object, Object> configProps = new LinkedHashMap<>();

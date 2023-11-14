@@ -34,14 +34,12 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.LegacyArtifactHandlerManager;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.execution.ExecutionEvent;
-import org.eclipse.aether.artifact.ArtifactType;
-import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton
-public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistry, ArtifactTypeRegistry {
+public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistry {
     private final Map<String, Type> types;
 
     private final ConcurrentHashMap<String, Type> usedTypes;
@@ -96,17 +94,5 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
             }
             return type;
         });
-    }
-
-    @Override
-    public ArtifactType get(String typeId) {
-        Type type = getType(typeId);
-        if (type instanceof ArtifactType) {
-            return (ArtifactType) type;
-        }
-        if (type != null) {
-            return DefaultType.wrap(type);
-        }
-        return null;
     }
 }
