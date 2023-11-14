@@ -70,7 +70,7 @@ public class DefaultType implements Type, ArtifactType {
         return getDependencyProperties().asMap();
     }
 
-    static ArtifactType wrap(Type type) {
+    public static ArtifactType wrap(Type type) {
         return new DefaultType(type.getId(), type.getExtension(), type.getClassifier(), type.getDependencyProperties());
     }
 }

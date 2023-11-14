@@ -24,13 +24,13 @@ import org.apache.maven.internal.impl.DefaultType;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
+import static java.util.Objects.requireNonNull;
 
 public class TypeRegistryAdapter implements ArtifactTypeRegistry {
     private final TypeRegistry typeRegistry;
 
     public TypeRegistryAdapter(TypeRegistry typeRegistry) {
-        this.typeRegistry = nonNull(typeRegistry, "null typeRegistry");
+        this.typeRegistry = requireNonNull(typeRegistry, "null typeRegistry");
     }
 
     @Override
