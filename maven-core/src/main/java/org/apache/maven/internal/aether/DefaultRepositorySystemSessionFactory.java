@@ -56,6 +56,7 @@ import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.resolution.ArtifactDescriptorPolicy;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
@@ -64,6 +65,7 @@ import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
+import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
@@ -371,6 +373,12 @@ public class DefaultRepositorySystemSessionFactory {
         if (recordReverseTree) {
             session.setRepositoryListener(new ChainedRepositoryListener(
                     session.getRepositoryListener(), new ReverseTreeRepositoryListener()));
+        }
+
+        boolean strictDescriptorPolicy =
+                ConfigUtils.getBoolean(session, false, "aether.artifactDescriptorPolicy.strict");
+        if (strictDescriptorPolicy) {
+            session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(ArtifactDescriptorPolicy.STRICT));
         }
 
         mavenRepositorySystem.injectMirror(request.getRemoteRepositories(), request.getMirrors());
