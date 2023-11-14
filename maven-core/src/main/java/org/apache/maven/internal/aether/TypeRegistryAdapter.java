@@ -40,7 +40,8 @@ public class TypeRegistryAdapter implements ArtifactTypeRegistry {
             return (ArtifactType) type;
         }
         if (type != null) {
-            return new DefaultType(type.getId(), type.getExtension(), type.getClassifier(), type.getDependencyProperties());
+            return new DefaultType(
+                    type.getId(), type.getExtension(), type.getClassifier(), type.getDependencyProperties());
         }
         return null;
     }
