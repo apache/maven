@@ -69,8 +69,4 @@ public class DefaultType implements Type, ArtifactType {
     public Map<String, String> getProperties() {
         return getDependencyProperties().asMap();
     }
-
-    public static ArtifactType wrap(Type type) {
-        return new DefaultType(type.getId(), type.getExtension(), type.getClassifier(), type.getDependencyProperties());
-    }
 }
