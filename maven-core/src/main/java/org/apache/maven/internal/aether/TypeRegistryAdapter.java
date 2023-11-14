@@ -29,7 +29,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class TypeRegistryAdapter implements ArtifactTypeRegistry {
     private final TypeRegistry typeRegistry;
 
-    public TypeRegistryAdapter( TypeRegistry typeRegistry) {
+    public TypeRegistryAdapter(TypeRegistry typeRegistry) {
         this.typeRegistry = nonNull(typeRegistry, "null typeRegistry");
     }
 
