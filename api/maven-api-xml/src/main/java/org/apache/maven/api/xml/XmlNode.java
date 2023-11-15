@@ -30,6 +30,8 @@ import org.apache.maven.api.annotations.ThreadSafe;
 /**
  * An immutable xml node.
  *
+ * TODO: v4: add support for namespaces
+ *
  * @since 4.0.0
  */
 @Experimental

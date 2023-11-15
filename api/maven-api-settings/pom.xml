@@ -29,7 +29,7 @@ under the License.
   <artifactId>maven-api-settings</artifactId>
 
   <name>Maven 4 API :: Settings</name>
-  <description>Maven 4 API - Immutable Settings model</description>
+  <description>Maven 4 API - Immutable Settings model.</description>
 
   <dependencies>
     <dependency>
