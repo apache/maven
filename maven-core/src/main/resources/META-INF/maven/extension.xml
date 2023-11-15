@@ -111,6 +111,9 @@ under the License.
     <exportedPackage>javax.annotation.*</exportedPackage>
     <exportedPackage>javax.annotation.security.*</exportedPackage>
 
+    <exportedPackage>jakarta.inject.*</exportedPackage>
+    <exportedPackage>jakarta.annotation.*</exportedPackage>
+
     <!--
       | We may potentially want to export these, but right now I'm not sure that anything Guice specific needs
       | to be made available to plugin authors. If we find people are getting fancy and want to take advantage of
