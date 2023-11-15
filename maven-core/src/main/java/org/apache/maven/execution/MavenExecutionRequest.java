@@ -285,6 +285,26 @@ public interface MavenExecutionRequest {
 
     MavenExecutionRequest setCacheNotFound(boolean cacheNotFound);
 
+    /**
+     * @since 4.0.0
+     */
+    boolean isIgnoreMissingArtifactDescriptor();
+
+    /**
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setIgnoreMissingArtifactDescriptor(boolean ignoreMissing);
+
+    /**
+     * @since 4.0.0
+     */
+    boolean isIgnoreInvalidArtifactDescriptor();
+
+    /**
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setIgnoreInvalidArtifactDescriptor(boolean ignoreInvalid);
+
     // Profiles
     List<Profile> getProfiles();
 

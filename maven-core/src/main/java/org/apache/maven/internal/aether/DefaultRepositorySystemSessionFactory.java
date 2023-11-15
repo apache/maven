@@ -71,6 +71,7 @@ import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
+import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
@@ -218,6 +219,9 @@ public class DefaultRepositorySystemSessionFactory {
                 : ResolutionErrorPolicy.CACHE_DISABLED;
         session.setResolutionErrorPolicy(
                 new SimpleResolutionErrorPolicy(errorPolicy, errorPolicy | ResolutionErrorPolicy.CACHE_NOT_FOUND));
+
+        session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
+                request.isIgnoreMissingArtifactDescriptor(), request.isIgnoreInvalidArtifactDescriptor()));
 
         session.setArtifactTypeRegistry(RepositoryUtils.newArtifactTypeRegistry(artifactHandlerManager));
 

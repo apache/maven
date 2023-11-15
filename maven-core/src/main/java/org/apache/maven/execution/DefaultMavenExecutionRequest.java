@@ -66,6 +66,10 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private boolean cacheNotFound = false;
 
+    private boolean ignoreMissingArtifactDescriptor = true;
+
+    private boolean ignoreInvalidArtifactDescriptor = true;
+
     private List<Proxy> proxies;
 
     private List<Server> servers;
@@ -174,6 +178,8 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setInteractiveMode(original.isInteractiveMode());
         copy.setCacheNotFound(original.isCacheNotFound());
         copy.setCacheTransferError(original.isCacheTransferError());
+        copy.setIgnoreMissingArtifactDescriptor(original.isIgnoreMissingArtifactDescriptor());
+        copy.setIgnoreInvalidArtifactDescriptor(original.isIgnoreInvalidArtifactDescriptor());
         copy.setProxies(original.getProxies());
         copy.setServers(original.getServers());
         copy.setMirrors(original.getMirrors());
@@ -1031,6 +1037,28 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     @Override
     public MavenExecutionRequest setCacheNotFound(boolean cacheNotFound) {
         this.cacheNotFound = cacheNotFound;
+        return this;
+    }
+
+    @Override
+    public boolean isIgnoreMissingArtifactDescriptor() {
+        return ignoreMissingArtifactDescriptor;
+    }
+
+    @Override
+    public MavenExecutionRequest setIgnoreMissingArtifactDescriptor(boolean ignoreMissing) {
+        this.ignoreMissingArtifactDescriptor = ignoreMissing;
+        return this;
+    }
+
+    @Override
+    public boolean isIgnoreInvalidArtifactDescriptor() {
+        return ignoreInvalidArtifactDescriptor;
+    }
+
+    @Override
+    public MavenExecutionRequest setIgnoreInvalidArtifactDescriptor(boolean ignoreInvalid) {
+        this.ignoreInvalidArtifactDescriptor = ignoreInvalid;
         return this;
     }
 
