@@ -39,6 +39,8 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
@@ -419,15 +421,40 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             throws PluginContainerException {
         try {
             if (pluginDescriptor != null) {
-                for (ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents()) {
-                    componentDescriptor.setRealm(pluginRealm);
-                    container.addComponentDescriptor(componentDescriptor);
+                for (MojoDescriptor mojo : pluginDescriptor.getMojos()) {
+                    if (!mojo.isV4Api()) {
+                        mojo.setRealm(pluginRealm);
+                        container.addComponentDescriptor(mojo);
+                    }
                 }
             }
 
             ((DefaultPlexusContainer) container)
                     .discoverComponents(
                             pluginRealm,
+                            new AbstractModule() {
+                                @Override
+                                protected void configure() {
+                                    if (pluginDescriptor != null) {
+                                        for (MojoDescriptor mojo : pluginDescriptor.getMojos()) {
+                                            if (mojo.isV4Api()) {
+                                                try {
+                                                    mojo.setRealm(pluginRealm);
+                                                    Class<?> cl = mojo.getImplementationClass();
+                                                    if (cl == null) {
+                                                        cl = pluginRealm.loadClass(mojo.getImplementation());
+                                                    }
+                                                    bind(org.apache.maven.api.plugin.Mojo.class)
+                                                            .annotatedWith(Names.named(mojo.getId()))
+                                                            .to((Class) cl);
+                                                } catch (ClassNotFoundException e) {
+                                                    throw new IllegalStateException("Unable to load mojo class", e);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
                             new SessionScopeModule(container),
                             new MojoExecutionScopeModule(container),
                             new PluginConfigurationModule(plugin.getDelegate()));

@@ -16,29 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.annotations;
+package org.apache.maven.api.plugin;
 
+import java.util.List;
+
+import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 
 /**
- * Component instantiation strategy.
- *
- * @since 4.0.0
+ * Interface that can be provided by the plugin to wire in custom lifecycles
+ * leveraged using the {@link org.apache.maven.api.plugin.annotations.Execute}
+ * annotation.  If a {@code META-INF/maven/lifecycle.xml} file is packaged
+ * in the plugin, Maven will provide a default implementation that will parse
+ * the file and return the contained lifecycle definitions.
  */
 @Experimental
-public enum InstantiationStrategy {
-    PER_LOOKUP("per-lookup"),
-    SINGLETON("singleton"),
-    KEEP_ALIVE("keep-alive"),
-    POOLABLE("poolable");
+@Consumer
+public interface LifecycleProvider {
 
-    private final String id;
-
-    InstantiationStrategy(String id) {
-        this.id = id;
-    }
-
-    public String id() {
-        return this.id;
-    }
+    List<Lifecycle> getLifecycles();
 }

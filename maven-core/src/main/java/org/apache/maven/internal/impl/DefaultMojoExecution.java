@@ -21,7 +21,9 @@ package org.apache.maven.internal.impl;
 import java.util.Optional;
 
 import org.apache.maven.api.MojoExecution;
-import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.Plugin;
+import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -38,7 +40,22 @@ public class DefaultMojoExecution implements MojoExecution {
 
     @Override
     public Plugin getPlugin() {
-        return delegate.getPlugin().getDelegate();
+        return null;
+    }
+
+    @Override
+    public PluginExecution getPluginExecutionModel() {
+        return null;
+    }
+
+    @Override
+    public MojoDescriptor getMojoDescriptor() {
+        return null;
+    }
+
+    @Override
+    public String getLifecyclePhase() {
+        return delegate.getLifecyclePhase();
     }
 
     @Override

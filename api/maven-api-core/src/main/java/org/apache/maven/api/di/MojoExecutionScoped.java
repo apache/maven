@@ -16,33 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api;
+package org.apache.maven.api.di;
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
 
-/**
- * A range of versions.
- *
- * @since 4.0.0
- */
-@Experimental
-public interface VersionRange {
+import jakarta.inject.Scope;
 
-    // TODO: v4: add access to the version information
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    /**
-     * Determines whether the specified version is contained within this range.
-     *
-     * @param version the version to test, must not be {@code null}
-     * @return {@code true} if this range contains the specified version, {@code false} otherwise
-     */
-    boolean contains(@Nonnull Version version);
-
-    /**
-     * Returns a string representation of this version range
-     * @return the string representation of this version range
-     */
-    @Nonnull
-    String asString();
-}
+@Scope
+@Documented
+@Retention(RUNTIME)
+public @interface MojoExecutionScoped {}

@@ -16,42 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.annotations;
+package org.apache.maven.api;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 
 /**
- * Used to configure injection of Plexus components by
- * <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/MavenPluginManager.html">
- * <code>MavenPluginManager.getConfiguredMojo(...)</code></a>.
- *
- * @since 4.0.0
+ * Represents a maven plugin runtime
  */
 @Experimental
-@Documented
-@Retention(RetentionPolicy.CLASS)
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
-@Inherited
-public @interface Component {
-    /**
-     * role of the component to inject.
-     * @return the role
-     */
-    @Nonnull
-    Class<?> role() default Object.class;
+public interface Plugin {
 
-    /**
-     * hint of the component to inject.
-     * @return the hint
-     */
     @Nonnull
-    String hint() default "";
+    org.apache.maven.api.model.Plugin getModel();
+
+    @Nonnull
+    PluginDescriptor getDescriptor();
+
+    @Nonnull
+    List<Lifecycle> getLifecycles();
+
+    @Nonnull
+    ClassLoader getClassLoader();
+
+    @Nonnull
+    Artifact getArtifact();
+
+    @Nonnull
+    List<Dependency> getDependencies();
 }

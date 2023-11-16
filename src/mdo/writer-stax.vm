@@ -224,7 +224,7 @@ public class ${className} {
             serializer.writeStartElement(namespace, tagName);
   #end
   #foreach ( $field in $allFields )
-    #if ( $Helper.xmlFieldMetadata( $field ).attribute )
+    #if ( $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).format )
       #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
       #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
       #if ( $field.type == "String" )
@@ -242,7 +242,8 @@ public class ${className} {
     #end
   #end
   #foreach ( $field in $allFields )
-    #if ( ! $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).transient )
+    #if ( ! $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).transient
+                 && ! $Helper.xmlFieldMetadata( $field ).format )
       #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
       #if ( ! $fieldTagName )
         #set ( $fieldTagName = $field.name )

@@ -33,12 +33,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
+import org.apache.maven.api.plugin.descriptor.lifecycle.LifecycleConfiguration;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.lifecycle.Lifecycle;
-import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
-import org.apache.maven.plugin.lifecycle.io.LifecycleMappingsStaxReader;
+import org.apache.maven.plugin.lifecycle.io.LifecycleStaxReader;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 
@@ -330,7 +330,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
             LifecycleConfiguration lifecycleConfiguration;
 
             try (InputStream input = getDescriptorStream(LIFECYCLE_DESCRIPTOR)) {
-                lifecycleConfiguration = new LifecycleMappingsStaxReader().read(input);
+                lifecycleConfiguration = new LifecycleStaxReader().read(input);
             }
 
             lifecycleMappings = new HashMap<>();
