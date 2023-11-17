@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -17,18 +16,33 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
+  <artifactId>aid</artifactId>
+  <groupId>gid</groupId>
+  <version>0.1</version>
+  <packaging>pom</packaging>
 
-  <parent>
-    <groupId>org.apache.maven</groupId>
-    <artifactId>maven</artifactId>
-    <version>3.9.6-SNAPSHOT</version>
-  </parent>
+  <profiles>
 
-  <artifactId>maven-builder-support</artifactId>
+    <profile>
+      <id>exists-project-version</id>
+      <activation>
+        <file>
+          <exists>${project.version}/test.txt</exists>
+        </file>
+      </activation>
+    </profile>
+    <profile>
+      <id>missing-project-version</id>
+      <activation>
+        <file>
+          <missing>${project.version}/test.txt</missing>
+        </file>
+      </activation>
+    </profile>
 
-  <name>Maven Builder Support</name>
-  <description>Support for descriptor builders (model, setting, toolchains)</description>
-
+  </profiles>
 </project>

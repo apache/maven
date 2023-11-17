@@ -117,6 +117,15 @@ public class DefaultModelValidatorTest extends TestCase {
         assertTrue(result.getFatals().get(0).contains("modelVersion"));
     }
 
+    public void testModelVersion40() throws Exception {
+        SimpleProblemCollector result =
+                validateRaw("modelVersion-4_0.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
+
+        assertViolations(result, 0, 1, 0);
+
+        assertTrue(result.getErrors().get(0).contains("'modelVersion' must be one of"));
+    }
+
     public void testMissingArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-artifactId-pom.xml");
 
@@ -737,5 +746,27 @@ public class DefaultModelValidatorTest extends TestCase {
         assertEquals(
                 "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)",
                 result.getWarnings().get(0));
+    }
+
+    public void testProfileActivationWithAllowedExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/profile-activation-file-with-allowed-expressions.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    public void testProfileActivationWithProjectExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/profile-activation-file-with-project-expressions.xml");
+        assertViolations(result, 0, 0, 2);
+
+        assertEquals(
+                "'profiles.profile[exists-project-version].activation.file.exists' "
+                        + "Failed to interpolate file location ${project.version}/test.txt: "
+                        + "${project.version} expressions are not supported during profile activation.",
+                result.getWarnings().get(0));
+
+        assertEquals(
+                "'profiles.profile[missing-project-version].activation.file.missing' "
+                        + "Failed to interpolate file location ${project.version}/test.txt: "
+                        + "${project.version} expressions are not supported during profile activation.",
+                result.getWarnings().get(1));
     }
 }

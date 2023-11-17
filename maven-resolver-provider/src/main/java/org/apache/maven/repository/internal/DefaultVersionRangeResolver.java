@@ -77,12 +77,13 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
 
     private RepositoryEventDispatcher repositoryEventDispatcher;
 
+    @Deprecated
     public DefaultVersionRangeResolver() {
         // enable default constructor
     }
 
     @Inject
-    DefaultVersionRangeResolver(
+    public DefaultVersionRangeResolver(
             MetadataResolver metadataResolver,
             SyncContextFactory syncContextFactory,
             RepositoryEventDispatcher repositoryEventDispatcher) {
@@ -91,6 +92,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
         setRepositoryEventDispatcher(repositoryEventDispatcher);
     }
 
+    @Deprecated
     public void initService(ServiceLocator locator) {
         setMetadataResolver(locator.getService(MetadataResolver.class));
         setSyncContextFactory(locator.getService(SyncContextFactory.class));
@@ -114,6 +116,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
         return this;
     }
 
+    @Override
     public VersionRangeResult resolveVersionRange(RepositorySystemSession session, VersionRangeRequest request)
             throws VersionRangeResolutionException {
         VersionRangeResult result = new VersionRangeResult(request);

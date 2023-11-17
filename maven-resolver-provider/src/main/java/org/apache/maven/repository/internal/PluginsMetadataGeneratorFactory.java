@@ -30,9 +30,11 @@ import org.eclipse.aether.installation.InstallRequest;
 /**
  * Maven G level metadata generator factory.
  */
-@Named("plugins")
+@Named(PluginsMetadataGeneratorFactory.NAME)
 @Singleton
 public class PluginsMetadataGeneratorFactory implements MetadataGeneratorFactory {
+    public static final String NAME = "plugins";
+
     @Override
     public MetadataGenerator newInstance(RepositorySystemSession session, InstallRequest request) {
         return new PluginsMetadataGenerator(session, request);

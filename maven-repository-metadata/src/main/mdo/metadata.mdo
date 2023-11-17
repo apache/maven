@@ -74,10 +74,7 @@ under the License.
         <field xdoc.separator="blank">
           <name>plugins</name>
           <version>1.0.0+</version>
-          <description>The set of plugins when this directory represents a "groupId" (deprecated)</description>
-          <annotations>
-            <annotation>@Deprecated</annotation>
-          </annotations>
+          <description>The set of plugins when this directory represents a "groupId".</description>
           <association>
             <type>Plugin</type>
             <multiplicity>*</multiplicity>
@@ -383,10 +380,7 @@ under the License.
     <class java.clone="deep">
       <name>Plugin</name>
       <version>1.0.0+</version>
-      <description>Mapping information for a single plugin within this group (deprecated).</description>
-      <annotations>
-        <annotation>@Deprecated</annotation>
-      </annotations>
+      <description>Mapping information for a single plugin within this group.</description>
       <comment>NOTE: plugin version is _NOT_ included here, since it is resolved using a separate algorithm in plugins' artifact.</comment>
       <fields>
         <field>

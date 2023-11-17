@@ -69,6 +69,7 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultModelValidator implements ModelValidator {
 
     private static final Pattern CI_FRIENDLY_EXPRESSION = Pattern.compile("\\$\\{(.+?)}");
+    private static final Pattern EXPRESSION_PROJECT_NAME_PATTERN = Pattern.compile("\\$\\{(project.+?)}");
 
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
@@ -196,8 +197,7 @@ public class DefaultModelValidator implements ModelValidator {
                             profile);
                 }
 
-                validate30RawProfileActivation(
-                        problems, profile.getActivation(), profile.getId(), prefix, "activation", request);
+                validate30RawProfileActivation(problems, profile.getActivation(), prefix);
 
                 validate20RawDependencies(
                         problems, profile.getDependencies(), prefix, "dependencies.dependency.", request);
@@ -235,54 +235,41 @@ public class DefaultModelValidator implements ModelValidator {
         }
     }
 
-    private void validate30RawProfileActivation(
-            ModelProblemCollector problems,
-            Activation activation,
-            String sourceHint,
-            String prefix,
-            String fieldName,
-            ModelBuildingRequest request) {
-        if (activation == null) {
+    private void validate30RawProfileActivation(ModelProblemCollector problems, Activation activation, String prefix) {
+        if (activation == null || activation.getFile() == null) {
             return;
         }
 
         ActivationFile file = activation.getFile();
 
-        if (file != null) {
-            String path;
-            boolean missing;
+        String path;
+        String location;
 
-            if (StringUtils.isNotEmpty(file.getExists())) {
-                path = file.getExists();
-                missing = false;
-            } else if (StringUtils.isNotEmpty(file.getMissing())) {
-                path = file.getMissing();
-                missing = true;
-            } else {
-                return;
-            }
+        if (file.getExists() != null && !file.getExists().isEmpty()) {
+            path = file.getExists();
+            location = "exists";
+        } else if (file.getMissing() != null && !file.getMissing().isEmpty()) {
+            path = file.getMissing();
+            location = "missing";
+        } else {
+            return;
+        }
 
-            if (path.contains("${project.basedir}")) {
-                addViolation(
-                        problems,
-                        Severity.WARNING,
-                        Version.V30,
-                        prefix + fieldName + (missing ? ".file.missing" : ".file.exists"),
-                        null,
-                        "Failed to interpolate file location " + path + " for profile " + sourceHint
-                                + ": ${project.basedir} expression not supported during profile activation, "
-                                + "use ${basedir} instead",
-                        file.getLocation(missing ? "missing" : "exists"));
-            } else if (hasProjectExpression(path)) {
-                addViolation(
-                        problems,
-                        Severity.WARNING,
-                        Version.V30,
-                        prefix + fieldName + (missing ? ".file.missing" : ".file.exists"),
-                        null,
-                        "Failed to interpolate file location " + path + " for profile " + sourceHint
-                                + ": ${project.*} expressions are not supported during profile activation",
-                        file.getLocation(missing ? "missing" : "exists"));
+        if (hasProjectExpression(path)) {
+            Matcher matcher = EXPRESSION_PROJECT_NAME_PATTERN.matcher(path);
+            while (matcher.find()) {
+                String propertyName = matcher.group(0);
+                if (!"${project.basedir}".equals(propertyName)) {
+                    addViolation(
+                            problems,
+                            Severity.WARNING,
+                            Version.V30,
+                            prefix + "activation.file." + location,
+                            null,
+                            "Failed to interpolate file location " + path + ": " + propertyName
+                                    + " expressions are not supported during profile activation.",
+                            file.getLocation(location));
+                }
             }
         }
     }
@@ -1449,16 +1436,14 @@ public class DefaultModelValidator implements ModelValidator {
         // we use a dedicated comparator because we control our model version scheme.
         String[] firstSegments = StringUtils.split(first, ".");
         String[] secondSegments = StringUtils.split(second, ".");
-        for (int i = 0; i < Math.min(firstSegments.length, secondSegments.length); i++) {
-            int result = Long.valueOf(firstSegments[i]).compareTo(Long.valueOf(secondSegments[i]));
+        for (int i = 0; i < Math.max(firstSegments.length, secondSegments.length); i++) {
+            int result = Long.valueOf(i < firstSegments.length ? firstSegments[i] : "0")
+                    .compareTo(Long.valueOf(i < secondSegments.length ? secondSegments[i] : "0"));
             if (result != 0) {
                 return result;
             }
         }
-        if (firstSegments.length == secondSegments.length) {
-            return 0;
-        }
-        return firstSegments.length > secondSegments.length ? -1 : 1;
+        return 0;
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
