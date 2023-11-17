@@ -63,8 +63,15 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
 
             @Override
             public String getUserProperty(String key) {
-                return context.userProperties.computeIfAbsent(
-                        key, k -> request.getUserProperties().getProperty(key));
+                return context.userProperties.computeIfAbsent(key, this::getProperty);
+            }
+
+            private String getProperty(String k) {
+                String v = request.getUserProperties().getProperty(k);
+                if (v == null) {
+                    v = request.getFileModel().getProperties().getProperty(k);
+                }
+                return v;
             }
 
             @Override
