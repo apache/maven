@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.Mojo;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
@@ -607,5 +608,42 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
         } catch (CloneNotSupportedException e) {
             throw new UnsupportedOperationException(e);
         }
+    }
+
+    private volatile org.apache.maven.api.plugin.descriptor.MojoDescriptor mojoDescriptorV4;
+
+    public org.apache.maven.api.plugin.descriptor.MojoDescriptor getMojoDescriptorV4() {
+        if (mojoDescriptorV4 == null) {
+            synchronized (this) {
+                if (mojoDescriptorV4 == null) {
+                    mojoDescriptorV4 = org.apache.maven.api.plugin.descriptor.MojoDescriptor.newBuilder()
+                            .goal(goal)
+                            .description(getDescription())
+                            .implementation(getImplementation())
+                            .language(getLanguage())
+                            .phase(phase)
+                            .executeGoal(executeGoal)
+                            .executeLifecycle(executeLifecycle)
+                            .executePhase(executePhase)
+                            .aggregator(aggregator)
+                            .dependencyResolution(dependencyResolutionRequired)
+                            .dependencyCollection(dependencyCollectionRequired)
+                            .projectRequired(projectRequired)
+                            .onlineRequired(onlineRequired)
+                            .inheritedByDefault(inheritedByDefault)
+                            .since(since)
+                            .deprecated(deprecated)
+                            .configurator(getComponentConfigurator())
+                            .parameters(getParameters().stream()
+                                    .filter(p -> p.getRequirement() == null)
+                                    .map(Parameter::getParameterV4)
+                                    .collect(Collectors.toList()))
+                            .id(getId())
+                            .fullGoalName(getFullGoalName())
+                            .build();
+                }
+            }
+        }
+        return mojoDescriptorV4;
     }
 }

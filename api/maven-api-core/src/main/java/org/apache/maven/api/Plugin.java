@@ -18,7 +18,9 @@
  */
 package org.apache.maven.api;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -47,5 +49,10 @@ public interface Plugin {
     Artifact getArtifact();
 
     @Nonnull
-    List<Dependency> getDependencies();
+    default Collection<Dependency> getDependencies() {
+        return getDependenciesMap().values();
+    }
+
+    @Nonnull
+    Map<String, Dependency> getDependenciesMap();
 }

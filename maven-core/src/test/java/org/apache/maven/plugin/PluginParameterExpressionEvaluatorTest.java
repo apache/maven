@@ -401,7 +401,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         mavenSession.getRequest().setTopDirectory(path);
         mavenSession.getRequest().setRootDirectory(path);
 
-        Object result = new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null)
+        Object result = new PluginParameterExpressionEvaluator(mavenSession, new MojoExecution(null))
                 .evaluate("${session.rootDirectory.uri}");
         assertEquals(path.toUri(), result);
     }
@@ -414,7 +414,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         mavenSession.getRequest().setTopDirectory(path);
         mavenSession.getRequest().setRootDirectory(path);
 
-        Object result = new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null)
+        Object result = new PluginParameterExpressionEvaluator(mavenSession, new MojoExecution(null))
                 .evaluate("${session.rootDirectory/target}");
         assertEquals(path.resolve("target"), result);
     }
@@ -428,8 +428,8 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         mavenSession.getRequest().setRootDirectory(path);
         DefaultModelBuildingRequest mbr = new DefaultModelBuildingRequest();
 
-        PluginParameterExpressionEvaluatorV4 evaluator =
-                new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null);
+        PluginParameterExpressionEvaluator evaluator =
+                new PluginParameterExpressionEvaluator(mavenSession, new MojoExecution(null));
 
         DefaultPlexusConfiguration configuration = new DefaultPlexusConfiguration("config");
         configuration.addChild("uri", "${session.rootDirectory.uri}");
@@ -438,7 +438,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         configuration.addChild("uriAsciiString", "${session.rootDirectory.uri.ASCIIString}");
         configuration.addChild("pathString", "${session.rootDirectory.string}");
 
-        PluginParameterExpressionEvaluatorV4Test.Mojo mojo = new PluginParameterExpressionEvaluatorV4Test.Mojo();
+        Mojo mojo = new Mojo();
         new EnhancedComponentConfigurator().configureComponent(mojo, configuration, evaluator, null);
 
         assertEquals(

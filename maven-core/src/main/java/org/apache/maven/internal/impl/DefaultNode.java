@@ -66,7 +66,7 @@ public class DefaultNode extends AbstractNode {
 
     @Override
     public Optional<RemoteRepository> getRepository() {
-        // TODO
+        // TODO: v4: implement
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

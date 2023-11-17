@@ -53,11 +53,11 @@ public class DefaultEvent implements Event {
 
     @Override
     public Optional<MojoExecution> getMojoExecution() {
-        return Optional.ofNullable(delegate.getMojoExecution()).map(DefaultMojoExecution::new);
+        return Optional.ofNullable(delegate.getMojoExecution()).map(me -> new DefaultMojoExecution(session, me));
     }
 
     @Override
     public Optional<Exception> getException() {
-        return Optional.empty();
+        return Optional.ofNullable(delegate.getException());
     }
 }

@@ -25,6 +25,12 @@ import jakarta.inject.Scope;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Indicates that the annotated bean has a lifespan limited to a given mojo execution,
+ * which means each mojo execution will result in a different instance being injected.
+ *
+ * @since 4.0.0
+ */
 @Scope
 @Documented
 @Retention(RUNTIME)

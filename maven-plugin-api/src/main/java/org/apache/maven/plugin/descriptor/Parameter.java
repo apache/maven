@@ -168,4 +168,20 @@ public class Parameter implements Cloneable {
             throw new UnsupportedOperationException(e);
         }
     }
+
+    public org.apache.maven.api.plugin.descriptor.Parameter getParameterV4() {
+        return org.apache.maven.api.plugin.descriptor.Parameter.newBuilder()
+                .alias(alias)
+                .name(name)
+                .type(type)
+                .required(required)
+                .editable(editable)
+                .description(description)
+                .expression(expression)
+                .deprecated(deprecated)
+                .defaultValue(defaultValue)
+                .implementation(implementation)
+                .since(since)
+                .build();
+    }
 }

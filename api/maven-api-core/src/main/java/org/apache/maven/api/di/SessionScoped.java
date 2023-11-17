@@ -19,13 +19,22 @@
 package org.apache.maven.api.di;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 import jakarta.inject.Scope;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Indicates that annotated component should be instantiated before session execution starts
+ * and discarded after session execution completes.
+ *
+ * @since 4.0.0
+ */
 @Scope
 @Documented
 @Retention(RUNTIME)
+@Target(ElementType.TYPE)
 public @interface SessionScoped {}

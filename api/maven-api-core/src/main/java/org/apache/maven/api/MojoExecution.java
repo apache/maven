@@ -39,10 +39,10 @@ public interface MojoExecution {
     Plugin getPlugin();
 
     @Nonnull
-    PluginExecution getPluginExecutionModel();
+    PluginExecution getModel();
 
     @Nonnull
-    MojoDescriptor getMojoDescriptor();
+    MojoDescriptor getDescriptor();
 
     @Nonnull
     String getExecutionId();

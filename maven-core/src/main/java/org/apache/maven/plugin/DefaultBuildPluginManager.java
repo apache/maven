@@ -121,8 +121,9 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
                     org.apache.maven.api.plugin.Log.class,
                     new DefaultLog(LoggerFactory.getLogger(
                             mojoExecution.getMojoDescriptor().getFullGoalName())));
-            scope.seed(Project.class, InternalSession.from(session.getSession()).getProject(project));
-            scope.seed(org.apache.maven.api.MojoExecution.class, new DefaultMojoExecution(mojoExecution));
+            InternalSession sessionV4 = InternalSession.from(session.getSession());
+            scope.seed(Project.class, sessionV4.getProject(project));
+            scope.seed(org.apache.maven.api.MojoExecution.class, new DefaultMojoExecution(sessionV4, mojoExecution));
 
             if (mojoDescriptor.isV4Api()) {
                 org.apache.maven.api.plugin.Mojo mojoV4 = mavenPluginManager.getConfiguredMojo(

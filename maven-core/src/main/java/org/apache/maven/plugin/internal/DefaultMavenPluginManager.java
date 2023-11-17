@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -47,6 +46,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
+import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.Plugin;
@@ -222,18 +222,18 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                     ZipEntry pluginDescriptorEntry = pluginJar.getEntry(getPluginDescriptorLocation());
 
                     if (pluginDescriptorEntry != null) {
-                        InputStream is = pluginJar.getInputStream(pluginDescriptorEntry);
-
-                        pluginDescriptor = parsePluginDescriptor(is, plugin, pluginFile.getAbsolutePath());
+                        pluginDescriptor = parsePluginDescriptor(
+                                () -> pluginJar.getInputStream(pluginDescriptorEntry),
+                                plugin,
+                                pluginFile.getAbsolutePath());
                     }
                 }
             } else {
                 File pluginXml = new File(pluginFile, getPluginDescriptorLocation());
 
                 if (pluginXml.isFile()) {
-                    try (InputStream is = Files.newInputStream(pluginXml.toPath())) {
-                        pluginDescriptor = parsePluginDescriptor(is, plugin, pluginXml.getAbsolutePath());
-                    }
+                    pluginDescriptor = parsePluginDescriptor(
+                            () -> Files.newInputStream(pluginXml.toPath()), plugin, pluginXml.getAbsolutePath());
                 }
             }
 
@@ -261,7 +261,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         return "META-INF/maven/plugin.xml";
     }
 
-    private PluginDescriptor parsePluginDescriptor(InputStream is, Plugin plugin, String descriptorLocation)
+    private PluginDescriptor parsePluginDescriptor(
+            PluginDescriptorBuilder.StreamSupplier is, Plugin plugin, String descriptorLocation)
             throws PluginDescriptorParsingException {
         try {
             return builder.build(is, descriptorLocation);
@@ -412,6 +413,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
         discoverPluginComponents(pluginRealm, plugin, pluginDescriptor);
 
+        pluginDescriptor.setDependencyNode(root);
         pluginDescriptor.setClassRealm(pluginRealm);
         pluginDescriptor.setArtifacts(pluginArtifacts);
     }
@@ -611,11 +613,12 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             }
 
             ExpressionEvaluator expressionEvaluator;
+            InternalSession sessionV4 = InternalSession.from(session.getSession());
             if (mojoDescriptor.isV4Api()) {
                 expressionEvaluator = new PluginParameterExpressionEvaluatorV4(
-                        session.getSession(),
-                        InternalSession.from(session.getSession()).getProject(session.getCurrentProject()),
-                        mojoExecution);
+                        sessionV4,
+                        sessionV4.getProject(session.getCurrentProject()),
+                        new DefaultMojoExecution(sessionV4, mojoExecution));
             } else {
                 expressionEvaluator = new PluginParameterExpressionEvaluator(session, mojoExecution);
             }
