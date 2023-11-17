@@ -27,7 +27,7 @@
   </parent>
 
   <artifactId>maven-api-meta</artifactId>
-  <name>Maven 4 API Meta annotations</name>
-  <description>Java annotations for Maven 4 Immutable API.</description>
+  <name>Maven 4 API :: Meta annotations</name>
+  <description>Maven 4 API - Java meta annotations.</description>
 
 </project>

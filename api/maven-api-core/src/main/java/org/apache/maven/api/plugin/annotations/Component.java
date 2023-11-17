@@ -26,6 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Used to configure injection of Plexus components by
@@ -44,11 +45,13 @@ public @interface Component {
      * role of the component to inject.
      * @return the role
      */
+    @Nonnull
     Class<?> role() default Object.class;
 
     /**
      * hint of the component to inject.
      * @return the hint
      */
+    @Nonnull
     String hint() default "";
 }

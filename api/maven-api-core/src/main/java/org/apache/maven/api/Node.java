@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Provider;
 
 /**
  * Represents a dependency node within a Maven project's dependency collector.
@@ -35,6 +36,7 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Immutable
+@Provider
 public interface Node {
 
     /**
@@ -78,13 +80,15 @@ public interface Node {
      * @param filter the filter to apply
      * @return a new filtered graph
      */
-    Node filter(Predicate<Node> filter);
+    @Nonnull
+    Node filter(@Nonnull Predicate<Node> filter);
 
     /**
      * Returns a string representation of this dependency node.
      *
      * @return the string representation
      */
+    @Nonnull
     String asString();
 
     /**
