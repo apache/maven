@@ -18,8 +18,6 @@
  */
 package org.apache.maven.artifact.versioning;
 
-import java.util.StringTokenizer;
-
 /**
  * Default implementation of artifact versioning.
  *
@@ -123,29 +121,30 @@ public class DefaultArtifactVersion implements ArtifactVersion {
         } else {
             boolean fallback = false;
 
-            StringTokenizer tok = new StringTokenizer(part1, ".");
-            if (tok.hasMoreTokens()) {
-                majorVersion = getNextIntegerToken(tok);
+            String[] tok = part1.split("\\.");
+            int idx = 0;
+            if (idx < tok.length) {
+                majorVersion = getNextIntegerToken(tok[idx++]);
                 if (majorVersion == null) {
                     fallback = true;
                 }
             } else {
                 fallback = true;
             }
-            if (tok.hasMoreTokens()) {
-                minorVersion = getNextIntegerToken(tok);
+            if (idx < tok.length) {
+                minorVersion = getNextIntegerToken(tok[idx++]);
                 if (minorVersion == null) {
                     fallback = true;
                 }
             }
-            if (tok.hasMoreTokens()) {
-                incrementalVersion = getNextIntegerToken(tok);
+            if (idx < tok.length) {
+                incrementalVersion = getNextIntegerToken(tok[idx++]);
                 if (incrementalVersion == null) {
                     fallback = true;
                 }
             }
-            if (tok.hasMoreTokens()) {
-                qualifier = tok.nextToken();
+            if (idx < tok.length) {
+                qualifier = tok[idx++];
                 fallback = isDigits(qualifier);
             }
 
@@ -178,8 +177,7 @@ public class DefaultArtifactVersion implements ArtifactVersion {
         return true;
     }
 
-    private static Integer getNextIntegerToken(StringTokenizer tok) {
-        String s = tok.nextToken();
+    private static Integer getNextIntegerToken(String s) {
         if ((s.length() > 1) && s.startsWith("0")) {
             return null;
         }
