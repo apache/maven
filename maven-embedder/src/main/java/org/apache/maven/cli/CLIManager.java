@@ -117,9 +117,9 @@ public class CLIManager {
 
     public static final String COLOR = "color";
 
-    public static final String CACHE_ARTIFACT_NOT_FOUND = "cache-artifact-not-found";
+    public static final String CACHE_ARTIFACT_NOT_FOUND = "canf";
 
-    public static final String STRICT_ARTIFACT_DESCRIPTOR_POLICY = "strict-artifact-descriptor-policy";
+    public static final String STRICT_ARTIFACT_DESCRIPTOR_POLICY = "sadp";
 
     /** This option is deprecated and may be repurposed as Java debug in a future version.
      * Use {@code -X/--verbose} instead. */
@@ -312,14 +312,14 @@ public class CLIManager {
                 .optionalArg(true)
                 .desc("Defines the color mode of the output. Supported are 'auto', 'always', 'never'.")
                 .build());
-        options.addOption(Option.builder()
-                .longOpt(CACHE_ARTIFACT_NOT_FOUND)
+        options.addOption(Option.builder(CACHE_ARTIFACT_NOT_FOUND)
+                .longOpt("cache-artifact-not-found")
                 .hasArg()
                 .desc(
                         "Defines caching behaviour for 'not found' artifacts. Supported values are 'true' (default), 'false'.")
                 .build());
-        options.addOption(Option.builder()
-                .longOpt(STRICT_ARTIFACT_DESCRIPTOR_POLICY)
+        options.addOption(Option.builder(STRICT_ARTIFACT_DESCRIPTOR_POLICY)
+                .longOpt("strict-artifact-descriptor-policy")
                 .hasArg()
                 .desc("Defines 'strict' artifact descriptor policy. Supported values are 'true', 'false' (default).")
                 .build());
