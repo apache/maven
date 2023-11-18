@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Session;
@@ -47,6 +47,8 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A Maven execution session.
  *
@@ -56,7 +58,7 @@ public class MavenSession implements Cloneable {
 
     private final MavenExecutionResult result;
 
-    private final AtomicReference<RepositorySystemSession> repositorySession;
+    private final Supplier<RepositorySystemSession> repositorySystemSessionSupplier;
 
     private final Properties executionProperties;
 
@@ -89,13 +91,6 @@ public class MavenSession implements Cloneable {
     @SuppressWarnings("checkstyle:linelength")
     private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Object>>>
             pluginContextsByProjectAndPluginKey = new ConcurrentHashMap<>();
-
-    /**
-     * For internal use only.
-     */
-    public void swapRepositorySystemSession(RepositorySystemSession repositorySystemSession) {
-        this.repositorySession.set(repositorySystemSession);
-    }
 
     public void setProjects(List<MavenProject> projects) {
         if (!projects.isEmpty()) {
@@ -265,7 +260,7 @@ public class MavenSession implements Cloneable {
     }
 
     public RepositorySystemSession getRepositorySession() {
-        return repositorySession.get();
+        return repositorySystemSessionSupplier.get();
     }
 
     private Map<String, MavenProject> projectMap;
@@ -290,7 +285,7 @@ public class MavenSession implements Cloneable {
     // Deprecated
     //
 
-    private PlexusContainer container;
+    private final PlexusContainer container;
 
     private final Settings settings;
 
@@ -300,6 +295,21 @@ public class MavenSession implements Cloneable {
     /** @deprecated This appears not to be used anywhere within Maven itself. */
     public Map<String, MavenProject> getProjectMap() {
         return projectMap;
+    }
+
+    public MavenSession(
+            Supplier<RepositorySystemSession> repositorySystemSessionSupplier,
+            MavenExecutionRequest request,
+            MavenExecutionResult result) {
+        this.container = null;
+        this.request = requireNonNull(request);
+        this.result = requireNonNull(result);
+        this.settings = adaptSettings(request);
+        this.repositorySystemSessionSupplier = requireNonNull(repositorySystemSessionSupplier);
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
     }
 
     @Deprecated
@@ -312,7 +322,7 @@ public class MavenSession implements Cloneable {
         this.request = request;
         this.result = result;
         this.settings = adaptSettings(request);
-        this.repositorySession = new AtomicReference<>(repositorySession);
+        this.repositorySystemSessionSupplier = () -> repositorySession;
         Properties executionProperties = new Properties();
         executionProperties.putAll(request.getSystemProperties());
         executionProperties.putAll(request.getUserProperties());
@@ -376,7 +386,7 @@ public class MavenSession implements Cloneable {
         this.request.setBaseDirectory((executionRootDir != null) ? new File(executionRootDir) : null);
         this.request.setStartTime(startTime);
         this.result = null;
-        this.repositorySession = new AtomicReference<>(null);
+        this.repositorySystemSessionSupplier = () -> null;
     }
 
     @Deprecated
@@ -394,7 +404,7 @@ public class MavenSession implements Cloneable {
         executionProperties.putAll(request.getUserProperties());
         this.executionProperties = executionProperties;
         setProjects(projects);
-        this.repositorySession = new AtomicReference<>(null);
+        this.repositorySystemSessionSupplier = () -> null;
     }
 
     /**
