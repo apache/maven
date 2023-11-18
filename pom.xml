@@ -159,7 +159,7 @@ under the License.
     <asmVersion>9.6</asmVersion>
     <byteBuddyVersion>1.14.9</byteBuddyVersion>
     <cipherVersion>2.0</cipherVersion>
-    <classWorldsVersion>2.6.0</classWorldsVersion>
+    <classWorldsVersion>2.7.0</classWorldsVersion>
     <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsIoVersion>2.11.0</commonsIoVersion>
     <guiceVersion>5.1.0</guiceVersion>
