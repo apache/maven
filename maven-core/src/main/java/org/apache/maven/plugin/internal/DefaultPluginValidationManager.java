@@ -30,10 +30,12 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.execution.ExecutionEvent;
@@ -61,7 +63,11 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
 
     private static final String ISSUES_KEY = DefaultPluginValidationManager.class.getName() + ".issues";
 
+    private static final String PLUGIN_EXCLUDES_KEY = DefaultPluginValidationManager.class.getName() + ".excludes";
+
     private static final String MAVEN_PLUGIN_VALIDATION_KEY = "maven.plugin.validation";
+
+    private static final String MAVEN_PLUGIN_VALIDATION_EXCLUDES_KEY = "maven.plugin.validation.excludes";
 
     private static final ValidationReportLevel DEFAULT_VALIDATION_LEVEL = ValidationReportLevel.INLINE;
 
@@ -87,10 +93,26 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
                 RepositorySystemSession repositorySystemSession =
                         executionEvent.getSession().getRepositorySession();
                 validationReportLevel(repositorySystemSession); // this will parse and store it in session.data
+                validationPluginExcludes(repositorySystemSession);
             } else if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
                 reportSessionCollectedValidationIssues(executionEvent.getSession());
             }
         }
+    }
+
+    private List<?> validationPluginExcludes(RepositorySystemSession session) {
+        return (List<?>) session.getData().computeIfAbsent(PLUGIN_EXCLUDES_KEY, () -> parsePluginExcludes(session));
+    }
+
+    private List<String> parsePluginExcludes(RepositorySystemSession session) {
+        String excludes = ConfigUtils.getString(session, null, MAVEN_PLUGIN_VALIDATION_EXCLUDES_KEY);
+        if (excludes == null || excludes.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(excludes.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
     }
 
     private ValidationReportLevel validationReportLevel(RepositorySystemSession session) {
@@ -141,6 +163,9 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
     public void reportPluginValidationIssue(
             IssueLocality locality, RepositorySystemSession session, Artifact pluginArtifact, String issue) {
         String pluginKey = pluginKey(pluginArtifact);
+        if (validationPluginExcludes(session).contains(pluginKey)) {
+            return;
+        }
         PluginValidationIssues pluginIssues =
                 pluginIssues(session).computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginIssue(locality, null, issue);
@@ -151,6 +176,9 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
     public void reportPluginValidationIssue(
             IssueLocality locality, MavenSession mavenSession, MojoDescriptor mojoDescriptor, String issue) {
         String pluginKey = pluginKey(mojoDescriptor);
+        if (validationPluginExcludes(mavenSession.getRepositorySession()).contains(pluginKey)) {
+            return;
+        }
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginIssue(locality, pluginDeclaration(mavenSession, mojoDescriptor), issue);
@@ -165,6 +193,9 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
             Class<?> mojoClass,
             String issue) {
         String pluginKey = pluginKey(mojoDescriptor);
+        if (validationPluginExcludes(mavenSession.getRepositorySession()).contains(pluginKey)) {
+            return;
+        }
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginMojoIssue(
