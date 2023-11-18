@@ -20,7 +20,7 @@ org.apache.groovy:groovy-ant:4.0.15
 org.apache.groovy:groovy:4.0.15
 org.apache.maven:maven-api-spi:4.0.0-alpha-8
 org.apache.maven:maven-api-model:4.0.0-alpha-8:mdo
-org.apache.maven.extensions:maven-extensions:40:pom
+org.apache.maven.extensions:maven-extensions:41:pom
 org.apache.maven.its.plugins.class-loader:dep-c:${project.version}
 org.apache.maven.its.plugins:maven-it-plugin-active-collection:${project.version}
 org.apache.maven.its.plugins:maven-it-plugin-all:${project.version}
@@ -70,11 +70,13 @@ org.apache.maven.its:maven-core-it-support:1.3
 org.apache.maven.its:maven-core-it-support:1.4
 org.apache.maven.plugin-tools:maven-plugin-annotations:3.3
 org.apache.maven.plugins:maven-antrun-plugin:3.0.0
+org.apache.maven.plugins:maven-antrun-plugin:3.1.0
 org.apache.maven.plugins:maven-assembly-plugin:3.1.0
 org.apache.maven.plugins:maven-clean-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-clean-plugin:2.5
 org.apache.maven.plugins:maven-clean-plugin:3.1.0
 org.apache.maven.plugins:maven-clean-plugin:3.2.0
+org.apache.maven.plugins:maven-clean-plugin:3.3.2
 org.apache.maven.plugins:maven-compiler-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-compiler-plugin:3.1
 org.apache.maven.plugins:maven-compiler-plugin:3.8.1
@@ -113,6 +115,7 @@ org.apache.maven.plugins:maven-source-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-surefire-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M5
 org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M7
+org.apache.maven.plugins:maven-surefire-plugin:3.2.2
 org.apache.maven.plugins:maven-war-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-war-plugin:3.3.2
 org.apache.maven.plugins:maven-wrapper-plugin:3.1.0
