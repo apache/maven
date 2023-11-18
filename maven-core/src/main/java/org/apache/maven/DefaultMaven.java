@@ -73,6 +73,7 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.slf4j.Logger;
@@ -213,7 +214,7 @@ public class DefaultMaven implements Maven {
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        try (CloseableSession closeableSession = newRepositorySession(request)) {
+        try (CloseableSession closeableSession = newCloseableSession(request)) {
             MavenSession session = new MavenSession(container, closeableSession, request, result);
             session.setSession(defaultSessionFactory.getSession(session));
 
@@ -406,7 +407,17 @@ public class DefaultMaven implements Maven {
         }
     }
 
-    public CloseableSession newRepositorySession(MavenExecutionRequest request) {
+    /**
+     * Nobody should ever use this method.
+     *
+     * @deprecated If you use this method and your code is not in Maven Core, stop doing this.
+     */
+    @Deprecated
+    public RepositorySystemSession newRepositorySession( MavenExecutionRequest request) {
+        return newCloseableSession(request);
+    }
+
+    private CloseableSession newCloseableSession(MavenExecutionRequest request) {
         return repositorySessionFactory.newRepositorySessionBuilder(request).build();
     }
 
