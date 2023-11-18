@@ -22,13 +22,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
+
+import static java.util.Objects.nonNull;
 
 /**
  * Pseudo test to generate documentation fragment about supported CLI options. TODO such documentation generation code
@@ -48,27 +49,45 @@ class CLIManagerDocumentationTest {
     private static class CLIManagerExtension extends CLIManager {
         public Collection<Option> getOptions() {
             List<Option> optList = new ArrayList<>(options.getOptions());
-            Collections.sort(optList, new OptionComparator());
+            optList.sort(new OptionComparator());
             return optList;
         }
     }
 
     String getOptionsAsHtml() {
         StringBuilder sb = new StringBuilder(512);
-        boolean a = true;
+        boolean odd = true;
         sb.append(
                 "<table border='1' class='zebra-striped'><tr class='a'><th><b>Options</b></th><th><b>Description</b></th></tr>");
         for (Option option : new CLIManagerExtension().getOptions()) {
-            a = !a;
-            sb.append("<tr class='").append(a ? 'a' : 'b').append("'><td><code>-<a name='");
-            sb.append(option.getOpt());
+            odd = !odd;
+            sb.append("<tr class='");
+            sb.append(odd ? 'a' : 'b');
             sb.append("'>");
-            sb.append(option.getOpt());
-            sb.append("</a>,--<a name='");
-            sb.append(option.getLongOpt());
-            sb.append("'>");
-            sb.append(option.getLongOpt());
-            sb.append("</a>");
+
+            sb.append("<td>");
+
+            sb.append("<code>");
+
+            if (nonNull(option.getOpt())) {
+                sb.append("-<a name='");
+                sb.append(option.getOpt());
+                sb.append("'>");
+                sb.append(option.getOpt());
+                sb.append("</a>");
+            }
+
+            if (nonNull(option.getLongOpt())) {
+                if (nonNull(option.getOpt())) {
+                    sb.append(", ");
+                }
+                sb.append("--<a name='");
+                sb.append(option.getLongOpt());
+                sb.append("'>");
+                sb.append(option.getLongOpt());
+                sb.append("</a>");
+            }
+
             if (option.hasArg()) {
                 if (option.hasArgName()) {
                     sb.append(" &lt;").append(option.getArgName()).append("&gt;");
@@ -76,9 +95,14 @@ class CLIManagerDocumentationTest {
                     sb.append(' ');
                 }
             }
-            sb.append("</code></td><td>");
+            sb.append("</code>");
+
+            sb.append("</td>");
+            sb.append("<td>");
             sb.append(option.getDescription());
-            sb.append("</td></tr>");
+            sb.append("</td>");
+
+            sb.append("</tr>");
             sb.append(LS);
         }
         sb.append("</table>");
