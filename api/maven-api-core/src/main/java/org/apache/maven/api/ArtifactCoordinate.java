@@ -75,6 +75,7 @@ public interface ArtifactCoordinate {
     /**
      * Unique id identifying this artifact
      */
+    @Nonnull
     default String getId() {
         return getGroupId()
                 + ":" + getArtifactId()

@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Service used to interact with the end user.
@@ -37,7 +39,8 @@ public interface Prompter extends Service {
      * @return the string entered by the user
      * @throws PrompterException if an exception occurs
      */
-    default String prompt(String message) throws PrompterException {
+    @Nonnull
+    default String prompt(@Nullable String message) throws PrompterException {
         return prompt(message, null, null);
     }
 
@@ -49,7 +52,8 @@ public interface Prompter extends Service {
      * @return the string entered by the user
      * @throws PrompterException if an exception occurs
      */
-    default String prompt(String message, String defaultReply) throws PrompterException {
+    @Nonnull
+    default String prompt(@Nullable String message, @Nullable String defaultReply) throws PrompterException {
         return prompt(message, null, defaultReply);
     }
 
@@ -61,7 +65,8 @@ public interface Prompter extends Service {
      * @return the string entered by the user
      * @throws PrompterException if an exception occurs
      */
-    default String prompt(String message, List<String> possibleValues) throws PrompterException {
+    @Nonnull
+    default String prompt(@Nullable String message, @Nullable List<String> possibleValues) throws PrompterException {
         return prompt(message, possibleValues, null);
     }
 
@@ -74,7 +79,9 @@ public interface Prompter extends Service {
      * @return the string entered by the user
      * @throws PrompterException if an exception occurs
      */
-    String prompt(String message, List<String> possibleValues, String defaultReply) throws PrompterException;
+    @Nonnull
+    String prompt(@Nullable String message, @Nullable List<String> possibleValues, @Nullable String defaultReply)
+            throws PrompterException;
 
     /**
      * Prompts the user for a password.
@@ -83,7 +90,8 @@ public interface Prompter extends Service {
      * @return the password entered by the user
      * @throws PrompterException if an exception occurs
      */
-    String promptForPassword(String message) throws PrompterException;
+    @Nonnull
+    String promptForPassword(@Nullable String message) throws PrompterException;
 
     /**
      * Displays a message to the user.
@@ -91,5 +99,5 @@ public interface Prompter extends Service {
      * @param message the message to display
      * @throws PrompterException if an exception occurs
      */
-    void showMessage(String message) throws PrompterException;
+    void showMessage(@Nullable String message) throws PrompterException;
 }

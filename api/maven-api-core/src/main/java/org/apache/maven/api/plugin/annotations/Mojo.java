@@ -27,6 +27,7 @@ import java.lang.annotation.Target;
 
 import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * This annotation will mark your class as a Mojo (ie. goal in a Maven plugin).
@@ -43,30 +44,35 @@ public @interface Mojo {
      * goal name (required).
      * @return the goal name
      */
+    @Nonnull
     String name();
 
     /**
      * default phase to bind your mojo.
      * @return the default phase
      */
+    @Nonnull
     LifecyclePhase defaultPhase() default LifecyclePhase.NONE;
 
     /**
      * the required dependency resolution scope.
      * @return the required dependency resolution scope
      */
+    @Nonnull
     ResolutionScope requiresDependencyResolution() default ResolutionScope.NONE;
 
     /**
      * the required dependency collection scope.
      * @return the required dependency collection scope
      */
+    @Nonnull
     ResolutionScope requiresDependencyCollection() default ResolutionScope.NONE;
 
     /**
      * your Mojo instantiation strategy. (Only <code>per-lookup</code> and <code>singleton</code> are supported)
      * @return the instantiation strategy
      */
+    @Nonnull
     InstantiationStrategy instantiationStrategy() default InstantiationStrategy.PER_LOOKUP;
 
     /**
@@ -91,5 +97,6 @@ public @interface Mojo {
      * configurator bean name.
      * @return the configurator bean name
      */
+    @Nonnull
     String configurator() default "";
 }

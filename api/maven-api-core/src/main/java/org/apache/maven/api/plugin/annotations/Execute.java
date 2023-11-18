@@ -26,6 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Used if your Mojo needs to fork a <a href="/ref/3.0.4/maven-core/lifecycles.html">lifecycle</a>.
@@ -44,6 +45,7 @@ public @interface Execute {
      * Only one of {@link #customPhase()} and {@link #phase()} must be set.
      * @return the phase
      */
+    @Nonnull
     LifecyclePhase phase() default LifecyclePhase.NONE;
 
     /**
@@ -52,6 +54,7 @@ public @interface Execute {
      * Only one of {@link #customPhase()} and {@link #phase()} must be set.
      * @return the custom phase id
      */
+    @Nonnull
     String customPhase() default "";
 
     /**
@@ -59,6 +62,7 @@ public @interface Execute {
      * another goal of the same plugin.
      * @return the goal
      */
+    @Nonnull
     String goal() default "";
 
     /**
@@ -68,5 +72,6 @@ public @interface Execute {
      * @see <a href="https://maven.apache.org/maven-plugin-api/lifecycle-mappings.html">Lifecycle Mappings</a>
      * @return the lifecycle id
      */
+    @Nonnull
     String lifecycle() default "";
 }

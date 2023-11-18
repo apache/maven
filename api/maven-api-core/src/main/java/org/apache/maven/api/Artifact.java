@@ -37,6 +37,7 @@ public interface Artifact {
      *
      * @return the unique identifier
      */
+    @Nonnull
     default String key() {
         return getGroupId()
                 + ':'

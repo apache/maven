@@ -28,7 +28,7 @@
 
   <artifactId>maven-api-core</artifactId>
   <name>Maven 4 API :: Core</name>
-  <description>Maven 4 API - Maven Core APIs.</description>
+  <description>Maven 4 API - Maven Core API</description>
 
   <dependencies>
     <dependency>

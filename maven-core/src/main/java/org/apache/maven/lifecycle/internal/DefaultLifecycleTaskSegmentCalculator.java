@@ -24,7 +24,8 @@ import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
@@ -73,11 +74,9 @@ public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegme
         if ((tasks == null || tasks.isEmpty())
                 && (rootProject.getDefaultGoal() != null
                         && !rootProject.getDefaultGoal().isEmpty())) {
-            StringTokenizer tokenizer = new StringTokenizer(rootProject.getDefaultGoal());
-            tasks = new ArrayList<>();
-            while (tokenizer.hasMoreTokens()) {
-                tasks.add(tokenizer.nextToken());
-            }
+            tasks = Stream.of(rootProject.getDefaultGoal().split("\\s+"))
+                    .filter(g -> !g.isEmpty())
+                    .collect(Collectors.toList());
         }
 
         return calculateTaskSegments(session, tasks);

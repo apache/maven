@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.execution.MavenSession;
@@ -127,9 +126,9 @@ public class MojoDescriptorCreator {
 
         Plugin plugin = null;
 
-        StringTokenizer tok = new StringTokenizer(task, ":");
+        String[] tok = task.split(":");
 
-        int numTokens = tok.countTokens();
+        int numTokens = tok.length;
 
         if (numTokens >= 4) {
             // We have everything that we need
@@ -142,19 +141,19 @@ public class MojoDescriptorCreator {
             // goal
             //
             plugin = new Plugin();
-            plugin.setGroupId(tok.nextToken());
-            plugin.setArtifactId(tok.nextToken());
-            plugin.setVersion(tok.nextToken());
-            goal = tok.nextToken();
+            plugin.setGroupId(tok[0]);
+            plugin.setArtifactId(tok[1]);
+            plugin.setVersion(tok[2]);
+            goal = tok[3];
 
             // This won't be valid, but it constructs something easy to read in the error message
-            while (tok.hasMoreTokens()) {
-                goal += ":" + tok.nextToken();
+            for (int idx = 4; idx < tok.length; idx++) {
+                goal += ":" + tok[idx];
             }
         } else if (numTokens == 3) {
             // groupId:artifactId:goal or pluginPrefix:version:goal (since Maven 3.9.0)
 
-            String firstToken = tok.nextToken();
+            String firstToken = tok[0];
             // groupId or pluginPrefix? heuristics: groupId contains dot (.) but not pluginPrefix
             if (firstToken.contains(".")) {
                 // We have everything that we need except the version
@@ -168,22 +167,22 @@ public class MojoDescriptorCreator {
                 //
                 plugin = new Plugin();
                 plugin.setGroupId(firstToken);
-                plugin.setArtifactId(tok.nextToken());
+                plugin.setArtifactId(tok[1]);
             } else {
                 // pluginPrefix:version:goal, like remote-resources:3.5.0:process
                 plugin = findPluginForPrefix(firstToken, session);
-                plugin.setVersion(tok.nextToken());
+                plugin.setVersion(tok[1]);
             }
-            goal = tok.nextToken();
+            goal = tok[2];
         } else {
             // We have a prefix and goal
             //
             // idea:idea
             //
-            String prefix = tok.nextToken();
+            String prefix = tok[0];
 
             if (numTokens == 2) {
-                goal = tok.nextToken();
+                goal = tok[1];
             } else {
                 // goal was missing - pass through to MojoNotFoundException
                 goal = "";

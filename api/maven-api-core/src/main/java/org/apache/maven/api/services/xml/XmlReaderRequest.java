@@ -27,6 +27,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * An XML reader request.
@@ -37,20 +38,27 @@ import org.apache.maven.api.annotations.NotThreadSafe;
 @Immutable
 public interface XmlReaderRequest {
 
+    @Nullable
     Path getPath();
 
+    @Nullable
     URL getURL();
 
+    @Nullable
     InputStream getInputStream();
 
+    @Nullable
     Reader getReader();
 
+    @Nullable
     Transformer getTransformer();
 
     boolean isStrict();
 
+    @Nullable
     String getModelId();
 
+    @Nullable
     String getLocation();
 
     boolean isAddDefaultEntities();
