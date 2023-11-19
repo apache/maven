@@ -60,6 +60,7 @@ class ConsumerPomArtifactTransformerTest {
         try (InputStream expected = Files.newInputStream(beforePomFile)) {
             Model model = new Model(new MavenStaxReader().read(expected));
             MavenProject project = new MavenProject(model);
+            project.setOriginalModel(model);
             ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer(modelBuilder);
             t.createConsumerPomArtifact(project, tempFile, systemSessionMock)
                     .transform(beforePomFile, tempFile, model.getDelegate());

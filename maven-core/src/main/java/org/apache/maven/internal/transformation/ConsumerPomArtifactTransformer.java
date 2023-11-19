@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.Repository;
 import org.apache.maven.api.feature.Features;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
@@ -223,7 +225,8 @@ public final class ConsumerPomArtifactTransformer {
             String version;
 
             String packaging = model.getPackaging();
-            if (POM_PACKAGING.equals(packaging)) {
+            String originalPackaging = project.getOriginalModel().getPackaging();
+            if (POM_PACKAGING.equals(packaging) && !BOM_PACKAGING.equals(originalPackaging)) {
                 // This is a bit of a hack, but all models are cached, so not sure why we'd need to parse it again
                 ModelCache cache = DefaultModelCache.newInstance(session);
                 Object modelData = cache.get(new FileModelSource(src.toFile()), "raw");
@@ -265,6 +268,27 @@ public final class ConsumerPomArtifactTransformer {
                 } else {
                     version = consumer.getModelVersion();
                 }
+            } else if (BOM_PACKAGING.equals(originalPackaging)) {
+                DependencyManagement dependencyManagement =
+                        project.getOriginalModel().getDependencyManagement().getDelegate();
+                List<Dependency> dependencies = new ArrayList<>();
+                dependencyManagement
+                        .getDependencies()
+                        .forEach((dependency) -> dependencies.add(dependency.withVersion(model.getVersion())));
+                Model.Builder builder = prune(
+                        Model.newBuilder(model, true)
+                                .preserveModelVersion(false)
+                                .root(false)
+                                .parent(null)
+                                .dependencyManagement(dependencyManagement.withDependencies(dependencies))
+                                .build(null),
+                        model);
+                builder.profiles(model.getProfiles().stream()
+                        .map(p -> prune(Profile.newBuilder(p, true), p).build())
+                        .collect(Collectors.toList()));
+                consumer = builder.build();
+                version = new MavenModelVersion().getModelVersion(consumer);
+                consumer = consumer.withModelVersion(version);
             } else {
                 Model.Builder builder = prune(
                         Model.newBuilder(model, true)
@@ -273,10 +297,6 @@ public final class ConsumerPomArtifactTransformer {
                                 .parent(null)
                                 .build(null),
                         model);
-                boolean isBom = BOM_PACKAGING.equals(packaging);
-                if (isBom) {
-                    builder.packaging(POM_PACKAGING);
-                }
                 builder.profiles(model.getProfiles().stream()
                         .map(p -> prune(Profile.newBuilder(p, true), p).build())
                         .collect(Collectors.toList()));
