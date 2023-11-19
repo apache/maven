@@ -42,7 +42,6 @@ node('s390x') {
 
         stage('Build / Unit Test') {
             String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
-            jdkName = "ibm-semeru-8u362-b09"
             String mvnName = jenkinsEnv.mvnFromVersion(buildOs, buildMvn)
             try {
                 withEnv(["JAVA_HOME=${ tool "$jdkName" }",
