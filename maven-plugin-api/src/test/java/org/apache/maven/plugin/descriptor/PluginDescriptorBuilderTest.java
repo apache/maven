@@ -19,13 +19,11 @@
 package org.apache.maven.plugin.descriptor;
 
 import java.io.IOException;
-import java.io.Reader;
 
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,9 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PluginDescriptorBuilderTest {
 
     private PluginDescriptor build(String resource) throws IOException, PlexusConfigurationException {
-        Reader reader = new XmlStreamReader(getClass().getResourceAsStream(resource));
-
-        return new PluginDescriptorBuilder().build(reader);
+        return new PluginDescriptorBuilder().build(getClass().getResourceAsStream(resource), null);
     }
 
     @Test
