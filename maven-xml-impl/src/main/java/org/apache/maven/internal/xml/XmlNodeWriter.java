@@ -32,18 +32,14 @@ import org.codehaus.stax2.util.StreamWriterDelegate;
  *
  */
 public class XmlNodeWriter {
-    public static void write(Writer writer, XmlNode dom) {
-        try {
-            XMLOutputFactory factory = new com.ctc.wstx.stax.WstxOutputFactory();
-            factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
-            factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_USE_DOUBLE_QUOTES_IN_XML_DECL, true);
-            factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_ADD_SPACE_AFTER_EMPTY_ELEM, true);
-            XMLStreamWriter serializer = new IndentingXMLStreamWriter(factory.createXMLStreamWriter(writer));
-            write(serializer, dom);
-            serializer.close();
-        } catch (XMLStreamException e) {
-            throw new RuntimeException("Unexpected error when writing XML", e);
-        }
+    public static void write(Writer writer, XmlNode dom) throws XMLStreamException {
+        XMLOutputFactory factory = new com.ctc.wstx.stax.WstxOutputFactory();
+        factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
+        factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_USE_DOUBLE_QUOTES_IN_XML_DECL, true);
+        factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_ADD_SPACE_AFTER_EMPTY_ELEM, true);
+        XMLStreamWriter serializer = new IndentingXMLStreamWriter(factory.createXMLStreamWriter(writer));
+        write(serializer, dom);
+        serializer.close();
     }
 
     public static void write(XMLStreamWriter xmlWriter, XmlNode dom) throws XMLStreamException {

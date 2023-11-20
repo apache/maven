@@ -18,6 +18,8 @@
  */
 package org.apache.maven.internal.xml;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -404,9 +407,44 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     @Override
     public String toString() {
+        try {
+            return toStringXml();
+        } catch (XMLStreamException e) {
+            return toStringObject();
+        }
+    }
+
+    public String toStringXml() throws XMLStreamException {
         StringWriter writer = new StringWriter();
         XmlNodeWriter.write(writer, this);
         return writer.toString();
+    }
+
+    public String toStringObject() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("XmlNode[");
+        boolean w = false;
+        w = addToStringField(sb, prefix, o -> !o.isEmpty(), "prefix", w);
+        w = addToStringField(sb, namespaceUri, o -> !o.isEmpty(), "namespaceUri", w);
+        w = addToStringField(sb, name, o -> !o.isEmpty(), "name", w);
+        w = addToStringField(sb, value, o -> !o.isEmpty(), "value", w);
+        w = addToStringField(sb, attributes, o -> !o.isEmpty(), "attributes", w);
+        w = addToStringField(sb, children, o -> !o.isEmpty(), "children", w);
+        w = addToStringField(sb, location, Objects::nonNull, "location", w);
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private static <T> boolean addToStringField(StringBuilder sb, T o, Function<T, Boolean> p, String n, boolean w) {
+        if (!p.apply(o)) {
+            if (w) {
+                sb.append(", ");
+            } else {
+                w = true;
+            }
+            sb.append(n).append("='").append(o).append('\'');
+        }
+        return w;
     }
 
     private static boolean isEmpty(String str) {
