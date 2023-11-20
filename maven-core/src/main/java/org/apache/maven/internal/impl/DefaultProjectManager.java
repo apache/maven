@@ -73,7 +73,7 @@ public class DefaultProjectManager implements ProjectManager {
     @Nonnull
     @Override
     public Collection<Artifact> getAttachedArtifacts(Project project) {
-        AbstractSession session = ((DefaultProject) project).getSession();
+        InternalSession session = ((DefaultProject) project).getSession();
         Collection<Artifact> attached = getMavenProject(project).getAttachedArtifacts().stream()
                 .map(RepositoryUtils::toArtifact)
                 .map(session::getArtifact)
@@ -129,12 +129,12 @@ public class DefaultProjectManager implements ProjectManager {
                     getMavenProject(project),
                     toResolve,
                     toResolve,
-                    ((DefaultSession) session).getMavenSession(),
+                    InternalSession.from(session).getMavenSession(),
                     false,
                     Collections.emptySet());
             return artifacts.stream()
                     .map(RepositoryUtils::toArtifact)
-                    .map(((DefaultSession) session)::getArtifact)
+                    .map(InternalSession.from(session)::getArtifact)
                     .collect(Collectors.toList());
         } catch (LifecycleExecutionException | ComponentLookupException e) {
             throw new MavenException("Unable to resolve project dependencies", e);

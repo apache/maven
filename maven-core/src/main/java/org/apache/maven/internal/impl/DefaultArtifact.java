@@ -31,11 +31,11 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
  * A wrapper class around a maven resolver artifact.
  */
 public class DefaultArtifact implements Artifact {
-    private final @Nonnull AbstractSession session;
+    private final @Nonnull InternalSession session;
     private final @Nonnull org.eclipse.aether.artifact.Artifact artifact;
     private final String id;
 
-    public DefaultArtifact(@Nonnull AbstractSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
+    public DefaultArtifact(@Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
         this.session = nonNull(session, "session can not be null");
         this.artifact = nonNull(artifact, "artifact can not be null");
         this.id = getGroupId()

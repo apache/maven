@@ -114,7 +114,7 @@ class TestApi {
                 .withRemoteRepositories(Collections.singletonList(remoteRepository));
 
         sessionScope.enter();
-        sessionScope.seed(DefaultSession.class, (DefaultSession) this.session);
+        sessionScope.seed(InternalSession.class, InternalSession.from(this.session));
     }
 
     @Test

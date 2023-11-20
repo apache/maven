@@ -30,7 +30,6 @@ import org.apache.maven.api.services.DependencyCoordinateFactory;
 import org.apache.maven.api.services.DependencyCoordinateFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
-import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -41,8 +40,7 @@ public class DefaultDependencyCoordinateFactory implements DependencyCoordinateF
     @Override
     public DependencyCoordinate create(@Nonnull DependencyCoordinateFactoryRequest request) {
         nonNull(request, "request can not be null");
-        DefaultSession session =
-                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
+        InternalSession session = InternalSession.from(request.getSession());
 
         ArtifactType type = null;
         if (request.getType() != null) {

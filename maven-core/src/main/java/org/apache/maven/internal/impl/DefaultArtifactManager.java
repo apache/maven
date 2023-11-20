@@ -38,12 +38,12 @@ import org.apache.maven.project.MavenProject;
 public class DefaultArtifactManager implements ArtifactManager {
 
     @Nonnull
-    private final DefaultSession session;
+    private final InternalSession session;
 
     private final Map<String, Path> paths = new ConcurrentHashMap<>();
 
     @Inject
-    public DefaultArtifactManager(@Nonnull DefaultSession session) {
+    public DefaultArtifactManager(@Nonnull InternalSession session) {
         this.session = session;
     }
 

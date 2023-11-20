@@ -41,7 +41,6 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
-import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -58,8 +57,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
     public ArtifactResolverResult resolve(ArtifactResolverRequest request)
             throws ArtifactResolverException, IllegalArgumentException {
         nonNull(request, "request can not be null");
-        DefaultSession session =
-                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
+        InternalSession session = InternalSession.from(request.getSession());
         try {
             List<RemoteRepository> repositories = session.toRepositories(session.getRemoteRepositories());
             List<ArtifactRequest> requests = request.getCoordinates().stream()

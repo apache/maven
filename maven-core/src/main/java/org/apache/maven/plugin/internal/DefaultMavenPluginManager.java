@@ -45,7 +45,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
-import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.ContextEnabled;
@@ -587,7 +587,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             if (mojoDescriptor.isV4Api()) {
                 expressionEvaluator = new PluginParameterExpressionEvaluatorV4(
                         session.getSession(),
-                        ((DefaultSession) session.getSession()).getProject(session.getCurrentProject()),
+                        InternalSession.from(session.getSession()).getProject(session.getCurrentProject()),
                         mojoExecution);
             } else {
                 expressionEvaluator = new PluginParameterExpressionEvaluator(session, mojoExecution);

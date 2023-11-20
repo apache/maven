@@ -27,7 +27,7 @@ import java.util.Properties;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
-import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.interpolation.reflection.ReflectionValueExtractor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -198,8 +198,8 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
         } else if ("project".equals(expression)) {
             value = project;
         } else if ("executedProject".equals(expression)) {
-            value = ((DefaultSession) session)
-                    .getProject(((DefaultSession) session)
+            value = InternalSession.from(session)
+                    .getProject(InternalSession.from(session)
                             .getMavenSession()
                             .getCurrentProject()
                             .getExecutionProject());
