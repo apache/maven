@@ -203,6 +203,14 @@ public class DefaultRepositorySystemSessionFactory {
                     configProps.get(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY));
         }
 
+        // HACK: Resolver 2.0.0-alpha-2 carries a bad change:
+        // https://github.com/apache/maven-resolver/commit/178cfba9f3889f7e942a6a0d74716355b01a78f5
+        // that is fixed in later versions by MRESOLVER-437 https://github.com/apache/maven-resolver/pull/373
+        // TODO: remove this hack below once Resolver PR above is applied
+        if (!configProps.containsKey(ConfigurationProperties.HTTP_EXPECT_CONTINUE)) {
+            configProps.put(ConfigurationProperties.HTTP_EXPECT_CONTINUE, Boolean.FALSE.toString());
+        }
+
         session.setOffline(request.isOffline());
         session.setChecksumPolicy(request.getGlobalChecksumPolicy());
         session.setUpdatePolicy(
