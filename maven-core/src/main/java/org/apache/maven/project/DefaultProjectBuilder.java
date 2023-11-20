@@ -215,14 +215,13 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             this.session =
                     RepositoryUtils.overlay(request.getLocalRepository(), request.getRepositorySession(), repoSystem);
             this.repositories = RepositoryUtils.toRepos(request.getRemoteRepositories());
+            this.forkJoinPool = new ForkJoinPool(getParallelism(request));
             if (localProjects) {
                 this.modelPool = new ReactorModelPool();
                 this.transformerContextBuilder = modelBuilder.newTransformerContextBuilder();
-                this.forkJoinPool = new ForkJoinPool(getParallelism(request));
             } else {
                 this.modelPool = null;
                 this.transformerContextBuilder = null;
-                this.forkJoinPool = null;
             }
         }
 
