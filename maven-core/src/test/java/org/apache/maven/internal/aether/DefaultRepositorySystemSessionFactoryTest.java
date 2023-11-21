@@ -54,7 +54,6 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
  */
 @PlexusTest
 public class DefaultRepositorySystemSessionFactoryTest {
-
     @Inject
     protected MavenRepositorySystem mavenRepositorySystem;
 
@@ -81,7 +80,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information);
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
@@ -104,7 +102,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information);
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
@@ -139,7 +136,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information);
 
         PlexusConfiguration plexusConfiguration = (PlexusConfiguration) systemSessionFactory
@@ -182,7 +178,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information);
 
         Map<String, String> headers = (Map<String, String>) systemSessionFactory
@@ -219,7 +214,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information);
 
         int connectionTimeout = (Integer) systemSessionFactory
@@ -260,7 +254,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information);
 
         int connectionTimeout = (Integer) systemSessionFactory
@@ -295,7 +288,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information);
 
         int requestTimeout = (Integer) systemSessionFactory
@@ -336,7 +328,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information);
 
         int requestTimeout = (Integer) systemSessionFactory
@@ -354,7 +345,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information);
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();

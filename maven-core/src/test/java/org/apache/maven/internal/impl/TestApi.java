@@ -35,6 +35,7 @@ import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -96,7 +97,8 @@ class TestApi {
     void setup() {
         RepositorySystemSession rss = MavenRepositorySystemUtils.newSession();
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
-        MavenSession ms = new MavenSession(null, rss, mer, null);
+        DefaultMavenExecutionResult meres = new DefaultMavenExecutionResult();
+        MavenSession ms = new MavenSession(() -> rss, mer, meres);
         DefaultSession session = new DefaultSession(
                 ms,
                 repositorySystem,

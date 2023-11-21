@@ -21,8 +21,10 @@ package org.apache.maven.internal.aether;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -50,26 +54,28 @@ import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.eclipse.aether.ConfigurationProperties;
-import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.repository.LocalRepository;
-import org.eclipse.aether.repository.LocalRepositoryManager;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
+import org.eclipse.aether.repository.AuthenticationContext;
+import org.eclipse.aether.repository.AuthenticationSelector;
+import org.eclipse.aether.repository.ProxySelector;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
-import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
+import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * @since 3.3.0
@@ -90,7 +96,9 @@ public class DefaultRepositorySystemSessionFactory {
      * Default: {@code true}, will ignore availability from tail local repositories.
      *
      * @since 3.9.0
+     * @deprecated Use {@link ChainedLocalRepositoryManager#IGNORE_TAIL_AVAILABILITY} instead.
      */
+    @Deprecated
     private static final String MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY = "maven.repo.local.tail.ignoreAvailability";
 
     /**
@@ -129,7 +137,7 @@ public class DefaultRepositorySystemSessionFactory {
 
     private static final String JDK_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.JdkTransporterFactory";
 
-    private static final String NATIVE_FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
+    private static final String FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
 
     private static final String RESOLVER_MAX_PRIORITY = String.valueOf(Float.MAX_VALUE);
 
@@ -145,8 +153,6 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final EventSpyDispatcher eventSpyDispatcher;
 
-    private final MavenRepositorySystem mavenRepositorySystem;
-
     private final RuntimeInformation runtimeInformation;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -157,20 +163,23 @@ public class DefaultRepositorySystemSessionFactory {
             @Nullable @Named("ide") WorkspaceReader workspaceRepository,
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
-            MavenRepositorySystem mavenRepositorySystem,
             RuntimeInformation runtimeInformation) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.workspaceRepository = workspaceRepository;
         this.settingsDecrypter = settingsDecrypter;
         this.eventSpyDispatcher = eventSpyDispatcher;
-        this.mavenRepositorySystem = mavenRepositorySystem;
         this.runtimeInformation = runtimeInformation;
     }
 
+    @Deprecated
+    public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
+        return newRepositorySessionBuilder(request).build();
+    }
+
     @SuppressWarnings("checkstyle:methodLength")
-    public DefaultRepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+    public SessionBuilder newRepositorySessionBuilder(MavenExecutionRequest request) {
+        SessionBuilder session = MavenRepositorySystemUtils.newSession(repoSystem.createSessionBuilder());
         session.setCache(request.getRepositoryCache());
 
         Map<Object, Object> configProps = new LinkedHashMap<>();
@@ -182,6 +191,25 @@ public class DefaultRepositorySystemSessionFactory {
         // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
         configProps.putAll(request.getSystemProperties());
         configProps.putAll(request.getUserProperties());
+
+        // we need to "translate" this
+        if (configProps.containsKey(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY)) {
+            logger.warn(
+                    "User property {} is DEPRECATED, switch to {}",
+                    MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY,
+                    ChainedLocalRepositoryManager.IGNORE_TAIL_AVAILABILITY);
+            configProps.put(
+                    ChainedLocalRepositoryManager.IGNORE_TAIL_AVAILABILITY,
+                    configProps.get(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY));
+        }
+
+        // HACK: Resolver 2.0.0-alpha-2 carries a bad change:
+        // https://github.com/apache/maven-resolver/commit/178cfba9f3889f7e942a6a0d74716355b01a78f5
+        // that is fixed in later versions by MRESOLVER-437 https://github.com/apache/maven-resolver/pull/373
+        // TODO: remove this hack below once Resolver PR above is applied
+        if (!configProps.containsKey(ConfigurationProperties.HTTP_EXPECT_CONTINUE)) {
+            configProps.put(ConfigurationProperties.HTTP_EXPECT_CONTINUE, Boolean.FALSE.toString());
+        }
 
         session.setOffline(request.isOffline());
         session.setChecksumPolicy(request.getGlobalChecksumPolicy());
@@ -199,6 +227,9 @@ public class DefaultRepositorySystemSessionFactory {
                 : ResolutionErrorPolicy.CACHE_DISABLED;
         session.setResolutionErrorPolicy(
                 new SimpleResolutionErrorPolicy(errorPolicy, errorPolicy | ResolutionErrorPolicy.CACHE_NOT_FOUND));
+
+        session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
+                request.isIgnoreMissingArtifactDescriptor(), request.isIgnoreInvalidArtifactDescriptor()));
 
         session.setArtifactTypeRegistry(RepositoryUtils.newArtifactTypeRegistry(artifactHandlerManager));
 
@@ -336,7 +367,7 @@ public class DefaultRepositorySystemSessionFactory {
             // The "default" mode (user did not set anything) from now on defaults to AUTO
         } else if (MAVEN_RESOLVER_TRANSPORT_JDK.equals(transport)) {
             // Make sure (whatever extra priority is set) that resolver file/jdk is selected
-            configProps.put(NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+            configProps.put(FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
             configProps.put(JDK_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
         } else if (MAVEN_RESOLVER_TRANSPORT_APACHE.equals(transport)
                 || MAVEN_RESOLVER_TRANSPORT_NATIVE.equals(transport)) {
@@ -347,7 +378,7 @@ public class DefaultRepositorySystemSessionFactory {
                         MAVEN_RESOLVER_TRANSPORT_APACHE);
             }
             // Make sure (whatever extra priority is set) that resolver file/apache is selected
-            configProps.put(NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+            configProps.put(FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
             configProps.put(APACHE_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
         } else if (MAVEN_RESOLVER_TRANSPORT_WAGON.equals(transport)) {
             // Make sure (whatever extra priority is set) that wagon is selected
@@ -365,52 +396,38 @@ public class DefaultRepositorySystemSessionFactory {
 
         session.setTransferListener(request.getTransferListener());
 
-        session.setRepositoryListener(eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger)));
+        RepositoryListener repositoryListener = eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger));
 
-        boolean recordReverseTree = ConfigUtils.getBoolean(session, false, MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE);
+        boolean recordReverseTree = configProps.containsKey(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE)
+                && Boolean.parseBoolean((String) configProps.get(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE));
         if (recordReverseTree) {
-            session.setRepositoryListener(new ChainedRepositoryListener(
-                    session.getRepositoryListener(), new ReverseTreeRepositoryListener()));
+            repositoryListener = new ChainedRepositoryListener(repositoryListener, new ReverseTreeRepositoryListener());
         }
+        session.setRepositoryListener(repositoryListener);
 
-        mavenRepositorySystem.injectMirror(request.getRemoteRepositories(), request.getMirrors());
-        mavenRepositorySystem.injectProxy(session, request.getRemoteRepositories());
-        mavenRepositorySystem.injectAuthentication(session, request.getRemoteRepositories());
+        injectMirror(request.getRemoteRepositories(), request.getMirrors());
+        injectProxy(proxySelector, request.getRemoteRepositories());
+        injectAuthentication(authSelector, request.getRemoteRepositories());
 
-        mavenRepositorySystem.injectMirror(request.getPluginArtifactRepositories(), request.getMirrors());
-        mavenRepositorySystem.injectProxy(session, request.getPluginArtifactRepositories());
-        mavenRepositorySystem.injectAuthentication(session, request.getPluginArtifactRepositories());
+        injectMirror(request.getPluginArtifactRepositories(), request.getMirrors());
+        injectProxy(proxySelector, request.getPluginArtifactRepositories());
+        injectAuthentication(authSelector, request.getPluginArtifactRepositories());
 
-        setUpLocalRepositoryManager(request, session);
+        ArrayList<File> paths = new ArrayList<>();
+        paths.add(new File(request.getLocalRepository().getBasedir()));
+        String localRepoTail = (String) configProps.get(MAVEN_REPO_LOCAL_TAIL);
+        if (localRepoTail != null) {
+            Arrays.stream(localRepoTail.split(","))
+                    .filter(p -> p != null && !p.trim().isEmpty())
+                    .map(File::new)
+                    .forEach(paths::add);
+        }
+        session.withLocalRepositoryBaseDirectories(paths);
 
         return session;
     }
 
-    private void setUpLocalRepositoryManager(MavenExecutionRequest request, DefaultRepositorySystemSession session) {
-        LocalRepository localRepo =
-                new LocalRepository(request.getLocalRepository().getBasedir());
-
-        LocalRepositoryManager lrm = repoSystem.newLocalRepositoryManager(session, localRepo);
-
-        String localRepoTail = ConfigUtils.getString(session, null, MAVEN_REPO_LOCAL_TAIL);
-        if (localRepoTail != null) {
-            boolean ignoreTailAvailability =
-                    ConfigUtils.getBoolean(session, true, MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY);
-            List<LocalRepositoryManager> tail = new ArrayList<>();
-            List<String> paths = Arrays.stream(localRepoTail.split(","))
-                    .filter(p -> p != null && !p.trim().isEmpty())
-                    .collect(toList());
-            for (String path : paths) {
-                tail.add(repoSystem.newLocalRepositoryManager(session, new LocalRepository(path)));
-            }
-            session.setLocalRepositoryManager(new ChainedLocalRepositoryManager(lrm, tail, ignoreTailAvailability));
-        } else {
-            session.setLocalRepositoryManager(lrm);
-        }
-    }
-
     private Map<?, ?> getPropertiesFromRequestedProfiles(MavenExecutionRequest request) {
-
         HashSet<String> activeProfileId =
                 new HashSet<>(request.getProfileActivation().getRequiredActiveProfileIds());
         activeProfileId.addAll(request.getProfileActivation().getOptionalActiveProfileIds());
@@ -427,5 +444,96 @@ public class DefaultRepositorySystemSessionFactory {
         version = version.isEmpty() ? version : "/" + version;
         return "Apache-Maven" + version + " (Java " + System.getProperty("java.version") + "; "
                 + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")";
+    }
+
+    private void injectMirror(List<ArtifactRepository> repositories, List<Mirror> mirrors) {
+        if (repositories != null && mirrors != null) {
+            for (ArtifactRepository repository : repositories) {
+                Mirror mirror = MavenRepositorySystem.getMirror(repository, mirrors);
+                injectMirror(repository, mirror);
+            }
+        }
+    }
+
+    private void injectMirror(ArtifactRepository repository, Mirror mirror) {
+        if (mirror != null) {
+            ArtifactRepository original = MavenRepositorySystem.createArtifactRepository(
+                    repository.getId(),
+                    repository.getUrl(),
+                    repository.getLayout(),
+                    repository.getSnapshots(),
+                    repository.getReleases());
+
+            repository.setMirroredRepositories(Collections.singletonList(original));
+
+            repository.setId(mirror.getId());
+            repository.setUrl(mirror.getUrl());
+
+            if (mirror.getLayout() != null && !mirror.getLayout().isEmpty()) {
+                repository.setLayout(original.getLayout());
+            }
+
+            repository.setBlocked(mirror.isBlocked());
+        }
+    }
+
+    private void injectProxy(ProxySelector selector, List<ArtifactRepository> repositories) {
+        if (repositories != null && selector != null) {
+            for (ArtifactRepository repository : repositories) {
+                repository.setProxy(getProxy(selector, repository));
+            }
+        }
+    }
+
+    private org.apache.maven.repository.Proxy getProxy(ProxySelector selector, ArtifactRepository repository) {
+        if (selector != null) {
+            RemoteRepository repo = RepositoryUtils.toRepo(repository);
+            org.eclipse.aether.repository.Proxy proxy = selector.getProxy(repo);
+            if (proxy != null) {
+                org.apache.maven.repository.Proxy p = new org.apache.maven.repository.Proxy();
+                p.setHost(proxy.getHost());
+                p.setProtocol(proxy.getType());
+                p.setPort(proxy.getPort());
+                if (proxy.getAuthentication() != null) {
+                    repo = new RemoteRepository.Builder(repo).setProxy(proxy).build();
+                    AuthenticationContext authCtx = AuthenticationContext.forProxy(null, repo);
+                    p.setUserName(authCtx.get(AuthenticationContext.USERNAME));
+                    p.setPassword(authCtx.get(AuthenticationContext.PASSWORD));
+                    p.setNtlmDomain(authCtx.get(AuthenticationContext.NTLM_DOMAIN));
+                    p.setNtlmHost(authCtx.get(AuthenticationContext.NTLM_WORKSTATION));
+                    authCtx.close();
+                }
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public void injectAuthentication(AuthenticationSelector selector, List<ArtifactRepository> repositories) {
+        if (repositories != null && selector != null) {
+            for (ArtifactRepository repository : repositories) {
+                repository.setAuthentication(getAuthentication(selector, repository));
+            }
+        }
+    }
+
+    private Authentication getAuthentication(AuthenticationSelector selector, ArtifactRepository repository) {
+        if (selector != null) {
+            RemoteRepository repo = RepositoryUtils.toRepo(repository);
+            org.eclipse.aether.repository.Authentication auth = selector.getAuthentication(repo);
+            if (auth != null) {
+                repo = new RemoteRepository.Builder(repo)
+                        .setAuthentication(auth)
+                        .build();
+                AuthenticationContext authCtx = AuthenticationContext.forRepository(null, repo);
+                Authentication result = new Authentication(
+                        authCtx.get(AuthenticationContext.USERNAME), authCtx.get(AuthenticationContext.PASSWORD));
+                result.setPrivateKey(authCtx.get(AuthenticationContext.PRIVATE_KEY_PATH));
+                result.setPassphrase(authCtx.get(AuthenticationContext.PRIVATE_KEY_PASSPHRASE));
+                authCtx.close();
+                return result;
+            }
+        }
+        return null;
     }
 }
