@@ -237,6 +237,7 @@ public final class ConsumerPomArtifactTransformer {
                     project.getRemoteProjectRepositories(),
                     ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
                     null));
+            request.setTransformerContextBuilder(modelBuilder.newTransformerContextBuilder());
             Properties props = new Properties();
             props.putAll(session.getSystemProperties());
             props.putAll(session.getUserProperties());
