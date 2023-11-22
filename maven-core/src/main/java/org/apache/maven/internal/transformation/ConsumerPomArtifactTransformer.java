@@ -21,18 +21,19 @@ package org.apache.maven.internal.transformation;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
@@ -43,21 +44,24 @@ import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Profile;
-import org.apache.maven.model.building.FileModelSource;
+import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuilder;
+import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelCache;
-import org.apache.maven.model.building.Result;
-import org.apache.maven.model.building.TransformerContext;
+import org.apache.maven.model.building.ModelBuildingResult;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenStaxWriter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectModelResolver;
 import org.apache.maven.project.artifact.ProjectArtifact;
-import org.apache.maven.repository.internal.DefaultModelCache;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.deployment.DeployRequest;
+import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.installation.InstallRequest;
 
 /**
@@ -84,10 +88,17 @@ public final class ConsumerPomArtifactTransformer {
     private final Set<Path> toDelete = new CopyOnWriteArraySet<>();
 
     private final ModelBuilder modelBuilder;
+    private final Provider<RepositorySystem> repoSystem;
+    private final Provider<RemoteRepositoryManager> repositoryManager;
 
     @Inject
-    ConsumerPomArtifactTransformer(ModelBuilder modelBuilder) {
+    ConsumerPomArtifactTransformer(
+            ModelBuilder modelBuilder,
+            Provider<RepositorySystem> repoSystem,
+            Provider<RemoteRepositoryManager> repositoryManager) {
         this.modelBuilder = modelBuilder;
+        this.repoSystem = repoSystem;
+        this.repositoryManager = repositoryManager;
     }
 
     public void injectTransformedArtifacts(MavenProject project, RepositorySystemSession session) throws IOException {
@@ -214,56 +225,47 @@ public final class ConsumerPomArtifactTransformer {
 
         @Override
         public void transform(Path src, Path dest) {
-            Model model = project.getModel().getDelegate();
-            transform(src, dest, model);
+            DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+            request.setPomFile(src.toFile());
+            request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+            request.setLocationTracking(false);
+            request.setModelResolver(new ProjectModelResolver(
+                    session,
+                    new RequestTrace(null),
+                    repoSystem.get(),
+                    repositoryManager.get(),
+                    project.getRemoteProjectRepositories(),
+                    ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
+                    null));
+            Properties props = new Properties();
+            props.putAll(session.getSystemProperties());
+            props.putAll(session.getUserProperties());
+            request.setSystemProperties(props);
+            try {
+                ModelBuildingResult result = modelBuilder.build(request);
+                transform(src, dest, result.getEffectiveModel().getDelegate());
+            } catch (ModelBuildingException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         void transform(Path src, Path dest, Model model) {
-            Model consumer = null;
             String version;
 
             String packaging = model.getPackaging();
             if (POM_PACKAGING.equals(packaging)) {
-                // This is a bit of a hack, but all models are cached, so not sure why we'd need to parse it again
-                ModelCache cache = DefaultModelCache.newInstance(session);
-                Object modelData = cache.get(new FileModelSource(src.toFile()), "raw");
-                if (modelData != null) {
-                    try {
-                        Method getModel = modelData.getClass().getMethod("getModel");
-                        getModel.setAccessible(true);
-                        org.apache.maven.model.Model cachedModel =
-                                (org.apache.maven.model.Model) getModel.invoke(modelData);
-                        consumer = cachedModel.getDelegate();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                if (consumer == null) {
-                    TransformerContext context =
-                            (TransformerContext) session.getData().get(TransformerContext.KEY);
-                    Result<? extends org.apache.maven.model.Model> result = modelBuilder.buildRawModel(
-                            src.toFile(), ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, false, context);
-                    if (result.hasErrors()) {
-                        throw new IllegalStateException(
-                                "Unable to build POM " + src,
-                                result.getProblems().iterator().next().getException());
-                    }
-                    consumer = result.get().getDelegate();
-                }
-
                 // raw to consumer transform
-                consumer = consumer.withRoot(false).withModules(null);
-                if (consumer.getParent() != null) {
-                    consumer = consumer.withParent(consumer.getParent().withRelativePath(null));
+                model = model.withRoot(false).withModules(null);
+                if (model.getParent() != null) {
+                    model = model.withParent(model.getParent().withRelativePath(null));
                 }
 
-                if (!consumer.isPreserveModelVersion()) {
-                    consumer = consumer.withPreserveModelVersion(false);
-                    version = new MavenModelVersion().getModelVersion(consumer);
-                    consumer = consumer.withModelVersion(version);
+                if (!model.isPreserveModelVersion()) {
+                    model = model.withPreserveModelVersion(false);
+                    version = new MavenModelVersion().getModelVersion(model);
+                    model = model.withModelVersion(version);
                 } else {
-                    version = consumer.getModelVersion();
+                    version = model.getModelVersion();
                 }
             } else {
                 Model.Builder builder = prune(
@@ -280,9 +282,9 @@ public final class ConsumerPomArtifactTransformer {
                 builder.profiles(model.getProfiles().stream()
                         .map(p -> prune(Profile.newBuilder(p, true), p).build())
                         .collect(Collectors.toList()));
-                consumer = builder.build();
-                version = new MavenModelVersion().getModelVersion(consumer);
-                consumer = consumer.withModelVersion(version);
+                model = builder.build();
+                version = new MavenModelVersion().getModelVersion(model);
+                model = model.withModelVersion(version);
             }
 
             try {
@@ -292,7 +294,7 @@ public final class ConsumerPomArtifactTransformer {
                     writer.setNamespace(String.format(NAMESPACE_FORMAT, version));
                     writer.setSchemaLocation(String.format(SCHEMA_LOCATION_FORMAT, version));
                     writer.setAddLocationInformation(false);
-                    writer.write(w, consumer);
+                    writer.write(w, model);
                 }
             } catch (XMLStreamException | IOException e) {
                 throw new RuntimeException(e);
