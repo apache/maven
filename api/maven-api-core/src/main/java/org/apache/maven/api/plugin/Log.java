@@ -20,6 +20,8 @@ package org.apache.maven.api.plugin;
 
 import java.util.function.Supplier;
 
+import org.apache.maven.api.annotations.Provider;
+
 /**
  * This interface supplies the API for providing feedback to the user from the <code>Mojo</code>, using standard
  * <code>Maven</code> channels.<br>
@@ -30,6 +32,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0.0
  */
+@Provider
 public interface Log {
     /**
      * @return true if the <b>debug</b> error level is enabled

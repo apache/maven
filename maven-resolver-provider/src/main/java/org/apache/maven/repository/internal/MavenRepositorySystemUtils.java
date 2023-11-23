@@ -19,6 +19,7 @@
 package org.apache.maven.repository.internal;
 
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -56,18 +57,45 @@ public final class MavenRepositorySystemUtils {
     }
 
     /**
-     * Creates a new Maven-like repository system session by initializing the session with values typical for
-     * Maven-based resolution. In more detail, this method configures settings relevant for the processing of dependency
-     * graphs, most other settings remain at their generic default value. Use the various setters to further configure
-     * the session with authentication, mirror, proxy and other information required for your environment.
-     * <p>
-     * This method is meant for third-party integrators to create "maven like session" without having all the Maven
-     * bits on classpath (just completing Resolver with Maven models). Maven itself does NOT and should NOT use this
-     * method anymore, but the {@link #newSession(ArtifactTypeRegistry)} instead.
+     * This method is deprecated, nobody should use it.
      *
-     * @return The new repository system session, never {@code null}.
+     * @deprecated This method is here only for legacy uses (like UTs), nothing else should use it.
      */
+    @Deprecated
     public static DefaultRepositorySystemSession newSession() {
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
+
+        DependencyTraverser depTraverser = new FatArtifactTraverser();
+        session.setDependencyTraverser(depTraverser);
+
+        DependencyManager depManager = new ClassicDependencyManager();
+        session.setDependencyManager(depManager);
+
+        DependencySelector depFilter = new AndDependencySelector(
+                new ScopeDependencySelector("test", "provided"),
+                new OptionalDependencySelector(),
+                new ExclusionDependencySelector());
+        session.setDependencySelector(depFilter);
+
+        DependencyGraphTransformer transformer = new ConflictResolver(
+                new NearestVersionSelector(), new JavaScopeSelector(),
+                new SimpleOptionalitySelector(), new JavaScopeDeriver());
+        transformer = new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner());
+        session.setDependencyGraphTransformer(transformer);
+
+        session.setArtifactTypeRegistry(newArtifactTypeRegistry());
+
+        session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, true));
+
+        return session;
+    }
+
+    /**
+     * Creates new Maven-like {@link ArtifactTypeRegistry}. This method should not be used from Maven.
+     *
+     * @since 4.0.0
+     */
+    public static ArtifactTypeRegistry newArtifactTypeRegistry() {
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
         stereotypes.add(new DefaultArtifactType("pom"));
         stereotypes.add(new DefaultArtifactType("maven-plugin", "jar", "", "java"));
@@ -81,7 +109,7 @@ public final class MavenRepositorySystemUtils {
         stereotypes.add(new DefaultArtifactType("ear", "ear", "", "java", false, true));
         stereotypes.add(new DefaultArtifactType("rar", "rar", "", "java", false, true));
         stereotypes.add(new DefaultArtifactType("par", "par", "", "java", false, true));
-        return newSession(stereotypes);
+        return stereotypes;
     }
 
     /**
@@ -91,11 +119,11 @@ public final class MavenRepositorySystemUtils {
      * the session with authentication, mirror, proxy and other information required for your environment.
      *
      * @return The new repository system session, never {@code null}.
-     * @since 4.0
+     * @since 4.0.0
      */
-    public static DefaultRepositorySystemSession newSession(ArtifactTypeRegistry artifactTypeRegistry) {
+    public static SessionBuilder newSession(SessionBuilder session, ArtifactTypeRegistry artifactTypeRegistry) {
+        requireNonNull(session, "null sessionBuilder");
         requireNonNull(artifactTypeRegistry, "null artifactTypeRegistry");
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
 
         DependencyTraverser depTraverser = new FatArtifactTraverser();
         session.setDependencyTraverser(depTraverser);

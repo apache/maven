@@ -55,7 +55,6 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
  */
 @PlexusTest
 public class DefaultRepositorySystemSessionFactoryTest {
-
     @Inject
     protected MavenRepositorySystem mavenRepositorySystem;
 
@@ -85,7 +84,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information,
                 defaultTypeRegistry);
 
@@ -109,7 +107,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information,
                 defaultTypeRegistry);
 
@@ -145,7 +142,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information,
                 defaultTypeRegistry);
 
@@ -189,7 +185,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information,
                 defaultTypeRegistry);
 
@@ -227,7 +222,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information,
                 defaultTypeRegistry);
 
@@ -269,7 +263,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information,
                 defaultTypeRegistry);
 
@@ -305,7 +298,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information,
                 defaultTypeRegistry);
 
@@ -347,7 +339,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information,
                 defaultTypeRegistry);
 
@@ -366,7 +357,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 null,
                 settingsDecrypter,
                 eventSpyDispatcher,
-                mavenRepositorySystem,
                 information,
                 defaultTypeRegistry);
 

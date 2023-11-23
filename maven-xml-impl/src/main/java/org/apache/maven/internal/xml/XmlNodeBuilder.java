@@ -51,8 +51,8 @@ public class XmlNodeBuilder {
      * @param locationBuilder the builder
      * @since 3.2.0
      * @return DOM
-     * @throws XmlPullParserException xml exception
-     * @throws IOException io
+     * @throws XmlPullParserException XML well-formedness error
+     * @throws IOException I/O error reading file or stream
      */
     public static XmlNodeImpl build(Reader reader, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
@@ -80,8 +80,8 @@ public class XmlNodeBuilder {
      * @param locationBuilder the builder
      * @since 3.2.0
      * @return DOM
-     * @throws XmlPullParserException xml exception
-     * @throws IOException io
+     * @throws XmlPullParserException XML well-formedness error
+     * @throws IOException I/O error reading file or stream
      */
     public static XmlNodeImpl build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
@@ -104,8 +104,8 @@ public class XmlNodeBuilder {
      * @param parser the parser
      * @param trim do trim
      * @return DOM
-     * @throws XmlPullParserException xml exception
-     * @throws IOException io
+     * @throws XmlPullParserException XML well-formedness error
+     * @throws IOException I/O error reading file or stream
      */
     public static XmlNodeImpl build(XmlPullParser parser, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
@@ -201,7 +201,7 @@ public class XmlNodeBuilder {
                         for (int i = 0; i < namespacesSize; i++) {
                             String prefix = parser.getNamespacePrefix(i);
                             String namespace = parser.getNamespaceURI(i);
-                            attrs.put("xmlns:" + prefix, namespace);
+                            attrs.put(prefix != null && !prefix.isEmpty() ? "xmlns:" + prefix : "xmlns", namespace);
                         }
                         for (int i = 0; i < attributesSize; i++) {
                             String aname = parser.getAttributeLocalName(i);

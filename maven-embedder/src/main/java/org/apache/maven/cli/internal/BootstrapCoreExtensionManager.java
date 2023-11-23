@@ -45,6 +45,7 @@ import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
@@ -91,11 +92,14 @@ public class BootstrapCoreExtensionManager {
     public List<CoreExtensionEntry> loadCoreExtensions(
             MavenExecutionRequest request, Set<String> providedArtifacts, List<CoreExtension> extensions)
             throws Exception {
-        RepositorySystemSession repoSession = repositorySystemSessionFactory.newRepositorySession(request);
-        List<RemoteRepository> repositories = RepositoryUtils.toRepos(request.getPluginArtifactRepositories());
-        Interpolator interpolator = createInterpolator(request);
+        try (CloseableSession repoSession = repositorySystemSessionFactory
+                .newRepositorySessionBuilder(request)
+                .build()) {
+            List<RemoteRepository> repositories = RepositoryUtils.toRepos(request.getPluginArtifactRepositories());
+            Interpolator interpolator = createInterpolator(request);
 
-        return resolveCoreExtensions(repoSession, repositories, providedArtifacts, extensions, interpolator);
+            return resolveCoreExtensions(repoSession, repositories, providedArtifacts, extensions, interpolator);
+        }
     }
 
     private List<CoreExtensionEntry> resolveCoreExtensions(
