@@ -42,12 +42,13 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     @Test
     void testTrivialConsumer() {
         MavenProject project = new MavenProject();
+        project.setRootDirectory(Paths.get("src/test/resources/consumer/trivial"));
         project.setRemoteArtifactRepositories(Collections.singletonList(new MavenArtifactRepository(
                 "central", "http://repo.maven.apache.org/", new DefaultRepositoryLayout(), null, null)));
-        Path file = Paths.get("src/test/resources/consumer/trivial/child.xml");
+        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
         Model model = builder.build(session, project, file);
 
-        model.getDependencies();
+        assertNotNull(model);
     }
 
     @Test
