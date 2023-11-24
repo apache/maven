@@ -84,66 +84,90 @@ public class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     ModelCacheFactory modelCacheFactory;
 
     public Model build(RepositorySystemSession session, MavenProject project, Path src) {
+        Model model = project.getModel().getDelegate();
+        String packaging = model.getPackaging();
+        if (POM_PACKAGING.equals(packaging)) {
+            return buildPom(session, project, src);
+        } else {
+            return buildNonPom(session, project, src);
+        }
+    }
+
+    protected Model buildPom(RepositorySystemSession session, MavenProject project, Path src) {
         try {
-            ProfileSelector customSelector = new DefaultProfileSelector() {
-                @Override
-                public List<Profile> getActiveProfilesV4(
-                        Collection<Profile> profiles,
-                        ProfileActivationContext context,
-                        ModelProblemCollector problems) {
-                    return new ArrayList<>();
-                }
-            };
-            DefaultModelBuilder modelBuilder = new DefaultModelBuilderFactory()
-                    .setProfileSelector(customSelector)
-                    // apply currently active ModelProcessor etc. to support extensions like jgitver
-                    .setProfileInjector(lookup(ProfileInjector.class))
-                    .setInheritanceAssembler(lookup(InheritanceAssembler.class))
-                    .setDependencyManagementImporter(lookup(DependencyManagementImporter.class))
-                    .setDependencyManagementInjector(lookup(DependencyManagementInjector.class))
-                    .setLifecycleBindingsInjector(lookup(LifecycleBindingsInjector.class))
-                    .setModelInterpolator(lookup(ModelInterpolator.class))
-                    .setModelNormalizer(lookup(ModelNormalizer.class))
-                    .setModelPathTranslator(lookup(ModelPathTranslator.class))
-                    .setModelProcessor(lookup(ModelProcessor.class))
-                    .setModelUrlNormalizer(lookup(ModelUrlNormalizer.class))
-                    .setModelValidator(lookup(ModelValidator.class))
-                    .setPluginConfigurationExpander(lookup(PluginConfigurationExpander.class))
-                    .setPluginManagementInjector(lookup(PluginManagementInjector.class))
-                    .setReportConfigurationExpander(lookup(ReportConfigurationExpander.class))
-                    .setSuperPomProvider(lookup(SuperPomProvider.class))
-                    .newInstance();
-            DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
-            try {
-                request.setRootDirectory(project.getRootDirectory());
-            } catch (IllegalStateException e) {
-                // ignore if we don't have a root directory
-            }
-            request.setPomFile(src.toFile());
-            request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
-            request.setLocationTracking(false);
-            request.setModelResolver(new ProjectModelResolver(
-                    session,
-                    new RequestTrace(null),
-                    lookup(RepositorySystem.class),
-                    lookup(RemoteRepositoryManager.class),
-                    project.getRemoteProjectRepositories(),
-                    ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
-                    null));
-            request.setTransformerContextBuilder(modelBuilder.newTransformerContextBuilder());
-            Properties props = new Properties();
-            props.putAll(session.getSystemProperties());
-            request.setSystemProperties(props);
-            props = new Properties();
-            props.putAll(session.getUserProperties());
-            request.setUserProperties(props);
-            request.setModelCache(modelCacheFactory.createCache(session));
-            ModelBuildingResult result = modelBuilder.build(request);
+            ModelBuildingResult result = buildModel(session, project, src);
+            Model model = result.getRawModel().getDelegate();
+            return transform(model);
+        } catch (ModelBuildingException | ComponentLookupException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected Model buildNonPom(RepositorySystemSession session, MavenProject project, Path src) {
+        try {
+            ModelBuildingResult result = buildModel(session, project, src);
             Model model = result.getEffectiveModel().getDelegate();
             return transform(model);
         } catch (ModelBuildingException | ComponentLookupException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private ModelBuildingResult buildModel(RepositorySystemSession session, MavenProject project, Path src)
+            throws ComponentLookupException, ModelBuildingException {
+        ProfileSelector customSelector = new DefaultProfileSelector() {
+            @Override
+            public List<Profile> getActiveProfilesV4(
+                    Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems) {
+                return new ArrayList<>();
+            }
+        };
+        DefaultModelBuilder modelBuilder = new DefaultModelBuilderFactory()
+                .setProfileSelector(customSelector)
+                // apply currently active ModelProcessor etc. to support extensions like jgitver
+                .setProfileInjector(lookup(ProfileInjector.class))
+                .setInheritanceAssembler(lookup(InheritanceAssembler.class))
+                .setDependencyManagementImporter(lookup(DependencyManagementImporter.class))
+                .setDependencyManagementInjector(lookup(DependencyManagementInjector.class))
+                .setLifecycleBindingsInjector(lookup(LifecycleBindingsInjector.class))
+                .setModelInterpolator(lookup(ModelInterpolator.class))
+                .setModelNormalizer(lookup(ModelNormalizer.class))
+                .setModelPathTranslator(lookup(ModelPathTranslator.class))
+                .setModelProcessor(lookup(ModelProcessor.class))
+                .setModelUrlNormalizer(lookup(ModelUrlNormalizer.class))
+                .setModelValidator(lookup(ModelValidator.class))
+                .setPluginConfigurationExpander(lookup(PluginConfigurationExpander.class))
+                .setPluginManagementInjector(lookup(PluginManagementInjector.class))
+                .setReportConfigurationExpander(lookup(ReportConfigurationExpander.class))
+                .setSuperPomProvider(lookup(SuperPomProvider.class))
+                .newInstance();
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        try {
+            request.setRootDirectory(project.getRootDirectory());
+        } catch (IllegalStateException e) {
+            // ignore if we don't have a root directory
+        }
+        request.setPomFile(src.toFile());
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setLocationTracking(false);
+        request.setModelResolver(new ProjectModelResolver(
+                session,
+                new RequestTrace(null),
+                lookup(RepositorySystem.class),
+                lookup(RemoteRepositoryManager.class),
+                project.getRemoteProjectRepositories(),
+                ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
+                null));
+        request.setTransformerContextBuilder(modelBuilder.newTransformerContextBuilder());
+        Properties props = new Properties();
+        props.putAll(session.getSystemProperties());
+        request.setSystemProperties(props);
+        props = new Properties();
+        props.putAll(session.getUserProperties());
+        request.setUserProperties(props);
+        request.setModelCache(modelCacheFactory.createCache(session));
+        ModelBuildingResult result = modelBuilder.build(request);
+        return result;
     }
 
     private <T> T lookup(Class<T> clazz) throws ComponentLookupException {
