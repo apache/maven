@@ -288,7 +288,7 @@ public class DefaultSettingsValidator implements SettingsValidator {
             return false;
         }
 
-        if (string.length() > 0) {
+        if (!string.isEmpty()) {
             return true;
         }
 

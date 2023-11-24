@@ -115,7 +115,7 @@ public class ExtensionDescriptorBuilder {
                 String string = child.getValue();
                 if (string != null) {
                     string = string.trim();
-                    if (string.length() > 0) {
+                    if (!string.isEmpty()) {
                         strings.add(string);
                     }
                 }

@@ -41,10 +41,10 @@ public final class RelocatedArtifact extends AbstractArtifact {
 
     RelocatedArtifact(Artifact artifact, String groupId, String artifactId, String version, String message) {
         this.artifact = Objects.requireNonNull(artifact, "artifact cannot be null");
-        this.groupId = (groupId != null && groupId.length() > 0) ? groupId : null;
-        this.artifactId = (artifactId != null && artifactId.length() > 0) ? artifactId : null;
-        this.version = (version != null && version.length() > 0) ? version : null;
-        this.message = (message != null && message.length() > 0) ? message : null;
+        this.groupId = (groupId != null && !groupId.isEmpty()) ? groupId : null;
+        this.artifactId = (artifactId != null && !artifactId.isEmpty()) ? artifactId : null;
+        this.version = (version != null && !version.isEmpty()) ? version : null;
+        this.message = (message != null && !message.isEmpty()) ? message : null;
     }
 
     @Override
@@ -78,7 +78,7 @@ public final class RelocatedArtifact extends AbstractArtifact {
     @Override
     public Artifact setVersion(String version) {
         String current = getVersion();
-        if (current.equals(version) || (version == null && current.length() <= 0)) {
+        if (current.equals(version) || (version == null && current.isEmpty())) {
             return this;
         }
         return new RelocatedArtifact(artifact, groupId, artifactId, version, message);

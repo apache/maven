@@ -65,7 +65,7 @@ import org.eclipse.aether.util.repository.AuthenticationBuilder;
 public class RepositoryUtils {
 
     private static String nullify(String string) {
-        return (string == null || string.length() <= 0) ? null : string;
+        return (string == null || string.isEmpty()) ? null : string;
     }
 
     private static org.apache.maven.artifact.Artifact toArtifact(Dependency dependency) {
@@ -206,7 +206,7 @@ public class RepositoryUtils {
             String className = repo.getLayout().getClass().getSimpleName();
             if (className.endsWith("RepositoryLayout")) {
                 String layout = className.substring(0, className.length() - "RepositoryLayout".length());
-                if (layout.length() > 0) {
+                if (!layout.isEmpty()) {
                     layout = Character.toLowerCase(layout.charAt(0)) + layout.substring(1);
                     return layout;
                 }

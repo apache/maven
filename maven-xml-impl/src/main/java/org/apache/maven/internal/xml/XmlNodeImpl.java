@@ -408,10 +408,10 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     }
 
     private static boolean isNotEmpty(String str) {
-        return ((str != null) && (str.length() > 0));
+        return ((str != null) && (!str.isEmpty()));
     }
 
     private static boolean isEmpty(String str) {
-        return ((str == null) || (str.length() == 0));
+        return ((str == null) || (str.isEmpty()));
     }
 }

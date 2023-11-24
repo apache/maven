@@ -138,7 +138,7 @@ public class DefaultModelProblem implements ModelProblem {
     public String getMessage() {
         String msg;
 
-        if (message != null && message.length() > 0) {
+        if (message != null && !message.isEmpty()) {
             msg = message;
         } else {
             msg = exception.getMessage();

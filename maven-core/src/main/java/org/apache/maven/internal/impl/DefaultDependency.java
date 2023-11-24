@@ -46,7 +46,7 @@ public class DefaultDependency implements Dependency {
                 + getArtifactId()
                 + ':'
                 + getExtension()
-                + (getClassifier().length() > 0 ? ":" + getClassifier() : "")
+                + (!getClassifier().isEmpty() ? ":" + getClassifier() : "")
                 + ':'
                 + getVersion();
     }

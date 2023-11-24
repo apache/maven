@@ -75,7 +75,7 @@ class DefaultProblem implements Problem {
     public String getLocation() {
         StringBuilder buffer = new StringBuilder(256);
 
-        if (getSource().length() > 0) {
+        if (!getSource().isEmpty()) {
             if (buffer.length() > 0) {
                 buffer.append(", ");
             }
