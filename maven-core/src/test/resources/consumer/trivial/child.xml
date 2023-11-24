@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <parent>
+    <groupId>org.my.group</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>parent.xml</relativePath>
+  </parent>
+  <artifactId>child</artifactId>
+  <packaging>jar</packaging>
+
+  <properties>
+    <prop-child>bar</prop-child>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+  </dependencies>
+</project>

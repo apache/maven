@@ -18,9 +18,12 @@
  */
 package org.apache.maven.model.building;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,6 +59,9 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
         // We must assume the TransformerContext was created using this.newTransformerContextBuilder()
         DefaultModelProblemCollector problems = (DefaultModelProblemCollector) collector;
         return new TransformerContext() {
+
+            private volatile boolean fullReactorLoaded;
+
             @Override
             public Path locate(Path path) {
                 return context.locate(path);
@@ -91,6 +97,11 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
 
             private Model findRawModel(Path from, String groupId, String artifactId) {
                 FileModelSource source = getSource(groupId, artifactId);
+                if (source == null) {
+                    // we need to check the whole reactor in case it's a dependency
+                    loadFullReactor();
+                    source = getSource(groupId, artifactId);
+                }
                 if (source != null) {
                     if (!addEdge(from, source.getFile().toPath(), problems)) {
                         return null;
@@ -104,6 +115,44 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
                     }
                 }
                 return null;
+            }
+
+            private void loadFullReactor() {
+                if (!fullReactorLoaded) {
+                    synchronized (this) {
+                        if (!fullReactorLoaded) {
+                            doLoadFullReactor();
+                            fullReactorLoaded = true;
+                        }
+                    }
+                }
+            }
+
+            private void doLoadFullReactor() {
+                List<File> toLoad = new ArrayList<>();
+                File root = defaultModelBuilder
+                        .getModelProcessor()
+                        .locateExistingPom(request.getRootDirectory().toFile());
+                toLoad.add(root);
+                while (!toLoad.isEmpty()) {
+                    File pom = toLoad.remove(0);
+                    try {
+                        ModelBuildingRequest gaBuildingRequest =
+                                new DefaultModelBuildingRequest(request).setModelSource(new FileModelSource(pom));
+                        Model rawModel = defaultModelBuilder.readFileModel(gaBuildingRequest, problems);
+                        for (String module : rawModel.getModules()) {
+                            File moduleFile = defaultModelBuilder
+                                    .getModelProcessor()
+                                    .locateExistingPom(new File(pom.getParent(), module));
+                            if (moduleFile != null) {
+                                toLoad.add(moduleFile);
+                            }
+                        }
+                    } catch (ModelBuildingException e) {
+                        // gathered with problem collector
+                        e.getProblems();
+                    }
+                }
             }
 
             private Model findRawModel(Path from, Path p) {
