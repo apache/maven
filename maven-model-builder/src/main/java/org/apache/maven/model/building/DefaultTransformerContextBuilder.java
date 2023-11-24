@@ -129,10 +129,12 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
             }
 
             private void doLoadFullReactor() {
+                Path rootDirectory = request.getRootDirectory();
+                if (rootDirectory == null) {
+                    return;
+                }
                 List<File> toLoad = new ArrayList<>();
-                File root = defaultModelBuilder
-                        .getModelProcessor()
-                        .locateExistingPom(request.getRootDirectory().toFile());
+                File root = defaultModelBuilder.getModelProcessor().locateExistingPom(rootDirectory.toFile());
                 toLoad.add(root);
                 while (!toLoad.isEmpty()) {
                     File pom = toLoad.remove(0);

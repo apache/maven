@@ -114,7 +114,11 @@ public class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                     .setSuperPomProvider(lookup(SuperPomProvider.class))
                     .newInstance();
             DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
-            request.setRootDirectory(project.getRootDirectory());
+            try {
+                request.setRootDirectory(project.getRootDirectory());
+            } catch (IllegalStateException e) {
+                // ignore if we don't have a root directory
+            }
             request.setPomFile(src.toFile());
             request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
             request.setLocationTracking(false);
