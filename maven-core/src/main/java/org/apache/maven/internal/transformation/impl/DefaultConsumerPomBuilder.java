@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.transformation;
+package org.apache.maven.internal.transformation.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -72,7 +72,7 @@ import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 
 @Named
-public class DefaultConsumerPomBuilder implements ConsumerPomArtifactTransformer.ConsumerPomBuilder {
+class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
 
     private static final String BOM_PACKAGING = "bom";
 
@@ -110,7 +110,7 @@ public class DefaultConsumerPomBuilder implements ConsumerPomArtifactTransformer
     }
 
     private ModelBuildingResult buildModel(RepositorySystemSession session, MavenProject project, Path src)
-            throws ComponentLookupException, ModelBuildingException {
+            throws ModelBuildingException, ComponentLookupException {
         ProfileSelector customSelector = new DefaultProfileSelector() {
             @Override
             public List<Profile> getActiveProfilesV4(
@@ -172,7 +172,6 @@ public class DefaultConsumerPomBuilder implements ConsumerPomArtifactTransformer
     }
 
     static Model transform(Model model) {
-        String version;
         String packaging = model.getPackaging();
         if (POM_PACKAGING.equals(packaging)) {
             // raw to consumer transform
@@ -183,10 +182,8 @@ public class DefaultConsumerPomBuilder implements ConsumerPomArtifactTransformer
 
             if (!model.isPreserveModelVersion()) {
                 model = model.withPreserveModelVersion(false);
-                version = new MavenModelVersion().getModelVersion(model);
+                String version = new MavenModelVersion().getModelVersion(model);
                 model = model.withModelVersion(version);
-            } else {
-                version = model.getModelVersion();
             }
         } else {
             Model.Builder builder = prune(
@@ -204,7 +201,7 @@ public class DefaultConsumerPomBuilder implements ConsumerPomArtifactTransformer
                     .map(p -> prune(Profile.newBuilder(p, true), p).build())
                     .collect(Collectors.toList()));
             model = builder.build();
-            version = new MavenModelVersion().getModelVersion(model);
+            String version = new MavenModelVersion().getModelVersion(model);
             model = model.withModelVersion(version);
         }
         return model;

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.transformation;
+package org.apache.maven.internal.transformation.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,13 +56,13 @@ class ConsumerPomArtifactTransformerTest {
         try (InputStream expected = Files.newInputStream(beforePomFile)) {
             Model model = new Model(new MavenStaxReader().read(expected));
             MavenProject project = new MavenProject(model);
-            ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer((s, p, f) -> {
+            DefaultConsumerPomArtifactTransformer t = new DefaultConsumerPomArtifactTransformer((s, p, f) -> {
                 try (InputStream is = Files.newInputStream(f)) {
                     return DefaultConsumerPomBuilder.transform(new MavenStaxReader().read(is));
                 }
             });
 
-            t.createConsumerPomArtifact(project, tempFile, systemSessionMock).transform(beforePomFile, tempFile);
+            t.transform(project, systemSessionMock, beforePomFile, tempFile);
         }
         XmlAssert.assertThat(afterPomFile.toFile()).and(tempFile.toFile()).areIdentical();
     }
@@ -76,8 +76,8 @@ class ConsumerPomArtifactTransformerTest {
         when(systemSessionMock.getData()).thenReturn(sessionDataMock);
         when(sessionDataMock.get(any())).thenReturn(new NoTransformerContext());
 
-        new ConsumerPomArtifactTransformer((session, project, src) -> null)
-                .injectTransformedArtifacts(emptyProject, systemSessionMock);
+        new DefaultConsumerPomArtifactTransformer((session, project, src) -> null)
+                .injectTransformedArtifacts(systemSessionMock, emptyProject);
 
         assertThat(emptyProject.getAttachedArtifacts()).isEmpty();
     }

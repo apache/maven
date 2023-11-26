@@ -152,7 +152,6 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
                         }
                     } catch (ModelBuildingException e) {
                         // gathered with problem collector
-                        e.getProblems();
                     }
                 }
             }

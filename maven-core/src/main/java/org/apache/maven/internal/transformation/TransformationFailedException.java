@@ -18,24 +18,13 @@
  */
 package org.apache.maven.internal.transformation;
 
-import java.io.IOException;
-
-import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.deployment.DeployRequest;
-import org.eclipse.aether.installation.InstallRequest;
-
 /**
- * Consumer POM transformer.
- *
- * @since TBD
+ * Exception that may be thrown by the {@link org.apache.maven.artifact.Artifact#getFile()}
+ * implementation.
  */
-public interface ConsumerPomArtifactTransformer {
+public class TransformationFailedException extends RuntimeException {
 
-    InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request);
-
-    DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request);
-
-    void injectTransformedArtifacts(RepositorySystemSession repositorySession, MavenProject currentProject)
-            throws IOException;
+    public TransformationFailedException(Throwable cause) {
+        super(cause);
+    }
 }

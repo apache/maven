@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.transformation;
+package org.apache.maven.internal.transformation.impl;
 
 import javax.inject.Inject;
 
@@ -27,7 +27,7 @@ import java.util.Collections;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer.ConsumerPomBuilder;
+import org.apache.maven.internal.transformation.AbstractRepositoryTestCase;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.Test;

@@ -16,26 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.transformation;
+package org.apache.maven.internal.transformation.impl;
+
+import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
+import org.apache.maven.api.model.Model;
+import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.deployment.DeployRequest;
-import org.eclipse.aether.installation.InstallRequest;
 
-/**
- * Consumer POM transformer.
- *
- * @since TBD
- */
-public interface ConsumerPomArtifactTransformer {
+interface ConsumerPomBuilder {
 
-    InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request);
-
-    DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request);
-
-    void injectTransformedArtifacts(RepositorySystemSession repositorySession, MavenProject currentProject)
-            throws IOException;
+    Model build(RepositorySystemSession session, MavenProject project, Path src)
+            throws ModelBuildingException, ComponentLookupException, IOException, XMLStreamException;
 }
