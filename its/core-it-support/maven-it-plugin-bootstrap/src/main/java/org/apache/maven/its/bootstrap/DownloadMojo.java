@@ -123,18 +123,31 @@ public class DownloadMojo extends AbstractMojo {
     static Dependency toDependency(String artifact) throws MojoFailureException {
         Dependency coordinate = new Dependency();
         String[] tokens = artifact.split(":");
-        if (tokens.length < 3 || tokens.length > 5) {
-            throw new MojoFailureException("Invalid artifact, you must specify "
-                    + "groupId:artifactId:version[:packaging[:classifier]] " + artifact);
-        }
-        coordinate.setGroupId(tokens[0]);
-        coordinate.setArtifactId(tokens[1]);
-        coordinate.setVersion(tokens[2]);
-        if (tokens.length >= 4) {
-            coordinate.setType(tokens[3]);
-        }
-        if (tokens.length == 5) {
-            coordinate.setClassifier(tokens[4]);
+        switch (tokens.length) {
+            case 3:
+                // groupId:artifactId:version
+                coordinate.setGroupId(tokens[0]);
+                coordinate.setArtifactId(tokens[1]);
+                coordinate.setVersion(tokens[2]);
+                break;
+            case 4:
+                // groupId:artifactId:type:version
+                coordinate.setGroupId(tokens[0]);
+                coordinate.setArtifactId(tokens[1]);
+                coordinate.setType(tokens[2]);
+                coordinate.setVersion(tokens[3]);
+                break;
+            case 5:
+                // groupId:artifactId:type:classifier:version
+                coordinate.setGroupId(tokens[0]);
+                coordinate.setArtifactId(tokens[1]);
+                coordinate.setType(tokens[2]);
+                coordinate.setClassifier(tokens[3]);
+                coordinate.setVersion(tokens[4]);
+                break;
+            default:
+                throw new MojoFailureException("Invalid artifact, you must specify "
+                        + "groupId:artifactId[:packaging[:classifier]]:version " + artifact);
         }
         return coordinate;
     }
