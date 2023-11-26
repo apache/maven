@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -154,15 +155,16 @@ public class DefaultConsumerPomBuilder implements ConsumerPomArtifactTransformer
                 ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
                 null));
         request.setTransformerContextBuilder(modelBuilder.newTransformerContextBuilder());
-        Properties props = new Properties();
-        props.putAll(session.getSystemProperties());
-        request.setSystemProperties(props);
-        props = new Properties();
-        props.putAll(session.getUserProperties());
-        request.setUserProperties(props);
+        request.setSystemProperties(toProperties(session.getSystemProperties()));
+        request.setUserProperties(toProperties(session.getUserProperties()));
         request.setModelCache(modelCacheFactory.createCache(session));
-        ModelBuildingResult result = modelBuilder.build(request);
-        return result;
+        return modelBuilder.build(request);
+    }
+
+    private Properties toProperties(Map<String, String> map) {
+        Properties props = new Properties();
+        props.putAll(map);
+        return props;
     }
 
     private <T> T lookup(Class<T> clazz) throws ComponentLookupException {
