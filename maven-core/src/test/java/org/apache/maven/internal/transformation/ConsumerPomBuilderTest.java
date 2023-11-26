@@ -27,6 +27,7 @@ import java.util.Collections;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer.ConsumerPomBuilder;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     ConsumerPomBuilder builder;
 
     @Test
-    void testTrivialConsumer() {
+    void testTrivialConsumer() throws Exception {
         MavenProject project = new MavenProject();
         project.setRootDirectory(Paths.get("src/test/resources/consumer/trivial"));
         project.setRemoteArtifactRepositories(Collections.singletonList(new MavenArtifactRepository(
@@ -52,7 +53,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testSimpleConsumer() {
+    void testSimpleConsumer() throws Exception {
         MavenProject project = new MavenProject();
         project.setRootDirectory(Paths.get("src/test/resources/consumer/simple"));
         project.setRemoteArtifactRepositories(Collections.singletonList(new MavenArtifactRepository(

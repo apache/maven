@@ -71,7 +71,7 @@ import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 
 @Named
-public class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
+public class DefaultConsumerPomBuilder implements ConsumerPomArtifactTransformer.ConsumerPomBuilder {
 
     private static final String BOM_PACKAGING = "bom";
 
@@ -83,7 +83,8 @@ public class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     @Inject
     ModelCacheFactory modelCacheFactory;
 
-    public Model build(RepositorySystemSession session, MavenProject project, Path src) {
+    public Model build(RepositorySystemSession session, MavenProject project, Path src)
+            throws ModelBuildingException, ComponentLookupException {
         Model model = project.getModel().getDelegate();
         String packaging = model.getPackaging();
         if (POM_PACKAGING.equals(packaging)) {
@@ -93,24 +94,18 @@ public class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         }
     }
 
-    protected Model buildPom(RepositorySystemSession session, MavenProject project, Path src) {
-        try {
-            ModelBuildingResult result = buildModel(session, project, src);
-            Model model = result.getRawModel().getDelegate();
-            return transform(model);
-        } catch (ModelBuildingException | ComponentLookupException e) {
-            throw new RuntimeException(e);
-        }
+    protected Model buildPom(RepositorySystemSession session, MavenProject project, Path src)
+            throws ModelBuildingException, ComponentLookupException {
+        ModelBuildingResult result = buildModel(session, project, src);
+        Model model = result.getRawModel().getDelegate();
+        return transform(model);
     }
 
-    protected Model buildNonPom(RepositorySystemSession session, MavenProject project, Path src) {
-        try {
-            ModelBuildingResult result = buildModel(session, project, src);
-            Model model = result.getEffectiveModel().getDelegate();
-            return transform(model);
-        } catch (ModelBuildingException | ComponentLookupException e) {
-            throw new RuntimeException(e);
-        }
+    protected Model buildNonPom(RepositorySystemSession session, MavenProject project, Path src)
+            throws ModelBuildingException, ComponentLookupException {
+        ModelBuildingResult result = buildModel(session, project, src);
+        Model model = result.getEffectiveModel().getDelegate();
+        return transform(model);
     }
 
     private ModelBuildingResult buildModel(RepositorySystemSession session, MavenProject project, Path src)

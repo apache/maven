@@ -59,8 +59,6 @@ class ConsumerPomArtifactTransformerTest {
             ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer((s, p, f) -> {
                 try (InputStream is = Files.newInputStream(f)) {
                     return DefaultConsumerPomBuilder.transform(new MavenStaxReader().read(is));
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
                 }
             });
 
@@ -78,13 +76,7 @@ class ConsumerPomArtifactTransformerTest {
         when(systemSessionMock.getData()).thenReturn(sessionDataMock);
         when(sessionDataMock.get(any())).thenReturn(new NoTransformerContext());
 
-        new ConsumerPomArtifactTransformer(new ConsumerPomBuilder() {
-                    @Override
-                    public org.apache.maven.api.model.Model build(
-                            RepositorySystemSession session, MavenProject project, Path src) {
-                        return null;
-                    }
-                })
+        new ConsumerPomArtifactTransformer((session, project, src) -> null)
                 .injectTransformedArtifacts(emptyProject, systemSessionMock);
 
         assertThat(emptyProject.getAttachedArtifacts()).isEmpty();

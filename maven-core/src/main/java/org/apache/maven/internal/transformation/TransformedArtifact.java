@@ -38,7 +38,11 @@ import static java.util.Objects.requireNonNull;
  */
 abstract class TransformedArtifact extends DefaultArtifact {
 
-    private final OnChangeTransformer onChangeTransformer;
+    interface Transformer {
+        Path transform() throws Exception;
+    }
+
+    private final Transformer onChangeTransformer;
 
     TransformedArtifact(
             Artifact source, Supplier<Path> sourcePathProvider, String classifier, String extension, Path targetPath) {
@@ -67,36 +71,36 @@ abstract class TransformedArtifact extends DefaultArtifact {
 
     @Override
     public File getFile() {
-        Path result = onChangeTransformer.get();
-        if (result == null) {
-            return null;
-        }
-        return result.toFile();
-    }
-
-    private static final int BUFFER_SIZE = 8192;
-
-    private static String sha1(Path path) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-            try (InputStream fis = Files.newInputStream(path)) {
-                byte[] buffer = new byte[BUFFER_SIZE];
-                int read;
-                while ((read = fis.read(buffer)) != -1) {
-                    md.update(buffer, 0, read);
-                }
+            Path result = onChangeTransformer.transform();
+            if (result == null) {
+                return null;
             }
-            StringBuilder result = new StringBuilder();
-            for (byte b : md.digest()) {
-                result.append(String.format("%02x", b));
-            }
-            return result.toString();
+            return result.toFile();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    protected abstract void transform(Path src, Path dst);
+    private static final int BUFFER_SIZE = 8192;
+
+    private static String sha1(Path path) throws Exception {
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        try (InputStream fis = Files.newInputStream(path)) {
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int read;
+            while ((read = fis.read(buffer)) != -1) {
+                md.update(buffer, 0, read);
+            }
+        }
+        StringBuilder result = new StringBuilder();
+        for (byte b : md.digest()) {
+            result.append(String.format("%02x", b));
+        }
+        return result.toString();
+    }
+
+    protected abstract void transform(Path src, Path dst) throws Exception;
 
     private static class TransformedArtifactHandler implements ArtifactHandler {
         private final String classifier;

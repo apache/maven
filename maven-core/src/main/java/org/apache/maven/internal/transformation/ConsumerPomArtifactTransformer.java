@@ -55,6 +55,11 @@ import org.eclipse.aether.installation.InstallRequest;
 @Named("consumer-pom")
 public final class ConsumerPomArtifactTransformer {
 
+    interface ConsumerPomBuilder {
+
+        Model build(RepositorySystemSession session, MavenProject project, Path src) throws Exception;
+    }
+
     private static final String CONSUMER_POM_CLASSIFIER = "consumer";
 
     private static final String BUILD_POM_CLASSIFIER = "build";
@@ -196,24 +201,20 @@ public final class ConsumerPomArtifactTransformer {
         }
 
         @Override
-        public void transform(Path src, Path dest) {
+        public void transform(Path src, Path dest) throws Exception {
             Model model = builder.build(session, project, src);
             write(model, dest);
         }
 
-        void write(Model model, Path dest) {
+        void write(Model model, Path dest) throws IOException, XMLStreamException {
             String version = model.getModelVersion();
-            try {
-                Files.createDirectories(dest.getParent());
-                try (Writer w = Files.newBufferedWriter(dest)) {
-                    MavenStaxWriter writer = new MavenStaxWriter();
-                    writer.setNamespace(String.format(NAMESPACE_FORMAT, version));
-                    writer.setSchemaLocation(String.format(SCHEMA_LOCATION_FORMAT, version));
-                    writer.setAddLocationInformation(false);
-                    writer.write(w, model);
-                }
-            } catch (XMLStreamException | IOException e) {
-                throw new RuntimeException(e);
+            Files.createDirectories(dest.getParent());
+            try (Writer w = Files.newBufferedWriter(dest)) {
+                MavenStaxWriter writer = new MavenStaxWriter();
+                writer.setNamespace(String.format(NAMESPACE_FORMAT, version));
+                writer.setSchemaLocation(String.format(SCHEMA_LOCATION_FORMAT, version));
+                writer.setAddLocationInformation(false);
+                writer.write(w, model);
             }
         }
     }

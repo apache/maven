@@ -18,14 +18,10 @@
  */
 package org.apache.maven.internal.transformation;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
@@ -43,23 +39,28 @@ import static java.util.Objects.requireNonNull;
  *
  * @since TBD
  */
-final class OnChangeTransformer implements Supplier<Path> {
+final class OnChangeTransformer implements TransformedArtifact.Transformer {
+
+    interface StateFunction {
+        String state(Path path) throws Exception;
+    }
+
+    interface TransformerFunction {
+        void transform(Path source, Path target) throws Exception;
+    }
 
     private final Supplier<Path> source;
 
     private final Path target;
 
-    private final Function<Path, String> stateFunction;
+    private final StateFunction stateFunction;
 
-    private final BiConsumer<Path, Path> transformerConsumer;
+    private final TransformerFunction transformerConsumer;
 
     private final AtomicReference<String> sourceState;
 
     OnChangeTransformer(
-            Supplier<Path> source,
-            Path target,
-            Function<Path, String> stateFunction,
-            BiConsumer<Path, Path> transformerConsumer) {
+            Supplier<Path> source, Path target, StateFunction stateFunction, TransformerFunction transformerConsumer) {
         this.source = requireNonNull(source);
         this.target = requireNonNull(target);
         this.stateFunction = requireNonNull(stateFunction);
@@ -68,7 +69,7 @@ final class OnChangeTransformer implements Supplier<Path> {
     }
 
     @Override
-    public synchronized Path get() {
+    public synchronized Path transform() throws Exception {
         String state = mayUpdate();
         if (state == null) {
             return null;
@@ -76,27 +77,23 @@ final class OnChangeTransformer implements Supplier<Path> {
         return target;
     }
 
-    private String mayUpdate() {
+    private String mayUpdate() throws Exception {
         String result;
-        try {
-            Path src = source.get();
-            if (src == null) {
-                Files.deleteIfExists(target);
-                result = null;
-            } else if (!Files.exists(src)) {
-                Files.deleteIfExists(target);
-                result = "";
-            } else {
-                String current = stateFunction.apply(src);
-                String existing = sourceState.get();
-                if (!Objects.equals(current, existing)) {
-                    transformerConsumer.accept(src, target);
-                    Files.setLastModifiedTime(target, Files.getLastModifiedTime(src));
-                }
-                result = current;
+        Path src = source.get();
+        if (src == null) {
+            Files.deleteIfExists(target);
+            result = null;
+        } else if (!Files.exists(src)) {
+            Files.deleteIfExists(target);
+            result = "";
+        } else {
+            String current = stateFunction.state(src);
+            String existing = sourceState.get();
+            if (!Objects.equals(current, existing)) {
+                transformerConsumer.transform(src, target);
+                Files.setLastModifiedTime(target, Files.getLastModifiedTime(src));
             }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            result = current;
         }
         sourceState.set(result);
         return result;
