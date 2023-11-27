@@ -370,7 +370,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
         Map<String, Object> configProperties =
                 systemSessionFactory.newRepositorySession(request).getConfigProperties();
         assertEquals(String.valueOf(Float.MAX_VALUE), configProperties.get("aether.priority.FileTransporterFactory"));
-        assertEquals(String.valueOf(Float.MAX_VALUE), configProperties.get("aether.priority.HttpTransporterFactory"));
+        assertEquals(String.valueOf(Float.MAX_VALUE), configProperties.get("aether.priority.ApacheTransporterFactory"));
         properties.remove("maven.resolver.transport");
 
         // wagon

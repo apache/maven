@@ -97,7 +97,7 @@ public class DefaultRepositorySystemSessionFactory {
      * Default: {@code true}, will ignore availability from tail local repositories.
      *
      * @since 3.9.0
-     * @deprecated Use {@link ChainedLocalRepositoryManager#IGNORE_TAIL_AVAILABILITY} instead.
+     * @deprecated Use {@link ChainedLocalRepositoryManager#CONFIG_PROP_IGNORE_TAIL_AVAILABILITY} instead.
      */
     @Deprecated
     private static final String MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY = "maven.repo.local.tail.ignoreAvailability";
@@ -134,7 +134,7 @@ public class DefaultRepositorySystemSessionFactory {
 
     private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
 
-    private static final String APACHE_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.HttpTransporterFactory";
+    private static final String APACHE_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.ApacheTransporterFactory";
 
     private static final String JDK_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.JdkTransporterFactory";
 
@@ -203,9 +203,9 @@ public class DefaultRepositorySystemSessionFactory {
             logger.warn(
                     "User property {} is DEPRECATED, switch to {}",
                     MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY,
-                    ChainedLocalRepositoryManager.IGNORE_TAIL_AVAILABILITY);
+                    ChainedLocalRepositoryManager.CONFIG_PROP_IGNORE_TAIL_AVAILABILITY);
             configProps.put(
-                    ChainedLocalRepositoryManager.IGNORE_TAIL_AVAILABILITY,
+                    ChainedLocalRepositoryManager.CONFIG_PROP_IGNORE_TAIL_AVAILABILITY,
                     configProps.get(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY));
         }
 
