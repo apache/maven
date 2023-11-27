@@ -23,11 +23,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.api.Type;
-import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.eventspy.AbstractEventSpy;
@@ -39,15 +36,14 @@ import static java.util.Objects.requireNonNull;
  */
 @Named
 @Singleton
-public class DefaultArtifactHandlerManager extends AbstractEventSpy implements ArtifactHandlerManager {
-    private final TypeRegistry typeRegistry;
+public class LegacyArtifactHandlerManager extends AbstractEventSpy {
+    private final Map<String, ArtifactHandler> artifactHandlers;
 
-    private final ConcurrentHashMap<String, ArtifactHandler> allHandlers;
+    private final Map<String, ArtifactHandler> allHandlers = new ConcurrentHashMap<>();
 
     @Inject
-    public DefaultArtifactHandlerManager(TypeRegistry typeRegistry) {
-        this.typeRegistry = requireNonNull(typeRegistry, "null typeRegistry");
-        this.allHandlers = new ConcurrentHashMap<>();
+    public LegacyArtifactHandlerManager(Map<String, ArtifactHandler> artifactHandlers) {
+        this.artifactHandlers = requireNonNull(artifactHandlers);
     }
 
     @Override
@@ -60,27 +56,17 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
         }
     }
 
-    public ArtifactHandler getArtifactHandler(String id) {
-        return allHandlers.computeIfAbsent(id, k -> {
-            Type type = typeRegistry.getType(id);
-            return new DefaultArtifactHandler(
-                    id,
-                    type.getExtension(),
-                    type.getClassifier(),
-                    null,
-                    null,
-                    type.isIncludesDependencies(),
-                    "none",
-                    type.isAddedToClassPath()); // TODO: watch out for module path
-        });
-    }
-
-    public void addHandlers(Map<String, ArtifactHandler> handlers) {
-        throw new UnsupportedOperationException("Adding handlers programmatically is not supported anymore");
-    }
-
-    @Deprecated
-    public Set<String> getHandlerTypes() {
-        throw new UnsupportedOperationException("Querying handlers programmatically is not supported anymore");
+    public ArtifactHandler getArtifactHandler(String type) {
+        requireNonNull(type, "null type");
+        ArtifactHandler handler = allHandlers.get(type);
+        if (handler == null) {
+            handler = artifactHandlers.get(type);
+            if (handler == null) {
+                handler = new DefaultArtifactHandler(type);
+            } else {
+                allHandlers.put(type, handler);
+            }
+        }
+        return handler;
     }
 }

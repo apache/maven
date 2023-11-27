@@ -16,18 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.repository.internal;
+package org.apache.maven.internal.impl.types;
 
-import org.eclipse.aether.RepositorySystemSession;
-import org.junit.jupiter.api.Test;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.apache.maven.api.Type;
+import org.apache.maven.internal.impl.DefaultDependencyProperties;
+import org.apache.maven.internal.impl.DefaultType;
 
-class MavenRepositorySystemUtilsTest {
+@Named(BomTypeProvider.NAME)
+@Singleton
+public class BomTypeProvider implements Provider<Type> {
+    public static final String NAME = "bom";
 
-    @Test
-    void testNewSession() {
-        RepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-        assertNotNull(session);
+    private final Type type;
+
+    public BomTypeProvider() {
+        this.type = new DefaultType(NAME, "pom", null, new DefaultDependencyProperties());
+    }
+
+    @Override
+    public Type get() {
+        return type;
     }
 }

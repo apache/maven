@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -155,6 +156,8 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final RuntimeInformation runtimeInformation;
 
+    private final TypeRegistry typeRegistry;
+
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
     public DefaultRepositorySystemSessionFactory(
@@ -163,13 +166,15 @@ public class DefaultRepositorySystemSessionFactory {
             @Nullable @Named("ide") WorkspaceReader workspaceRepository,
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
-            RuntimeInformation runtimeInformation) {
+            RuntimeInformation runtimeInformation,
+            TypeRegistry typeRegistry) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.workspaceRepository = workspaceRepository;
         this.settingsDecrypter = settingsDecrypter;
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.runtimeInformation = runtimeInformation;
+        this.typeRegistry = typeRegistry;
     }
 
     @Deprecated
@@ -179,7 +184,8 @@ public class DefaultRepositorySystemSessionFactory {
 
     @SuppressWarnings("checkstyle:methodLength")
     public SessionBuilder newRepositorySessionBuilder(MavenExecutionRequest request) {
-        SessionBuilder session = MavenRepositorySystemUtils.newSession(repoSystem.createSessionBuilder());
+        SessionBuilder session = MavenRepositorySystemUtils.newSession(
+                repoSystem.createSessionBuilder(), new TypeRegistryAdapter(typeRegistry));
         session.setCache(request.getRepositoryCache());
 
         Map<Object, Object> configProps = new LinkedHashMap<>();
