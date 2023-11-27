@@ -29,6 +29,10 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 
+/**
+ * This interface is not public and the purpose is to allow easy unit testing
+ * of {@link DefaultConsumerPomArtifactTransformer}.
+ */
 interface ConsumerPomBuilder {
 
     Model build(RepositorySystemSession session, MavenProject project, Path src)
