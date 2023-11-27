@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.xml.XmlNode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -71,8 +72,17 @@ class ModelXmlTest {
 
         Model model = fromXml(xml);
         Plugin plugin = model.getBuild().getPlugins().get(0);
-        assertNotNull(plugin.getConfiguration());
-        String config = plugin.getConfiguration().toString();
+        XmlNode node = plugin.getConfiguration();
+        assertNotNull(node);
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.getNamespaceUri());
+        assertEquals("m", node.getPrefix());
+        assertEquals("configuration", node.getName());
+        assertEquals(1, node.getChildren().size());
+        XmlNode myConfig = node.getChildren().get(0);
+        assertEquals("http://fabric8.io/fabric8-maven-plugin", myConfig.getNamespaceUri());
+        assertEquals("", myConfig.getPrefix());
+        assertEquals("myConfig", myConfig.getName());
+        String config = node.toString();
         assertFalse(config.isEmpty());
     }
 
