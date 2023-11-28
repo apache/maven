@@ -93,16 +93,6 @@ public class DefaultRepositorySystemSessionFactory {
     private static final String MAVEN_REPO_LOCAL_TAIL = "maven.repo.local.tail";
 
     /**
-     * User property for chained LRM: should artifact availability be ignored in tail local repositories or not.
-     * Default: {@code true}, will ignore availability from tail local repositories.
-     *
-     * @since 3.9.0
-     * @deprecated Use {@link ChainedLocalRepositoryManager#CONFIG_PROP_IGNORE_TAIL_AVAILABILITY} instead.
-     */
-    @Deprecated
-    private static final String MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY = "maven.repo.local.tail.ignoreAvailability";
-
-    /**
      * User property for reverse dependency tree. If enabled, Maven will record ".tracking" directory into local
      * repository with "reverse dependency tree", essentially explaining WHY given artifact is present in local
      * repository.
@@ -198,25 +188,6 @@ public class DefaultRepositorySystemSessionFactory {
         configProps.putAll(request.getSystemProperties());
         configProps.putAll(request.getUserProperties());
 
-        // we need to "translate" this
-        if (configProps.containsKey(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY)) {
-            logger.warn(
-                    "User property {} is DEPRECATED, switch to {}",
-                    MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY,
-                    ChainedLocalRepositoryManager.CONFIG_PROP_IGNORE_TAIL_AVAILABILITY);
-            configProps.put(
-                    ChainedLocalRepositoryManager.CONFIG_PROP_IGNORE_TAIL_AVAILABILITY,
-                    configProps.get(MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY));
-        }
-
-        // HACK: Resolver 2.0.0-alpha-2 carries a bad change:
-        // https://github.com/apache/maven-resolver/commit/178cfba9f3889f7e942a6a0d74716355b01a78f5
-        // that is fixed in later versions by MRESOLVER-437 https://github.com/apache/maven-resolver/pull/373
-        // TODO: remove this hack below once Resolver PR above is applied
-        if (!configProps.containsKey(ConfigurationProperties.HTTP_EXPECT_CONTINUE)) {
-            configProps.put(ConfigurationProperties.HTTP_EXPECT_CONTINUE, Boolean.FALSE.toString());
-        }
-
         session.setOffline(request.isOffline());
         session.setChecksumPolicy(request.getGlobalChecksumPolicy());
         session.setUpdatePolicy(
@@ -277,6 +248,8 @@ public class DefaultRepositorySystemSessionFactory {
         }
         session.setProxySelector(proxySelector);
 
+        // Note: we do NOT use WagonTransportConfigurationKeys here as Maven Core does NOT depend on Wagon Transport
+        // and this is okay and "good thing".
         DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
         for (Server server : decrypted.getServers()) {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
@@ -291,7 +264,7 @@ public class DefaultRepositorySystemSessionFactory {
                         .collect(Collectors.toList());
                 dom = new XmlNodeImpl(dom.getName(), null, null, children, null);
                 PlexusConfiguration config = XmlPlexusConfiguration.toPlexusConfiguration(dom);
-                configProps.put("aether.connector.wagon.config." + server.getId(), config);
+                configProps.put("aether.transport.wagon.config." + server.getId(), config);
 
                 // Translate to proper resolver configuration properties as well (as Plexus XML above is Wagon specific
                 // only) but support only configuration/httpConfiguration/all, see
@@ -363,8 +336,8 @@ public class DefaultRepositorySystemSessionFactory {
                 }
             }
 
-            configProps.put("aether.connector.perms.fileMode." + server.getId(), server.getFilePermissions());
-            configProps.put("aether.connector.perms.dirMode." + server.getId(), server.getDirectoryPermissions());
+            configProps.put("aether.transport.wagon.perms.fileMode." + server.getId(), server.getFilePermissions());
+            configProps.put("aether.transport.wagon.perms.dirMode." + server.getId(), server.getDirectoryPermissions());
         }
         session.setAuthenticationSelector(authSelector);
 

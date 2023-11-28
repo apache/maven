@@ -148,7 +148,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
         PlexusConfiguration plexusConfiguration = (PlexusConfiguration) systemSessionFactory
                 .newRepositorySession(request)
                 .getConfigProperties()
-                .get("aether.connector.wagon.config.repository");
+                .get("aether.transport.wagon.config.repository");
         assertNotNull(plexusConfiguration);
         assertEquals(0, plexusConfiguration.getChildCount());
     }
