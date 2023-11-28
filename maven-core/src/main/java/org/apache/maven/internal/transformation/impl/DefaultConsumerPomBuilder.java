@@ -216,7 +216,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                     .relocation(model.getDistributionManagement().getRelocation())
                     .build());
         }
-        // only keep repositories others than 'central'
+        // only keep repositories other than 'central'
         builder.pluginRepositories(pruneRepositories(model.getPluginRepositories()));
         builder.repositories(pruneRepositories(model.getRepositories()));
         return builder;

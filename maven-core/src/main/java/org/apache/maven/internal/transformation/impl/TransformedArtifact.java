@@ -86,7 +86,7 @@ class TransformedArtifact extends DefaultArtifact {
 
     @Override
     public void setFile(File file) {
-        throw new IllegalStateException("transformed artifact file cannot be set");
+        throw new UnsupportedOperationException("transformed artifact file cannot be set");
     }
 
     @Override
