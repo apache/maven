@@ -94,7 +94,7 @@ public class LifecycleModuleBuilder {
                 return;
             }
 
-            consumerPomArtifactTransformer.injectTransformedArtifacts(currentProject, session.getRepositorySession());
+            consumerPomArtifactTransformer.injectTransformedArtifacts(session.getRepositorySession(), currentProject);
 
             BuilderCommon.attachToThread(currentProject);
 

@@ -192,8 +192,9 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
     @Test
     void testReadErroneousMavenProjectContainsReference() throws Exception {
-        File pomFile = new File("src/test/resources/projects/artifactMissingVersion.xml").getAbsoluteFile();
+        File pomFile = new File("src/test/resources/projects/artifactMissingVersion/pom.xml").getAbsoluteFile();
         MavenSession mavenSession = createMavenSession(null);
+        mavenSession.getRequest().setRootDirectory(pomFile.getParentFile().toPath());
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
         configuration.setRepositorySession(mavenSession.getRepositorySession());
