@@ -23,13 +23,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- *
+ * Mojo parameters container
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface InjectMojo {
-
-    String goal();
-
-    String pom() default "";
+public @interface Basedir {
+    String value() default "";
 }

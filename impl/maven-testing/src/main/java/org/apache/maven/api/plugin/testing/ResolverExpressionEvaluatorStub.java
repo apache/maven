@@ -21,11 +21,9 @@ package org.apache.maven.api.plugin.testing;
 import java.io.File;
 import java.util.Map;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
-import org.codehaus.plexus.testing.PlexusExtension;
 import org.eclipse.aether.repository.LocalRepository;
 
 /**
@@ -81,14 +79,14 @@ public class ResolverExpressionEvaluatorStub implements TypeAwareExpressionEvalu
             return expression.contains("$$") ? expression.replaceAll("\\$\\$", "\\$") : expression;
         } else {
             if ("basedir".equals(expression) || "project.basedir".equals(expression)) {
-                value = PlexusExtension.getBasedir();
+                value = MojoExtension.getBasedir();
             } else if (expression.startsWith("basedir") || expression.startsWith("project.basedir")) {
                 int pathSeparator = expression.indexOf("/");
                 if (pathSeparator > 0) {
-                    value = PlexusTestCase.getBasedir() + expression.substring(pathSeparator);
+                    value = MojoExtension.getBasedir() + expression.substring(pathSeparator);
                 }
             } else if ("localRepository".equals(expression)) {
-                File localRepo = new File(PlexusTestCase.getBasedir(), "target/local-repo");
+                File localRepo = new File(MojoExtension.getBasedir(), "target/local-repo");
                 return new LocalRepository("file://" + localRepo.getAbsolutePath());
             }
             if (value == null && properties != null && properties.containsKey(expression)) {
@@ -109,12 +107,12 @@ public class ResolverExpressionEvaluatorStub implements TypeAwareExpressionEvalu
     /** {@inheritDoc} */
     @Override
     public File alignToBaseDirectory(File file) {
-        if (file.getAbsolutePath().startsWith(PlexusExtension.getBasedir())) {
+        if (file.getAbsolutePath().startsWith(MojoExtension.getBasedir())) {
             return file;
         } else if (file.isAbsolute()) {
             return file;
         } else {
-            return new File(PlexusExtension.getBasedir(), file.getPath());
+            return new File(MojoExtension.getBasedir(), file.getPath());
         }
     }
 }

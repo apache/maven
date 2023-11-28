@@ -20,7 +20,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<plugin>
+<plugin xmlns="http://maven.apache.org/PLUGIN/2.0.0" >
   <name>test-plugin</name>
   <description></description>
   <groupId>test</groupId>
@@ -31,19 +31,31 @@ under the License.
   <inheritedByDefault>true</inheritedByDefault>
   <mojos>
     <mojo>
-      <goal>parameters</goal>
-      <requiresDirectInvocation>false</requiresDirectInvocation>
-      <requiresProject>true</requiresProject>
-      <requiresReports>false</requiresReports>
+      <goal>goal</goal>
+      <projectRequired>true</projectRequired>
       <aggregator>false</aggregator>
-      <requiresOnline>false</requiresOnline>
+      <onlineRequired>false</onlineRequired>
       <inheritedByDefault>true</inheritedByDefault>
       <implementation>org.apache.maven.plugin.testing.ParametersMojo</implementation>
       <language>java</language>
-      <instantiationStrategy>per-lookup</instantiationStrategy>
-      <executionStrategy>once-per-session</executionStrategy>
-      <threadSafe>false</threadSafe>
       <parameters>
+        <parameter>
+          <name>basedir</name>
+          <type>java.nio.file.Path</type>
+        </parameter>
+        <parameter>
+          <name>workdir</name>
+          <type>java.nio.file.Path</type>
+        </parameter>
+        <parameter>
+          <name>param</name>
+          <type>java.lang.String</type>
+        </parameter>
+        <parameter>
+          <name>param2</name>
+          <type>java.lang.String</type>
+        </parameter>
+        <!--
         <parameter>
           <name>plain</name>
           <type>java.lang.String</type>
@@ -57,6 +69,7 @@ under the License.
           <required>false</required>
           <editable>true</editable>
           <description></description>
+          <defaultValue>default</defaultValue>
         </parameter>
         <parameter>
           <name>withProperty</name>
@@ -64,6 +77,7 @@ under the License.
           <required>false</required>
           <editable>true</editable>
           <description></description>
+          <expression>${property}</expression>
         </parameter>
         <parameter>
           <name>withPropertyAndDefault</name>
@@ -71,14 +85,11 @@ under the License.
           <required>false</required>
           <editable>true</editable>
           <description></description>
+          <defaultValue>default</defaultValue>
+          <expression>${property}</expression>
         </parameter>
+        -->
       </parameters>
-      <configuration>
-        <withDefault implementation="java.lang.String" default-value="default"/>
-        <withProperty implementation="java.lang.String">${property}</withProperty>
-        <withPropertyAndDefault implementation="java.lang.String" default-value="default">${property}</withPropertyAndDefault>
-      </configuration>
     </mojo>
   </mojos>
-  <dependencies/>
 </plugin>

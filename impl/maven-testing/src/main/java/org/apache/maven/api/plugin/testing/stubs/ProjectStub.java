@@ -18,18 +18,16 @@
  */
 package org.apache.maven.api.plugin.testing.stubs;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.DependencyCoordinate;
-import org.apache.maven.api.Project;
-import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.PluginContainer;
+import org.apache.maven.internal.impl.DefaultVersionParser;
+import org.apache.maven.repository.internal.DefaultModelVersionParser;
+import org.eclipse.aether.util.version.GenericVersionScheme;
 
 /**
  * @author Olivier Lamy
@@ -40,10 +38,11 @@ public class ProjectStub implements Project {
 
     private Model model = Model.newInstance();
     private Path basedir;
-    private File pomPath;
+    private Path pomPath;
     private boolean topProject;
-    private Artifact artifact;
     private Path rootDirectory;
+    private Map<String, String> properties = new HashMap<>();
+    private Artifact mainArtifact;
 
     public void setModel(Model model) {
         this.model = model;
@@ -73,14 +72,59 @@ public class ProjectStub implements Project {
 
     @Nonnull
     @Override
-    public String getPackaging() {
-        return model.getPackaging();
+    public Packaging getPackaging() {
+        return new Packaging() {
+            @Override
+            public String id() {
+                return model.getPackaging();
+            }
+
+            @Override
+            public Type type() {
+                return new Type() {
+                    @Override
+                    public String id() {
+                        return model.getPackaging();
+                    }
+
+                    @Override
+                    public Language getLanguage() {
+                        return null;
+                    }
+
+                    @Override
+                    public String getExtension() {
+                        return model.getPackaging();
+                    }
+
+                    @Override
+                    public String getClassifier() {
+                        return "";
+                    }
+
+                    @Override
+                    public boolean isIncludesDependencies() {
+                        return false;
+                    }
+
+                    @Override
+                    public Set<PathType> getPathTypes() {
+                        return Set.of();
+                    }
+                };
+            }
+
+            @Override
+            public Map<String, PluginContainer> plugins() {
+                return Map.of();
+            }
+        };
     }
 
-    @Nonnull
     @Override
-    public Artifact getArtifact() {
-        return artifact;
+    public List<Artifact> getArtifacts() {
+        Artifact pomArtifact = new ArtifactStub(getGroupId(), getArtifactId(), "", getVersion(), "pom");
+        return mainArtifact != null ? Arrays.asList(pomArtifact, mainArtifact) : Arrays.asList(pomArtifact);
     }
 
     @Nonnull
@@ -91,8 +135,8 @@ public class ProjectStub implements Project {
 
     @Nonnull
     @Override
-    public Optional<Path> getPomPath() {
-        return Optional.ofNullable(pomPath).map(File::toPath);
+    public Path getPomPath() {
+        return pomPath;
     }
 
     @Nonnull
@@ -108,8 +152,8 @@ public class ProjectStub implements Project {
     }
 
     @Override
-    public Optional<Path> getBasedir() {
-        return Optional.ofNullable(basedir);
+    public Path getBasedir() {
+        return basedir;
     }
 
     public void setBasedir(Path basedir) {
@@ -117,23 +161,8 @@ public class ProjectStub implements Project {
     }
 
     @Override
-    public boolean isExecutionRoot() {
-        return isTopProject();
-    }
-
-    @Override
     public Optional<Project> getParent() {
         return Optional.empty();
-    }
-
-    @Override
-    public List<RemoteRepository> getRemoteProjectRepositories() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public List<RemoteRepository> getRemotePluginRepositories() {
-        return Collections.emptyList();
     }
 
     @Override
@@ -171,11 +200,11 @@ public class ProjectStub implements Project {
         model = model.withPackaging(packaging);
     }
 
-    public void setArtifact(Artifact artifact) {
-        this.artifact = artifact;
+    public void setMainArtifact(Artifact mainArtifact) {
+        this.mainArtifact = mainArtifact;
     }
 
-    public void setPomPath(File pomPath) {
+    public void setPomPath(Path pomPath) {
         this.pomPath = pomPath;
     }
 
@@ -189,5 +218,52 @@ public class ProjectStub implements Project {
 
     public void setRootDirectory(Path rootDirectory) {
         this.rootDirectory = rootDirectory;
+    }
+
+    public void addProperty(String key, String value) {
+        properties.put(key, value);
+    }
+
+    class ProjectArtifact implements Artifact {
+        @Override
+        public String getGroupId() {
+            return ProjectStub.this.getGroupId();
+        }
+
+        @Override
+        public String getArtifactId() {
+            return ProjectStub.this.getArtifactId();
+        }
+
+        @Override
+        public Version getVersion() {
+            return new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme()))
+                    .parseVersion(ProjectStub.this.getVersion());
+        }
+
+        @Override
+        public Version getBaseVersion() {
+            return null;
+        }
+
+        @Override
+        public String getClassifier() {
+            return "";
+        }
+
+        @Override
+        public String getExtension() {
+            return "pom";
+        }
+
+        @Override
+        public boolean isSnapshot() {
+            return false;
+        }
+
+        @Override
+        public ArtifactCoordinate toCoordinate() {
+            return null;
+        }
     }
 }

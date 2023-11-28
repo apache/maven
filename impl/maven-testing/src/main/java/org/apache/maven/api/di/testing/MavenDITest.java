@@ -16,20 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.testing;
+package org.apache.maven.api.di.testing;
 
-import java.lang.annotation.Inherited;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
- *
+ * Plexus test
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Inherited
-public @interface InjectMojo {
-
-    String goal();
-
-    String pom() default "";
-}
+@ExtendWith(MavenDIExtension.class)
+@Target(ElementType.TYPE)
+public @interface MavenDITest {}

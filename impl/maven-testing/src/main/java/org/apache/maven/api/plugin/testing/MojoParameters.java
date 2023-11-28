@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api.plugin.testing;
 
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -25,6 +26,7 @@ import java.lang.annotation.RetentionPolicy;
  * Mojo parameters container
  */
 @Retention(RetentionPolicy.RUNTIME)
+@Inherited
 public @interface MojoParameters {
     MojoParameter[] value();
 }

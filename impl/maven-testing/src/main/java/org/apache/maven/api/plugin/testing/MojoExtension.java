@@ -18,67 +18,74 @@
  */
 package org.apache.maven.api.plugin.testing;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.inject.internal.ProviderMethodsModule;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Priority;
+import org.apache.maven.api.di.Provides;
+import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.di.testing.MavenDIExtension;
+import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.ConfigurationContainer;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.api.plugin.Log;
 import org.apache.maven.api.plugin.Mojo;
+import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.api.plugin.descriptor.Parameter;
+import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.api.plugin.testing.stubs.*;
+import org.apache.maven.api.services.ArtifactDeployer;
+import org.apache.maven.api.services.ArtifactFactory;
+import org.apache.maven.api.services.ArtifactInstaller;
+import org.apache.maven.api.services.ArtifactManager;
+import org.apache.maven.api.services.LocalRepositoryManager;
+import org.apache.maven.api.services.ProjectBuilder;
+import org.apache.maven.api.services.ProjectManager;
+import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.VersionParser;
+import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.configuration.internal.EnhancedComponentConfigurator;
+import org.apache.maven.di.Injector;
+import org.apache.maven.di.Key;
+import org.apache.maven.di.impl.DIException;
 import org.apache.maven.internal.impl.DefaultLog;
+import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.model.DefaultModelPathTranslator;
+import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.xml.XmlNodeImpl;
+import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
+import org.apache.maven.model.v4.MavenMerger;
+import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluatorV4;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.configurator.ComponentConfigurator;
+import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.testing.PlexusExtension;
-import org.codehaus.plexus.util.InterpolationFilterReader;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
+import org.eclipse.aether.RepositorySystem;
+import org.junit.jupiter.api.extension.*;
+import org.junit.platform.commons.support.AnnotationSupport;
 import org.slf4j.LoggerFactory;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * JUnit extension to help testing Mojos. The extension should be automatically registered
@@ -87,8 +94,25 @@ import org.slf4j.LoggerFactory;
  * @see MojoTest
  * @see InjectMojo
  * @see MojoParameter
+ * @see Basedir
  */
-public class MojoExtension extends PlexusExtension implements ParameterResolver {
+public class MojoExtension extends MavenDIExtension implements ParameterResolver, BeforeEachCallback {
+
+    protected static String pluginBasedir;
+    protected static String basedir;
+
+    public static String getTestId() {
+        return context.getRequiredTestClass().getSimpleName() + "-"
+                + context.getRequiredTestMethod().getName();
+    }
+
+    public static String getBasedir() {
+        return requireNonNull(basedir != null ? basedir : MavenDIExtension.basedir);
+    }
+
+    public static String getPluginBasedir() {
+        return requireNonNull(pluginBasedir);
+    }
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
@@ -101,65 +125,369 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
         try {
-            InjectMojo injectMojo = parameterContext
-                    .findAnnotation(InjectMojo.class)
-                    .orElseGet(() -> parameterContext.getDeclaringExecutable().getAnnotation(InjectMojo.class));
-
-            Set<MojoParameter> mojoParameters =
-                    new HashSet<>(parameterContext.findRepeatableAnnotations(MojoParameter.class));
-
-            Optional.ofNullable(parameterContext.getDeclaringExecutable().getAnnotation(MojoParameter.class))
-                    .ifPresent(mojoParameters::add);
-
-            Optional.ofNullable(parameterContext.getDeclaringExecutable().getAnnotation(MojoParameters.class))
-                    .map(MojoParameters::value)
-                    .map(Arrays::asList)
-                    .ifPresent(mojoParameters::addAll);
-
             Class<?> holder = parameterContext.getTarget().get().getClass();
             PluginDescriptor descriptor = extensionContext
                     .getStore(ExtensionContext.Namespace.GLOBAL)
                     .get(PluginDescriptor.class, PluginDescriptor.class);
-            return lookupMojo(holder, injectMojo, mojoParameters, descriptor);
+            Model model =
+                    extensionContext.getStore(ExtensionContext.Namespace.GLOBAL).get(Model.class, Model.class);
+            InjectMojo parameterInjectMojo =
+                    parameterContext.getAnnotatedElement().getAnnotation(InjectMojo.class);
+            String goal;
+            if (parameterInjectMojo != null) {
+                String pom = parameterInjectMojo.pom();
+                if (pom != null && !pom.isEmpty()) {
+                    try (Reader r = openPomUrl(holder, pom, new Path[1])) {
+                        Model localModel = new MavenStaxReader().read(r);
+                        model = new MavenMerger().merge(localModel, model, false, null);
+                        model = new DefaultModelPathTranslator(new DefaultPathTranslator())
+                                .alignToBaseDirectory(model, Paths.get(getBasedir()), null);
+                    }
+                }
+                goal = parameterInjectMojo.goal();
+            } else {
+                InjectMojo methodInjectMojo = AnnotationSupport.findAnnotation(
+                                parameterContext.getDeclaringExecutable(), InjectMojo.class)
+                        .orElse(null);
+                if (methodInjectMojo != null) {
+                    goal = methodInjectMojo.goal();
+                } else {
+                    goal = getGoalFromMojoImplementationClass(
+                            parameterContext.getParameter().getType());
+                }
+            }
+
+            Set<MojoParameter> mojoParameters = new LinkedHashSet<>();
+            for (AnnotatedElement ae :
+                    Arrays.asList(parameterContext.getDeclaringExecutable(), parameterContext.getAnnotatedElement())) {
+                mojoParameters.addAll(AnnotationSupport.findRepeatableAnnotations(ae, MojoParameter.class));
+            }
+            String[] coord = mojoCoordinates(goal);
+
+            XmlNode pluginConfiguration = model.getBuild().getPlugins().stream()
+                    .filter(p ->
+                            Objects.equals(p.getGroupId(), coord[0]) && Objects.equals(p.getArtifactId(), coord[1]))
+                    .map(ConfigurationContainer::getConfiguration)
+                    .findFirst()
+                    .orElseGet(() -> new XmlNodeImpl("config"));
+            List<XmlNode> children = mojoParameters.stream()
+                    .map(mp -> new XmlNodeImpl(mp.name(), mp.value()))
+                    .collect(Collectors.toList());
+            XmlNode config = new XmlNodeImpl("configuration", null, null, children, null);
+            pluginConfiguration = XmlNode.merge(config, pluginConfiguration);
+
+            // load default config
+            // pluginkey = groupId : artifactId : version : goal
+            Mojo mojo = lookup(Mojo.class, coord[0] + ":" + coord[1] + ":" + coord[2] + ":" + coord[3]);
+            for (MojoDescriptor mojoDescriptor : descriptor.getMojos()) {
+                if (Objects.equals(mojoDescriptor.getGoal(), coord[3])) {
+                    if (pluginConfiguration != null) {
+                        pluginConfiguration = finalizeConfig(pluginConfiguration, mojoDescriptor);
+                    }
+                }
+            }
+
+            Session session = getInjector().getInstance(Session.class);
+            Project project = getInjector().getInstance(Project.class);
+            MojoExecution mojoExecution = getInjector().getInstance(MojoExecution.class);
+            ExpressionEvaluator evaluator = new WrapEvaluator(
+                    getInjector(), new PluginParameterExpressionEvaluatorV4(session, project, mojoExecution));
+
+            EnhancedComponentConfigurator configurator = new EnhancedComponentConfigurator();
+            configurator.configureComponent(
+                    mojo, new XmlPlexusConfiguration(pluginConfiguration), evaluator, null, null);
+            return mojo;
         } catch (Exception e) {
-            throw new ParameterResolutionException("Unable to resolve parameter", e);
+            throw new ParameterResolutionException("Unable to resolve mojo", e);
         }
+    }
+
+    /**
+     * The @Mojo annotation is only retained in the class file, not at runtime,
+     * so we need to actually read the class file with ASM to find the annotation and
+     * the goal.
+     */
+    private static String getGoalFromMojoImplementationClass(Class<?> cl) throws IOException {
+        return cl.getAnnotation(Named.class).value();
     }
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        // TODO provide protected setters in PlexusExtension
-        Field field = PlexusExtension.class.getDeclaredField("basedir");
-        field.setAccessible(true);
-        field.set(null, getBasedir());
-        field = PlexusExtension.class.getDeclaredField("context");
-        field.setAccessible(true);
-        field.set(this, context);
+        if (pluginBasedir == null) {
+            pluginBasedir = MavenDIExtension.getBasedir();
+        }
+        basedir = AnnotationSupport.findAnnotation(context.getElement().get(), Basedir.class)
+                .map(Basedir::value)
+                .orElse(pluginBasedir);
+        if (basedir != null) {
+            if (basedir.isEmpty()) {
+                basedir = pluginBasedir + "/target/tests/"
+                        + context.getRequiredTestClass().getSimpleName() + "/"
+                        + context.getRequiredTestMethod().getName();
+            } else {
+                basedir = basedir.replace("${basedir}", pluginBasedir);
+            }
+        }
 
-        getContainer().addComponent(getContainer(), PlexusContainer.class.getName());
+        setContext(context);
 
-        ((DefaultPlexusContainer) getContainer()).addPlexusInjector(Collections.emptyList(), binder -> {
-            binder.install(ProviderMethodsModule.forObject(context.getRequiredTestInstance()));
-            binder.requestInjection(context.getRequiredTestInstance());
-            binder.bind(Log.class).toInstance(new DefaultLog(LoggerFactory.getLogger("anonymous")));
-        });
+        /*
+           binder.install(ProviderMethodsModule.forObject(context.getRequiredTestInstance()));
+           binder.requestInjection(context.getRequiredTestInstance());
+           binder.bind(Log.class).toInstance(new DefaultLog(LoggerFactory.getLogger("anonymous")));
+           binder.bind(ExtensionContext.class).toInstance(context);
+           // Load maven 4 api Services interfaces and try to bind them to the (possible) mock instances
+           // returned by the (possibly) mock InternalSession
+           try {
+               for (ClassPath.ClassInfo clazz :
+                       ClassPath.from(getClassLoader()).getAllClasses()) {
+                   if ("org.apache.maven.api.services".equals(clazz.getPackageName())) {
+                       Class<?> load = clazz.load();
+                       if (Service.class.isAssignableFrom(load)) {
+                           Class<Service> svc = (Class) load;
+                           binder.bind(svc).toProvider(() -> {
+                               try {
+                                   return getContainer()
+                                           .lookup(InternalSession.class)
+                                           .getService(svc);
+                               } catch (ComponentLookupException e) {
+                                   throw new RuntimeException("Unable to lookup service " + svc.getName());
+                               }
+                           });
+                       }
+                   }
+               }
+           } catch (Exception e) {
+               throw new RuntimeException("Unable to bind session services", e);
+           }
 
-        Map<Object, Object> map = getContainer().getContext().getContextData();
+        */
 
+        Path basedirPath = Paths.get(getBasedir());
+
+        InjectMojo mojo = AnnotationSupport.findAnnotation(context.getElement().get(), InjectMojo.class)
+                .orElse(null);
+        Model defaultModel = Model.newBuilder()
+                .groupId("myGroupId")
+                .artifactId("myArtifactId")
+                .version("1.0-SNAPSHOT")
+                .packaging("jar")
+                .build(Build.newBuilder()
+                        .directory(basedirPath.resolve("target").toString())
+                        .outputDirectory(basedirPath.resolve("target/classes").toString())
+                        .sourceDirectory(basedirPath.resolve("src/main/java").toString())
+                        .testSourceDirectory(
+                                basedirPath.resolve("src/test/java").toString())
+                        .testOutputDirectory(
+                                basedirPath.resolve("target/test-classes").toString())
+                        .build())
+                .build();
+        Path[] modelPath = new Path[] {null};
+        Model tmodel = null;
+        if (mojo != null) {
+            String pom = mojo.pom();
+            if (pom != null && !pom.isEmpty()) {
+                try (Reader r = openPomUrl(context.getRequiredTestClass(), pom, modelPath)) {
+                    tmodel = new MavenStaxReader().read(r);
+                }
+            } else {
+                Path pomPath = basedirPath.resolve("pom.xml");
+                if (Files.exists(pomPath)) {
+                    try (Reader r = Files.newBufferedReader(pomPath)) {
+                        tmodel = new MavenStaxReader().read(r);
+                        modelPath[0] = pomPath;
+                    }
+                }
+            }
+        }
+        Model model;
+        if (tmodel == null) {
+            model = defaultModel;
+        } else {
+            model = new MavenMerger().merge(tmodel, defaultModel, false, null);
+        }
+        tmodel = new DefaultModelPathTranslator(new DefaultPathTranslator())
+                .alignToBaseDirectory(tmodel, Paths.get(getBasedir()), null);
+        context.getStore(ExtensionContext.Namespace.GLOBAL).put(Model.class, tmodel);
+
+        // mojo execution
+        // Map<Object, Object> map = getInjector().getContext().getContextData();
+        PluginDescriptor pluginDescriptor;
         ClassLoader classLoader = context.getRequiredTestClass().getClassLoader();
-        try (InputStream is = Objects.requireNonNull(
+        try (InputStream is = requireNonNull(
                         classLoader.getResourceAsStream(getPluginDescriptorLocation()),
                         "Unable to find plugin descriptor: " + getPluginDescriptorLocation());
-                Reader reader = new BufferedReader(new XmlStreamReader(is));
-                InterpolationFilterReader interpolationReader = new InterpolationFilterReader(reader, map, "${", "}")) {
+                Reader reader = new BufferedReader(new XmlStreamReader(is))) {
+            // new InterpolationFilterReader(reader, map, "${", "}");
+            pluginDescriptor = new PluginDescriptorStaxReader().read(reader);
+        }
+        context.getStore(ExtensionContext.Namespace.GLOBAL).put(PluginDescriptor.class, pluginDescriptor);
+        // for (ComponentDescriptor<?> desc : pluginDescriptor.getComponents()) {
+        //    getContainer().addComponentDescriptor(desc);
+        // }
 
-            PluginDescriptor pluginDescriptor = new PluginDescriptorBuilder().build(interpolationReader);
+        @SuppressWarnings({"unused", "MagicNumber"})
+        class Foo {
 
-            context.getStore(ExtensionContext.Namespace.GLOBAL).put(PluginDescriptor.class, pluginDescriptor);
-
-            for (ComponentDescriptor<?> desc : pluginDescriptor.getComponents()) {
-                getContainer().addComponentDescriptor(desc);
+            @Provides
+            @Singleton
+            @Priority(-10)
+            private InternalSession createSession() {
+                return SessionStub.getMockSession(getBasedir());
             }
+
+            @Provides
+            @Singleton
+            @Priority(-10)
+            private Project createProject(InternalSession s) {
+                ProjectStub stub = new ProjectStub();
+                if (!"pom".equals(model.getPackaging())) {
+                    ArtifactStub artifact = new ArtifactStub(
+                            model.getGroupId(), model.getArtifactId(), "", model.getVersion(), model.getPackaging());
+                    stub.setMainArtifact(artifact);
+                }
+                stub.setModel(model);
+                stub.setBasedir(Paths.get(MojoExtension.getBasedir()));
+                stub.setPomPath(modelPath[0]);
+                s.getService(ArtifactManager.class).setPath(stub.getPomArtifact(), modelPath[0]);
+                return stub;
+            }
+
+            @Provides
+            @Singleton
+            @Priority(-10)
+            private MojoExecution createMojoExecution() {
+                MojoExecutionStub mes = new MojoExecutionStub("executionId", null);
+                if (mojo != null) {
+                    String goal = mojo.goal();
+                    int idx = goal.lastIndexOf(':');
+                    if (idx >= 0) {
+                        goal = goal.substring(idx + 1);
+                    }
+                    mes.setGoal(goal);
+                    for (MojoDescriptor md : pluginDescriptor.getMojos()) {
+                        if (goal.equals(md.getGoal())) {
+                            mes.setDescriptor(md);
+                        }
+                    }
+                    requireNonNull(mes.getDescriptor());
+                }
+                PluginStub plugin = new PluginStub();
+                plugin.setDescriptor(pluginDescriptor);
+                mes.setPlugin(plugin);
+                return mes;
+            }
+
+            @Provides
+            @Singleton
+            @Priority(-10)
+            private Log createLog() {
+                return new DefaultLog(LoggerFactory.getLogger("anonymous"));
+            }
+
+            @Provides
+            static RepositorySystemSupplier newRepositorySystemSupplier() {
+                return new RepositorySystemSupplier();
+            }
+
+            @Provides
+            static RepositorySystem newRepositorySystem(RepositorySystemSupplier repositorySystemSupplier) {
+                return repositorySystemSupplier.getRepositorySystem();
+            }
+
+            @Provides
+            @Priority(10)
+            static RepositoryFactory newRepositoryFactory(Session session) {
+                return session.getService(RepositoryFactory.class);
+            }
+
+            @Provides
+            @Priority(10)
+            static VersionParser newVersionParser(Session session) {
+                return session.getService(VersionParser.class);
+            }
+
+            @Provides
+            @Priority(10)
+            static LocalRepositoryManager newLocalRepositoryManager(Session session) {
+                return session.getService(LocalRepositoryManager.class);
+            }
+
+            @Provides
+            @Priority(10)
+            static ArtifactInstaller newArtifactInstaller(Session session) {
+                return session.getService(ArtifactInstaller.class);
+            }
+
+            @Provides
+            @Priority(10)
+            static ArtifactDeployer newArtifactDeployer(Session session) {
+                return session.getService(ArtifactDeployer.class);
+            }
+
+            @Provides
+            @Priority(10)
+            static ArtifactManager newArtifactManager(Session session) {
+                return session.getService(ArtifactManager.class);
+            }
+
+            @Provides
+            @Priority(10)
+            static ProjectManager newProjectManager(Session session) {
+                return session.getService(ProjectManager.class);
+            }
+
+            @Provides
+            @Priority(10)
+            static ArtifactFactory newArtifactFactory(Session session) {
+                return session.getService(ArtifactFactory.class);
+            }
+
+            @Provides
+            @Priority(10)
+            static ProjectBuilder newProjectBuilder(Session session) {
+                return session.getService(ProjectBuilder.class);
+            }
+
+            @Provides
+            @Priority(10)
+            static ModelXmlFactory newModelXmlFactory(Session session) {
+                return session.getService(ModelXmlFactory.class);
+            }
+        }
+
+        getInjector().bindInstance(Foo.class, new Foo());
+
+        getInjector().injectInstance(context.getRequiredTestInstance());
+
+        //        SessionScope sessionScope = getInjector().getInstance(SessionScope.class);
+        //        sessionScope.enter();
+        //        sessionScope.seed(Session.class, s);
+        //        sessionScope.seed(InternalSession.class, s);
+
+        //        MojoExecutionScope mojoExecutionScope = getInjector().getInstance(MojoExecutionScope.class);
+        //        mojoExecutionScope.enter();
+        //        mojoExecutionScope.seed(Project.class, p);
+        //        mojoExecutionScope.seed(MojoExecution.class, me);
+    }
+
+    private Reader openPomUrl(Class<?> holder, String pom, Path[] modelPath) throws IOException {
+        if (pom.startsWith("file:")) {
+            Path path = Paths.get(getBasedir()).resolve(pom.substring("file:".length()));
+            modelPath[0] = path;
+            return Files.newBufferedReader(path);
+        } else if (pom.startsWith("classpath:")) {
+            URL url = holder.getResource(pom.substring("classpath:".length()));
+            if (url == null) {
+                throw new IllegalStateException("Unable to find pom on classpath: " + pom);
+            }
+            return new XmlStreamReader(url.openStream());
+        } else if (pom.contains("<project>")) {
+            return new StringReader(pom);
+        } else {
+            Path path = Paths.get(getBasedir()).resolve(pom);
+            modelPath[0] = path;
+            return Files.newBufferedReader(path);
         }
     }
 
@@ -167,49 +495,12 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
         return "META-INF/maven/plugin.xml";
     }
 
-    private Mojo lookupMojo(
-            Class<?> holder,
-            InjectMojo injectMojo,
-            Collection<MojoParameter> mojoParameters,
-            PluginDescriptor descriptor)
-            throws Exception {
-        String goal = injectMojo.goal();
-        String pom = injectMojo.pom();
-        String[] coord = mojoCoordinates(goal);
-        Xpp3Dom pomDom;
-        if (pom.startsWith("file:")) {
-            Path path = Paths.get(getBasedir()).resolve(pom.substring("file:".length()));
-            pomDom = Xpp3DomBuilder.build(ReaderFactory.newXmlReader(path.toFile()));
-        } else if (pom.startsWith("classpath:")) {
-            URL url = holder.getResource(pom.substring("classpath:".length()));
-            if (url == null) {
-                throw new IllegalStateException("Unable to find pom on classpath: " + pom);
-            }
-            pomDom = Xpp3DomBuilder.build(ReaderFactory.newXmlReader(url.openStream()));
-        } else if (pom.contains("<project>")) {
-            pomDom = Xpp3DomBuilder.build(new StringReader(pom));
-        } else {
-            Path path = Paths.get(getBasedir()).resolve(pom);
-            pomDom = Xpp3DomBuilder.build(ReaderFactory.newXmlReader(path.toFile()));
-        }
-        XmlNode pluginConfiguration = extractPluginConfiguration(coord[1], pomDom);
-        if (!mojoParameters.isEmpty()) {
-            List<XmlNode> children = mojoParameters.stream()
-                    .map(mp -> new XmlNodeImpl(mp.name(), mp.value()))
-                    .collect(Collectors.toList());
-            XmlNode config = new XmlNodeImpl("configuration", null, null, children, null);
-            pluginConfiguration = XmlNode.merge(config, pluginConfiguration);
-        }
-        Mojo mojo = lookupMojo(coord, pluginConfiguration, descriptor);
-        return mojo;
-    }
-
     protected String[] mojoCoordinates(String goal) throws Exception {
         if (goal.matches(".*:.*:.*:.*")) {
             return goal.split(":");
         } else {
-            Path pluginPom = Paths.get(getBasedir(), "pom.xml");
-            Xpp3Dom pluginPomDom = Xpp3DomBuilder.build(ReaderFactory.newXmlReader(pluginPom.toFile()));
+            Path pluginPom = Paths.get(getPluginBasedir(), "pom.xml");
+            Xpp3Dom pluginPomDom = Xpp3DomBuilder.build(Files.newBufferedReader(pluginPom));
             String artifactId = pluginPomDom.getChild("artifactId").getValue();
             String groupId = resolveFromRootThenParent(pluginPomDom, "groupId");
             String version = resolveFromRootThenParent(pluginPomDom, "version");
@@ -217,55 +508,11 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
         }
     }
 
-    /**
-     * lookup the mojo while we have all the relevent information
-     */
-    protected Mojo lookupMojo(String[] coord, XmlNode pluginConfiguration, PluginDescriptor descriptor)
-            throws Exception {
-        // pluginkey = groupId : artifactId : version : goal
-        Mojo mojo = lookup(Mojo.class, coord[0] + ":" + coord[1] + ":" + coord[2] + ":" + coord[3]);
-        for (MojoDescriptor mojoDescriptor : descriptor.getMojos()) {
-            if (Objects.equals(
-                    mojoDescriptor.getImplementation(), mojo.getClass().getName())) {
-                if (pluginConfiguration != null) {
-                    pluginConfiguration = finalizeConfig(pluginConfiguration, mojoDescriptor);
-                }
-            }
-        }
-        if (pluginConfiguration != null) {
-            Session session = getContainer().lookup(Session.class);
-            Project project;
-            try {
-                project = getContainer().lookup(Project.class);
-            } catch (ComponentLookupException e) {
-                project = null;
-            }
-            org.apache.maven.plugin.MojoExecution mojoExecution;
-            try {
-                MojoExecution me = getContainer().lookup(MojoExecution.class);
-                mojoExecution = new org.apache.maven.plugin.MojoExecution(
-                        new org.apache.maven.model.Plugin(me.getPlugin()), me.getGoal(), me.getExecutionId());
-            } catch (ComponentLookupException e) {
-                mojoExecution = null;
-            }
-            ExpressionEvaluator evaluator = new WrapEvaluator(
-                    getContainer(), new PluginParameterExpressionEvaluatorV4(session, project, mojoExecution));
-            ComponentConfigurator configurator = new EnhancedComponentConfigurator();
-            configurator.configureComponent(
-                    mojo,
-                    new XmlPlexusConfiguration(new Xpp3Dom(pluginConfiguration)),
-                    evaluator,
-                    getContainer().getContainerRealm());
-        }
-
-        return mojo;
-    }
-
     private XmlNode finalizeConfig(XmlNode config, MojoDescriptor mojoDescriptor) {
         List<XmlNode> children = new ArrayList<>();
         if (mojoDescriptor != null && mojoDescriptor.getParameters() != null) {
-            XmlNode defaultConfiguration =
-                    MojoDescriptorCreator.convert(mojoDescriptor).getDom();
+            XmlNode defaultConfiguration;
+            defaultConfiguration = MojoDescriptorCreator.convert(mojoDescriptor);
             for (Parameter parameter : mojoDescriptor.getParameters()) {
                 XmlNode parameterConfiguration = config.getChild(parameter.getName());
                 if (parameterConfiguration == null) {
@@ -275,10 +522,10 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
                 parameterConfiguration = XmlNode.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 if (parameterConfiguration != null) {
                     Map<String, String> attributes = new HashMap<>(parameterConfiguration.getAttributes());
-                    if (isEmpty(parameterConfiguration.getAttribute("implementation"))
-                            && !isEmpty(parameter.getImplementation())) {
-                        attributes.put("implementation", parameter.getImplementation());
-                    }
+                    // if (isEmpty(parameterConfiguration.getAttribute("implementation"))
+                    //         && !isEmpty(parameter.getImplementation())) {
+                    //     attributes.put("implementation", parameter.getImplementation());
+                    // }
                     parameterConfiguration = new XmlNodeImpl(
                             parameter.getName(),
                             parameterConfiguration.getValue(),
@@ -380,18 +627,18 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
     public static void setVariableValueToObject(Object object, String variable, Object value)
             throws IllegalAccessException {
         Field field = ReflectionUtils.getFieldByNameIncludingSuperclasses(variable, object.getClass());
-        Objects.requireNonNull(field, "Field " + variable + " not found");
+        requireNonNull(field, "Field " + variable + " not found");
         field.setAccessible(true);
         field.set(object, value);
     }
 
     static class WrapEvaluator implements TypeAwareExpressionEvaluator {
 
-        private final PlexusContainer container;
+        private final Injector injector;
         private final TypeAwareExpressionEvaluator evaluator;
 
-        WrapEvaluator(PlexusContainer container, TypeAwareExpressionEvaluator evaluator) {
-            this.container = container;
+        WrapEvaluator(Injector injector, TypeAwareExpressionEvaluator evaluator) {
+            this.injector = injector;
             this.evaluator = evaluator;
         }
 
@@ -407,8 +654,8 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
                 String expr = stripTokens(expression);
                 if (expr != null) {
                     try {
-                        value = container.lookup(type, expr);
-                    } catch (ComponentLookupException e) {
+                        value = injector.getInstance(Key.of(type, expr));
+                    } catch (DIException e) {
                         // nothing
                     }
                 }
@@ -428,4 +675,35 @@ public class MojoExtension extends PlexusExtension implements ParameterResolver 
             return evaluator.alignToBaseDirectory(path);
         }
     }
+
+    /*
+    private Scope getScopeInstanceOrNull(final Injector injector, final Binding<?> binding) {
+        return binding.acceptScopingVisitor(new DefaultBindingScopingVisitor<Scope>() {
+
+            @Override
+            public Scope visitScopeAnnotation(Class<? extends Annotation> scopeAnnotation) {
+                throw new RuntimeException(String.format(
+                        "I don't know how to handle the scopeAnnotation: %s", scopeAnnotation.getCanonicalName()));
+            }
+
+            @Override
+            public Scope visitNoScoping() {
+                if (binding instanceof LinkedKeyBinding) {
+                    Binding<?> childBinding = injector.getBinding(((LinkedKeyBinding) binding).getLinkedKey());
+                    return getScopeInstanceOrNull(injector, childBinding);
+                }
+                return null;
+            }
+
+            @Override
+            public Scope visitEagerSingleton() {
+                return Scopes.SINGLETON;
+            }
+
+            public Scope visitScope(Scope scope) {
+                return scope;
+            }
+        });
+    }*/
+
 }

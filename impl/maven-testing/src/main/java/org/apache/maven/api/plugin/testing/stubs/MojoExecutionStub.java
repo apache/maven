@@ -21,24 +21,28 @@ package org.apache.maven.api.plugin.testing.stubs;
 import java.util.Optional;
 
 import org.apache.maven.api.MojoExecution;
-import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.Plugin;
+import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.xml.XmlNode;
 
 /**
  * Stub for {@link MojoExecution}.
  */
 public class MojoExecutionStub implements MojoExecution {
-    private final String artifactId;
-    private final String executionId;
-    private final String goal;
-    private final XmlNode dom;
+    private String executionId;
+    private String goal;
+    private XmlNode dom;
+    private Plugin plugin = new PluginStub();
+    private PluginExecution model;
+    private MojoDescriptor descriptor;
+    private String lifecyclePhase;
 
-    public MojoExecutionStub(String artifactId, String executionId, String goal) {
-        this(artifactId, executionId, goal, null);
+    public MojoExecutionStub(String executionId, String goal) {
+        this(executionId, goal, null);
     }
 
-    public MojoExecutionStub(String artifactId, String executionId, String goal, XmlNode dom) {
-        this.artifactId = artifactId;
+    public MojoExecutionStub(String executionId, String goal, XmlNode dom) {
         this.executionId = executionId;
         this.goal = goal;
         this.dom = dom;
@@ -46,7 +50,22 @@ public class MojoExecutionStub implements MojoExecution {
 
     @Override
     public Plugin getPlugin() {
-        return Plugin.newBuilder().artifactId(artifactId).build();
+        return plugin;
+    }
+
+    @Override
+    public PluginExecution getModel() {
+        return model;
+    }
+
+    @Override
+    public MojoDescriptor getDescriptor() {
+        return descriptor;
+    }
+
+    @Override
+    public String getLifecyclePhase() {
+        return lifecyclePhase;
     }
 
     @Override
@@ -62,5 +81,33 @@ public class MojoExecutionStub implements MojoExecution {
     @Override
     public Optional<XmlNode> getConfiguration() {
         return Optional.ofNullable(dom);
+    }
+
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
+
+    public void setGoal(String goal) {
+        this.goal = goal;
+    }
+
+    public void setDom(XmlNode dom) {
+        this.dom = dom;
+    }
+
+    public void setPlugin(Plugin plugin) {
+        this.plugin = plugin;
+    }
+
+    public void setModel(PluginExecution model) {
+        this.model = model;
+    }
+
+    public void setDescriptor(MojoDescriptor descriptor) {
+        this.descriptor = descriptor;
+    }
+
+    public void setLifecyclePhase(String lifecyclePhase) {
+        this.lifecyclePhase = lifecyclePhase;
     }
 }
