@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.transformation;
+package org.apache.maven.internal.transformation.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,8 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.DefaultModelBuilderFactory;
-import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.project.MavenProject;
@@ -41,8 +39,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class ConsumerPomArtifactTransformerTest {
-
-    ModelBuilder modelBuilder = new DefaultModelBuilderFactory().newInstance();
 
     @Test
     void transform() throws Exception {
@@ -60,9 +56,13 @@ class ConsumerPomArtifactTransformerTest {
         try (InputStream expected = Files.newInputStream(beforePomFile)) {
             Model model = new Model(new MavenStaxReader().read(expected));
             MavenProject project = new MavenProject(model);
-            ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer(modelBuilder);
-            t.createConsumerPomArtifact(project, tempFile, systemSessionMock)
-                    .transform(beforePomFile, tempFile, model.getDelegate());
+            DefaultConsumerPomArtifactTransformer t = new DefaultConsumerPomArtifactTransformer((s, p, f) -> {
+                try (InputStream is = Files.newInputStream(f)) {
+                    return DefaultConsumerPomBuilder.transform(new MavenStaxReader().read(is));
+                }
+            });
+
+            t.transform(project, systemSessionMock, beforePomFile, tempFile);
         }
         XmlAssert.assertThat(afterPomFile.toFile()).and(tempFile.toFile()).areIdentical();
     }
@@ -76,7 +76,8 @@ class ConsumerPomArtifactTransformerTest {
         when(systemSessionMock.getData()).thenReturn(sessionDataMock);
         when(sessionDataMock.get(any())).thenReturn(new NoTransformerContext());
 
-        new ConsumerPomArtifactTransformer(modelBuilder).injectTransformedArtifacts(emptyProject, systemSessionMock);
+        new DefaultConsumerPomArtifactTransformer((session, project, src) -> null)
+                .injectTransformedArtifacts(systemSessionMock, emptyProject);
 
         assertThat(emptyProject.getAttachedArtifacts()).isEmpty();
     }
