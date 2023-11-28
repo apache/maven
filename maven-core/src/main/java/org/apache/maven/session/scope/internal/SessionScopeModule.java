@@ -55,8 +55,14 @@ public class SessionScopeModule extends AbstractModule {
         bindScope(org.apache.maven.api.di.SessionScoped.class, scope);
         bind(SessionScope.class).toInstance(scope);
 
-        bind(MavenSession.class).toProvider(SessionScope.seededKeyProvider()).in(scope);
-        bind(Session.class).toProvider(SessionScope.seededKeyProvider()).in(scope);
-        bind(InternalSession.class).toProvider(SessionScope.seededKeyProvider()).in(scope);
+        bind(MavenSession.class)
+                .toProvider(SessionScope.seededKeyProvider(MavenSession.class))
+                .in(scope);
+        bind(Session.class)
+                .toProvider(SessionScope.seededKeyProvider(Session.class))
+                .in(scope);
+        bind(InternalSession.class)
+                .toProvider(SessionScope.seededKeyProvider(InternalSession.class))
+                .in(scope);
     }
 }

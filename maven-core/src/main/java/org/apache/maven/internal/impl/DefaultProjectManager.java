@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
@@ -39,6 +38,7 @@ import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.Scope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ProjectManager;
@@ -47,8 +47,10 @@ import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.eclipse.sisu.Typed;
 
 @Named
+@Typed
 @SessionScoped
 public class DefaultProjectManager implements ProjectManager {
 
