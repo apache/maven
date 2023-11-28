@@ -447,7 +447,7 @@ public class MavenCli {
         }
 
         if (cliRequest.rootDirectory == null) {
-            slf4jLogger.debug(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
+            slf4jLogger.info(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
         }
     }
 
