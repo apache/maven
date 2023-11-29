@@ -139,6 +139,8 @@ under the License.
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
@@ -147,11 +149,6 @@ under the License.
     <dependency>
       <groupId>commons-jxpath</groupId>
       <artifactId>commons-jxpath</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-inline</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -172,6 +169,12 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-testing</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${mockitoVersion}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

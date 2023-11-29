@@ -16,31 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.artifact.handler.providers;
+package org.apache.maven.internal.impl.types;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.Type;
+import org.apache.maven.internal.impl.DefaultDependencyProperties;
+import org.apache.maven.internal.impl.DefaultType;
 
-/**
- * {@code jar} artifact handler provider.
- */
-@Named("jar")
+@Named(WarTypeProvider.NAME)
 @Singleton
-public class JarArtifactHandlerProvider implements Provider<ArtifactHandler> {
-    private final ArtifactHandler artifactHandler;
+public class WarTypeProvider implements Provider<Type> {
+    public static final String NAME = "war";
 
-    @Inject
-    public JarArtifactHandlerProvider() {
-        this.artifactHandler = new DefaultArtifactHandler("jar", null, null, null, null, false, "java", true);
+    private final Type type;
+
+    public WarTypeProvider() {
+        this.type = new DefaultType(
+                NAME, "war", null, new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
     }
 
     @Override
-    public ArtifactHandler get() {
-        return artifactHandler;
+    public Type get() {
+        return type;
     }
 }

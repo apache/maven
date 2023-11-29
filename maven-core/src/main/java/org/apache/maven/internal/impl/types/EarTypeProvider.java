@@ -16,31 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.artifact.handler.providers;
+package org.apache.maven.internal.impl.types;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.Type;
+import org.apache.maven.internal.impl.DefaultDependencyProperties;
+import org.apache.maven.internal.impl.DefaultType;
 
-/**
- * {@code pom} artifact handler provider.
- */
-@Named("pom")
+@Named(EarTypeProvider.NAME)
 @Singleton
-public class PomArtifactHandlerProvider implements Provider<ArtifactHandler> {
-    private final ArtifactHandler artifactHandler;
+public class EarTypeProvider implements Provider<Type> {
+    public static final String NAME = "ear";
 
-    @Inject
-    public PomArtifactHandlerProvider() {
-        this.artifactHandler = new DefaultArtifactHandler("pom", null, null, null, null, false, "none", false);
+    private final Type type;
+
+    public EarTypeProvider() {
+        this.type = new DefaultType(
+                NAME, "ear", null, new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
     }
 
     @Override
-    public ArtifactHandler get() {
-        return artifactHandler;
+    public Type get() {
+        return type;
     }
 }

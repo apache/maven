@@ -16,31 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.artifact.handler.providers;
+package org.apache.maven.internal.impl.types;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.Type;
+import org.apache.maven.internal.impl.DefaultDependencyProperties;
+import org.apache.maven.internal.impl.DefaultType;
 
-/**
- * {@code javadoc} artifact handler provider.
- */
-@Named("javadoc")
+@Named(JavadocTypeProvider.NAME)
 @Singleton
-public class JavadocArtifactHandlerProvider implements Provider<ArtifactHandler> {
-    private final ArtifactHandler artifactHandler;
+public class JavadocTypeProvider implements Provider<Type> {
+    public static final String NAME = "javadoc";
 
-    @Inject
-    public JavadocArtifactHandlerProvider() {
-        this.artifactHandler = new DefaultArtifactHandler("javadoc", "jar", "javadoc", null, null, false, "java", true);
+    private final Type type;
+
+    public JavadocTypeProvider() {
+        this.type = new DefaultType(
+                NAME,
+                "jar",
+                "javadoc",
+                new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
     }
 
     @Override
-    public ArtifactHandler get() {
-        return artifactHandler;
+    public Type get() {
+        return type;
     }
 }

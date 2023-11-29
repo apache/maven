@@ -80,6 +80,12 @@ public interface XmlNode {
     @Nonnull
     String getName();
 
+    @Nonnull
+    String getNamespaceUri();
+
+    @Nonnull
+    String getPrefix();
+
     @Nullable
     String getValue();
 
@@ -103,8 +109,6 @@ public interface XmlNode {
     }
 
     XmlNode merge(@Nullable XmlNode source, @Nullable Boolean childMergeOverride);
-
-    XmlNode clone();
 
     /**
      * Merge recessive into dominant and return either {@code dominant}

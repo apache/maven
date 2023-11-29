@@ -16,15 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.transfer;
+package org.apache.maven.internal.impl.types;
 
-import java.io.PrintStream;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
-/**
- * BatchModeMavenTransferListener
- */
-public class BatchModeMavenTransferListener extends AbstractMavenTransferListener {
-    public BatchModeMavenTransferListener(PrintStream out) {
-        super(out);
+import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.Type;
+import org.apache.maven.internal.impl.DefaultDependencyProperties;
+import org.apache.maven.internal.impl.DefaultType;
+
+@Named(EjbTypeProvider.NAME)
+@Singleton
+public class EjbTypeProvider implements Provider<Type> {
+    public static final String NAME = "ejb";
+
+    private final Type type;
+
+    public EjbTypeProvider() {
+        this.type = new DefaultType(
+                NAME, "jar", null, new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
+    }
+
+    @Override
+    public Type get() {
+        return type;
     }
 }

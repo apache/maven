@@ -51,8 +51,8 @@ public class XmlNodeBuilder {
      * @param locationBuilder the builder
      * @since 3.2.0
      * @return DOM
-     * @throws XmlPullParserException xml exception
-     * @throws IOException io
+     * @throws XmlPullParserException XML well-formedness error
+     * @throws IOException I/O error reading file or stream
      */
     public static XmlNodeImpl build(Reader reader, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
@@ -80,8 +80,8 @@ public class XmlNodeBuilder {
      * @param locationBuilder the builder
      * @since 3.2.0
      * @return DOM
-     * @throws XmlPullParserException xml exception
-     * @throws IOException io
+     * @throws XmlPullParserException XML well-formedness error
+     * @throws IOException I/O error reading file or stream
      */
     public static XmlNodeImpl build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
@@ -104,8 +104,8 @@ public class XmlNodeBuilder {
      * @param parser the parser
      * @param trim do trim
      * @return DOM
-     * @throws XmlPullParserException xml exception
-     * @throws IOException io
+     * @throws XmlPullParserException XML well-formedness error
+     * @throws IOException I/O error reading file or stream
      */
     public static XmlNodeImpl build(XmlPullParser parser, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
@@ -176,8 +176,10 @@ public class XmlNodeBuilder {
     public static XmlNodeImpl build(XMLStreamReader parser, boolean trim, InputLocationBuilderStax locationBuilder)
             throws XMLStreamException {
         boolean spacePreserve = false;
-        String name = null;
-        String value = null;
+        String lPrefix = null;
+        String lNamespaceUri = null;
+        String lName = null;
+        String lValue = null;
         Object location = null;
         Map<String, String> attrs = null;
         List<XmlNode> children = null;
@@ -187,31 +189,29 @@ public class XmlNodeBuilder {
             if (eventType == XMLStreamReader.START_ELEMENT) {
                 lastStartTag = parser.getLocation().getLineNumber() * 1000
                         + parser.getLocation().getColumnNumber();
-                if (name == null) {
+                if (lName == null) {
                     int namespacesSize = parser.getNamespaceCount();
-                    name = parser.getLocalName();
-                    String pfx = parser.getPrefix();
-                    if (pfx != null && !pfx.isEmpty()) {
-                        name = pfx + ":" + name;
-                    }
+                    lPrefix = parser.getPrefix();
+                    lNamespaceUri = parser.getNamespaceURI();
+                    lName = parser.getLocalName();
                     location = locationBuilder != null ? locationBuilder.toInputLocation(parser) : null;
                     int attributesSize = parser.getAttributeCount();
                     if (attributesSize > 0 || namespacesSize > 0) {
                         attrs = new HashMap<>();
                         for (int i = 0; i < namespacesSize; i++) {
-                            String prefix = parser.getNamespacePrefix(i);
-                            String namespace = parser.getNamespaceURI(i);
-                            attrs.put("xmlns:" + prefix, namespace);
+                            String nsPrefix = parser.getNamespacePrefix(i);
+                            String nsUri = parser.getNamespaceURI(i);
+                            attrs.put(nsPrefix != null && !nsPrefix.isEmpty() ? "xmlns:" + nsPrefix : "xmlns", nsUri);
                         }
                         for (int i = 0; i < attributesSize; i++) {
-                            String aname = parser.getAttributeLocalName(i);
-                            String avalue = parser.getAttributeValue(i);
-                            String apfx = parser.getAttributePrefix(i);
-                            if (apfx != null && !apfx.isEmpty()) {
-                                aname = apfx + ":" + aname;
+                            String aName = parser.getAttributeLocalName(i);
+                            String aValue = parser.getAttributeValue(i);
+                            String aPrefix = parser.getAttributePrefix(i);
+                            if (aPrefix != null && !aPrefix.isEmpty()) {
+                                aName = aPrefix + ":" + aName;
                             }
-                            attrs.put(aname, avalue);
-                            spacePreserve = spacePreserve || ("xml:space".equals(aname) && "preserve".equals(avalue));
+                            attrs.put(aName, aValue);
+                            spacePreserve = spacePreserve || ("xml:space".equals(aName) && "preserve".equals(aValue));
                         }
                     }
                 } else {
@@ -223,17 +223,19 @@ public class XmlNodeBuilder {
                 }
             } else if (eventType == XMLStreamReader.CHARACTERS || eventType == XMLStreamReader.CDATA) {
                 String text = parser.getText();
-                value = value != null ? value + text : text;
+                lValue = lValue != null ? lValue + text : text;
             } else if (eventType == XMLStreamReader.END_ELEMENT) {
                 boolean emptyTag = lastStartTag
                         == parser.getLocation().getLineNumber() * 1000
                                 + parser.getLocation().getColumnNumber();
-                if (value != null && trim && !spacePreserve) {
-                    value = value.trim();
+                if (lValue != null && trim && !spacePreserve) {
+                    lValue = lValue.trim();
                 }
                 return new XmlNodeImpl(
-                        name,
-                        children == null ? (value != null ? value : emptyTag ? null : "") : null,
+                        lPrefix,
+                        lNamespaceUri,
+                        lName,
+                        children == null ? (lValue != null ? lValue : emptyTag ? null : "") : null,
                         attrs,
                         children,
                         location);

@@ -36,6 +36,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -73,8 +74,8 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,9 +215,9 @@ public class DefaultMaven implements Maven {
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        try {
-            DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) newRepositorySession(request);
-            MavenSession session = new MavenSession(container, repoSession, request, result);
+        try (CloseableSession closeableSession = newCloseableSession(request)) {
+            AtomicReference<CloseableSession> closeableSessionRef = new AtomicReference<>(closeableSession);
+            MavenSession session = new MavenSession(closeableSessionRef::get, request, result);
             session.setSession(defaultSessionFactory.getSession(session));
 
             sessionScope.seed(MavenSession.class, session);
@@ -225,7 +226,7 @@ public class DefaultMaven implements Maven {
 
             legacySupport.setSession(session);
 
-            return doExecute(request, session, result, repoSession);
+            return doExecute(request, session, result, closeableSessionRef);
         } finally {
             sessionScope.exit();
         }
@@ -235,7 +236,7 @@ public class DefaultMaven implements Maven {
             MavenExecutionRequest request,
             MavenSession session,
             MavenExecutionResult result,
-            DefaultRepositorySystemSession repoSession) {
+            AtomicReference<CloseableSession> closeableSessionRef) {
         try {
             afterSessionStart(session);
         } catch (MavenExecutionException e) {
@@ -244,7 +245,11 @@ public class DefaultMaven implements Maven {
 
         try {
             WorkspaceReader reactorReader = container.lookup(WorkspaceReader.class, ReactorReader.HINT);
-            repoSession.setWorkspaceReader(reactorReader);
+            closeableSessionRef.set(closeableSessionRef
+                    .get()
+                    .copy()
+                    .setWorkspaceReader(reactorReader)
+                    .build());
         } catch (ComponentLookupException e) {
             return addExceptionToResult(result, e);
         }
@@ -265,11 +270,10 @@ public class DefaultMaven implements Maven {
         }
 
         try {
-            setupWorkspaceReader(session, repoSession);
+            closeableSessionRef.set(setupWorkspaceReader(session, closeableSessionRef.get()));
         } catch (ComponentLookupException e) {
             return addExceptionToResult(result, e);
         }
-        repoSession.setReadOnly();
         try {
             afterProjectsRead(session);
         } catch (MavenExecutionException e) {
@@ -336,7 +340,7 @@ public class DefaultMaven implements Maven {
         return result;
     }
 
-    private void setupWorkspaceReader(MavenSession session, DefaultRepositorySystemSession repoSession)
+    private CloseableSession setupWorkspaceReader(MavenSession session, CloseableSession repoSession)
             throws ComponentLookupException {
         // Desired order of precedence for workspace readers before querying the local artifact repositories
         Set<WorkspaceReader> workspaceReaders = new LinkedHashSet<>();
@@ -350,7 +354,10 @@ public class DefaultMaven implements Maven {
         }
         // 3) .. n) Project-scoped workspace readers
         workspaceReaders.addAll(getProjectScopedExtensionComponents(session.getProjects(), WorkspaceReader.class));
-        repoSession.setWorkspaceReader(MavenChainedWorkspaceReader.of(workspaceReaders));
+        return repoSession
+                .copy()
+                .setWorkspaceReader(MavenChainedWorkspaceReader.of(workspaceReaders))
+                .build();
     }
 
     private void afterSessionStart(MavenSession session) throws MavenExecutionException {
@@ -404,8 +411,18 @@ public class DefaultMaven implements Maven {
         }
     }
 
+    /**
+     * Nobody should ever use this method.
+     *
+     * @deprecated If you use this method and your code is not in Maven Core, stop doing this.
+     */
+    @Deprecated
     public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
-        return repositorySessionFactory.newRepositorySession(request);
+        return newCloseableSession(request);
+    }
+
+    private CloseableSession newCloseableSession(MavenExecutionRequest request) {
+        return repositorySessionFactory.newRepositorySessionBuilder(request).build();
     }
 
     private void validateLocalRepository(MavenExecutionRequest request) throws IOException {

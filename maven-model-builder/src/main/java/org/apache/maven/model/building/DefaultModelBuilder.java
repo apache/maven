@@ -1045,7 +1045,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    private Model readFileModel(ModelBuildingRequest request, DefaultModelProblemCollector problems)
+    Model readFileModel(ModelBuildingRequest request, DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         ModelSource modelSource = request.getModelSource();
         org.apache.maven.api.model.Model model = cache(

@@ -97,6 +97,7 @@ public interface XmlFactory<T> extends Service {
      * @throws XmlReaderException if an error occurs during the parsing
      * @see #toXmlString(Object)
      */
+    @Nonnull
     default T fromXmlString(@Nonnull String xml) throws XmlReaderException {
         return read(new StringReader(xml));
     }
@@ -109,6 +110,7 @@ public interface XmlFactory<T> extends Service {
      * @throws XmlWriterException if an error occurs during the transformation
      * @see #fromXmlString(String)
      */
+    @Nonnull
     default String toXmlString(@Nonnull T content) throws XmlWriterException {
         StringWriter sw = new StringWriter();
         write(content, sw);

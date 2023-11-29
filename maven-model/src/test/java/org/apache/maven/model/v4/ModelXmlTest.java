@@ -27,9 +27,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.xml.XmlNode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ModelXmlTest {
 
@@ -48,6 +52,38 @@ class ModelXmlTest {
             String newStr = toXml(fromXml(xml));
             assertEquals(newStr, xml);
         }
+    }
+
+    @Test
+    void testNamespaceInXmlNode() throws XMLStreamException {
+        String xml = "<project xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                + "         xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
+                + "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/POM/4.0.0\">\n"
+                + "  <build>\n"
+                + "    <plugins>\n"
+                + "      <plugin>\n"
+                + "         <m:configuration xmlns:m=\"http://maven.apache.org/POM/4.0.0\" xmlns=\"http://fabric8.io/fabric8-maven-plugin\">\n"
+                + "             <myConfig>foo</myConfig>\n"
+                + "         </m:configuration>\n"
+                + "      </plugin>\n"
+                + "    </plugins>\n"
+                + "  </build>\n"
+                + "</project>";
+
+        Model model = fromXml(xml);
+        Plugin plugin = model.getBuild().getPlugins().get(0);
+        XmlNode node = plugin.getConfiguration();
+        assertNotNull(node);
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.getNamespaceUri());
+        assertEquals("m", node.getPrefix());
+        assertEquals("configuration", node.getName());
+        assertEquals(1, node.getChildren().size());
+        XmlNode myConfig = node.getChildren().get(0);
+        assertEquals("http://fabric8.io/fabric8-maven-plugin", myConfig.getNamespaceUri());
+        assertEquals("", myConfig.getPrefix());
+        assertEquals("myConfig", myConfig.getName());
+        String config = node.toString();
+        assertFalse(config.isEmpty());
     }
 
     String toXml(Model model) throws IOException, XMLStreamException {

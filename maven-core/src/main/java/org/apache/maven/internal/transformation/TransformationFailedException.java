@@ -16,31 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.artifact.handler.providers;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+package org.apache.maven.internal.transformation;
 
 /**
- * {@code bom} artifact handler provider.
+ * Exception that may be thrown by the {@link org.apache.maven.artifact.Artifact#getFile()}
+ * implementation.
  */
-@Named("bom")
-@Singleton
-public class BomArtifactHandlerProvider implements Provider<ArtifactHandler> {
-    private final ArtifactHandler artifactHandler;
+public class TransformationFailedException extends RuntimeException {
 
-    @Inject
-    public BomArtifactHandlerProvider() {
-        this.artifactHandler = new DefaultArtifactHandler("pom", null, null, null, null, false, "none", false);
-    }
-
-    @Override
-    public ArtifactHandler get() {
-        return artifactHandler;
+    public TransformationFailedException(Throwable cause) {
+        super(cause);
     }
 }

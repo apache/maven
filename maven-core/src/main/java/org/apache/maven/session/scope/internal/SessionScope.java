@@ -18,11 +18,16 @@
  */
 package org.apache.maven.session.scope.internal;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
@@ -89,7 +94,47 @@ public class SessionScope implements Scope {
 
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
         // Lazy evaluating provider
-        return () -> getScopeState().scope(key, unscoped).get();
+        return () -> {
+            if (values.isEmpty()) {
+                return createProxy(key, unscoped);
+            } else {
+                return getScopeState().scope(key, unscoped).get();
+            }
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T createProxy(Key<T> key, Provider<T> unscoped) {
+        InvocationHandler dispatcher = (proxy, method, args) -> {
+            method.setAccessible(true);
+            return method.invoke(getScopeState().scope(key, unscoped).get(), args);
+        };
+        Class<T> superType = (Class<T>) key.getTypeLiteral().getRawType();
+        for (Annotation a : superType.getAnnotations()) {
+            Class<? extends Annotation> annotationType = a.annotationType();
+            if ("org.eclipse.sisu.Typed".equals(annotationType.getName())
+                    || "javax.enterprise.inject.Typed".equals(annotationType.getName())) {
+                try {
+                    Class<?>[] value =
+                            (Class<?>[]) annotationType.getMethod("value").invoke(a);
+                    if (value.length == 0) {
+                        value = superType.getInterfaces();
+                    }
+                    List<Class<?>> nonInterfaces =
+                            Stream.of(value).filter(c -> !c.isInterface()).collect(Collectors.toList());
+                    if (!nonInterfaces.isEmpty()) {
+                        throw new IllegalArgumentException(
+                                "The Typed annotation must contain only interfaces but the following types are not: "
+                                        + nonInterfaces);
+                    }
+                    return (T) java.lang.reflect.Proxy.newProxyInstance(superType.getClassLoader(), value, dispatcher);
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        }
+        throw new IllegalArgumentException("The use of session scoped proxies require "
+                + "a org.eclipse.sisu.Typed or javax.enterprise.inject.Typed annotation");
     }
 
     /**

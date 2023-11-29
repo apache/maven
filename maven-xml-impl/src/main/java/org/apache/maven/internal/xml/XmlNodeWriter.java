@@ -18,49 +18,142 @@
  */
 package org.apache.maven.internal.xml;
 
-import java.io.PrintWriter;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import java.io.Writer;
 import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
-import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
-import org.codehaus.plexus.util.xml.XMLWriter;
+import org.codehaus.stax2.util.StreamWriterDelegate;
 
 /**
  *
  */
 public class XmlNodeWriter {
-    public static void write(Writer writer, XmlNode dom) {
-        write(new PrettyPrintXMLWriter(writer), dom);
+    public static void write(Writer writer, XmlNode dom) throws XMLStreamException {
+        XMLOutputFactory factory = new com.ctc.wstx.stax.WstxOutputFactory();
+        factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
+        factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_USE_DOUBLE_QUOTES_IN_XML_DECL, true);
+        factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_ADD_SPACE_AFTER_EMPTY_ELEM, true);
+        XMLStreamWriter serializer = new IndentingXMLStreamWriter(factory.createXMLStreamWriter(writer));
+        write(serializer, dom);
+        serializer.close();
     }
 
-    public static void write(PrintWriter writer, XmlNode dom) {
-        write(new PrettyPrintXMLWriter(writer), dom);
-    }
-
-    public static void write(XMLWriter xmlWriter, XmlNode dom) {
-        write(xmlWriter, dom, true);
-    }
-
-    public static void write(XMLWriter xmlWriter, XmlNode dom, boolean escape) {
-        // TODO: move to XMLWriter?
-        xmlWriter.startElement(dom.getName());
+    public static void write(XMLStreamWriter xmlWriter, XmlNode dom) throws XMLStreamException {
+        xmlWriter.writeStartElement(dom.getPrefix(), dom.getName(), dom.getNamespaceUri());
         for (Map.Entry<String, String> attr : dom.getAttributes().entrySet()) {
-            xmlWriter.addAttribute(attr.getKey(), attr.getValue());
+            xmlWriter.writeAttribute(attr.getKey(), attr.getValue());
         }
         for (XmlNode aChildren : dom.getChildren()) {
-            write(xmlWriter, aChildren, escape);
+            write(xmlWriter, aChildren);
         }
-
         String value = dom.getValue();
         if (value != null) {
-            if (escape) {
-                xmlWriter.writeText(value);
-            } else {
-                xmlWriter.writeMarkup(value);
-            }
+            xmlWriter.writeCharacters(value);
+        }
+        xmlWriter.writeEndElement();
+    }
+
+    static class IndentingXMLStreamWriter extends StreamWriterDelegate {
+
+        int depth = 0;
+        boolean hasChildren = false;
+        boolean anew = true;
+
+        IndentingXMLStreamWriter(XMLStreamWriter parent) {
+            super(parent);
         }
 
-        xmlWriter.endElement();
+        @Override
+        public void writeStartDocument() throws XMLStreamException {
+            super.writeStartDocument();
+            anew = false;
+        }
+
+        @Override
+        public void writeStartDocument(String version) throws XMLStreamException {
+            super.writeStartDocument(version);
+            anew = false;
+        }
+
+        @Override
+        public void writeStartDocument(String encoding, String version) throws XMLStreamException {
+            super.writeStartDocument(encoding, version);
+            anew = false;
+        }
+
+        @Override
+        public void writeEmptyElement(String localName) throws XMLStreamException {
+            indent();
+            super.writeEmptyElement(localName);
+            hasChildren = true;
+            anew = false;
+        }
+
+        @Override
+        public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
+            indent();
+            super.writeEmptyElement(namespaceURI, localName);
+            hasChildren = true;
+            anew = false;
+        }
+
+        @Override
+        public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+            indent();
+            super.writeEmptyElement(prefix, localName, namespaceURI);
+            hasChildren = true;
+            anew = false;
+        }
+
+        @Override
+        public void writeStartElement(String localName) throws XMLStreamException {
+            indent();
+            super.writeStartElement(localName);
+            depth++;
+            hasChildren = false;
+            anew = false;
+        }
+
+        @Override
+        public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
+            indent();
+            super.writeStartElement(namespaceURI, localName);
+            depth++;
+            hasChildren = false;
+            anew = false;
+        }
+
+        @Override
+        public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+            indent();
+            super.writeStartElement(prefix, localName, namespaceURI);
+            depth++;
+            hasChildren = false;
+            anew = false;
+        }
+
+        @Override
+        public void writeEndElement() throws XMLStreamException {
+            depth--;
+            if (hasChildren) {
+                indent();
+            }
+            super.writeEndElement();
+            hasChildren = true;
+            anew = false;
+        }
+
+        private void indent() throws XMLStreamException {
+            if (!anew) {
+                super.writeCharacters("\n");
+            }
+            for (int i = 0; i < depth; i++) {
+                super.writeCharacters("  ");
+            }
+        }
     }
 }

@@ -213,8 +213,8 @@ public class DefaultSession extends AbstractSession {
 
         RepositorySystemSession repoSession =
                 new DefaultRepositorySystemSession(session).setLocalRepositoryManager(localRepositoryManager);
-        MavenSession newSession = new MavenSession(
-                mavenSession.getContainer(), repoSession, mavenSession.getRequest(), mavenSession.getResult());
+        MavenSession newSession =
+                new MavenSession(() -> repoSession, mavenSession.getRequest(), mavenSession.getResult());
         return new DefaultSession(
                 newSession, repositorySystem, repositories, mavenRepositorySystem, container, runtimeInformation);
     }

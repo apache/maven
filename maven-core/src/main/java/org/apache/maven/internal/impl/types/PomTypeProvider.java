@@ -16,32 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.artifact.handler.providers;
+package org.apache.maven.internal.impl.types;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.api.Type;
+import org.apache.maven.internal.impl.DefaultDependencyProperties;
+import org.apache.maven.internal.impl.DefaultType;
 
-/**
- * {@code ejb-client} artifact handler provider.
- */
-@Named("ejb-client")
+@Named(PomTypeProvider.NAME)
 @Singleton
-public class EjbClientArtifactHandlerProvider implements Provider<ArtifactHandler> {
-    private final ArtifactHandler artifactHandler;
+public class PomTypeProvider implements Provider<Type> {
+    public static final String NAME = "pom";
 
-    @Inject
-    public EjbClientArtifactHandlerProvider() {
-        this.artifactHandler =
-                new DefaultArtifactHandler("ejb-client", "jar", "client", null, "ejb", false, "java", true);
+    private final Type type;
+
+    public PomTypeProvider() {
+        this.type = new DefaultType(NAME, "pom", null, new DefaultDependencyProperties());
     }
 
     @Override
-    public ArtifactHandler get() {
-        return artifactHandler;
+    public Type get() {
+        return type;
     }
 }
