@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
@@ -70,9 +72,12 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConsumerPomBuilder.class);
 
     private static final String BOM_PACKAGING = "bom";
 
@@ -88,7 +93,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
             throws ModelBuildingException, ComponentLookupException {
         Model model = project.getModel().getDelegate();
         String packaging = model.getPackaging();
-        if (POM_PACKAGING.equals(packaging)) {
+        String originalPackaging = project.getOriginalModel().getPackaging();
+        if (POM_PACKAGING.equals(packaging) && !BOM_PACKAGING.equals(originalPackaging)) {
             return buildPom(session, project, src);
         } else {
             return buildNonPom(session, project, src);
@@ -99,14 +105,14 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
             throws ModelBuildingException, ComponentLookupException {
         ModelBuildingResult result = buildModel(session, project, src);
         Model model = result.getRawModel().getDelegate();
-        return transform(model);
+        return transform(model, project);
     }
 
     protected Model buildNonPom(RepositorySystemSession session, MavenProject project, Path src)
             throws ModelBuildingException, ComponentLookupException {
         ModelBuildingResult result = buildModel(session, project, src);
         Model model = result.getEffectiveModel().getDelegate();
-        return transform(model);
+        return transform(model, project);
     }
 
     private ModelBuildingResult buildModel(RepositorySystemSession session, MavenProject project, Path src)
@@ -171,7 +177,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         return container.lookup(clazz);
     }
 
-    static Model transform(Model model) {
+    static Model transform(Model model, MavenProject project) {
         String packaging = model.getPackaging();
         if (POM_PACKAGING.equals(packaging)) {
             // raw to consumer transform
@@ -182,9 +188,34 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
 
             if (!model.isPreserveModelVersion()) {
                 model = model.withPreserveModelVersion(false);
-                String version = new MavenModelVersion().getModelVersion(model);
-                model = model.withModelVersion(version);
+                String modelVersion = new MavenModelVersion().getModelVersion(model);
+                model = model.withModelVersion(modelVersion);
             }
+        } else if (BOM_PACKAGING.equals(packaging)) {
+            DependencyManagement dependencyManagement =
+                    project.getOriginalModel().getDependencyManagement().getDelegate();
+            List<Dependency> dependencies = new ArrayList<>();
+            String version = model.getVersion();
+
+            dependencyManagement
+                    .getDependencies()
+                    .forEach((dependency) -> dependencies.add(dependency.withVersion(version)));
+            Model.Builder builder = prune(
+                    Model.newBuilder(model, true)
+                            .preserveModelVersion(false)
+                            .root(false)
+                            .parent(null)
+                            .dependencyManagement(dependencyManagement.withDependencies(dependencies))
+                            .build(null),
+                    model);
+            builder.packaging(POM_PACKAGING);
+            builder.profiles(model.getProfiles().stream()
+                    .map(p -> prune(Profile.newBuilder(p, true), p).build())
+                    .collect(Collectors.toList()));
+
+            model = builder.build();
+            String modelVersion = new MavenModelVersion().getModelVersion(model);
+            model = model.withModelVersion(modelVersion);
         } else {
             Model.Builder builder = prune(
                     Model.newBuilder(model, true)
@@ -193,16 +224,12 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                             .parent(null)
                             .build(null),
                     model);
-            boolean isBom = BOM_PACKAGING.equals(packaging);
-            if (isBom) {
-                builder.packaging(POM_PACKAGING);
-            }
             builder.profiles(model.getProfiles().stream()
                     .map(p -> prune(Profile.newBuilder(p, true), p).build())
                     .collect(Collectors.toList()));
             model = builder.build();
-            String version = new MavenModelVersion().getModelVersion(model);
-            model = model.withModelVersion(version);
+            String modelVersion = new MavenModelVersion().getModelVersion(model);
+            model = model.withModelVersion(modelVersion);
         }
         return model;
     }
