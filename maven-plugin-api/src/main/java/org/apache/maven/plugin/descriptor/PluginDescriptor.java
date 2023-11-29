@@ -141,6 +141,9 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         this.setRequiredJavaVersion(original.getRequiredJavaVersion());
         this.setPluginArtifact(null); // TODO: v4
         this.setComponents(Collections.emptyList()); // TODO: v4
+        this.setComponents(original.getMojos().stream()
+                .map(m -> new MojoDescriptor(this, m))
+                .collect(Collectors.toList()));
         this.setId(original.getId());
         this.setIsolatedRealm(original.isIsolatedRealm());
         this.setSource(null);

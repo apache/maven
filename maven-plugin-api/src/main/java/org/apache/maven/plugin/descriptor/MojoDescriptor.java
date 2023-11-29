@@ -147,6 +147,34 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
         setComponentFactory(DEFAULT_LANGUAGE);
     }
 
+    public MojoDescriptor(PluginDescriptor pd, org.apache.maven.api.plugin.descriptor.MojoDescriptor md) {
+        this();
+        this.setPluginDescriptor(pd);
+        this.setGoal(md.getGoal());
+        this.setExecuteGoal(md.getExecuteGoal());
+        this.setExecuteLifecycle(md.getExecuteLifecycle());
+        this.setExecutePhase(md.getExecutePhase());
+        this.setDeprecated(md.getDeprecated());
+        this.setLanguage(md.getLanguage());
+        this.setAggregator(md.isAggregator());
+        this.setDependencyCollectionRequired(md.getDependencyCollection());
+        this.setDependencyResolutionRequired(md.getDependencyResolution());
+        this.setComponentConfigurator(md.getConfigurator());
+        this.setInheritedByDefault(md.isInheritedByDefault());
+        this.setPhase(md.getPhase());
+        this.setOnlineRequired(md.isOnlineRequired());
+        this.setProjectRequired(md.isProjectRequired());
+        this.setSince(md.getSince());
+        this.setThreadSafe(true);
+        this.setV4Api(true);
+        this.setImplementation(md.getImplementation());
+        try {
+            this.setParameters(md.getParameters().stream().map(Parameter::new).collect(Collectors.toList()));
+        } catch (DuplicateParameterException e) {
+            throw new IllegalArgumentException(e);
+        }
+        this.mojoDescriptorV4 = md;
+    }
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------

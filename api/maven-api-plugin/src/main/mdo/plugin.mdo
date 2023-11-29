@@ -477,12 +477,6 @@ under the License.
           ]]></description>
         </field>
         <field>
-          <name>implementation</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <description></description>
-        </field>
-        <field>
           <name>description</name>
           <version>1.0.0+</version>
           <type>String</type>
