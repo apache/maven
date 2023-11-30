@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.plugin.descriptor.lifecycle.Execution;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Phase;
@@ -334,18 +333,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
 
     private XmlNode getMojoConfiguration(MojoDescriptor mojoDescriptor) {
         if (mojoDescriptor.isV4Api()) {
-            List<XmlNode> children = mojoDescriptor.getMojoDescriptorV4().getParameters().stream()
-                    .map(p -> new XmlNodeImpl(
-                            p.getName(),
-                            p.getExpression(),
-                            p.getDefaultValue() != null
-                                    ? Collections.singletonMap("default-value", p.getDefaultValue())
-                                    : null,
-                            null,
-                            null))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-            return new XmlNodeImpl("configuration", null, null, children, null);
+            return MojoDescriptorCreator.convert(mojoDescriptor.getMojoDescriptorV4());
         } else {
             return MojoDescriptorCreator.convert(mojoDescriptor).getDom();
         }

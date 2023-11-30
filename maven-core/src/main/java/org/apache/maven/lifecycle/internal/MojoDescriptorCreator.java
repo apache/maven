@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.execution.MavenSession;
@@ -89,6 +91,21 @@ public class MojoDescriptorCreator {
         }
 
         return null;
+    }
+
+    public static XmlNode convert(org.apache.maven.api.plugin.descriptor.MojoDescriptor mojoDescriptor) {
+        List<XmlNode> children = mojoDescriptor.getParameters().stream()
+                .map(p -> new XmlNodeImpl(
+                        p.getName(),
+                        p.getExpression(),
+                        p.getDefaultValue() != null
+                                ? Collections.singletonMap("default-value", p.getDefaultValue())
+                                : null,
+                        null,
+                        null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        return new XmlNodeImpl("configuration", null, null, children, null);
     }
 
     public static org.codehaus.plexus.util.xml.Xpp3Dom convert(MojoDescriptor mojoDescriptor) {
