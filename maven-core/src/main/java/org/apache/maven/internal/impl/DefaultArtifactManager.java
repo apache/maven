@@ -24,8 +24,10 @@ import javax.inject.Named;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Nonnull;
@@ -75,12 +77,10 @@ public class DefaultArtifactManager implements ArtifactManager {
     public void setPath(@Nonnull Artifact artifact, Path path) {
         String id = id(artifact);
         if (session.getMavenSession().getAllProjects() != null) {
-            for (MavenProject project : session.getMavenSession().getAllProjects()) {
-                if (id.equals(id(project.getArtifact()))) {
-                    project.getArtifact().setFile(path != null ? path.toFile() : null);
-                    break;
-                }
-            }
+            session.getMavenSession().getAllProjects().stream()
+                    .flatMap(this::getProjectArtifacts)
+                    .filter(a -> Objects.equals(id, id(a)))
+                    .forEach(a -> a.setFile(path != null ? path.toFile() : null));
         }
         if (path == null) {
             paths.remove(id);
@@ -89,10 +89,18 @@ public class DefaultArtifactManager implements ArtifactManager {
         }
     }
 
+    /**
+     * Retrieve a stream of the project's artifacts.
+     * Do not include the POM artifact as the file can't be set anyway.
+     */
+    private Stream<org.apache.maven.artifact.Artifact> getProjectArtifacts(MavenProject project) {
+        return Stream.concat(Stream.of(project.getArtifact()), project.getAttachedArtifacts().stream());
+    }
+
     private String id(org.apache.maven.artifact.Artifact artifact) {
         return artifact.getGroupId()
                 + ":" + artifact.getArtifactId()
-                + ":" + artifact.getType()
+                + ":" + artifact.getArtifactHandler().getExtension()
                 + (artifact.getClassifier() == null || artifact.getClassifier().isEmpty()
                         ? ""
                         : ":" + artifact.getClassifier())
