@@ -36,7 +36,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -215,9 +214,9 @@ public class DefaultMaven implements Maven {
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        try (CloseableSession closeableSession = newCloseableSession(request)) {
-            AtomicReference<CloseableSession> closeableSessionRef = new AtomicReference<>(closeableSession);
-            MavenSession session = new MavenSession(closeableSessionRef::get, request, result);
+        MavenChainedWorkspaceReader chainedWorkspaceReader = new MavenChainedWorkspaceReader();
+        try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
+            MavenSession session = new MavenSession(closeableSession, request, result);
             session.setSession(defaultSessionFactory.getSession(session));
 
             sessionScope.seed(MavenSession.class, session);
@@ -226,7 +225,7 @@ public class DefaultMaven implements Maven {
 
             legacySupport.setSession(session);
 
-            return doExecute(request, session, result, closeableSessionRef);
+            return doExecute(request, session, result, chainedWorkspaceReader);
         } finally {
             sessionScope.exit();
         }
@@ -236,7 +235,7 @@ public class DefaultMaven implements Maven {
             MavenExecutionRequest request,
             MavenSession session,
             MavenExecutionResult result,
-            AtomicReference<CloseableSession> closeableSessionRef) {
+            MavenChainedWorkspaceReader chainedWorkspaceReader) {
         try {
             afterSessionStart(session);
         } catch (MavenExecutionException e) {
@@ -245,11 +244,7 @@ public class DefaultMaven implements Maven {
 
         try {
             WorkspaceReader reactorReader = container.lookup(WorkspaceReader.class, ReactorReader.HINT);
-            closeableSessionRef.set(closeableSessionRef
-                    .get()
-                    .copy()
-                    .setWorkspaceReader(reactorReader)
-                    .build());
+            chainedWorkspaceReader.setReaders(Collections.singletonList(reactorReader));
         } catch (ComponentLookupException e) {
             return addExceptionToResult(result, e);
         }
@@ -270,7 +265,7 @@ public class DefaultMaven implements Maven {
         }
 
         try {
-            closeableSessionRef.set(setupWorkspaceReader(session, closeableSessionRef.get()));
+            setupWorkspaceReader(session, chainedWorkspaceReader);
         } catch (ComponentLookupException e) {
             return addExceptionToResult(result, e);
         }
@@ -340,7 +335,7 @@ public class DefaultMaven implements Maven {
         return result;
     }
 
-    private CloseableSession setupWorkspaceReader(MavenSession session, CloseableSession repoSession)
+    private void setupWorkspaceReader(MavenSession session, MavenChainedWorkspaceReader chainedWorkspaceReader)
             throws ComponentLookupException {
         // Desired order of precedence for workspace readers before querying the local artifact repositories
         Set<WorkspaceReader> workspaceReaders = new LinkedHashSet<>();
@@ -348,16 +343,14 @@ public class DefaultMaven implements Maven {
         WorkspaceReader reactorReader = container.lookup(WorkspaceReader.class, ReactorReader.HINT);
         workspaceReaders.add(reactorReader);
         // 2) Repository system session-scoped workspace reader
-        WorkspaceReader repoWorkspaceReader = repoSession.getWorkspaceReader();
-        if (repoWorkspaceReader != null && repoWorkspaceReader != reactorReader) {
-            workspaceReaders.add(repoWorkspaceReader);
+        for (WorkspaceReader repoWorkspaceReader : chainedWorkspaceReader.getReaders()) {
+            if (repoWorkspaceReader != null && repoWorkspaceReader != reactorReader) {
+                workspaceReaders.add(repoWorkspaceReader);
+            }
         }
         // 3) .. n) Project-scoped workspace readers
         workspaceReaders.addAll(getProjectScopedExtensionComponents(session.getProjects(), WorkspaceReader.class));
-        return repoSession
-                .copy()
-                .setWorkspaceReader(MavenChainedWorkspaceReader.of(workspaceReaders))
-                .build();
+        chainedWorkspaceReader.setReaders(workspaceReaders);
     }
 
     private void afterSessionStart(MavenSession session) throws MavenExecutionException {
@@ -418,11 +411,14 @@ public class DefaultMaven implements Maven {
      */
     @Deprecated
     public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
-        return newCloseableSession(request);
+        return newCloseableSession(request, new MavenChainedWorkspaceReader());
     }
 
-    private CloseableSession newCloseableSession(MavenExecutionRequest request) {
-        return repositorySessionFactory.newRepositorySessionBuilder(request).build();
+    private CloseableSession newCloseableSession(MavenExecutionRequest request, WorkspaceReader workspaceReader) {
+        return repositorySessionFactory
+                .newRepositorySessionBuilder(request)
+                .setWorkspaceReader(workspaceReader)
+                .build();
     }
 
     private void validateLocalRepository(MavenExecutionRequest request) throws IOException {
