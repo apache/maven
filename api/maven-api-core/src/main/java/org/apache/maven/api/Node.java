@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.Provider;
 
 /**
@@ -40,8 +41,15 @@ import org.apache.maven.api.annotations.Provider;
 public interface Node {
 
     /**
+     * @return artifact for this node
+     */
+    @Nullable
+    Artifact getArtifact();
+
+    /**
      * @return dependency for this node
      */
+    @Nullable
     Dependency getDependency();
 
     /**
