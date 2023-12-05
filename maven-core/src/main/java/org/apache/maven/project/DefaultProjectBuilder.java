@@ -39,7 +39,7 @@ import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -860,7 +860,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 modelBuildingRequest.setModelCache(modelCacheFactory.createCache(session));
             }
             modelBuildingRequest.setTransformerContextBuilder(transformerContextBuilder);
-            DefaultSession session = (DefaultSession) this.session.getData().get(DefaultSession.class);
+            InternalSession session = (InternalSession) this.session.getData().get(InternalSession.class);
             if (session != null) {
                 try {
                     modelBuildingRequest.setRootDirectory(session.getRootDirectory());

@@ -34,6 +34,8 @@ public final class Features {
 
     /**
      * Name of the Maven user property to enable or disable the build/consumer POM feature.
+     *
+     * TODO: v4: remove experimental bit
      */
     public static final String BUILDCONSUMER = "maven.experimental.buildconsumer";
 

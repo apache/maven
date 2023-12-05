@@ -66,7 +66,7 @@ import org.apache.maven.project.MavenProject;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
-public abstract class AbstractSession implements Session {
+public abstract class AbstractSession implements InternalSession {
 
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
     private final Map<org.eclipse.aether.graph.DependencyNode, Node> allNodes =

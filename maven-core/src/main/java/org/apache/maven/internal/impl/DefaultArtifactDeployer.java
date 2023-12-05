@@ -35,7 +35,6 @@ import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.deployment.DeployResult;
 import org.eclipse.aether.deployment.DeploymentException;
 
-import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 /**
@@ -54,8 +53,7 @@ public class DefaultArtifactDeployer implements ArtifactDeployer {
     @Override
     public void deploy(@Nonnull ArtifactDeployerRequest request) {
         nonNull(request, "request can not be null");
-        DefaultSession session =
-                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
+        InternalSession session = InternalSession.from(request.getSession());
         Collection<Artifact> artifacts = nonNull(request.getArtifacts(), "request.artifacts can not be null");
         RemoteRepository repository = nonNull(request.getRepository(), "request.repository can not be null");
         try {

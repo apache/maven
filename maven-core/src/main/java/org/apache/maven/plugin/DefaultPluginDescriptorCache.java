@@ -28,11 +28,8 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -97,49 +94,7 @@ public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
     }
 
     protected static PluginDescriptor clone(PluginDescriptor original) {
-        PluginDescriptor clone = null;
-
-        if (original != null) {
-            clone = new PluginDescriptor();
-
-            clone.setGroupId(original.getGroupId());
-            clone.setArtifactId(original.getArtifactId());
-            clone.setVersion(original.getVersion());
-            clone.setGoalPrefix(original.getGoalPrefix());
-            clone.setInheritedByDefault(original.isInheritedByDefault());
-
-            clone.setName(original.getName());
-            clone.setDescription(original.getDescription());
-            clone.setRequiredMavenVersion(original.getRequiredMavenVersion());
-            clone.setRequiredJavaVersion(original.getRequiredJavaVersion());
-
-            clone.setPluginArtifact(ArtifactUtils.copyArtifactSafe(original.getPluginArtifact()));
-
-            clone.setComponents(clone(original.getMojos(), clone));
-            clone.setId(original.getId());
-            clone.setIsolatedRealm(original.isIsolatedRealm());
-            clone.setSource(original.getSource());
-
-            clone.setDependencies(original.getDependencies());
-        }
-
-        return clone;
-    }
-
-    private static List<ComponentDescriptor<?>> clone(List<MojoDescriptor> mojos, PluginDescriptor pluginDescriptor) {
-        List<ComponentDescriptor<?>> clones = null;
-
-        if (mojos != null) {
-            clones = new ArrayList<>(mojos.size());
-
-            for (MojoDescriptor mojo : mojos) {
-                MojoDescriptor clone = mojo.clone();
-                clone.setPluginDescriptor(pluginDescriptor);
-                clones.add(clone);
-            }
-        }
-
-        return clones;
+        return new PluginDescriptor(original);
     }
 
     private static final class CacheKey implements Key {

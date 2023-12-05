@@ -16,42 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.annotations;
+package org.apache.maven.api.di;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+import jakarta.inject.Scope;
+
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Used to configure injection of Plexus components by
- * <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/MavenPluginManager.html">
- * <code>MavenPluginManager.getConfiguredMojo(...)</code></a>.
+ * Indicates that the annotated bean has a lifespan limited to a given mojo execution,
+ * which means each mojo execution will result in a different instance being injected.
  *
  * @since 4.0.0
  */
-@Experimental
+@Scope
 @Documented
-@Retention(RetentionPolicy.CLASS)
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
-@Inherited
-public @interface Component {
-    /**
-     * role of the component to inject.
-     * @return the role
-     */
-    @Nonnull
-    Class<?> role() default Object.class;
-
-    /**
-     * hint of the component to inject.
-     * @return the hint
-     */
-    @Nonnull
-    String hint() default "";
-}
+@Retention(RUNTIME)
+@Target({TYPE, METHOD})
+public @interface MojoExecutionScoped {}

@@ -57,7 +57,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     @Override
     public SettingsBuilderResult build(SettingsBuilderRequest request)
             throws SettingsBuilderException, IllegalArgumentException {
-        DefaultSession session = (DefaultSession) request.getSession();
+        InternalSession session = InternalSession.from(request.getSession());
         try {
             DefaultSettingsBuildingRequest req = new DefaultSettingsBuildingRequest();
             req.setUserProperties(toProperties(session.getUserProperties()));

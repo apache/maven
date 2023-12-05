@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Nonnull;
 @Experimental
 public interface VersionRange {
 
-    // TODO: add access to the version information
+    // TODO: v4: add access to the version information
 
     /**
      * Determines whether the specified version is contained within this range.

@@ -41,7 +41,6 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 
-import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -60,8 +59,7 @@ public class DefaultDependencyCollector implements DependencyCollector {
     public DependencyCollectorResult collect(@Nonnull DependencyCollectorRequest request)
             throws DependencyCollectorException, IllegalArgumentException {
         nonNull(request, "request can not be null");
-        DefaultSession session =
-                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
+        InternalSession session = InternalSession.from(request.getSession());
 
         Artifact rootArtifact =
                 request.getRootArtifact().map(session::toArtifact).orElse(null);

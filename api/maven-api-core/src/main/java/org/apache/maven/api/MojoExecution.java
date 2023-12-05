@@ -22,22 +22,36 @@ import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.xml.XmlNode;
 
 /**
- * A {@code MojoExecution}
+ * A {@code MojoExecution} represents a single execution of a Maven Plugin during a given build.
+ * An instance of this object is bound to the {@link org.apache.maven.api.di.MojoExecutionScoped}
+ * and available as {@code mojoExecution} within {@link org.apache.maven.api.plugin.annotations.Parameter}
+ * expressions.
  */
 @Experimental
 public interface MojoExecution {
+
     @Nonnull
     Plugin getPlugin();
+
+    @Nonnull
+    PluginExecution getModel();
+
+    @Nonnull
+    MojoDescriptor getDescriptor();
 
     @Nonnull
     String getExecutionId();
 
     @Nonnull
     String getGoal();
+
+    @Nonnull
+    String getLifecyclePhase();
 
     @Nonnull
     Optional<XmlNode> getConfiguration();

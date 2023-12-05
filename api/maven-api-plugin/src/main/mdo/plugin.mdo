@@ -24,26 +24,15 @@ under the License.
   <id>plugin</id>
   <name>PluginDescriptor</name>
   <description><![CDATA[
-    Plugin descriptor, stored in <code>META-INF/maven/plugin.xml</code> in a plugin's jar artifact.
-    This descriptor is generally generated from plugin sources, using
-    <a href="/plugins/maven-plugin-plugin/">maven-plugin-plugin</a>.
-    <p><i>Notice:</i> this documentation is generated from a Modello model but the
-    <a href="apidocs/org/apache/maven/plugin/descriptor/PluginDescriptor.html"><code>PluginDescriptor</code></a>/<a href="apidocs/org/apache/maven/plugin/descriptor/MojoDescriptor.html"><code>MojoDescriptor</code></a>
-    code executed is not generated from this model. Please report if you find anything wrong this documentation.</p>
-    <p>An XSD is available at <a href="https://maven.apache.org/xsd/plugin-1.1.0.xsd">https://maven.apache.org/xsd/plugin-1.1.0.xsd</a></p>
+    Maven 4 Plugin descriptor, stored in <code>META-INF/maven/plugin.xml</code> in a plugin's jar artifact.
+    This descriptor is generally using the information contained in the annotations of the plugin api.
+    <p>An XSD is available at <a href="https://maven.apache.org/xsd/plugin-2.0.0.xsd">https://maven.apache.org/xsd/plugin-2.0.0.xsd</a></p>
   ]]></description>
-  <defaults>
-    <default>
-      <key>package</key>
-      <value>plugin descriptor XML documentation (no java generation)</value><!-- intentionally non-buildable value -->
-    </default>
-  </defaults>
   <classes>
     <class rootElement="true" xml.tagName="plugin" xdoc.anchorName="plugin">
       <name>PluginDescriptor</name>
       <version>1.0.0+</version>
       <description><![CDATA[Root element of the <code>plugin.xml</code> file.]]></description>
-      <!-- see o.a.m.plugin.descriptor.PluginDescriptor -->
       <fields>
         <field>
           <name>name</name>
@@ -120,7 +109,7 @@ under the License.
         </field>
         <field xdoc.separator="blank">
           <name>dependencies</name>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <association>
             <type>Dependency</type>
             <multiplicity>*</multiplicity>
@@ -131,6 +120,21 @@ under the License.
           </description>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>2.0.0+</version>
+          <code><![CDATA[
+    public String getPluginLookupKey() {
+        return groupId + ":" + artifactId;
+    }
+
+    public String getId() {
+        return groupId + ":" + artifactId + ":" + version;
+    }
+
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
 
     <class xdoc.anchorName="mojo">
@@ -139,7 +143,6 @@ under the License.
       <description><![CDATA[
         A Mojo description.
       ]]></description>
-      <!-- see o.a.m.plugin.descriptor.MojoDescriptor -->
       <fields>
         <field>
           <name>goal</name>
@@ -203,7 +206,18 @@ under the License.
         </field>
         <field>
           <name>requiresDependencyResolution</name>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
+          <type>String</type>
+          <defaultValue>runtime</defaultValue>
+          <description><![CDATA[
+            Flags this Mojo as requiring the dependencies in the specified class path to be resolved before it can
+            execute: <code>compile</code>, <code>runtime</code>, <code>test</code>,
+            <code>compile+runtime</code> (since Maven 3.0) or <code>runtime+system</code> (since Maven 3.0)
+          ]]></description>
+        </field>
+        <field>
+          <name>dependencyResolution</name>
+          <version>2.0.0+</version>
           <type>String</type>
           <defaultValue>runtime</defaultValue>
           <description><![CDATA[
@@ -214,7 +228,20 @@ under the License.
         </field>
         <field>
           <name>requiresDependencyCollection</name>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
+          <type>String</type>
+          <description><![CDATA[
+            Flags this Mojo as requiring information about the dependencies that would make up the specified class
+            path. As the name suggests, this is similar to requiresDependencyResolution and supports the same values.
+            The important difference is this will not resolve the files for the dependencies, i.e. the artifacts
+            associated with a Maven project can lack a file. As such, this annotation is meant for Mojos that only
+            want to analyze the set of transitive dependencies, in particular during early lifecycle phases where
+            full dependency resolution might fail due to projects which haven't been built yet.
+          ]]></description>
+        </field>
+        <field>
+          <name>dependencyCollection</name>
+          <version>2.0.0+</version>
           <type>String</type>
           <description><![CDATA[
             Flags this Mojo as requiring information about the dependencies that would make up the specified class
@@ -227,14 +254,28 @@ under the License.
         </field>
         <field>
           <name>requiresDirectInvocation</name>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
+          <type>boolean</type>
+          <description>Flags this Mojo to be invoked directly only.</description>
+          <defaultValue>false</defaultValue>
+        </field>
+        <field>
+          <name>directInvocationOnly</name>
+          <version>2.0.0+</version>
           <type>boolean</type>
           <description>Flags this Mojo to be invoked directly only.</description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>requiresProject</name>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
+          <type>boolean</type>
+          <description>Flags this Mojo to require running inside of a project.</description>
+          <defaultValue>true</defaultValue>
+        </field>
+        <field>
+          <name>projectRequired</name>
+          <version>2.0.0+</version>
           <type>boolean</type>
           <description>Flags this Mojo to require running inside of a project.</description>
           <defaultValue>true</defaultValue>
@@ -248,7 +289,14 @@ under the License.
         </field>
         <field>
           <name>requiresOnline</name>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
+          <type>boolean</type>
+          <description>Flags this Mojo to require online mode for its operation.</description>
+          <defaultValue>false</defaultValue>
+        </field>
+        <field>
+          <name>onlineRequired</name>
+          <version>2.0.0+</version>
           <type>boolean</type>
           <description>Flags this Mojo to require online mode for its operation.</description>
           <defaultValue>false</defaultValue>
@@ -272,7 +320,7 @@ under the License.
         </field>
         <field>
           <name>threadSafe</name>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <type>boolean</type>
           <description>
             Marks this Mojo as being thread-safe, i.e. the Mojo safely supports concurrent execution during parallel
@@ -283,21 +331,21 @@ under the License.
         </field>
         <field>
           <name>v4Api</name>
-          <version>1.1.0+</version>
+          <version>1.1.0</version>
           <type>boolean</type>
           <description>Marks this Mojo as using Maven 4 API. This makes the plugin implicitly incompatible with earlier Maven versions. Only evaluated since Maven 4.</description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>instantiationStrategy</name>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <type>String</type>
           <defaultValue>per-lookup</defaultValue>
           <description>Specify the instantiation strategy.</description>
         </field>
         <field>
           <name>executionStrategy</name>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <type>String</type>
           <description><![CDATA[
             Specify the execution strategy: <code>once-per-session</code>, <code>always</code>.
@@ -331,7 +379,7 @@ under the License.
         </field>
         <field>
           <name>composer</name>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <type>String</type>
           <description></description>
         </field>
@@ -344,26 +392,26 @@ under the License.
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
-          <name>configuration</name>
-          <version>1.0.0+</version>
-          <description>Specifies default values of parameters (with attribute "default-value") as well as how they can be overwritten by Maven properties (in the element content).</description>
-          <!-- https://github.com/codehaus-plexus/modello/issues/264 -->
-          <type>DOM</type>
-          <!--
-          <association xml.tagName="paramName">
-            <type>Configuration</type>
-            <multiplicity>*</multiplicity>
-          </association> -->
-        </field>
         <field xdoc.separator="blank">
           <name>requirements</name>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <description></description>
           <association>
             <type>Requirement</type>
             <multiplicity>*</multiplicity>
           </association>
+        </field>
+        <field xml.format="((PluginDescriptor.Builder) context.peekLast()).build().getId() + &quot;:&quot; + mojoDescriptor.build().getGoal()">
+          <name>id</name>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>the id of the mojo, based on the goal name</description>
+        </field>
+        <field xml.format="((PluginDescriptor.Builder) context.peekLast()).build().getGoalPrefix() + &quot;:&quot; + mojoDescriptor.build().getGoal()">
+          <name>fullGoalName</name>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>the full goal name</description>
         </field>
       </fields>
     </class>
@@ -429,12 +477,6 @@ under the License.
           ]]></description>
         </field>
         <field>
-          <name>implementation</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <description></description>
-        </field>
-        <field>
           <name>description</name>
           <version>1.0.0+</version>
           <type>String</type>
@@ -455,31 +497,15 @@ under the License.
             This will trigger a warning when a user tries to configure a parameter marked as deprecated.
           ]]></description>
         </field>
-      </fields>
-    </class>
-
-    <class>
-      <name>Configuration</name>
-      <version>1.0.0+</version>
-      <description>A parameter configuration.</description>
-      <!-- see o.a.m.plugin.descriptor.Parameter -->
-      <fields>
-        <field xml.content="true">
+        <field>
           <name>expression</name>
-          <required>true</required>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <type>String</type>
           <description>Parameter expression, to let user override default value with a user property, system property or project property.</description>
         </field>
-        <field xml.attribute="true" xml.tagName="implementation">
-          <name>implementation</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <description></description>
-        </field>
-        <field xml.attribute="true" xml.tagName="default-value">
+        <field>
           <name>defaultValue</name>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <type>String</type>
           <description>The default value, as an expression that will be evaluated at injection or run-time.</description>
         </field>
@@ -488,7 +514,7 @@ under the License.
 
     <class xdoc.anchorName="requirement">
       <name>Requirement</name>
-      <version>1.0.0+</version>
+      <version>1.0.0/1.1.0</version>
       <description>Describes a component requirement.</description>
       <!-- see o.a.m.plugin.descriptor.Requirement -->
       <fields>
@@ -517,7 +543,7 @@ under the License.
 
     <class xdoc.anchorName="dependency">
       <name>Dependency</name>
-      <version>1.0.0+</version>
+      <version>1.0.0/1.1.0</version>
       <description>Definition of a dependency, needed by the plugin at runtime.</description>
       <fields>
         <field>

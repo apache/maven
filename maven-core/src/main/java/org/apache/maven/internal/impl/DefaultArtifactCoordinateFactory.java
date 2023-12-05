@@ -27,7 +27,6 @@ import org.apache.maven.api.services.ArtifactCoordinateFactory;
 import org.apache.maven.api.services.ArtifactCoordinateFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
-import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -36,8 +35,7 @@ public class DefaultArtifactCoordinateFactory implements ArtifactCoordinateFacto
     @Override
     public ArtifactCoordinate create(@Nonnull ArtifactCoordinateFactoryRequest request) {
         nonNull(request, "request can not be null");
-        DefaultSession session =
-                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
+        InternalSession session = InternalSession.from(request.getSession());
         ArtifactType type = null;
         if (request.getType() != null) {
             type = session.getSession().getArtifactTypeRegistry().get(request.getType());
