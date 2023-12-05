@@ -43,6 +43,7 @@ public class MojoExecutionScopeModule extends AbstractModule {
     @Override
     protected void configure() {
         bindScope(MojoExecutionScoped.class, scope);
+        bindScope(org.apache.maven.api.di.MojoExecutionScoped.class, scope);
         bind(MojoExecutionScope.class).toInstance(scope);
         bind(MavenProject.class)
                 .toProvider(MojoExecutionScope.seededKeyProvider())

@@ -34,13 +34,13 @@ import org.eclipse.aether.artifact.ArtifactProperties;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultDependency implements Dependency {
-    private final AbstractSession session;
+    private final InternalSession session;
     private final org.eclipse.aether.graph.Dependency dependency;
     private final DependencyProperties dependencyProperties;
     private final String key;
 
     public DefaultDependency(
-            @Nonnull AbstractSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency) {
+            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency) {
         this.session = nonNull(session, "session");
         this.dependency = nonNull(dependency, "dependency");
         this.dependencyProperties =
@@ -50,7 +50,7 @@ public class DefaultDependency implements Dependency {
                 + getArtifactId()
                 + ':'
                 + getExtension()
-                + (getClassifier().length() > 0 ? ":" + getClassifier() : "")
+                + (!getClassifier().isEmpty() ? ":" + getClassifier() : "")
                 + ':'
                 + getVersion();
     }

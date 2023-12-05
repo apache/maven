@@ -110,31 +110,41 @@ public class SessionScope implements Scope {
             return method.invoke(getScopeState().scope(key, unscoped).get(), args);
         };
         Class<T> superType = (Class<T>) key.getTypeLiteral().getRawType();
-        for (Annotation a : superType.getAnnotations()) {
-            Class<? extends Annotation> annotationType = a.annotationType();
-            if ("org.eclipse.sisu.Typed".equals(annotationType.getName())
-                    || "javax.enterprise.inject.Typed".equals(annotationType.getName())) {
-                try {
-                    Class<?>[] value =
-                            (Class<?>[]) annotationType.getMethod("value").invoke(a);
-                    if (value.length == 0) {
-                        value = superType.getInterfaces();
+        Class<?>[] interfaces = getInterfaces(superType);
+        return (T) java.lang.reflect.Proxy.newProxyInstance(superType.getClassLoader(), interfaces, dispatcher);
+    }
+
+    private Class<?>[] getInterfaces(Class<?> superType) {
+        if (superType.isInterface()) {
+            return new Class<?>[] {superType};
+        } else {
+            for (Annotation a : superType.getAnnotations()) {
+                Class<? extends Annotation> annotationType = a.annotationType();
+                if ("org.eclipse.sisu.Typed".equals(annotationType.getName())
+                        || "javax.enterprise.inject.Typed".equals(annotationType.getName())
+                        || "jakarta.enterprise.inject.Typed".equals(annotationType.getName())) {
+                    try {
+                        Class<?>[] value =
+                                (Class<?>[]) annotationType.getMethod("value").invoke(a);
+                        if (value.length == 0) {
+                            value = superType.getInterfaces();
+                        }
+                        List<Class<?>> nonInterfaces =
+                                Stream.of(value).filter(c -> !c.isInterface()).collect(Collectors.toList());
+                        if (!nonInterfaces.isEmpty()) {
+                            throw new IllegalArgumentException(
+                                    "The Typed annotation must contain only interfaces but the following types are not: "
+                                            + nonInterfaces);
+                        }
+                        return value;
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        throw new IllegalStateException(e);
                     }
-                    List<Class<?>> nonInterfaces =
-                            Stream.of(value).filter(c -> !c.isInterface()).collect(Collectors.toList());
-                    if (!nonInterfaces.isEmpty()) {
-                        throw new IllegalArgumentException(
-                                "The Typed annotation must contain only interfaces but the following types are not: "
-                                        + nonInterfaces);
-                    }
-                    return (T) java.lang.reflect.Proxy.newProxyInstance(superType.getClassLoader(), value, dispatcher);
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    throw new IllegalStateException(e);
                 }
             }
+            throw new IllegalArgumentException("The use of session scoped proxies require "
+                    + "a org.eclipse.sisu.Typed or javax.enterprise.inject.Typed annotation");
         }
-        throw new IllegalArgumentException("The use of session scoped proxies require "
-                + "a org.eclipse.sisu.Typed or javax.enterprise.inject.Typed annotation");
     }
 
     /**
@@ -169,5 +179,11 @@ public class SessionScope implements Scope {
     @SuppressWarnings({"unchecked"})
     public static <T> Provider<T> seededKeyProvider() {
         return (Provider<T>) SEEDED_KEY_PROVIDER;
+    }
+
+    public static <T> Provider<T> seededKeyProvider(Class<? extends T> clazz) {
+        return () -> {
+            throw new IllegalStateException("No instance of " + clazz.getName() + " is bound to the session scope.");
+        };
     }
 }

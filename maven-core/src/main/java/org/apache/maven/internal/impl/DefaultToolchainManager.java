@@ -49,7 +49,7 @@ public class DefaultToolchainManager implements ToolchainManager {
     @Override
     public List<Toolchain> getToolchains(Session session, String type, Map<String, String> requirements)
             throws ToolchainManagerException {
-        MavenSession s = ((DefaultSession) session).getMavenSession();
+        MavenSession s = InternalSession.from(session).getMavenSession();
         List<org.apache.maven.toolchain.Toolchain> toolchains =
                 toolchainManagerPrivate.getToolchains(s, type, requirements);
         return new MappedList<>(toolchains, this::toToolchain);
@@ -58,7 +58,7 @@ public class DefaultToolchainManager implements ToolchainManager {
     @Override
     public Optional<Toolchain> getToolchainFromBuildContext(Session session, String type)
             throws ToolchainManagerException {
-        MavenSession s = ((DefaultSession) session).getMavenSession();
+        MavenSession s = InternalSession.from(session).getMavenSession();
         return Optional.ofNullable(toolchainManagerPrivate.getToolchainFromBuildContext(type, s))
                 .map(this::toToolchain);
     }
@@ -66,7 +66,7 @@ public class DefaultToolchainManager implements ToolchainManager {
     @Override
     public List<Toolchain> getToolchainsForType(Session session, String type) throws ToolchainManagerException {
         try {
-            MavenSession s = ((DefaultSession) session).getMavenSession();
+            MavenSession s = InternalSession.from(session).getMavenSession();
             ToolchainPrivate[] toolchains = toolchainManagerPrivate.getToolchainsForType(type, s);
             return new MappedList<>(Arrays.asList(toolchains), this::toToolchain);
         } catch (MisconfiguredToolchainException e) {
@@ -76,7 +76,7 @@ public class DefaultToolchainManager implements ToolchainManager {
 
     @Override
     public void storeToolchainToBuildContext(Session session, Toolchain toolchain) throws ToolchainManagerException {
-        MavenSession s = ((DefaultSession) session).getMavenSession();
+        MavenSession s = InternalSession.from(session).getMavenSession();
         org.apache.maven.toolchain.ToolchainPrivate tc =
                 (org.apache.maven.toolchain.ToolchainPrivate) ((ToolchainWrapper) toolchain).toolchain;
         toolchainManagerPrivate.storeToolchainToBuildContext(tc, s);

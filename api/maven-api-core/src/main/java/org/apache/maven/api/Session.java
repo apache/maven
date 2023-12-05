@@ -215,6 +215,13 @@ public interface Session {
     DependencyCoordinate createDependencyCoordinate(@Nonnull ArtifactCoordinate coordinate);
 
     /**
+     * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
+     * @see DependencyCoordinateFactory#create(Session, Dependency)
+     */
+    @Nonnull
+    DependencyCoordinate createDependencyCoordinate(@Nonnull Dependency dependency);
+
+    /**
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
      * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String)
      */

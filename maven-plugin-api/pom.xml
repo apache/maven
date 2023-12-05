@@ -34,6 +34,10 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-plugin</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
     </dependency>
     <dependency>
@@ -54,6 +58,10 @@ under the License.
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-classworlds</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -63,43 +71,54 @@ under the License.
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
           <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>
-          <models>
-            <model>src/main/mdo/lifecycle.mdo</model>
-          </models>
-          <version>1.0.0</version>
         </configuration>
         <executions>
           <execution>
-            <id>velocity</id>
+            <id>velocity-lifecycle</id>
             <goals>
               <goal>velocity</goal>
             </goals>
             <phase>generate-sources</phase>
             <configuration>
               <templates>
-                <template>model.vm</template>
                 <template>reader-stax.vm</template>
                 <template>writer-stax.vm</template>
               </templates>
               <params>
-                <param>packageModelV3=org.apache.maven.plugin.lifecycle</param>
-                <param>packageModelV4=org.apache.maven.plugin.lifecycle</param>
+                <param>packageModelV4=org.apache.maven.api.plugin.descriptor.lifecycle</param>
                 <param>packageToolV4=org.apache.maven.plugin.lifecycle.io</param>
               </params>
+              <models>
+                <model>../api/maven-api-plugin/src/main/mdo/lifecycle.mdo</model>
+              </models>
+              <version>1.0.0</version>
             </configuration>
           </execution>
           <execution>
-            <id>modello-site-docs2</id>
+            <id>velocity-plugin</id>
             <goals>
-              <goal>xdoc</goal>
+              <goal>velocity</goal>
             </goals>
-            <phase>pre-site</phase>
+            <phase>generate-sources</phase>
             <configuration>
+              <templates>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV3=org.apache.maven.plugin.descriptor</param>
+                <param>packageModelV4=org.apache.maven.api.plugin.descriptor</param>
+                <param>packageToolV4=org.apache.maven.plugin.descriptor.io</param>
+              </params>
               <models>
-                <model>src/main/mdo/plugin.mdo</model>
+                <model>../api/maven-api-plugin/src/main/mdo/plugin.mdo</model>
               </models>
-              <version>1.1.0</version>
+              <version>2.0.0</version>
             </configuration>
+          </execution>
+          <execution>
+            <id>modello-site-docs</id>
+            <phase>none</phase>
           </execution>
         </executions>
       </plugin>
@@ -110,32 +129,8 @@ under the License.
           <parameter>
             <excludes>
               <exclude>org.apache.maven.monitor.logging.DefaultLog</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Execution#addGoal(java.lang.String):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Execution#getConfiguration():METHOD_RETURN_TYPE_CHANGED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Execution#removeGoal(java.lang.String):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Execution#setConfiguration(java.lang.Object):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Execution#setGoals(java.util.List):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Execution#Execution():CONSTRUCTOR_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader#contentTransformer</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Lifecycle#addPhase(org.apache.maven.plugin.lifecycle.Phase):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Lifecycle#removePhase(org.apache.maven.plugin.lifecycle.Phase):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Lifecycle#setId(java.lang.String):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Lifecycle#setPhases(java.util.List):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Lifecycle#Lifecycle():CONSTRUCTOR_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.LifecycleConfiguration#addLifecycle(org.apache.maven.plugin.lifecycle.Lifecycle):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.LifecycleConfiguration#removeLifecycle(org.apache.maven.plugin.lifecycle.Lifecycle):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.LifecycleConfiguration#setLifecycles(java.util.List):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.LifecycleConfiguration#setModelEncoding(java.lang.String):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.LifecycleConfiguration#LifecycleConfiguration():CONSTRUCTOR_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Phase#addExecution(org.apache.maven.plugin.lifecycle.Execution):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Phase#getConfiguration():METHOD_RETURN_TYPE_CHANGED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Phase#removeExecution(org.apache.maven.plugin.lifecycle.Execution):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Phase#setConfiguration(java.lang.Object):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Phase#setExecutions(java.util.List):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Phase#setId(java.lang.String):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.Phase#Phase():CONSTRUCTOR_REMOVED</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader</exclude>
-              <exclude>org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Writer</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle</exclude>
+              <exclude>org.apache.maven.plugin.descriptor.PluginDescriptor#getLifecycleMapping(java.lang.String)</exclude>
             </excludes>
           </parameter>
         </configuration>

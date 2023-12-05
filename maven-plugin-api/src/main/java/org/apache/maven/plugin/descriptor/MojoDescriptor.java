@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.Mojo;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
@@ -146,6 +147,34 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
         setComponentFactory(DEFAULT_LANGUAGE);
     }
 
+    public MojoDescriptor(PluginDescriptor pd, org.apache.maven.api.plugin.descriptor.MojoDescriptor md) {
+        this();
+        this.setPluginDescriptor(pd);
+        this.setGoal(md.getGoal());
+        this.setExecuteGoal(md.getExecuteGoal());
+        this.setExecuteLifecycle(md.getExecuteLifecycle());
+        this.setExecutePhase(md.getExecutePhase());
+        this.setDeprecated(md.getDeprecated());
+        this.setLanguage(md.getLanguage());
+        this.setAggregator(md.isAggregator());
+        this.setDependencyCollectionRequired(md.getDependencyCollection());
+        this.setDependencyResolutionRequired(md.getDependencyResolution());
+        this.setComponentConfigurator(md.getConfigurator());
+        this.setInheritedByDefault(md.isInheritedByDefault());
+        this.setPhase(md.getPhase());
+        this.setOnlineRequired(md.isOnlineRequired());
+        this.setProjectRequired(md.isProjectRequired());
+        this.setSince(md.getSince());
+        this.setThreadSafe(true);
+        this.setV4Api(true);
+        this.setImplementation(md.getImplementation());
+        try {
+            this.setParameters(md.getParameters().stream().map(Parameter::new).collect(Collectors.toList()));
+        } catch (DuplicateParameterException e) {
+            throw new IllegalArgumentException(e);
+        }
+        this.mojoDescriptorV4 = md;
+    }
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -607,5 +636,42 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
         } catch (CloneNotSupportedException e) {
             throw new UnsupportedOperationException(e);
         }
+    }
+
+    private volatile org.apache.maven.api.plugin.descriptor.MojoDescriptor mojoDescriptorV4;
+
+    public org.apache.maven.api.plugin.descriptor.MojoDescriptor getMojoDescriptorV4() {
+        if (mojoDescriptorV4 == null) {
+            synchronized (this) {
+                if (mojoDescriptorV4 == null) {
+                    mojoDescriptorV4 = org.apache.maven.api.plugin.descriptor.MojoDescriptor.newBuilder()
+                            .goal(goal)
+                            .description(getDescription())
+                            .implementation(getImplementation())
+                            .language(getLanguage())
+                            .phase(phase)
+                            .executeGoal(executeGoal)
+                            .executeLifecycle(executeLifecycle)
+                            .executePhase(executePhase)
+                            .aggregator(aggregator)
+                            .dependencyResolution(dependencyResolutionRequired)
+                            .dependencyCollection(dependencyCollectionRequired)
+                            .projectRequired(projectRequired)
+                            .onlineRequired(onlineRequired)
+                            .inheritedByDefault(inheritedByDefault)
+                            .since(since)
+                            .deprecated(deprecated)
+                            .configurator(getComponentConfigurator())
+                            .parameters(getParameters().stream()
+                                    .filter(p -> p.getRequirement() == null)
+                                    .map(Parameter::getParameterV4)
+                                    .collect(Collectors.toList()))
+                            .id(getId())
+                            .fullGoalName(getFullGoalName())
+                            .build();
+                }
+            }
+        }
+        return mojoDescriptorV4;
     }
 }

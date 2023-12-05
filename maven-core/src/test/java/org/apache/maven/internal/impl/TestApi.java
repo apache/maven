@@ -98,7 +98,7 @@ class TestApi {
         RepositorySystemSession rss = MavenRepositorySystemUtils.newSession();
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
         DefaultMavenExecutionResult meres = new DefaultMavenExecutionResult();
-        MavenSession ms = new MavenSession(() -> rss, mer, meres);
+        MavenSession ms = new MavenSession(rss, mer, meres);
         DefaultSession session = new DefaultSession(
                 ms,
                 repositorySystem,
@@ -114,7 +114,7 @@ class TestApi {
                 .withRemoteRepositories(Collections.singletonList(remoteRepository));
 
         sessionScope.enter();
-        sessionScope.seed(DefaultSession.class, (DefaultSession) this.session);
+        sessionScope.seed(InternalSession.class, InternalSession.from(this.session));
     }
 
     @Test

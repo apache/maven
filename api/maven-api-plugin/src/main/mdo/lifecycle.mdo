@@ -17,22 +17,16 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.0.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.0.0.xsd"
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/2.0.0 http://codehaus-plexus.github.io/modello/xsd/modello-2.0.0.xsd"
   xml.namespace="http://maven.apache.org/LIFECYCLE/${version}"
   xml.schemaLocation="http://maven.apache.org/xsd/lifecycle-${version}.xsd">
-  <id>lifecycle-mappings</id>
-  <name>LifecycleMappings</name>
+  <id>lifecycle</id>
+  <name>Lifecycle</name>
   <description><![CDATA[
     Configuration of custom lifecycle mappings for the plugin, as generally stored in
     <code>META-INF/maven/lifecycle.xml</code> in a plugin's jar artifact.
   ]]></description>
-  <defaults>
-    <default>
-      <key>package</key>
-      <value>org.apache.maven.plugin.lifecycle</value>
-    </default>
-  </defaults>
   <classes>
     <class rootElement="true" xml.tagName="lifecycles" xsd.compositor="sequence">
       <name>LifecycleConfiguration</name>

@@ -21,11 +21,11 @@ package org.apache.maven.internal.impl;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -65,7 +65,7 @@ public class DefaultSession extends AbstractSession {
     private final MavenRepositorySystem mavenRepositorySystem;
     private final PlexusContainer container;
     private final RuntimeInformation runtimeInformation;
-    private final Map<Class<? extends Service>, Service> services = new HashMap<>();
+    private final Map<Class<? extends Service>, Service> services = new ConcurrentHashMap<>();
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultSession(
@@ -213,8 +213,7 @@ public class DefaultSession extends AbstractSession {
 
         RepositorySystemSession repoSession =
                 new DefaultRepositorySystemSession(session).setLocalRepositoryManager(localRepositoryManager);
-        MavenSession newSession =
-                new MavenSession(() -> repoSession, mavenSession.getRequest(), mavenSession.getResult());
+        MavenSession newSession = new MavenSession(repoSession, mavenSession.getRequest(), mavenSession.getResult());
         return new DefaultSession(
                 newSession, repositorySystem, repositories, mavenRepositorySystem, container, runtimeInformation);
     }

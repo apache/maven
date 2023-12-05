@@ -33,12 +33,12 @@ import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 
 public class DefaultNode extends AbstractNode {
 
-    protected final @Nonnull AbstractSession session;
+    protected final @Nonnull InternalSession session;
     protected final @Nonnull org.eclipse.aether.graph.DependencyNode node;
     protected final boolean verbose;
 
     public DefaultNode(
-            @Nonnull AbstractSession session, @Nonnull org.eclipse.aether.graph.DependencyNode node, boolean verbose) {
+            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.DependencyNode node, boolean verbose) {
         this.session = session;
         this.node = node;
         this.verbose = verbose;
@@ -66,7 +66,7 @@ public class DefaultNode extends AbstractNode {
 
     @Override
     public Optional<RemoteRepository> getRepository() {
-        // TODO
+        // TODO: v4: implement
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

@@ -52,7 +52,7 @@ public class DefaultTransportProvider implements TransportProvider {
             return new DefaultTransport(
                     baseURI,
                     transporterProvider.newTransporter(
-                            ((DefaultSession) session).getSession(),
+                            InternalSession.from(session).getSession(),
                             ((DefaultRemoteRepository) repository).getRepository()));
         } catch (URISyntaxException e) {
             throw new TransportProviderException("Remote repository URL invalid", e);

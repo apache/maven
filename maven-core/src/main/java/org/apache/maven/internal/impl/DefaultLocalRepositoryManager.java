@@ -35,7 +35,7 @@ public class DefaultLocalRepositoryManager implements LocalRepositoryManager {
 
     @Override
     public Path getPathForLocalArtifact(Session session, LocalRepository local, Artifact artifact) {
-        DefaultSession s = (DefaultSession) session;
+        InternalSession s = InternalSession.from(session);
         String path = getManager(s, local).getPathForLocalArtifact(s.toArtifact(artifact));
         return local.getPath().resolve(path);
     }
@@ -43,14 +43,14 @@ public class DefaultLocalRepositoryManager implements LocalRepositoryManager {
     @Override
     public Path getPathForRemoteArtifact(
             Session session, LocalRepository local, RemoteRepository remote, Artifact artifact) {
-        DefaultSession s = (DefaultSession) session;
+        InternalSession s = InternalSession.from(session);
         String path =
                 getManager(s, local).getPathForRemoteArtifact(s.toArtifact(artifact), s.toRepository(remote), null);
         return local.getPath().resolve(path);
     }
 
     private org.eclipse.aether.repository.LocalRepositoryManager getManager(
-            DefaultSession session, LocalRepository local) {
+            InternalSession session, LocalRepository local) {
         org.eclipse.aether.repository.LocalRepository repository = session.toRepository(local);
         if ("enhanced".equals(repository.getContentType())) {
             repository = new org.eclipse.aether.repository.LocalRepository(repository.getBasedir(), "");
