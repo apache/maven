@@ -1,5 +1,3 @@
-package org.apache.maven.cli;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.cli;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.cli;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -25,26 +24,17 @@ import java.nio.file.Paths;
 /**
  * Resolve relative file path against the given base directory
  */
-public class ResolveFile
-{
-    public static File resolveFile( File file, String baseDirectory )
-    {
-        if ( file == null )
-        {
+public class ResolveFile {
+    public static File resolveFile(File file, String baseDirectory) {
+        if (file == null) {
             return null;
-        }
-        else if ( file.isAbsolute() )
-        {
+        } else if (file.isAbsolute()) {
             return file;
-        }
-        else if ( file.getPath().startsWith( File.separator ) )
-        {
+        } else if (file.getPath().startsWith(File.separator)) {
             // drive-relative Windows path
             return file.getAbsoluteFile();
-        }
-        else
-        {
-            return Paths.get( baseDirectory, file.getPath() ).normalize().toFile();
+        } else {
+            return Paths.get(baseDirectory, file.getPath()).normalize().toFile();
         }
     }
 }

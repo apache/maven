@@ -1,5 +1,3 @@
-package org.apache.maven.model.management;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven.model.management;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.management;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,15 +27,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginContainer;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.PluginManagement;
+import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginContainer;
+import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.model.PluginManagement;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
@@ -41,104 +40,91 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles injection of plugin management into the model.
  *
- * @author Benjamin Bentmann
  */
-@SuppressWarnings( { "checkstyle:methodname" } )
+@SuppressWarnings({"checkstyle:methodname"})
 @Named
 @Singleton
-public class DefaultPluginManagementInjector
-    implements PluginManagementInjector
-{
+public class DefaultPluginManagementInjector implements PluginManagementInjector {
 
     private ManagementModelMerger merger = new ManagementModelMerger();
 
     @Override
-    public void injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
-    {
-        merger.mergeManagedBuildPlugins( model );
+    public void injectManagement(
+            org.apache.maven.model.Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
+        model.update(merger.mergeManagedBuildPlugins(model.getDelegate()));
     }
 
     /**
      * ManagementModelMerger
      */
-    protected static class ManagementModelMerger
-        extends MavenModelMerger
-    {
+    protected static class ManagementModelMerger extends MavenModelMerger {
 
-        public void mergeManagedBuildPlugins( Model model )
-        {
+        public Model mergeManagedBuildPlugins(Model model) {
             Build build = model.getBuild();
-            if ( build != null )
-            {
+            if (build != null) {
                 PluginManagement pluginManagement = build.getPluginManagement();
-                if ( pluginManagement != null )
-                {
-                    mergePluginContainerPlugins( build, pluginManagement );
+                if (pluginManagement != null) {
+                    return model.withBuild(mergePluginContainerPlugins(build, pluginManagement));
                 }
             }
+            return model;
         }
 
-        private void mergePluginContainerPlugins( PluginContainer target, PluginContainer source )
-        {
+        private Build mergePluginContainerPlugins(Build target, PluginContainer source) {
             List<Plugin> src = source.getPlugins();
-            if ( !src.isEmpty() )
-            {
-                List<Plugin> tgt = target.getPlugins();
-
-                Map<Object, Plugin> managedPlugins = new LinkedHashMap<>( src.size() * 2 );
+            if (!src.isEmpty()) {
+                Map<Object, Plugin> managedPlugins = new LinkedHashMap<>(src.size() * 2);
 
                 Map<Object, Object> context = Collections.emptyMap();
 
-                for ( Plugin element : src )
-                {
-                    Object key = getPluginKey().apply( element );
-                    managedPlugins.put( key, element );
+                for (Plugin element : src) {
+                    Object key = getPluginKey().apply(element);
+                    managedPlugins.put(key, element);
                 }
 
-                for ( Plugin element : tgt )
-                {
-                    Object key = getPluginKey().apply( element );
-                    Plugin managedPlugin = managedPlugins.get( key );
-                    if ( managedPlugin != null )
-                    {
-                        mergePlugin( element, managedPlugin, false, context );
+                List<Plugin> newPlugins = new ArrayList<>();
+                for (Plugin element : target.getPlugins()) {
+                    Object key = getPluginKey().apply(element);
+                    Plugin managedPlugin = managedPlugins.get(key);
+                    if (managedPlugin != null) {
+                        element = mergePlugin(element, managedPlugin, false, context);
                     }
+                    newPlugins.add(element);
                 }
+                return target.withPlugins(newPlugins);
             }
+            return target;
         }
 
         @Override
-        protected void mergePlugin_Executions( Plugin target, Plugin source, boolean sourceDominant,
-                                               Map<Object, Object> context )
-        {
+        protected void mergePlugin_Executions(
+                Plugin.Builder builder,
+                Plugin target,
+                Plugin source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
             List<PluginExecution> src = source.getExecutions();
-            if ( !src.isEmpty() )
-            {
+            if (!src.isEmpty()) {
                 List<PluginExecution> tgt = target.getExecutions();
 
-                Map<Object, PluginExecution> merged =
-                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, PluginExecution> merged = new LinkedHashMap<>((src.size() + tgt.size()) * 2);
 
-                for ( PluginExecution element : src )
-                {
-                    Object key = getPluginExecutionKey().apply( element );
-                    merged.put( key, element.clone() );
+                for (PluginExecution element : src) {
+                    Object key = getPluginExecutionKey().apply(element);
+                    merged.put(key, element);
                 }
 
-                for ( PluginExecution element : tgt )
-                {
-                    Object key = getPluginExecutionKey().apply( element );
-                    PluginExecution existing = merged.get( key );
-                    if ( existing != null )
-                    {
-                        mergePluginExecution( element, existing, sourceDominant, context );
+                for (PluginExecution element : tgt) {
+                    Object key = getPluginExecutionKey().apply(element);
+                    PluginExecution existing = merged.get(key);
+                    if (existing != null) {
+                        element = mergePluginExecution(element, existing, sourceDominant, context);
                     }
-                    merged.put( key, element );
+                    merged.put(key, element);
                 }
 
-                target.setExecutions( new ArrayList<>( merged.values() ) );
+                builder.executions(merged.values());
             }
         }
     }
-
 }

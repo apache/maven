@@ -25,6 +25,6 @@
 
 Maven Core Extensions Reference
 
-  Maven core provides default extensions as defined in <<</META-INF/maven/extension.xml>>>:
+  Maven core provides default {{{./extension.html}extensions}} as defined in <<</META-INF/maven/extension.xml>>>:
 
 %{snippet|id=core-extension|file=${project.basedir}/src/main/resources/META-INF/maven/extension.xml}

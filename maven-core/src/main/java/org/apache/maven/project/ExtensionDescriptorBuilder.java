@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,35 +16,34 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import com.ctc.wstx.stax.WstxInputFactory;
+import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeBuilder;
+
 /**
  * Creates an extension descriptor from some XML stream.
  *
- * @author Benjamin Bentmann
  */
-public class ExtensionDescriptorBuilder
-{
+public class ExtensionDescriptorBuilder {
 
     /**
      * @since 3.3.0
      */
-    public String getExtensionDescriptorLocation()
-    {
+    public String getExtensionDescriptorLocation() {
         return "META-INF/maven/extension.xml";
     }
 
@@ -57,35 +54,25 @@ public class ExtensionDescriptorBuilder
      * @return The extracted descriptor or {@code null} if no descriptor was found.
      * @throws IOException If the descriptor is present but could not be parsed.
      */
-    public ExtensionDescriptor build( File extensionJar )
-        throws IOException
-    {
+    public ExtensionDescriptor build(File extensionJar) throws IOException {
         ExtensionDescriptor extensionDescriptor = null;
 
-        if ( extensionJar.isFile() )
-        {
-            try ( JarFile pluginJar = new JarFile( extensionJar, false ) )
-            {
-                ZipEntry pluginDescriptorEntry = pluginJar.getEntry( getExtensionDescriptorLocation() );
+        if (extensionJar.isFile()) {
+            try (JarFile pluginJar = new JarFile(extensionJar, false)) {
+                ZipEntry pluginDescriptorEntry = pluginJar.getEntry(getExtensionDescriptorLocation());
 
-                if ( pluginDescriptorEntry != null )
-                {
-                    try ( InputStream is = pluginJar.getInputStream( pluginDescriptorEntry ) )
-                    {
-                        extensionDescriptor = build( is );
+                if (pluginDescriptorEntry != null) {
+                    try (InputStream is = pluginJar.getInputStream(pluginDescriptorEntry)) {
+                        extensionDescriptor = build(is);
                     }
                 }
             }
-        }
-        else
-        {
-            File pluginXml = new File( extensionJar, getExtensionDescriptorLocation() );
+        } else {
+            File pluginXml = new File(extensionJar, getExtensionDescriptorLocation());
 
-            if ( pluginXml.canRead() )
-            {
-                try ( InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) ) )
-                {
-                    extensionDescriptor = build( is );
+            if (pluginXml.canRead()) {
+                try (InputStream is = Files.newInputStream(pluginXml.toPath())) {
+                    extensionDescriptor = build(is);
                 }
             }
         }
@@ -96,50 +83,40 @@ public class ExtensionDescriptorBuilder
     /**
      * @since 3.3.0
      */
-    public ExtensionDescriptor build( InputStream is )
-        throws IOException
-    {
+    public ExtensionDescriptor build(InputStream is) throws IOException {
         ExtensionDescriptor extensionDescriptor = new ExtensionDescriptor();
 
-        Xpp3Dom dom;
-        try
-        {
-            dom = Xpp3DomBuilder.build( ReaderFactory.newXmlReader( is ) );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new IOException( e.getMessage(), e );
+        XmlNode dom;
+        try {
+            XMLStreamReader reader = WstxInputFactory.newFactory().createXMLStreamReader(is);
+            dom = XmlNodeBuilder.build(reader);
+        } catch (XMLStreamException e) {
+            throw new IOException(e.getMessage(), e);
         }
 
-        if ( !"extension".equals( dom.getName() ) )
-        {
-            throw new IOException( "Unexpected root element \"" + dom.getName() + "\", expected \"extension\"" );
+        if (!"extension".equals(dom.getName())) {
+            throw new IOException("Unexpected root element \"" + dom.getName() + "\", expected \"extension\"");
         }
 
-        extensionDescriptor.setExportedPackages( parseStrings( dom.getChild( "exportedPackages" ) ) );
+        extensionDescriptor.setExportedPackages(parseStrings(dom.getChild("exportedPackages")));
 
-        extensionDescriptor.setExportedArtifacts( parseStrings( dom.getChild( "exportedArtifacts" ) ) );
+        extensionDescriptor.setExportedArtifacts(parseStrings(dom.getChild("exportedArtifacts")));
 
         return extensionDescriptor;
     }
 
-    private List<String> parseStrings( Xpp3Dom dom )
-    {
+    private List<String> parseStrings(XmlNode dom) {
         List<String> strings = null;
 
-        if ( dom != null )
-        {
+        if (dom != null) {
             strings = new ArrayList<>();
 
-            for ( Xpp3Dom child : dom.getChildren() )
-            {
+            for (XmlNode child : dom.getChildren()) {
                 String string = child.getValue();
-                if ( string != null )
-                {
+                if (string != null) {
                     string = string.trim();
-                    if ( string.length() > 0 )
-                    {
-                        strings.add( string );
+                    if (string.length() > 0) {
+                        strings.add(string);
                     }
                 }
             }
@@ -147,5 +124,4 @@ public class ExtensionDescriptorBuilder
 
         return strings;
     }
-
 }

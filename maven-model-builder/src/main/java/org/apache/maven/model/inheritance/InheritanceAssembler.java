@@ -1,5 +1,3 @@
-package org.apache.maven.model.inheritance;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,18 +16,17 @@ package org.apache.maven.model.inheritance;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.inheritance;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles inheritance of model values.
  *
- * @author Benjamin Bentmann
  */
-public interface InheritanceAssembler
-{
+public interface InheritanceAssembler {
 
     /**
      * Merges values from the specified parent model into the given child model. Implementations are expected to keep
@@ -42,7 +39,6 @@ public interface InheritanceAssembler
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
-                                   ModelProblemCollector problems );
-
+    Model assembleModelInheritance(
+            Model child, Model parent, ModelBuildingRequest request, ModelProblemCollector problems);
 }

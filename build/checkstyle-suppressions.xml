@@ -26,5 +26,4 @@ under the License.
 <suppressions>
     <suppress checks="JavadocVariable|JavadocMethod" files=".*" />
     <suppress checks="HiddenField" files=".*" />
-    <suppress checks="FileLength" files="ModelMerger\.java" />
 </suppressions>

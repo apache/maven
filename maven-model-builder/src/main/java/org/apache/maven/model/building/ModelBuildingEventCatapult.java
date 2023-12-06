@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,14 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 /**
  * Assists in firing events from a generic method by abstracting from the actual callback method to be called on the
  * listener.
  *
- * @author Benjamin Bentmann
  */
-interface ModelBuildingEventCatapult
-{
+interface ModelBuildingEventCatapult {
 
     /**
      * Notifies the specified listener of the given event.
@@ -34,8 +31,7 @@ interface ModelBuildingEventCatapult
      * @param listener The listener to notify, must not be {@code null}.
      * @param event The event to fire, must not be {@code null}.
      */
-    void fire( ModelBuildingListener listener, ModelBuildingEvent event );
+    void fire(ModelBuildingListener listener, ModelBuildingEvent event);
 
     ModelBuildingEventCatapult BUILD_EXTENSIONS_ASSEMBLED = ModelBuildingListener::buildExtensionsAssembled;
-
 }

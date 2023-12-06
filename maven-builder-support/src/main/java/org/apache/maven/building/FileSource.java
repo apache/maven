@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,19 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Objects;
 
 /**
  * Wraps an ordinary {@link File} as a source.
  *
- * @author Benjamin Bentmann
  */
-public class FileSource
-    implements Source
-{
+public class FileSource implements Source {
     private final File file;
 
     private final int hashCode;
@@ -42,22 +38,18 @@ public class FileSource
      *
      * @param file The file, must not be {@code null}.
      */
-    public FileSource( File file )
-    {
-        this.file = Objects.requireNonNull( file, "file cannot be null" ).getAbsoluteFile();
-        this.hashCode = Objects.hash( file );
+    public FileSource(File file) {
+        this.file = Objects.requireNonNull(file, "file cannot be null").getAbsoluteFile();
+        this.hashCode = Objects.hash(file);
     }
 
     @Override
-    public InputStream getInputStream()
-        throws IOException
-    {
-        return new FileInputStream( file );
+    public InputStream getInputStream() throws IOException {
+        return Files.newInputStream(file.toPath());
     }
 
     @Override
-    public String getLocation()
-    {
+    public String getLocation() {
         return file.getPath();
     }
 
@@ -66,42 +58,35 @@ public class FileSource
      *
      * @return The underlying file, never {@code null}.
      */
-    public File getFile()
-    {
+    public File getFile() {
         return file;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getLocation();
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return hashCode;
     }
 
     @Override
-    public boolean equals( Object obj )
-    {
-        if ( this == obj )
-        {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if ( obj == null )
-        {
+        if (obj == null) {
             return false;
         }
 
-        if ( !FileSource.class.equals( obj.getClass() ) )
-        {
+        if (!FileSource.class.equals(obj.getClass())) {
             return false;
         }
 
         FileSource other = (FileSource) obj;
-        return this.file.equals( other.file );
+        return this.file.equals(other.file);
     }
 }

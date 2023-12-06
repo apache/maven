@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,19 +16,18 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.Model;
 
 /**
  * Describes a tag used by the model builder to access a {@link ModelCache}. This interface basically aggregates a name
  * and a class to provide some type safety when working with the otherwise untyped cache.
  *
- * @author Benjamin Bentmann
  * @param <T> The type of data associated with the tag.
  */
-interface ModelCacheTag<T>
-{
+interface ModelCacheTag<T> {
 
     /**
      * Gets the name of the tag.
@@ -53,7 +50,7 @@ interface ModelCacheTag<T>
      * @param data The data to store in the cache, must not be {@code null}.
      * @return The data being stored in the cache, never {@code null}.
      */
-    T intoCache( T data );
+    T intoCache(T data);
 
     /**
      * Creates a copy of the data suitable for retrieval from the cache. The retrieved data can be mutated after the
@@ -62,101 +59,83 @@ interface ModelCacheTag<T>
      * @param data The data to retrieve from the cache, must not be {@code null}.
      * @return The data being retrieved from the cache, never {@code null}.
      */
-    T fromCache( T data );
+    T fromCache(T data);
 
     /**
      * The tag used for the raw model without profile activation
      */
-    ModelCacheTag<ModelData> RAW = new ModelCacheTag<ModelData>()
-    {
+    ModelCacheTag<ModelData> RAW = new ModelCacheTag<ModelData>() {
 
         @Override
-        public String getName()
-        {
+        public String getName() {
             return "raw";
         }
 
         @Override
-        public Class<ModelData> getType()
-        {
+        public Class<ModelData> getType() {
             return ModelData.class;
         }
 
         @Override
-        public ModelData intoCache( ModelData data )
-        {
-            Model model = ( data.getModel() != null ) ? data.getModel().clone() : null;
-            return new ModelData( data.getSource(), model, data.getGroupId(), data.getArtifactId(), data.getVersion() );
+        public ModelData intoCache(ModelData data) {
+            return data;
         }
 
         @Override
-        public ModelData fromCache( ModelData data )
-        {
-            return intoCache( data );
+        public ModelData fromCache(ModelData data) {
+            return data;
         }
-
     };
 
     /**
      * The tag used to denote an effective dependency management section from an imported model.
      */
-    ModelCacheTag<DependencyManagement> IMPORT = new ModelCacheTag<DependencyManagement>()
-    {
+    ModelCacheTag<DependencyManagement> IMPORT = new ModelCacheTag<DependencyManagement>() {
 
         @Override
-        public String getName()
-        {
+        public String getName() {
             return "import";
         }
 
         @Override
-        public Class<DependencyManagement> getType()
-        {
+        public Class<DependencyManagement> getType() {
             return DependencyManagement.class;
         }
 
         @Override
-        public DependencyManagement intoCache( DependencyManagement data )
-        {
-            return ( data != null ) ? data.clone() : null;
+        public DependencyManagement intoCache(DependencyManagement data) {
+            return data;
         }
 
         @Override
-        public DependencyManagement fromCache( DependencyManagement data )
-        {
-            return intoCache( data );
+        public DependencyManagement fromCache(DependencyManagement data) {
+            return data;
         }
-
     };
 
     /**
      * The tag used for the file model without profile activation
      * @since 4.0.0
      */
-    ModelCacheTag<Model> FILE = new ModelCacheTag<Model>()
-    {
+    ModelCacheTag<Model> FILE = new ModelCacheTag<Model>() {
         @Override
-        public String getName()
-        {
+        public String getName() {
             return "file";
         }
 
         @Override
-        public Class<Model> getType()
-        {
+        public Class<Model> getType() {
             return Model.class;
         }
 
         @Override
-        public Model intoCache( Model data )
-        {
-            return ( data != null ) ? data.clone() : null;
+        public Model intoCache(Model data) {
+            return data;
         }
 
         @Override
-        public Model fromCache( Model data )
-        {
-            return intoCache( data );
+        public Model fromCache(Model data) {
+            return data;
         }
     };
 }

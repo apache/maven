@@ -1,5 +1,3 @@
-package org.apache.maven.model.path;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.path;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,35 +16,39 @@ package org.apache.maven.model.path;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.path;
 
-import org.apache.maven.model.ActivationFile;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.io.File;
+import java.nio.file.Path;
+
+import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.model.profile.ProfileActivationContext;
+import org.apache.maven.model.root.RootLocator;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.File;
-
 /**
  * Finds an absolute path for {@link ActivationFile#getExists()} or {@link ActivationFile#getMissing()}
  *
- * @author Ravil Galeyev
  */
 @Named
 @Singleton
-public class ProfileActivationFilePathInterpolator
-{
+public class ProfileActivationFilePathInterpolator {
 
     private final PathTranslator pathTranslator;
 
+    private final RootLocator rootLocator;
+
     @Inject
-    public ProfileActivationFilePathInterpolator( PathTranslator pathTranslator )
-    {
+    public ProfileActivationFilePathInterpolator(PathTranslator pathTranslator, RootLocator rootLocator) {
         this.pathTranslator = pathTranslator;
+        this.rootLocator = rootLocator;
     }
 
     /**
@@ -54,10 +56,8 @@ public class ProfileActivationFilePathInterpolator
      *
      * @return absolute path or {@code null} if the input was {@code null}
      */
-    public String interpolate( String path, ProfileActivationContext context ) throws InterpolationException
-    {
-        if ( path == null )
-        {
+    public String interpolate(String path, ProfileActivationContext context) throws InterpolationException {
+        if (path == null) {
             return null;
         }
 
@@ -65,38 +65,40 @@ public class ProfileActivationFilePathInterpolator
 
         final File basedir = context.getProjectDirectory();
 
-        if ( basedir != null )
-        {
-            interpolator.addValueSource( new AbstractValueSource( false )
-            {
+        if (basedir != null) {
+            interpolator.addValueSource(new AbstractValueSource(false) {
                 @Override
-                public Object getValue( String expression )
-                {
-                    /*
-                     * We intentionally only support ${basedir} and not ${project.basedir} as the latter form
-                     * would suggest that other project.* expressions can be used which is beyond the design.
-                     */
-                    if ( "basedir".equals( expression ) )
-                    {
+                public Object getValue(String expression) {
+                    if ("basedir".equals(expression) || "project.basedir".equals(expression)) {
                         return basedir.getAbsolutePath();
                     }
                     return null;
                 }
-            } );
-        }
-        else if ( path.contains( "${basedir}" ) )
-        {
+            });
+        } else if (path.contains("${basedir}")) {
             return null;
         }
 
-        interpolator.addValueSource( new MapBasedValueSource( context.getProjectProperties() ) );
+        interpolator.addValueSource(new AbstractValueSource(false) {
+            @Override
+            public Object getValue(String expression) {
+                if ("rootDirectory".equals(expression)) {
+                    Path base = basedir != null ? basedir.toPath() : null;
+                    Path root = rootLocator.findMandatoryRoot(base);
+                    return root.toFile().getAbsolutePath();
+                }
+                return null;
+            }
+        });
 
-        interpolator.addValueSource( new MapBasedValueSource( context.getUserProperties() ) );
+        interpolator.addValueSource(new MapBasedValueSource(context.getProjectProperties()));
 
-        interpolator.addValueSource( new MapBasedValueSource( context.getSystemProperties() ) );
+        interpolator.addValueSource(new MapBasedValueSource(context.getUserProperties()));
 
-        String absolutePath = interpolator.interpolate( path, "" );
+        interpolator.addValueSource(new MapBasedValueSource(context.getSystemProperties()));
 
-        return pathTranslator.alignToBaseDirectory( absolutePath, basedir );
+        String absolutePath = interpolator.interpolate(path, "");
+
+        return pathTranslator.alignToBaseDirectory(absolutePath, basedir);
     }
 }

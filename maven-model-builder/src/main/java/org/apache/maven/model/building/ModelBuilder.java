@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.io.File;
 
@@ -26,10 +25,8 @@ import org.apache.maven.model.Model;
 /**
  * Builds the effective model from a POM.
  *
- * @author Benjamin Bentmann
  */
-public interface ModelBuilder
-{
+public interface ModelBuilder {
 
     /**
      * Builds the effective model of the specified POM.
@@ -38,8 +35,7 @@ public interface ModelBuilder
      * @return The result of the model building, never {@code null}.
      * @throws ModelBuildingException If the effective model could not be built.
      */
-    ModelBuildingResult build( ModelBuildingRequest request )
-        throws ModelBuildingException;
+    ModelBuildingResult build(ModelBuildingRequest request) throws ModelBuildingException;
 
     /**
      * Builds the effective model by completing the specified interim result which was produced by a previous call to
@@ -52,14 +48,15 @@ public interface ModelBuilder
      * @return The result of the model building, never {@code null}.
      * @throws ModelBuildingException If the effective model could not be built.
      */
-    ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result )
-        throws ModelBuildingException;
+    ModelBuildingResult build(ModelBuildingRequest request, ModelBuildingResult result) throws ModelBuildingException;
 
     /**
      * Performs only the part of {@link ModelBuilder#build(ModelBuildingRequest)} that loads the raw model
      */
-    Result<? extends Model> buildRawModel( File pomFile, int validationLevel, boolean locationTracking );
+    Result<? extends Model> buildRawModel(File pomFile, int validationLevel, boolean locationTracking);
+
+    Result<? extends Model> buildRawModel(
+            File pomFile, int validationLevel, boolean locationTracking, TransformerContext context);
 
     TransformerContextBuilder newTransformerContextBuilder();
-
 }

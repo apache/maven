@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,14 +17,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-1-SNAPSHOT</version>
+    <version>4.0.0-alpha-9-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-model</artifactId>
@@ -35,8 +33,34 @@ under the License.
 
   <dependencies>
     <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-model</artifactId>
+      <version>4.0.0-alpha-9-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-xml-impl</artifactId>
+      <version>4.0.0-alpha-9-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <artifactId>plexus-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-core</artifactId>
+      <version>1.36</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-annprocess</artifactId>
+      <version>1.36</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
     </dependency>
   </dependencies>
 
@@ -46,23 +70,111 @@ under the License.
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
-          <version>4.0.0</version>
+          <basedir>${project.basedir}/../api/maven-api-model</basedir>
+          <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>
+          <version>4.1.0</version>
           <models>
             <model>src/main/mdo/maven.mdo</model>
           </models>
+          <params>
+            <param>forcedIOModelVersion=4.0.0</param>
+            <param>packageModelV3=org.apache.maven.model</param>
+            <param>packageModelV4=org.apache.maven.api.model</param>
+            <param>packageToolV4=org.apache.maven.model.v4</param>
+            <param>isMavenModel=true</param>
+            <param>minimalVersion=4.0.0</param>
+          </params>
         </configuration>
         <executions>
           <execution>
-            <id>modello</id>
+            <id>modello-site-docs</id>
             <goals>
-              <goal>java</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xpp3-extended-reader</goal>
-              <goal>xpp3-writer</goal>
-              <goal>xpp3-extended-writer</goal>
+              <goal>xdoc</goal>
             </goals>
+            <phase>pre-site</phase>
+          </execution>
+          <execution>
+            <id>modello-schema</id>
+            <goals>
+              <goal>xsd</goal>
+            </goals>
+            <phase>generate-resources</phase>
+          </execution>
+          <execution>
+            <id>model-v3</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <version>4.0.99</version>
+              <templates>
+                <template>model-v3.vm</template>
+              </templates>
+            </configuration>
+          </execution>
+          <execution>
+            <id>model-v4</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <version>4.1.0</version>
+              <templates>
+                <template>merger.vm</template>
+                <template>transformer.vm</template>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
+                <template>model-version.vm</template>
+              </templates>
+            </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/package-info.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.github.siom79.japicmp</groupId>
+        <artifactId>japicmp-maven-plugin</artifactId>
+        <configuration>
+          <parameter>
+            <excludes>
+              <exclude>org.apache.maven.model.*#setOtherLocation(java.lang.Object,org.apache.maven.model.InputLocation):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ConfigurationContainer#isInheritanceApplied():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ConfigurationContainer#setInherited(boolean):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ConfigurationContainer#unsetInheritanceApplied():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Contributor#addProperty(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Dependency#clearManagementKey():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ModelBase#addProperty(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ModelBase#getReports():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ModelBase#setReports(java.lang.Object):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Notifier#addConfiguration(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Plugin#getGoals():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Plugin#setGoals(java.lang.Object):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Reporting#flushReportPluginMap():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Reporting#getReportPluginsAsMap():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Resource#initMergeId():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Scm#setChildScmConnectionInheritAppendPath(boolean):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Scm#setChildScmDeveloperConnectionInheritAppendPath(boolean):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Scm#setChildScmUrlInheritAppendPath(boolean):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Site#setChildSiteUrlInheritAppendPath(boolean):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3Reader#contentTransformer</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx#contentTransformer</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#stringFormatter</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#toString(org.apache.maven.model.InputLocation):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#writeXpp3DomToSerializer(org.codehaus.plexus.util.xml.Xpp3Dom,org.codehaus.plexus.util.xml.pull.XmlSerializer):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.merge.ModelMerger</exclude>
+            </excludes>
+          </parameter>
+        </configuration>
       </plugin>
     </plugins>
   </build>

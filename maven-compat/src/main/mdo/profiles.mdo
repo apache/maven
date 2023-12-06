@@ -24,8 +24,8 @@ under the License.
   <id>profiles</id>
   <name>Profiles</name>
   <description><![CDATA[
-    Project-local overrides to the build process based on detected or user-provided environmental parameters.
-    This is the model specification for ${basedir}/profiles.xml.
+    <b>Deprecated in Maven 2</b> Project-local overrides to the build process based on detected or user-provided environmental parameters.
+    This is the model specification for <code>${basedir}/profiles.xml</code>.
   ]]></description>
   <defaults>
     <default>
@@ -162,7 +162,7 @@ under the License.
           <name>property</name>
           <version>1.0.0</version>
           <description><![CDATA[
-            Specifies that this profile will be activated when this System property is specified.
+            Specifies that this profile will be activated when this property is specified.
           ]]></description>
           <association>
             <type>ActivationProperty</type>

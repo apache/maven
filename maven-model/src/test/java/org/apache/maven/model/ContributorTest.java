@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,36 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code Contributor}.
  *
- * @author Benjamin Bentmann
  */
-public class ContributorTest
-{
+class ContributorTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    void testHashCodeNullSafe() {
         new Contributor().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Contributor().equals( null ) );
+    void testEqualsNullSafe() {
+        assertFalse(new Contributor().equals(null));
 
-        new Contributor().equals( new Contributor() );
+        new Contributor().equals(new Contributor());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    void testEqualsIdentity() {
         Contributor thing = new Contributor();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Contributor().toString() );
+    void testToStringNullSafe() {
+        assertNotNull(new Contributor().toString());
     }
-
 }

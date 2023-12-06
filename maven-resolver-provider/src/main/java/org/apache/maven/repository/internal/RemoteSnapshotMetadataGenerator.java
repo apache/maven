@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -33,23 +32,18 @@ import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.util.ConfigUtils;
 
 /**
- * @author Benjamin Bentmann
+ * Maven remote GAV level metadata generator.
+ * <p>
+ * Remote snapshot metadata converts artifact on-the-fly to use timestamped snapshot version, and enlist it accordingly.
  */
-class RemoteSnapshotMetadataGenerator
-    implements MetadataGenerator
-{
+class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
 
     private final Map<Object, RemoteSnapshotMetadata> snapshots;
 
-    private final boolean legacyFormat;
-
     private final Date timestamp;
 
-    RemoteSnapshotMetadataGenerator( RepositorySystemSession session, DeployRequest request )
-    {
-        legacyFormat = ConfigUtils.getBoolean( session, false, "maven.metadata.legacy" );
-
-        timestamp = (Date) ConfigUtils.getObject( session, new Date(), "maven.startTime" );
+    RemoteSnapshotMetadataGenerator(RepositorySystemSession session, DeployRequest request) {
+        timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
 
         snapshots = new LinkedHashMap<>();
 
@@ -59,54 +53,46 @@ class RemoteSnapshotMetadataGenerator
          * same timestamp+buildno for the snapshot versions. Allowing the caller to pass in metadata from a previous
          * deployment allows to re-establish the association between the artifacts of the same project.
          */
-        for ( Metadata metadata : request.getMetadata() )
-        {
-            if ( metadata instanceof RemoteSnapshotMetadata )
-            {
+        for (Metadata metadata : request.getMetadata()) {
+            if (metadata instanceof RemoteSnapshotMetadata) {
                 RemoteSnapshotMetadata snapshotMetadata = (RemoteSnapshotMetadata) metadata;
-                snapshots.put( snapshotMetadata.getKey(), snapshotMetadata );
+                snapshots.put(snapshotMetadata.getKey(), snapshotMetadata);
             }
         }
     }
 
-    public Collection<? extends Metadata> prepare( Collection<? extends Artifact> artifacts )
-    {
-        for ( Artifact artifact : artifacts )
-        {
-            if ( artifact.isSnapshot() )
-            {
-                Object key = RemoteSnapshotMetadata.getKey( artifact );
-                RemoteSnapshotMetadata snapshotMetadata = snapshots.get( key );
-                if ( snapshotMetadata == null )
-                {
-                    snapshotMetadata = new RemoteSnapshotMetadata( artifact, legacyFormat, timestamp );
-                    snapshots.put( key, snapshotMetadata );
+    @Override
+    public Collection<? extends Metadata> prepare(Collection<? extends Artifact> artifacts) {
+        for (Artifact artifact : artifacts) {
+            if (artifact.isSnapshot()) {
+                Object key = RemoteSnapshotMetadata.getKey(artifact);
+                RemoteSnapshotMetadata snapshotMetadata = snapshots.get(key);
+                if (snapshotMetadata == null) {
+                    snapshotMetadata = new RemoteSnapshotMetadata(artifact, timestamp);
+                    snapshots.put(key, snapshotMetadata);
                 }
-                snapshotMetadata.bind( artifact );
+                snapshotMetadata.bind(artifact);
             }
         }
 
         return snapshots.values();
     }
 
-    public Artifact transformArtifact( Artifact artifact )
-    {
-        if ( artifact.isSnapshot() && artifact.getVersion().equals( artifact.getBaseVersion() ) )
-        {
-            Object key = RemoteSnapshotMetadata.getKey( artifact );
-            RemoteSnapshotMetadata snapshotMetadata = snapshots.get( key );
-            if ( snapshotMetadata != null )
-            {
-                artifact = artifact.setVersion( snapshotMetadata.getExpandedVersion( artifact ) );
+    @Override
+    public Artifact transformArtifact(Artifact artifact) {
+        if (artifact.isSnapshot() && artifact.getVersion().equals(artifact.getBaseVersion())) {
+            Object key = RemoteSnapshotMetadata.getKey(artifact);
+            RemoteSnapshotMetadata snapshotMetadata = snapshots.get(key);
+            if (snapshotMetadata != null) {
+                artifact = artifact.setVersion(snapshotMetadata.getExpandedVersion(artifact));
             }
         }
 
         return artifact;
     }
 
-    public Collection<? extends Metadata> finish( Collection<? extends Artifact> artifacts )
-    {
+    @Override
+    public Collection<? extends Metadata> finish(Collection<? extends Artifact> artifacts) {
         return Collections.emptyList();
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import org.apache.maven.building.Source;
 
@@ -27,12 +26,8 @@ import org.apache.maven.building.Source;
  * This interface does not support loading of parent POM(s) from the same backing store, integrators are strongly
  * encouraged to implement {@link ModelSource2} instead of implementing this interface directly.
  *
- * @author Benjamin Bentmann
  * @see ModelSource2
  * @deprecated instead use {@link Source}
  */
 @Deprecated
-public interface ModelSource extends Source
-{
-
-}
+public interface ModelSource extends Source {}

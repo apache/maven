@@ -1,5 +1,3 @@
-package org.apache.maven.model.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,188 +16,135 @@ package org.apache.maven.model.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.io;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelSourceTransformer;
-import org.apache.maven.model.building.TransformerContext;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
-import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
-import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.model.v4.MavenStaxReader;
 
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
-public class DefaultModelReader
-    implements ModelReader
-{
+public class DefaultModelReader implements ModelReader {
     private final ModelSourceTransformer transformer;
 
-    private Method readMethod;
-
-    private Method readMethodEx;
-
     @Inject
-    public DefaultModelReader( ModelSourceTransformer transformer )
-    {
+    public DefaultModelReader(ModelSourceTransformer transformer) {
         this.transformer = transformer;
     }
 
     @Override
-    public Model read( File input, Map<String, ?> options )
-        throws IOException
-    {
-        Objects.requireNonNull( input, "input cannot be null" );
+    public Model read(File input, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(input, "input cannot be null");
 
-        try ( XmlStreamReader in = ReaderFactory.newXmlReader( input ) )
-        {
-            Model model = read( in, input.toPath(), options );
+        try (InputStream in = Files.newInputStream(input.toPath())) {
+            Model model = read(in, input.toPath(), options);
 
-            model.setPomFile( input );
+            model.setPomFile(input);
 
             return model;
         }
     }
 
     @Override
-    public Model read( Reader input, Map<String, ?> options )
-        throws IOException
-    {
-        Objects.requireNonNull( input, "input cannot be null" );
+    public Model read(Reader input, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(input, "input cannot be null");
 
-        try ( Reader in = input )
-        {
-            return read( in, null, options );
+        try (Reader in = input) {
+            return read(in, null, options);
         }
     }
 
     @Override
-    public Model read( InputStream input, Map<String, ?> options )
-        throws IOException
-    {
-        Objects.requireNonNull( input, "input cannot be null" );
+    public Model read(InputStream input, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(input, "input cannot be null");
 
-        try ( XmlStreamReader in = ReaderFactory.newXmlReader( input ) )
-        {
-            return read( in, null, options );
+        try (InputStream in = input) {
+            return read(input, null, options);
         }
     }
 
-    private boolean isStrict( Map<String, ?> options )
-    {
-        Object value = ( options != null ) ? options.get( IS_STRICT ) : null;
-        return value == null || Boolean.parseBoolean( value.toString() );
+    private boolean isStrict(Map<String, ?> options) {
+        Object value = (options != null) ? options.get(IS_STRICT) : null;
+        return value == null || Boolean.parseBoolean(value.toString());
     }
 
-    private InputSource getSource( Map<String, ?> options )
-    {
-        Object value = ( options != null ) ? options.get( INPUT_SOURCE ) : null;
+    private InputSource getSource(Map<String, ?> options) {
+        Object value = (options != null) ? options.get(INPUT_SOURCE) : null;
         return (InputSource) value;
     }
 
-    private TransformerContext getTransformerContext( Map<String, ?> options )
-    {
-        Object value = ( options != null ) ? options.get( TRANSFORMER_CONTEXT ) : null;
-        return (TransformerContext) value;
+    private Path getRootDirectory(Map<String, ?> options) {
+        Object value = (options != null) ? options.get(ROOT_DIRECTORY) : null;
+        return (Path) value;
     }
 
-    private Model read( Reader reader, Path pomFile, Map<String, ?> options )
-        throws IOException
-    {
-        try
-        {
-            XmlPullParser parser = new MXParser( EntityReplacementMap.defaultEntityReplacementMap );
-            parser.setInput( reader );
+    private Model read(InputStream input, Path pomFile, Map<String, ?> options) throws IOException {
+        try {
+            XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+            factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+            XMLStreamReader parser = factory.createXMLStreamReader(input);
 
-            TransformerContext context = getTransformerContext( options );
-            XmlPullParser transformingParser = context != null
-                    ? transformer.transform( parser, pomFile, context ) : parser;
-
-            InputSource source = getSource( options );
-            boolean strict = isStrict( options );
-            try
-            {
-                if ( source != null )
-                {
-                    return readModelEx( transformingParser, source, strict );
-                }
-                else
-                {
-                    return readModel( transformingParser, strict );
-                }
-            }
-            catch ( InvocationTargetException e )
-            {
-                Throwable cause = e.getCause();
-                if ( cause instanceof Exception )
-                {
-                    throw ( Exception ) cause;
-                }
-                throw e;
-            }
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ModelParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
-        }
-        catch ( IOException e )
-        {
-            throw e;
-        }
-        catch ( Exception e )
-        {
-            throw new IOException( "Unable to transform pom", e );
+            InputSource source = getSource(options);
+            boolean strict = isStrict(options);
+            MavenStaxReader mr = new MavenStaxReader();
+            mr.setAddLocationInformation(source != null);
+            Model model = new Model(mr.read(parser, strict, source != null ? source.toApiSource() : null));
+            return model;
+        } catch (XMLStreamException e) {
+            Location location = e.getLocation();
+            throw new ModelParseException(
+                    e.getMessage(),
+                    location != null ? location.getLineNumber() : -1,
+                    location != null ? location.getColumnNumber() : -1,
+                    e);
+        } catch (Exception e) {
+            throw new IOException("Unable to transform pom", e);
         }
     }
 
-    private Model readModel( XmlPullParser parser, boolean strict )
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-    {
-        if ( readMethod == null )
-        {
-            readMethod = MavenXpp3Reader.class.getDeclaredMethod( "read", XmlPullParser.class, boolean.class );
-            readMethod.setAccessible( true );
-        }
-        MavenXpp3Reader mr = new MavenXpp3Reader();
-        Object model = readMethod.invoke( mr, parser, strict );
-        return ( Model ) model;
-    }
+    private Model read(Reader reader, Path pomFile, Map<String, ?> options) throws IOException {
+        try {
+            XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+            factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+            XMLStreamReader parser = factory.createXMLStreamReader(reader);
 
-    private Model readModelEx( XmlPullParser parser, InputSource source, boolean strict )
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-    {
-        if ( readMethodEx == null )
-        {
-            readMethodEx = MavenXpp3ReaderEx.class.getDeclaredMethod( "read",
-                    XmlPullParser.class, boolean.class, InputSource.class );
-            readMethodEx.setAccessible( true );
+            InputSource source = getSource(options);
+            boolean strict = isStrict(options);
+            MavenStaxReader mr = new MavenStaxReader();
+            mr.setAddLocationInformation(source != null);
+            Model model = new Model(mr.read(parser, strict, source != null ? source.toApiSource() : null));
+            return model;
+        } catch (XMLStreamException e) {
+            Location location = e.getLocation();
+            throw new ModelParseException(
+                    e.getMessage(),
+                    location != null ? location.getLineNumber() : -1,
+                    location != null ? location.getColumnNumber() : -1,
+                    e);
+        } catch (Exception e) {
+            throw new IOException("Unable to transform pom", e);
         }
-        MavenXpp3ReaderEx mr = new MavenXpp3ReaderEx();
-        Object model = readMethodEx.invoke( mr, parser, strict, source );
-        return ( Model ) model;
     }
-
 }

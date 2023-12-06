@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.handler.manager;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.handler.manager;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,68 +16,71 @@ package org.apache.maven.artifact.handler.manager;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+package org.apache.maven.artifact.handler.manager;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.maven.api.Type;
+import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.eventspy.AbstractEventSpy;
+import org.apache.maven.execution.ExecutionEvent;
+
+import static java.util.Objects.requireNonNull;
 
 /**
- * @author Jason van Zyl
  */
 @Named
 @Singleton
-public class DefaultArtifactHandlerManager
-    implements ArtifactHandlerManager
-{
+public class DefaultArtifactHandlerManager extends AbstractEventSpy implements ArtifactHandlerManager {
+    private final TypeRegistry typeRegistry;
 
-    private final Map<String, ArtifactHandler> artifactHandlers;
-
-    private final Map<String, ArtifactHandler> allHandlers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ArtifactHandler> allHandlers;
 
     @Inject
-    public DefaultArtifactHandlerManager( Map<String, ArtifactHandler> artifactHandlers )
-    {
-        this.artifactHandlers = artifactHandlers;
+    public DefaultArtifactHandlerManager(TypeRegistry typeRegistry) {
+        this.typeRegistry = requireNonNull(typeRegistry, "null typeRegistry");
+        this.allHandlers = new ConcurrentHashMap<>();
     }
 
-    public ArtifactHandler getArtifactHandler( String type )
-    {
-        ArtifactHandler handler = allHandlers.get( type );
-
-        if ( handler == null )
-        {
-            handler = artifactHandlers.get( type );
-
-            if ( handler == null )
-            {
-                handler = new DefaultArtifactHandler( type );
-            }
-            else
-            {
-                allHandlers.put( type, handler );
+    @Override
+    public void onEvent(Object event) {
+        if (event instanceof ExecutionEvent) {
+            ExecutionEvent executionEvent = (ExecutionEvent) event;
+            if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
+                allHandlers.clear();
             }
         }
-
-        return handler;
     }
 
-    public void addHandlers( Map<String, ArtifactHandler> handlers )
-    {
-        // legacy support for maven-gpg-plugin:1.0
-        allHandlers.putAll( handlers );
+    public ArtifactHandler getArtifactHandler(String id) {
+        return allHandlers.computeIfAbsent(id, k -> {
+            Type type = typeRegistry.getType(id);
+            return new DefaultArtifactHandler(
+                    id,
+                    type.getExtension(),
+                    type.getClassifier(),
+                    null,
+                    null,
+                    type.isIncludesDependencies(),
+                    "none",
+                    type.isAddedToClassPath()); // TODO: watch out for module path
+        });
+    }
+
+    public void addHandlers(Map<String, ArtifactHandler> handlers) {
+        throw new UnsupportedOperationException("Adding handlers programmatically is not supported anymore");
     }
 
     @Deprecated
-    public Set<String> getHandlerTypes()
-    {
-        return artifactHandlers.keySet();
+    public Set<String> getHandlerTypes() {
+        throw new UnsupportedOperationException("Querying handlers programmatically is not supported anymore");
     }
-
 }

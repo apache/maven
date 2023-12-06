@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,14 +17,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-1-SNAPSHOT</version>
+    <version>4.0.0-alpha-9-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-plugin-api</artifactId>
@@ -34,6 +32,10 @@ under the License.
   <description>The API for plugins - Mojos - development.</description>
 
   <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-plugin</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
@@ -45,14 +47,20 @@ under the License.
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-utils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-classworlds</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-api</artifactId>
     </dependency>
   </dependencies>
 
@@ -62,25 +70,70 @@ under the License.
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
-          <models>
-            <model>src/main/mdo/lifecycle.mdo</model>
-          </models>
-          <version>1.0.0</version>
+          <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>
         </configuration>
         <executions>
           <execution>
-            <id>modello-site-doc</id>
-            <phase>pre-site</phase>
+            <id>velocity-lifecycle</id>
             <goals>
-              <goal>xdoc</goal>
+              <goal>velocity</goal>
             </goals>
+            <phase>generate-sources</phase>
             <configuration>
+              <templates>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV4=org.apache.maven.api.plugin.descriptor.lifecycle</param>
+                <param>packageToolV4=org.apache.maven.plugin.lifecycle.io</param>
+              </params>
               <models>
-                <model>src/main/mdo/plugin.mdo</model>
+                <model>../api/maven-api-plugin/src/main/mdo/lifecycle.mdo</model>
               </models>
+              <version>1.0.0</version>
             </configuration>
           </execution>
+          <execution>
+            <id>velocity-plugin</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <templates>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV3=org.apache.maven.plugin.descriptor</param>
+                <param>packageModelV4=org.apache.maven.api.plugin.descriptor</param>
+                <param>packageToolV4=org.apache.maven.plugin.descriptor.io</param>
+              </params>
+              <models>
+                <model>../api/maven-api-plugin/src/main/mdo/plugin.mdo</model>
+              </models>
+              <version>2.0.0</version>
+            </configuration>
+          </execution>
+          <execution>
+            <id>modello-site-docs</id>
+            <phase>none</phase>
+          </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.siom79.japicmp</groupId>
+        <artifactId>japicmp-maven-plugin</artifactId>
+        <configuration>
+          <parameter>
+            <excludes>
+              <exclude>org.apache.maven.monitor.logging.DefaultLog</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle</exclude>
+              <exclude>org.apache.maven.plugin.descriptor.PluginDescriptor#getLifecycleMapping(java.lang.String)</exclude>
+            </excludes>
+          </parameter>
+        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -1,5 +1,3 @@
-package org.slf4j.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,13 @@ package org.slf4j.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.slf4j.impl;
 
 import java.io.PrintStream;
 
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
-import static org.apache.maven.shared.utils.logging.MessageUtils.level;
+import org.apache.maven.api.services.MessageBuilder;
+
+import static org.apache.maven.cli.jansi.MessageUtils.builder;
 
 /**
  * Logger for Maven, that support colorization of levels and stacktraces. This class implements 2 methods introduced in
@@ -30,90 +30,95 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.level;
  *
  * @since 3.5.0
  */
-public class MavenSimpleLogger extends SimpleLogger
-{
-    MavenSimpleLogger( String name )
-    {
-        super( name );
+public class MavenSimpleLogger extends SimpleLogger {
+
+    private final String traceRenderedLevel = builder().trace("TRACE").build();
+    private final String debugRenderedLevel = builder().debug("DEBUG").build();
+    private final String infoRenderedLevel = builder().info("INFO").build();
+    private final String warnRenderedLevel = builder().warning("WARNING").build();
+    private final String errorRenderedLevel = builder().error("ERROR").build();
+
+    MavenSimpleLogger(String name) {
+        super(name);
     }
 
     @Override
-    protected String renderLevel( int level )
-    {
-        switch ( level )
-        {
+    protected String renderLevel(int level) {
+        switch (level) {
             case LOG_LEVEL_TRACE:
-                return level().debug( "TRACE" );
+                return traceRenderedLevel;
             case LOG_LEVEL_DEBUG:
-                return level().debug( "DEBUG" );
+                return debugRenderedLevel;
             case LOG_LEVEL_INFO:
-                return level().info( "INFO" );
+                return infoRenderedLevel;
             case LOG_LEVEL_WARN:
-                return level().warning( "WARNING" );
+                return warnRenderedLevel;
             case LOG_LEVEL_ERROR:
             default:
-                return level().error( "ERROR" );
+                return errorRenderedLevel;
         }
     }
 
     @Override
-    protected void writeThrowable( Throwable t, PrintStream stream )
-    {
-        if ( t == null )
-        {
+    protected void writeThrowable(Throwable t, PrintStream stream) {
+        if (t == null) {
             return;
         }
-        stream.print( buffer().failure( t.getClass().getName() ) );
-        if ( t.getMessage() != null )
-        {
-            stream.print( ": " );
-            stream.print( buffer().failure( t.getMessage() ) );
+        MessageBuilder builder = builder().failure(t.getClass().getName());
+        if (t.getMessage() != null) {
+            builder.a(": ").failure(t.getMessage());
         }
-        stream.println();
+        stream.println(builder);
 
-        while ( t != null )
-        {
-            for ( StackTraceElement e : t.getStackTrace() )
-            {
-                stream.print( "    " );
-                stream.print( buffer().strong( "at" ) );
-                stream.print( " " + e.getClassName() + "." + e.getMethodName() );
-                stream.print( buffer().a( " (" ).strong( getLocation( e ) ).a( ")" ) );
-                stream.println();
-            }
+        printStackTrace(t, stream, "");
+    }
 
-            t = t.getCause();
-            if ( t != null )
-            {
-                stream.print( buffer().strong( "Caused by" ).a( ": " ).a( t.getClass().getName() ) );
-                if ( t.getMessage() != null )
-                {
-                    stream.print( ": " );
-                    stream.print( buffer().failure( t.getMessage() ) );
-                }
-                stream.println();
-            }
+    private void printStackTrace(Throwable t, PrintStream stream, String prefix) {
+        MessageBuilder builder = builder();
+        for (StackTraceElement e : t.getStackTrace()) {
+            builder.a(prefix);
+            builder.a("    ");
+            builder.strong("at");
+            builder.a(" ");
+            builder.a(e.getClassName());
+            builder.a(".");
+            builder.a(e.getMethodName());
+            builder.a(" (");
+            builder.strong(getLocation(e));
+            builder.a(")");
+            stream.println(builder);
+            builder.setLength(0);
+        }
+        for (Throwable se : t.getSuppressed()) {
+            writeThrowable(se, stream, "Suppressed", prefix + "    ");
+        }
+        Throwable cause = t.getCause();
+        if (cause != null && t != cause) {
+            writeThrowable(cause, stream, "Caused by", prefix);
         }
     }
 
-    protected String getLocation( final StackTraceElement e )
-    {
+    private void writeThrowable(Throwable t, PrintStream stream, String caption, String prefix) {
+        MessageBuilder builder =
+                builder().a(prefix).strong(caption).a(": ").a(t.getClass().getName());
+        if (t.getMessage() != null) {
+            builder.a(": ").failure(t.getMessage());
+        }
+        stream.println(builder);
+
+        printStackTrace(t, stream, prefix);
+    }
+
+    protected String getLocation(final StackTraceElement e) {
         assert e != null;
 
-        if ( e.isNativeMethod() )
-        {
+        if (e.isNativeMethod()) {
             return "Native Method";
-        }
-        else if ( e.getFileName() == null )
-        {
+        } else if (e.getFileName() == null) {
             return "Unknown Source";
-        }
-        else if ( e.getLineNumber() >= 0 )
-        {
-            return String.format( "%s:%s", e.getFileName(), e.getLineNumber() );
-        }
-        else
-        {
+        } else if (e.getLineNumber() >= 0) {
+            return e.getFileName() + ":" + e.getLineNumber();
+        } else {
             return e.getFileName();
         }
     }

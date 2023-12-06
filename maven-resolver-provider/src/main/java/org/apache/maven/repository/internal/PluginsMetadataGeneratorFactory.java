@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,8 +16,8 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -29,39 +27,27 @@ import org.eclipse.aether.impl.MetadataGenerator;
 import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.installation.InstallRequest;
 
-import static java.util.Objects.requireNonNull;
-
 /**
- * Plugin G level metadata.
+ * Maven G level metadata generator factory.
  */
-@Named( "plugins" )
+@Named(PluginsMetadataGeneratorFactory.NAME)
 @Singleton
-public class PluginsMetadataGeneratorFactory
-    implements MetadataGeneratorFactory
-{
-    private final PluginsMetadataInfoProvider pluginsMetadataInfoProvider;
+public class PluginsMetadataGeneratorFactory implements MetadataGeneratorFactory {
+    public static final String NAME = "plugins";
 
-    @Inject
-    public PluginsMetadataGeneratorFactory( PluginsMetadataInfoProvider pluginsMetadataInfoProvider )
-    {
-        this.pluginsMetadataInfoProvider = requireNonNull( pluginsMetadataInfoProvider );
+    @Override
+    public MetadataGenerator newInstance(RepositorySystemSession session, InstallRequest request) {
+        return new PluginsMetadataGenerator(session, request);
     }
 
     @Override
-    public MetadataGenerator newInstance( RepositorySystemSession session, InstallRequest request )
-    {
-        return new PluginsMetadataGenerator( pluginsMetadataInfoProvider, session, request );
+    public MetadataGenerator newInstance(RepositorySystemSession session, DeployRequest request) {
+        return new PluginsMetadataGenerator(session, request);
     }
 
+    @SuppressWarnings("checkstyle:magicnumber")
     @Override
-    public MetadataGenerator newInstance( RepositorySystemSession session, DeployRequest request )
-    {
-        return new PluginsMetadataGenerator( pluginsMetadataInfoProvider, session, request );
-    }
-
-    @Override
-    public float getPriority()
-    {
-        return 5;
+    public float getPriority() {
+        return 10; // G level MD should be deployed as 3rd MD
     }
 }

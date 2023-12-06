@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,8 +16,10 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -27,33 +27,39 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
+import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsUtilsV4;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A Maven execution session.
  *
- * @author Jason van Zyl
  */
-public class MavenSession
-    implements Cloneable
-{
-    private MavenExecutionRequest request;
+public class MavenSession implements Cloneable {
+    private final MavenExecutionRequest request;
 
-    private MavenExecutionResult result;
+    private final MavenExecutionResult result;
 
-    private RepositorySystemSession repositorySession;
+    private final RepositorySystemSession repositorySystemSession;
 
-    private Properties executionProperties;
+    private final Properties executionProperties;
 
     private ThreadLocal<MavenProject> currentProject = new ThreadLocal<>();
 
@@ -81,36 +87,30 @@ public class MavenSession
      * ({@link PluginDescriptor#getPluginLookupKey()}). Plugin contexts itself are mappings of {@link String} keys to
      * {@link Object} values.
      */
-    @SuppressWarnings( "checkstyle:linelength" )
-    private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Object>>> pluginContextsByProjectAndPluginKey =
-        new ConcurrentHashMap<>();
+    @SuppressWarnings("checkstyle:linelength")
+    private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Object>>>
+            pluginContextsByProjectAndPluginKey = new ConcurrentHashMap<>();
 
-
-    public void setProjects( List<MavenProject> projects )
-    {
-        if ( !projects.isEmpty() )
-        {
-            MavenProject first = projects.get( 0 );
-            this.currentProject = ThreadLocal.withInitial( () -> first );
-            this.topLevelProject =
-                    projects.stream().filter( project -> project.isExecutionRoot() ).findFirst()
-                            .orElse( first );
-        }
-        else
-        {
+    public void setProjects(List<MavenProject> projects) {
+        if (!projects.isEmpty()) {
+            MavenProject first = projects.get(0);
+            this.currentProject = ThreadLocal.withInitial(() -> first);
+            this.topLevelProject = projects.stream()
+                    .filter(project -> project.isExecutionRoot())
+                    .findFirst()
+                    .orElse(first);
+        } else {
             this.currentProject = new ThreadLocal<>();
             this.topLevelProject = null;
         }
         this.projects = projects;
     }
 
-    public ArtifactRepository getLocalRepository()
-    {
+    public ArtifactRepository getLocalRepository() {
         return request.getLocalRepository();
     }
 
-    public List<String> getGoals()
-    {
+    public List<String> getGoals() {
         return request.getGoals();
     }
 
@@ -121,8 +121,7 @@ public class MavenSession
      *
      * @return The user properties, never {@code null}.
      */
-    public Properties getUserProperties()
-    {
+    public Properties getUserProperties() {
         return request.getUserProperties();
     }
 
@@ -132,68 +131,75 @@ public class MavenSession
      *
      * @return The system properties, never {@code null}.
      */
-    public Properties getSystemProperties()
-    {
+    public Properties getSystemProperties() {
         return request.getSystemProperties();
     }
 
-    public Settings getSettings()
-    {
+    public Settings getSettings() {
         return settings;
     }
 
-    public List<MavenProject> getProjects()
-    {
+    public List<MavenProject> getProjects() {
         return projects;
     }
 
-    public String getExecutionRootDirectory()
-    {
+    /**
+     * @deprecated use {@link #getTopDirectory()} ()}
+     */
+    @Deprecated
+    public String getExecutionRootDirectory() {
         return request.getBaseDirectory();
     }
 
-    public MavenExecutionRequest getRequest()
-    {
+    /**
+     * @see MavenExecutionRequest#getTopDirectory()
+     * @since 4.0.0
+     */
+    public Path getTopDirectory() {
+        return request.getTopDirectory();
+    }
+
+    /**
+     * @see MavenExecutionRequest#getRootDirectory()
+     * @since 4.0.0
+     */
+    public Path getRootDirectory() {
+        return request.getRootDirectory();
+    }
+
+    public MavenExecutionRequest getRequest() {
         return request;
     }
 
-    public void setCurrentProject( MavenProject currentProject )
-    {
-        this.currentProject.set( currentProject );
+    public void setCurrentProject(MavenProject currentProject) {
+        this.currentProject.set(currentProject);
     }
 
-    public MavenProject getCurrentProject()
-    {
+    public MavenProject getCurrentProject() {
         return currentProject.get();
     }
 
-    public ProjectBuildingRequest getProjectBuildingRequest()
-    {
-        return request.getProjectBuildingRequest().setRepositorySession( getRepositorySession() );
+    public ProjectBuildingRequest getProjectBuildingRequest() {
+        return request.getProjectBuildingRequest().setRepositorySession(getRepositorySession());
     }
 
-    public List<String> getPluginGroups()
-    {
+    public List<String> getPluginGroups() {
         return request.getPluginGroups();
     }
 
-    public boolean isOffline()
-    {
+    public boolean isOffline() {
         return request.isOffline();
     }
 
-    public MavenProject getTopLevelProject()
-    {
+    public MavenProject getTopLevelProject() {
         return topLevelProject;
     }
 
-    public MavenExecutionResult getResult()
-    {
+    public MavenExecutionResult getResult() {
         return result;
     }
 
     // Backward compat
-
 
     /**
      * Returns the plugin context for given key ({@link PluginDescriptor#getPluginLookupKey()} and
@@ -203,87 +209,72 @@ public class MavenSession
      * implements {@link ConcurrentMap} as well.
      *
      */
-    public Map<String, Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
-    {
+    public Map<String, Object> getPluginContext(PluginDescriptor plugin, MavenProject project) {
         String projectKey = project.getId();
 
-        ConcurrentMap<String, ConcurrentMap<String, Object>> pluginContextsByKey = pluginContextsByProjectAndPluginKey
-                .computeIfAbsent( projectKey, k -> new ConcurrentHashMap<>() );
+        ConcurrentMap<String, ConcurrentMap<String, Object>> pluginContextsByKey =
+                pluginContextsByProjectAndPluginKey.computeIfAbsent(projectKey, k -> new ConcurrentHashMap<>());
 
         String pluginKey = plugin.getPluginLookupKey();
 
-        return pluginContextsByKey.computeIfAbsent( pluginKey, k -> new ConcurrentHashMap<>() );
+        return pluginContextsByKey.computeIfAbsent(pluginKey, k -> new ConcurrentHashMap<>());
     }
 
-    public ProjectDependencyGraph getProjectDependencyGraph()
-    {
+    public ProjectDependencyGraph getProjectDependencyGraph() {
         return projectDependencyGraph;
     }
 
-    public void setProjectDependencyGraph( ProjectDependencyGraph projectDependencyGraph )
-    {
+    public void setProjectDependencyGraph(ProjectDependencyGraph projectDependencyGraph) {
         this.projectDependencyGraph = projectDependencyGraph;
     }
 
-    public String getReactorFailureBehavior()
-    {
+    public String getReactorFailureBehavior() {
         return request.getReactorFailureBehavior();
     }
 
     @Override
-    public MavenSession clone()
-    {
-        try
-        {
+    public MavenSession clone() {
+        try {
             MavenSession clone = (MavenSession) super.clone();
             // the default must become the current project of the thread that clones this
             MavenProject current = getCurrentProject();
             // we replace the thread local of the clone to prevent write through and enforce the new default value
-            clone.currentProject = ThreadLocal.withInitial( () -> current );
+            clone.currentProject = ThreadLocal.withInitial(() -> current);
             return clone;
-        }
-        catch ( CloneNotSupportedException e )
-        {
-            throw new RuntimeException( "Bug", e );
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Bug", e);
         }
     }
 
-    public Date getStartTime()
-    {
+    public Date getStartTime() {
         return request.getStartTime();
     }
 
-    public boolean isParallel()
-    {
+    public boolean isParallel() {
         return parallel;
     }
 
-    public void setParallel( boolean parallel )
-    {
+    public void setParallel(boolean parallel) {
         this.parallel = parallel;
     }
 
-    public RepositorySystemSession getRepositorySession()
-    {
-        return repositorySession;
+    public RepositorySystemSession getRepositorySession() {
+        return repositorySystemSession;
     }
 
     private Map<String, MavenProject> projectMap;
 
-    public void setProjectMap( Map<String, MavenProject> projectMap )
-    {
+    public void setProjectMap(Map<String, MavenProject> projectMap) {
         this.projectMap = projectMap;
     }
 
     /** This is a provisional method and may be removed */
-    public List<MavenProject> getAllProjects()
-    {
+    public List<MavenProject> getAllProjects() {
         return allProjects;
     }
 
     /** This is a provisional method and may be removed */
-    public void setAllProjects( List<MavenProject> allProjects )
-    {
+    public void setAllProjects(List<MavenProject> allProjects) {
         this.allProjects = allProjects;
     }
 
@@ -293,77 +284,154 @@ public class MavenSession
     // Deprecated
     //
 
-    private PlexusContainer container;
+    private final PlexusContainer container;
 
     private final Settings settings;
 
+    private Session session;
+
     @Deprecated
     /** @deprecated This appears not to be used anywhere within Maven itself. */
-    public Map<String, MavenProject> getProjectMap()
-    {
+    public Map<String, MavenProject> getProjectMap() {
         return projectMap;
     }
 
+    public MavenSession(
+            RepositorySystemSession repositorySystemSession,
+            MavenExecutionRequest request,
+            MavenExecutionResult result) {
+        this.container = null;
+        this.request = requireNonNull(request);
+        this.result = requireNonNull(result);
+        this.settings = adaptSettings(request);
+        this.repositorySystemSession = requireNonNull(repositorySystemSession);
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
+    }
+
     @Deprecated
-    public MavenSession( PlexusContainer container, RepositorySystemSession repositorySession,
-                         MavenExecutionRequest request, MavenExecutionResult result )
-    {
+    public MavenSession(
+            PlexusContainer container,
+            RepositorySystemSession repositorySession,
+            MavenExecutionRequest request,
+            MavenExecutionResult result) {
         this.container = container;
         this.request = request;
         this.result = result;
-        this.settings = new SettingsAdapter( request );
-        this.repositorySession = repositorySession;
+        this.settings = adaptSettings(request);
+        this.repositorySystemSession = repositorySession;
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
     }
 
     @Deprecated
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result,
-                         MavenProject project )
-    {
-        this( container, request, result, Arrays.asList( new MavenProject[]{project} ) );
+    public MavenSession(
+            PlexusContainer container,
+            MavenExecutionRequest request,
+            MavenExecutionResult result,
+            MavenProject project) {
+        this(container, request, result, Arrays.asList(new MavenProject[] {project}));
     }
 
     @Deprecated
-    @SuppressWarnings( "checkstyle:parameternumber" )
-    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher, ReactorManager unused, List<String> goals,
-                         String executionRootDir, Properties executionProperties, Date startTime )
-    {
-        this( container, settings, localRepository, eventDispatcher, unused, goals, executionRootDir,
-              executionProperties, null, startTime );
+    @SuppressWarnings("checkstyle:parameternumber")
+    public MavenSession(
+            PlexusContainer container,
+            Settings settings,
+            ArtifactRepository localRepository,
+            EventDispatcher eventDispatcher,
+            ReactorManager unused,
+            List<String> goals,
+            String executionRootDir,
+            Properties executionProperties,
+            Date startTime) {
+        this(
+                container,
+                settings,
+                localRepository,
+                eventDispatcher,
+                unused,
+                goals,
+                executionRootDir,
+                executionProperties,
+                null,
+                startTime);
     }
 
     @Deprecated
-    @SuppressWarnings( "checkstyle:parameternumber" )
-    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher, ReactorManager unused, List<String> goals,
-                         String executionRootDir, Properties executionProperties, Properties userProperties,
-                         Date startTime )
-    {
+    @SuppressWarnings("checkstyle:parameternumber")
+    public MavenSession(
+            PlexusContainer container,
+            Settings settings,
+            ArtifactRepository localRepository,
+            EventDispatcher eventDispatcher,
+            ReactorManager unused,
+            List<String> goals,
+            String executionRootDir,
+            Properties executionProperties,
+            Properties userProperties,
+            Date startTime) {
         this.container = container;
         this.settings = settings;
         this.executionProperties = executionProperties;
         this.request = new DefaultMavenExecutionRequest();
-        this.request.setUserProperties( userProperties );
-        this.request.setLocalRepository( localRepository );
-        this.request.setGoals( goals );
-        this.request.setBaseDirectory( ( executionRootDir != null ) ? new File( executionRootDir ) : null );
-        this.request.setStartTime( startTime );
+        this.request.setUserProperties(userProperties);
+        this.request.setLocalRepository(localRepository);
+        this.request.setGoals(goals);
+        this.request.setBaseDirectory((executionRootDir != null) ? new File(executionRootDir) : null);
+        this.request.setStartTime(startTime);
+        this.result = null;
+        this.repositorySystemSession = null;
     }
 
     @Deprecated
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result,
-                         List<MavenProject> projects )
-    {
+    public MavenSession(
+            PlexusContainer container,
+            MavenExecutionRequest request,
+            MavenExecutionResult result,
+            List<MavenProject> projects) {
         this.container = container;
         this.request = request;
         this.result = result;
-        this.settings = new SettingsAdapter( request );
-        setProjects( projects );
+        this.settings = adaptSettings(request);
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
+        setProjects(projects);
+        this.repositorySystemSession = null;
+    }
+
+    /**
+     * Adapt a {@link MavenExecutionRequest} to a {@link Settings} object for use in the Maven core.
+     * We want to make sure that what is ask for in the execution request overrides what is in the settings.
+     * The CLI feeds into an execution request so if a particular value is present in the execution request
+     * then we will take that over the value coming from the user settings.
+     */
+    private static Settings adaptSettings(MavenExecutionRequest request) {
+        File localRepo = request.getLocalRepositoryPath();
+        return new Settings(org.apache.maven.api.settings.Settings.newBuilder()
+                .localRepository(localRepo != null ? localRepo.getAbsolutePath() : null)
+                .interactiveMode(request.isInteractiveMode())
+                .offline(request.isOffline())
+                .proxies(request.getProxies().stream().map(Proxy::getDelegate).collect(Collectors.toList()))
+                .servers(request.getServers().stream().map(Server::getDelegate).collect(Collectors.toList()))
+                .mirrors(request.getMirrors().stream().map(Mirror::getDelegate).collect(Collectors.toList()))
+                .profiles(request.getProfiles().stream()
+                        .map(Profile::getDelegate)
+                        .map(SettingsUtilsV4::convertToSettingsProfile)
+                        .collect(Collectors.toList()))
+                .activeProfiles(request.getActiveProfiles())
+                .pluginGroups(request.getPluginGroups())
+                .build());
     }
 
     @Deprecated
-    public List<MavenProject> getSortedProjects()
-    {
+    public List<MavenProject> getSortedProjects() {
         return getProjects();
     }
 
@@ -372,20 +440,17 @@ public class MavenSession
     // Used by Tycho and will break users and force them to upgrade to Maven 3.1 so we should really leave
     // this here, possibly indefinitely.
     //
-    public RepositoryCache getRepositoryCache()
-    {
+    public RepositoryCache getRepositoryCache() {
         return null;
     }
 
     @Deprecated
-    public EventDispatcher getEventDispatcher()
-    {
+    public EventDispatcher getEventDispatcher() {
         return null;
     }
 
     @Deprecated
-    public boolean isUsingPOMsFromFilesystem()
-    {
+    public boolean isUsingPOMsFromFilesystem() {
         return request.isProjectPresent();
     }
 
@@ -393,51 +458,41 @@ public class MavenSession
      * @deprecated Use either {@link #getUserProperties()} or {@link #getSystemProperties()}.
      */
     @Deprecated
-    public Properties getExecutionProperties()
-    {
-        if ( executionProperties == null )
-        {
-            executionProperties = new Properties();
-            executionProperties.putAll( request.getSystemProperties() );
-            executionProperties.putAll( request.getUserProperties() );
-        }
-
+    public Properties getExecutionProperties() {
         return executionProperties;
     }
 
     @Deprecated
-    public PlexusContainer getContainer()
-    {
+    public PlexusContainer getContainer() {
         return container;
     }
 
     @Deprecated
-    public Object lookup( String role )
-        throws ComponentLookupException
-    {
-        return container.lookup( role );
+    public Object lookup(String role) throws ComponentLookupException {
+        return container.lookup(role);
     }
 
     @Deprecated
-    public Object lookup( String role, String roleHint )
-        throws ComponentLookupException
-    {
-        return container.lookup( role, roleHint );
+    public Object lookup(String role, String roleHint) throws ComponentLookupException {
+        return container.lookup(role, roleHint);
     }
 
     @Deprecated
-    public List<Object> lookupList( String role )
-        throws ComponentLookupException
-    {
-        return container.lookupList( role );
+    public List<Object> lookupList(String role) throws ComponentLookupException {
+        return container.lookupList(role);
     }
 
     @Deprecated
-    public Map<String, Object> lookupMap( String role )
-        throws ComponentLookupException
-    {
-        return container.lookupMap( role );
+    public Map<String, Object> lookupMap(String role) throws ComponentLookupException {
+        return container.lookupMap(role);
     }
 
+    public Session getSession() {
+        return session;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
+    }
     /*end[MAVEN4]*/
 }

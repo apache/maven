@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,10 +24,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.Repository;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Parent;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
@@ -52,12 +52,9 @@ import org.eclipse.aether.resolution.VersionRangeResult;
  * A model resolver to assist building of dependency POMs. This resolver gives priority to those repositories that have
  * been initially specified and repositories discovered in dependency POMs are recessively merged into the search chain.
  *
- * @author Benjamin Bentmann
  * @see DefaultArtifactDescriptorReader
  */
-class DefaultModelResolver
-    implements ModelResolver
-{
+class DefaultModelResolver implements ModelResolver {
 
     private final RepositorySystemSession session;
 
@@ -77,10 +74,14 @@ class DefaultModelResolver
 
     private final Set<String> repositoryIds;
 
-    DefaultModelResolver( RepositorySystemSession session, RequestTrace trace, String context,
-                          ArtifactResolver resolver, VersionRangeResolver versionRangeResolver,
-                          RemoteRepositoryManager remoteRepositoryManager, List<RemoteRepository> repositories )
-    {
+    DefaultModelResolver(
+            RepositorySystemSession session,
+            RequestTrace trace,
+            String context,
+            ArtifactResolver resolver,
+            VersionRangeResolver versionRangeResolver,
+            RemoteRepositoryManager remoteRepositoryManager,
+            List<RemoteRepository> repositories) {
         this.session = session;
         this.trace = trace;
         this.context = context;
@@ -88,189 +89,202 @@ class DefaultModelResolver
         this.versionRangeResolver = versionRangeResolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
         this.repositories = repositories;
-        this.externalRepositories = Collections.unmodifiableList( new ArrayList<>( repositories ) );
+        this.externalRepositories = Collections.unmodifiableList(new ArrayList<>(repositories));
 
         this.repositoryIds = new HashSet<>();
     }
 
-    private DefaultModelResolver( DefaultModelResolver original )
-    {
+    private DefaultModelResolver(DefaultModelResolver original) {
         this.session = original.session;
         this.trace = original.trace;
         this.context = original.context;
         this.resolver = original.resolver;
         this.versionRangeResolver = original.versionRangeResolver;
         this.remoteRepositoryManager = original.remoteRepositoryManager;
-        this.repositories = new ArrayList<>( original.repositories );
+        this.repositories = new ArrayList<>(original.repositories);
         this.externalRepositories = original.externalRepositories;
-        this.repositoryIds = new HashSet<>( original.repositoryIds );
+        this.repositoryIds = new HashSet<>(original.repositoryIds);
     }
 
     @Override
-    public void addRepository( Repository repository )
-        throws InvalidRepositoryException
-    {
-        addRepository( repository, false );
+    public void addRepository(Repository repository) throws InvalidRepositoryException {
+        addRepository(repository, false);
     }
 
     @Override
-    public void addRepository( final Repository repository, boolean replace )
-        throws InvalidRepositoryException
-    {
-        if ( session.isIgnoreArtifactDescriptorRepositories() )
-        {
+    public void addRepository(final Repository repository, boolean replace) throws InvalidRepositoryException {
+        if (session.isIgnoreArtifactDescriptorRepositories()) {
             return;
         }
 
-        if ( !repositoryIds.add( repository.getId() ) )
-        {
-            if ( !replace )
-            {
+        if (!repositoryIds.add(repository.getId())) {
+            if (!replace) {
                 return;
             }
 
-            removeMatchingRepository( repositories, repository.getId() );
+            removeMatchingRepository(repositories, repository.getId());
         }
 
-        List<RemoteRepository> newRepositories =
-            Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository( repository ) );
+        List<RemoteRepository> newRepositories = Collections.singletonList(
+                ArtifactDescriptorUtils.toRemoteRepository(new org.apache.maven.model.Repository(repository)));
 
-        this.repositories =
-            remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true );
+        this.repositories = remoteRepositoryManager.aggregateRepositories(session, repositories, newRepositories, true);
     }
 
-    private static void removeMatchingRepository( Iterable<RemoteRepository> repositories, final String id )
-    {
+    private static void removeMatchingRepository(Iterable<RemoteRepository> repositories, final String id) {
         Iterator<RemoteRepository> iterator = repositories.iterator();
-        while ( iterator.hasNext() )
-        {
+        while (iterator.hasNext()) {
             RemoteRepository remoteRepository = iterator.next();
-            if ( remoteRepository.getId().equals( id ) )
-            {
+            if (remoteRepository.getId().equals(id)) {
                 iterator.remove();
             }
         }
     }
 
     @Override
-    public ModelResolver newCopy()
-    {
-        return new DefaultModelResolver( this );
+    public ModelResolver newCopy() {
+        return new DefaultModelResolver(this);
     }
 
     @Override
-    public ModelSource resolveModel( String groupId, String artifactId, String version )
-        throws UnresolvableModelException
-    {
-        Artifact pomArtifact = new DefaultArtifact( groupId, artifactId, "", "pom", version );
+    public ModelSource resolveModel(String groupId, String artifactId, String version)
+            throws UnresolvableModelException {
+        Artifact pomArtifact = new DefaultArtifact(groupId, artifactId, "", "pom", version);
 
-        try
-        {
-            ArtifactRequest request = new ArtifactRequest( pomArtifact, repositories, context );
-            request.setTrace( trace );
-            pomArtifact = resolver.resolveArtifact( session, request ).getArtifact();
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new UnresolvableModelException( e.getMessage(), groupId, artifactId, version, e );
+        try {
+            ArtifactRequest request = new ArtifactRequest(pomArtifact, repositories, context);
+            request.setTrace(trace);
+            pomArtifact = resolver.resolveArtifact(session, request).getArtifact();
+        } catch (ArtifactResolutionException e) {
+            throw new UnresolvableModelException(e.getMessage(), groupId, artifactId, version, e);
         }
 
-        return new ArtifactModelSource( pomArtifact.getFile(), groupId, artifactId, version );
+        return new ArtifactModelSource(pomArtifact.getFile(), groupId, artifactId, version);
     }
 
     @Override
-    public ModelSource resolveModel( final Parent parent )
-        throws UnresolvableModelException
-    {
-        try
-        {
-            final Artifact artifact = new DefaultArtifact( parent.getGroupId(), parent.getArtifactId(), "", "pom",
-                                                           parent.getVersion() );
+    public ModelSource resolveModel(final Parent parent, final AtomicReference<Parent> modified)
+            throws UnresolvableModelException {
+        try {
+            final Artifact artifact =
+                    new DefaultArtifact(parent.getGroupId(), parent.getArtifactId(), "", "pom", parent.getVersion());
 
-            final VersionRangeRequest versionRangeRequest = new VersionRangeRequest( artifact, repositories, context );
-            versionRangeRequest.setTrace( trace );
+            final VersionRangeRequest versionRangeRequest = new VersionRangeRequest(artifact, repositories, context);
+            versionRangeRequest.setTrace(trace);
 
             final VersionRangeResult versionRangeResult =
-                versionRangeResolver.resolveVersionRange( session, versionRangeRequest );
+                    versionRangeResolver.resolveVersionRange(session, versionRangeRequest);
 
-            if ( versionRangeResult.getHighestVersion() == null )
-            {
+            if (versionRangeResult.getHighestVersion() == null) {
                 throw new UnresolvableModelException(
-                    String.format( "No versions matched the requested parent version range '%s'",
-                                   parent.getVersion() ),
-                    parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
-
+                        String.format(
+                                "No versions matched the requested parent version range '%s'", parent.getVersion()),
+                        parent.getGroupId(),
+                        parent.getArtifactId(),
+                        parent.getVersion());
             }
 
-            if ( versionRangeResult.getVersionConstraint() != null
-                     && versionRangeResult.getVersionConstraint().getRange() != null
-                     && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
-            {
+            if (versionRangeResult.getVersionConstraint() != null
+                    && versionRangeResult.getVersionConstraint().getRange() != null
+                    && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null) {
                 // Message below is checked for in the MNG-2199 core IT.
                 throw new UnresolvableModelException(
-                    String.format( "The requested parent version range '%s' does not specify an upper bound",
-                                   parent.getVersion() ),
-                    parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
-
+                        String.format(
+                                "The requested parent version range '%s' does not specify an upper bound",
+                                parent.getVersion()),
+                        parent.getGroupId(),
+                        parent.getArtifactId(),
+                        parent.getVersion());
             }
 
-            parent.setVersion( versionRangeResult.getHighestVersion().toString() );
+            String newVersion = versionRangeResult.getHighestVersion().toString();
+            if (!parent.getVersion().equals(newVersion)) {
+                modified.set(parent.withVersion(newVersion));
+            }
 
-            return resolveModel( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
-        }
-        catch ( final VersionRangeResolutionException e )
-        {
-            throw new UnresolvableModelException( e.getMessage(), parent.getGroupId(), parent.getArtifactId(),
-                                                  parent.getVersion(), e );
-
+            return resolveModel(parent.getGroupId(), parent.getArtifactId(), newVersion);
+        } catch (final VersionRangeResolutionException e) {
+            throw new UnresolvableModelException(
+                    e.getMessage(), parent.getGroupId(), parent.getArtifactId(), parent.getVersion(), e);
         }
     }
 
     @Override
-    public ModelSource resolveModel( final Dependency dependency )
-        throws UnresolvableModelException
-    {
-        try
-        {
-            final Artifact artifact = new DefaultArtifact( dependency.getGroupId(), dependency.getArtifactId(), "",
-                                                           "pom", dependency.getVersion() );
+    public ModelSource resolveModel(final Dependency dependency, AtomicReference<Dependency> modified)
+            throws UnresolvableModelException {
+        try {
+            final Artifact artifact = new DefaultArtifact(
+                    dependency.getGroupId(), dependency.getArtifactId(), "", "pom", dependency.getVersion());
 
-            final VersionRangeRequest versionRangeRequest = new VersionRangeRequest( artifact, repositories, context );
-            versionRangeRequest.setTrace( trace );
+            final VersionRangeRequest versionRangeRequest = new VersionRangeRequest(artifact, repositories, context);
+            versionRangeRequest.setTrace(trace);
 
             final VersionRangeResult versionRangeResult =
-                versionRangeResolver.resolveVersionRange( session, versionRangeRequest );
+                    versionRangeResolver.resolveVersionRange(session, versionRangeRequest);
 
-            if ( versionRangeResult.getHighestVersion() == null )
-            {
+            if (versionRangeResult.getHighestVersion() == null) {
                 throw new UnresolvableModelException(
-                    String.format( "No versions matched the requested dependency version range '%s'",
-                                   dependency.getVersion() ),
-                    dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
-
+                        String.format(
+                                "No versions matched the requested dependency version range '%s'",
+                                dependency.getVersion()),
+                        dependency.getGroupId(),
+                        dependency.getArtifactId(),
+                        dependency.getVersion());
             }
 
-            if ( versionRangeResult.getVersionConstraint() != null
-                     && versionRangeResult.getVersionConstraint().getRange() != null
-                     && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
-            {
+            if (versionRangeResult.getVersionConstraint() != null
+                    && versionRangeResult.getVersionConstraint().getRange() != null
+                    && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null) {
                 // Message below is checked for in the MNG-4463 core IT.
                 throw new UnresolvableModelException(
-                    String.format( "The requested dependency version range '%s' does not specify an upper bound",
-                                   dependency.getVersion() ),
-                    dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
-
+                        String.format(
+                                "The requested dependency version range '%s' does not specify an upper bound",
+                                dependency.getVersion()),
+                        dependency.getGroupId(),
+                        dependency.getArtifactId(),
+                        dependency.getVersion());
             }
 
-            dependency.setVersion( versionRangeResult.getHighestVersion().toString() );
+            String newVersion = versionRangeResult.getHighestVersion().toString();
+            if (!dependency.getVersion().equals(newVersion)) {
+                modified.set(dependency.withVersion(newVersion));
+            }
 
-            return resolveModel( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+            return resolveModel(dependency.getGroupId(), dependency.getArtifactId(), newVersion);
+        } catch (VersionRangeResolutionException e) {
+            throw new UnresolvableModelException(
+                    e.getMessage(), dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), e);
         }
-        catch ( VersionRangeResolutionException e )
-        {
-            throw new UnresolvableModelException( e.getMessage(), dependency.getGroupId(), dependency.getArtifactId(),
-                                                  dependency.getVersion(), e );
+    }
 
+    @Override
+    public ModelSource resolveModel(org.apache.maven.model.Parent parent) throws UnresolvableModelException {
+        AtomicReference<org.apache.maven.api.model.Parent> resolvedParent = new AtomicReference<>();
+        ModelSource result = resolveModel(parent.getDelegate(), resolvedParent);
+        if (resolvedParent.get() != null) {
+            parent.setVersion(resolvedParent.get().getVersion());
         }
+        return result;
+    }
+
+    @Override
+    public ModelSource resolveModel(org.apache.maven.model.Dependency dependency) throws UnresolvableModelException {
+        AtomicReference<org.apache.maven.api.model.Dependency> resolvedDependency = new AtomicReference<>();
+        ModelSource result = resolveModel(dependency.getDelegate(), resolvedDependency);
+        if (resolvedDependency.get() != null) {
+            dependency.setVersion(resolvedDependency.get().getVersion());
+        }
+        return result;
+    }
+
+    @Override
+    public void addRepository(org.apache.maven.model.Repository repository) throws InvalidRepositoryException {
+        addRepository(repository.getDelegate());
+    }
+
+    @Override
+    public void addRepository(org.apache.maven.model.Repository repository, boolean replace)
+            throws InvalidRepositoryException {
+        addRepository(repository.getDelegate(), replace);
     }
 }

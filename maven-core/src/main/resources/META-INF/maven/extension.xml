@@ -22,6 +22,8 @@ under the License.
 <extension>
   <exportedPackages>
     <!-- maven-* -->
+    <exportedPackage>org.apache.maven.api</exportedPackage>
+
     <exportedPackage>org.apache.maven.*</exportedPackage>
     <exportedPackage>org.apache.maven.artifact</exportedPackage>
     <exportedPackage>org.apache.maven.classrealm</exportedPackage>
@@ -82,6 +84,7 @@ under the License.
 
     <!-- plexus-utils (for DOM-type fields in maven-model) -->
     <exportedPackage>org.codehaus.plexus.util.xml.Xpp3Dom</exportedPackage>
+    <exportedPackage>org.codehaus.plexus.util.xml.Xpp3DomBuilder</exportedPackage>
     <exportedPackage>org.codehaus.plexus.util.xml.pull.XmlPullParser</exportedPackage>
     <exportedPackage>org.codehaus.plexus.util.xml.pull.XmlPullParserException</exportedPackage>
     <exportedPackage>org.codehaus.plexus.util.xml.pull.XmlSerializer</exportedPackage>
@@ -108,6 +111,9 @@ under the License.
     <exportedPackage>javax.annotation.*</exportedPackage>
     <exportedPackage>javax.annotation.security.*</exportedPackage>
 
+    <exportedPackage>jakarta.inject.*</exportedPackage>
+    <exportedPackage>jakarta.annotation.*</exportedPackage>
+
     <!--
       | We may potentially want to export these, but right now I'm not sure that anything Guice specific needs
       | to be made available to plugin authors. If we find people are getting fancy and want to take advantage of
@@ -133,6 +139,14 @@ under the License.
   </exportedPackages>
 
   <exportedArtifacts>
+    <!-- maven 4 api -->
+    <exportedArtifact>org.apache.maven:maven-api-core</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-meta</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-model</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-settings</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-toolchain</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-xml</exportedArtifact>
+
     <exportedArtifact>classworlds:classworlds</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-classworlds</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-component-api</exportedArtifact>

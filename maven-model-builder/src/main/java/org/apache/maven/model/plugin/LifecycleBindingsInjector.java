@@ -1,5 +1,3 @@
-package org.apache.maven.model.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.plugin;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -26,10 +25,8 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.
  *
- * @author Benjamin Bentmann
  */
-public interface LifecycleBindingsInjector
-{
+public interface LifecycleBindingsInjector {
 
     /**
      * Injects plugin executions induced by lifecycle bindings into the specified model. The model has already undergone
@@ -41,6 +38,5 @@ public interface LifecycleBindingsInjector
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
-
+    void injectLifecycleBindings(Model model, ModelBuildingRequest request, ModelProblemCollector problems);
 }

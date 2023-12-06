@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,12 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import org.apache.maven.building.Source;
 import org.apache.maven.model.building.ModelCache;
@@ -30,72 +30,75 @@ import org.eclipse.aether.RepositorySystemSession;
 /**
  * A model builder cache backed by the repository system cache.
  *
- * @author Benjamin Bentmann
  */
-public class DefaultModelCache
-    implements ModelCache
-{
+public class DefaultModelCache implements ModelCache {
 
     private static final String KEY = DefaultModelCache.class.getName();
 
-    private final Map<Object, Object> cache;
+    private final Map<Object, Supplier<?>> cache;
 
-    public static ModelCache newInstance( RepositorySystemSession session )
-    {
-        Map<Object, Object> cache;
-        if ( session.getCache() == null )
-        {
+    public static ModelCache newInstance(RepositorySystemSession session) {
+        Map<Object, Supplier<?>> cache;
+        if (session.getCache() == null) {
             cache = new ConcurrentHashMap<>();
-        }
-        else
-        {
-            cache = ( Map ) session.getCache().get( session, KEY );
-            if ( cache == null )
-            {
+        } else {
+            cache = (Map) session.getCache().get(session, KEY);
+            if (cache == null) {
                 cache = new ConcurrentHashMap<>();
-                session.getCache().put( session, KEY, cache );
+                session.getCache().put(session, KEY, cache);
             }
         }
-        return new DefaultModelCache( cache );
+        return new DefaultModelCache(cache);
     }
 
-    private DefaultModelCache( Map<Object, Object> cache )
-    {
+    private DefaultModelCache(Map<Object, Supplier<?>> cache) {
         this.cache = cache;
     }
 
-    public Object get( Source path, String tag )
-    {
-        return get( new SourceCacheKey( path, tag ) );
+    public Object get(Source path, String tag) {
+        return get(new SourceCacheKey(path, tag));
     }
 
-    public void put( Source path, String tag, Object data )
-    {
-        put( new SourceCacheKey( path, tag ), data );
+    public void put(Source path, String tag, Object data) {
+        put(new SourceCacheKey(path, tag), data);
     }
 
-    public Object get( String groupId, String artifactId, String version, String tag )
-    {
-        return get( new GavCacheKey( groupId, artifactId, version, tag ) );
+    @Override
+    public Object get(String groupId, String artifactId, String version, String tag) {
+        return get(new GavCacheKey(groupId, artifactId, version, tag));
     }
 
-    public void put( String groupId, String artifactId, String version, String tag, Object data )
-    {
-        put( new GavCacheKey( groupId, artifactId, version, tag ), data );
+    @Override
+    public void put(String groupId, String artifactId, String version, String tag, Object data) {
+        put(new GavCacheKey(groupId, artifactId, version, tag), data);
     }
 
-    protected Object get( Object key )
-    {
-        return cache.get( key );
+    protected Object get(Object key) {
+        Supplier<?> s = cache.get(key);
+        return s != null ? s.get() : null;
     }
 
-    protected void put( Object key, Object data )
-    {
-        cache.put( key, data );
+    protected void put(Object key, Object data) {
+        cache.put(key, () -> data);
     }
 
-    static class GavCacheKey
-    {
+    @Override
+    public Object computeIfAbsent(
+            String groupId, String artifactId, String version, String tag, Supplier<Supplier<?>> data) {
+        return computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), data);
+    }
+
+    @Override
+    public Object computeIfAbsent(Source path, String tag, Supplier<Supplier<?>> data) {
+        return computeIfAbsent(new SourceCacheKey(path, tag), data);
+    }
+
+    protected Object computeIfAbsent(Object key, Supplier<Supplier<?>> data) {
+        Supplier<?> s = cache.computeIfAbsent(key, k -> data.get());
+        return s != null ? s.get() : null;
+    }
+
+    static class GavCacheKey {
 
         private final String gav;
 
@@ -103,111 +106,87 @@ public class DefaultModelCache
 
         private final int hash;
 
-        GavCacheKey( String groupId, String artifactId, String version, String tag )
-        {
-            this( gav( groupId, artifactId, version ), tag );
+        GavCacheKey(String groupId, String artifactId, String version, String tag) {
+            this(gav(groupId, artifactId, version), tag);
         }
 
-        GavCacheKey( String gav, String tag )
-        {
+        GavCacheKey(String gav, String tag) {
             this.gav = gav;
             this.tag = tag;
-            this.hash = Objects.hash( gav, tag );
+            this.hash = Objects.hash(gav, tag);
         }
 
-        private static String gav( String groupId, String artifactId, String version )
-        {
+        private static String gav(String groupId, String artifactId, String version) {
             StringBuilder sb = new StringBuilder();
-            if ( groupId != null )
-            {
-                sb.append( groupId );
+            if (groupId != null) {
+                sb.append(groupId);
             }
-            sb.append( ":" );
-            if ( artifactId != null )
-            {
-                sb.append( artifactId );
+            sb.append(":");
+            if (artifactId != null) {
+                sb.append(artifactId);
             }
-            sb.append( ":" );
-            if ( version != null )
-            {
-                sb.append( version );
+            sb.append(":");
+            if (version != null) {
+                sb.append(version);
             }
             return sb.toString();
         }
 
         @Override
-        public boolean equals( Object obj )
-        {
-            if ( this == obj )
-            {
+        public boolean equals(Object obj) {
+            if (this == obj) {
                 return true;
             }
-            if ( null == obj || !getClass().equals( obj.getClass() ) )
-            {
+            if (null == obj || !getClass().equals(obj.getClass())) {
                 return false;
             }
             GavCacheKey that = (GavCacheKey) obj;
-            return Objects.equals( this.gav, that.gav ) && Objects.equals( this.tag, that.tag );
+            return Objects.equals(this.gav, that.gav) && Objects.equals(this.tag, that.tag);
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return hash;
         }
 
         @Override
-        public String toString()
-        {
-            return "GavCacheKey{"
-                    + "gav='" + gav + '\''
-                    + ", tag='" + tag + '\''
-                    + '}';
+        public String toString() {
+            return "GavCacheKey{" + "gav='" + gav + '\'' + ", tag='" + tag + '\'' + '}';
         }
     }
 
-    private static final class SourceCacheKey
-    {
+    private static final class SourceCacheKey {
         private final Source source;
 
         private final String tag;
 
         private final int hash;
 
-        SourceCacheKey( Source source, String tag )
-        {
+        SourceCacheKey(Source source, String tag) {
             this.source = source;
             this.tag = tag;
-            this.hash = Objects.hash( source, tag );
+            this.hash = Objects.hash(source, tag);
         }
 
         @Override
-        public String toString()
-        {
-            return "SourceCacheKey{"
-                    + "source=" + source
-                    + ", tag='" + tag + '\''
-                    + '}';
+        public String toString() {
+            return "SourceCacheKey{" + "source=" + source + ", tag='" + tag + '\'' + '}';
         }
 
         @Override
-        public boolean equals( Object obj )
-        {
-            if ( this == obj )
-            {
+        public boolean equals(Object obj) {
+            if (this == obj) {
                 return true;
             }
-            if ( null == obj || !getClass().equals( obj.getClass() ) )
-            {
+            if (null == obj || !getClass().equals(obj.getClass())) {
                 return false;
             }
             SourceCacheKey that = (SourceCacheKey) obj;
-            return Objects.equals( this.source, that.source ) && Objects.equals( this.tag, that.tag );
+            return Objects.equals(this.source, that.source) && Objects.equals(this.tag, that.tag);
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return hash;
         }
     }

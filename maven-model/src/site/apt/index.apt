@@ -27,12 +27,14 @@
 
 Maven Model
 
- This is strictly the model for Maven POM (Project Object Model), so really just plain objects. All the effective model
+ This is strictly the model for Maven POM (Project Object Model) in <<<org.apache.maven.model>>> package,
+ delegating content to {{{../api/maven-api-model/index.html}Maven 4 API immutable model}}. All the effective model
  building logic from multiple POMs and building context is done in {{{../maven-model-builder/}Maven Model Builder}}.
 
  The following are generated from this model:
 
-   * {{{./apidocs/index.html}Java sources}} with Reader and Writers for the Xpp3 XML parser
+   * {{{./apidocs/index.html}Java sources}} with Reader and Writers for the Xpp3 XML parser, <<<ToAPiV3()>>> and <<<ToApiV4()>>> transformers, and <<<v4>>> package
+     for Merger and v4 Reader and Writers for the Xpp3 XML parser,
 
    * A {{{./maven.html}Descriptor Reference}}
 

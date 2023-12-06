@@ -1,5 +1,3 @@
-package org.apache.maven.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,14 +16,13 @@ package org.apache.maven.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact;
 
 /**
  * Exception thrown when the identity of an artifact can not be established,
  * e.g. one of groupId, artifactId, version or type is null.
  */
-public class InvalidArtifactRTException
-    extends RuntimeException
-{
+public class InvalidArtifactRTException extends RuntimeException {
 
     private final String groupId;
     private final String artifactId;
@@ -33,12 +30,7 @@ public class InvalidArtifactRTException
     private final String type;
     private final String baseMessage;
 
-    public InvalidArtifactRTException( String groupId,
-                                       String artifactId,
-                                       String version,
-                                       String type,
-                                       String message )
-    {
+    public InvalidArtifactRTException(String groupId, String artifactId, String version, String type, String message) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
@@ -46,14 +38,9 @@ public class InvalidArtifactRTException
         this.baseMessage = message;
     }
 
-    public InvalidArtifactRTException( String groupId,
-                                       String artifactId,
-                                       String version,
-                                       String type,
-                                       String message,
-                                       Throwable cause )
-    {
-        super( cause );
+    public InvalidArtifactRTException(
+            String groupId, String artifactId, String version, String type, String message, Throwable cause) {
+        super(cause);
 
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -62,39 +49,31 @@ public class InvalidArtifactRTException
         this.baseMessage = message;
     }
 
-    public String getMessage()
-    {
+    public String getMessage() {
         return "For artifact {" + getArtifactKey() + "}: " + getBaseMessage();
     }
 
-    public String getBaseMessage()
-    {
+    public String getBaseMessage() {
         return baseMessage;
     }
 
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifactId;
     }
 
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
 
-    public String getArtifactKey()
-    {
+    public String getArtifactKey() {
         return groupId + ":" + artifactId + ":" + version + ":" + type;
     }
-
 }

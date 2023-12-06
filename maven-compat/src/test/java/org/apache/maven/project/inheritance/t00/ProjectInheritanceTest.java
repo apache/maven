@@ -1,5 +1,3 @@
-package org.apache.maven.project.inheritance.t00;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.inheritance.t00;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.inheritance.t00;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.inheritance.t00;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
@@ -34,11 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * anywhere else in the lineage. We are just making sure that values
  * down in the lineage are bubbling up where they should.
  *
- * @author Jason van Zyl
  */
-public class ProjectInheritanceTest
-    extends AbstractProjectInheritanceTestCase
-{
+class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p4 inherits from p3
@@ -54,43 +50,41 @@ public class ProjectInheritanceTest
     // ----------------------------------------------------------------------
 
     @Test
-    public void testProjectInheritance()
-        throws Exception
-    {
-        MavenProject p4 = getProject( projectFile( "p4" ) );
+    void testProjectInheritance() throws Exception {
+        MavenProject p4 = getProject(projectFile("p4"));
 
-        assertEquals( "p4", p4.getName() );
+        assertEquals("p4", p4.getName());
 
         // ----------------------------------------------------------------------
         // Value inherited from p3
         // ----------------------------------------------------------------------
 
-        assertEquals( "2000", p4.getInceptionYear() );
+        assertEquals("2000", p4.getInceptionYear());
 
         // ----------------------------------------------------------------------
         // Value taken from p2
         // ----------------------------------------------------------------------
 
-        assertEquals( "mailing-list", p4.getMailingLists().get( 0 ).getName() );
+        assertEquals("mailing-list", p4.getMailingLists().get(0).getName());
 
         // ----------------------------------------------------------------------
         // Value taken from p1
         // ----------------------------------------------------------------------
 
-        assertEquals( "scm-url/p2/p3/p4", p4.getScm().getUrl() );
+        assertEquals("scm-url/p2/p3/p4", p4.getScm().getUrl());
 
         // ----------------------------------------------------------------------
         // Value taken from p4
         // ----------------------------------------------------------------------
 
-        assertEquals( "Codehaus", p4.getOrganization().getName() );
+        assertEquals("Codehaus", p4.getOrganization().getName());
 
         // ----------------------------------------------------------------------
         // Value taken from super model
         // ----------------------------------------------------------------------
 
-        assertEquals( "4.0.0", p4.getModelVersion() );
+        assertEquals("4.0.0", p4.getModelVersion());
 
-        assertEquals( "4.0.0", p4.getModelVersion() );
+        assertEquals("4.0.0", p4.getModelVersion());
     }
 }

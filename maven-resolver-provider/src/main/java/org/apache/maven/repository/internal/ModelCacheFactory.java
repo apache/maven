@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import org.apache.maven.model.building.ModelCache;
 import org.eclipse.aether.RepositorySystemSession;
@@ -25,9 +24,7 @@ import org.eclipse.aether.RepositorySystemSession;
 /**
  * Factory for {@link ModelCache} objects.
  */
-public interface ModelCacheFactory
-{
+public interface ModelCacheFactory {
 
-    ModelCache createCache( RepositorySystemSession session );
-
+    ModelCache createCache(RepositorySystemSession session);
 }

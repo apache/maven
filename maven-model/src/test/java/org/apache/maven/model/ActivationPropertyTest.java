@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,36 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code ActivationProperty}.
  *
- * @author Benjamin Bentmann
  */
-public class ActivationPropertyTest
-{
+class ActivationPropertyTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    void testHashCodeNullSafe() {
         new ActivationProperty().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new ActivationProperty().equals( null ) );
+    void testEqualsNullSafe() {
+        assertFalse(new ActivationProperty().equals(null));
 
-        new ActivationProperty().equals( new ActivationProperty() );
+        new ActivationProperty().equals(new ActivationProperty());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    void testEqualsIdentity() {
         ActivationProperty thing = new ActivationProperty();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new ActivationProperty().toString() );
+    void testToStringNullSafe() {
+        assertNotNull(new ActivationProperty().toString());
     }
-
 }

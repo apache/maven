@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,28 +16,27 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.io.File;
 import java.net.URI;
 
 import org.apache.maven.building.FileSource;
+import org.apache.maven.model.locator.ModelLocator;
 
 /**
  * Wraps an ordinary {@link File} as a model source.
  *
- * @author Benjamin Bentmann
  */
-public class FileModelSource extends FileSource implements ModelSource2
-{
+public class FileModelSource extends FileSource implements ModelSource3 {
 
     /**
      * Creates a new model source backed by the specified file.
      *
      * @param pomFile The POM file, must not be {@code null}.
      */
-    public FileModelSource( File pomFile )
-    {
-        super( pomFile );
+    public FileModelSource(File pomFile) {
+        super(pomFile);
     }
 
     /**
@@ -49,63 +46,49 @@ public class FileModelSource extends FileSource implements ModelSource2
      * @deprecated instead use {@link #getFile()}
      */
     @Deprecated
-    public File getPomFile()
-    {
+    public File getPomFile() {
         return getFile();
     }
 
     @Override
-    public ModelSource2 getRelatedSource( String relPath )
-    {
-        relPath = relPath.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
+    public ModelSource3 getRelatedSource(ModelLocator locator, String relPath) {
+        relPath = relPath.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-        File relatedPom = new File( getFile().getParentFile(), relPath );
+        File path = new File(getFile().getParentFile(), relPath);
 
-        if ( relatedPom.isDirectory() )
-        {
-            // TODO figure out how to reuse ModelLocator.locatePom(File) here
-            relatedPom = new File( relatedPom, "pom.xml" );
-        }
+        File relatedPom = locator.locateExistingPom(path);
 
-        if ( relatedPom.isFile() && relatedPom.canRead() )
-        {
-            return new FileModelSource( new File( relatedPom.toURI().normalize() ) );
+        if (relatedPom != null) {
+            return new FileModelSource(relatedPom.toPath().normalize().toFile());
         }
 
         return null;
     }
 
     @Override
-    public URI getLocationURI()
-    {
+    public URI getLocationURI() {
         return getFile().toURI();
     }
 
     @Override
-    public boolean equals( Object obj )
-    {
-        if ( this == obj )
-        {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if ( obj == null )
-        {
+        if (obj == null) {
             return false;
         }
 
-        if ( !FileModelSource.class.equals( obj.getClass() )  )
-        {
+        if (!FileModelSource.class.equals(obj.getClass())) {
             return false;
         }
-        FileModelSource other = ( FileModelSource ) obj;
-        return getFile().equals( other.getFile() );
+        FileModelSource other = (FileModelSource) obj;
+        return getFile().equals(other.getFile());
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return getFile().hashCode();
     }
-
 }

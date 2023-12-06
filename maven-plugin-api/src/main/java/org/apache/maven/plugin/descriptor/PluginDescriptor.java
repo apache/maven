@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.descriptor;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.descriptor;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,40 +16,43 @@ package org.apache.maven.plugin.descriptor;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.descriptor;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.lifecycle.Lifecycle;
-import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
-import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
+import org.apache.maven.api.plugin.descriptor.lifecycle.LifecycleConfiguration;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.lifecycle.io.LifecycleStaxReader;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.eclipse.aether.graph.DependencyNode;
 
 /**
- * @author Jason van Zyl
  */
-public class PluginDescriptor
-    extends ComponentSetDescriptor
-    implements Cloneable
-{
+public class PluginDescriptor extends ComponentSetDescriptor implements Cloneable {
 
     private static final String LIFECYCLE_DESCRIPTOR = "META-INF/maven/lifecycle.xml";
+
+    private static final Pattern PATTERN_FILTER_1 = Pattern.compile("-?(maven|plugin)-?");
 
     private String groupId;
 
@@ -67,6 +68,8 @@ public class PluginDescriptor
 
     private List<Artifact> artifacts;
 
+    private DependencyNode dependencyNode;
+
     private ClassRealm classRealm;
 
     // calculated on-demand.
@@ -80,6 +83,8 @@ public class PluginDescriptor
 
     private String requiredMavenVersion;
 
+    private String requiredJavaVersion;
+
     private Plugin plugin;
 
     private Artifact pluginArtifact;
@@ -90,57 +95,109 @@ public class PluginDescriptor
     //
     // ----------------------------------------------------------------------
 
-    @SuppressWarnings( { "unchecked", "rawtypes" } )
-    public List<MojoDescriptor> getMojos()
-    {
+    public PluginDescriptor() {}
+
+    public PluginDescriptor(PluginDescriptor original) {
+        this.setGroupId(original.getGroupId());
+        this.setArtifactId(original.getArtifactId());
+        this.setVersion(original.getVersion());
+        this.setGoalPrefix(original.getGoalPrefix());
+        this.setInheritedByDefault(original.isInheritedByDefault());
+        this.setName(original.getName());
+        this.setDescription(original.getDescription());
+        this.setRequiredMavenVersion(original.getRequiredMavenVersion());
+        this.setRequiredJavaVersion(original.getRequiredJavaVersion());
+        this.setPluginArtifact(ArtifactUtils.copyArtifactSafe(original.getPluginArtifact()));
+        this.setComponents(clone(original.getMojos(), this));
+        this.setId(original.getId());
+        this.setIsolatedRealm(original.isIsolatedRealm());
+        this.setSource(original.getSource());
+        this.setDependencies(original.getDependencies());
+        this.setDependencyNode(original.getDependencyNode());
+    }
+
+    private static List<ComponentDescriptor<?>> clone(List<MojoDescriptor> mojos, PluginDescriptor pluginDescriptor) {
+        List<ComponentDescriptor<?>> clones = null;
+        if (mojos != null) {
+            clones = new ArrayList<>(mojos.size());
+            for (MojoDescriptor mojo : mojos) {
+                MojoDescriptor clone = mojo.clone();
+                clone.setPluginDescriptor(pluginDescriptor);
+                clones.add(clone);
+            }
+        }
+        return clones;
+    }
+
+    public PluginDescriptor(org.apache.maven.api.plugin.descriptor.PluginDescriptor original) {
+        this.setGroupId(original.getGroupId());
+        this.setArtifactId(original.getArtifactId());
+        this.setVersion(original.getVersion());
+        this.setGoalPrefix(original.getGoalPrefix());
+        this.setInheritedByDefault(original.isInheritedByDefault());
+        this.setName(original.getName());
+        this.setDescription(original.getDescription());
+        this.setRequiredMavenVersion(original.getRequiredMavenVersion());
+        this.setRequiredJavaVersion(original.getRequiredJavaVersion());
+        this.setPluginArtifact(null); // TODO: v4
+        this.setComponents(Collections.emptyList()); // TODO: v4
+        this.setComponents(original.getMojos().stream()
+                .map(m -> new MojoDescriptor(this, m))
+                .collect(Collectors.toList()));
+        this.setId(original.getId());
+        this.setIsolatedRealm(original.isIsolatedRealm());
+        this.setSource(null);
+        this.setDependencies(Collections.emptyList()); // TODO: v4
+        this.setDependencyNode(null); // TODO: v4
+        this.pluginDescriptorV4 = original;
+    }
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<MojoDescriptor> getMojos() {
         return (List) getComponents();
     }
 
-    public void addMojo( MojoDescriptor mojoDescriptor )
-        throws DuplicateMojoDescriptorException
-    {
+    public void addMojo(MojoDescriptor mojoDescriptor) throws DuplicateMojoDescriptorException {
         MojoDescriptor existing = null;
         // this relies heavily on the equals() and hashCode() for ComponentDescriptor,
         // which uses role:roleHint for identity...and roleHint == goalPrefix:goal.
         // role does not vary for Mojos.
         List<MojoDescriptor> mojos = getMojos();
 
-        if ( mojos != null && mojos.contains( mojoDescriptor ) )
-        {
-            int indexOf = mojos.indexOf( mojoDescriptor );
+        if (mojos != null && mojos.contains(mojoDescriptor)) {
+            int indexOf = mojos.indexOf(mojoDescriptor);
 
-            existing = mojos.get( indexOf );
+            existing = mojos.get(indexOf);
         }
 
-        if ( existing != null )
-        {
-            throw new DuplicateMojoDescriptorException( getGoalPrefix(), mojoDescriptor.getGoal(),
-                                                        existing.getImplementation(),
-                                                        mojoDescriptor.getImplementation() );
-        }
-        else
-        {
-            addComponentDescriptor( mojoDescriptor );
+        if (existing != null) {
+            throw new DuplicateMojoDescriptorException(
+                    getGoalPrefix(),
+                    mojoDescriptor.getGoal(),
+                    existing.getImplementation(),
+                    mojoDescriptor.getImplementation());
+        } else {
+            addComponentDescriptor(mojoDescriptor);
         }
     }
 
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId( String groupId )
-    {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifactId;
     }
 
-    public void setArtifactId( String artifactId )
-    {
+    public void setArtifactId(String artifactId) {
         this.artifactId = artifactId;
     }
 
@@ -148,28 +205,23 @@ public class PluginDescriptor
     // Dependencies
     // ----------------------------------------------------------------------
 
-    public static String constructPluginKey( String groupId, String artifactId, String version )
-    {
+    public static String constructPluginKey(String groupId, String artifactId, String version) {
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    public String getPluginLookupKey()
-    {
+    public String getPluginLookupKey() {
         return groupId + ":" + artifactId;
     }
 
-    public String getId()
-    {
-        return constructPluginKey( groupId, artifactId, version );
+    public String getId() {
+        return constructPluginKey(groupId, artifactId, version);
     }
 
-    public static String getDefaultPluginArtifactId( String id )
-    {
+    public static String getDefaultPluginArtifactId(String id) {
         return "maven-" + id + "-plugin";
     }
 
-    public static String getDefaultPluginGroupId()
-    {
+    public static String getDefaultPluginGroupId() {
         return "org.apache.maven.plugins";
     }
 
@@ -178,55 +230,43 @@ public class PluginDescriptor
      *
      * TODO move to plugin-tools-api as a default only
      */
-    public static String getGoalPrefixFromArtifactId( String artifactId )
-    {
-        if ( "maven-plugin-plugin".equals( artifactId ) )
-        {
+    public static String getGoalPrefixFromArtifactId(String artifactId) {
+        if ("maven-plugin-plugin".equals(artifactId)) {
             return "plugin";
-        }
-        else
-        {
-            return artifactId.replaceAll( "-?maven-?", "" ).replaceAll( "-?plugin-?", "" );
+        } else {
+            return PATTERN_FILTER_1.matcher(artifactId).replaceAll("");
         }
     }
 
-    public String getGoalPrefix()
-    {
+    public String getGoalPrefix() {
         return goalPrefix;
     }
 
-    public void setGoalPrefix( String goalPrefix )
-    {
+    public void setGoalPrefix(String goalPrefix) {
         this.goalPrefix = goalPrefix;
     }
 
-    public void setVersion( String version )
-    {
+    public void setVersion(String version) {
         this.version = version;
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
 
-    public void setSource( String source )
-    {
+    public void setSource(String source) {
         this.source = source;
     }
 
-    public String getSource()
-    {
+    public String getSource() {
         return source;
     }
 
-    public boolean isInheritedByDefault()
-    {
+    public boolean isInheritedByDefault() {
         return inheritedByDefault;
     }
 
-    public void setInheritedByDefault( boolean inheritedByDefault )
-    {
+    public void setInheritedByDefault(boolean inheritedByDefault) {
         this.inheritedByDefault = inheritedByDefault;
     }
 
@@ -236,17 +276,23 @@ public class PluginDescriptor
      *
      * @return The plugin artifacts, never {@code null}.
      */
-    public List<Artifact> getArtifacts()
-    {
+    public List<Artifact> getArtifacts() {
         return artifacts;
     }
 
-    public void setArtifacts( List<Artifact> artifacts )
-    {
+    public void setArtifacts(List<Artifact> artifacts) {
         this.artifacts = artifacts;
 
         // clear the calculated artifactMap
         artifactMap = null;
+    }
+
+    public DependencyNode getDependencyNode() {
+        return dependencyNode;
+    }
+
+    public void setDependencyNode(DependencyNode dependencyNode) {
+        this.dependencyNode = dependencyNode;
     }
 
     /**
@@ -255,168 +301,140 @@ public class PluginDescriptor
      * @return a Map of artifacts, never {@code null}
      * @see #getArtifacts()
      */
-    public Map<String, Artifact> getArtifactMap()
-    {
-        if ( artifactMap == null )
-        {
-            artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
+    public Map<String, Artifact> getArtifactMap() {
+        if (artifactMap == null) {
+            artifactMap = ArtifactUtils.artifactMapByVersionlessId(getArtifacts());
         }
 
         return artifactMap;
     }
 
-    public boolean equals( Object object )
-    {
-        if ( this == object )
-        {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
 
-        return object instanceof PluginDescriptor && getId().equals( ( (PluginDescriptor) object ).getId() );
+        return object instanceof PluginDescriptor && getId().equals(((PluginDescriptor) object).getId());
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         return 10 + getId().hashCode();
     }
 
-    public MojoDescriptor getMojo( String goal )
-    {
-        if ( getMojos() == null )
-        {
+    public MojoDescriptor getMojo(String goal) {
+        if (getMojos() == null) {
             return null; // no mojo in this POM
         }
 
         // TODO could we use a map? Maybe if the parent did that for components too, as this is too vulnerable to
         // changes above not being propagated to the map
-        for ( MojoDescriptor desc : getMojos() )
-        {
-            if ( goal.equals( desc.getGoal() ) )
-            {
+        for (MojoDescriptor desc : getMojos()) {
+            if (goal.equals(desc.getGoal())) {
                 return desc;
             }
         }
         return null;
     }
 
-    public void setClassRealm( ClassRealm classRealm )
-    {
+    public void setClassRealm(ClassRealm classRealm) {
         this.classRealm = classRealm;
     }
 
-    public ClassRealm getClassRealm()
-    {
+    public ClassRealm getClassRealm() {
         return classRealm;
     }
 
-    public void setIntroducedDependencyArtifacts( Set<Artifact> introducedDependencyArtifacts )
-    {
+    public void setIntroducedDependencyArtifacts(Set<Artifact> introducedDependencyArtifacts) {
         this.introducedDependencyArtifacts = introducedDependencyArtifacts;
     }
 
-    public Set<Artifact> getIntroducedDependencyArtifacts()
-    {
-        return ( introducedDependencyArtifacts != null )
-            ? introducedDependencyArtifacts
-            : Collections.emptySet();
+    public Set<Artifact> getIntroducedDependencyArtifacts() {
+        return (introducedDependencyArtifacts != null) ? introducedDependencyArtifacts : Collections.emptySet();
     }
 
-    public void setName( String name )
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setDescription( String description )
-    {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
-    public void setRequiredMavenVersion( String requiredMavenVersion )
-    {
+    public void setRequiredMavenVersion(String requiredMavenVersion) {
         this.requiredMavenVersion = requiredMavenVersion;
     }
 
-    public String getRequiredMavenVersion()
-    {
+    public String getRequiredMavenVersion() {
         return requiredMavenVersion;
     }
 
-    public void setPlugin( Plugin plugin )
-    {
+    public void setRequiredJavaVersion(String requiredJavaVersion) {
+        this.requiredJavaVersion = requiredJavaVersion;
+    }
+
+    public String getRequiredJavaVersion() {
+        return requiredJavaVersion;
+    }
+
+    public void setPlugin(Plugin plugin) {
         this.plugin = plugin;
     }
 
-    public Plugin getPlugin()
-    {
+    public Plugin getPlugin() {
         return plugin;
     }
 
-    public Artifact getPluginArtifact()
-    {
+    public Artifact getPluginArtifact() {
         return pluginArtifact;
     }
 
-    public void setPluginArtifact( Artifact pluginArtifact )
-    {
+    public void setPluginArtifact(Artifact pluginArtifact) {
         this.pluginArtifact = pluginArtifact;
     }
 
-    public Lifecycle getLifecycleMapping( String lifecycleId )
-        throws IOException, XmlPullParserException
-    {
-        if ( lifecycleMappings == null )
-        {
+    public Lifecycle getLifecycleMapping(String lifecycleId) throws IOException, XMLStreamException {
+        return getLifecycleMappings().get(lifecycleId);
+    }
+
+    public Map<String, Lifecycle> getLifecycleMappings() throws IOException, XMLStreamException {
+        if (lifecycleMappings == null) {
             LifecycleConfiguration lifecycleConfiguration;
 
-            try ( Reader reader = ReaderFactory.newXmlReader( getDescriptorStream( LIFECYCLE_DESCRIPTOR ) ) )
-            {
-                lifecycleConfiguration = new LifecycleMappingsXpp3Reader().read( reader );
+            try (InputStream input = getDescriptorStream(LIFECYCLE_DESCRIPTOR)) {
+                lifecycleConfiguration = new LifecycleStaxReader().read(input);
             }
 
             lifecycleMappings = new HashMap<>();
 
-            for ( Lifecycle lifecycle : lifecycleConfiguration.getLifecycles() )
-            {
-                lifecycleMappings.put( lifecycle.getId(), lifecycle );
+            for (Lifecycle lifecycle : lifecycleConfiguration.getLifecycles()) {
+                lifecycleMappings.put(lifecycle.getId(), lifecycle);
             }
         }
-
-        return lifecycleMappings.get( lifecycleId );
+        return lifecycleMappings;
     }
 
-    private InputStream getDescriptorStream( String descriptor )
-        throws IOException
-    {
-        File pluginFile = ( pluginArtifact != null ) ? pluginArtifact.getFile() : null;
-        if ( pluginFile == null )
-        {
-            throw new IllegalStateException( "plugin main artifact has not been resolved for " + getId() );
+    private InputStream getDescriptorStream(String descriptor) throws IOException {
+        File pluginFile = (pluginArtifact != null) ? pluginArtifact.getFile() : null;
+        if (pluginFile == null) {
+            throw new IllegalStateException("plugin main artifact has not been resolved for " + getId());
         }
 
-        if ( pluginFile.isFile() )
-        {
-            try
-            {
-                return new URL( "jar:" + pluginFile.toURI() + "!/" + descriptor ).openStream();
+        if (pluginFile.isFile()) {
+            try {
+                return new URL("jar:" + pluginFile.toURI() + "!/" + descriptor).openStream();
+            } catch (MalformedURLException e) {
+                throw new IllegalStateException(e);
             }
-            catch ( MalformedURLException e )
-            {
-                throw new IllegalStateException( e );
-            }
-        }
-        else
-        {
-            return new FileInputStream( new File( pluginFile, descriptor ) );
+        } else {
+            return Files.newInputStream(new File(pluginFile, descriptor).toPath());
         }
     }
 
@@ -424,26 +442,46 @@ public class PluginDescriptor
      * Creates a shallow copy of this plugin descriptor.
      */
     @Override
-    public PluginDescriptor clone()
-    {
-        try
-        {
+    public PluginDescriptor clone() {
+        try {
             return (PluginDescriptor) super.clone();
-        }
-        catch ( CloneNotSupportedException e )
-        {
-            throw new UnsupportedOperationException( e );
+        } catch (CloneNotSupportedException e) {
+            throw new UnsupportedOperationException(e);
         }
     }
 
-    public void addMojos( List<MojoDescriptor> mojos )
-        throws DuplicateMojoDescriptorException
-    {
-        for ( MojoDescriptor mojoDescriptor : mojos )
-        {
-            addMojo( mojoDescriptor );
+    public void addMojos(List<MojoDescriptor> mojos) throws DuplicateMojoDescriptorException {
+        for (MojoDescriptor mojoDescriptor : mojos) {
+            addMojo(mojoDescriptor);
         }
-
     }
 
+    private volatile org.apache.maven.api.plugin.descriptor.PluginDescriptor pluginDescriptorV4;
+
+    public org.apache.maven.api.plugin.descriptor.PluginDescriptor getPluginDescriptorV4() {
+        if (pluginDescriptorV4 == null) {
+            synchronized (this) {
+                if (pluginDescriptorV4 == null) {
+                    pluginDescriptorV4 = org.apache.maven.api.plugin.descriptor.PluginDescriptor.newBuilder()
+                            .namespaceUri(null)
+                            .modelEncoding(null)
+                            .name(name)
+                            .description(description)
+                            .groupId(groupId)
+                            .artifactId(artifactId)
+                            .version(version)
+                            .goalPrefix(goalPrefix)
+                            .isolatedRealm(isIsolatedRealm())
+                            .inheritedByDefault(inheritedByDefault)
+                            .requiredJavaVersion(requiredJavaVersion)
+                            .requiredMavenVersion(requiredMavenVersion)
+                            .mojos(getMojos().stream()
+                                    .map(MojoDescriptor::getMojoDescriptorV4)
+                                    .collect(Collectors.toList()))
+                            .build();
+                }
+            }
+        }
+        return pluginDescriptorV4;
+    }
 }

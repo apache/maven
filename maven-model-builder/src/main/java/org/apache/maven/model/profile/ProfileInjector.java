@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,9 @@ package org.apache.maven.model.profile;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile;
+
+import java.util.List;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -27,10 +28,8 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles profile injection into the model.
  *
- * @author Benjamin Bentmann
  */
-public interface ProfileInjector
-{
+public interface ProfileInjector {
 
     /**
      * Merges values from the specified profile into the given model. Implementations are expected to keep the profile
@@ -41,6 +40,46 @@ public interface ProfileInjector
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void injectProfile( Model model, Profile profile, ModelBuildingRequest request, ModelProblemCollector problems );
+    void injectProfile(Model model, Profile profile, ModelBuildingRequest request, ModelProblemCollector problems);
 
+    /**
+     * Merges values from the specified profile into the given model. Implementations are expected to keep the profile
+     * and model completely decoupled by injecting deep copies rather than the original objects from the profile.
+     *
+     * @param model The model into which to merge the values defined by the profile, must not be <code>null</code>.
+     * @param profile The (read-only) profile whose values should be injected, may be <code>null</code>.
+     * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     */
+    default org.apache.maven.api.model.Model injectProfile(
+            org.apache.maven.api.model.Model model,
+            org.apache.maven.api.model.Profile profile,
+            ModelBuildingRequest request,
+            ModelProblemCollector problems) {
+        Model m = new Model(model);
+        injectProfile(m, profile != null ? new Profile(profile) : null, request, problems);
+        return m.getDelegate();
+    }
+
+    /**
+     * Merges values from the specified profile into the given model. Implementations are expected to keep the profile
+     * and model completely decoupled by injecting deep copies rather than the original objects from the profile.
+     *
+     * @param model The model into which to merge the values defined by the profile, must not be <code>null</code>.
+     * @param profiles The (read-only) list of profiles whose values should be injected, must not be <code>null</code>.
+     * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     */
+    default org.apache.maven.api.model.Model injectProfiles(
+            org.apache.maven.api.model.Model model,
+            List<org.apache.maven.api.model.Profile> profiles,
+            ModelBuildingRequest request,
+            ModelProblemCollector problems) {
+        for (org.apache.maven.api.model.Profile profile : profiles) {
+            if (profile != null) {
+                model = injectProfile(model, profile, request, problems);
+            }
+        }
+        return model;
+    }
 }

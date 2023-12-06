@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,79 +16,79 @@ package org.apache.maven.toolchain.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.io;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.toolchain.model.PersistedToolchains;
-import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
 
 /**
  * Handles deserialization of toolchains from the default textual format.
  *
- * @author Robert Scholte
  * @since 3.3.0
  */
 @Named
 @Singleton
-public class DefaultToolchainsReader
-    implements ToolchainsReader
-{
+public class DefaultToolchainsReader implements ToolchainsReader {
 
     @Override
-    public PersistedToolchains read( File input, Map<String, ?> options )
-        throws IOException
-    {
-        Objects.requireNonNull( input, "input cannot be null" );
+    public PersistedToolchains read(File input, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(input, "input cannot be null");
 
-        return read( ReaderFactory.newXmlReader( input ), options );
-    }
-
-    @Override
-    public PersistedToolchains read( Reader input, Map<String, ?> options )
-        throws IOException
-    {
-        Objects.requireNonNull( input, "input cannot be null" );
-
-        try ( Reader in = input )
-        {
-            return new MavenToolchainsXpp3Reader().read( in, isStrict( options ) );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ToolchainsParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
+        try (InputStream in = Files.newInputStream(input.toPath())) {
+            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options)));
+        } catch (XMLStreamException e) {
+            throw new ToolchainsParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 
     @Override
-    public PersistedToolchains read( InputStream input, Map<String, ?> options )
-        throws IOException
-    {
-        Objects.requireNonNull( input, "input cannot be null" );
+    public PersistedToolchains read(Reader input, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(input, "input cannot be null");
 
-        try ( InputStream in = input )
-        {
-            return new MavenToolchainsXpp3Reader().read( in, isStrict( options ) );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ToolchainsParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
+        try (Reader in = input) {
+            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options)));
+        } catch (XMLStreamException e) {
+            throw new ToolchainsParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
         }
     }
 
-    private boolean isStrict( Map<String, ?> options )
-    {
-        Object value = ( options != null ) ? options.get( IS_STRICT ) : null;
-        return value == null || Boolean.parseBoolean( value.toString() );
+    @Override
+    public PersistedToolchains read(InputStream input, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(input, "input cannot be null");
+
+        try (InputStream in = input) {
+            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options)));
+        } catch (XMLStreamException e) {
+            throw new ToolchainsParseException(
+                    e.getMessage(),
+                    e.getLocation().getLineNumber(),
+                    e.getLocation().getColumnNumber(),
+                    e);
+        }
     }
 
+    private boolean isStrict(Map<String, ?> options) {
+        Object value = (options != null) ? options.get(IS_STRICT) : null;
+        return value == null || Boolean.parseBoolean(value.toString());
+    }
 }

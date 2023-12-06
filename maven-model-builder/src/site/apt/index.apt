@@ -41,7 +41,7 @@ Maven Model Builder
 
    ** profile activation: see {{{./apidocs/org/apache/maven/model/profile/activation/package-summary.html}available activators}}.
    Notice that model interpolation hasn't happened yet, then interpolation for file-based activation is limited to
-   <<<$\{basedir}>>> (since Maven 3), System properties and request properties
+   <<<$\{basedir}>>> (since Maven 3), <<<$\{rootDirectory}>>> (since Maven 4), system properties and user properties
 
    ** file model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
    with its <<<DefaultModelValidator>>> implementation
@@ -51,7 +51,7 @@ Maven Model Builder
 
  * phase 2, with optional plugin processing
 
-   ** Build up a raw model by re-reading the file and enrich it based on information available in the reactor. Some features:
+   ** Build up a raw model by re-reading the file and enriching it based on information available in the reactor. Some features:
 
       *** Resolve version of versionless parents based on relativePath (including ci-friendly versions)
 
@@ -156,13 +156,13 @@ Maven Model Builder
 
 * Model Interpolation
 
-  Model Interpolation consists in replacing <<<$\{...\}>>> with calculated value. It is done in <<<StringSearchModelInterpolator>>>
-  ({{{./apidocs/org/apache/maven/model/interpolation/StringSearchModelInterpolator.html}javadoc}},
-  {{{./xref/org/apache/maven/model/interpolation/StringSearchModelInterpolator.html}source}}).
+  Model Interpolation consists in replacing <<<$\{...\}>>> with calculated value. It is done in <<<StringVisitorModelInterpolator>>>
+  ({{{./apidocs/org/apache/maven/model/interpolation/StringVisitorModelInterpolator.html}javadoc}},
+  {{{./xref/org/apache/maven/model/interpolation/StringVisitorModelInterpolator.html}source}}).
 
-  Notice that model interpolation happens <after> profile activation, then profile activation doesn't benefit from every values:
+  Notice that model interpolation happens <after> profile activation, and that profile activation doesn't benefit from every values:
   interpolation for file-based activation is limited to <<<$\{basedir}>>> (which was introduced in Maven 3 and is not deprecated
-  in this context), System properties and request properties.
+  in this context) and <<<$\{rootDirectory}>>> (introduced in Maven 4), system properties and user properties.
 
   Values are evaluated in sequence from different syntaxes:
 
@@ -183,6 +183,8 @@ Maven Model Builder
 | <<<project.baseUri>>>\
 <<<pom.baseUri>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file as URI | <<<$\{project.baseUri\}>>> |
 *----+------+------+
+| <<<project.rootDirectory>>> | the project's root directory (containing a <<<.mvn>>> directory or with the <<<root="true">>> xml attribute) | <<<$\{project.rootDirectory\}>>> |
+*----+------+------+
 | <<<build.timestamp>>>\
 <<<maven.build.timestamp>>> | the UTC timestamp of build start, in <<<yyyy-MM-dd'T'HH:mm:ss'Z'>>> default format, which can be overridden with <<<maven.build.timestamp.format>>> POM property | <<<$\{maven.build.timestamp\}>>> |
 *----+------+------+
@@ -198,8 +200,10 @@ Maven Model Builder
 *----+------+------+
 | <<<maven.repo.local>>> | The repository on the local machine Maven shall use to store installed and downloaded artifacts (POMs, JARs, etc). | <<<$\{user.home\}/.m2/repository>>> |
 *----+------+------+
-| <<<*>>> | Java system properties (see {{{http://download.oracle.com/javase/6/docs/api/java/lang/System.html#getProperties()}JDK reference}}) | <<<$\{user.home\}>>>\
+| <<<*>>> | Java system properties (see {{{https://docs.oracle.com/javase/8/docs/api/java/lang/System.html#getProperties()}JDK reference}}) | <<<$\{user.home\}>>>\
  | | <<<$\{java.home\}>>> |
+*----+------+------+
+| <<<*>>> | User properties | <<<$\{foo\}>>> |
 *----+------+------+
 | <<<env.*>>>\
 <<<*>>> | environment variables | <<<$\{env.PATH\}>>> |
@@ -223,11 +227,13 @@ Maven Model Builder
 
     * <<<$\{project.build.sourceEncoding\}>>> for
     {{{https://cwiki.apache.org/confluence/display/MAVEN/POM+Element+for+Source+File+Encoding}source files encoding}}
-    (defaults to platform encoding)
+    (defaults to <<<UTF-8>>> since Maven 4.0.0, no default value was provided in Maven 3.x, meaning that the platform
+    encoding was used by plugins)
 
     * <<<$\{project.reporting.outputEncoding\}>>> for
     {{{https://cwiki.apache.org/confluence/display/MAVENOLD/Reporting+Encoding+Configuration}reporting output files encoding}}
-    (defaults to <<<UTF-8>>>)
+    (defaults to <<<UTF-8>>> since Maven 4.0.0, no default value was provided in Maven 3.x, plugins usually defaulting
+    to <<<UTF-8>>>)
 
     []
 

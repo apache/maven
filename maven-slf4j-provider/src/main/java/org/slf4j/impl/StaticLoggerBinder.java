@@ -1,5 +1,3 @@
-package org.slf4j.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.slf4j.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.slf4j.impl;
 
 import org.slf4j.ILoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
@@ -29,15 +28,13 @@ import org.slf4j.spi.LoggerFactoryBinder;
  *
  * @since 3.5.1
  */
-public final class StaticLoggerBinder
-    implements LoggerFactoryBinder
-{
+public final class StaticLoggerBinder implements LoggerFactoryBinder {
     /**
      * Declare the version of the SLF4J API this implementation is compiled
      * against. The value of this field is usually modified with each release.
      */
     // to avoid constant folding by the compiler, this field must *not* be final
-    @SuppressWarnings( { "checkstyle:staticvariablename", "checkstyle:visibilitymodifier" } )
+    @SuppressWarnings({"checkstyle:staticvariablename", "checkstyle:visibilitymodifier"})
     public static String REQUESTED_API_VERSION = "1.7.25"; // !final
 
     private static final String LOGGER_FACTORY_CLASS_STR = MavenLoggerFactory.class.getName();
@@ -56,16 +53,14 @@ public final class StaticLoggerBinder
     /**
      * Private constructor to prevent instantiation
      */
-    private StaticLoggerBinder()
-    {
+    private StaticLoggerBinder() {
         loggerFactory = new MavenLoggerFactory();
     }
 
     /**
      * Returns the singleton of this class.
      */
-    public static StaticLoggerBinder getSingleton()
-    {
+    public static StaticLoggerBinder getSingleton() {
         return SINGLETON;
     }
 
@@ -73,8 +68,7 @@ public final class StaticLoggerBinder
      * Returns the factory.
      */
     @Override
-    public ILoggerFactory getLoggerFactory()
-    {
+    public ILoggerFactory getLoggerFactory() {
         return loggerFactory;
     }
 
@@ -82,8 +76,7 @@ public final class StaticLoggerBinder
      * Returns the class name.
      */
     @Override
-    public String getLoggerFactoryClassStr()
-    {
+    public String getLoggerFactoryClassStr() {
         return LOGGER_FACTORY_CLASS_STR;
     }
 }

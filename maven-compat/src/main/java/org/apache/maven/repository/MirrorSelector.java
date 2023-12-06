@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.util.List;
 
@@ -27,10 +26,9 @@ import org.apache.maven.settings.Mirror;
 /**
  * Handles the selection of mirrors for repositories.
  *
- * @author Benjamin Bentmann
  */
-public interface MirrorSelector
-{
+@Deprecated
+public interface MirrorSelector {
 
     /**
      * Determines the mirror for the specified repository.
@@ -39,6 +37,5 @@ public interface MirrorSelector
      * @param mirrors The available mirrors, may be {@code null}.
      * @return The mirror specification for the repository or {@code null} if no mirror matched.
      */
-    Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors );
-
+    Mirror getMirror(ArtifactRepository repository, List<Mirror> mirrors);
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.configuration;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.configuration;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration;
 
 import java.io.File;
 
@@ -25,10 +24,8 @@ import java.io.File;
  * Postprocesses filesystem paths. For instance, a path translator might want to resolve relative paths given in the
  * bean configuration against some base directory.
  *
- * @author Benjamin Bentmann
  */
-public interface BeanConfigurationPathTranslator
-{
+public interface BeanConfigurationPathTranslator {
 
     /**
      * Translates the specified path.
@@ -36,6 +33,5 @@ public interface BeanConfigurationPathTranslator
      * @param path The path to translate, may be {@code null}.
      * @return The translated path or {@code null} if none.
      */
-    File translatePath( File path );
-
+    File translatePath(File path);
 }

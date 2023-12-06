@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,36 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code ReportPlugin}.
  *
- * @author Benjamin Bentmann
  */
-public class ReportPluginTest
-{
+class ReportPluginTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    void testHashCodeNullSafe() {
         new ReportPlugin().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new ReportPlugin().equals( null ) );
+    void testEqualsNullSafe() {
+        assertFalse(new ReportPlugin().equals(null));
 
-        new ReportPlugin().equals( new ReportPlugin() );
+        new ReportPlugin().equals(new ReportPlugin());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    void testEqualsIdentity() {
         ReportPlugin thing = new ReportPlugin();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new ReportPlugin().toString() );
+    void testToStringNullSafe() {
+        assertNotNull(new ReportPlugin().toString());
     }
-
 }

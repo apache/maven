@@ -1,5 +1,3 @@
-package org.apache.maven.model.management;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.management;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.management;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -26,10 +25,8 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles injection of dependency management into the model.
  *
- * @author Benjamin Bentmann
  */
-public interface DependencyManagementInjector
-{
+public interface DependencyManagementInjector {
 
     /**
      * Merges default values from the dependency management section of the given model into itself.
@@ -39,6 +36,5 @@ public interface DependencyManagementInjector
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
-
+    void injectManagement(Model model, ModelBuildingRequest request, ModelProblemCollector problems);
 }

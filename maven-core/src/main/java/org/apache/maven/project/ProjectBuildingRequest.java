@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.Date;
 import java.util.List;
@@ -30,18 +29,17 @@ import org.eclipse.aether.RepositorySystemSession;
 /**
  * ProjectBuildingRequest
  */
-public interface ProjectBuildingRequest
-{
+public interface ProjectBuildingRequest {
 
-    ProjectBuildingRequest setLocalRepository( ArtifactRepository localRepository );
+    ProjectBuildingRequest setLocalRepository(ArtifactRepository localRepository);
 
     ArtifactRepository getLocalRepository();
 
-    ProjectBuildingRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
+    ProjectBuildingRequest setRemoteRepositories(List<ArtifactRepository> remoteRepositories);
 
     List<ArtifactRepository> getRemoteRepositories();
 
-    ProjectBuildingRequest setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories );
+    ProjectBuildingRequest setPluginArtifactRepositories(List<ArtifactRepository> pluginArtifactRepositories);
 
     List<ArtifactRepository> getPluginArtifactRepositories();
 
@@ -52,7 +50,7 @@ public interface ProjectBuildingRequest
      * @param systemProperties The system properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ProjectBuildingRequest setSystemProperties( Properties systemProperties );
+    ProjectBuildingRequest setSystemProperties(Properties systemProperties);
 
     /**
      * Gets the system properties to use for interpolation and profile activation. The system properties are collected
@@ -70,7 +68,7 @@ public interface ProjectBuildingRequest
      * @param userProperties The user properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ProjectBuildingRequest setUserProperties( Properties userProperties );
+    ProjectBuildingRequest setUserProperties(Properties userProperties);
 
     /**
      * Gets the user properties to use for interpolation and profile activation. The user properties have been
@@ -81,15 +79,15 @@ public interface ProjectBuildingRequest
      */
     Properties getUserProperties();
 
-    void setProject( MavenProject mavenProject );
+    void setProject(MavenProject mavenProject);
 
     MavenProject getProject();
 
-    ProjectBuildingRequest setProcessPlugins( boolean processPlugins );
+    ProjectBuildingRequest setProcessPlugins(boolean processPlugins);
 
     boolean isProcessPlugins();
 
-    ProjectBuildingRequest setResolveDependencies( boolean resolveDependencies );
+    ProjectBuildingRequest setResolveDependencies(boolean resolveDependencies);
 
     boolean isResolveDependencies();
 
@@ -100,7 +98,7 @@ public interface ProjectBuildingRequest
      *            {@link org.apache.maven.model.building.ModelBuildingRequest#VALIDATION_LEVEL_STRICT}.
      * @return This configuration, never {@code null}.
      */
-    ProjectBuildingRequest setValidationLevel( int validationLevel );
+    ProjectBuildingRequest setValidationLevel(int validationLevel);
 
     /**
      * Gets the level of validation to perform on processed models.
@@ -115,11 +113,11 @@ public interface ProjectBuildingRequest
      * Set any active profiles that the {@link ProjectBuilder} should consider while constructing
      * a {@link MavenProject}.
      */
-    void setActiveProfileIds( List<String> activeProfileIds );
+    void setActiveProfileIds(List<String> activeProfileIds);
 
     List<String> getActiveProfileIds();
 
-    void setInactiveProfileIds( List<String> inactiveProfileIds );
+    void setInactiveProfileIds(List<String> inactiveProfileIds);
 
     List<String> getInactiveProfileIds();
 
@@ -129,9 +127,9 @@ public interface ProjectBuildingRequest
      *
      * @param profile
      */
-    void addProfile( Profile profile );
+    void addProfile(Profile profile);
 
-    void setProfiles( List<Profile> profiles );
+    void setProfiles(List<Profile> profiles);
 
     List<Profile> getProfiles();
 
@@ -147,11 +145,11 @@ public interface ProjectBuildingRequest
      *
      * @param buildStartTime The start time of the build, may be {@code null}.
      */
-    void setBuildStartTime( Date buildStartTime );
+    void setBuildStartTime(Date buildStartTime);
 
     RepositorySystemSession getRepositorySession();
 
-    ProjectBuildingRequest setRepositorySession( RepositorySystemSession repositorySession );
+    ProjectBuildingRequest setRepositorySession(RepositorySystemSession repositorySession);
 
     /**
      * Sets the merge mode used to combine repositories declared in the POM with the repositories specified in this
@@ -161,7 +159,7 @@ public interface ProjectBuildingRequest
      * @return This request for chaining, never {@code null}.
      * @see #setRemoteRepositories(List)
      */
-    ProjectBuildingRequest setRepositoryMerging( RepositoryMerging mode );
+    ProjectBuildingRequest setRepositoryMerging(RepositoryMerging mode);
 
     /**
      * Gets the merge mode used to combine repositories declared in the POM with the repositories specified in this
@@ -185,13 +183,12 @@ public interface ProjectBuildingRequest
      * Commit 6cf9320942c34bc68205425ab696b1712ace9ba4 updated the way 'MavenProject' objects are initialized.
      */
     @Deprecated
-    ProjectBuildingRequest setResolveVersionRanges( boolean value );
+    ProjectBuildingRequest setResolveVersionRanges(boolean value);
 
     /**
      * The possible merge modes for combining remote repositories.
      */
-    enum RepositoryMerging
-    {
+    enum RepositoryMerging {
 
         /**
          * The repositories declared in the POM have precedence over the repositories specified in the request.
@@ -203,5 +200,4 @@ public interface ProjectBuildingRequest
          */
         REQUEST_DOMINANT,
     }
-
 }

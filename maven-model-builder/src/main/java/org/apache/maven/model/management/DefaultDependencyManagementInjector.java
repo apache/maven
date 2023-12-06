@@ -1,5 +1,3 @@
-package org.apache.maven.model.management;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,19 +16,21 @@ package org.apache.maven.model.management;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.management;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.Exclusion;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
@@ -38,80 +38,84 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles injection of dependency management into the model.
  *
- * @author Benjamin Bentmann
  */
-@SuppressWarnings( { "checkstyle:methodname" } )
+@SuppressWarnings({"checkstyle:methodname"})
 @Named
 @Singleton
-public class DefaultDependencyManagementInjector
-    implements DependencyManagementInjector
-{
+public class DefaultDependencyManagementInjector implements DependencyManagementInjector {
 
     private ManagementModelMerger merger = new ManagementModelMerger();
 
     @Override
-    public void injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
-    {
-        merger.mergeManagedDependencies( model );
+    public void injectManagement(
+            org.apache.maven.model.Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
+        model.update(merger.mergeManagedDependencies(model.getDelegate()));
     }
 
     /**
      * ManagementModelMerger
      */
-    protected static class ManagementModelMerger
-        extends MavenModelMerger
-    {
+    protected static class ManagementModelMerger extends MavenModelMerger {
 
-        public void mergeManagedDependencies( Model model )
-        {
+        public Model mergeManagedDependencies(Model model) {
             DependencyManagement dependencyManagement = model.getDependencyManagement();
-            if ( dependencyManagement != null )
-            {
+            if (dependencyManagement != null) {
                 Map<Object, Dependency> dependencies = new HashMap<>();
                 Map<Object, Object> context = Collections.emptyMap();
 
-                for ( Dependency dependency : model.getDependencies() )
-                {
-                    Object key = getDependencyKey().apply( dependency );
-                    dependencies.put( key, dependency );
+                for (Dependency dependency : model.getDependencies()) {
+                    Object key = getDependencyKey().apply(dependency);
+                    dependencies.put(key, dependency);
                 }
 
-                for ( Dependency managedDependency : dependencyManagement.getDependencies() )
-                {
-                    Object key = getDependencyKey().apply( managedDependency );
-                    Dependency dependency = dependencies.get( key );
-                    if ( dependency != null )
-                    {
-                        mergeDependency( dependency, managedDependency, false, context );
+                boolean modified = false;
+                for (Dependency managedDependency : dependencyManagement.getDependencies()) {
+                    Object key = getDependencyKey().apply(managedDependency);
+                    Dependency dependency = dependencies.get(key);
+                    if (dependency != null) {
+                        Dependency merged = mergeDependency(dependency, managedDependency, false, context);
+                        if (merged != dependency) {
+                            dependencies.put(key, merged);
+                            modified = true;
+                        }
                     }
                 }
+
+                if (modified) {
+                    List<Dependency> newDeps = new ArrayList<>(dependencies.size());
+                    for (Dependency dep : model.getDependencies()) {
+                        Object key = getDependencyKey().apply(dep);
+                        Dependency dependency = dependencies.get(key);
+                        newDeps.add(dependency);
+                    }
+                    return Model.newBuilder(model).dependencies(newDeps).build();
+                }
             }
+            return model;
         }
 
         @Override
-        protected void mergeDependency_Optional( Dependency target, Dependency source, boolean sourceDominant,
-                                                 Map<Object, Object> context )
-        {
+        protected void mergeDependency_Optional(
+                Dependency.Builder builder,
+                Dependency target,
+                Dependency source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
             // optional flag is not managed
         }
 
         @Override
-        protected void mergeDependency_Exclusions( Dependency target, Dependency source, boolean sourceDominant,
-                                                   Map<Object, Object> context )
-        {
+        protected void mergeDependency_Exclusions(
+                Dependency.Builder builder,
+                Dependency target,
+                Dependency source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
             List<Exclusion> tgt = target.getExclusions();
-            if ( tgt.isEmpty() )
-            {
+            if (tgt.isEmpty()) {
                 List<Exclusion> src = source.getExclusions();
-
-                for ( Exclusion element : src )
-                {
-                    Exclusion clone = element.clone();
-                    target.addExclusion( clone );
-                }
+                builder.exclusions(src);
             }
         }
-
     }
-
 }
