@@ -107,9 +107,9 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     private static final String WAGON_LOG_SNIPPET = "[DEBUG] Using transporter WagonTransporter";
 
-    private static final String APACHE_LOG_SNIPPET = "[DEBUG] Using transporter HttpTransporter";
+    private static final String APACHE_LOG_SNIPPET = "[DEBUG] Using transporter ApacheTransporter";
 
-    private static final String JDK_LOG_SNIPPET = "[DEBUG] Using transporter JdkHttpTransporter";
+    private static final String JDK_LOG_SNIPPET = "[DEBUG] Using transporter JdkTransporter";
 
     /**
      * Returns {@code true} if JDK HttpClient transport is usable (Java11 or better).
@@ -119,7 +119,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
     }
 
     /**
-     * Returns {@code true} if JDK HttpClient transport is present in Maven (since 4.0.0-alpha-9, the Resovler 2.0.0
+     * Returns {@code true} if JDK HttpClient transport is present in Maven (since 4.0.0-alpha-9, the Resolver 2.0.0
      * upgrade).
      */
     private boolean isJdkTransportPresent() {

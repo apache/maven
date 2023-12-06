@@ -75,16 +75,8 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends Abst
             List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
             for (String line : lines) {
                 sb.append(line).append(System.lineSeparator());
-                if (line.matches(".*Connection refused.*")) {
-                    foundCause = true;
-                    break;
-                }
-                // To be fixed with https://issues.apache.org/jira/browse/MRESOLVER-429
-                if (line.matches(".*ConnectException.*")) {
-                    foundCause = true;
-                    break;
-                }
-                if (line.matches(".*Connection to http://localhost:54312 refused.*")) {
+                if (line.matches(
+                        ".*Connection to http://localhost:54312.*refused.*")) { // URL may be with or without trailing /
                     foundCause = true;
                     break;
                 }

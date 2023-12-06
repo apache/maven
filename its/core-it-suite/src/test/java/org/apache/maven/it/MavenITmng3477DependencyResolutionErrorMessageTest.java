@@ -61,11 +61,6 @@ public class MavenITmng3477DependencyResolutionErrorMessageTest extends Abstract
                     foundCause = true;
                     break;
                 }
-                // To be fixed with https://issues.apache.org/jira/browse/MRESOLVER-429
-                if (line.matches(".*org.apache.maven.its.mng3477:dep:jar:1.0.*ConnectException.*")) {
-                    foundCause = true;
-                    break;
-                }
             }
             assertTrue("Transfer error cause was not found", foundCause);
         }
