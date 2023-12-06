@@ -148,7 +148,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
         PlexusConfiguration plexusConfiguration = (PlexusConfiguration) systemSessionFactory
                 .newRepositorySession(request)
                 .getConfigProperties()
-                .get("aether.connector.wagon.config.repository");
+                .get("aether.transport.wagon.config.repository");
         assertNotNull(plexusConfiguration);
         assertEquals(0, plexusConfiguration.getChildCount());
     }
@@ -370,7 +370,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
         Map<String, Object> configProperties =
                 systemSessionFactory.newRepositorySession(request).getConfigProperties();
         assertEquals(String.valueOf(Float.MAX_VALUE), configProperties.get("aether.priority.FileTransporterFactory"));
-        assertEquals(String.valueOf(Float.MAX_VALUE), configProperties.get("aether.priority.HttpTransporterFactory"));
+        assertEquals(String.valueOf(Float.MAX_VALUE), configProperties.get("aether.priority.ApacheTransporterFactory"));
         properties.remove("maven.resolver.transport");
 
         // wagon
