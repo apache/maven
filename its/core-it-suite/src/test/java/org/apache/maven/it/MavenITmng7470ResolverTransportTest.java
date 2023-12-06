@@ -107,6 +107,8 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     private static final String WAGON_LOG_SNIPPET = "[DEBUG] Using transporter WagonTransporter";
 
+    private static final String APACHE_LOG_SNIPPET_OLD = "[DEBUG] Using transporter HttpTransporter";
+
     private static final String APACHE_LOG_SNIPPET = "[DEBUG] Using transporter ApacheTransporter";
 
     private static final String JDK_LOG_SNIPPET = "[DEBUG] Using transporter JdkTransporter";
@@ -130,7 +132,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
         if (isJdkTransportUsable() && isJdkTransportPresent()) {
             return JDK_LOG_SNIPPET;
         }
-        return APACHE_LOG_SNIPPET;
+        return isJdkTransportPresent() ? APACHE_LOG_SNIPPET : APACHE_LOG_SNIPPET_OLD;
     }
 
     @Test
@@ -145,7 +147,9 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     @Test
     public void testResolverTransportApache() throws Exception {
-        performTest(isJdkTransportPresent() ? "apache" : "native", APACHE_LOG_SNIPPET);
+        performTest(
+                isJdkTransportPresent() ? "apache" : "native",
+                isJdkTransportPresent() ? APACHE_LOG_SNIPPET : APACHE_LOG_SNIPPET_OLD);
     }
 
     @Test
