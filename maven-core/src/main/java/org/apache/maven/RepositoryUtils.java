@@ -27,7 +27,6 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.project.DependencyResolutionResult;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -104,7 +103,6 @@ public class RepositoryUtils {
         return result;
     }
 
-    @Deprecated
     public static void toArtifacts(
             Collection<org.apache.maven.artifact.Artifact> artifacts,
             Collection<? extends DependencyNode> nodes,
@@ -123,39 +121,6 @@ public class RepositoryUtils {
             }
 
             toArtifacts(artifacts, node.getChildren(), nodeTrail, filter);
-        }
-    }
-
-    public static void toArtifactChildrenOnly(
-            Collection<org.apache.maven.artifact.Artifact> artifacts,
-            DependencyResolutionResult result,
-            List<String> trail) {
-        HashMap<String, org.apache.maven.artifact.Artifact> map = new HashMap<>();
-        convertWithTrail(map, result.getDependencyGraph().getChildren(), trail);
-
-        for (Dependency dependency : result.getDependencies()) {
-            org.apache.maven.artifact.Artifact artifact = map.get(dependency.toString());
-            if (artifact != null) {
-                artifacts.add(artifact);
-            }
-        }
-    }
-
-    private static void convertWithTrail(
-            Map<String, org.apache.maven.artifact.Artifact> map,
-            Collection<? extends DependencyNode> nodes,
-            List<String> trail) {
-        for (DependencyNode node : nodes) {
-            org.apache.maven.artifact.Artifact artifact = toArtifact(node.getDependency());
-
-            List<String> nodeTrail = new ArrayList<>(trail.size() + 1);
-            nodeTrail.addAll(trail);
-            nodeTrail.add(artifact.getId());
-
-            artifact.setDependencyTrail(nodeTrail);
-            map.put(node.getDependency().toString(), artifact);
-
-            convertWithTrail(map, node.getChildren(), nodeTrail);
         }
     }
 

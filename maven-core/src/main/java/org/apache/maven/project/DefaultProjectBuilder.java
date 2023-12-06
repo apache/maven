@@ -885,10 +885,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             Set<Artifact> artifacts = new LinkedHashSet<>();
             if (resolutionResult.getDependencyGraph() != null) {
-                RepositoryUtils.toArtifactChildrenOnly(
+                RepositoryUtils.toArtifacts(
                         artifacts,
-                        resolutionResult,
-                        Collections.singletonList(project.getArtifact().getId()));
+                        resolutionResult.getDependencyGraph().getChildren(),
+                        Collections.singletonList(project.getArtifact().getId()),
+                        null);
 
                 // Maven 2.x quirk: an artifact always points at the local repo, regardless whether resolved or not
                 LocalRepositoryManager lrm = session.getLocalRepositoryManager();
