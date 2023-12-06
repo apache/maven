@@ -44,13 +44,7 @@ import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactDescriptorException;
-import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
-import org.eclipse.aether.resolution.ArtifactDescriptorResult;
-import org.eclipse.aether.resolution.ArtifactRequest;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.DependencyRequest;
-import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.resolution.*;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
@@ -150,7 +144,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
     /**
      * @since 3.3.0
      */
-    public DependencyNode resolveCoreExtension(
+    public DependencyResult resolveCoreExtension(
             Plugin plugin,
             DependencyFilter dependencyFilter,
             List<RemoteRepository> repositories,
@@ -159,7 +153,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         return resolveInternal(plugin, null /* pluginArtifact */, dependencyFilter, repositories, session);
     }
 
-    public DependencyNode resolve(
+    public DependencyResult resolvePlugin(
             Plugin plugin,
             Artifact pluginArtifact,
             DependencyFilter dependencyFilter,
@@ -169,7 +163,18 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session);
     }
 
-    private DependencyNode resolveInternal(
+    public DependencyNode resolve(
+            Plugin plugin,
+            Artifact pluginArtifact,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session)
+            throws PluginResolutionException {
+        return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session)
+                .getRoot();
+    }
+
+    private DependencyResult resolveInternal(
             Plugin plugin,
             Artifact pluginArtifact,
             DependencyFilter dependencyFilter,
@@ -217,14 +222,12 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             }
 
             depRequest.setRoot(node);
-            repoSystem.resolveDependencies(session, depRequest);
+            return repoSystem.resolveDependencies(session, depRequest);
         } catch (DependencyCollectionException e) {
             throw new PluginResolutionException(plugin, e);
         } catch (DependencyResolutionException e) {
             throw new PluginResolutionException(plugin, e.getCause());
         }
-
-        return node;
     }
 
     // Keep this class in sync with org.apache.maven.project.DefaultProjectDependenciesResolver.GraphLogger
