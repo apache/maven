@@ -47,7 +47,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultModelXmlFactory implements ModelXmlFactory {
     @Override
     public Model read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
-        nonNull(request, "request can not be null");
+        nonNull(request, "request");
         Path path = request.getPath();
         URL url = request.getURL();
         Reader reader = request.getReader();
@@ -82,8 +82,8 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
 
     @Override
     public void write(XmlWriterRequest<Model> request) throws XmlWriterException {
-        nonNull(request, "request can not be null");
-        Model content = nonNull(request.getContent(), "content can not be null");
+        nonNull(request, "request");
+        Model content = nonNull(request.getContent(), "content");
         Path path = request.getPath();
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();

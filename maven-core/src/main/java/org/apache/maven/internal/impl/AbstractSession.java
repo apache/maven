@@ -29,7 +29,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Artifact;
@@ -64,6 +63,7 @@ import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 
+import static org.apache.maven.internal.impl.Utils.map;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public abstract class AbstractSession implements InternalSession {
@@ -102,7 +102,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     public List<Project> getProjects(List<MavenProject> projects) {
-        return projects == null ? null : projects.stream().map(this::getProject).collect(Collectors.toList());
+        return projects == null ? null : map(projects, this::getProject);
     }
 
     public Project getProject(MavenProject project) {
@@ -110,9 +110,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     public List<org.eclipse.aether.repository.RemoteRepository> toRepositories(List<RemoteRepository> repositories) {
-        return repositories == null
-                ? null
-                : repositories.stream().map(this::toRepository).collect(Collectors.toList());
+        return repositories == null ? null : map(repositories, this::toRepository);
     }
 
     public org.eclipse.aether.repository.RemoteRepository toRepository(RemoteRepository repository) {
@@ -134,25 +132,19 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     public List<ArtifactRepository> toArtifactRepositories(List<RemoteRepository> repositories) {
-        return repositories == null
-                ? null
-                : repositories.stream().map(this::toArtifactRepository).collect(Collectors.toList());
+        return repositories == null ? null : map(repositories, this::toArtifactRepository);
     }
 
     public abstract ArtifactRepository toArtifactRepository(RemoteRepository repository);
 
     public List<org.eclipse.aether.graph.Dependency> toDependencies(Collection<DependencyCoordinate> dependencies) {
-        return dependencies == null
-                ? null
-                : dependencies.stream().map(this::toDependency).collect(Collectors.toList());
+        return dependencies == null ? null : map(dependencies, this::toDependency);
     }
 
     public abstract org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency);
 
     public List<org.eclipse.aether.artifact.Artifact> toArtifacts(Collection<Artifact> artifacts) {
-        return artifacts == null
-                ? null
-                : artifacts.stream().map(this::toArtifact).collect(Collectors.toList());
+        return artifacts == null ? null : map(artifacts, this::toArtifact);
     }
 
     public org.eclipse.aether.artifact.Artifact toArtifact(Artifact artifact) {

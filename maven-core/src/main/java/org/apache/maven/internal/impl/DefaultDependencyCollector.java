@@ -58,7 +58,7 @@ public class DefaultDependencyCollector implements DependencyCollector {
     @Override
     public DependencyCollectorResult collect(@Nonnull DependencyCollectorRequest request)
             throws DependencyCollectorException, IllegalArgumentException {
-        nonNull(request, "request can not be null");
+        nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
 
         Artifact rootArtifact =

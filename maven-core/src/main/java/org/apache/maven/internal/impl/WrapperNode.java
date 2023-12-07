@@ -38,8 +38,7 @@ class WrapperNode extends AbstractNode {
 
     @Override
     DependencyNode getDependencyNode() {
-        return Utils.cast(AbstractNode.class, delegate, "delegate is not an instance of AbstractNode")
-                .getDependencyNode();
+        return Utils.cast(AbstractNode.class, delegate, "delegate").getDependencyNode();
     }
 
     @Override

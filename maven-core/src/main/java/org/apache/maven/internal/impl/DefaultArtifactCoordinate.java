@@ -35,8 +35,8 @@ public class DefaultArtifactCoordinate implements ArtifactCoordinate {
 
     public DefaultArtifactCoordinate(
             @Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact coordinate) {
-        this.session = nonNull(session, "session can not be null");
-        this.coordinate = nonNull(coordinate, "coordinate can not be null");
+        this.session = nonNull(session, "session");
+        this.coordinate = nonNull(coordinate, "coordinate");
     }
 
     public org.eclipse.aether.artifact.Artifact getCoordinate() {

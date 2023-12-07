@@ -47,15 +47,15 @@ public class DefaultArtifactDeployer implements ArtifactDeployer {
 
     @Inject
     DefaultArtifactDeployer(@Nonnull RepositorySystem repositorySystem) {
-        this.repositorySystem = nonNull(repositorySystem, "repositorySystem can not be null");
+        this.repositorySystem = nonNull(repositorySystem, "repositorySystem");
     }
 
     @Override
     public void deploy(@Nonnull ArtifactDeployerRequest request) {
-        nonNull(request, "request can not be null");
+        nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
-        Collection<Artifact> artifacts = nonNull(request.getArtifacts(), "request.artifacts can not be null");
-        RemoteRepository repository = nonNull(request.getRepository(), "request.repository can not be null");
+        Collection<Artifact> artifacts = nonNull(request.getArtifacts(), "request.artifacts");
+        RemoteRepository repository = nonNull(request.getRepository(), "request.repository");
         try {
             DeployRequest deployRequest = new DeployRequest()
                     .setRepository(session.toRepository(repository))
