@@ -46,21 +46,7 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Repository;
-import org.apache.maven.api.services.ArtifactCoordinateFactory;
-import org.apache.maven.api.services.ArtifactDeployer;
-import org.apache.maven.api.services.ArtifactDeployerException;
-import org.apache.maven.api.services.ArtifactFactory;
-import org.apache.maven.api.services.ArtifactInstaller;
-import org.apache.maven.api.services.ArtifactInstallerException;
-import org.apache.maven.api.services.ArtifactManager;
-import org.apache.maven.api.services.ArtifactResolver;
-import org.apache.maven.api.services.ArtifactResolverException;
-import org.apache.maven.api.services.DependencyCollector;
-import org.apache.maven.api.services.DependencyCollectorException;
-import org.apache.maven.api.services.DependencyCoordinateFactory;
-import org.apache.maven.api.services.LocalRepositoryManager;
-import org.apache.maven.api.services.RepositoryFactory;
-import org.apache.maven.api.services.VersionParser;
+import org.apache.maven.api.services.*;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 
@@ -507,5 +493,15 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public VersionRange parseVersionRange(String versionRange) {
         return getService(VersionParser.class).parseVersionRange(versionRange);
+    }
+
+    @Override
+    public Version resolveVersion(ArtifactCoordinate artifact) {
+        return getService(VersionResolver.class).resolve(this, artifact).getVersion();
+    }
+
+    @Override
+    public List<Version> resolveVersionRange(ArtifactCoordinate artifact) {
+        return getService(VersionRangeResolver.class).resolve(this, artifact).getVersions();
     }
 }

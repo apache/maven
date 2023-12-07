@@ -16,36 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.api.services;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
-class Utils {
-    static <T> T nonNull(T t) {
-        if (t == null) {
-            throw new IllegalArgumentException();
-        }
-        return t;
-    }
+import org.apache.maven.api.Repository;
+import org.apache.maven.api.Version;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
-    static <T> T nonNull(T t, String message) {
-        if (t == null) {
-            throw new IllegalArgumentException(message);
-        }
-        return t;
-    }
+@Experimental
+public interface VersionResolverResult {
 
-    static <T> T cast(Class<T> clazz, Object o, String message) {
-        if (!clazz.isInstance(o)) {
-            throw new IllegalArgumentException(message);
-        }
-        return clazz.cast(o);
-    }
+    @Nonnull
+    List<Exception> getExceptions();
 
-    static <U, V> List<V> map(Collection<U> list, Function<U, V> mapper) {
-        return list.stream().map(mapper).collect(Collectors.toList());
-    }
+    @Nonnull
+    Version getVersion();
+
+    @Nonnull
+    Optional<Repository> getRepository();
 }

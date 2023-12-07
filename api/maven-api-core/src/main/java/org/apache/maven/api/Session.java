@@ -365,4 +365,10 @@ public interface Session {
      */
     @Nonnull
     VersionRange parseVersionRange(@Nonnull String versionRange);
+
+    @Nonnull
+    Version resolveVersion(@Nonnull ArtifactCoordinate artifact);
+
+    @Nonnull
+    List<Version> resolveVersionRange(@Nonnull ArtifactCoordinate artifact);
 }
