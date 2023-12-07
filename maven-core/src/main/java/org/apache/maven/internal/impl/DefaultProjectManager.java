@@ -37,6 +37,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.sisu.Typed;
 
+import static org.apache.maven.internal.impl.Utils.map;
+
 @Named
 @Typed
 @SessionScoped
@@ -63,10 +65,9 @@ public class DefaultProjectManager implements ProjectManager {
     @Override
     public Collection<Artifact> getAttachedArtifacts(Project project) {
         InternalSession session = ((DefaultProject) project).getSession();
-        Collection<Artifact> attached = getMavenProject(project).getAttachedArtifacts().stream()
-                .map(RepositoryUtils::toArtifact)
-                .map(session::getArtifact)
-                .collect(Collectors.toList());
+        Collection<Artifact> attached = map(
+                getMavenProject(project).getAttachedArtifacts(),
+                a -> session.getArtifact(RepositoryUtils.toArtifact(a)));
         return Collections.unmodifiableCollection(attached);
     }
 

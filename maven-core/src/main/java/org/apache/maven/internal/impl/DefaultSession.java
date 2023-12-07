@@ -27,7 +27,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyCoordinate;
@@ -54,6 +53,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 
+import static org.apache.maven.internal.impl.Utils.map;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultSession extends AbstractSession {
@@ -80,10 +80,9 @@ public class DefaultSession extends AbstractSession {
         this.repositorySystem = nonNull(repositorySystem);
         this.repositories = repositories != null
                 ? repositories
-                : mavenSession.getRequest().getRemoteRepositories().stream()
-                        .map(RepositoryUtils::toRepo)
-                        .map(this::getRemoteRepository)
-                        .collect(Collectors.toList());
+                : map(
+                        mavenSession.getRequest().getRemoteRepositories(),
+                        r -> getRemoteRepository(RepositoryUtils.toRepo(r)));
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.container = container;
         this.runtimeInformation = runtimeInformation;

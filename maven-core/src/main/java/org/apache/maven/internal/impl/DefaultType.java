@@ -36,10 +36,10 @@ public class DefaultType implements Type, ArtifactType {
     private final DependencyProperties dependencyProperties;
 
     public DefaultType(String id, String extension, String classifier, DependencyProperties dependencyProperties) {
-        nonNull(id, "null id");
-        this.extension = nonNull(extension, "null extension");
+        nonNull(id, "id");
+        this.extension = nonNull(extension, "extension");
         this.classifier = classifier;
-        nonNull(dependencyProperties, "null dependencyProperties");
+        nonNull(dependencyProperties, "dependencyProperties");
         HashMap<String, String> props = new HashMap<>(dependencyProperties.asMap());
         props.put(ArtifactProperties.TYPE, id);
         this.dependencyProperties = new DefaultDependencyProperties(props);

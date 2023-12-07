@@ -70,7 +70,7 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     @Override
     @Nonnull
     public Type getType(String id) {
-        nonNull(id, "null id");
+        nonNull(id, "id");
         return usedTypes.computeIfAbsent(id, i -> {
             Type type = types.get(id);
             if (type == null) {

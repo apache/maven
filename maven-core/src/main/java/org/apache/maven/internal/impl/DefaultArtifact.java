@@ -36,8 +36,8 @@ public class DefaultArtifact implements Artifact {
     private final String key;
 
     public DefaultArtifact(@Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
-        this.session = nonNull(session, "session can not be null");
-        this.artifact = nonNull(artifact, "artifact can not be null");
+        this.session = nonNull(session, "session");
+        this.artifact = nonNull(artifact, "artifact");
         this.key = getGroupId()
                 + ':'
                 + getArtifactId()

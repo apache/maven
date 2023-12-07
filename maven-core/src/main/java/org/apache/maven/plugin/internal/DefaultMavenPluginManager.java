@@ -103,10 +103,10 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
-import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,7 +138,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private ClassRealmManager classRealmManager;
     private PluginDescriptorCache pluginDescriptorCache;
     private PluginRealmCache pluginRealmCache;
-    private PluginDependenciesResolver pluginDependenciesResolver;
+    private DefaultPluginDependenciesResolver pluginDependenciesResolver;
     private RuntimeInformation runtimeInformation;
     private ExtensionRealmCache extensionRealmCache;
     private PluginVersionResolver pluginVersionResolver;
@@ -157,7 +157,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             ClassRealmManager classRealmManager,
             PluginDescriptorCache pluginDescriptorCache,
             PluginRealmCache pluginRealmCache,
-            PluginDependenciesResolver pluginDependenciesResolver,
+            DefaultPluginDependenciesResolver pluginDependenciesResolver,
             RuntimeInformation runtimeInformation,
             ExtensionRealmCache extensionRealmCache,
             PluginVersionResolver pluginVersionResolver,
@@ -396,24 +396,21 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         DependencyFilter dependencyFilter = project.getExtensionDependencyFilter();
         dependencyFilter = AndDependencyFilter.newInstance(dependencyFilter, filter);
 
-        DependencyNode root = pluginDependenciesResolver.resolve(
+        DependencyResult result = pluginDependenciesResolver.resolvePlugin(
                 plugin,
                 RepositoryUtils.toArtifact(pluginArtifact),
                 dependencyFilter,
                 project.getRemotePluginRepositories(),
                 repositorySession);
 
-        PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-        root.accept(nlg);
-
-        pluginArtifacts = toMavenArtifacts(root, nlg);
+        pluginArtifacts = toMavenArtifacts(result);
 
         pluginRealm = classRealmManager.createPluginRealm(
                 plugin, parent, null, foreignImports, toAetherArtifacts(pluginArtifacts));
 
         discoverPluginComponents(pluginRealm, plugin, pluginDescriptor);
 
-        pluginDescriptor.setDependencyNode(root);
+        pluginDescriptor.setDependencyNode(result.getRoot());
         pluginDescriptor.setClassRealm(pluginRealm);
         pluginDescriptor.setArtifacts(pluginArtifacts);
     }
@@ -473,10 +470,12 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         return new ArrayList<>(RepositoryUtils.toArtifacts(pluginArtifacts));
     }
 
-    private List<Artifact> toMavenArtifacts(DependencyNode root, PreorderNodeListGenerator nlg) {
-        List<Artifact> artifacts = new ArrayList<>(nlg.getNodes().size());
-        RepositoryUtils.toArtifacts(artifacts, Collections.singleton(root), Collections.emptyList(), null);
-        artifacts.removeIf(artifact -> artifact.getFile() == null);
+    private List<Artifact> toMavenArtifacts(DependencyResult dependencyResult) {
+        List<Artifact> artifacts =
+                new ArrayList<>(dependencyResult.getArtifactResults().size());
+        dependencyResult.getArtifactResults().stream()
+                .filter(ArtifactResult::isResolved)
+                .forEach(a -> artifacts.add(RepositoryUtils.toArtifact(a.getArtifact())));
         return Collections.unmodifiableList(artifacts);
     }
 
@@ -891,9 +890,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private List<Artifact> resolveExtensionArtifacts(
             Plugin extensionPlugin, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginResolutionException {
-        DependencyNode root = pluginDependenciesResolver.resolve(extensionPlugin, null, null, repositories, session);
-        PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-        root.accept(nlg);
-        return toMavenArtifacts(root, nlg);
+        DependencyResult root =
+                pluginDependenciesResolver.resolvePlugin(extensionPlugin, null, null, repositories, session);
+        return toMavenArtifacts(root);
     }
 }

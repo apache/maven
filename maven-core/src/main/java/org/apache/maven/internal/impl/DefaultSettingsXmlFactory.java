@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
@@ -38,12 +37,14 @@ import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.v4.SettingsStaxReader;
 import org.apache.maven.settings.v4.SettingsStaxWriter;
 
+import static org.apache.maven.internal.impl.Utils.nonNull;
+
 @Named
 @Singleton
 public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
     @Override
     public Settings read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
-        Objects.requireNonNull(request, "request can not be null");
+        nonNull(request, "request");
         Reader reader = request.getReader();
         InputStream inputStream = request.getInputStream();
         if (reader == null && inputStream == null) {
@@ -68,8 +69,8 @@ public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
 
     @Override
     public void write(XmlWriterRequest<Settings> request) throws XmlWriterException {
-        Objects.requireNonNull(request, "request can not be null");
-        Settings content = Objects.requireNonNull(request.getContent(), "content can not be null");
+        nonNull(request, "request");
+        Settings content = nonNull(request.getContent(), "content");
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();
         if (writer == null && outputStream == null) {

@@ -31,16 +31,16 @@ class Utils {
         return t;
     }
 
-    static <T> T nonNull(T t, String message) {
+    static <T> T nonNull(T t, String name) {
         if (t == null) {
-            throw new IllegalArgumentException(message);
+            throw new IllegalArgumentException(name + " cannot be null");
         }
         return t;
     }
 
-    static <T> T cast(Class<T> clazz, Object o, String message) {
+    static <T> T cast(Class<T> clazz, Object o, String name) {
         if (!clazz.isInstance(o)) {
-            throw new IllegalArgumentException(message);
+            throw new IllegalArgumentException(name + " is not an instance of " + clazz.getName());
         }
         return clazz.cast(o);
     }
