@@ -49,6 +49,13 @@ public interface ClassRealmManager {
     ClassRealm getMavenApiRealm();
 
     /**
+     * Gets the class realm exposing the Maven 4 API. This is basically a restricted view on the Maven core realm.
+     *
+     * @return The class realm exposing the Maven API, never {@code null}.
+     */
+    ClassRealm getMaven4ApiRealm();
+
+    /**
      * Creates a new class realm for the specified project and its build extensions.
      *
      * @param model The model of the project for which to create a realm, must not be {@code null}.
