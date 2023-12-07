@@ -57,9 +57,9 @@ import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
+import org.eclipse.aether.spi.version.VersionSchemeSelector;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
-import org.eclipse.aether.version.VersionScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,18 +79,18 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     private final RepositorySystem repositorySystem;
     private final MetadataReader metadataReader;
     private final MavenPluginManager pluginManager;
-    private final VersionScheme versionScheme;
+    private final VersionSchemeSelector versionSchemeSelector;
 
     @Inject
     public DefaultPluginVersionResolver(
             RepositorySystem repositorySystem,
             MetadataReader metadataReader,
             MavenPluginManager pluginManager,
-            VersionScheme versionScheme) {
+            VersionSchemeSelector versionSchemeSelector) {
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
         this.pluginManager = pluginManager;
-        this.versionScheme = versionScheme;
+        this.versionSchemeSelector = versionSchemeSelector;
     }
 
     @Override
@@ -194,7 +194,9 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
             for (String ver : versions.versions.keySet()) {
                 try {
-                    Version v = versionScheme.parseVersion(ver);
+                    Version v = versionSchemeSelector
+                            .selectVersionScheme(request.getRepositorySession())
+                            .parseVersion(ver);
 
                     if (ver.endsWith("-SNAPSHOT")) {
                         snapshots.add(v);

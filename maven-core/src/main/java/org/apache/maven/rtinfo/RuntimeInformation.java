@@ -41,6 +41,8 @@ public interface RuntimeInformation {
      * @return {@code true} if the current Maven runtime matches the specified version range, {@code false} otherwise.
      * @throws IllegalArgumentException If the specified version range is {@code null}, empty or otherwise not a valid
      *             version specification.
+     * @deprecated This method is deprecated, use {@link #getMavenVersion()} instead.
      */
+    @Deprecated
     boolean isMavenVersion(String versionRange);
 }

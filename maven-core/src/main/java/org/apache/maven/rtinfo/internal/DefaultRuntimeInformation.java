@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.rtinfo.RuntimeInformation;
+import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -43,13 +44,13 @@ import org.slf4j.LoggerFactory;
 public class DefaultRuntimeInformation implements RuntimeInformation {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final VersionScheme versionScheme;
+    @Deprecated
+    private final VersionScheme versionScheme = new GenericVersionScheme();
 
     private final String mavenVersion;
 
     @Inject
-    public DefaultRuntimeInformation(final VersionScheme versionScheme) {
-        this.versionScheme = versionScheme;
+    public DefaultRuntimeInformation() {
         this.mavenVersion = loadMavenVersion();
     }
 
@@ -87,6 +88,7 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
         }
     }
 
+    @Deprecated
     @Override
     public boolean isMavenVersion(String versionRange) {
         if (Objects.requireNonNull(versionRange, "versionRange cannot be null").isEmpty()) {
