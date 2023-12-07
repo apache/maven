@@ -49,6 +49,8 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.sisu.Typed;
 
+import static org.apache.maven.internal.impl.Utils.map;
+
 @Named
 @Typed
 @SessionScoped
@@ -76,10 +78,9 @@ public class DefaultProjectManager implements ProjectManager {
     @Override
     public Collection<Artifact> getAttachedArtifacts(Project project) {
         InternalSession session = ((DefaultProject) project).getSession();
-        Collection<Artifact> attached = getMavenProject(project).getAttachedArtifacts().stream()
-                .map(RepositoryUtils::toArtifact)
-                .map(session::getArtifact)
-                .collect(Collectors.toList());
+        Collection<Artifact> attached = map(
+                getMavenProject(project).getAttachedArtifacts(),
+                a -> session.getArtifact(RepositoryUtils.toArtifact(a)));
         return Collections.unmodifiableCollection(attached);
     }
 
@@ -134,10 +135,7 @@ public class DefaultProjectManager implements ProjectManager {
                     InternalSession.from(session).getMavenSession(),
                     false,
                     Collections.emptySet());
-            return artifacts.stream()
-                    .map(RepositoryUtils::toArtifact)
-                    .map(InternalSession.from(session)::getArtifact)
-                    .collect(Collectors.toList());
+            return map(artifacts, a -> InternalSession.from(session).getArtifact(RepositoryUtils.toArtifact(a)));
         } catch (LifecycleExecutionException | ComponentLookupException e) {
             throw new MavenException("Unable to resolve project dependencies", e);
         }

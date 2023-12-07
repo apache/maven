@@ -51,13 +51,13 @@ public class DefaultArtifactResolver implements ArtifactResolver {
 
     @Inject
     DefaultArtifactResolver(@Nonnull RepositorySystem repositorySystem) {
-        this.repositorySystem = nonNull(repositorySystem, "repositorySystem can not be null");
+        this.repositorySystem = nonNull(repositorySystem, "repositorySystem");
     }
 
     @Override
     public ArtifactResolverResult resolve(ArtifactResolverRequest request)
             throws ArtifactResolverException, IllegalArgumentException {
-        nonNull(request, "request can not be null");
+        nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
         try {
             Map<Artifact, Path> paths = new HashMap<>();

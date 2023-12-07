@@ -34,7 +34,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultArtifactFactory implements ArtifactFactory {
     @Override
     public Artifact create(@Nonnull ArtifactFactoryRequest request) {
-        nonNull(request, "request can not be null");
+        nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
         ArtifactType type = null;
         if (request.getType() != null) {
