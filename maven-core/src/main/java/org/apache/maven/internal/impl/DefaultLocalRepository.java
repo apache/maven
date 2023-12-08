@@ -33,7 +33,7 @@ public class DefaultLocalRepository implements LocalRepository {
 
     @Inject
     public DefaultLocalRepository(@Nonnull org.eclipse.aether.repository.LocalRepository repository) {
-        this.repository = nonNull(repository, "repository can not be null");
+        this.repository = nonNull(repository, "repository");
     }
 
     @Nonnull

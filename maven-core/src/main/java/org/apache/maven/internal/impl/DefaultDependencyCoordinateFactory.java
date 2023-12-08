@@ -21,8 +21,6 @@ package org.apache.maven.internal.impl;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.stream.Collectors;
-
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.annotations.Nonnull;
@@ -30,6 +28,7 @@ import org.apache.maven.api.services.DependencyCoordinateFactory;
 import org.apache.maven.api.services.DependencyCoordinateFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
+import static org.apache.maven.internal.impl.Utils.map;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -39,7 +38,7 @@ public class DefaultDependencyCoordinateFactory implements DependencyCoordinateF
     @Nonnull
     @Override
     public DependencyCoordinate create(@Nonnull DependencyCoordinateFactoryRequest request) {
-        nonNull(request, "request can not be null");
+        nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
 
         ArtifactType type = null;
@@ -58,7 +57,7 @@ public class DefaultDependencyCoordinateFactory implements DependencyCoordinateF
                                 type),
                         request.getScope(),
                         request.isOptional(),
-                        request.getExclusions().stream().map(this::toExclusion).collect(Collectors.toList())));
+                        map(request.getExclusions(), this::toExclusion)));
     }
 
     private org.eclipse.aether.graph.Exclusion toExclusion(Exclusion exclusion) {

@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.RemoteRepository;
@@ -38,13 +39,17 @@ class WrapperNode extends AbstractNode {
 
     @Override
     DependencyNode getDependencyNode() {
-        return Utils.cast(AbstractNode.class, delegate, "delegate is not an instance of AbstractNode")
-                .getDependencyNode();
+        return Utils.cast(AbstractNode.class, delegate, "delegate").getDependencyNode();
     }
 
     @Override
     public List<Node> getChildren() {
         return children;
+    }
+
+    @Override
+    public Artifact getArtifact() {
+        return delegate.getArtifact();
     }
 
     @Override

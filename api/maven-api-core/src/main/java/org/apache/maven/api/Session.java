@@ -250,7 +250,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
      */
-    Artifact resolveArtifact(ArtifactCoordinate coordinate);
+    Map.Entry<Artifact, Path> resolveArtifact(ArtifactCoordinate coordinate);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -258,7 +258,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
      */
-    Collection<Artifact> resolveArtifacts(ArtifactCoordinate... coordinates);
+    Map<Artifact, Path> resolveArtifacts(ArtifactCoordinate... coordinates);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -266,7 +266,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
      */
-    Collection<Artifact> resolveArtifacts(Collection<? extends ArtifactCoordinate> coordinates);
+    Map<Artifact, Path> resolveArtifacts(Collection<? extends ArtifactCoordinate> coordinates);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -274,7 +274,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
      */
-    Artifact resolveArtifact(Artifact artifact);
+    Map.Entry<Artifact, Path> resolveArtifact(Artifact artifact);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -282,7 +282,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
      */
-    Collection<Artifact> resolveArtifacts(Artifact... artifacts);
+    Map<Artifact, Path> resolveArtifacts(Artifact... artifacts);
 
     /**
      * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}.
@@ -384,6 +384,24 @@ public interface Session {
      */
     @Nonnull
     Node collectDependencies(@Nonnull DependencyCoordinate dependency);
+
+    /**
+     * Shortcut for {@code getService(DependencyResolver.class).flatten(...)}.
+     *
+     * @see org.apache.maven.api.services.DependencyResolver#flatten(Session, Node, ResolutionScope)
+     * @throws org.apache.maven.api.services.DependencyResolverException if the dependency flattening failed
+     */
+    @Nonnull
+    List<Node> flattenDependencies(@Nonnull Node node, @Nonnull ResolutionScope scope);
+
+    @Nonnull
+    List<Path> resolveDependencies(@Nonnull DependencyCoordinate dependencyCoordinate);
+
+    @Nonnull
+    List<Path> resolveDependencies(@Nonnull List<DependencyCoordinate> dependencyCoordinates);
+
+    @Nonnull
+    List<Path> resolveDependencies(@Nonnull Project project, @Nonnull ResolutionScope scope);
 
     /**
      * Resolves an artifact's meta version (if any) to a concrete version. For example, resolves "1.0-SNAPSHOT"
