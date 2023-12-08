@@ -41,35 +41,35 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 public enum ResolutionScope {
     /**
-     * empty resolution scope
-     */
-    NONE(null),
-    /**
      * <code>compile</code> resolution scope
-     * = <code>compile</code> + <code>system</code> + <code>provided</code> dependencies
+     * = <code>compile-only</code> + <code>compile</code> + <code>provided</code> dependencies
      */
-    COMPILE("compile", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED),
-    /**
-     * <code>compile+runtime</code> resolution scope (Maven 3 only)
-     * = <code>compile</code> + <code>system</code> + <code>provided</code> + <code>runtime</code> dependencies
-     */
-    COMPILE_PLUS_RUNTIME("compile+runtime", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED, Scope.RUNTIME),
+    PROJECT_COMPILE("project-compile", Scope.EMPTY, Scope.COMPILE_ONLY, Scope.COMPILE, Scope.PROVIDED),
     /**
      * <code>runtime</code> resolution scope
      * = <code>compile</code> + <code>runtime</code> dependencies
      */
-    RUNTIME("runtime", Scope.COMPILE, Scope.RUNTIME),
+    PROJECT_RUNTIME("project-runtime", Scope.EMPTY, Scope.COMPILE, Scope.RUNTIME),
     /**
-     * <code>runtime+system</code> resolution scope (Maven 3 only)
-     * = <code>compile</code> + <code>system</code> + <code>runtime</code> dependencies
-     */
-    RUNTIME_PLUS_SYSTEM("runtime+system", Scope.COMPILE, Scope.SYSTEM, Scope.RUNTIME),
-    /**
-     * <code>test</code> resolution scope
-     * = <code>compile</code> + <code>system</code> + <code>provided</code> + <code>runtime</code> + <code>test</code>
+     * <code>test-compile</code> resolution scope
+     * = <code>compile-only</code> + <code>compile</code> + <code>provided</code> + <code>test-compile-only</code> + <code>test</code>
      * dependencies
      */
-    TEST("test", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED, Scope.RUNTIME, Scope.TEST);
+    TEST_COMPILE(
+            "test-compile",
+            Scope.EMPTY,
+            Scope.COMPILE_ONLY,
+            Scope.COMPILE,
+            Scope.PROVIDED,
+            Scope.TEST_COMPILE_ONLY,
+            Scope.TEST),
+    /**
+     * <code>test</code> resolution scope
+     * = <code>compile</code> + <code>runtime</code> + <code>provided</code> + <code>test</code> + <code>test-runtime</code>
+     * dependencies
+     */
+    TEST_RUNTIME(
+            "test-runtime", Scope.EMPTY, Scope.COMPILE, Scope.RUNTIME, Scope.PROVIDED, Scope.TEST, Scope.TEST_RUNTIME);
 
     private static final Map<String, ResolutionScope> VALUES =
             Stream.of(ResolutionScope.values()).collect(Collectors.toMap(ResolutionScope::id, s -> s));

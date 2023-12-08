@@ -16,51 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api;
-
-import java.util.HashMap;
-import java.util.Map;
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
 
-/**
- * Scope for a dependency
- *
- * @since 4.0.0
- */
 @Experimental
-public enum Scope {
-    EMPTY(""),
-    COMPILE_ONLY("compile-only"),
-    COMPILE("compile"),
-    RUNTIME("runtime"),
-    PROVIDED("provided"),
-    TEST_COMPILE_ONLY("test-compile-only"),
-    TEST("test"),
-    TEST_RUNTIME("test-runtime"),
-    IMPORT("import"); // TODO: v4: remove import scope somehow
+public class DependencyResolverException extends MavenException {
 
-    private final String id;
+    private static final long serialVersionUID = 1101171569179057614L;
 
-    private static final Map<String, Scope> SCOPES;
-
-    static {
-        Map<String, Scope> scopes = new HashMap<>();
-        for (Scope s : Scope.values()) {
-            scopes.put(s.id, s);
-        }
-        SCOPES = scopes;
-    }
-
-    Scope(String id) {
-        this.id = id;
-    }
-
-    public String id() {
-        return this.id;
-    }
-
-    public static Scope get(String scope) {
-        return SCOPES.get(scope);
+    public DependencyResolverException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

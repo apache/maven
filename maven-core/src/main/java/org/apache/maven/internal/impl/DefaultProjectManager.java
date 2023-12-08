@@ -26,27 +26,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Node;
-import org.apache.maven.api.Project;
-import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.ResolutionScope;
-import org.apache.maven.api.Scope;
-import org.apache.maven.api.Session;
+import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
-import org.apache.maven.api.services.ArtifactManager;
-import org.apache.maven.api.services.MavenException;
-import org.apache.maven.api.services.ProjectManager;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
+import org.apache.maven.api.services.*;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.sisu.Typed;
 
 import static org.apache.maven.internal.impl.Utils.map;
@@ -56,12 +44,12 @@ import static org.apache.maven.internal.impl.Utils.map;
 @SessionScoped
 public class DefaultProjectManager implements ProjectManager {
 
-    private final Session session;
+    private final InternalSession session;
     private final ArtifactManager artifactManager;
     private final PlexusContainer container;
 
     @Inject
-    public DefaultProjectManager(Session session, ArtifactManager artifactManager, PlexusContainer container) {
+    public DefaultProjectManager(InternalSession session, ArtifactManager artifactManager, PlexusContainer container) {
         this.session = session;
         this.artifactManager = artifactManager;
         this.container = container;
@@ -70,8 +58,7 @@ public class DefaultProjectManager implements ProjectManager {
     @Nonnull
     @Override
     public Optional<Path> getPath(Project project) {
-        // TODO: apiv4
-        throw new UnsupportedOperationException("Not implemented yet");
+        return artifactManager.getPath(project.getArtifact());
     }
 
     @Nonnull
@@ -118,33 +105,10 @@ public class DefaultProjectManager implements ProjectManager {
 
     @Override
     public List<RemoteRepository> getRepositories(Project project) {
-        // TODO: apiv4
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    public List<Artifact> getResolvedDependencies(Project project, ResolutionScope scope) {
-        Collection<String> toResolve = toScopes(scope);
-        try {
-            LifecycleDependencyResolver lifecycleDependencyResolver =
-                    container.lookup(LifecycleDependencyResolver.class);
-            Set<org.apache.maven.artifact.Artifact> artifacts = lifecycleDependencyResolver.resolveProjectArtifacts(
-                    getMavenProject(project),
-                    toResolve,
-                    toResolve,
-                    InternalSession.from(session).getMavenSession(),
-                    false,
-                    Collections.emptySet());
-            return map(artifacts, a -> InternalSession.from(session).getArtifact(RepositoryUtils.toArtifact(a)));
-        } catch (LifecycleExecutionException | ComponentLookupException e) {
-            throw new MavenException("Unable to resolve project dependencies", e);
-        }
-    }
-
-    @Override
-    public Node getCollectedDependencies(Project project, ResolutionScope scope) {
-        // TODO: apiv4
-        throw new UnsupportedOperationException("Not implemented yet");
+        return ((DefaultProject) project)
+                .getProject().getRemoteProjectRepositories().stream()
+                        .map(session::getRemoteRepository)
+                        .collect(Collectors.toList());
     }
 
     @Override
@@ -154,9 +118,5 @@ public class DefaultProjectManager implements ProjectManager {
 
     private MavenProject getMavenProject(Project project) {
         return ((DefaultProject) project).getProject();
-    }
-
-    private Collection<String> toScopes(ResolutionScope scope) {
-        return scope.scopes().stream().map(Scope::id).collect(Collectors.toList());
     }
 }
