@@ -493,4 +493,14 @@ public abstract class AbstractSession implements InternalSession {
     public VersionRange parseVersionRange(String versionRange) {
         return getService(VersionParser.class).parseVersionRange(versionRange);
     }
+
+    @Override
+    public Version resolveVersion(ArtifactCoordinate artifact) {
+        return getService(VersionResolver.class).resolve(this, artifact).getVersion();
+    }
+
+    @Override
+    public List<Version> resolveVersionRange(ArtifactCoordinate artifact) {
+        return getService(VersionRangeResolver.class).resolve(this, artifact).getVersions();
+    }
 }

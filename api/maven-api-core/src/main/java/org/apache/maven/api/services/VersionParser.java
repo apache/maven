@@ -31,6 +31,7 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 public interface VersionParser extends Service {
+
     /**
      * Parses the specified version string, for example "1.0".
      *
