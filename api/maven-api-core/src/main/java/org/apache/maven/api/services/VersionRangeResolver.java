@@ -25,10 +25,26 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
+/**
+ * Parses and evaluates version ranges encountered in dependency declarations.
+ */
 @Experimental
 @Consumer
 public interface VersionRangeResolver extends Service {
 
+    /**
+     * Expands a version range to a list of matching versions, in ascending order.
+     * For example, resolves "[3.8,4.0)" to "3.8", "3.8.1", "3.8.2".
+     * The returned list of versions is only dependent on the configured repositories and their contents.
+     * The supplied request may also refer to a single concrete version rather than a version range.
+     * In this case though, the result contains simply the (parsed) input version, regardless of the
+     * repositories and their contents.
+     *
+     * @param session the session to use
+     * @param artifactCoordinate t
+     * @return the version range resolution result
+     * @throws VersionResolverException if an errors occurs
+     */
     @Nonnull
     default VersionRangeResolverResult resolve(@Nonnull Session session, @Nonnull ArtifactCoordinate artifactCoordinate)
             throws VersionResolverException {

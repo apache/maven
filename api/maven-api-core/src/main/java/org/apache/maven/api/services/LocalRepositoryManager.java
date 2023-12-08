@@ -26,6 +26,7 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  *
@@ -34,7 +35,34 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 public interface LocalRepositoryManager extends Service {
 
-    Path getPathForLocalArtifact(Session session, LocalRepository local, Artifact artifact);
+    /**
+     * Gets the relative path for a locally installed artifact.
+     * Note that the artifact need not actually exist yet at
+     * the returned location, the path merely indicates where
+     * the artifact would eventually be stored.
+     *
+     * @param session The session to use, must not be {@code null}.
+     * @param artifact The artifact for which to determine the path, must not be {@code null}.
+     * @return The path, resolved against the local repository's base directory.
+     */
+    @Nonnull
+    Path getPathForLocalArtifact(@Nonnull Session session, @Nonnull LocalRepository local, @Nonnull Artifact artifact);
 
-    Path getPathForRemoteArtifact(Session session, LocalRepository local, RemoteRepository remote, Artifact artifact);
+    /**
+     * Gets the relative path for an artifact cached from a remote repository.
+     * Note that the artifact need not actually exist yet at the returned location,
+     * the path merely indicates where the artifact would eventually be stored.
+     *
+     * @param session The session to use, must not be {@code null}.
+     * @param local The local repository, must not be {@code null}.
+     * @param artifact The artifact for which to determine the path, must not be {@code null}.
+     * @param remote – The source repository of the artifact, must not be {@code null}.
+     * @return The path, relative to the local repository's base directory.
+     */
+    @Nonnull
+    Path getPathForRemoteArtifact(
+            @Nonnull Session session,
+            @Nonnull LocalRepository local,
+            @Nonnull RemoteRepository remote,
+            @Nonnull Artifact artifact);
 }
