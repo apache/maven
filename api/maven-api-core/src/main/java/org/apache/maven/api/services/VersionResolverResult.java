@@ -19,33 +19,22 @@
 package org.apache.maven.api.services;
 
 import java.util.List;
+import java.util.Optional;
 
-import org.apache.maven.api.Node;
+import org.apache.maven.api.Repository;
+import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 
-/**
- * The result of a dependency collection request.
- *
- * @since 4.0.0
- * @see DependencyCollector#collect(DependencyCollectorRequest)
- */
 @Experimental
-public interface DependencyCollectorResult {
-    /**
-     * Gets the exceptions that occurred while building the dependency graph.
-     *
-     * @return the exceptions that occurred, never {@code null}
-     */
+public interface VersionResolverResult {
+
     @Nonnull
     List<Exception> getExceptions();
 
-    /**
-     * Gets the root node of the dependency graph.
-     *
-     * @return the root node of the dependency graph or {@code null} if none
-     */
-    @Nullable
-    Node getRoot();
+    @Nonnull
+    Version getVersion();
+
+    @Nonnull
+    Optional<Repository> getRepository();
 }

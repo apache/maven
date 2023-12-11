@@ -53,6 +53,8 @@ public interface DependencyCollectorRequest {
     @Nonnull
     Session getSession();
 
+    Optional<Project> getProject();
+
     @Nonnull
     Optional<Artifact> getRootArtifact();
 
@@ -87,9 +89,7 @@ public interface DependencyCollectorRequest {
     static DependencyCollectorRequest build(@Nonnull Session session, @Nonnull Project project) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
-                .rootArtifact(nonNull(project, "project cannot be null").getArtifact())
-                .dependencies(project.getDependencies())
-                .managedDependencies(project.getManagedDependencies())
+                .project(nonNull(project, "project cannot be null"))
                 .build();
     }
 
@@ -102,6 +102,7 @@ public interface DependencyCollectorRequest {
     class DependencyCollectorRequestBuilder {
 
         Session session;
+        Project project;
         Artifact rootArtifact;
         DependencyCoordinate root;
         List<DependencyCoordinate> dependencies = Collections.emptyList();
@@ -113,6 +114,12 @@ public interface DependencyCollectorRequest {
         @Nonnull
         public DependencyCollectorRequestBuilder session(@Nonnull Session session) {
             this.session = session;
+            return this;
+        }
+
+        @Nonnull
+        public DependencyCollectorRequestBuilder project(@Nullable Project project) {
+            this.project = project;
             return this;
         }
 
@@ -222,10 +229,11 @@ public interface DependencyCollectorRequest {
         @Nonnull
         public DependencyCollectorRequest build() {
             return new DefaultDependencyCollectorRequest(
-                    session, rootArtifact, root, dependencies, managedDependencies, verbose);
+                    session, project, rootArtifact, root, dependencies, managedDependencies, verbose);
         }
 
         static class DefaultDependencyCollectorRequest extends BaseRequest implements DependencyCollectorRequest {
+            private final Project project;
             private final Artifact rootArtifact;
             private final DependencyCoordinate root;
             private final Collection<DependencyCoordinate> dependencies;
@@ -241,18 +249,26 @@ public interface DependencyCollectorRequest {
              */
             DefaultDependencyCollectorRequest(
                     @Nonnull Session session,
+                    @Nullable Project project,
                     @Nullable Artifact rootArtifact,
                     @Nullable DependencyCoordinate root,
                     @Nonnull Collection<DependencyCoordinate> dependencies,
                     @Nonnull Collection<DependencyCoordinate> managedDependencies,
                     boolean verbose) {
                 super(session);
+                this.project = project;
                 this.rootArtifact = rootArtifact;
                 this.root = root;
                 this.dependencies = unmodifiable(nonNull(dependencies, "dependencies cannot be null"));
                 this.managedDependencies =
                         unmodifiable(nonNull(managedDependencies, "managedDependencies cannot be null"));
                 this.verbose = verbose;
+            }
+
+            @Nonnull
+            @Override
+            public Optional<Project> getProject() {
+                return Optional.ofNullable(project);
             }
 
             @Nonnull

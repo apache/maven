@@ -16,51 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api;
+package org.apache.maven.api.services;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
+import org.apache.maven.api.Repository;
+import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
-/**
- * Scope for a dependency
- *
- * @since 4.0.0
- */
 @Experimental
-public enum Scope {
-    EMPTY(""),
-    COMPILE_ONLY("compile-only"),
-    COMPILE("compile"),
-    RUNTIME("runtime"),
-    PROVIDED("provided"),
-    TEST_COMPILE_ONLY("test-compile-only"),
-    TEST("test"),
-    TEST_RUNTIME("test-runtime"),
-    IMPORT("import"); // TODO: v4: remove import scope somehow
+public interface VersionRangeResolverResult {
 
-    private final String id;
+    @Nonnull
+    List<Exception> getExceptions();
 
-    private static final Map<String, Scope> SCOPES;
+    @Nonnull
+    List<Version> getVersions();
 
-    static {
-        Map<String, Scope> scopes = new HashMap<>();
-        for (Scope s : Scope.values()) {
-            scopes.put(s.id, s);
-        }
-        SCOPES = scopes;
+    @Nonnull
+    default Optional<Version> getLowerVersion() {
+        return getVersions().isEmpty()
+                ? Optional.empty()
+                : Optional.of(getVersions().get(0));
     }
 
-    Scope(String id) {
-        this.id = id;
+    @Nonnull
+    default Optional<Version> getHigherVersion() {
+        return getVersions().isEmpty()
+                ? Optional.empty()
+                : Optional.of(getVersions().get(getVersions().size() - 1));
     }
 
-    public String id() {
-        return this.id;
-    }
-
-    public static Scope get(String scope) {
-        return SCOPES.get(scope);
-    }
+    @Nonnull
+    Optional<Repository> getRepository(Version version);
 }

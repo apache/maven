@@ -97,7 +97,9 @@ public class DefaultMojoExecution implements MojoExecution {
                         delegate.getMojoDescriptor().getPluginDescriptor().getDependencyNode();
                 DefaultNode node = new DefaultNode(session, resolverNode, false);
                 return Collections.unmodifiableMap(node.stream()
+                        .filter(Objects::nonNull)
                         .map(Node::getDependency)
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toMap(d -> d.getGroupId() + ":" + d.getArtifactId(), d -> d)));
             }
         };

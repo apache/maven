@@ -40,7 +40,7 @@ public class DefaultDependencyProperties implements DependencyProperties {
     }
 
     public DefaultDependencyProperties(@Nonnull Collection<String> flags) {
-        nonNull(flags, "null flags");
+        nonNull(flags, "flags");
         HashMap<String, String> map = new HashMap<>();
         for (String flag : flags) {
             map.put(flag, Boolean.TRUE.toString());
@@ -49,7 +49,7 @@ public class DefaultDependencyProperties implements DependencyProperties {
     }
 
     public DefaultDependencyProperties(@Nonnull Map<String, String> properties) {
-        this.properties = Collections.unmodifiableMap(nonNull(properties, "null properties"));
+        this.properties = Collections.unmodifiableMap(nonNull(properties, "properties"));
     }
 
     @Nonnull
@@ -60,7 +60,7 @@ public class DefaultDependencyProperties implements DependencyProperties {
 
     @Override
     public boolean checkFlag(@Nonnull String flag) {
-        nonNull(flag, "null flag");
+        nonNull(flag, "flag");
         return Boolean.parseBoolean(properties.getOrDefault(flag, ""));
     }
 }

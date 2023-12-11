@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl;
 
 import java.util.Objects;
 
+import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.DependencyProperties;
@@ -128,7 +129,7 @@ public class DefaultDependency implements Dependency {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof DefaultDependency && Objects.equals(key, ((DefaultDependency) o).key);
+        return o instanceof Artifact && Objects.equals(key(), ((Artifact) o).key());
     }
 
     @Override

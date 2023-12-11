@@ -25,7 +25,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -56,20 +55,6 @@ public @interface Mojo {
      */
     @Nonnull
     LifecyclePhase defaultPhase() default LifecyclePhase.NONE;
-
-    /**
-     * the required dependency resolution scope.
-     * @return the required dependency resolution scope
-     */
-    @Nonnull
-    ResolutionScope dependencyResolutionRequired() default ResolutionScope.NONE;
-
-    /**
-     * the required dependency collection scope.
-     * @return the required dependency collection scope
-     */
-    @Nonnull
-    ResolutionScope dependencyCollectionRequired() default ResolutionScope.NONE;
 
     /**
      * does your mojo requires a project to be executed?

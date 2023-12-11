@@ -46,7 +46,7 @@ public class DefaultArtifactInstaller implements ArtifactInstaller {
 
     @Override
     public void install(ArtifactInstallerRequest request) throws ArtifactInstallerException, IllegalArgumentException {
-        nonNull(request, "request can not be null");
+        nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
         try {
             InstallRequest installRequest =
