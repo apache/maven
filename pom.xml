@@ -148,7 +148,7 @@ under the License.
   <properties>
     <javaVersion>8</javaVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
-    <maven.baseline>3.8.7</maven.baseline>
+    <maven.baseline>3.8.8</maven.baseline>
     <!-- Control the name of the distribution and information output by mvn -->
     <distributionId>apache-maven</distributionId>
     <distributionShortName>Maven</distributionShortName>

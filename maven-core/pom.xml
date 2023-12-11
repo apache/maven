@@ -310,7 +310,7 @@ under the License.
               <!-- was only a workaround for Plexus Container, hopefully never used by anyone else -->
               <exclude>org.apache.maven.plugin.DefaultBuildPluginManager#setMojoExecutionListeners(java.util.List)</exclude>
               <!-- could have never been used due to usage of non-export class (CoreExportsProvider) -->
-              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#DefaultClassRealmManager(org.codehaus.plexus.logging.Logger,org.codehaus.plexus.PlexusContainer,java.util.List,org.apache.maven.extension.internal.CoreExportsProvider)</exclude>
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#DefaultClassRealmManager(org.codehaus.plexus.logging.Logger,org.codehaus.plexus.PlexusContainer,java.util.List,org.apache.maven.extension.internal.CoreExports)</exclude>
               <!-- internal field removed -->
               <exclude>org.apache.maven.graph.DefaultGraphBuilder#projectBuilder</exclude>
               <!-- MavenPluginValidator has been transformed into an interface -->
