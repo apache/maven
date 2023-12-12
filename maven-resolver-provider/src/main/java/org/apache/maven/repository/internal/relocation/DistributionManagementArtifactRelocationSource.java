@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.repository.internal;
+package org.apache.maven.repository.internal.relocation;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -24,6 +24,8 @@ import javax.inject.Singleton;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Relocation;
+import org.apache.maven.repository.internal.MavenArtifactRelocationSource;
+import org.apache.maven.repository.internal.RelocatedArtifact;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.sisu.Priority;
