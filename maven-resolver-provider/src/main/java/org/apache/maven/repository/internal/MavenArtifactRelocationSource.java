@@ -21,14 +21,13 @@ package org.apache.maven.repository.internal;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.spi.relocation.ArtifactRelocationSource;
 
 /**
  * Maven relocation source.
  *
  * @since 4.0.0
  */
-public interface MavenArtifactRelocationSource extends ArtifactRelocationSource {
+public interface MavenArtifactRelocationSource {
     /**
      * Returns {@link Artifact} instance where to relocate to, or {@code null}.
      *

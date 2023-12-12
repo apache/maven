@@ -26,6 +26,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Relocation;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.sisu.Priority;
 
 /**
  * Relocation source from standard distribution management. This is the "one and only" relocation implementation that
@@ -35,17 +36,8 @@ import org.eclipse.aether.artifact.Artifact;
  */
 @Singleton
 @Named
+@Priority(5)
 public final class DistributionManagementArtifactRelocationSource implements MavenArtifactRelocationSource {
-    @Override
-    public float getPriority() {
-        return 5;
-    }
-
-    @Override
-    public Artifact relocatedTarget(RepositorySystemSession session, Artifact artifact) {
-        return null;
-    }
-
     @Override
     public Artifact relocatedTarget(RepositorySystemSession session, Artifact artifact, Model model) {
         DistributionManagement distMgmt = model.getDistributionManagement();

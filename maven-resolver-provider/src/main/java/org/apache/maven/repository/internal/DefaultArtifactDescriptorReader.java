@@ -61,8 +61,6 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResolutionException;
 import org.eclipse.aether.resolution.VersionResult;
-import org.eclipse.aether.spi.relocation.ArtifactRelocationSource;
-import org.eclipse.aether.spi.relocation.ArtifactRelocationSourceProvider;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
 /**
@@ -78,7 +76,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
     private final RepositoryEventDispatcher repositoryEventDispatcher;
     private final ModelBuilder modelBuilder;
     private final ModelCacheFactory modelCacheFactory;
-    private final ArtifactRelocationSourceProvider artifactRelocationSourceProvider;
+    private final Map<String, MavenArtifactRelocationSource> artifactRelocationSources;
     private final ArtifactDescriptorReaderDelegate delegate;
 
     @Inject
@@ -90,7 +88,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             ModelBuilder modelBuilder,
             RepositoryEventDispatcher repositoryEventDispatcher,
             ModelCacheFactory modelCacheFactory,
-            ArtifactRelocationSourceProvider artifactRelocationSourceProvider) {
+            Map<String, MavenArtifactRelocationSource> artifactRelocationSources) {
         this.remoteRepositoryManager =
                 Objects.requireNonNull(remoteRepositoryManager, "remoteRepositoryManager cannot be null");
         this.versionResolver = Objects.requireNonNull(versionResolver, "versionResolver cannot be null");
@@ -100,8 +98,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         this.repositoryEventDispatcher =
                 Objects.requireNonNull(repositoryEventDispatcher, "repositoryEventDispatcher cannot be null");
         this.modelCacheFactory = Objects.requireNonNull(modelCacheFactory, "modelCacheFactory cannot be null");
-        this.artifactRelocationSourceProvider = Objects.requireNonNull(
-                artifactRelocationSourceProvider, "artifactRelocationSourceProvider cannot be null");
+        this.artifactRelocationSources =
+                Objects.requireNonNull(artifactRelocationSources, "artifactRelocationSources cannot be null");
         this.delegate = new ArtifactDescriptorReaderDelegate();
     }
 
@@ -263,12 +261,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
     private Artifact getRelocation(RepositorySystemSession session, Artifact artifact, Model model) {
         Artifact result = null;
-        for (ArtifactRelocationSource relocationSource : artifactRelocationSourceProvider.getSources(session)) {
-            if (relocationSource instanceof MavenArtifactRelocationSource) {
-                result = ((MavenArtifactRelocationSource) relocationSource).relocatedTarget(session, artifact, model);
-            } else {
-                result = relocationSource.relocatedTarget(session, artifact);
-            }
+        for (MavenArtifactRelocationSource source : artifactRelocationSources.values()) {
+            result = source.relocatedTarget(session, artifact, model);
             if (result != null) {
                 break;
             }
