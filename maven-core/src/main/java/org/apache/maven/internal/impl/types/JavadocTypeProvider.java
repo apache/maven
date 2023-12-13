@@ -37,7 +37,7 @@ public class JavadocTypeProvider implements Provider<Type> {
     public JavadocTypeProvider() {
         this.type = new DefaultType(
                 NAME,
-                "java",
+                Type.LANGUAGE_JAVA,
                 "jar",
                 "javadoc",
                 new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));

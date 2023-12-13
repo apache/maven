@@ -42,12 +42,8 @@ import org.apache.maven.api.model.Dependency;
 @Immutable
 public interface Type {
 
-    String POM = "pom";
-    String JAR = "jar";
-    String JAVA_SOURCE = "java-source";
-    String JAVADOC = "javadoc";
-    String MAVEN_PLUGIN = "maven-plugin";
-    String TEST_JAR = "test-jar";
+    String LANGUAGE_NONE = "none";
+    String LANGUAGE_JAVA = "java";
 
     /**
      * Returns the dependency type id.

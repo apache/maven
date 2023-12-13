@@ -37,7 +37,7 @@ public class ParTypeProvider implements Provider<Type> {
     public ParTypeProvider() {
         this.type = new DefaultType(
                 NAME,
-                "java",
+                Type.LANGUAGE_JAVA,
                 "par",
                 null,
                 new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));

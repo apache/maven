@@ -34,7 +34,7 @@ public class PomTypeProvider implements Provider<Type> {
     private final Type type;
 
     public PomTypeProvider() {
-        this.type = new DefaultType(NAME, "none", "pom", null, new DefaultDependencyProperties());
+        this.type = new DefaultType(NAME, Type.LANGUAGE_NONE, "pom", null, new DefaultDependencyProperties());
     }
 
     @Override

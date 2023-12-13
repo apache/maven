@@ -37,7 +37,7 @@ public class MavenPluginTypeProvider implements Provider<Type> {
     public MavenPluginTypeProvider() {
         this.type = new DefaultType(
                 NAME,
-                "java",
+                Type.LANGUAGE_JAVA,
                 "jar",
                 null,
                 new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
