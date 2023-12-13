@@ -59,6 +59,13 @@ public interface Type {
     String getId();
 
     /**
+     * Returns the dependency type language.
+     *
+     * @return the language of this type, never {@code null}.
+     */
+    String getLanguage();
+
+    /**
      * Get the file extension of artifacts of this type.
      *
      * @return the file extension, never {@code null}.

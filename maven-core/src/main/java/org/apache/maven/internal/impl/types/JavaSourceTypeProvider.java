@@ -34,7 +34,7 @@ public class JavaSourceTypeProvider implements Provider<Type> {
     private final Type type;
 
     public JavaSourceTypeProvider() {
-        this.type = new DefaultType(NAME, "jar", "sources", new DefaultDependencyProperties());
+        this.type = new DefaultType(NAME, "java", "jar", "sources", new DefaultDependencyProperties());
     }
 
     @Override

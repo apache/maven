@@ -70,7 +70,7 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
                     null,
                     null,
                     type.isIncludesDependencies(),
-                    "none",
+                    type.getLanguage(),
                     type.isAddedToClassPath()); // TODO: watch out for module path
         });
     }
