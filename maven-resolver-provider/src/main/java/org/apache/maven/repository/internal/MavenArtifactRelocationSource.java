@@ -33,7 +33,7 @@ public interface MavenArtifactRelocationSource {
      * Returns {@link Artifact} instance where to relocate to, or {@code null}.
      *
      * @param session  The session, never {@code null}.
-     * @param artifact The artifact, never {@code null}.
+     * @param request The artifact descriptor request, never {@code null}.
      * @param model    The artifact model, never {@code null}.
      * @return The {@link Artifact} to relocate to, or {@code null} if no relocation wanted.
      */
