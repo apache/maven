@@ -41,6 +41,8 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.sisu.Priority;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Relocation source from a local file.
@@ -51,6 +53,8 @@ import org.eclipse.sisu.Priority;
 @Named
 @Priority(15)
 public final class FileArtifactRelocationSource implements MavenArtifactRelocationSource {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileArtifactRelocationSource.class);
+
     private static final String CONFIG_PROP_RELOCATIONS = "maven.relocations.file";
 
     private static final String CONFIG_PROP_GLOBAL = "maven.relocations.file.global";
@@ -63,21 +67,13 @@ public final class FileArtifactRelocationSource implements MavenArtifactRelocati
             if (relocations != null) {
                 Relocation relocation = relocations.getRelocation(request.getArtifact());
                 if (relocation != null) {
-                    if (relocation.target != null) {
-                        return new RelocatedArtifact(
-                                request.getArtifact(),
-                                isAny(relocation.target.getGroupId()) ? null : relocation.target.getGroupId(),
-                                isAny(relocation.target.getArtifactId()) ? null : relocation.target.getArtifactId(),
-                                isAny(relocation.target.getVersion()) ? null : relocation.target.getVersion(),
-                                "User relocation");
-                    } else {
-                        return new RelocatedArtifact(
-                                request.getArtifact(),
-                                "org.apache.maven",
-                                "banned",
-                                "1.0",
-                                "User relocation (banned artifact)");
-                    }
+                    LOGGER.info("User relocation: {}", relocation);
+                    return new RelocatedArtifact(
+                            request.getArtifact(),
+                            isAny(relocation.target.getGroupId()) ? null : relocation.target.getGroupId(),
+                            isAny(relocation.target.getArtifactId()) ? null : relocation.target.getArtifactId(),
+                            isAny(relocation.target.getVersion()) ? null : relocation.target.getVersion(),
+                            "User relocation");
                 }
             }
         }
@@ -95,14 +91,14 @@ public final class FileArtifactRelocationSource implements MavenArtifactRelocati
         }
     }
 
-    private boolean isAny(String str) {
+    private static boolean isAny(String str) {
         return "*".equals(str);
     }
 
     // starts with G
     // ends with G
 
-    private Predicate<Artifact> artifactPredicate(Artifact artifact) {
+    private static Predicate<Artifact> artifactPredicate(Artifact artifact) {
         return a -> {
             if ("*".equals(artifact.getGroupId()) || artifact.getGroupId().equals(a.getGroupId())) {
                 if ("*".equals(artifact.getArtifactId())
@@ -118,12 +114,19 @@ public final class FileArtifactRelocationSource implements MavenArtifactRelocati
     }
 
     private static class Relocation {
-        private final Predicate<Artifact> source;
+        private final Predicate<Artifact> predicate;
+        private final Artifact source;
         private final Artifact target;
 
-        private Relocation(Predicate<Artifact> source, Artifact target) {
+        private Relocation(Artifact source, Artifact target) {
+            this.predicate = artifactPredicate(source);
             this.source = source;
             this.target = target;
+        }
+
+        @Override
+        public String toString() {
+            return source + " > " + target;
         }
     }
 
@@ -136,7 +139,7 @@ public final class FileArtifactRelocationSource implements MavenArtifactRelocati
 
         private Relocation getRelocation(Artifact artifact) {
             return relocations.stream()
-                    .filter(r -> r.source.test(artifact))
+                    .filter(r -> r.predicate.test(artifact))
                     .findFirst()
                     .orElse(null);
         }
@@ -166,14 +169,17 @@ public final class FileArtifactRelocationSource implements MavenArtifactRelocati
                         if (parts.length < 1) {
                             throw new IllegalArgumentException("Unrecognized line: " + l);
                         }
-                        Predicate<Artifact> p = artifactPredicate(new DefaultArtifact(parts[0]));
+                        Artifact s = new DefaultArtifact(parts[0]);
                         Artifact t = null;
                         if (parts.length > 1) {
                             t = new DefaultArtifact(parts[1]);
+                        } else {
+                            t = new DefaultArtifact("org.apache.maven:banned:1.0");
                         }
-                        return new Relocation(p, t);
+                        return new Relocation(s, t);
                     })
                     .collect(Collectors.toList());
+            LOGGER.info("Loaded up {} user relocations", relocationList.size());
             return new Relocations(relocationList);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
