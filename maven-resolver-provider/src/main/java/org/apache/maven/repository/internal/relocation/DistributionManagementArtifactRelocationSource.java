@@ -28,6 +28,7 @@ import org.apache.maven.repository.internal.MavenArtifactRelocationSource;
 import org.apache.maven.repository.internal.RelocatedArtifact;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.sisu.Priority;
 
 /**
@@ -41,13 +42,13 @@ import org.eclipse.sisu.Priority;
 @Priority(5)
 public final class DistributionManagementArtifactRelocationSource implements MavenArtifactRelocationSource {
     @Override
-    public Artifact relocatedTarget(RepositorySystemSession session, Artifact artifact, Model model) {
+    public Artifact relocatedTarget(RepositorySystemSession session, ArtifactDescriptorRequest request, Model model) {
         DistributionManagement distMgmt = model.getDistributionManagement();
         if (distMgmt != null) {
             Relocation relocation = distMgmt.getRelocation();
             if (relocation != null) {
                 return new RelocatedArtifact(
-                        artifact,
+                        request.getArtifact(),
                         relocation.getGroupId(),
                         relocation.getArtifactId(),
                         relocation.getVersion(),

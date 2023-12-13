@@ -39,6 +39,7 @@ import org.apache.maven.repository.internal.RelocatedArtifact;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.sisu.Priority;
 
 /**
@@ -52,27 +53,46 @@ import org.eclipse.sisu.Priority;
 public final class FileArtifactRelocationSource implements MavenArtifactRelocationSource {
     private static final String CONFIG_PROP_RELOCATIONS = "maven.relocations.file";
 
+    private static final String CONFIG_PROP_GLOBAL = "maven.relocations.file.global";
+
     @Override
-    public Artifact relocatedTarget(RepositorySystemSession session, Artifact artifact, Model model) {
-        Relocations relocations = (Relocations) session.getData()
-                .computeIfAbsent(getClass().getName() + ".relocations", () -> readRelocations(session));
-        if (relocations != null) {
-            Relocation relocation = relocations.getRelocation(artifact);
-            if (relocation != null) {
-                if (relocation.target != null) {
-                    return new RelocatedArtifact(
-                            artifact,
-                            isAny(relocation.target.getGroupId()) ? null : relocation.target.getGroupId(),
-                            isAny(relocation.target.getArtifactId()) ? null : relocation.target.getArtifactId(),
-                            isAny(relocation.target.getVersion()) ? null : relocation.target.getVersion(),
-                            "User relocation");
-                } else {
-                    return new RelocatedArtifact(
-                            artifact, "org.apache.maven", "banned", "1.0", "User relocation (banned artifact)");
+    public Artifact relocatedTarget(RepositorySystemSession session, ArtifactDescriptorRequest request, Model model) {
+        if (isActive(session, request.getRequestContext())) {
+            Relocations relocations = (Relocations) session.getData()
+                    .computeIfAbsent(getClass().getName() + ".relocations", () -> readRelocations(session));
+            if (relocations != null) {
+                Relocation relocation = relocations.getRelocation(request.getArtifact());
+                if (relocation != null) {
+                    if (relocation.target != null) {
+                        return new RelocatedArtifact(
+                                request.getArtifact(),
+                                isAny(relocation.target.getGroupId()) ? null : relocation.target.getGroupId(),
+                                isAny(relocation.target.getArtifactId()) ? null : relocation.target.getArtifactId(),
+                                isAny(relocation.target.getVersion()) ? null : relocation.target.getVersion(),
+                                "User relocation");
+                    } else {
+                        return new RelocatedArtifact(
+                                request.getArtifact(),
+                                "org.apache.maven",
+                                "banned",
+                                "1.0",
+                                "User relocation (banned artifact)");
+                    }
                 }
             }
         }
         return null;
+    }
+
+    private boolean isActive(RepositorySystemSession session, String context) {
+        Object global = session.getConfigProperties().get(CONFIG_PROP_GLOBAL);
+        if (global instanceof Boolean) {
+            return (Boolean) global;
+        } else if (global instanceof String) {
+            return Boolean.parseBoolean((String) global);
+        } else {
+            return context != null && context.startsWith("project");
+        }
     }
 
     private boolean isAny(String str) {
@@ -140,8 +160,7 @@ public final class FileArtifactRelocationSource implements MavenArtifactRelocati
         }
         try (BufferedReader reader = Files.newBufferedReader(relocations);
                 Stream<String> lines = reader.lines()) {
-            List<Relocation> relocationList = lines
-                    .filter(l -> !l.trim().isEmpty() && !l.startsWith("#"))
+            List<Relocation> relocationList = lines.filter(l -> !l.trim().isEmpty() && !l.startsWith("#"))
                     .map(l -> {
                         String[] parts = l.split(">");
                         if (parts.length < 1) {

@@ -21,6 +21,7 @@ package org.apache.maven.repository.internal;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 
 /**
  * Maven relocation source.
@@ -36,5 +37,5 @@ public interface MavenArtifactRelocationSource {
      * @param model    The artifact model, never {@code null}.
      * @return The {@link Artifact} to relocate to, or {@code null} if no relocation wanted.
      */
-    Artifact relocatedTarget(RepositorySystemSession session, Artifact artifact, Model model);
+    Artifact relocatedTarget(RepositorySystemSession session, ArtifactDescriptorRequest request, Model model);
 }
