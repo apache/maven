@@ -263,10 +263,6 @@ under the License.
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
           </exclusion>
-          <exclusion>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-          </exclusion>
           <!-- Detach them: We want to handle Sisu inject and plexus explicitly -->
           <!-- Once have this, once have that on classpath -->
           <!-- Finally, we may want to use some with classifier -->
@@ -275,6 +271,11 @@ under the License.
             <artifactId>org.eclipse.sisu.inject</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>javax.annotation</groupId>
+        <artifactId>javax.annotation-api</artifactId>
+        <version>${javaxAnnotationApiVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
