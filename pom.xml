@@ -183,7 +183,7 @@ under the License.
     <stax2ApiVersion>4.2.1</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <woodstoxVersion>6.5.1</woodstoxVersion>
-    <xmlunitVersion>2.6.4</xmlunitVersion>
+    <xmlunitVersion>2.9.1</xmlunitVersion>
   </properties>
 
   <!--bootstrap-start-comment-->
@@ -455,16 +455,16 @@ under the License.
         <artifactId>xmlunit-matchers</artifactId>
         <version>${xmlunitVersion}</version>
         <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-core</artifactId>
-        <version>${hamcrestVersion}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-library</artifactId>
+        <artifactId>hamcrest</artifactId>
         <version>${hamcrestVersion}</version>
         <scope>test</scope>
       </dependency>
@@ -506,7 +506,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
+      <artifactId>hamcrest</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -545,6 +545,13 @@ under the License.
             <upToDateChecking>
               <enabled>true</enabled>
             </upToDateChecking>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <proc>none</proc>
           </configuration>
         </plugin>
         <plugin>
