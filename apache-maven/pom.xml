@@ -105,12 +105,12 @@ under the License.
     <!-- DI Runtime -->
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
-      <artifactId>org.eclipse.sisu.inject</artifactId>
-      <classifier>no_asm</classifier>
+      <artifactId>org.eclipse.sisu.plexus</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
-      <artifactId>org.eclipse.sisu.plexus</artifactId>
+      <artifactId>org.eclipse.sisu.inject</artifactId>
+      <classifier>no_asm</classifier>
     </dependency>
     <dependency>
       <groupId>com.google.inject</groupId>
