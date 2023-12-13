@@ -49,8 +49,8 @@ under the License.
       <artifactId>org.eclipse.sisu.plexus</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-utils</artifactId>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

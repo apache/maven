@@ -163,7 +163,7 @@ under the License.
     <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsIoVersion>2.11.0</commonsIoVersion>
     <guiceVersion>6.0.0</guiceVersion>
-    <guavaVersion>32.0.1-jre</guavaVersion>
+    <guavaVersion>32.1.3-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
     <hamcrestVersion>2.2</hamcrestVersion>
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
@@ -220,62 +220,35 @@ under the License.
         <artifactId>guice</artifactId>
         <version>${guiceVersion}</version>
         <classifier>classes</classifier>
-        <exclusions>
-          <exclusion>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-          </exclusion>
-        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.google.inject</groupId>
+        <artifactId>guice</artifactId>
+        <version>${guiceVersion}</version>
       </dependency>
       <dependency>
         <!-- This is a transitive dep of com.google.inject:guice -->
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guavaVersion}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.google.errorprone</groupId>
-            <artifactId>error_prone_annotations</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.google.guava</groupId>
-            <artifactId>failureaccess</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.google.guava</groupId>
-            <artifactId>listenablefuture</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.google.j2objc</groupId>
-            <artifactId>j2objc-annotations</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.checkerframework</groupId>
-            <artifactId>checker-qual</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <!-- This is a transitive dep of com.google.guava:guava -->
-        <groupId>com.google.guava</groupId>
-        <artifactId>failureaccess</artifactId>
-        <version>${guavafailureaccessVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.plexus</artifactId>
         <version>${sisuVersion}</version>
         <exclusions>
+          <!-- Remove bad annotations -->
           <exclusion>
-            <!-- Way too easy to conflict with plugins to be in Maven and leak in plugins -->
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
           </exclusion>
-          <!-- we use the no_asm classifier for sisu.inject -->
+          <exclusion>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+          </exclusion>
+          <!-- Detach them: We want to handle Sisu inject and plexus explicitly -->
+          <!-- Once have this, once have that on classpath -->
+          <!-- Finally, we may want to use some with classifier -->
           <exclusion>
             <groupId>org.eclipse.sisu</groupId>
             <artifactId>org.eclipse.sisu.inject</artifactId>
@@ -302,11 +275,6 @@ under the License.
         <groupId>javax.inject</groupId>
         <artifactId>javax.inject</artifactId>
         <version>1</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>javax.annotation-api</artifactId>
-        <version>${javaxAnnotationApiVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
