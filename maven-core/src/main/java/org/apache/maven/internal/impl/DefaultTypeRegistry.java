@@ -87,6 +87,7 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                     }
                     return new DefaultType(
                             id,
+                            handler.getLanguage(),
                             handler.getExtension(),
                             handler.getClassifier(),
                             new DefaultDependencyProperties(flags));

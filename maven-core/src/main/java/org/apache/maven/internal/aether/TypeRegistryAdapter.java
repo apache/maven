@@ -30,7 +30,7 @@ public class TypeRegistryAdapter implements ArtifactTypeRegistry {
     private final TypeRegistry typeRegistry;
 
     public TypeRegistryAdapter(TypeRegistry typeRegistry) {
-        this.typeRegistry = requireNonNull(typeRegistry, "null typeRegistry");
+        this.typeRegistry = requireNonNull(typeRegistry, "typeRegistry");
     }
 
     @Override
@@ -41,7 +41,11 @@ public class TypeRegistryAdapter implements ArtifactTypeRegistry {
         }
         if (type != null) {
             return new DefaultType(
-                    type.getId(), type.getExtension(), type.getClassifier(), type.getDependencyProperties());
+                    type.getId(),
+                    type.getLanguage(),
+                    type.getExtension(),
+                    type.getClassifier(),
+                    type.getDependencyProperties());
         }
         return null;
     }
