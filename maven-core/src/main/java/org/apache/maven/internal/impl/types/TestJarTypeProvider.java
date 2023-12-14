@@ -37,6 +37,7 @@ public class TestJarTypeProvider implements Provider<Type> {
     public TestJarTypeProvider() {
         this.type = new DefaultType(
                 NAME,
+                Type.LANGUAGE_JAVA,
                 "jar",
                 "tests",
                 new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));

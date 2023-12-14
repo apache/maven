@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.transformation.impl;
 
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -48,6 +47,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.installation.InstallRequest;
+import org.eclipse.sisu.PreDestroy;
 
 /**
  * Consumer POM transformer.

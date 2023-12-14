@@ -35,19 +35,31 @@ public class DefaultType implements Type, ArtifactType {
 
     private final DependencyProperties dependencyProperties;
 
-    public DefaultType(String id, String extension, String classifier, DependencyProperties dependencyProperties) {
+    public DefaultType(
+            String id,
+            String language,
+            String extension,
+            String classifier,
+            DependencyProperties dependencyProperties) {
         nonNull(id, "id");
+        nonNull(language, "language");
         this.extension = nonNull(extension, "extension");
         this.classifier = classifier;
         nonNull(dependencyProperties, "dependencyProperties");
         HashMap<String, String> props = new HashMap<>(dependencyProperties.asMap());
         props.put(ArtifactProperties.TYPE, id);
+        props.put(ArtifactProperties.LANGUAGE, language);
         this.dependencyProperties = new DefaultDependencyProperties(props);
     }
 
     @Override
     public String getId() {
         return dependencyProperties.asMap().get(ArtifactProperties.TYPE);
+    }
+
+    @Override
+    public String getLanguage() {
+        return dependencyProperties.asMap().get(ArtifactProperties.LANGUAGE);
     }
 
     @Override
