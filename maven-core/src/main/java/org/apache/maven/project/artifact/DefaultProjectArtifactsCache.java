@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.internal.SetWithResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
@@ -195,8 +196,17 @@ public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
 
         assertUniqueKey(key);
 
-        CacheRecord record = new CacheRecord(Collections.unmodifiableSet(new LinkedHashSet<>(projectArtifacts)));
+        SetWithResolutionResult artifacts;
+        if (projectArtifacts instanceof SetWithResolutionResult) {
+            artifacts = (SetWithResolutionResult) projectArtifacts;
+        } else if (projectArtifacts instanceof ArtifactsSetWithResult) {
+            artifacts = new SetWithResolutionResult(
+                    ((ArtifactsSetWithResult) projectArtifacts).getResult(), projectArtifacts);
+        } else {
+            throw new IllegalArgumentException("projectArtifacts must implement ArtifactsSetWithResult");
+        }
 
+        CacheRecord record = new CacheRecord(artifacts);
         cache.put(key, record);
 
         return record;

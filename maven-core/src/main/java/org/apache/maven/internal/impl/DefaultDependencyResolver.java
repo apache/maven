@@ -26,13 +26,14 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Node;
@@ -43,8 +44,8 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.services.*;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
+import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
@@ -81,7 +82,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
     private static DependencyFilter getScopeDependencyFilter(ResolutionScope scope) {
         Set<String> scopes = scope.scopes().stream().map(Scope::id).collect(Collectors.toSet());
         return (n, p) -> {
-            Dependency d = n.getDependency();
+            org.eclipse.aether.graph.Dependency d = n.getDependency();
             return d == null || scopes.contains(d.getScope());
         };
     }
@@ -93,15 +94,26 @@ public class DefaultDependencyResolver implements DependencyResolver {
         InternalSession session = InternalSession.from(request.getSession());
 
         if (request.getProject().isPresent()) {
-            List<Artifact> artifacts = resolveDependencies(
+            DependencyResolutionResult result = resolveDependencies(
                     request.getSession(), request.getProject().get(), request.getResolutionScope());
-            List<Path> paths = artifacts.stream()
-                    .map(a -> request.getSession()
-                            .getService(ArtifactManager.class)
-                            .getPath(a)
-                            .get())
-                    .collect(Collectors.toList());
-            return new DefaultDependencyResolverResult(Collections.emptyList(), null, Collections.emptyList(), paths);
+
+            Map<org.eclipse.aether.graph.Dependency, org.eclipse.aether.graph.DependencyNode> nodes = stream(
+                            result.getDependencyGraph())
+                    .filter(n -> n.getDependency() != null)
+                    .collect(Collectors.toMap(DependencyNode::getDependency, n -> n));
+
+            Node root = session.getNode(result.getDependencyGraph());
+            List<Node> dependencies = new ArrayList<>();
+            Map<Artifact, Path> artifacts = new LinkedHashMap<>();
+            List<Path> paths = new ArrayList<>();
+            for (org.eclipse.aether.graph.Dependency dep : result.getResolvedDependencies()) {
+                dependencies.add(session.getNode(nodes.get(dep)));
+                Path path = dep.getArtifact().getFile().toPath();
+                artifacts.put(session.getDependency(dep), path);
+                paths.add(path);
+            }
+            return new DefaultDependencyResolverResult(
+                    result.getCollectionErrors(), root, dependencies, paths, artifacts);
         }
 
         DependencyCollectorResult collectorResult =
@@ -122,22 +134,25 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 .collect(Collectors.toList());
 
         return new DefaultDependencyResolverResult(
-                collectorResult.getExceptions(), collectorResult.getRoot(), dependencies, paths);
+                collectorResult.getExceptions(), collectorResult.getRoot(), dependencies, paths, artifacts);
     }
 
-    private List<Artifact> resolveDependencies(Session session, Project project, ResolutionScope scope) {
+    private Stream<DependencyNode> stream(DependencyNode node) {
+        return Stream.concat(Stream.of(node), node.getChildren().stream().flatMap(this::stream));
+    }
+
+    private DependencyResolutionResult resolveDependencies(Session session, Project project, ResolutionScope scope) {
         Collection<String> toResolve = toScopes(scope);
         try {
             LifecycleDependencyResolver lifecycleDependencyResolver =
                     session.getService(Lookup.class).lookup(LifecycleDependencyResolver.class);
-            Set<org.apache.maven.artifact.Artifact> artifacts = lifecycleDependencyResolver.resolveProjectArtifacts(
+            return lifecycleDependencyResolver.getProjectDependencyResolutionResult(
                     getMavenProject(project),
                     toResolve,
                     toResolve,
                     InternalSession.from(session).getMavenSession(),
                     false,
                     Collections.emptySet());
-            return map(artifacts, a -> InternalSession.from(session).getArtifact(RepositoryUtils.toArtifact(a)));
         } catch (LifecycleExecutionException e) {
             throw new DependencyResolverException("Unable to resolve project dependencies", e);
         }
@@ -156,13 +171,19 @@ public class DefaultDependencyResolver implements DependencyResolver {
         private final Node root;
         private final List<Node> dependencies;
         private final List<Path> paths;
+        private final Map<Artifact, Path> artifacts;
 
         DefaultDependencyResolverResult(
-                List<Exception> exceptions, Node root, List<Node> dependencies, List<Path> paths) {
+                List<Exception> exceptions,
+                Node root,
+                List<Node> dependencies,
+                List<Path> paths,
+                Map<Artifact, Path> artifacts) {
             this.exceptions = exceptions;
             this.root = root;
             this.dependencies = dependencies;
             this.paths = paths;
+            this.artifacts = artifacts;
         }
 
         @Override
@@ -183,6 +204,11 @@ public class DefaultDependencyResolver implements DependencyResolver {
         @Override
         public List<Path> getPaths() {
             return paths;
+        }
+
+        @Override
+        public Map<Artifact, Path> getArtifacts() {
+            return artifacts;
         }
     }
 }

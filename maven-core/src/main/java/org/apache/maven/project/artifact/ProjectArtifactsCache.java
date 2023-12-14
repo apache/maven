@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
 
@@ -39,6 +40,10 @@ public interface ProjectArtifactsCache {
      */
     interface Key {
         // marker interface for cache keys
+    }
+
+    interface ArtifactsSetWithResult extends Set<Artifact> {
+        DependencyResolutionResult getResult();
     }
 
     /**
