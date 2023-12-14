@@ -613,6 +613,7 @@ public class ${className} {
   #foreach( $entry in $aliases.entrySet() )
             case "${entry.key}":
                 tagName = "${entry.value}";
+                break;
   #end
         }
 #end
@@ -626,6 +627,10 @@ public class ${className} {
                 if (!parsed.add(tagName)) {
                     throw new XMLStreamException("Duplicated tag: '" + tagName + "'", parser.getLocation(), null);
                 }
+        }
+#else
+        if (!parsed.add(tagName)) {
+            throw new XMLStreamException("Duplicated tag: '" + tagName + "'", parser.getLocation(), null);
         }
 #end
         return tagName;
