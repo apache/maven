@@ -60,7 +60,10 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
         if (relocations != null) {
             Relocation relocation = relocations.getRelocation(request.getArtifact());
             if (relocation != null && (isProjectContext(request.getRequestContext()) || relocation.global)) {
-                LOGGER.info("{} applied: {}", relocation.global ? "User global relocation" : "User project relocation", relocation);
+                LOGGER.info(
+                        "{} applied: {}",
+                        relocation.global ? "User global relocation" : "User project relocation",
+                        relocation);
                 return new RelocatedArtifact(
                         request.getArtifact(),
                         isAny(relocation.target.getGroupId()) ? null : relocation.target.getGroupId(),
