@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.impl;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -30,13 +29,11 @@ import java.util.Map;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
-import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
 import org.apache.maven.api.services.ArtifactResolverRequest;
 import org.apache.maven.api.services.ArtifactResolverResult;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
@@ -47,12 +44,6 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 @Named
 @Singleton
 public class DefaultArtifactResolver implements ArtifactResolver {
-    private final RepositorySystem repositorySystem;
-
-    @Inject
-    DefaultArtifactResolver(@Nonnull RepositorySystem repositorySystem) {
-        this.repositorySystem = nonNull(repositorySystem, "repositorySystem");
-    }
 
     @Override
     public ArtifactResolverResult resolve(ArtifactResolverRequest request)
@@ -75,7 +66,8 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                 }
             }
             if (!requests.isEmpty()) {
-                List<ArtifactResult> results = repositorySystem.resolveArtifacts(session.getSession(), requests);
+                List<ArtifactResult> results =
+                        session.getRepositorySystem().resolveArtifacts(session.getSession(), requests);
                 for (ArtifactResult result : results) {
                     Artifact artifact = session.getArtifact(result.getArtifact());
                     Path path = result.getArtifact().getFile().toPath();

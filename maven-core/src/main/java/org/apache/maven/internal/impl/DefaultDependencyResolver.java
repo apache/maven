@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.impl;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -36,6 +35,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ResolutionScope;
@@ -59,9 +59,6 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 @Named
 @Singleton
 public class DefaultDependencyResolver implements DependencyResolver {
-
-    @Inject
-    public DefaultDependencyResolver() {}
 
     @Override
     public List<Node> flatten(Session s, Node node, ResolutionScope scope) throws DependencyResolverException {
@@ -104,7 +101,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
 
             Node root = session.getNode(result.getDependencyGraph());
             List<Node> dependencies = new ArrayList<>();
-            Map<Artifact, Path> artifacts = new LinkedHashMap<>();
+            Map<Dependency, Path> artifacts = new LinkedHashMap<>();
             List<Path> paths = new ArrayList<>();
             for (org.eclipse.aether.graph.Dependency dep : result.getResolvedDependencies()) {
                 dependencies.add(session.getNode(nodes.get(dep)));
@@ -118,23 +115,17 @@ public class DefaultDependencyResolver implements DependencyResolver {
 
         DependencyCollectorResult collectorResult =
                 session.getService(DependencyCollector.class).collect(request);
-        List<Node> dependencies = flatten(session, collectorResult.getRoot(), request.getResolutionScope());
-
-        List<ArtifactCoordinate> coordinates = dependencies.stream()
-                .map(Node::getDependency)
-                .filter(Objects::nonNull)
-                .map(Artifact::toCoordinate)
-                .collect(Collectors.toList());
+        List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getResolutionScope());
+        List<Dependency> deps =
+                nodes.stream().map(Node::getDependency).filter(Objects::nonNull).collect(Collectors.toList());
+        List<ArtifactCoordinate> coordinates =
+                deps.stream().map(Artifact::toCoordinate).collect(Collectors.toList());
         Map<Artifact, Path> artifacts = session.resolveArtifacts(coordinates);
-        List<Path> paths = dependencies.stream()
-                .map(Node::getDependency)
-                .filter(Objects::nonNull)
-                .map(artifacts::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        Map<Dependency, Path> dependencies = deps.stream().collect(Collectors.toMap(d -> d, artifacts::get));
+        List<Path> paths = new ArrayList<>(dependencies.values());
 
         return new DefaultDependencyResolverResult(
-                collectorResult.getExceptions(), collectorResult.getRoot(), dependencies, paths, artifacts);
+                collectorResult.getExceptions(), collectorResult.getRoot(), nodes, paths, dependencies);
     }
 
     private Stream<DependencyNode> stream(DependencyNode node) {
@@ -169,21 +160,21 @@ public class DefaultDependencyResolver implements DependencyResolver {
     static class DefaultDependencyResolverResult implements DependencyResolverResult {
         private final List<Exception> exceptions;
         private final Node root;
-        private final List<Node> dependencies;
+        private final List<Node> nodes;
         private final List<Path> paths;
-        private final Map<Artifact, Path> artifacts;
+        private final Map<Dependency, Path> dependencies;
 
         DefaultDependencyResolverResult(
                 List<Exception> exceptions,
                 Node root,
-                List<Node> dependencies,
+                List<Node> nodes,
                 List<Path> paths,
-                Map<Artifact, Path> artifacts) {
+                Map<Dependency, Path> dependencies) {
             this.exceptions = exceptions;
             this.root = root;
-            this.dependencies = dependencies;
+            this.nodes = nodes;
             this.paths = paths;
-            this.artifacts = artifacts;
+            this.dependencies = dependencies;
         }
 
         @Override
@@ -197,8 +188,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
         }
 
         @Override
-        public List<Node> getDependencies() {
-            return dependencies;
+        public List<Node> getNodes() {
+            return nodes;
         }
 
         @Override
@@ -207,8 +198,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
         }
 
         @Override
-        public Map<Artifact, Path> getArtifacts() {
-            return artifacts;
+        public Map<Dependency, Path> getDependencies() {
+            return dependencies;
         }
     }
 }
