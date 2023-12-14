@@ -40,6 +40,7 @@ import org.eclipse.sisu.Priority;
 @Singleton
 @Named
 @Priority(5)
+@SuppressWarnings("checkstyle:MagicNumber")
 public final class DistributionManagementArtifactRelocationSource implements MavenArtifactRelocationSource {
     @Override
     public Artifact relocatedTarget(RepositorySystemSession session, ArtifactDescriptorRequest request, Model model) {

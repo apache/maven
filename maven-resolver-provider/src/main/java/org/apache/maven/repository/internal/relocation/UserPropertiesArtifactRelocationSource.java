@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Named
 @Priority(50)
+@SuppressWarnings("checkstyle:MagicNumber")
 public final class UserPropertiesArtifactRelocationSource implements MavenArtifactRelocationSource {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserPropertiesArtifactRelocationSource.class);
 
