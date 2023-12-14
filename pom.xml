@@ -176,7 +176,7 @@ under the License.
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusTestingVersion>1.0.0</plexusTestingVersion>
     <plexusXmlVersion>4.0.1</plexusXmlVersion>
-    <resolverVersion>2.0.0-SNAPSHOT</resolverVersion>
+    <resolverVersion>2.0.0-alpha-5</resolverVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <sisuVersion>0.9.0.M2</sisuVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
@@ -501,6 +501,20 @@ under the License.
     </dependency>
   </dependencies>
   <!--bootstrap-end-comment-->
+
+  <!-- TODO: Is on vote, to be removed once out -->
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>maven-2048</id>
+      <url>https://repository.apache.org/content/repositories/maven-2048</url>
+    </repository>
+  </repositories>
 
   <build>
     <pluginManagement>
