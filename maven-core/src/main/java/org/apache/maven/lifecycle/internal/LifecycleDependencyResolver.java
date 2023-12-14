@@ -234,7 +234,7 @@ public class LifecycleDependencyResolver {
         }
 
         if (scopesToCollect.isEmpty() && scopesToResolve.isEmpty()) {
-            return new LinkedHashSet<>();
+            return new SetWithResolutionResult(null, new LinkedHashSet<>());
         }
 
         scopesToCollect = new HashSet<>(scopesToCollect);
