@@ -51,15 +51,7 @@ public interface ProjectArtifactsCache {
      */
     class CacheRecord {
 
-        public Set<Artifact> getArtifacts() {
-            return artifacts;
-        }
-
         private final Set<Artifact> artifacts;
-
-        public LifecycleExecutionException getException() {
-            return exception;
-        }
 
         private final LifecycleExecutionException exception;
 
@@ -71,6 +63,14 @@ public interface ProjectArtifactsCache {
         CacheRecord(LifecycleExecutionException exception) {
             this.artifacts = null;
             this.exception = exception;
+        }
+
+        public Set<Artifact> getArtifacts() {
+            return artifacts;
+        }
+
+        public LifecycleExecutionException getException() {
+            return exception;
         }
     }
 
