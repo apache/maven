@@ -36,6 +36,7 @@ import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputSource;
+import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionParserException;
 import org.apache.maven.building.Source;
 import org.apache.maven.model.Activation;
@@ -76,7 +77,6 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.model.version.ModelVersionParser;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
@@ -110,7 +110,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final ModelVersionProcessor versionProcessor;
     private final ModelSourceTransformer transformer;
-    private final ModelVersionParser modelVersionParser;
+    private final VersionParser versionParser;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -134,7 +134,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             ModelVersionProcessor versionProcessor,
             ModelSourceTransformer transformer,
-            ModelVersionParser modelVersionParser) {
+            VersionParser versionParser) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
         this.modelNormalizer = modelNormalizer;
@@ -154,7 +154,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.versionProcessor = versionProcessor;
         this.transformer = transformer;
-        this.modelVersionParser = modelVersionParser;
+        this.versionParser = versionParser;
     }
 
     /**
@@ -183,7 +183,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -212,7 +212,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -241,7 +241,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -270,7 +270,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -299,7 +299,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -328,7 +328,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -357,7 +357,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -386,7 +386,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -415,7 +415,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -444,7 +444,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -473,7 +473,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -503,7 +503,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -533,7 +533,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -562,7 +562,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -591,7 +591,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -620,7 +620,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -650,7 +650,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationFilePathInterpolator,
                 versionProcessor,
                 transformer,
-                modelVersionParser);
+                versionParser);
     }
 
     /**
@@ -1505,8 +1505,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         String version = getVersion(candidateModel);
         if (version != null && parent.getVersion() != null && !version.equals(parent.getVersion())) {
             try {
-                VersionRange parentRange = modelVersionParser.parseVersionRange(parent.getVersion());
-                if (!parentRange.contains(modelVersionParser.parseVersion(version))) {
+                VersionRange parentRange = versionParser.parseVersionRange(parent.getVersion());
+                if (!parentRange.contains(versionParser.parseVersion(version))) {
                     // version skew drop back to resolution from the repository
                     return null;
                 }

@@ -37,6 +37,7 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.model.building.DefaultModelBuilder;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
@@ -63,7 +64,6 @@ import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.model.version.ModelVersionParser;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectModelResolver;
@@ -128,7 +128,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private Provider<SuperPomProvider> superPomProvider;
 
     @Inject
-    private Provider<ModelVersionParser> modelVersionParser;
+    private Provider<VersionParser> versionParser;
 
     // To break circular dependency
     @Inject
@@ -190,7 +190,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 .setPluginManagementInjector(pluginManagementInjector.get())
                 .setReportConfigurationExpander(reportConfigurationExpander.get())
                 .setSuperPomProvider(superPomProvider.get())
-                .setModelVersionParser(modelVersionParser.get())
+                .setModelVersionParser(versionParser.get())
                 .newInstance();
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
         try {

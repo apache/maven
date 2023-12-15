@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
@@ -73,7 +74,6 @@ import org.apache.maven.model.superpom.DefaultSuperPomProvider;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.model.version.ModelVersionParser;
 
 import static java.util.Objects.requireNonNull;
 
@@ -106,7 +106,7 @@ public class DefaultModelBuilderFactory {
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private ModelVersionProcessor versionProcessor;
     private ModelSourceTransformer transformer;
-    private ModelVersionParser modelVersionParser;
+    private VersionParser versionParser;
 
     public DefaultModelBuilderFactory setModelProcessor(ModelProcessor modelProcessor) {
         this.modelProcessor = modelProcessor;
@@ -214,8 +214,8 @@ public class DefaultModelBuilderFactory {
         return this;
     }
 
-    public DefaultModelBuilderFactory setModelVersionParser(ModelVersionParser modelVersionParser) {
-        this.modelVersionParser = modelVersionParser;
+    public DefaultModelBuilderFactory setModelVersionParser(VersionParser versionParser) {
+        this.versionParser = versionParser;
         return this;
     }
 
@@ -337,10 +337,10 @@ public class DefaultModelBuilderFactory {
         return new BuildModelSourceTransformer();
     }
 
-    private ModelVersionParser newModelVersionParser() {
+    private VersionParser newModelVersionParser() {
         // This is a limited parser that does not support ranges and compares versions as strings
         // in real-life this parser should not be used, but replaced with a proper one
-        return new ModelVersionParser() {
+        return new VersionParser() {
             @Override
             public Version parseVersion(String version) {
                 requireNonNull(version, "version");
@@ -360,6 +360,11 @@ public class DefaultModelBuilderFactory {
             @Override
             public VersionRange parseVersionRange(String range) {
                 throw new IllegalArgumentException("ranges not supported by this parser");
+            }
+
+            @Override
+            public boolean isSnapshot(String version) {
+                return version.endsWith("SNAPSHOT");
             }
         };
     }
@@ -392,7 +397,7 @@ public class DefaultModelBuilderFactory {
                         : newProfileActivationFilePathInterpolator(),
                 versionProcessor != null ? versionProcessor : newModelVersionPropertiesProcessor(),
                 transformer != null ? transformer : newModelSourceTransformer(),
-                modelVersionParser != null ? modelVersionParser : newModelVersionParser());
+                versionParser != null ? versionParser : newModelVersionParser());
     }
 
     private static class StubLifecycleBindingsInjector implements LifecycleBindingsInjector {
