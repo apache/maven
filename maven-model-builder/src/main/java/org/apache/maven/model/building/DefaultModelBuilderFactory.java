@@ -75,6 +75,8 @@ import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
 import org.apache.maven.model.version.ModelVersionParser;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A factory to create model builder instances when no dependency injection is available. <em>Note:</em> This class is
  * only meant as a utility for developers that want to employ the model builder outside the Maven build system, Maven
@@ -341,6 +343,7 @@ public class DefaultModelBuilderFactory {
         return new ModelVersionParser() {
             @Override
             public Version parseVersion(String version) {
+                requireNonNull(version, "version");
                 return new Version() {
                     @Override
                     public String asString() {

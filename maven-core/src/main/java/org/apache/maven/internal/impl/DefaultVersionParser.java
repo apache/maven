@@ -46,13 +46,11 @@ public class DefaultVersionParser implements VersionParser {
 
     @Override
     public Version parseVersion(String version) {
-        nonNull(version, "version");
         return modelVersionParser.parseVersion(version);
     }
 
     @Override
     public VersionRange parseVersionRange(String range) {
-        nonNull(range, "range");
         return modelVersionParser.parseVersionRange(range);
     }
 
