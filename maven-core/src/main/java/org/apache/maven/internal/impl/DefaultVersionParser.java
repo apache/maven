@@ -20,38 +20,57 @@ package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParser;
+import org.apache.maven.api.services.VersionParserException;
+import org.eclipse.aether.spi.version.VersionSchemeSelector;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.VersionScheme;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A wrapper class around a maven resolver artifact.
  */
 @Named
 @Singleton
-public class DefaultVersionParser implements VersionParser {
+public class DefaultVersionParser implements VersionParser, org.apache.maven.model.version.VersionParser {
     private static final String SNAPSHOT = "SNAPSHOT";
     private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$");
 
-    private final org.apache.maven.model.version.VersionParser versionParser;
+    private final Provider<InternalSession> internalSessionProvider;
+    private final VersionSchemeSelector versionSchemeSelector;
 
     @Inject
-    public DefaultVersionParser(org.apache.maven.model.version.VersionParser versionParser) {
-        this.versionParser = versionParser;
+    public DefaultVersionParser(
+            Provider<InternalSession> internalSessionProvider, VersionSchemeSelector versionSchemeSelector) {
+        this.internalSessionProvider = internalSessionProvider;
+        this.versionSchemeSelector = versionSchemeSelector;
     }
 
     @Override
     public Version parseVersion(String version) {
-        return versionParser.parseVersion(version);
+        requireNonNull(version, "version");
+        return new DefaultVersion(
+                versionSchemeSelector.selectVersionScheme(
+                        internalSessionProvider.get().getSession()),
+                version);
     }
 
     @Override
     public VersionRange parseVersionRange(String range) {
-        return versionParser.parseVersionRange(range);
+        requireNonNull(range, "range");
+        return new DefaultVersionRange(
+                versionSchemeSelector.selectVersionScheme(
+                        internalSessionProvider.get().getSession()),
+                range);
     }
 
     @Override
@@ -61,5 +80,88 @@ public class DefaultVersionParser implements VersionParser {
 
     static boolean checkSnapshot(String version) {
         return version.endsWith(SNAPSHOT) || SNAPSHOT_TIMESTAMP.matcher(version).matches();
+    }
+
+    static class DefaultVersion implements Version {
+        private final VersionScheme versionScheme;
+        private final org.eclipse.aether.version.Version delegate;
+
+        DefaultVersion(VersionScheme versionScheme, String delegateValue) {
+            this.versionScheme = versionScheme;
+            try {
+                this.delegate = versionScheme.parseVersion(delegateValue);
+            } catch (InvalidVersionSpecificationException e) {
+                throw new VersionParserException("Unable to parse version: " + delegateValue, e);
+            }
+        }
+
+        @Override
+        public int compareTo(Version o) {
+            if (o instanceof DefaultVersion) {
+                return delegate.compareTo(((DefaultVersion) o).delegate);
+            } else {
+                return compareTo(new DefaultVersion(versionScheme, o.asString()));
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            DefaultVersion that = (DefaultVersion) o;
+            return delegate.equals(that.delegate);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(delegate);
+        }
+
+        @Override
+        public String asString() {
+            return delegate.toString();
+        }
+
+        @Override
+        public String toString() {
+            return asString();
+        }
+    }
+
+    static class DefaultVersionRange implements VersionRange {
+        private final VersionScheme versionScheme;
+        private final org.eclipse.aether.version.VersionRange delegate;
+
+        DefaultVersionRange(VersionScheme versionScheme, String delegateValue) {
+            this.versionScheme = versionScheme;
+            try {
+                this.delegate = versionScheme.parseVersionRange(delegateValue);
+            } catch (InvalidVersionSpecificationException e) {
+                throw new VersionParserException("Unable to parse version range: " + delegateValue, e);
+            }
+        }
+
+        @Override
+        public boolean contains(Version version) {
+            if (version instanceof DefaultVersion) {
+                return delegate.containsVersion(((DefaultVersion) version).delegate);
+            } else {
+                return contains(new DefaultVersion(versionScheme, version.asString()));
+            }
+        }
+
+        @Override
+        public String asString() {
+            return delegate.toString();
+        }
+
+        @Override
+        public String toString() {
+            return asString();
+        }
     }
 }

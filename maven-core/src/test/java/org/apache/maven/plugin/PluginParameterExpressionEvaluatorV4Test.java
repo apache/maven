@@ -44,10 +44,7 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.AbstractSession;
-import org.apache.maven.internal.impl.DefaultMojoExecution;
-import org.apache.maven.internal.impl.DefaultProject;
-import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.*;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
@@ -58,6 +55,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.CycleDetectedException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
@@ -65,10 +63,12 @@ import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.Os;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
@@ -80,6 +80,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  */
@@ -90,9 +91,23 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     PlexusContainer container;
 
     @Inject
+    SessionScope sessionScope;
+
+    @Inject
     private MavenRepositorySystem factory;
 
     private Path rootDirectory;
+
+    @BeforeEach
+    public void setUp() {
+        RepositorySystemSession repositorySystemSession = mock(RepositorySystemSession.class);
+        when(repositorySystemSession.getConfigProperties()).thenReturn(Collections.emptyMap());
+        InternalSession internalSession = mock(InternalSession.class);
+        when(internalSession.getSession()).thenReturn(repositorySystemSession);
+
+        sessionScope.enter();
+        sessionScope.seed(InternalSession.class, internalSession);
+    }
 
     @Test
     public void testPluginDescriptorExpressionReference() throws Exception {

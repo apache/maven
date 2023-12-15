@@ -23,8 +23,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.eclipse.aether.spi.version.VersionSchemeSelector;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -34,11 +36,14 @@ import org.eclipse.aether.version.VersionScheme;
 @Singleton
 public class MavenPluginJavaPrerequisiteChecker implements MavenPluginPrerequisitesChecker {
 
-    private final Provider<VersionScheme> versionSchemeProvider;
+    private final Provider<InternalSession> internalSessionProvider;
+    private final VersionSchemeSelector versionSchemeSelector;
 
     @Inject
-    public MavenPluginJavaPrerequisiteChecker(Provider<VersionScheme> versionSchemeProvider) {
-        this.versionSchemeProvider = versionSchemeProvider;
+    public MavenPluginJavaPrerequisiteChecker(
+            Provider<InternalSession> internalSessionProvider, VersionSchemeSelector versionSchemeSelector) {
+        this.internalSessionProvider = internalSessionProvider;
+        this.versionSchemeSelector = versionSchemeSelector;
     }
 
     @Override
@@ -54,15 +59,17 @@ public class MavenPluginJavaPrerequisiteChecker implements MavenPluginPrerequisi
     }
 
     boolean matchesVersion(String requiredVersion, String currentVersion) {
+        VersionScheme versionScheme = versionSchemeSelector.selectVersionScheme(
+                internalSessionProvider.get().getSession());
         VersionConstraint constraint;
         try {
-            constraint = versionSchemeProvider.get().parseVersionConstraint(requiredVersion);
+            constraint = versionScheme.parseVersionConstraint(requiredVersion);
         } catch (InvalidVersionSpecificationException e) {
             throw new IllegalArgumentException("Invalid 'requiredJavaVersion' given in plugin descriptor", e);
         }
         Version current;
         try {
-            current = versionSchemeProvider.get().parseVersion(currentVersion);
+            current = versionScheme.parseVersion(currentVersion);
         } catch (InvalidVersionSpecificationException e) {
             throw new IllegalStateException("Could not parse current Java version", e);
         }

@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MavenPluginManager;
@@ -58,9 +59,9 @@ import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
+import org.eclipse.aether.spi.version.VersionSchemeSelector;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
-import org.eclipse.aether.version.VersionScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,18 +81,21 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     private final RepositorySystem repositorySystem;
     private final MetadataReader metadataReader;
     private final MavenPluginManager pluginManager;
-    private final Provider<VersionScheme> versionSchemeProvider;
+    private final Provider<InternalSession> internalSessionProvider;
+    private final VersionSchemeSelector versionSchemeSelector;
 
     @Inject
     public DefaultPluginVersionResolver(
             RepositorySystem repositorySystem,
             MetadataReader metadataReader,
             MavenPluginManager pluginManager,
-            Provider<VersionScheme> versionSchemeProvider) {
+            Provider<InternalSession> internalSessionProvider,
+            VersionSchemeSelector versionSchemeSelector) {
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
         this.pluginManager = pluginManager;
-        this.versionSchemeProvider = versionSchemeProvider;
+        this.internalSessionProvider = internalSessionProvider;
+        this.versionSchemeSelector = versionSchemeSelector;
     }
 
     @Override
@@ -195,7 +199,9 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
             for (String ver : versions.versions.keySet()) {
                 try {
-                    Version v = versionSchemeProvider.get().parseVersion(ver);
+                    Version v = versionSchemeSelector
+                            .selectVersionScheme(internalSessionProvider.get().getSession())
+                            .parseVersion(ver);
 
                     if (ver.endsWith("-SNAPSHOT")) {
                         snapshots.add(v);

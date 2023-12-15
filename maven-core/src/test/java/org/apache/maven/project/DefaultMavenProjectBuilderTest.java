@@ -18,15 +18,21 @@
  */
 package org.apache.maven.project;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.session.scope.internal.SessionScope;
+import org.eclipse.aether.RepositorySystemSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -45,6 +51,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     @TempDir
@@ -54,10 +62,21 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     @TempDir
     Path projectRoot;
 
+    @Inject
+    SessionScope sessionScope;
+
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         projectBuilder = getContainer().lookup(ProjectBuilder.class);
+
+        RepositorySystemSession repositorySystemSession = mock(RepositorySystemSession.class);
+        when(repositorySystemSession.getConfigProperties()).thenReturn(Collections.emptyMap());
+        InternalSession internalSession = mock(InternalSession.class);
+        when(internalSession.getSession()).thenReturn(repositorySystemSession);
+
+        sessionScope.enter();
+        sessionScope.seed(InternalSession.class, internalSession);
     }
 
     protected MavenProject getProject(Artifact pom, boolean allowStub) throws Exception {
