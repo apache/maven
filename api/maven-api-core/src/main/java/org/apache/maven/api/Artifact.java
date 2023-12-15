@@ -74,6 +74,14 @@ public interface Artifact {
     Version getVersion();
 
     /**
+     * The base version of the artifact.
+     *
+     * @return the version
+     */
+    @Nonnull
+    Version getBaseVersion();
+
+    /**
      * The classifier of the artifact.
      *
      * @return the classifier or an empty string if none, never {@code null}
