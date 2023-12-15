@@ -22,15 +22,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParser;
-import org.apache.maven.api.services.VersionParserException;
-import org.eclipse.aether.version.InvalidVersionSpecificationException;
-import org.eclipse.aether.version.VersionScheme;
+import org.apache.maven.model.version.ModelVersionParser;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
@@ -40,23 +37,23 @@ public class DefaultVersionParser implements VersionParser {
     private static final String SNAPSHOT = "SNAPSHOT";
     private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$");
 
-    private final VersionScheme versionScheme;
+    private final ModelVersionParser modelVersionParser;
 
     @Inject
-    public DefaultVersionParser(VersionScheme versionScheme) {
-        this.versionScheme = nonNull(versionScheme, "versionScheme");
+    public DefaultVersionParser(ModelVersionParser modelVersionParser) {
+        this.modelVersionParser = nonNull(modelVersionParser, "modelVersionParser");
     }
 
     @Override
     public Version parseVersion(String version) {
         nonNull(version, "version");
-        return new DefaultVersion(versionScheme, version);
+        return modelVersionParser.parseVersion(version);
     }
 
     @Override
     public VersionRange parseVersionRange(String range) {
         nonNull(range, "range");
-        return new DefaultVersionRange(versionScheme, range);
+        return modelVersionParser.parseVersionRange(range);
     }
 
     @Override
@@ -66,88 +63,5 @@ public class DefaultVersionParser implements VersionParser {
 
     static boolean checkSnapshot(String version) {
         return version.endsWith(SNAPSHOT) || SNAPSHOT_TIMESTAMP.matcher(version).matches();
-    }
-
-    static class DefaultVersion implements Version {
-        private final VersionScheme versionScheme;
-        private final org.eclipse.aether.version.Version delegate;
-
-        DefaultVersion(VersionScheme versionScheme, String delegateValue) {
-            this.versionScheme = versionScheme;
-            try {
-                this.delegate = versionScheme.parseVersion(delegateValue);
-            } catch (InvalidVersionSpecificationException e) {
-                throw new VersionParserException("Unable to parse version: " + delegateValue, e);
-            }
-        }
-
-        @Override
-        public int compareTo(Version o) {
-            if (o instanceof DefaultVersion) {
-                return delegate.compareTo(((DefaultVersion) o).delegate);
-            } else {
-                return compareTo(new DefaultVersion(versionScheme, o.toString()));
-            }
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            DefaultVersion that = (DefaultVersion) o;
-            return delegate.equals(that.delegate);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(delegate);
-        }
-
-        @Override
-        public String asString() {
-            return delegate.toString();
-        }
-
-        @Override
-        public String toString() {
-            return asString();
-        }
-    }
-
-    static class DefaultVersionRange implements VersionRange {
-        private final VersionScheme versionScheme;
-        private final org.eclipse.aether.version.VersionRange delegate;
-
-        DefaultVersionRange(VersionScheme versionScheme, String delegateValue) {
-            this.versionScheme = versionScheme;
-            try {
-                this.delegate = versionScheme.parseVersionRange(delegateValue);
-            } catch (InvalidVersionSpecificationException e) {
-                throw new VersionParserException("Unable to parse version range: " + delegateValue, e);
-            }
-        }
-
-        @Override
-        public boolean contains(Version version) {
-            if (version instanceof DefaultVersion) {
-                return delegate.containsVersion(((DefaultVersion) version).delegate);
-            } else {
-                return contains(new DefaultVersion(versionScheme, version.toString()));
-            }
-        }
-
-        @Override
-        public String asString() {
-            return delegate.toString();
-        }
-
-        @Override
-        public String toString() {
-            return asString();
-        }
     }
 }
