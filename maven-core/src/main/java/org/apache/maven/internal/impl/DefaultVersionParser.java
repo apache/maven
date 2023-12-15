@@ -34,7 +34,7 @@ import org.eclipse.aether.spi.version.VersionSchemeSelector;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.VersionScheme;
 
-import static java.util.Objects.requireNonNull;
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 /**
  * A wrapper class around a maven resolver artifact.
@@ -51,13 +51,13 @@ public class DefaultVersionParser implements VersionParser, org.apache.maven.mod
     @Inject
     public DefaultVersionParser(
             Provider<InternalSession> internalSessionProvider, VersionSchemeSelector versionSchemeSelector) {
-        this.internalSessionProvider = internalSessionProvider;
-        this.versionSchemeSelector = versionSchemeSelector;
+        this.internalSessionProvider = nonNull(internalSessionProvider, "internalSessionProvider");
+        this.versionSchemeSelector = nonNull(versionSchemeSelector, "versionSchemeSelector");
     }
 
     @Override
     public Version parseVersion(String version) {
-        requireNonNull(version, "version");
+        nonNull(version, "version");
         return new DefaultVersion(
                 versionSchemeSelector.selectVersionScheme(
                         internalSessionProvider.get().getSession()),
@@ -66,7 +66,7 @@ public class DefaultVersionParser implements VersionParser, org.apache.maven.mod
 
     @Override
     public VersionRange parseVersionRange(String range) {
-        requireNonNull(range, "range");
+        nonNull(range, "range");
         return new DefaultVersionRange(
                 versionSchemeSelector.selectVersionScheme(
                         internalSessionProvider.get().getSession()),
