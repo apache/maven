@@ -83,7 +83,7 @@ public class MavenSimpleLogger extends SimpleLogger {
             builder.a(e.getClassName());
             builder.a(".");
             builder.a(e.getMethodName());
-            builder.a(" (");
+            builder.a("(");
             builder.strong(getLocation(e));
             builder.a(")");
             stream.println(builder);

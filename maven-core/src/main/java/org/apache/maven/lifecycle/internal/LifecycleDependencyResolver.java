@@ -169,6 +169,24 @@ public class LifecycleDependencyResolver {
         }
     }
 
+    public DependencyResolutionResult getProjectDependencyResolutionResult(
+            MavenProject project,
+            Collection<String> scopesToCollect,
+            Collection<String> scopesToResolve,
+            MavenSession session,
+            boolean aggregating,
+            Set<Artifact> projectArtifacts)
+            throws LifecycleExecutionException {
+
+        Set<Artifact> resolvedArtifacts = resolveProjectArtifacts(
+                project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
+        if (resolvedArtifacts instanceof ProjectArtifactsCache.ArtifactsSetWithResult) {
+            return ((ProjectArtifactsCache.ArtifactsSetWithResult) resolvedArtifacts).getResult();
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
     public Set<Artifact> resolveProjectArtifacts(
             MavenProject project,
             Collection<String> scopesToCollect,
@@ -216,7 +234,7 @@ public class LifecycleDependencyResolver {
         }
 
         if (scopesToCollect.isEmpty() && scopesToResolve.isEmpty()) {
-            return new LinkedHashSet<>();
+            return new SetWithResolutionResult(null, new LinkedHashSet<>());
         }
 
         scopesToCollect = new HashSet<>(scopesToCollect);
@@ -270,7 +288,7 @@ public class LifecycleDependencyResolver {
                     Collections.singletonList(project.getArtifact().getId()),
                     collectionFilter);
         }
-        return artifacts;
+        return new SetWithResolutionResult(result, artifacts);
     }
 
     private boolean areAllDependenciesInReactor(

@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.impl;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -30,7 +29,6 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactDeployerException;
 import org.apache.maven.api.services.ArtifactDeployerRequest;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.deployment.DeployResult;
 import org.eclipse.aether.deployment.DeploymentException;
@@ -43,12 +41,6 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 @Named
 @Singleton
 public class DefaultArtifactDeployer implements ArtifactDeployer {
-    private final @Nonnull RepositorySystem repositorySystem;
-
-    @Inject
-    DefaultArtifactDeployer(@Nonnull RepositorySystem repositorySystem) {
-        this.repositorySystem = nonNull(repositorySystem, "repositorySystem");
-    }
 
     @Override
     public void deploy(@Nonnull ArtifactDeployerRequest request) {
@@ -61,7 +53,7 @@ public class DefaultArtifactDeployer implements ArtifactDeployer {
                     .setRepository(session.toRepository(repository))
                     .setArtifacts(session.toArtifacts(artifacts));
 
-            DeployResult result = repositorySystem.deploy(session.getSession(), deployRequest);
+            DeployResult result = session.getRepositorySystem().deploy(session.getSession(), deployRequest);
         } catch (DeploymentException e) {
             throw new ArtifactDeployerException("Unable to deploy artifacts", e);
         }
