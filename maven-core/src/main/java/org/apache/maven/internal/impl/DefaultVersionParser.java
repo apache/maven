@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.impl;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -28,11 +29,9 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionParserException;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.VersionScheme;
 
-import static org.apache.maven.artifact.versioning.VersionRange.createFromVersionSpec;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -41,18 +40,23 @@ public class DefaultVersionParser implements VersionParser {
     private static final String SNAPSHOT = "SNAPSHOT";
     private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$");
 
+    private final VersionScheme versionScheme;
+
+    @Inject
+    public DefaultVersionParser(VersionScheme versionScheme) {
+        this.versionScheme = nonNull(versionScheme, "versionScheme");
+    }
+
     @Override
     public Version parseVersion(String version) {
-        return new DefaultVersion(new DefaultArtifactVersion(nonNull(version, "version")));
+        nonNull(version, "version");
+        return new DefaultVersion(versionScheme, version);
     }
 
     @Override
     public VersionRange parseVersionRange(String range) {
-        try {
-            return new DefaultVersionRange(createFromVersionSpec(nonNull(range, "version")));
-        } catch (InvalidVersionSpecificationException e) {
-            throw new VersionParserException("Unable to parse version range: " + range, e);
-        }
+        nonNull(range, "range");
+        return new DefaultVersionRange(versionScheme, range);
     }
 
     @Override
@@ -65,10 +69,16 @@ public class DefaultVersionParser implements VersionParser {
     }
 
     static class DefaultVersion implements Version {
-        private final ArtifactVersion delegate;
+        private final VersionScheme versionScheme;
+        private final org.eclipse.aether.version.Version delegate;
 
-        DefaultVersion(ArtifactVersion delegate) {
-            this.delegate = delegate;
+        DefaultVersion(VersionScheme versionScheme, String delegateValue) {
+            this.versionScheme = versionScheme;
+            try {
+                this.delegate = versionScheme.parseVersion(delegateValue);
+            } catch (InvalidVersionSpecificationException e) {
+                throw new VersionParserException("Unable to parse version: " + delegateValue, e);
+            }
         }
 
         @Override
@@ -76,7 +86,7 @@ public class DefaultVersionParser implements VersionParser {
             if (o instanceof DefaultVersion) {
                 return delegate.compareTo(((DefaultVersion) o).delegate);
             } else {
-                return delegate.compareTo(new DefaultArtifactVersion(o.toString()));
+                return compareTo(new DefaultVersion(versionScheme, o.toString()));
             }
         }
 
@@ -109,10 +119,16 @@ public class DefaultVersionParser implements VersionParser {
     }
 
     static class DefaultVersionRange implements VersionRange {
-        private final org.apache.maven.artifact.versioning.VersionRange delegate;
+        private final VersionScheme versionScheme;
+        private final org.eclipse.aether.version.VersionRange delegate;
 
-        DefaultVersionRange(org.apache.maven.artifact.versioning.VersionRange delegate) {
-            this.delegate = delegate;
+        DefaultVersionRange(VersionScheme versionScheme, String delegateValue) {
+            this.versionScheme = versionScheme;
+            try {
+                this.delegate = versionScheme.parseVersionRange(delegateValue);
+            } catch (InvalidVersionSpecificationException e) {
+                throw new VersionParserException("Unable to parse version range: " + delegateValue, e);
+            }
         }
 
         @Override
@@ -120,7 +136,7 @@ public class DefaultVersionParser implements VersionParser {
             if (version instanceof DefaultVersion) {
                 return delegate.containsVersion(((DefaultVersion) version).delegate);
             } else {
-                return delegate.containsVersion(new DefaultArtifactVersion(version.toString()));
+                return contains(new DefaultVersion(versionScheme, version.toString()));
             }
         }
 
