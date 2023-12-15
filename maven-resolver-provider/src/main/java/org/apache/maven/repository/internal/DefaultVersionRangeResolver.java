@@ -20,6 +20,7 @@ package org.apache.maven.repository.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.io.InputStream;
@@ -53,11 +54,7 @@ import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
-import org.eclipse.aether.spi.version.VersionSchemeSelector;
-import org.eclipse.aether.version.InvalidVersionSpecificationException;
-import org.eclipse.aether.version.Version;
-import org.eclipse.aether.version.VersionConstraint;
-import org.eclipse.aether.version.VersionRange;
+import org.eclipse.aether.version.*;
 
 /**
  */
@@ -70,20 +67,20 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
     private final MetadataResolver metadataResolver;
     private final SyncContextFactory syncContextFactory;
     private final RepositoryEventDispatcher repositoryEventDispatcher;
-    private final VersionSchemeSelector versionSchemeSelector;
+    private final Provider<VersionScheme> versionSchemeProvider;
 
     @Inject
     public DefaultVersionRangeResolver(
             MetadataResolver metadataResolver,
             SyncContextFactory syncContextFactory,
             RepositoryEventDispatcher repositoryEventDispatcher,
-            VersionSchemeSelector versionSchemeSelector) {
+            Provider<VersionScheme> versionSchemeProvider) {
         this.metadataResolver = Objects.requireNonNull(metadataResolver, "metadataResolver cannot be null");
         this.syncContextFactory = Objects.requireNonNull(syncContextFactory, "syncContextFactory cannot be null");
         this.repositoryEventDispatcher =
                 Objects.requireNonNull(repositoryEventDispatcher, "repositoryEventDispatcher cannot be null");
-        this.versionSchemeSelector =
-                Objects.requireNonNull(versionSchemeSelector, "versionSchemeSelector cannot be null");
+        this.versionSchemeProvider =
+                Objects.requireNonNull(versionSchemeProvider, "versionSchemeProvider cannot be null");
     }
 
     @Override
@@ -93,8 +90,8 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
 
         VersionConstraint versionConstraint;
         try {
-            versionConstraint = versionSchemeSelector
-                    .selectVersionScheme(session)
+            versionConstraint = versionSchemeProvider
+                    .get()
                     .parseVersionConstraint(request.getArtifact().getVersion());
         } catch (InvalidVersionSpecificationException e) {
             result.addException(e);
@@ -116,9 +113,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                 List<Version> versions = new ArrayList<>();
                 for (Map.Entry<String, ArtifactRepository> v : versionIndex.entrySet()) {
                     try {
-                        Version ver = versionSchemeSelector
-                                .selectVersionScheme(session)
-                                .parseVersion(v.getKey());
+                        Version ver = versionSchemeProvider.get().parseVersion(v.getKey());
                         if (versionConstraint.containsVersion(ver)) {
                             versions.add(ver);
                             result.setRepository(ver, v.getValue());

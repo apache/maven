@@ -20,15 +20,15 @@ package org.apache.maven.repository.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
-import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionParserException;
+import org.apache.maven.model.version.VersionParser;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.VersionScheme;
 
@@ -37,35 +37,23 @@ import static java.util.Objects.requireNonNull;
 @Named
 @Singleton
 public class DefaultVersionParser implements VersionParser {
-    private static final String SNAPSHOT = "SNAPSHOT";
-    private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$");
-
-    private final VersionScheme versionScheme;
+    private final Provider<VersionScheme> versionSchemeProvider;
 
     @Inject
-    public DefaultVersionParser(VersionScheme versionScheme) {
-        this.versionScheme = requireNonNull(versionScheme, "versionScheme");
+    public DefaultVersionParser(Provider<VersionScheme> versionSchemeProvider) {
+        this.versionSchemeProvider = requireNonNull(versionSchemeProvider, "versionSchemeProvider");
     }
 
     @Override
     public Version parseVersion(String version) {
         requireNonNull(version, "version");
-        return new DefaultVersion(versionScheme, version);
+        return new DefaultVersion(versionSchemeProvider.get(), version);
     }
 
     @Override
     public VersionRange parseVersionRange(String range) {
         requireNonNull(range, "range");
-        return new DefaultVersionRange(versionScheme, range);
-    }
-
-    @Override
-    public boolean isSnapshot(String version) {
-        return checkSnapshot(version);
-    }
-
-    public static boolean checkSnapshot(String version) {
-        return version.endsWith(SNAPSHOT) || SNAPSHOT_TIMESTAMP.matcher(version).matches();
+        return new DefaultVersionRange(versionSchemeProvider.get(), range);
     }
 
     static class DefaultVersion implements Version {

@@ -76,8 +76,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.repository.WorkspaceReader;
-import org.eclipse.aether.spi.version.VersionSchemeSelector;
-import org.eclipse.aether.version.VersionScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
@@ -115,8 +113,6 @@ public class DefaultMaven implements Maven {
 
     private final DefaultSessionFactory defaultSessionFactory;
 
-    private final VersionSchemeSelector versionSchemeSelector;
-
     private final ProjectSelector projectSelector;
 
     @Inject
@@ -133,8 +129,7 @@ public class DefaultMaven implements Maven {
             BuildResumptionAnalyzer buildResumptionAnalyzer,
             BuildResumptionDataRepository buildResumptionDataRepository,
             SuperPomProvider superPomProvider,
-            DefaultSessionFactory defaultSessionFactory,
-            VersionSchemeSelector versionSchemeSelector) {
+            DefaultSessionFactory defaultSessionFactory) {
         this.projectBuilder = projectBuilder;
         this.lifecycleStarter = lifecycleStarter;
         this.container = container;
@@ -147,7 +142,6 @@ public class DefaultMaven implements Maven {
         this.buildResumptionDataRepository = buildResumptionDataRepository;
         this.superPomProvider = superPomProvider;
         this.defaultSessionFactory = defaultSessionFactory;
-        this.versionSchemeSelector = versionSchemeSelector;
         this.projectSelector = new ProjectSelector(); // if necessary switch to DI
     }
 
@@ -228,8 +222,6 @@ public class DefaultMaven implements Maven {
             sessionScope.seed(MavenSession.class, session);
             sessionScope.seed(Session.class, session.getSession());
             sessionScope.seed(InternalSession.class, InternalSession.from(session.getSession()));
-            sessionScope.seed(
-                    VersionScheme.class, versionSchemeSelector.selectVersionScheme(session.getRepositorySession()));
 
             legacySupport.setSession(session);
 

@@ -20,6 +20,7 @@ package org.apache.maven.plugin.version.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.io.IOException;
@@ -57,9 +58,9 @@ import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
-import org.eclipse.aether.spi.version.VersionSchemeSelector;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
+import org.eclipse.aether.version.VersionScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,18 +80,18 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     private final RepositorySystem repositorySystem;
     private final MetadataReader metadataReader;
     private final MavenPluginManager pluginManager;
-    private final VersionSchemeSelector versionSchemeSelector;
+    private final Provider<VersionScheme> versionSchemeProvider;
 
     @Inject
     public DefaultPluginVersionResolver(
             RepositorySystem repositorySystem,
             MetadataReader metadataReader,
             MavenPluginManager pluginManager,
-            VersionSchemeSelector versionSchemeSelector) {
+            Provider<VersionScheme> versionSchemeProvider) {
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
         this.pluginManager = pluginManager;
-        this.versionSchemeSelector = versionSchemeSelector;
+        this.versionSchemeProvider = versionSchemeProvider;
     }
 
     @Override
@@ -194,9 +195,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
             for (String ver : versions.versions.keySet()) {
                 try {
-                    Version v = versionSchemeSelector
-                            .selectVersionScheme(request.getRepositorySession())
-                            .parseVersion(ver);
+                    Version v = versionSchemeProvider.get().parseVersion(ver);
 
                     if (ver.endsWith("-SNAPSHOT")) {
                         snapshots.add(v);
