@@ -20,7 +20,9 @@ package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -32,8 +34,11 @@ public interface DependencyResolverResult extends DependencyCollectorResult {
      * The ordered list of the flattened dependency nodes.
      */
     @Nonnull
-    List<Node> getDependencies();
+    List<Node> getNodes();
 
     @Nonnull
     List<Path> getPaths();
+
+    @Nonnull
+    Map<Dependency, Path> getDependencies();
 }

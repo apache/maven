@@ -51,7 +51,7 @@ class MavenSimpleLoggerTest {
 
         Class<?> testClass = testInfo.getTestClass().get();
         String testMethodName = testInfo.getTestMethod().get().getName();
-        String testClassStackTraceLinePattern = "at " + testClass.getName() + "." + testMethodName + " \\("
+        String testClassStackTraceLinePattern = "at " + testClass.getName() + "." + testMethodName + "\\("
                 + testClass.getSimpleName() + ".java:\\d+\\)";
         List<String> expectedLines = Arrays.asList(
                 "java.lang.RuntimeException: top-level",
