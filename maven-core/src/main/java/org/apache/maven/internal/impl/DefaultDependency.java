@@ -87,6 +87,11 @@ public class DefaultDependency implements Dependency {
     }
 
     @Override
+    public Version getBaseVersion() {
+        return session.parseVersion(dependency.getArtifact().getBaseVersion());
+    }
+
+    @Override
     public String getExtension() {
         return dependency.getArtifact().getExtension();
     }
