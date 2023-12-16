@@ -60,7 +60,7 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
                         relocation.getArtifactId(),
                         relocation.getVersion(),
                         relocation.getMessage());
-                LOGGER.warn(
+                LOGGER.debug(
                         "The artifact {} has been relocated to {}: {}",
                         request.getArtifact(),
                         result,

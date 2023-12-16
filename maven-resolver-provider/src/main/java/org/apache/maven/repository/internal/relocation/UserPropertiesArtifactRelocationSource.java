@@ -66,7 +66,7 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
                         isAny(relocation.target.getArtifactId()) ? null : relocation.target.getArtifactId(),
                         isAny(relocation.target.getVersion()) ? null : relocation.target.getVersion(),
                         relocation.global ? "User global relocation" : "User project relocation");
-                LOGGER.warn(
+                LOGGER.debug(
                         "The artifact {} has been relocated to {}: {}",
                         request.getArtifact(),
                         result,
