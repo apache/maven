@@ -56,7 +56,7 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
     @Override
     public Artifact relocatedTarget(RepositorySystemSession session, ArtifactDescriptorRequest request, Model model) {
         Relocations relocations = (Relocations) session.getData()
-                .computeIfAbsent(getClass().getName() + ".relocations", () -> readRelocations(session));
+                .computeIfAbsent(getClass().getName() + ".relocations", () -> parseRelocations(session));
         if (relocations != null) {
             Relocation relocation = relocations.getRelocation(request.getArtifact());
             if (relocation != null && (isProjectContext(request.getRequestContext()) || relocation.global)) {
@@ -135,7 +135,7 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
         }
     }
 
-    private Relocations readRelocations(RepositorySystemSession session) {
+    private Relocations parseRelocations(RepositorySystemSession session) {
         String relocationsEntries = (String) session.getConfigProperties().get(CONFIG_PROP_RELOCATIONS_ENTRIES);
         if (relocationsEntries == null) {
             return null;

@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Relocation source from standard distribution management. This is the "one and only" relocation implementation that
  * existed in Maven 3 land, uses POM distributionManagement/relocation.
+ * <p>
+ * Note: this component should kick-in last regarding relocations.
  *
  * @since 4.0.0
  */
@@ -45,6 +47,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("checkstyle:MagicNumber")
 public final class DistributionManagementArtifactRelocationSource implements MavenArtifactRelocationSource {
     private static final Logger LOGGER = LoggerFactory.getLogger(DistributionManagementArtifactRelocationSource.class);
+
     @Override
     public Artifact relocatedTarget(RepositorySystemSession session, ArtifactDescriptorRequest request, Model model) {
         DistributionManagement distMgmt = model.getDistributionManagement();
