@@ -75,6 +75,11 @@ public class DefaultArtifact implements Artifact {
         return session.parseVersion(artifact.getVersion());
     }
 
+    @Override
+    public Version getBaseVersion() {
+        return session.parseVersion(artifact.getBaseVersion());
+    }
+
     @Nonnull
     @Override
     public String getExtension() {
