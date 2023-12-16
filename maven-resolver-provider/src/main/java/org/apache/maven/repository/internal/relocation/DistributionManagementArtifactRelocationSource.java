@@ -30,6 +30,8 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.sisu.Priority;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Relocation source from standard distribution management. This is the "one and only" relocation implementation that
@@ -42,18 +44,25 @@ import org.eclipse.sisu.Priority;
 @Priority(5)
 @SuppressWarnings("checkstyle:MagicNumber")
 public final class DistributionManagementArtifactRelocationSource implements MavenArtifactRelocationSource {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DistributionManagementArtifactRelocationSource.class);
     @Override
     public Artifact relocatedTarget(RepositorySystemSession session, ArtifactDescriptorRequest request, Model model) {
         DistributionManagement distMgmt = model.getDistributionManagement();
         if (distMgmt != null) {
             Relocation relocation = distMgmt.getRelocation();
             if (relocation != null) {
-                return new RelocatedArtifact(
+                Artifact result = new RelocatedArtifact(
                         request.getArtifact(),
                         relocation.getGroupId(),
                         relocation.getArtifactId(),
                         relocation.getVersion(),
                         relocation.getMessage());
+                LOGGER.warn(
+                        "The artifact {} has been relocated to {}: {}",
+                        request.getArtifact(),
+                        result,
+                        relocation.getMessage());
+                return result;
             }
         }
         return null;
