@@ -18,8 +18,6 @@
  */
 package org.apache.maven.project;
 
-import javax.inject.Inject;
-
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -33,7 +31,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
@@ -41,9 +38,6 @@ import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource;
-import org.apache.maven.session.scope.internal.SessionScope;
-import org.eclipse.aether.RepositorySystemSession;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -60,24 +54,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
-    @Inject
-    SessionScope sessionScope;
-
-    @BeforeEach
-    public void setUp() {
-        RepositorySystemSession repositorySystemSession = mock(RepositorySystemSession.class);
-        when(repositorySystemSession.getConfigProperties()).thenReturn(Collections.emptyMap());
-        InternalSession internalSession = mock(InternalSession.class);
-        when(internalSession.getSession()).thenReturn(repositorySystemSession);
-
-        sessionScope.enter();
-        sessionScope.seed(InternalSession.class, internalSession);
-    }
-
     @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/project-builder";

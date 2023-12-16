@@ -18,8 +18,6 @@
  */
 package org.apache.maven.project;
 
-import javax.inject.Inject;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -27,19 +25,15 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.apache.maven.session.scope.internal.SessionScope;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
@@ -48,8 +42,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Test cases for the project {@code ModelResolver} implementation.
@@ -58,18 +50,11 @@ import static org.mockito.Mockito.when;
  */
 class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
 
-    @Inject
-    SessionScope sessionScope;
-
-    @BeforeEach
-    public void setUp() {
-        RepositorySystemSession repositorySystemSession = mock(RepositorySystemSession.class);
-        when(repositorySystemSession.getConfigProperties()).thenReturn(Collections.emptyMap());
-        InternalSession internalSession = mock(InternalSession.class);
-        when(internalSession.getSession()).thenReturn(repositorySystemSession);
-
-        sessionScope.enter();
-        sessionScope.seed(InternalSession.class, internalSession);
+    /**
+     * Creates a new {@code ProjectModelResolverTest} instance.
+     */
+    public ProjectModelResolverTest() {
+        super();
     }
 
     @Test

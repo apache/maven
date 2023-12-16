@@ -20,7 +20,6 @@ package org.apache.maven.plugin;
 
 import javax.inject.Inject;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
@@ -28,43 +27,22 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.eclipse.aether.RepositorySystemSession;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private DefaultBuildPluginManager pluginManager;
 
-    @Inject
-    SessionScope sessionScope;
-
-    @BeforeEach
-    public void setUp() {
-        RepositorySystemSession repositorySystemSession = mock(RepositorySystemSession.class);
-        when(repositorySystemSession.getConfigProperties()).thenReturn(Collections.emptyMap());
-        InternalSession internalSession = mock(InternalSession.class);
-        when(internalSession.getSession()).thenReturn(repositorySystemSession);
-
-        sessionScope.enter();
-        sessionScope.seed(InternalSession.class, internalSession);
-    }
-
-    @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/plugin-manager";
     }
