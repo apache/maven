@@ -20,16 +20,11 @@ package org.apache.maven.plugin.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.eclipse.aether.version.InvalidVersionSpecificationException;
-import org.eclipse.aether.version.Version;
-import org.eclipse.aether.version.VersionConstraint;
-import org.eclipse.aether.version.VersionScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,15 +32,12 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class MavenPluginMavenPrerequisiteChecker implements MavenPluginPrerequisitesChecker {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private final RuntimeInformation runtimeInformation;
-    private final Provider<VersionScheme> versionSchemeProvider;
 
     @Inject
-    public MavenPluginMavenPrerequisiteChecker(
-            RuntimeInformation runtimeInformation, Provider<VersionScheme> versionSchemeProvider) {
+    public MavenPluginMavenPrerequisiteChecker(RuntimeInformation runtimeInformation) {
+        super();
         this.runtimeInformation = runtimeInformation;
-        this.versionSchemeProvider = versionSchemeProvider;
     }
 
     @Override
@@ -56,34 +48,15 @@ public class MavenPluginMavenPrerequisiteChecker implements MavenPluginPrerequis
                 requiredMavenVersion == null || requiredMavenVersion.trim().isEmpty();
 
         if (!isBlankVersion) {
-            VersionScheme versionScheme = versionSchemeProvider.get();
-            VersionConstraint constraint;
+            boolean isRequirementMet = false;
             try {
-                constraint = versionScheme.parseVersionConstraint(requiredMavenVersion);
-            } catch (InvalidVersionSpecificationException e) {
+                isRequirementMet = runtimeInformation.isMavenVersion(requiredMavenVersion);
+            } catch (IllegalArgumentException e) {
                 logger.warn(
                         "Could not verify plugin's Maven prerequisite as an invalid version is given in "
                                 + requiredMavenVersion,
                         e);
                 return;
-            }
-
-            Version current;
-            try {
-                String mavenVersion = runtimeInformation.getMavenVersion();
-                if (mavenVersion == null || mavenVersion.isEmpty()) {
-                    throw new IllegalArgumentException("Could not determine current Maven version");
-                }
-                current = versionScheme.parseVersion(mavenVersion);
-            } catch (InvalidVersionSpecificationException e) {
-                throw new IllegalStateException("Could not parse current Maven version: " + e.getMessage(), e);
-            }
-
-            boolean isRequirementMet;
-            if (constraint.getRange() == null) {
-                isRequirementMet = constraint.getVersion().compareTo(current) <= 0;
-            } else {
-                isRequirementMet = constraint.containsVersion(current);
             }
             if (!isRequirementMet) {
                 throw new IllegalStateException("Required Maven version " + requiredMavenVersion

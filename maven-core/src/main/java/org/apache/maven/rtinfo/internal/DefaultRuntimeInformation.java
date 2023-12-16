@@ -20,6 +20,7 @@ package org.apache.maven.rtinfo.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.io.IOException;
@@ -28,7 +29,6 @@ import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -44,13 +44,13 @@ import org.slf4j.LoggerFactory;
 public class DefaultRuntimeInformation implements RuntimeInformation {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Deprecated
-    private final VersionScheme versionScheme = new GenericVersionScheme();
+    private final Provider<VersionScheme> versionSchemeProvider;
 
     private final String mavenVersion;
 
     @Inject
-    public DefaultRuntimeInformation() {
+    public DefaultRuntimeInformation(Provider<VersionScheme> versionSchemeProvider) {
+        this.versionSchemeProvider = versionSchemeProvider;
         this.mavenVersion = loadMavenVersion();
     }
 
@@ -88,13 +88,13 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
         }
     }
 
-    @Deprecated
     @Override
     public boolean isMavenVersion(String versionRange) {
         if (Objects.requireNonNull(versionRange, "versionRange cannot be null").isEmpty()) {
             throw new IllegalArgumentException("versionRange cannot be empty");
         }
 
+        VersionScheme versionScheme = versionSchemeProvider.get();
         VersionConstraint constraint;
         try {
             constraint = versionScheme.parseVersionConstraint(versionRange);
