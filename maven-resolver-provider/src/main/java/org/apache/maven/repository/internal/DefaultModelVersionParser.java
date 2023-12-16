@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.repository.internal.util;
+package org.apache.maven.repository.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,11 +36,11 @@ import static java.util.Objects.requireNonNull;
 
 @Named
 @Singleton
-public class TestVersionParser implements VersionParser {
+public class DefaultModelVersionParser implements VersionParser {
     private final Provider<VersionScheme> versionSchemeProvider;
 
     @Inject
-    public TestVersionParser(Provider<VersionScheme> versionSchemeProvider) {
+    public DefaultModelVersionParser(Provider<VersionScheme> versionSchemeProvider) {
         this.versionSchemeProvider = requireNonNull(versionSchemeProvider, "versionSchemeProvider");
     }
 
