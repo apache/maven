@@ -23,10 +23,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.eclipse.aether.spi.version.VersionSchemeSelector;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -35,15 +33,11 @@ import org.eclipse.aether.version.VersionScheme;
 @Named
 @Singleton
 public class MavenPluginJavaPrerequisiteChecker implements MavenPluginPrerequisitesChecker {
-
-    private final Provider<InternalSession> internalSessionProvider;
-    private final VersionSchemeSelector versionSchemeSelector;
+    private final Provider<VersionScheme> versionSchemeProvider;
 
     @Inject
-    public MavenPluginJavaPrerequisiteChecker(
-            Provider<InternalSession> internalSessionProvider, VersionSchemeSelector versionSchemeSelector) {
-        this.internalSessionProvider = internalSessionProvider;
-        this.versionSchemeSelector = versionSchemeSelector;
+    public MavenPluginJavaPrerequisiteChecker(Provider<VersionScheme> versionSchemeProvider) {
+        this.versionSchemeProvider = versionSchemeProvider;
     }
 
     @Override
@@ -59,8 +53,7 @@ public class MavenPluginJavaPrerequisiteChecker implements MavenPluginPrerequisi
     }
 
     boolean matchesVersion(String requiredVersion, String currentVersion) {
-        VersionScheme versionScheme = versionSchemeSelector.selectVersionScheme(
-                internalSessionProvider.get().getSession());
+        VersionScheme versionScheme = versionSchemeProvider.get();
         VersionConstraint constraint;
         try {
             constraint = versionScheme.parseVersionConstraint(requiredVersion);

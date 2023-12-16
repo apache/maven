@@ -23,11 +23,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.eclipse.aether.spi.version.VersionSchemeSelector;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -41,17 +39,13 @@ public class MavenPluginMavenPrerequisiteChecker implements MavenPluginPrerequis
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final RuntimeInformation runtimeInformation;
-    private final Provider<InternalSession> internalSessionProvider;
-    private final VersionSchemeSelector versionSchemeSelector;
+    private final Provider<VersionScheme> versionSchemeProvider;
 
     @Inject
     public MavenPluginMavenPrerequisiteChecker(
-            RuntimeInformation runtimeInformation,
-            Provider<InternalSession> internalSessionProvider,
-            VersionSchemeSelector versionSchemeSelector) {
+            RuntimeInformation runtimeInformation, Provider<VersionScheme> versionSchemeProvider) {
         this.runtimeInformation = runtimeInformation;
-        this.internalSessionProvider = internalSessionProvider;
-        this.versionSchemeSelector = versionSchemeSelector;
+        this.versionSchemeProvider = versionSchemeProvider;
     }
 
     @Override
@@ -62,8 +56,7 @@ public class MavenPluginMavenPrerequisiteChecker implements MavenPluginPrerequis
                 requiredMavenVersion == null || requiredMavenVersion.trim().isEmpty();
 
         if (!isBlankVersion) {
-            VersionScheme versionScheme = versionSchemeSelector.selectVersionScheme(
-                    internalSessionProvider.get().getSession()); // this must happen within session
+            VersionScheme versionScheme = versionSchemeProvider.get();
             VersionConstraint constraint;
             try {
                 constraint = versionScheme.parseVersionConstraint(requiredMavenVersion);

@@ -30,15 +30,35 @@ import java.util.Set;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.session.scope.internal.SessionScope;
+import org.eclipse.aether.RepositorySystemSession;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private LifecycleDependencyResolver resolver;
+
+    @Inject
+    SessionScope sessionScope;
+
+    @BeforeEach
+    public void setUp() {
+        RepositorySystemSession repositorySystemSession = mock(RepositorySystemSession.class);
+        when(repositorySystemSession.getConfigProperties()).thenReturn(Collections.emptyMap());
+        InternalSession internalSession = mock(InternalSession.class);
+        when(internalSession.getSession()).thenReturn(repositorySystemSession);
+
+        sessionScope.enter();
+        sessionScope.seed(InternalSession.class, internalSession);
+    }
 
     @Override
     protected String getProjectsDirectory() {

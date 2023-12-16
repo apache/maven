@@ -18,30 +18,16 @@
  */
 package org.apache.maven.plugin.internal;
 
-import org.apache.maven.internal.impl.InternalSession;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.spi.version.VersionSchemeSelector;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class MavenPluginJavaPrerequisiteCheckerTest {
 
     @Test
     void testMatchesVersion() {
-        RepositorySystemSession repositorySystemSession = mock(RepositorySystemSession.class);
-        InternalSession internalSession = mock(InternalSession.class);
-        when(internalSession.getSession()).thenReturn(repositorySystemSession);
-        VersionSchemeSelector schemeSelector = mock(VersionSchemeSelector.class);
-        when(schemeSelector.selectVersionScheme(any(RepositorySystemSession.class)))
-                .thenReturn(new GenericVersionScheme());
-
-        MavenPluginJavaPrerequisiteChecker checker =
-                new MavenPluginJavaPrerequisiteChecker(() -> internalSession, schemeSelector);
+        MavenPluginJavaPrerequisiteChecker checker = new MavenPluginJavaPrerequisiteChecker(GenericVersionScheme::new);
         assertTrue(checker.matchesVersion("1.0", "1.8"));
         assertTrue(checker.matchesVersion("1.8", "9.0.1+11"));
         assertFalse(checker.matchesVersion("[1.0,2],[3,4]", "2.1"));

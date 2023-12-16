@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
+
     // ----------------------------------------------------------------------
     //
     // p4 inherits from p3

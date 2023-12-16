@@ -30,14 +30,13 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionParserException;
-import org.eclipse.aether.spi.version.VersionSchemeSelector;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.VersionScheme;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 /**
- * A wrapper class around a maven resolver artifact.
+ * A wrapper class around a resolver version that works as model version parser as well.
  */
 @Named
 @Singleton
@@ -45,32 +44,23 @@ public class DefaultVersionParser implements VersionParser, org.apache.maven.mod
     private static final String SNAPSHOT = "SNAPSHOT";
     private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$");
 
-    private final Provider<InternalSession> internalSessionProvider;
-    private final VersionSchemeSelector versionSchemeSelector;
+    private final Provider<VersionScheme> versionSchemeProvider;
 
     @Inject
-    public DefaultVersionParser(
-            Provider<InternalSession> internalSessionProvider, VersionSchemeSelector versionSchemeSelector) {
-        this.internalSessionProvider = nonNull(internalSessionProvider, "internalSessionProvider");
-        this.versionSchemeSelector = nonNull(versionSchemeSelector, "versionSchemeSelector");
+    public DefaultVersionParser(Provider<VersionScheme> versionSchemeProvider) {
+        this.versionSchemeProvider = nonNull(versionSchemeProvider, "versionSchemeProvider");
     }
 
     @Override
     public Version parseVersion(String version) {
         nonNull(version, "version");
-        return new DefaultVersion(
-                versionSchemeSelector.selectVersionScheme(
-                        internalSessionProvider.get().getSession()),
-                version);
+        return new DefaultVersion(versionSchemeProvider.get(), version);
     }
 
     @Override
     public VersionRange parseVersionRange(String range) {
         nonNull(range, "range");
-        return new DefaultVersionRange(
-                versionSchemeSelector.selectVersionScheme(
-                        internalSessionProvider.get().getSession()),
-                range);
+        return new DefaultVersionRange(versionSchemeProvider.get(), range);
     }
 
     @Override

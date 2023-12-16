@@ -18,15 +18,39 @@
  */
 package org.apache.maven.project.inheritance;
 
-import java.io.File;
+import javax.inject.Inject;
 
+import java.io.File;
+import java.util.Collections;
+
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.project.AbstractMavenProjectTestCase;
+import org.apache.maven.session.scope.internal.SessionScope;
+import org.eclipse.aether.RepositorySystemSession;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  */
 public abstract class AbstractProjectInheritanceTestCase extends AbstractMavenProjectTestCase {
+
+    @Inject
+    SessionScope sessionScope;
+
+    @BeforeEach
+    public void setUpSession() {
+        RepositorySystemSession repositorySystemSession = mock(RepositorySystemSession.class);
+        when(repositorySystemSession.getConfigProperties()).thenReturn(Collections.emptyMap());
+        InternalSession internalSession = mock(InternalSession.class);
+        when(internalSession.getSession()).thenReturn(repositorySystemSession);
+
+        sessionScope.enter();
+        sessionScope.seed(InternalSession.class, internalSession);
+    }
+
     protected String getTestSeries() {
         String className = getClass().getPackage().getName();
 

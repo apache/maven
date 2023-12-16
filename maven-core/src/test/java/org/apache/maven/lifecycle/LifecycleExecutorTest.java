@@ -35,6 +35,7 @@ import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.lifecycle.internal.DefaultLifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
@@ -47,6 +48,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.session.scope.internal.SessionScope;
+import org.eclipse.aether.RepositorySystemSession;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -55,6 +59,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     @Inject
@@ -68,6 +74,20 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
 
     @Inject
     private MojoDescriptorCreator mojoDescriptorCreator;
+
+    @Inject
+    SessionScope sessionScope;
+
+    @BeforeEach
+    public void setUp() {
+        RepositorySystemSession repositorySystemSession = mock(RepositorySystemSession.class);
+        when(repositorySystemSession.getConfigProperties()).thenReturn(Collections.emptyMap());
+        InternalSession internalSession = mock(InternalSession.class);
+        when(internalSession.getSession()).thenReturn(repositorySystemSession);
+
+        sessionScope.enter();
+        sessionScope.seed(InternalSession.class, internalSession);
+    }
 
     protected String getProjectsDirectory() {
         return "src/test/projects/lifecycle-executor";
