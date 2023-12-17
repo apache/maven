@@ -98,6 +98,7 @@ org.apache.maven.plugins:maven-install-plugin:3.0.1
 org.apache.maven.plugins:maven-jar-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-jar-plugin:3.3.0
 org.apache.maven.plugins:maven-javadoc-plugin:${stubPluginVersion}
+org.apache.maven.plugins:maven-javadoc-plugin:3.6.3
 org.apache.maven.plugins:maven-plugin-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-plugin-plugin:3.2
 org.apache.maven.plugins:maven-plugin-plugin:3.3
