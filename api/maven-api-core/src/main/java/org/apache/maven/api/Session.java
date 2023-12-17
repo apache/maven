@@ -194,14 +194,21 @@ public interface Session {
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
      *
-     * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String)
+     * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String, String, String, String)
      */
     ArtifactCoordinate createArtifactCoordinate(String groupId, String artifactId, String version, String extension);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
      *
-     * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String, String, String)
+     * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String)
+     */
+    ArtifactCoordinate createArtifactCoordinate(String coordString);
+
+    /**
+     * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
+     *
+     * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String, String, String, String, String, String)
      */
     ArtifactCoordinate createArtifactCoordinate(
             String groupId, String artifactId, String version, String classifier, String extension, String type);
@@ -209,7 +216,7 @@ public interface Session {
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
      *
-     * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String, String, String)
+     * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String, String, String, String, String, String)
      */
     ArtifactCoordinate createArtifactCoordinate(Artifact artifact);
 

@@ -43,6 +43,20 @@ public interface ArtifactCoordinateFactory extends Service {
     @Nonnull
     ArtifactCoordinate create(@Nonnull ArtifactCoordinateFactoryRequest request);
 
+    /**
+     * Creates a coordinate out of string that is formatted like:
+     * <pre>
+     * <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>
+     * </pre>
+     *
+     * @param session the session.
+     * @param coordinateString the string having "standard" coordinate.
+     * @return an {@code Artifact}, never {@code null}
+     * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
+     */
+    @Nonnull
+    ArtifactCoordinate create(@Nonnull Session session, @Nonnull String coordinateString);
+
     @Nonnull
     default ArtifactCoordinate create(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {

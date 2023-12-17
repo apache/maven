@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactCoordinateFactory;
 import org.apache.maven.api.services.ArtifactCoordinateFactoryRequest;
@@ -55,5 +56,13 @@ public class DefaultArtifactCoordinateFactory implements ArtifactCoordinateFacto
                         extension,
                         request.getVersion(),
                         type));
+    }
+
+    @Override
+    public ArtifactCoordinate create(Session session, String coordinateString) {
+        nonNull(coordinateString, "coordinateString");
+        InternalSession internalSession = InternalSession.from(session);
+        return new DefaultArtifactCoordinate(
+                internalSession, new org.eclipse.aether.artifact.DefaultArtifact(coordinateString));
     }
 }
