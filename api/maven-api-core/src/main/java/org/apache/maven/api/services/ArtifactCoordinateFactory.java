@@ -45,9 +45,7 @@ public interface ArtifactCoordinateFactory extends Service {
 
     /**
      * Creates a coordinate out of string that is formatted like:
-     * <pre>
-     * <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>
-     * </pre>
+     * {@code <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>}
      *
      * @param session the session.
      * @param coordinateString the string having "standard" coordinate.

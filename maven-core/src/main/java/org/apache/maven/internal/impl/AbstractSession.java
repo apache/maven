@@ -222,7 +222,7 @@ public abstract class AbstractSession implements InternalSession {
     /**
      * Shortcut for <code>getService(CoordinateFactory.class).create(...)</code>
      *
-     * @see ArtifactFactory#create(Session, String)
+     * @see ArtifactCoordinateFactory#create(Session, String)
      */
     @Override
     public ArtifactCoordinate createArtifactCoordinate(String coordString) {
