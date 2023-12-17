@@ -18,13 +18,13 @@
  */
 package org.apache.maven.internal.impl;
 
-import org.apache.maven.api.Version;
-import org.apache.maven.api.services.RuntimeInformation;
-import org.apache.maven.api.services.VersionParser;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.apache.maven.api.Version;
+import org.apache.maven.api.services.RuntimeInformation;
+import org.apache.maven.api.services.VersionParser;
 
 @Named
 @Singleton
@@ -32,7 +32,8 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
     private final Version runtimeVersion;
 
     @Inject
-    public DefaultRuntimeInformation(org.apache.maven.rtinfo.RuntimeInformation runtimeInformation, VersionParser versionParser) {
+    public DefaultRuntimeInformation(
+            org.apache.maven.rtinfo.RuntimeInformation runtimeInformation, VersionParser versionParser) {
         this.runtimeVersion = versionParser.parseVersion(runtimeInformation.getMavenVersion());
     }
 

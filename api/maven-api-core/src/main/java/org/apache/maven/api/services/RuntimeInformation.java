@@ -20,7 +20,6 @@ package org.apache.maven.api.services;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Version;
-import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
