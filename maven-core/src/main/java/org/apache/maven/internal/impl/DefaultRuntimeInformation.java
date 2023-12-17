@@ -37,7 +37,7 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
     }
 
     @Override
-    public Version runtimeVersion(String version) {
+    public Version runtimeVersion() {
         return runtimeVersion;
     }
 }

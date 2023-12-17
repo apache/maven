@@ -38,5 +38,5 @@ public interface RuntimeInformation extends Service {
      * @return the runtime version, never {@code null}
      */
     @Nonnull
-    Version runtimeVersion(@Nonnull String version);
+    Version runtimeVersion();
 }
