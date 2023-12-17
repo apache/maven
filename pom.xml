@@ -502,20 +502,6 @@ under the License.
   </dependencies>
   <!--bootstrap-end-comment-->
 
-  <!-- TODO: Is on vote, to be removed once out -->
-  <repositories>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>maven-2048</id>
-      <url>https://repository.apache.org/content/repositories/maven-2048</url>
-    </repository>
-  </repositories>
-
   <build>
     <pluginManagement>
       <plugins>
