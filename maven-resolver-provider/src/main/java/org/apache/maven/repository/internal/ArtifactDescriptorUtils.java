@@ -43,6 +43,17 @@ public class ArtifactDescriptorUtils {
         return pomArtifact;
     }
 
+    /**
+     * Creates POM artifact out of passed in artifact by dropping classifier (if exists) and rewriting extension to
+     * "pom". Unconditionally, unlike {@link #toPomArtifact(Artifact)} that does this only for artifacts without
+     * classifiers.
+     *
+     * @since 4.0.0
+     */
+    public static Artifact toPomArtifactUnconditionally(Artifact artifact) {
+        return new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), "pom", artifact.getVersion());
+    }
+
     public static RemoteRepository toRemoteRepository(Repository repository) {
         RemoteRepository.Builder builder =
                 new RemoteRepository.Builder(repository.getId(), repository.getLayout(), repository.getUrl());

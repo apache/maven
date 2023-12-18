@@ -26,7 +26,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ArtifactModelSource;
@@ -129,9 +128,9 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             throws ArtifactDescriptorException {
         RequestTrace trace = RequestTrace.newChild(request.getTrace(), request);
 
-        Set<String> visited = new LinkedHashSet<>();
+        LinkedHashSet<String> visited = new LinkedHashSet<>();
         for (Artifact a = request.getArtifact(); ; ) {
-            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact(a);
+            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifactUnconditionally(a);
             try {
                 VersionRequest versionRequest =
                         new VersionRequest(a, request.getRepositories(), request.getRequestContext());
@@ -239,13 +238,24 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
             Artifact relocatedArtifact = getRelocation(session, result, model);
             if (relocatedArtifact != null) {
-                result.addRelocation(a);
-                a = relocatedArtifact;
-                result.setArtifact(a);
+                if (withinSameGav(relocatedArtifact, a)) {
+                    result.setArtifact(relocatedArtifact);
+                    return model; // they share same model
+                } else {
+                    result.addRelocation(a);
+                    a = relocatedArtifact;
+                    result.setArtifact(a);
+                }
             } else {
                 return model;
             }
         }
+    }
+
+    private boolean withinSameGav(Artifact a1, Artifact a2) {
+        return Objects.equals(a1.getGroupId(), a2.getGroupId())
+                && Objects.equals(a1.getArtifactId(), a2.getArtifactId())
+                && Objects.equals(a1.getVersion(), a2.getVersion());
     }
 
     private Properties toProperties(Map<String, String> dominant, Map<String, String> recessive) {
