@@ -22,7 +22,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.ArtifactCoordinate;
-import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactCoordinateFactory;
 import org.apache.maven.api.services.ArtifactCoordinateFactoryRequest;
@@ -37,32 +36,30 @@ public class DefaultArtifactCoordinateFactory implements ArtifactCoordinateFacto
     public ArtifactCoordinate create(@Nonnull ArtifactCoordinateFactoryRequest request) {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
-        ArtifactType type = null;
-        if (request.getType() != null) {
-            type = session.getSession().getArtifactTypeRegistry().get(request.getType());
+        if (request.getCoordinateString() != null) {
+            return new DefaultArtifactCoordinate(
+                    session, new org.eclipse.aether.artifact.DefaultArtifact(request.getCoordinateString()));
+        } else {
+            ArtifactType type = null;
+            if (request.getType() != null) {
+                type = session.getSession().getArtifactTypeRegistry().get(request.getType());
+            }
+            String str1 = request.getClassifier();
+            String classifier = str1 != null && !str1.isEmpty()
+                    ? request.getClassifier()
+                    : type != null ? type.getClassifier() : "";
+            String str = request.getExtension();
+            String extension =
+                    str != null && !str.isEmpty() ? request.getExtension() : type != null ? type.getExtension() : "";
+            return new DefaultArtifactCoordinate(
+                    session,
+                    new org.eclipse.aether.artifact.DefaultArtifact(
+                            request.getGroupId(),
+                            request.getArtifactId(),
+                            classifier,
+                            extension,
+                            request.getVersion(),
+                            type));
         }
-        String str1 = request.getClassifier();
-        String classifier =
-                str1 != null && !str1.isEmpty() ? request.getClassifier() : type != null ? type.getClassifier() : "";
-        String str = request.getExtension();
-        String extension =
-                str != null && !str.isEmpty() ? request.getExtension() : type != null ? type.getExtension() : "";
-        return new DefaultArtifactCoordinate(
-                session,
-                new org.eclipse.aether.artifact.DefaultArtifact(
-                        request.getGroupId(),
-                        request.getArtifactId(),
-                        classifier,
-                        extension,
-                        request.getVersion(),
-                        type));
-    }
-
-    @Override
-    public ArtifactCoordinate create(Session session, String coordinateString) {
-        nonNull(coordinateString, "coordinateString");
-        InternalSession internalSession = InternalSession.from(session);
-        return new DefaultArtifactCoordinate(
-                internalSession, new org.eclipse.aether.artifact.DefaultArtifact(coordinateString));
     }
 }

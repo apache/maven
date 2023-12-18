@@ -53,7 +53,9 @@ public interface ArtifactCoordinateFactory extends Service {
      * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
      */
     @Nonnull
-    ArtifactCoordinate create(@Nonnull Session session, @Nonnull String coordinateString);
+    default ArtifactCoordinate create(@Nonnull Session session, @Nonnull String coordinateString) {
+        return create(ArtifactCoordinateFactoryRequest.build(session, coordinateString));
+    }
 
     @Nonnull
     default ArtifactCoordinate create(
