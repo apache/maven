@@ -18,15 +18,12 @@
  */
 package org.apache.maven.internal.impl;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.services.ArtifactCoordinateFactory;
 import org.apache.maven.api.services.DependencyCoordinateFactory;
 import org.apache.maven.api.services.DependencyCoordinateFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
