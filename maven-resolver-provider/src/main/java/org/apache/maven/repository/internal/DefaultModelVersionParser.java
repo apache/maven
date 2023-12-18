@@ -20,7 +20,6 @@ package org.apache.maven.repository.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.util.Objects;
