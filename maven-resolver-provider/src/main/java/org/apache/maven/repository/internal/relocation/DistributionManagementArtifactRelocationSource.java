@@ -28,7 +28,7 @@ import org.apache.maven.repository.internal.MavenArtifactRelocationSource;
 import org.apache.maven.repository.internal.RelocatedArtifact;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.sisu.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,13 +49,14 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
     private static final Logger LOGGER = LoggerFactory.getLogger(DistributionManagementArtifactRelocationSource.class);
 
     @Override
-    public Artifact relocatedTarget(RepositorySystemSession session, ArtifactDescriptorRequest request, Model model) {
+    public Artifact relocatedTarget(
+            RepositorySystemSession session, ArtifactDescriptorResult artifactDescriptorResult, Model model) {
         DistributionManagement distMgmt = model.getDistributionManagement();
         if (distMgmt != null) {
             Relocation relocation = distMgmt.getRelocation();
             if (relocation != null) {
                 Artifact result = new RelocatedArtifact(
-                        request.getArtifact(),
+                        artifactDescriptorResult.getRequest().getArtifact(),
                         relocation.getGroupId(),
                         relocation.getArtifactId(),
                         null,
@@ -64,7 +65,7 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
                         relocation.getMessage());
                 LOGGER.debug(
                         "The artifact {} has been relocated to {}: {}",
-                        request.getArtifact(),
+                        artifactDescriptorResult.getRequest().getArtifact(),
                         result,
                         relocation.getMessage());
                 return result;

@@ -237,7 +237,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 throw new ArtifactDescriptorException(result);
             }
 
-            Artifact relocatedArtifact = getRelocation(session, request, model);
+            Artifact relocatedArtifact = getRelocation(session, result, model);
             if (relocatedArtifact != null) {
                 result.addRelocation(a);
                 a = relocatedArtifact;
@@ -259,10 +259,12 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         return props;
     }
 
-    private Artifact getRelocation(RepositorySystemSession session, ArtifactDescriptorRequest request, Model model) {
+    private Artifact getRelocation(
+            RepositorySystemSession session, ArtifactDescriptorResult artifactDescriptorResult, Model model)
+            throws ArtifactDescriptorException {
         Artifact result = null;
         for (MavenArtifactRelocationSource source : artifactRelocationSources.values()) {
-            result = source.relocatedTarget(session, request, model);
+            result = source.relocatedTarget(session, artifactDescriptorResult, model);
             if (result != null) {
                 break;
             }
