@@ -64,6 +64,8 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
                         request.getArtifact(),
                         isAny(relocation.target.getGroupId()) ? null : relocation.target.getGroupId(),
                         isAny(relocation.target.getArtifactId()) ? null : relocation.target.getArtifactId(),
+                        isAny(relocation.target.getClassifier()) ? null : relocation.target.getClassifier(),
+                        isAny(relocation.target.getExtension()) ? null : relocation.target.getExtension(),
                         isAny(relocation.target.getVersion()) ? null : relocation.target.getVersion(),
                         relocation.global ? "User global relocation" : "User project relocation");
                 LOGGER.debug(
@@ -98,7 +100,9 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
     private static Predicate<Artifact> artifactPredicate(Artifact artifact) {
         return a -> matches(artifact.getGroupId(), a.getGroupId())
                 && matches(artifact.getArtifactId(), a.getArtifactId())
-                && matches(artifact.getBaseVersion(), a.getBaseVersion());
+                && matches(artifact.getBaseVersion(), a.getBaseVersion())
+                && matches(artifact.getExtension(), a.getExtension())
+                && matches(artifact.getClassifier(), a.getClassifier());
     }
 
     private static class Relocation {
@@ -160,10 +164,10 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
                         if (parts.length < 1) {
                             throw new IllegalArgumentException("Unrecognized entry: " + l);
                         }
-                        Artifact s = new DefaultArtifact(parts[0]);
+                        Artifact s = parseArtifact(parts[0]);
                         Artifact t;
                         if (parts.length > 1) {
-                            t = new DefaultArtifact(parts[1]);
+                            t = parseArtifact(parts[1]);
                         } else {
                             t = new DefaultArtifact("org.apache.maven.banned:user-relocation:1.0");
                         }
@@ -173,5 +177,25 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
             LOGGER.info("Parsed {} user relocations", relocationList.size());
             return new Relocations(relocationList);
         }
+    }
+
+    private static Artifact parseArtifact(String coord) {
+        Artifact s;
+        String[] parts = coord.split(":");
+        switch (parts.length) {
+            case 3:
+                s = new DefaultArtifact(parts[0], parts[1], "*", "*", parts[2]);
+                break;
+            case 4:
+                s = new DefaultArtifact(parts[0], parts[1], "*", parts[2], parts[3]);
+                break;
+            case 5:
+                s = new DefaultArtifact(parts[0], parts[1], parts[2], parts[3], parts[4]);
+                break;
+            default:
+                throw new IllegalArgumentException("Bad artifact coordinates " + coord
+                        + ", expected format is <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>");
+        }
+        return s;
     }
 }

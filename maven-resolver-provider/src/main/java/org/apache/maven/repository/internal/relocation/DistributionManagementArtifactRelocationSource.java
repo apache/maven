@@ -58,6 +58,8 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
                         request.getArtifact(),
                         relocation.getGroupId(),
                         relocation.getArtifactId(),
+                        null,
+                        null,
                         relocation.getVersion(),
                         relocation.getMessage());
                 LOGGER.debug(
