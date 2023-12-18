@@ -20,6 +20,7 @@ package org.apache.maven.internal.transformation.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -29,7 +30,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import org.apache.maven.SessionScoped;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
@@ -72,11 +72,8 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
-import org.eclipse.sisu.Typed;
 
 @Named
-@SessionScoped
-@Typed
 class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private static final String BOM_PACKAGING = "bom";
 
@@ -135,7 +132,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
 
     // To break circular dependency
     @Inject
-    private RepositorySystem repositorySystem;
+    private Provider<RepositorySystem> repositorySystem;
 
     @Inject
     private RemoteRepositoryManager remoteRepositoryManager;
@@ -207,7 +204,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         request.setModelResolver(new ProjectModelResolver(
                 session,
                 new RequestTrace(null),
-                repositorySystem,
+                repositorySystem.get(),
                 remoteRepositoryManager,
                 project.getRemoteProjectRepositories(),
                 ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
