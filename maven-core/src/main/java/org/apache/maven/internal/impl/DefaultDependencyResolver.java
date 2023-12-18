@@ -48,9 +48,6 @@ import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
-import org.eclipse.aether.graph.DependencyVisitor;
-import org.eclipse.aether.util.graph.visitor.FilteringDependencyVisitor;
-import org.eclipse.aether.util.graph.visitor.PreorderDependencyNodeConsumerVisitor;
 
 import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.map;
@@ -63,16 +60,10 @@ public class DefaultDependencyResolver implements DependencyResolver {
     @Override
     public List<Node> flatten(Session s, Node node, ResolutionScope scope) throws DependencyResolverException {
         InternalSession session = InternalSession.from(s);
-
-        // TODO: v4: refactor with RepositorySystem#flattenDependencyNodes with resolver alpha-3
         DependencyNode root = cast(AbstractNode.class, node, "node").getDependencyNode();
-        List<DependencyNode> dependencies = new ArrayList<>();
-        DependencyVisitor builder = new PreorderDependencyNodeConsumerVisitor(dependencies::add);
-        DependencyFilter filter = getScopeDependencyFilter(scope);
-        DependencyVisitor visitor = new FilteringDependencyVisitor(builder, filter);
-        root.accept(visitor);
+        List<DependencyNode> dependencies = session.getRepositorySystem()
+                .flattenDependencyNodes(session.getSession(), root, getScopeDependencyFilter(scope));
         dependencies.remove(root);
-
         return map(dependencies, session::getNode);
     }
 
