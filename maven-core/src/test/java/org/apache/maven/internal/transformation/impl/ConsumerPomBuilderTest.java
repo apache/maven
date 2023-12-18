@@ -32,7 +32,9 @@ import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.internal.transformation.AbstractRepositoryTestCase;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -42,6 +44,13 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
     @Inject
     ConsumerPomBuilder builder;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        super.setUp();
+        SessionScope scope = container.lookup(SessionScope.class);
+        scope.enter();
+    }
 
     @Test
     void testTrivialConsumer() throws Exception {

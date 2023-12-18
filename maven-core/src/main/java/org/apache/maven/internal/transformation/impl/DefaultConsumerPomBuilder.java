@@ -20,7 +20,6 @@ package org.apache.maven.internal.transformation.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.apache.maven.SessionScoped;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
@@ -72,8 +72,11 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
+import org.eclipse.sisu.Typed;
 
 @Named
+@SessionScoped
+@Typed
 class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private static final String BOM_PACKAGING = "bom";
 
@@ -83,59 +86,59 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private ModelCacheFactory modelCacheFactory;
 
     @Inject
-    private Provider<ProfileInjector> profileInjector;
+    private ProfileInjector profileInjector;
 
     @Inject
-    private Provider<InheritanceAssembler> inheritanceAssembler;
+    private InheritanceAssembler inheritanceAssembler;
 
     @Inject
-    private Provider<DependencyManagementImporter> dependencyManagementImporter;
+    private DependencyManagementImporter dependencyManagementImporter;
 
     @Inject
-    private Provider<DependencyManagementInjector> dependencyManagementInjector;
+    private DependencyManagementInjector dependencyManagementInjector;
 
     @Inject
-    private Provider<LifecycleBindingsInjector> lifecycleBindingsInjector;
+    private LifecycleBindingsInjector lifecycleBindingsInjector;
 
     @Inject
-    private Provider<ModelInterpolator> modelInterpolator;
+    private ModelInterpolator modelInterpolator;
 
     @Inject
-    private Provider<ModelNormalizer> modelNormalizer;
+    private ModelNormalizer modelNormalizer;
 
     @Inject
-    private Provider<ModelPathTranslator> modelPathTranslator;
+    private ModelPathTranslator modelPathTranslator;
 
     @Inject
-    private Provider<ModelProcessor> modelProcessor;
+    private ModelProcessor modelProcessor;
 
     @Inject
-    private Provider<ModelUrlNormalizer> modelUrlNormalizer;
+    private ModelUrlNormalizer modelUrlNormalizer;
 
     @Inject
-    private Provider<ModelValidator> modelValidator;
+    private ModelValidator modelValidator;
 
     @Inject
-    private Provider<PluginConfigurationExpander> pluginConfigurationExpander;
+    private PluginConfigurationExpander pluginConfigurationExpander;
 
     @Inject
-    private Provider<PluginManagementInjector> pluginManagementInjector;
+    private PluginManagementInjector pluginManagementInjector;
 
     @Inject
-    private Provider<ReportConfigurationExpander> reportConfigurationExpander;
+    private ReportConfigurationExpander reportConfigurationExpander;
 
     @Inject
-    private Provider<SuperPomProvider> superPomProvider;
+    private SuperPomProvider superPomProvider;
 
     @Inject
-    private Provider<VersionParser> versionParser;
+    private VersionParser versionParser;
 
     // To break circular dependency
     @Inject
-    private Provider<RepositorySystem> repositorySystem;
+    private RepositorySystem repositorySystem;
 
     @Inject
-    private Provider<RemoteRepositoryManager> remoteRepositoryManager;
+    private RemoteRepositoryManager remoteRepositoryManager;
 
     @Override
     public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuildingException {
@@ -175,22 +178,22 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         DefaultModelBuilder modelBuilder = new DefaultModelBuilderFactory()
                 .setProfileSelector(customSelector)
                 // apply currently active ModelProcessor etc. to support extensions like jgitver
-                .setProfileInjector(profileInjector.get())
-                .setInheritanceAssembler(inheritanceAssembler.get())
-                .setDependencyManagementImporter(dependencyManagementImporter.get())
-                .setDependencyManagementInjector(dependencyManagementInjector.get())
-                .setLifecycleBindingsInjector(lifecycleBindingsInjector.get())
-                .setModelInterpolator(modelInterpolator.get())
-                .setModelNormalizer(modelNormalizer.get())
-                .setModelPathTranslator(modelPathTranslator.get())
-                .setModelProcessor(modelProcessor.get())
-                .setModelUrlNormalizer(modelUrlNormalizer.get())
-                .setModelValidator(modelValidator.get())
-                .setPluginConfigurationExpander(pluginConfigurationExpander.get())
-                .setPluginManagementInjector(pluginManagementInjector.get())
-                .setReportConfigurationExpander(reportConfigurationExpander.get())
-                .setSuperPomProvider(superPomProvider.get())
-                .setModelVersionParser(versionParser.get())
+                .setProfileInjector(profileInjector)
+                .setInheritanceAssembler(inheritanceAssembler)
+                .setDependencyManagementImporter(dependencyManagementImporter)
+                .setDependencyManagementInjector(dependencyManagementInjector)
+                .setLifecycleBindingsInjector(lifecycleBindingsInjector)
+                .setModelInterpolator(modelInterpolator)
+                .setModelNormalizer(modelNormalizer)
+                .setModelPathTranslator(modelPathTranslator)
+                .setModelProcessor(modelProcessor)
+                .setModelUrlNormalizer(modelUrlNormalizer)
+                .setModelValidator(modelValidator)
+                .setPluginConfigurationExpander(pluginConfigurationExpander)
+                .setPluginManagementInjector(pluginManagementInjector)
+                .setReportConfigurationExpander(reportConfigurationExpander)
+                .setSuperPomProvider(superPomProvider)
+                .setModelVersionParser(versionParser)
                 .newInstance();
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
         try {
@@ -204,8 +207,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         request.setModelResolver(new ProjectModelResolver(
                 session,
                 new RequestTrace(null),
-                repositorySystem.get(),
-                remoteRepositoryManager.get(),
+                repositorySystem,
+                remoteRepositoryManager,
                 project.getRemoteProjectRepositories(),
                 ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
                 null));
