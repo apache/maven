@@ -361,6 +361,12 @@ public class DefaultModelBuilderFactory {
             public VersionRange parseVersionRange(String range) {
                 throw new IllegalArgumentException("ranges not supported by this parser");
             }
+
+            @Override
+            public boolean isSnapshot(String version) {
+                requireNonNull(version, "version");
+                return version.endsWith("SNAPSHOT");
+            }
         };
     }
 

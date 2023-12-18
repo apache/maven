@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
@@ -36,6 +37,9 @@ import static java.util.Objects.requireNonNull;
 @Named
 @Singleton
 public class DefaultModelVersionParser implements VersionParser {
+    private static final String SNAPSHOT = "SNAPSHOT";
+    private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$");
+
     private final VersionScheme versionScheme;
 
     @Inject
@@ -53,6 +57,15 @@ public class DefaultModelVersionParser implements VersionParser {
     public VersionRange parseVersionRange(String range) {
         requireNonNull(range, "range");
         return new DefaultVersionRange(versionScheme, range);
+    }
+
+    @Override
+    public boolean isSnapshot(String version) {
+        return checkSnapshot(version);
+    }
+
+    public static boolean checkSnapshot(String version) {
+        return version.endsWith(SNAPSHOT) || SNAPSHOT_TIMESTAMP.matcher(version).matches();
     }
 
     static class DefaultVersion implements Version {

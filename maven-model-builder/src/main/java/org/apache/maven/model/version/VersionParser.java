@@ -51,4 +51,9 @@ public interface VersionParser {
      */
     @Nonnull
     VersionRange parseVersionRange(@Nonnull String range);
+
+    /**
+     * Checks whether a given artifact version is considered a {@code SNAPSHOT} or not.
+     */
+    boolean isSnapshot(@Nonnull String version);
 }
