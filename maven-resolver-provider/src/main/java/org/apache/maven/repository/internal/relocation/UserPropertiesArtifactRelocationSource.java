@@ -34,7 +34,8 @@ import org.apache.maven.repository.internal.RelocatedArtifact;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.sisu.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,15 +54,28 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
 
     private static final String CONFIG_PROP_RELOCATIONS_ENTRIES = "maven.relocations.entries";
 
+    private static final Artifact SENTINEL = new DefaultArtifact("org.apache.maven.banned:user-relocation:1.0");
+
     @Override
-    public Artifact relocatedTarget(RepositorySystemSession session, ArtifactDescriptorRequest request, Model model) {
+    public Artifact relocatedTarget(
+            RepositorySystemSession session, ArtifactDescriptorResult artifactDescriptorResult, Model model)
+            throws ArtifactDescriptorException {
         Relocations relocations = (Relocations) session.getData()
                 .computeIfAbsent(getClass().getName() + ".relocations", () -> parseRelocations(session));
         if (relocations != null) {
-            Relocation relocation = relocations.getRelocation(request.getArtifact());
-            if (relocation != null && (isProjectContext(request.getRequestContext()) || relocation.global)) {
+            Artifact original = artifactDescriptorResult.getRequest().getArtifact();
+            Relocation relocation = relocations.getRelocation(original);
+            if (relocation != null
+                    && (isProjectContext(artifactDescriptorResult.getRequest().getRequestContext())
+                            || relocation.global)) {
+                if (relocation.target == SENTINEL) {
+                    String message = "The artifact " + original + " has been banned from resolution: "
+                            + (relocation.global ? "User global ban" : "User project ban");
+                    LOGGER.debug(message);
+                    throw new ArtifactDescriptorException(artifactDescriptorResult, message);
+                }
                 Artifact result = new RelocatedArtifact(
-                        request.getArtifact(),
+                        original,
                         isAny(relocation.target.getGroupId()) ? null : relocation.target.getGroupId(),
                         isAny(relocation.target.getArtifactId()) ? null : relocation.target.getArtifactId(),
                         isAny(relocation.target.getClassifier()) ? null : relocation.target.getClassifier(),
@@ -70,7 +84,7 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
                         relocation.global ? "User global relocation" : "User project relocation");
                 LOGGER.debug(
                         "The artifact {} has been relocated to {}: {}",
-                        request.getArtifact(),
+                        original,
                         result,
                         relocation.global ? "User global relocation" : "User project relocation");
                 return result;
@@ -169,7 +183,7 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
                         if (parts.length > 1) {
                             t = parseArtifact(parts[1]);
                         } else {
-                            t = new DefaultArtifact("org.apache.maven.banned:user-relocation:1.0");
+                            t = SENTINEL;
                         }
                         return new Relocation(global, s, t);
                     })
