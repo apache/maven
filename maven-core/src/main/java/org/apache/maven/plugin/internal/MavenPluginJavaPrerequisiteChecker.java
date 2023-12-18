@@ -32,11 +32,10 @@ import org.eclipse.aether.version.VersionScheme;
 @Named
 @Singleton
 public class MavenPluginJavaPrerequisiteChecker implements MavenPluginPrerequisitesChecker {
-
     private final VersionScheme versionScheme;
 
     @Inject
-    public MavenPluginJavaPrerequisiteChecker(final VersionScheme versionScheme) {
+    public MavenPluginJavaPrerequisiteChecker(VersionScheme versionScheme) {
         this.versionScheme = versionScheme;
     }
 

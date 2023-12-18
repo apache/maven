@@ -27,7 +27,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
  * Service responsible for validating plugin configuration.
  *
  */
-interface MavenPluginConfigurationValidator {
+public interface MavenPluginConfigurationValidator {
     /**
      * Checks mojo configuration issues.
      */

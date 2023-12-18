@@ -20,6 +20,7 @@ package org.apache.maven.internal.transformation.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -62,35 +63,82 @@ import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.validation.ModelValidator;
+import org.apache.maven.model.version.VersionParser;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectModelResolver;
 import org.apache.maven.repository.internal.ModelCacheFactory;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Named
 class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConsumerPomBuilder.class);
-
     private static final String BOM_PACKAGING = "bom";
 
     public static final String POM_PACKAGING = "pom";
 
     @Inject
-    PlexusContainer container;
+    private ModelCacheFactory modelCacheFactory;
 
     @Inject
-    ModelCacheFactory modelCacheFactory;
+    private ProfileInjector profileInjector;
 
-    public Model build(RepositorySystemSession session, MavenProject project, Path src)
-            throws ModelBuildingException, ComponentLookupException {
+    @Inject
+    private InheritanceAssembler inheritanceAssembler;
+
+    @Inject
+    private DependencyManagementImporter dependencyManagementImporter;
+
+    @Inject
+    private DependencyManagementInjector dependencyManagementInjector;
+
+    @Inject
+    private LifecycleBindingsInjector lifecycleBindingsInjector;
+
+    @Inject
+    private ModelInterpolator modelInterpolator;
+
+    @Inject
+    private ModelNormalizer modelNormalizer;
+
+    @Inject
+    private ModelPathTranslator modelPathTranslator;
+
+    @Inject
+    private ModelProcessor modelProcessor;
+
+    @Inject
+    private ModelUrlNormalizer modelUrlNormalizer;
+
+    @Inject
+    private ModelValidator modelValidator;
+
+    @Inject
+    private PluginConfigurationExpander pluginConfigurationExpander;
+
+    @Inject
+    private PluginManagementInjector pluginManagementInjector;
+
+    @Inject
+    private ReportConfigurationExpander reportConfigurationExpander;
+
+    @Inject
+    private SuperPomProvider superPomProvider;
+
+    @Inject
+    private VersionParser versionParser;
+
+    // To break circular dependency
+    @Inject
+    private Provider<RepositorySystem> repositorySystem;
+
+    @Inject
+    private RemoteRepositoryManager remoteRepositoryManager;
+
+    @Override
+    public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuildingException {
         Model model = project.getModel().getDelegate();
         String packaging = model.getPackaging();
         String originalPackaging = project.getOriginalModel().getPackaging();
@@ -102,21 +150,21 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     }
 
     protected Model buildPom(RepositorySystemSession session, MavenProject project, Path src)
-            throws ModelBuildingException, ComponentLookupException {
+            throws ModelBuildingException {
         ModelBuildingResult result = buildModel(session, project, src);
         Model model = result.getRawModel().getDelegate();
         return transform(model, project);
     }
 
     protected Model buildNonPom(RepositorySystemSession session, MavenProject project, Path src)
-            throws ModelBuildingException, ComponentLookupException {
+            throws ModelBuildingException {
         ModelBuildingResult result = buildModel(session, project, src);
         Model model = result.getEffectiveModel().getDelegate();
         return transform(model, project);
     }
 
     private ModelBuildingResult buildModel(RepositorySystemSession session, MavenProject project, Path src)
-            throws ModelBuildingException, ComponentLookupException {
+            throws ModelBuildingException {
         ProfileSelector customSelector = new DefaultProfileSelector() {
             @Override
             public List<Profile> getActiveProfilesV4(
@@ -127,21 +175,22 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         DefaultModelBuilder modelBuilder = new DefaultModelBuilderFactory()
                 .setProfileSelector(customSelector)
                 // apply currently active ModelProcessor etc. to support extensions like jgitver
-                .setProfileInjector(lookup(ProfileInjector.class))
-                .setInheritanceAssembler(lookup(InheritanceAssembler.class))
-                .setDependencyManagementImporter(lookup(DependencyManagementImporter.class))
-                .setDependencyManagementInjector(lookup(DependencyManagementInjector.class))
-                .setLifecycleBindingsInjector(lookup(LifecycleBindingsInjector.class))
-                .setModelInterpolator(lookup(ModelInterpolator.class))
-                .setModelNormalizer(lookup(ModelNormalizer.class))
-                .setModelPathTranslator(lookup(ModelPathTranslator.class))
-                .setModelProcessor(lookup(ModelProcessor.class))
-                .setModelUrlNormalizer(lookup(ModelUrlNormalizer.class))
-                .setModelValidator(lookup(ModelValidator.class))
-                .setPluginConfigurationExpander(lookup(PluginConfigurationExpander.class))
-                .setPluginManagementInjector(lookup(PluginManagementInjector.class))
-                .setReportConfigurationExpander(lookup(ReportConfigurationExpander.class))
-                .setSuperPomProvider(lookup(SuperPomProvider.class))
+                .setProfileInjector(profileInjector)
+                .setInheritanceAssembler(inheritanceAssembler)
+                .setDependencyManagementImporter(dependencyManagementImporter)
+                .setDependencyManagementInjector(dependencyManagementInjector)
+                .setLifecycleBindingsInjector(lifecycleBindingsInjector)
+                .setModelInterpolator(modelInterpolator)
+                .setModelNormalizer(modelNormalizer)
+                .setModelPathTranslator(modelPathTranslator)
+                .setModelProcessor(modelProcessor)
+                .setModelUrlNormalizer(modelUrlNormalizer)
+                .setModelValidator(modelValidator)
+                .setPluginConfigurationExpander(pluginConfigurationExpander)
+                .setPluginManagementInjector(pluginManagementInjector)
+                .setReportConfigurationExpander(reportConfigurationExpander)
+                .setSuperPomProvider(superPomProvider)
+                .setModelVersionParser(versionParser)
                 .newInstance();
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
         try {
@@ -155,8 +204,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         request.setModelResolver(new ProjectModelResolver(
                 session,
                 new RequestTrace(null),
-                lookup(RepositorySystem.class),
-                lookup(RemoteRepositoryManager.class),
+                repositorySystem.get(),
+                remoteRepositoryManager,
                 project.getRemoteProjectRepositories(),
                 ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
                 null));
@@ -171,10 +220,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         Properties props = new Properties();
         props.putAll(map);
         return props;
-    }
-
-    private <T> T lookup(Class<T> clazz) throws ComponentLookupException {
-        return container.lookup(clazz);
     }
 
     static Model transform(Model model, MavenProject project) {

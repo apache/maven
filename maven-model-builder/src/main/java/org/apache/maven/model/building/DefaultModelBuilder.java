@@ -32,12 +32,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputSource;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.api.services.VersionParserException;
 import org.apache.maven.building.Source;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
@@ -50,7 +49,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblem.Severity;
-import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
@@ -78,6 +76,7 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
+import org.apache.maven.model.version.VersionParser;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
@@ -111,6 +110,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final ModelVersionProcessor versionProcessor;
     private final ModelSourceTransformer transformer;
+    private final VersionParser versionParser;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -133,7 +133,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             ReportConfigurationExpander reportConfigurationExpander,
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             ModelVersionProcessor versionProcessor,
-            ModelSourceTransformer transformer) {
+            ModelSourceTransformer transformer,
+            VersionParser versionParser) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
         this.modelNormalizer = modelNormalizer;
@@ -153,6 +154,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.versionProcessor = versionProcessor;
         this.transformer = transformer;
+        this.versionParser = versionParser;
     }
 
     /**
@@ -180,7 +182,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -208,7 +211,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -236,7 +240,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -264,7 +269,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -292,7 +298,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -320,7 +327,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -348,7 +356,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -376,7 +385,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -404,7 +414,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -432,7 +443,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -460,7 +472,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -489,7 +502,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -518,7 +532,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -546,7 +561,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -574,7 +590,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -602,7 +619,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -631,7 +649,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor,
-                transformer);
+                transformer,
+                versionParser);
     }
 
     /**
@@ -921,7 +940,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             String path,
             InterpolationException e,
             String locationKey) {
-        problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+        problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                 .setMessage("Failed to interpolate file location " + path + ": " + e.getMessage())
                 .setLocation(Optional.ofNullable(file.getLocation(locationKey))
                         .map(InputLocation::new)
@@ -1036,7 +1055,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     transformer.transform(pomFile.toPath(), context, model);
                 }
             } catch (TransformerException e) {
-                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V40).setException(e));
+                problems.add(
+                        new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.V40).setException(e));
             }
 
             return newResult(model, problems.getProblems());
@@ -1108,7 +1128,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
 
                 Severity severity = (modelSource instanceof FileModelSource) ? Severity.ERROR : Severity.WARNING;
-                problems.add(new ModelProblemCollectorRequest(severity, Version.V20)
+                problems.add(new ModelProblemCollectorRequest(severity, ModelProblem.Version.V20)
                         .setMessage("Malformed POM " + modelSource.getLocation() + ": " + e.getMessage())
                         .setException(e));
             }
@@ -1128,7 +1148,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
         } catch (ModelParseException e) {
-            problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.BASE)
+            problems.add(new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.BASE)
                     .setMessage("Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage())
                     .setException(e));
             throw problems.newModelBuildingException();
@@ -1142,7 +1162,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     msg = e.getClass().getSimpleName();
                 }
             }
-            problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.BASE)
+            problems.add(new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.BASE)
                     .setMessage("Non-readable POM " + modelSource.getLocation() + ": " + msg)
                     .setException(e));
             throw problems.newModelBuildingException();
@@ -1193,7 +1213,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     transformer.transform(pomFile.toPath(), context, rawModel);
                 }
             } catch (TransformerException e) {
-                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V40).setException(e));
+                problems.add(
+                        new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.V40).setException(e));
             }
         } else if (request.getFileModel() == null) {
             rawModel = readFileModel(request, problems);
@@ -1264,7 +1285,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 try {
                     modelResolver.addRepository(repository, replaceRepositories);
                 } catch (InvalidRepositoryException e) {
-                    problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                    problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                             .setMessage("Invalid repository " + repository.getId() + ": " + e.getMessage())
                             .setLocation(new InputLocation(repository.getLocation("")))
                             .setException(e));
@@ -1307,7 +1328,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         for (String key : versions.keySet()) {
             if (versions.get(key) == null && managedVersions.get(key) == null) {
                 InputLocation location = plugins.get(key).getLocation("");
-                problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.V20)
+                problems.add(new ModelProblemCollectorRequest(Severity.WARNING, ModelProblem.Version.V20)
                         .setMessage("'build.plugins.plugin.version' for " + key + " is missing.")
                         .setLocation(location));
             }
@@ -1376,7 +1397,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                         ssi.interpolate(interpolatedModel.getParent().getVersion());
                 interpolatedModel.getParent().setVersion(interpolated);
             } catch (Exception e) {
-                ModelProblemCollectorRequest mpcr = new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                ModelProblemCollectorRequest mpcr = new ModelProblemCollectorRequest(
+                                Severity.ERROR, ModelProblem.Version.BASE)
                         .setMessage("Failed to interpolate field: "
                                 + interpolatedModel.getParent().getVersion()
                                 + " on class: ")
@@ -1406,7 +1428,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             Model parentModel = parentData.getModel();
             if (!"pom".equals(parentModel.getPackaging())) {
-                problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                         .setMessage("Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint(parentModel)
                                 + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"")
                         .setLocation(parentModel.getLocation("packaging")));
@@ -1439,7 +1461,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 candidateModel =
                         resolver.resolveRawModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
             } catch (UnresolvableModelException e) {
-                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.BASE) //
+                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.BASE) //
                         .setMessage(e.getMessage())
                         .setLocation(parent.getLocation(""))
                         .setException(e));
@@ -1474,7 +1496,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             buffer.append(parent.getArtifactId()).append(", please verify your project structure");
 
             problems.setSource(childModel);
-            problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.BASE)
+            problems.add(new ModelProblemCollectorRequest(Severity.WARNING, ModelProblem.Version.BASE)
                     .setMessage(buffer.toString())
                     .setLocation(parent.getLocation("")));
             return null;
@@ -1483,12 +1505,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         String version = getVersion(candidateModel);
         if (version != null && parent.getVersion() != null && !version.equals(parent.getVersion())) {
             try {
-                VersionRange parentRange = VersionRange.createFromVersionSpec(parent.getVersion());
-                if (!parentRange.hasRestrictions()) {
-                    // the parent version is not a range, we have version skew, drop back to resolution from repo
-                    return null;
-                }
-                if (!parentRange.containsVersion(new DefaultArtifactVersion(version))) {
+                VersionRange parentRange = versionParser.parseVersionRange(parent.getVersion());
+                if (!parentRange.contains(versionParser.parseVersion(version))) {
                     // version skew drop back to resolution from the repository
                     return null;
                 }
@@ -1498,21 +1516,21 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                 if (rawChildModelVersion == null) {
                     // Message below is checked for in the MNG-2199 core IT.
-                    problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V31)
+                    problems.add(new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.V31)
                             .setMessage("Version must be a constant")
                             .setLocation(childModel.getLocation("")));
 
                 } else {
                     if (rawChildVersionReferencesParent(rawChildModelVersion)) {
                         // Message below is checked for in the MNG-2199 core IT.
-                        problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V31)
+                        problems.add(new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.V31)
                                 .setMessage("Version must be a constant")
                                 .setLocation(childModel.getLocation("version")));
                     }
                 }
 
                 // MNG-2199: What else to check here ?
-            } catch (InvalidVersionSpecificationException e) {
+            } catch (VersionParserException e) {
                 // invalid version range, so drop back to resolution from the repository
                 return null;
             }
@@ -1596,7 +1614,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
 
-            problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.BASE)
+            problems.add(new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.BASE)
                     .setMessage(buffer.toString())
                     .setLocation(parent.getLocation(""))
                     .setException(e));
@@ -1616,14 +1634,14 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             if (rawChildModelVersion == null) {
                 // Message below is checked for in the MNG-2199 core IT.
-                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V31)
+                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.V31)
                         .setMessage("Version must be a constant")
                         .setLocation(childModel.getLocation("")));
 
             } else {
                 if (rawChildVersionReferencesParent(rawChildModelVersion)) {
                     // Message below is checked for in the MNG-2199 core IT.
-                    problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V31)
+                    problems.add(new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.V31)
                             .setMessage("Version must be a constant")
                             .setLocation(childModel.getLocation("version")));
                 }
@@ -1695,21 +1713,21 @@ public class DefaultModelBuilder implements ModelBuilder {
         String version = dependency.getVersion();
 
         if (groupId == null || groupId.length() <= 0) {
-            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                     .setMessage("'dependencyManagement.dependencies.dependency.groupId' for "
                             + dependency.getManagementKey() + " is missing.")
                     .setLocation(dependency.getLocation("")));
             return null;
         }
         if (artifactId == null || artifactId.length() <= 0) {
-            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                     .setMessage("'dependencyManagement.dependencies.dependency.artifactId' for "
                             + dependency.getManagementKey() + " is missing.")
                     .setLocation(dependency.getLocation("")));
             return null;
         }
         if (version == null || version.length() <= 0) {
-            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                     .setMessage("'dependencyManagement.dependencies.dependency.version' for "
                             + dependency.getManagementKey() + " is missing.")
                     .setLocation(dependency.getLocation("")));
@@ -1725,7 +1743,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 message.append(modelId).append(" -> ");
             }
             message.append(imported);
-            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE).setMessage(message.toString()));
+            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
+                    .setMessage(message.toString()));
 
             return null;
         }
@@ -1786,7 +1805,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             try {
                 importModel = workspaceResolver.resolveEffectiveModel(groupId, artifactId, version);
             } catch (UnresolvableModelException e) {
-                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.BASE)
+                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.BASE)
                         .setMessage(e.getMessage())
                         .setException(e));
                 return null;
@@ -1806,7 +1825,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
                 buffer.append(": ").append(e.getMessage());
 
-                problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                         .setMessage(buffer.toString())
                         .setLocation(dependency.getLocation(""))
                         .setException(e));

@@ -83,7 +83,6 @@ import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.ExtensionDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
@@ -134,19 +133,18 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private PlexusContainer container;
-    private ClassRealmManager classRealmManager;
-    private PluginDescriptorCache pluginDescriptorCache;
-    private PluginRealmCache pluginRealmCache;
-    private DefaultPluginDependenciesResolver pluginDependenciesResolver;
-    private RuntimeInformation runtimeInformation;
-    private ExtensionRealmCache extensionRealmCache;
-    private PluginVersionResolver pluginVersionResolver;
-    private PluginArtifactsCache pluginArtifactsCache;
-    private MavenPluginValidator pluginValidator;
-    private List<MavenPluginConfigurationValidator> configurationValidators;
-    private PluginValidationManager pluginValidationManager;
-    private List<MavenPluginPrerequisitesChecker> prerequisitesCheckers;
+    private final PlexusContainer container;
+    private final ClassRealmManager classRealmManager;
+    private final PluginDescriptorCache pluginDescriptorCache;
+    private final PluginRealmCache pluginRealmCache;
+    private final DefaultPluginDependenciesResolver pluginDependenciesResolver;
+    private final ExtensionRealmCache extensionRealmCache;
+    private final PluginVersionResolver pluginVersionResolver;
+    private final PluginArtifactsCache pluginArtifactsCache;
+    private final MavenPluginValidator pluginValidator;
+    private final List<MavenPluginConfigurationValidator> configurationValidators;
+    private final PluginValidationManager pluginValidationManager;
+    private final List<MavenPluginPrerequisitesChecker> prerequisitesCheckers;
     private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
@@ -158,7 +156,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             PluginDescriptorCache pluginDescriptorCache,
             PluginRealmCache pluginRealmCache,
             DefaultPluginDependenciesResolver pluginDependenciesResolver,
-            RuntimeInformation runtimeInformation,
             ExtensionRealmCache extensionRealmCache,
             PluginVersionResolver pluginVersionResolver,
             PluginArtifactsCache pluginArtifactsCache,
@@ -171,7 +168,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         this.pluginDescriptorCache = pluginDescriptorCache;
         this.pluginRealmCache = pluginRealmCache;
         this.pluginDependenciesResolver = pluginDependenciesResolver;
-        this.runtimeInformation = runtimeInformation;
         this.extensionRealmCache = extensionRealmCache;
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginArtifactsCache = pluginArtifactsCache;
