@@ -131,7 +131,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
         Set<String> visited = new LinkedHashSet<>();
         for (Artifact a = request.getArtifact(); ; ) {
-            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact(a);
+            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifactUnconditionally(a);
             try {
                 VersionRequest versionRequest =
                         new VersionRequest(a, request.getRepositories(), request.getRequestContext());
