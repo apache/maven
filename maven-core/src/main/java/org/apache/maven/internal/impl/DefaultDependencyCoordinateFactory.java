@@ -45,19 +45,29 @@ public class DefaultDependencyCoordinateFactory implements DependencyCoordinateF
         if (request.getType() != null) {
             type = session.getSession().getArtifactTypeRegistry().get(request.getType());
         }
-        return new DefaultDependencyCoordinate(
-                session,
-                new org.eclipse.aether.graph.Dependency(
-                        new org.eclipse.aether.artifact.DefaultArtifact(
-                                request.getGroupId(),
-                                request.getArtifactId(),
-                                request.getClassifier(),
-                                request.getExtension(),
-                                request.getVersion(),
-                                type),
-                        request.getScope(),
-                        request.isOptional(),
-                        map(request.getExclusions(), this::toExclusion)));
+        if (request.getCoordinateString() != null) {
+            return new DefaultDependencyCoordinate(
+                    session,
+                    new org.eclipse.aether.graph.Dependency(
+                            new org.eclipse.aether.artifact.DefaultArtifact(request.getCoordinateString()),
+                            request.getScope(),
+                            request.isOptional(),
+                            map(request.getExclusions(), this::toExclusion)));
+        } else {
+            return new DefaultDependencyCoordinate(
+                    session,
+                    new org.eclipse.aether.graph.Dependency(
+                            new org.eclipse.aether.artifact.DefaultArtifact(
+                                    request.getGroupId(),
+                                    request.getArtifactId(),
+                                    request.getClassifier(),
+                                    request.getExtension(),
+                                    request.getVersion(),
+                                    type),
+                            request.getScope(),
+                            request.isOptional(),
+                            map(request.getExclusions(), this::toExclusion)));
+        }
     }
 
     private org.eclipse.aether.graph.Exclusion toExclusion(Exclusion exclusion) {
