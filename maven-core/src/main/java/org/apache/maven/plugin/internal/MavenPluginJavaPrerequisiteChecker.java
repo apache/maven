@@ -20,7 +20,6 @@ package org.apache.maven.plugin.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
@@ -33,11 +32,11 @@ import org.eclipse.aether.version.VersionScheme;
 @Named
 @Singleton
 public class MavenPluginJavaPrerequisiteChecker implements MavenPluginPrerequisitesChecker {
-    private final Provider<VersionScheme> versionSchemeProvider;
+    private final VersionScheme versionScheme;
 
     @Inject
-    public MavenPluginJavaPrerequisiteChecker(Provider<VersionScheme> versionSchemeProvider) {
-        this.versionSchemeProvider = versionSchemeProvider;
+    public MavenPluginJavaPrerequisiteChecker(VersionScheme versionScheme) {
+        this.versionScheme = versionScheme;
     }
 
     @Override
@@ -53,7 +52,6 @@ public class MavenPluginJavaPrerequisiteChecker implements MavenPluginPrerequisi
     }
 
     boolean matchesVersion(String requiredVersion, String currentVersion) {
-        VersionScheme versionScheme = versionSchemeProvider.get();
         VersionConstraint constraint;
         try {
             constraint = versionScheme.parseVersionConstraint(requiredVersion);

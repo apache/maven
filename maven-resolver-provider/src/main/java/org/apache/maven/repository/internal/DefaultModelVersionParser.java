@@ -37,23 +37,23 @@ import static java.util.Objects.requireNonNull;
 @Named
 @Singleton
 public class DefaultModelVersionParser implements VersionParser {
-    private final Provider<VersionScheme> versionSchemeProvider;
+    private final VersionScheme versionScheme;
 
     @Inject
-    public DefaultModelVersionParser(Provider<VersionScheme> versionSchemeProvider) {
-        this.versionSchemeProvider = requireNonNull(versionSchemeProvider, "versionSchemeProvider");
+    public DefaultModelVersionParser(VersionScheme versionScheme) {
+        this.versionScheme = requireNonNull(versionScheme, "versionScheme");
     }
 
     @Override
     public Version parseVersion(String version) {
         requireNonNull(version, "version");
-        return new DefaultVersion(versionSchemeProvider.get(), version);
+        return new DefaultVersion(versionScheme, version);
     }
 
     @Override
     public VersionRange parseVersionRange(String range) {
         requireNonNull(range, "range");
-        return new DefaultVersionRange(versionSchemeProvider.get(), range);
+        return new DefaultVersionRange(versionScheme, range);
     }
 
     static class DefaultVersion implements Version {

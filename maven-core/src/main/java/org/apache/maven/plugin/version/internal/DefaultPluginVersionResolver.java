@@ -20,7 +20,6 @@ package org.apache.maven.plugin.version.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.io.IOException;
@@ -80,18 +79,18 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     private final RepositorySystem repositorySystem;
     private final MetadataReader metadataReader;
     private final MavenPluginManager pluginManager;
-    private final Provider<VersionScheme> versionSchemeProvider;
+    private final VersionScheme versionScheme;
 
     @Inject
     public DefaultPluginVersionResolver(
             RepositorySystem repositorySystem,
             MetadataReader metadataReader,
             MavenPluginManager pluginManager,
-            Provider<VersionScheme> versionSchemeProvider) {
+            VersionScheme versionScheme) {
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
         this.pluginManager = pluginManager;
-        this.versionSchemeProvider = versionSchemeProvider;
+        this.versionScheme = versionScheme;
     }
 
     @Override
@@ -195,7 +194,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
             for (String ver : versions.versions.keySet()) {
                 try {
-                    Version v = versionSchemeProvider.get().parseVersion(ver);
+                    Version v = versionScheme.parseVersion(ver);
 
                     if (ver.endsWith("-SNAPSHOT")) {
                         snapshots.add(v);

@@ -20,7 +20,6 @@ package org.apache.maven.rtinfo.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.io.IOException;
@@ -44,13 +43,13 @@ import org.slf4j.LoggerFactory;
 public class DefaultRuntimeInformation implements RuntimeInformation {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Provider<VersionScheme> versionSchemeProvider;
+    private final VersionScheme versionScheme;
 
     private final String mavenVersion;
 
     @Inject
-    public DefaultRuntimeInformation(Provider<VersionScheme> versionSchemeProvider) {
-        this.versionSchemeProvider = versionSchemeProvider;
+    public DefaultRuntimeInformation(VersionScheme versionScheme) {
+        this.versionScheme = versionScheme;
         this.mavenVersion = loadMavenVersion();
     }
 
@@ -94,7 +93,6 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
             throw new IllegalArgumentException("versionRange cannot be empty");
         }
 
-        VersionScheme versionScheme = versionSchemeProvider.get();
         VersionConstraint constraint;
         try {
             constraint = versionScheme.parseVersionConstraint(versionRange);

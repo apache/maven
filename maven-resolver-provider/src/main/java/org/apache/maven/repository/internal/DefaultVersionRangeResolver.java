@@ -20,7 +20,6 @@ package org.apache.maven.repository.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.io.InputStream;
@@ -71,20 +70,19 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
     private final MetadataResolver metadataResolver;
     private final SyncContextFactory syncContextFactory;
     private final RepositoryEventDispatcher repositoryEventDispatcher;
-    private final Provider<VersionScheme> versionSchemeProvider;
+    private final VersionScheme versionScheme;
 
     @Inject
     public DefaultVersionRangeResolver(
             MetadataResolver metadataResolver,
             SyncContextFactory syncContextFactory,
             RepositoryEventDispatcher repositoryEventDispatcher,
-            Provider<VersionScheme> versionSchemeProvider) {
+            VersionScheme versionScheme) {
         this.metadataResolver = Objects.requireNonNull(metadataResolver, "metadataResolver cannot be null");
         this.syncContextFactory = Objects.requireNonNull(syncContextFactory, "syncContextFactory cannot be null");
         this.repositoryEventDispatcher =
                 Objects.requireNonNull(repositoryEventDispatcher, "repositoryEventDispatcher cannot be null");
-        this.versionSchemeProvider =
-                Objects.requireNonNull(versionSchemeProvider, "versionSchemeProvider cannot be null");
+        this.versionScheme = Objects.requireNonNull(versionScheme, "versionScheme cannot be null");
     }
 
     @Override
@@ -92,7 +90,6 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             throws VersionRangeResolutionException {
         VersionRangeResult result = new VersionRangeResult(request);
 
-        VersionScheme versionScheme = versionSchemeProvider.get();
         VersionConstraint versionConstraint;
         try {
             versionConstraint =
