@@ -77,7 +77,7 @@ public interface Session {
      * @return the maven version, never {@code null}
      */
     @Nonnull
-    String getMavenVersion();
+    Version getMavenVersion();
 
     int getDegreeOfConcurrency();
 
