@@ -199,8 +199,13 @@ public interface Session {
     ArtifactCoordinate createArtifactCoordinate(String groupId, String artifactId, String version, String extension);
 
     /**
+     * Creates a coordinate out of string that is formatted like:
+     * {@code <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>}
+     * <p>
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
      *
+     * @param coordString the string having "standard" coordinate.
+     * @return an {@code ArtifactCoordinate}, never {@code null}
      * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String)
      */
     ArtifactCoordinate createArtifactCoordinate(String coordString);

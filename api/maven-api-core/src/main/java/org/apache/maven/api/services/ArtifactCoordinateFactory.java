@@ -37,7 +37,7 @@ public interface ArtifactCoordinateFactory extends Service {
      * Creates a coordinate.
      *
      * @param request the request holding coordinate creation parameters
-     * @return an {@code Artifact}, never {@code null}
+     * @return an {@code ArtifactCoordinate}, never {@code null}
      * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
      */
     @Nonnull
@@ -49,8 +49,8 @@ public interface ArtifactCoordinateFactory extends Service {
      *
      * @param session the session.
      * @param coordinateString the string having "standard" coordinate.
-     * @return an {@code Artifact}, never {@code null}
-     * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
+     * @return an {@code ArtifactCoordinate}, never {@code null}
+     * @throws IllegalArgumentException if {@code session} is null or invalid
      */
     @Nonnull
     default ArtifactCoordinate create(@Nonnull Session session, @Nonnull String coordinateString) {
