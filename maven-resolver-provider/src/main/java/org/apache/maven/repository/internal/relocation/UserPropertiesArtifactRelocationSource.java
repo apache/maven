@@ -46,10 +46,11 @@ import org.slf4j.LoggerFactory;
  * @since 4.0.0
  */
 @Singleton
-@Named
+@Named(UserPropertiesArtifactRelocationSource.NAME)
 @Priority(50)
 @SuppressWarnings("checkstyle:MagicNumber")
 public final class UserPropertiesArtifactRelocationSource implements MavenArtifactRelocationSource {
+    public static final String NAME = "userProperties";
     private static final Logger LOGGER = LoggerFactory.getLogger(UserPropertiesArtifactRelocationSource.class);
 
     private static final String CONFIG_PROP_RELOCATIONS_ENTRIES = "maven.relocations.entries";

@@ -26,6 +26,8 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
  * Maven relocation source.
+ * Note: implementations of this component should avoid the "default" name (has special meaning in Eclipse Sisu) and
+ * explicitly order implementations using Sisu priorities.
  *
  * @since 4.0.0
  */

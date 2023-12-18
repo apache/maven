@@ -42,10 +42,11 @@ import org.slf4j.LoggerFactory;
  * @since 4.0.0
  */
 @Singleton
-@Named
+@Named(DistributionManagementArtifactRelocationSource.NAME)
 @Priority(5)
 @SuppressWarnings("checkstyle:MagicNumber")
 public final class DistributionManagementArtifactRelocationSource implements MavenArtifactRelocationSource {
+    public static final String NAME = "distributionManagement";
     private static final Logger LOGGER = LoggerFactory.getLogger(DistributionManagementArtifactRelocationSource.class);
 
     @Override
