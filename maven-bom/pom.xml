@@ -27,7 +27,7 @@ under the License.
   </parent>
 
   <artifactId>maven-bom</artifactId>
-  <version>4.0.0-alpha-10</version>
+  <version>4.0.0-alpha-11-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Maven Dependencies BOM</name>
