@@ -32,7 +32,7 @@ public interface VersionConstraint {
     /**
      * Returns the range of this constraint, or {@code null} if none.
      * <p>
-     * Note: only one of this method or {@link #getRecommendedVersion()} must return non-{@code null} value.
+     * Note: only one, this method or {@link #getRecommendedVersion()} method must return non-{@code null} value.
      */
     @Nullable
     VersionRange getVersionRange();
@@ -40,7 +40,7 @@ public interface VersionConstraint {
     /**
      * Returns the recommended version of this constraint, or {@code null} if none.
      * <p>
-     * Note: only one of this method or {@link #getVersionRange()} must return non-{@code null} value.
+     * Note: only one, this method or {@link #getVersionRange()} method must return non-{@code null} value.
      */
     @Nullable
     Version getRecommendedVersion();
