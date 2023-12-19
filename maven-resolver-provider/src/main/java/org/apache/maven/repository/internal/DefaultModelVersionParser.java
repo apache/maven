@@ -22,8 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.Objects;
-
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
