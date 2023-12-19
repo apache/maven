@@ -57,7 +57,7 @@ public interface VersionParser extends Service {
     /**
      * Parses the specified version constraint specification, for example "1.0" or "[1.0,2.0)".
      *
-     * @param constraint the range specification to parse, must not be {@code null}
+     * @param constraint the constraint specification to parse, must not be {@code null}
      * @return the parsed version constraint, never {@code null}
      * @throws VersionParserException if the range specification violates the syntax rules of this scheme
      */
