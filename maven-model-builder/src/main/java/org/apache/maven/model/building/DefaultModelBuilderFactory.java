@@ -21,6 +21,7 @@ package org.apache.maven.model.building;
 import java.util.Arrays;
 
 import org.apache.maven.api.Version;
+import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.model.Model;
@@ -360,6 +361,11 @@ public class DefaultModelBuilderFactory {
             @Override
             public VersionRange parseVersionRange(String range) {
                 throw new IllegalArgumentException("ranges not supported by this parser");
+            }
+
+            @Override
+            public VersionConstraint parseVersionConstraint(String constraint) {
+                throw new IllegalArgumentException("constraint not supported by this parser");
             }
         };
     }

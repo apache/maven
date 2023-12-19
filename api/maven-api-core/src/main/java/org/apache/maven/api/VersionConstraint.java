@@ -52,4 +52,11 @@ public interface VersionConstraint {
      * @return {@code true} if this range contains the specified version, {@code false} otherwise
      */
     boolean contains(@Nonnull Version version);
+
+    /**
+     * Returns a string representation of this version constraint
+     * @return the string representation of this version constraint
+     */
+    @Nonnull
+    String asString();
 }

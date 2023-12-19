@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.util.regex.Pattern;
 
 import org.apache.maven.api.Version;
+import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParser;
 
@@ -54,6 +55,11 @@ public class DefaultVersionParser implements VersionParser {
     @Override
     public VersionRange parseVersionRange(String range) {
         return modelVersionParser.parseVersionRange(range);
+    }
+
+    @Override
+    public VersionConstraint parseVersionConstraint(String constraint) {
+        return modelVersionParser.parseVersionConstraint(constraint);
     }
 
     @Override

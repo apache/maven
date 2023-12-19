@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.util.Objects;
 
 import org.apache.maven.api.Version;
+import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParserException;
 import org.apache.maven.model.version.VersionParser;
@@ -55,9 +56,20 @@ public class DefaultModelVersionParser implements VersionParser {
         return new DefaultVersionRange(versionScheme, range);
     }
 
+    @Override
+    public VersionConstraint parseVersionConstraint(String constraint) {
+        requireNonNull(constraint, "constraint");
+        return new DefaultVersionConstraint(versionScheme, constraint);
+    }
+
     static class DefaultVersion implements Version {
         private final VersionScheme versionScheme;
         private final org.eclipse.aether.version.Version delegate;
+
+        DefaultVersion(VersionScheme versionScheme, org.eclipse.aether.version.Version delegate) {
+            this.versionScheme = versionScheme;
+            this.delegate = delegate;
+        }
 
         DefaultVersion(VersionScheme versionScheme, String delegateValue) {
             this.versionScheme = versionScheme;
@@ -109,6 +121,11 @@ public class DefaultModelVersionParser implements VersionParser {
         private final VersionScheme versionScheme;
         private final org.eclipse.aether.version.VersionRange delegate;
 
+        DefaultVersionRange(VersionScheme versionScheme, org.eclipse.aether.version.VersionRange delegate) {
+            this.versionScheme = versionScheme;
+            this.delegate = delegate;
+        }
+
         DefaultVersionRange(VersionScheme versionScheme, String delegateValue) {
             this.versionScheme = versionScheme;
             try {
@@ -128,8 +145,95 @@ public class DefaultModelVersionParser implements VersionParser {
         }
 
         @Override
+        public Boundary getUpperBoundary() {
+            org.eclipse.aether.version.VersionRange.Bound bound = delegate.getUpperBound();
+            if (bound == null) {
+                return null;
+            }
+            return new Boundary() {
+                @Override
+                public Version getVersion() {
+                    return new DefaultVersion(versionScheme, bound.getVersion());
+                }
+
+                @Override
+                public boolean isInclusive() {
+                    return bound.isInclusive();
+                }
+            };
+        }
+
+        @Override
+        public Boundary getLowerBoundary() {
+            org.eclipse.aether.version.VersionRange.Bound bound = delegate.getLowerBound();
+            if (bound == null) {
+                return null;
+            }
+            return new Boundary() {
+                @Override
+                public Version getVersion() {
+                    return new DefaultVersion(versionScheme, bound.getVersion());
+                }
+
+                @Override
+                public boolean isInclusive() {
+                    return bound.isInclusive();
+                }
+            };
+        }
+
+        @Override
         public String asString() {
             return delegate.toString();
+        }
+
+        @Override
+        public String toString() {
+            return asString();
+        }
+    }
+
+    static class DefaultVersionConstraint implements VersionConstraint {
+        private final VersionScheme versionScheme;
+        private final org.eclipse.aether.version.VersionConstraint delegate;
+
+        DefaultVersionConstraint(VersionScheme versionScheme, String delegateValue) {
+            this.versionScheme = versionScheme;
+            try {
+                this.delegate = versionScheme.parseVersionConstraint(delegateValue);
+            } catch (InvalidVersionSpecificationException e) {
+                throw new VersionParserException("Unable to parse version constraint: " + delegateValue, e);
+            }
+        }
+
+        @Override
+        public boolean contains(Version version) {
+            if (version instanceof DefaultVersion) {
+                return delegate.containsVersion(((DefaultVersion) version).delegate);
+            } else {
+                return contains(new DefaultVersion(versionScheme, version.asString()));
+            }
+        }
+
+        @Override
+        public String asString() {
+            return delegate.toString();
+        }
+
+        @Override
+        public VersionRange getVersionRange() {
+            if (delegate.getRange() == null) {
+                return null;
+            }
+            return new DefaultVersionRange(versionScheme, delegate.getRange());
+        }
+
+        @Override
+        public Version getRecommendedVersion() {
+            if (delegate.getVersion() == null) {
+                return null;
+            }
+            return new DefaultVersion(versionScheme, delegate.getVersion());
         }
 
         @Override

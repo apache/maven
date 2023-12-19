@@ -505,6 +505,11 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
+    public VersionConstraint parseVersionConstraint(String versionConstraint) {
+        return getService(VersionParser.class).parseVersionConstraint(versionConstraint);
+    }
+
+    @Override
     public Version resolveVersion(ArtifactCoordinate artifact) {
         return getService(VersionResolver.class).resolve(this, artifact).getVersion();
     }
