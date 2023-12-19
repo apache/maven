@@ -30,9 +30,6 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 public interface Version extends Comparable<Version> {
-
-    // TODO: add access to the version information
-
     /**
      * Returns a string representation of this version.
      * @return the string representation of this version

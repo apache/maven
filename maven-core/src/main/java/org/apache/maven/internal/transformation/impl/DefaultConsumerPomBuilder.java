@@ -63,7 +63,7 @@ import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.model.version.VersionParser;
+import org.apache.maven.model.version.ModelVersionParser;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectModelResolver;
@@ -128,7 +128,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private SuperPomProvider superPomProvider;
 
     @Inject
-    private VersionParser versionParser;
+    private ModelVersionParser versionParser;
 
     // To break circular dependency
     @Inject

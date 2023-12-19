@@ -20,11 +20,7 @@ package org.apache.maven.internal.impl;
 
 import java.util.Collection;
 
-import org.apache.maven.api.DependencyCoordinate;
-import org.apache.maven.api.Exclusion;
-import org.apache.maven.api.Scope;
-import org.apache.maven.api.Type;
-import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.TypeRegistry;
@@ -63,8 +59,8 @@ public class DefaultDependencyCoordinate implements DependencyCoordinate {
     }
 
     @Override
-    public VersionRange getVersion() {
-        return session.parseVersionRange(dependency.getArtifact().getVersion());
+    public VersionConstraint getVersion() {
+        return session.parseVersionConstraint(dependency.getArtifact().getVersion());
     }
 
     @Override
