@@ -31,7 +31,7 @@ import org.apache.maven.api.services.VersionParserException;
  *
  * @since 4.0.0
  */
-public interface VersionParser {
+public interface ModelVersionParser {
 
     /**
      * Parses the specified version string, for example "1.0".

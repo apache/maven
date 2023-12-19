@@ -28,7 +28,7 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParserException;
-import org.apache.maven.model.version.VersionParser;
+import org.apache.maven.model.version.ModelVersionParser;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.VersionScheme;
 
@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
 
 @Named
 @Singleton
-public class DefaultModelVersionParser implements VersionParser {
+public class DefaultModelVersionParser implements ModelVersionParser {
     private final VersionScheme versionScheme;
 
     @Inject

@@ -74,7 +74,7 @@ import org.apache.maven.model.superpom.DefaultSuperPomProvider;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.model.version.VersionParser;
+import org.apache.maven.model.version.ModelVersionParser;
 
 import static java.util.Objects.requireNonNull;
 
@@ -107,7 +107,7 @@ public class DefaultModelBuilderFactory {
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private ModelVersionProcessor versionProcessor;
     private ModelSourceTransformer transformer;
-    private VersionParser versionParser;
+    private ModelVersionParser versionParser;
 
     public DefaultModelBuilderFactory setModelProcessor(ModelProcessor modelProcessor) {
         this.modelProcessor = modelProcessor;
@@ -215,7 +215,7 @@ public class DefaultModelBuilderFactory {
         return this;
     }
 
-    public DefaultModelBuilderFactory setModelVersionParser(VersionParser versionParser) {
+    public DefaultModelBuilderFactory setModelVersionParser(ModelVersionParser versionParser) {
         this.versionParser = versionParser;
         return this;
     }
@@ -338,10 +338,10 @@ public class DefaultModelBuilderFactory {
         return new BuildModelSourceTransformer();
     }
 
-    private VersionParser newModelVersionParser() {
+    private ModelVersionParser newModelVersionParser() {
         // This is a limited parser that does not support ranges and compares versions as strings
         // in real-life this parser should not be used, but replaced with a proper one
-        return new VersionParser() {
+        return new ModelVersionParser() {
             @Override
             public Version parseVersion(String version) {
                 requireNonNull(version, "version");
