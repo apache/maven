@@ -23,51 +23,33 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
- * A range of versions.
+ * Version constraint for dependency. Constraint is either a range ("[1,2)") or recommended version ("1.0").
  *
  * @since 4.0.0
  */
 @Experimental
-public interface VersionRange {
+public interface VersionConstraint {
     /**
-     * Determines whether the specified version is contained within this range.
+     * Returns the range of this constraint, or {@code null} if none.
+     * <p>
+     * Note: only one of this method or {@link #getRecommendedVersion()} must return non-{@code null} value.
+     */
+    @Nullable
+    VersionRange getVersionRange();
+
+    /**
+     * Returns the recommended version of this constraint, or {@code null} if none.
+     * <p>
+     * Note: only one of this method or {@link #getVersionRange()} must return non-{@code null} value.
+     */
+    @Nullable
+    Version getRecommendedVersion();
+
+    /**
+     * Determines whether the specified version is contained within this constraint.
      *
      * @param version the version to test, must not be {@code null}
      * @return {@code true} if this range contains the specified version, {@code false} otherwise
      */
     boolean contains(@Nonnull Version version);
-
-    /**
-     * Returns the upper boundary of this range, or {@code null} if none.
-     */
-    @Nullable
-    Boundary getUpperBoundary();
-
-    /**
-     * Returns the lower boundary of this range, or {@code null} if none.
-     */
-    @Nullable
-    Boundary getLowerBoundary();
-
-    /**
-     * Returns a string representation of this version range
-     * @return the string representation of this version range
-     */
-    @Nonnull
-    String asString();
-
-    /**
-     * Represents range boundary.
-     */
-    interface Boundary {
-        /**
-         * The bounding version.
-         */
-        Version getVersion();
-
-        /**
-         * Returns {@code true} if version is included of the range.
-         */
-        boolean isInclusive();
-    }
 }
