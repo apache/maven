@@ -103,7 +103,7 @@ public class DefaultModelVersionParser implements ModelVersionParser {
 
         @Override
         public int hashCode() {
-            return Objects.hash(delegate);
+            return delegate.hashCode();
         }
 
         @Override
@@ -191,6 +191,23 @@ public class DefaultModelVersionParser implements ModelVersionParser {
         public String toString() {
             return asString();
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            DefaultVersionRange that = (DefaultVersionRange) o;
+            return delegate.equals(that.delegate);
+        }
+
+        @Override
+        public int hashCode() {
+            return delegate.hashCode();
+        }
     }
 
     static class DefaultVersionConstraint implements VersionConstraint {
@@ -239,6 +256,23 @@ public class DefaultModelVersionParser implements ModelVersionParser {
         @Override
         public String toString() {
             return asString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            DefaultVersionConstraint that = (DefaultVersionConstraint) o;
+            return delegate.equals(that.delegate);
+        }
+
+        @Override
+        public int hashCode() {
+            return delegate.hashCode();
         }
     }
 }
