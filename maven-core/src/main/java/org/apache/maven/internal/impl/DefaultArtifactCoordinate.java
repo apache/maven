@@ -21,7 +21,7 @@ package org.apache.maven.internal.impl;
 import java.util.Objects;
 
 import org.apache.maven.api.ArtifactCoordinate;
-import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -57,8 +57,8 @@ public class DefaultArtifactCoordinate implements ArtifactCoordinate {
 
     @Nonnull
     @Override
-    public VersionRange getVersion() {
-        return session.parseVersionRange(coordinate.getVersion());
+    public VersionConstraint getVersion() {
+        return session.parseVersionConstraint(coordinate.getVersion());
     }
 
     @Override

@@ -26,14 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.DependencyCoordinate;
-import org.apache.maven.api.Exclusion;
-import org.apache.maven.api.Project;
-import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Scope;
-import org.apache.maven.api.Type;
-import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
@@ -180,8 +173,8 @@ public class DefaultProject implements Project {
             }
 
             @Override
-            public VersionRange getVersion() {
-                return session.parseVersionRange(dependency.getVersion());
+            public VersionConstraint getVersion() {
+                return session.parseVersionConstraint(dependency.getVersion());
             }
 
             @Override
