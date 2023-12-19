@@ -463,4 +463,15 @@ public interface Session {
      */
     @Nonnull
     VersionRange parseVersionRange(@Nonnull String versionRange);
+
+    /**
+     * Parses the specified version constraint specification, for example "1.0" or "[1.0,2.0)".
+     * <p>
+     * Shortcut for {@code getService(VersionParser.class).parseVersionConstraint(...)}.
+     *
+     * @see org.apache.maven.api.services.VersionParser#parseVersionConstraint(String)
+     * @throws org.apache.maven.api.services.VersionParserException if the parsing failed
+     */
+    @Nonnull
+    VersionConstraint parseVersionConstraint(@Nonnull String versionConstraint);
 }

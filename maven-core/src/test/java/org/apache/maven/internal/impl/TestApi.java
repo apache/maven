@@ -21,15 +21,23 @@ package org.apache.maven.internal.impl;
 import javax.inject.Inject;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.services.DependencyResolver;
+import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilder;
@@ -120,7 +128,7 @@ class TestApi {
     }
 
     @Test
-    void testCreateAndResolveArtifact() throws Exception {
+    void testCreateAndResolveArtifact() {
         ArtifactCoordinate coord =
                 session.createArtifactCoordinate("org.codehaus.plexus", "plexus-utils", "1.4.5", "pom");
 
@@ -131,11 +139,52 @@ class TestApi {
         Optional<Path> op = session.getArtifactPath(resolved.getKey());
         assertTrue(op.isPresent());
         assertEquals(resolved.getValue(), op.get());
+    }
+
+    @Test
+    void testBuildProject() {
+        Artifact artifact = session.createArtifact("org.codehaus.plexus", "plexus-utils", "1.4.5", "pom");
 
         Project project = session.getService(ProjectBuilder.class)
                 .build(ProjectBuilderRequest.builder()
                         .session(session)
-                        .path(op.get())
+                        .path(session.getPathForLocalArtifact(artifact))
+                        .processPlugins(false)
+                        .resolveDependencies(false)
+                        .build())
+                .getProject()
+                .get();
+        assertNotNull(project);
+    }
+
+    @Test
+    void testCollectArtifactDependencies() {
+        Artifact artifact =
+                session.createArtifact("org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "jar");
+        Node root = session.collectDependencies(artifact);
+        assertNotNull(root);
+    }
+
+    @Test
+    void testResolveArtifactCoordinateDependencies() {
+        ArtifactCoordinate coord =
+                session.createArtifactCoordinate("org.apache.maven.core.test", "test-extension", "1", "jar");
+
+        List<Path> paths = session.resolveDependencies(session.createDependencyCoordinate(coord));
+
+        assertNotNull(paths);
+        assertEquals(10, paths.size());
+        assertTrue(paths.get(0).getFileName().toString().equals("test-extension-1.jar"));
+    }
+
+    @Test
+    void testProjectDependencies() {
+        Artifact pom = session.createArtifact("org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "pom");
+
+        Project project = session.getService(ProjectBuilder.class)
+                .build(ProjectBuilderRequest.builder()
+                        .session(session)
+                        .path(session.getPathForLocalArtifact(pom))
                         .processPlugins(false)
                         .resolveDependencies(false)
                         .build())
@@ -143,9 +192,21 @@ class TestApi {
                 .get();
         assertNotNull(project);
 
-        Artifact artifact =
-                session.createArtifact("org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "jar");
+        Artifact artifact = session.createArtifact("org.apache.maven.core.test", "test-extension", "1", "jar");
         Node root = session.collectDependencies(artifact);
         assertNotNull(root);
+
+        DependencyResolverResult result =
+                session.getService(DependencyResolver.class).resolve(session, project, ResolutionScope.PROJECT_RUNTIME);
+        assertNotNull(result);
+        List<Dependency> deps = new ArrayList<>(result.getDependencies().keySet());
+        List<Dependency> deps2 = result.getNodes().stream()
+                .map(Node::getDependency)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        assertEquals(deps, deps2);
+        for (Dependency dep : deps2) {
+            dep.getVersion();
+        }
     }
 }
