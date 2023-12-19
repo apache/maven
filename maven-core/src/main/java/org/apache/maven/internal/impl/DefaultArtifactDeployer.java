@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.impl;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -30,12 +29,10 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactDeployerException;
 import org.apache.maven.api.services.ArtifactDeployerRequest;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.deployment.DeployResult;
 import org.eclipse.aether.deployment.DeploymentException;
 
-import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 /**
@@ -44,26 +41,19 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 @Named
 @Singleton
 public class DefaultArtifactDeployer implements ArtifactDeployer {
-    private final @Nonnull RepositorySystem repositorySystem;
-
-    @Inject
-    DefaultArtifactDeployer(@Nonnull RepositorySystem repositorySystem) {
-        this.repositorySystem = nonNull(repositorySystem, "repositorySystem can not be null");
-    }
 
     @Override
     public void deploy(@Nonnull ArtifactDeployerRequest request) {
-        nonNull(request, "request can not be null");
-        DefaultSession session =
-                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
-        Collection<Artifact> artifacts = nonNull(request.getArtifacts(), "request.artifacts can not be null");
-        RemoteRepository repository = nonNull(request.getRepository(), "request.repository can not be null");
+        nonNull(request, "request");
+        InternalSession session = InternalSession.from(request.getSession());
+        Collection<Artifact> artifacts = nonNull(request.getArtifacts(), "request.artifacts");
+        RemoteRepository repository = nonNull(request.getRepository(), "request.repository");
         try {
             DeployRequest deployRequest = new DeployRequest()
                     .setRepository(session.toRepository(repository))
                     .setArtifacts(session.toArtifacts(artifacts));
 
-            DeployResult result = repositorySystem.deploy(session.getSession(), deployRequest);
+            DeployResult result = session.getRepositorySystem().deploy(session.getSession(), deployRequest);
         } catch (DeploymentException e) {
             throw new ArtifactDeployerException("Unable to deploy artifacts", e);
         }

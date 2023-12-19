@@ -18,7 +18,8 @@
  */
 package org.apache.maven.api;
 
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
 
@@ -29,14 +30,27 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 public enum Scope {
+    EMPTY(""),
+    COMPILE_ONLY("compile-only"),
     COMPILE("compile"),
-    PROVIDED("provided"),
-    SYSTEM("system"),
     RUNTIME("runtime"),
+    PROVIDED("provided"),
+    TEST_COMPILE_ONLY("test-compile-only"),
     TEST("test"),
-    IMPORT("import");
+    TEST_RUNTIME("test-runtime"),
+    IMPORT("import"); // TODO: v4: remove import scope somehow
 
     private final String id;
+
+    private static final Map<String, Scope> SCOPES;
+
+    static {
+        Map<String, Scope> scopes = new HashMap<>();
+        for (Scope s : Scope.values()) {
+            scopes.put(s.id, s);
+        }
+        SCOPES = scopes;
+    }
 
     Scope(String id) {
         this.id = id;
@@ -47,6 +61,6 @@ public enum Scope {
     }
 
     public static Scope get(String scope) {
-        return Enum.valueOf(Scope.class, scope.toUpperCase(Locale.ROOT));
+        return SCOPES.get(scope);
     }
 }

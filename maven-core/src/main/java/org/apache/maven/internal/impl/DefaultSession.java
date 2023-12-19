@@ -21,22 +21,15 @@ package org.apache.maven.internal.impl;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.DependencyCoordinate;
-import org.apache.maven.api.LocalRepository;
-import org.apache.maven.api.Project;
-import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Service;
-import org.apache.maven.api.Session;
-import org.apache.maven.api.SessionData;
+import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.MavenException;
@@ -54,6 +47,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 
+import static org.apache.maven.internal.impl.Utils.map;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultSession extends AbstractSession {
@@ -65,7 +59,7 @@ public class DefaultSession extends AbstractSession {
     private final MavenRepositorySystem mavenRepositorySystem;
     private final PlexusContainer container;
     private final RuntimeInformation runtimeInformation;
-    private final Map<Class<? extends Service>, Service> services = new HashMap<>();
+    private final Map<Class<? extends Service>, Service> services = new ConcurrentHashMap<>();
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultSession(
@@ -80,10 +74,9 @@ public class DefaultSession extends AbstractSession {
         this.repositorySystem = nonNull(repositorySystem);
         this.repositories = repositories != null
                 ? repositories
-                : mavenSession.getRequest().getRemoteRepositories().stream()
-                        .map(RepositoryUtils::toRepo)
-                        .map(this::getRemoteRepository)
-                        .collect(Collectors.toList());
+                : map(
+                        mavenSession.getRequest().getRemoteRepositories(),
+                        r -> getRemoteRepository(RepositoryUtils.toRepo(r)));
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.container = container;
         this.runtimeInformation = runtimeInformation;
@@ -125,8 +118,8 @@ public class DefaultSession extends AbstractSession {
 
     @Nonnull
     @Override
-    public String getMavenVersion() {
-        return runtimeInformation.getMavenVersion();
+    public Version getMavenVersion() {
+        return parseVersion(runtimeInformation.getMavenVersion());
     }
 
     @Override
@@ -213,8 +206,7 @@ public class DefaultSession extends AbstractSession {
 
         RepositorySystemSession repoSession =
                 new DefaultRepositorySystemSession(session).setLocalRepositoryManager(localRepositoryManager);
-        MavenSession newSession = new MavenSession(
-                mavenSession.getContainer(), repoSession, mavenSession.getRequest(), mavenSession.getResult());
+        MavenSession newSession = new MavenSession(repoSession, mavenSession.getRequest(), mavenSession.getResult());
         return new DefaultSession(
                 newSession, repositorySystem, repositories, mavenRepositorySystem, container, runtimeInformation);
     }

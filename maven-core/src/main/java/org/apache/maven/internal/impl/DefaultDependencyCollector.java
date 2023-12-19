@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.impl;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -31,7 +30,6 @@ import org.apache.maven.api.services.DependencyCollectorException;
 import org.apache.maven.api.services.DependencyCollectorRequest;
 import org.apache.maven.api.services.DependencyCollectorResult;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectRequest;
@@ -41,27 +39,18 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 
-import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton
 public class DefaultDependencyCollector implements DependencyCollector {
 
-    private final RepositorySystem repositorySystem;
-
-    @Inject
-    DefaultDependencyCollector(@Nonnull RepositorySystem repositorySystem) {
-        this.repositorySystem = repositorySystem;
-    }
-
     @Nonnull
     @Override
     public DependencyCollectorResult collect(@Nonnull DependencyCollectorRequest request)
             throws DependencyCollectorException, IllegalArgumentException {
-        nonNull(request, "request can not be null");
-        DefaultSession session =
-                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
+        nonNull(request, "request");
+        InternalSession session = InternalSession.from(request.getSession());
 
         Artifact rootArtifact =
                 request.getRootArtifact().map(session::toArtifact).orElse(null);
@@ -81,7 +70,8 @@ public class DefaultDependencyCollector implements DependencyCollector {
         }
 
         try {
-            final CollectResult result = repositorySystem.collectDependencies(systemSession, collectRequest);
+            final CollectResult result =
+                    session.getRepositorySystem().collectDependencies(systemSession, collectRequest);
             return new DependencyCollectorResult() {
                 @Override
                 public List<Exception> getExceptions() {

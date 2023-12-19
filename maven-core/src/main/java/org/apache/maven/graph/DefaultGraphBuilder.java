@@ -99,6 +99,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
             if (result == null) {
                 final List<MavenProject> projects = getProjectsForMavenReactor(session);
                 validateProjects(projects, session.getRequest());
+                processPackagingAttribute(projects, session.getRequest());
                 enrichRequestFromResumptionData(projects, session.getRequest());
                 result = reactorDependencyGraph(session, projects);
             }
@@ -387,6 +388,19 @@ public class DefaultGraphBuilder implements GraphBuilder {
                                 plugin.getKey());
                     }
                 }
+            }
+        }
+    }
+
+    private void processPackagingAttribute(List<MavenProject> projects, MavenExecutionRequest request)
+            throws MavenExecutionException {
+        List<MavenProject> projectsInRequestScope = getProjectsInRequestScope(request, projects);
+        for (MavenProject p : projectsInRequestScope) {
+            if ("bom".equals(p.getPackaging())) {
+                LOGGER.info(
+                        "The packaging attribute of the '{}' project is configured as 'bom' and changed to 'pom'",
+                        p.getName());
+                p.setPackaging("pom");
             }
         }
     }

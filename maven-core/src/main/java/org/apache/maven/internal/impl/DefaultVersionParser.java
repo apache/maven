@@ -18,41 +18,42 @@
  */
 package org.apache.maven.internal.impl;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParser;
-import org.apache.maven.api.services.VersionParserException;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 
-import static org.apache.maven.artifact.versioning.VersionRange.createFromVersionSpec;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
+/**
+ * A wrapper class around a resolver version that works as model version parser as well.
+ */
 @Named
 @Singleton
 public class DefaultVersionParser implements VersionParser {
     private static final String SNAPSHOT = "SNAPSHOT";
     private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$");
 
+    private final org.apache.maven.model.version.VersionParser modelVersionParser;
+
+    @Inject
+    public DefaultVersionParser(org.apache.maven.model.version.VersionParser modelVersionParser) {
+        this.modelVersionParser = nonNull(modelVersionParser, "modelVersionParser");
+    }
+
     @Override
     public Version parseVersion(String version) {
-        return new DefaultVersion(new DefaultArtifactVersion(nonNull(version, "version")));
+        return modelVersionParser.parseVersion(version);
     }
 
     @Override
     public VersionRange parseVersionRange(String range) {
-        try {
-            return new DefaultVersionRange(createFromVersionSpec(nonNull(range, "version")));
-        } catch (InvalidVersionSpecificationException e) {
-            throw new VersionParserException("Unable to parse version range: " + range, e);
-        }
+        return modelVersionParser.parseVersionRange(range);
     }
 
     @Override
@@ -62,76 +63,5 @@ public class DefaultVersionParser implements VersionParser {
 
     static boolean checkSnapshot(String version) {
         return version.endsWith(SNAPSHOT) || SNAPSHOT_TIMESTAMP.matcher(version).matches();
-    }
-
-    static class DefaultVersion implements Version {
-        private final ArtifactVersion delegate;
-
-        DefaultVersion(ArtifactVersion delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        public int compareTo(Version o) {
-            if (o instanceof DefaultVersion) {
-                return delegate.compareTo(((DefaultVersion) o).delegate);
-            } else {
-                return delegate.compareTo(new DefaultArtifactVersion(o.toString()));
-            }
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            DefaultVersion that = (DefaultVersion) o;
-            return delegate.equals(that.delegate);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(delegate);
-        }
-
-        @Override
-        public String asString() {
-            return delegate.toString();
-        }
-
-        @Override
-        public String toString() {
-            return asString();
-        }
-    }
-
-    static class DefaultVersionRange implements VersionRange {
-        private final org.apache.maven.artifact.versioning.VersionRange delegate;
-
-        DefaultVersionRange(org.apache.maven.artifact.versioning.VersionRange delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        public boolean contains(Version version) {
-            if (version instanceof DefaultVersion) {
-                return delegate.containsVersion(((DefaultVersion) version).delegate);
-            } else {
-                return delegate.containsVersion(new DefaultArtifactVersion(version.toString()));
-            }
-        }
-
-        @Override
-        public String asString() {
-            return delegate.toString();
-        }
-
-        @Override
-        public String toString() {
-            return asString();
-        }
     }
 }

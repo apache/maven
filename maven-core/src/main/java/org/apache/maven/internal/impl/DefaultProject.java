@@ -44,15 +44,15 @@ import org.apache.maven.project.MavenProject;
 
 public class DefaultProject implements Project {
 
-    private final AbstractSession session;
+    private final InternalSession session;
     private final MavenProject project;
 
-    public DefaultProject(AbstractSession session, MavenProject project) {
+    public DefaultProject(InternalSession session, MavenProject project) {
         this.session = session;
         this.project = project;
     }
 
-    public AbstractSession getSession() {
+    public InternalSession getSession() {
         return session;
     }
 

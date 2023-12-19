@@ -24,10 +24,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -78,10 +76,6 @@ public interface ProjectManager extends Service {
     void addTestCompileSourceRoot(Project project, String sourceRoot);
 
     List<RemoteRepository> getRepositories(Project project);
-
-    List<Artifact> getResolvedDependencies(Project project, ResolutionScope scope);
-
-    Node getCollectedDependencies(Project project, ResolutionScope scope);
 
     void setProperty(Project project, String key, String value);
 }

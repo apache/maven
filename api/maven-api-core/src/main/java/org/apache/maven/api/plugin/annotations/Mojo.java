@@ -25,12 +25,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * This annotation will mark your class as a Mojo (ie. goal in a Maven plugin).
+ * The mojo can be annotated with {@code jakarta.inject.*} annotations.
+ * The {@link Parameter} annotation can be added on fields to inject data
+ * from the plugin configuration or from other components.
  *
  * @since 4.0.0
  */
@@ -55,31 +57,10 @@ public @interface Mojo {
     LifecyclePhase defaultPhase() default LifecyclePhase.NONE;
 
     /**
-     * the required dependency resolution scope.
-     * @return the required dependency resolution scope
-     */
-    @Nonnull
-    ResolutionScope requiresDependencyResolution() default ResolutionScope.NONE;
-
-    /**
-     * the required dependency collection scope.
-     * @return the required dependency collection scope
-     */
-    @Nonnull
-    ResolutionScope requiresDependencyCollection() default ResolutionScope.NONE;
-
-    /**
-     * your Mojo instantiation strategy. (Only <code>per-lookup</code> and <code>singleton</code> are supported)
-     * @return the instantiation strategy
-     */
-    @Nonnull
-    InstantiationStrategy instantiationStrategy() default InstantiationStrategy.PER_LOOKUP;
-
-    /**
      * does your mojo requires a project to be executed?
      * @return requires a project
      */
-    boolean requiresProject() default true;
+    boolean projectRequired() default true;
 
     /**
      * if the Mojo uses the Maven project and its child modules.
@@ -91,9 +72,10 @@ public @interface Mojo {
      * does this Mojo need to be online to be executed?
      * @return need to be online
      */
-    boolean requiresOnline() default false;
+    boolean onlineRequired() default false;
 
     /**
+     * TODO: v4: add a SPI for the configurator
      * configurator bean name.
      * @return the configurator bean name
      */

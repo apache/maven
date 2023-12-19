@@ -51,11 +51,13 @@ public interface ArtifactCoordinateFactoryRequest {
 
     String getType();
 
+    String getCoordinateString();
+
     @Nonnull
     static ArtifactCoordinateFactoryRequest build(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
         return ArtifactCoordinateFactoryRequest.builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session(nonNull(session, "session"))
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
@@ -73,7 +75,7 @@ public interface ArtifactCoordinateFactoryRequest {
             String extension,
             String type) {
         return ArtifactCoordinateFactoryRequest.builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session(nonNull(session, "session"))
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
@@ -84,10 +86,18 @@ public interface ArtifactCoordinateFactoryRequest {
     }
 
     @Nonnull
+    static ArtifactCoordinateFactoryRequest build(@Nonnull Session session, @Nonnull String coordinateString) {
+        return ArtifactCoordinateFactoryRequest.builder()
+                .session(nonNull(session, "session"))
+                .coordinateString(nonNull(coordinateString, "coordinateString"))
+                .build();
+    }
+
+    @Nonnull
     static ArtifactCoordinateFactoryRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinate coordinate) {
         return ArtifactCoordinateFactoryRequest.builder()
-                .session(nonNull(session, "session cannot be null"))
-                .groupId(nonNull(coordinate, "coordinate cannot be null").getGroupId())
+                .session(nonNull(session, "session"))
+                .groupId(nonNull(coordinate, "coordinate").getGroupId())
                 .artifactId(coordinate.getArtifactId())
                 .classifier(coordinate.getClassifier())
                 .version(coordinate.getVersion().asString())
@@ -108,6 +118,7 @@ public interface ArtifactCoordinateFactoryRequest {
         private String classifier;
         private String extension;
         private String type;
+        private String coordinateString;
 
         ArtifactFactoryRequestBuilder() {}
 
@@ -146,9 +157,14 @@ public interface ArtifactCoordinateFactoryRequest {
             return this;
         }
 
+        public ArtifactFactoryRequestBuilder coordinateString(String coordinateString) {
+            this.coordinateString = coordinateString;
+            return this;
+        }
+
         public ArtifactCoordinateFactoryRequest build() {
             return new DefaultArtifactFactoryRequestArtifact(
-                    session, groupId, artifactId, version, classifier, extension, type);
+                    session, groupId, artifactId, version, classifier, extension, type, coordinateString);
         }
 
         private static class DefaultArtifactFactoryRequestArtifact extends BaseRequest
@@ -159,6 +175,7 @@ public interface ArtifactCoordinateFactoryRequest {
             private final String classifier;
             private final String extension;
             private final String type;
+            private final String coordinateString;
 
             DefaultArtifactFactoryRequestArtifact(
                     @Nonnull Session session,
@@ -167,7 +184,8 @@ public interface ArtifactCoordinateFactoryRequest {
                     String version,
                     String classifier,
                     String extension,
-                    String type) {
+                    String type,
+                    String coordinateString) {
                 super(session);
                 this.groupId = groupId;
                 this.artifactId = artifactId;
@@ -175,6 +193,7 @@ public interface ArtifactCoordinateFactoryRequest {
                 this.classifier = classifier;
                 this.extension = extension;
                 this.type = type;
+                this.coordinateString = coordinateString;
             }
 
             @Override
@@ -205,6 +224,10 @@ public interface ArtifactCoordinateFactoryRequest {
             @Override
             public String getType() {
                 return type;
+            }
+
+            public String getCoordinateString() {
+                return coordinateString;
             }
         }
     }

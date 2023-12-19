@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.WeakHashMap;
 
 import org.apache.maven.api.annotations.Nonnull;
@@ -213,6 +214,9 @@ public class ReflectionValueExtractor {
             }
         }
 
+        if (value instanceof Optional) {
+            value = ((Optional<?>) value).orElse(null);
+        }
         return value;
     }
 

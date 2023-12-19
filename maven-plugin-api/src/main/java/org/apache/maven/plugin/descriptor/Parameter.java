@@ -49,6 +49,25 @@ public class Parameter implements Cloneable {
     //
     // ----------------------------------------------------------------------
 
+    public Parameter() {}
+
+    public Parameter(org.apache.maven.api.plugin.descriptor.Parameter p) {
+        this.setAlias(p.getAlias());
+        this.setName(p.getName());
+        this.setRequired(p.isRequired());
+        this.setEditable(p.isEditable());
+        this.setDescription(p.getDescription());
+        this.setExpression(p.getExpression());
+        this.setDeprecated(p.getDeprecated());
+        this.setDefaultValue(p.getDefaultValue());
+        this.setType(p.getType());
+        this.setSince(p.getSince());
+    }
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
     public String getName() {
         return name;
     }
@@ -167,5 +186,20 @@ public class Parameter implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new UnsupportedOperationException(e);
         }
+    }
+
+    public org.apache.maven.api.plugin.descriptor.Parameter getParameterV4() {
+        return org.apache.maven.api.plugin.descriptor.Parameter.newBuilder()
+                .alias(alias)
+                .name(name)
+                .type(type)
+                .required(required)
+                .editable(editable)
+                .description(description)
+                .expression(expression)
+                .deprecated(deprecated)
+                .defaultValue(defaultValue)
+                .since(since)
+                .build();
     }
 }

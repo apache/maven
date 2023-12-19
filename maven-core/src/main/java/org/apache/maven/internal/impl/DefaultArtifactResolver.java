@@ -18,67 +18,64 @@
  */
 package org.apache.maven.internal.impl;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
 import org.apache.maven.api.services.ArtifactResolverRequest;
 import org.apache.maven.api.services.ArtifactResolverResult;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
-import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton
 public class DefaultArtifactResolver implements ArtifactResolver {
-    private final RepositorySystem repositorySystem;
-
-    @Inject
-    DefaultArtifactResolver(@Nonnull RepositorySystem repositorySystem) {
-        this.repositorySystem = nonNull(repositorySystem, "repositorySystem can not be null");
-    }
 
     @Override
     public ArtifactResolverResult resolve(ArtifactResolverRequest request)
             throws ArtifactResolverException, IllegalArgumentException {
-        nonNull(request, "request can not be null");
-        DefaultSession session =
-                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
+        nonNull(request, "request");
+        InternalSession session = InternalSession.from(request.getSession());
         try {
-            List<RemoteRepository> repositories = session.toRepositories(session.getRemoteRepositories());
-            List<ArtifactRequest> requests = request.getCoordinates().stream()
-                    .map(coord -> new ArtifactRequest(session.toArtifact(coord), repositories, null))
-                    .collect(Collectors.toList());
-            List<ArtifactResult> results = repositorySystem.resolveArtifacts(session.getSession(), requests);
             Map<Artifact, Path> paths = new HashMap<>();
-            for (ArtifactResult result : results) {
-                Artifact artifact = session.getArtifact(result.getArtifact());
-                Path path = result.getArtifact().getFile().toPath();
-                session.getService(ArtifactManager.class).setPath(artifact, path);
-                paths.put(artifact, path);
-            }
-            return new ArtifactResolverResult() {
-                @Override
-                public Map<Artifact, Path> getArtifacts() {
-                    return paths;
+            ArtifactManager artifactManager = session.getService(ArtifactManager.class);
+            List<RemoteRepository> repositories = session.toRepositories(session.getRemoteRepositories());
+            List<ArtifactRequest> requests = new ArrayList<>();
+            for (ArtifactCoordinate coord : request.getCoordinates()) {
+                org.eclipse.aether.artifact.Artifact aetherArtifact = session.toArtifact(coord);
+                Artifact artifact = session.getArtifact(aetherArtifact);
+                Path path = artifactManager.getPath(artifact).orElse(null);
+                if (path != null) {
+                    paths.put(artifact, path);
+                } else {
+                    requests.add(new ArtifactRequest(aetherArtifact, repositories, null));
                 }
-            };
+            }
+            if (!requests.isEmpty()) {
+                List<ArtifactResult> results =
+                        session.getRepositorySystem().resolveArtifacts(session.getSession(), requests);
+                for (ArtifactResult result : results) {
+                    Artifact artifact = session.getArtifact(result.getArtifact());
+                    Path path = result.getArtifact().getFile().toPath();
+                    artifactManager.setPath(artifact, path);
+                    paths.put(artifact, path);
+                }
+            }
+            return () -> paths;
         } catch (ArtifactResolutionException e) {
             throw new ArtifactResolverException("Unable to resolve artifact", e);
         }

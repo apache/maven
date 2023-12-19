@@ -26,47 +26,61 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.api.Type;
+import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.eventspy.AbstractEventSpy;
+import org.apache.maven.execution.ExecutionEvent;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  */
 @Named
 @Singleton
-public class DefaultArtifactHandlerManager implements ArtifactHandlerManager {
+public class DefaultArtifactHandlerManager extends AbstractEventSpy implements ArtifactHandlerManager {
+    private final TypeRegistry typeRegistry;
 
-    private final Map<String, ArtifactHandler> artifactHandlers;
-
-    private final Map<String, ArtifactHandler> allHandlers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ArtifactHandler> allHandlers;
 
     @Inject
-    public DefaultArtifactHandlerManager(Map<String, ArtifactHandler> artifactHandlers) {
-        this.artifactHandlers = artifactHandlers;
+    public DefaultArtifactHandlerManager(TypeRegistry typeRegistry) {
+        this.typeRegistry = requireNonNull(typeRegistry, "null typeRegistry");
+        this.allHandlers = new ConcurrentHashMap<>();
     }
 
-    public ArtifactHandler getArtifactHandler(String type) {
-        ArtifactHandler handler = allHandlers.get(type);
-
-        if (handler == null) {
-            handler = artifactHandlers.get(type);
-
-            if (handler == null) {
-                handler = new DefaultArtifactHandler(type);
-            } else {
-                allHandlers.put(type, handler);
+    @Override
+    public void onEvent(Object event) {
+        if (event instanceof ExecutionEvent) {
+            ExecutionEvent executionEvent = (ExecutionEvent) event;
+            if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
+                allHandlers.clear();
             }
         }
+    }
 
-        return handler;
+    public ArtifactHandler getArtifactHandler(String id) {
+        return allHandlers.computeIfAbsent(id, k -> {
+            Type type = typeRegistry.getType(id);
+            return new DefaultArtifactHandler(
+                    id,
+                    type.getExtension(),
+                    type.getClassifier(),
+                    null,
+                    null,
+                    type.isIncludesDependencies(),
+                    type.getLanguage(),
+                    type.isAddedToClassPath()); // TODO: watch out for module path
+        });
     }
 
     public void addHandlers(Map<String, ArtifactHandler> handlers) {
-        // legacy support for maven-gpg-plugin:1.0
-        allHandlers.putAll(handlers);
+        throw new UnsupportedOperationException("Adding handlers programmatically is not supported anymore");
     }
 
     @Deprecated
     public Set<String> getHandlerTypes() {
-        return artifactHandlers.keySet();
+        throw new UnsupportedOperationException("Querying handlers programmatically is not supported anymore");
     }
 }

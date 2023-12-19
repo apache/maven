@@ -20,6 +20,8 @@ package org.apache.maven.model.building;
 
 import java.util.Arrays;
 
+import org.apache.maven.api.Version;
+import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
@@ -71,6 +73,9 @@ import org.apache.maven.model.superpom.DefaultSuperPomProvider;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
+import org.apache.maven.model.version.VersionParser;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A factory to create model builder instances when no dependency injection is available. <em>Note:</em> This class is
@@ -101,8 +106,7 @@ public class DefaultModelBuilderFactory {
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private ModelVersionProcessor versionProcessor;
     private ModelSourceTransformer transformer;
-
-    private RootLocator rootLocator;
+    private VersionParser versionParser;
 
     public DefaultModelBuilderFactory setModelProcessor(ModelProcessor modelProcessor) {
         this.modelProcessor = modelProcessor;
@@ -205,13 +209,13 @@ public class DefaultModelBuilderFactory {
         return this;
     }
 
-    public DefaultModelBuilderFactory setRootLocator(RootLocator rootLocator) {
-        this.rootLocator = rootLocator;
+    public DefaultModelBuilderFactory setTransformer(ModelSourceTransformer transformer) {
+        this.transformer = transformer;
         return this;
     }
 
-    public DefaultModelBuilderFactory setTransformer(ModelSourceTransformer transformer) {
-        this.transformer = transformer;
+    public DefaultModelBuilderFactory setModelVersionParser(VersionParser versionParser) {
+        this.versionParser = versionParser;
         return this;
     }
 
@@ -333,6 +337,33 @@ public class DefaultModelBuilderFactory {
         return new BuildModelSourceTransformer();
     }
 
+    private VersionParser newModelVersionParser() {
+        // This is a limited parser that does not support ranges and compares versions as strings
+        // in real-life this parser should not be used, but replaced with a proper one
+        return new VersionParser() {
+            @Override
+            public Version parseVersion(String version) {
+                requireNonNull(version, "version");
+                return new Version() {
+                    @Override
+                    public String asString() {
+                        return version;
+                    }
+
+                    @Override
+                    public int compareTo(Version o) {
+                        return version.compareTo(o.asString());
+                    }
+                };
+            }
+
+            @Override
+            public VersionRange parseVersionRange(String range) {
+                throw new IllegalArgumentException("ranges not supported by this parser");
+            }
+        };
+    }
+
     /**
      * Creates a new model builder instance.
      *
@@ -360,7 +391,8 @@ public class DefaultModelBuilderFactory {
                         ? profileActivationFilePathInterpolator
                         : newProfileActivationFilePathInterpolator(),
                 versionProcessor != null ? versionProcessor : newModelVersionPropertiesProcessor(),
-                transformer != null ? transformer : newModelSourceTransformer());
+                transformer != null ? transformer : newModelSourceTransformer(),
+                versionParser != null ? versionParser : newModelVersionParser());
     }
 
     private static class StubLifecycleBindingsInjector implements LifecycleBindingsInjector {

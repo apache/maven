@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
@@ -35,6 +36,7 @@ import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -51,6 +53,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -96,7 +99,8 @@ class TestApi {
     void setup() {
         RepositorySystemSession rss = MavenRepositorySystemUtils.newSession();
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
-        MavenSession ms = new MavenSession(null, rss, mer, null);
+        DefaultMavenExecutionResult meres = new DefaultMavenExecutionResult();
+        MavenSession ms = new MavenSession(rss, mer, meres);
         DefaultSession session = new DefaultSession(
                 ms,
                 repositorySystem,
@@ -112,7 +116,7 @@ class TestApi {
                 .withRemoteRepositories(Collections.singletonList(remoteRepository));
 
         sessionScope.enter();
-        sessionScope.seed(DefaultSession.class, (DefaultSession) this.session);
+        sessionScope.seed(InternalSession.class, InternalSession.from(this.session));
     }
 
     @Test
@@ -120,10 +124,13 @@ class TestApi {
         ArtifactCoordinate coord =
                 session.createArtifactCoordinate("org.codehaus.plexus", "plexus-utils", "1.4.5", "pom");
 
-        Artifact resolved = session.resolveArtifact(coord);
-        Optional<Path> op = session.getArtifactPath(resolved);
+        Map.Entry<Artifact, Path> resolved = session.resolveArtifact(coord);
+        assertNotNull(resolved);
+        assertNotNull(resolved.getKey());
+        assertNotNull(resolved.getValue());
+        Optional<Path> op = session.getArtifactPath(resolved.getKey());
         assertTrue(op.isPresent());
-        assertNotNull(op.get());
+        assertEquals(resolved.getValue(), op.get());
 
         Project project = session.getService(ProjectBuilder.class)
                 .build(ProjectBuilderRequest.builder()

@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.internal.SetWithResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
@@ -140,13 +141,10 @@ public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
             if (o == this) {
                 return true;
             }
-
             if (!(o instanceof CacheKey)) {
                 return false;
             }
-
             CacheKey that = (CacheKey) o;
-
             return Objects.equals(groupId, that.groupId)
                     && Objects.equals(artifactId, that.artifactId)
                     && Objects.equals(version, that.version)
@@ -181,24 +179,38 @@ public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
     @Override
     public CacheRecord get(Key key) throws LifecycleExecutionException {
         CacheRecord cacheRecord = cache.get(key);
-
         if (cacheRecord != null && cacheRecord.getException() != null) {
             throw cacheRecord.getException();
         }
-
         return cacheRecord;
     }
 
     @Override
     public CacheRecord put(Key key, Set<Artifact> projectArtifacts) {
         Objects.requireNonNull(projectArtifacts, "projectArtifacts cannot be null");
-
         assertUniqueKey(key);
 
-        CacheRecord record = new CacheRecord(Collections.unmodifiableSet(new LinkedHashSet<>(projectArtifacts)));
+        SetWithResolutionResult artifacts;
+        if (projectArtifacts instanceof SetWithResolutionResult) {
+            artifacts = (SetWithResolutionResult) projectArtifacts;
+        } else if (projectArtifacts instanceof ArtifactsSetWithResult) {
+            artifacts = new SetWithResolutionResult(
+                    ((ArtifactsSetWithResult) projectArtifacts).getResult(), projectArtifacts);
+        } else {
+            throw new IllegalArgumentException("projectArtifacts must implement ArtifactsSetWithResult");
+        }
 
+        CacheRecord record = new CacheRecord(artifacts);
         cache.put(key, record);
+        return record;
+    }
 
+    @Override
+    public CacheRecord put(Key key, LifecycleExecutionException exception) {
+        Objects.requireNonNull(exception, "exception cannot be null");
+        assertUniqueKey(key);
+        CacheRecord record = new CacheRecord(exception);
+        cache.put(key, record);
         return record;
     }
 
@@ -206,19 +218,6 @@ public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
         if (cache.containsKey(key)) {
             throw new IllegalStateException("Duplicate artifact resolution result for project " + key);
         }
-    }
-
-    @Override
-    public CacheRecord put(Key key, LifecycleExecutionException exception) {
-        Objects.requireNonNull(exception, "exception cannot be null");
-
-        assertUniqueKey(key);
-
-        CacheRecord record = new CacheRecord(exception);
-
-        cache.put(key, record);
-
-        return record;
     }
 
     @Override

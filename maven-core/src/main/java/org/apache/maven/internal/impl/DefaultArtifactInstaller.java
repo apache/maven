@@ -31,7 +31,6 @@ import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.installation.InstallResult;
 import org.eclipse.aether.installation.InstallationException;
 
-import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -47,9 +46,8 @@ public class DefaultArtifactInstaller implements ArtifactInstaller {
 
     @Override
     public void install(ArtifactInstallerRequest request) throws ArtifactInstallerException, IllegalArgumentException {
-        nonNull(request, "request can not be null");
-        DefaultSession session =
-                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
+        nonNull(request, "request");
+        InternalSession session = InternalSession.from(request.getSession());
         try {
             InstallRequest installRequest =
                     new InstallRequest().setArtifacts(session.toArtifacts(request.getArtifacts()));

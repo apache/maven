@@ -28,10 +28,10 @@ import org.apache.maven.api.Session;
 import org.apache.maven.execution.ExecutionEvent;
 
 public class DefaultEvent implements Event {
-    private final AbstractSession session;
+    private final InternalSession session;
     private final ExecutionEvent delegate;
 
-    public DefaultEvent(AbstractSession session, ExecutionEvent delegate) {
+    public DefaultEvent(InternalSession session, ExecutionEvent delegate) {
         this.session = session;
         this.delegate = delegate;
     }
@@ -53,11 +53,11 @@ public class DefaultEvent implements Event {
 
     @Override
     public Optional<MojoExecution> getMojoExecution() {
-        return Optional.ofNullable(delegate.getMojoExecution()).map(DefaultMojoExecution::new);
+        return Optional.ofNullable(delegate.getMojoExecution()).map(me -> new DefaultMojoExecution(session, me));
     }
 
     @Override
     public Optional<Exception> getException() {
-        return Optional.empty();
+        return Optional.ofNullable(delegate.getException());
     }
 }

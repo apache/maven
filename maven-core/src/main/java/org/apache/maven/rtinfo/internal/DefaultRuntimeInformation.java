@@ -48,7 +48,7 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
     private final String mavenVersion;
 
     @Inject
-    public DefaultRuntimeInformation(final VersionScheme versionScheme) {
+    public DefaultRuntimeInformation(VersionScheme versionScheme) {
         this.versionScheme = versionScheme;
         this.mavenVersion = loadMavenVersion();
     }

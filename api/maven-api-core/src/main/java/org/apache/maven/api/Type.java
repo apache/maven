@@ -20,6 +20,8 @@ package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Dependency;
 
 /**
@@ -40,26 +42,31 @@ import org.apache.maven.api.model.Dependency;
 @Immutable
 public interface Type {
 
-    String POM = "pom";
-    String JAR = "jar";
-    String JAVA_SOURCE = "java-source";
-    String JAVADOC = "javadoc";
-    String MAVEN_PLUGIN = "maven-plugin";
-    String TEST_JAR = "test-jar";
+    String LANGUAGE_NONE = "none";
+    String LANGUAGE_JAVA = "java";
 
     /**
      * Returns the dependency type id.
      * The id uniquely identifies this <i>dependency type</i>.
      *
-     * @return the id of this type
+     * @return the id of this type, never {@code null}.
      */
+    @Nonnull
     String getId();
+
+    /**
+     * Returns the dependency type language.
+     *
+     * @return the language of this type, never {@code null}.
+     */
+    String getLanguage();
 
     /**
      * Get the file extension of artifacts of this type.
      *
-     * @return the file extension
+     * @return the file extension, never {@code null}.
      */
+    @Nonnull
     String getExtension();
 
     /**
@@ -67,17 +74,20 @@ public interface Type {
      * The default classifier can be overridden when specifying
      * the {@link Dependency#getClassifier()}.
      *
-     * @return the default classifier
+     * @return the default classifier, or {@code null}.
      */
+    @Nullable
     String getClassifier();
 
     /**
      * Specifies if the artifact contains java classes and should be
      * added to the classpath.
      *
-     * @return if the artifact should be added to the classpath
+     * @return if the artifact should be added to the class path
      */
-    boolean isAddedToClasspath();
+    default boolean isAddedToClassPath() {
+        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
+    }
 
     /**
      * Specifies if the artifact already embeds its own dependencies.
@@ -86,5 +96,15 @@ public interface Type {
      *
      * @return if the artifact's dependencies are included in the artifact
      */
-    boolean isIncludesDependencies();
+    default boolean isIncludesDependencies() {
+        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
+    }
+
+    /**
+     * Gets the default properties associated with this dependency type.
+     *
+     * @return the default properties, never {@code null}.
+     */
+    @Nonnull
+    DependencyProperties getDependencyProperties();
 }

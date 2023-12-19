@@ -40,6 +40,7 @@ import org.apache.maven.model.locator.DefaultModelLocator;
 import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.project.collector.DefaultProjectsSelector;
@@ -48,6 +49,7 @@ import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.ProjectsSelector;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -79,6 +81,7 @@ class DefaultGraphBuilderTest {
          module-c
          └─── module-c-1
               module-c-2        (depends on module-b)
+         module-d               (packaging is bom)
      */
     private static final String GROUP_ID = "unittest";
     private static final String PARENT_MODULE = "module-parent";
@@ -86,6 +89,7 @@ class DefaultGraphBuilderTest {
     private static final String MODULE_A = "module-a";
     private static final String MODULE_B = "module-b";
     private static final String MODULE_C = "module-c";
+    private static final String MODULE_D = "module-d";
     private static final String MODULE_C_1 = "module-c-1";
     private static final String MODULE_C_2 = "module-c-2";
 
@@ -329,6 +333,46 @@ class DefaultGraphBuilderTest {
         }
     }
 
+    @Test
+    void testProcessPackagingAttribute() throws ProjectBuildingException {
+        graphBuilder = new DefaultGraphBuilder(
+                mock(BuildResumptionDataRepository.class),
+                pomlessCollectionStrategy,
+                multiModuleCollectionStrategy,
+                requestPomCollectionStrategy);
+
+        // Create projects
+        MavenProject projectParent = getMavenProject(PARENT_MODULE);
+        MavenProject projectModuleD = getMavenProject(MODULE_D, projectParent, "bom");
+
+        projectParent.setCollectedProjects(singletonList(projectModuleD));
+
+        // Set up needed mocks
+        when(session.getRequest()).thenReturn(mavenExecutionRequest);
+        when(session.getProjects()).thenReturn(null); // needed, otherwise it will be an empty list by default
+        when(mavenExecutionRequest.getProjectBuildingRequest()).thenReturn(mock(ProjectBuildingRequest.class));
+        List<ProjectBuildingResult> projectBuildingResults =
+                createProjectBuildingResultMocks(Stream.of(projectParent, projectModuleD)
+                        .collect(Collectors.toMap(MavenProject::getArtifactId, identity()))
+                        .values());
+        when(projectBuilder.build(anyList(), anyBoolean(), any(ProjectBuildingRequest.class)))
+                .thenReturn(projectBuildingResults);
+
+        ProjectActivation projectActivation = new ProjectActivation();
+
+        when(mavenExecutionRequest.getProjectActivation()).thenReturn(projectActivation);
+        when(mavenExecutionRequest.getPom()).thenReturn(new File(PARENT_MODULE, "pom.xml"));
+
+        Result<ProjectDependencyGraph> result = graphBuilder.build(session);
+
+        assertThat(result.hasErrors())
+                .withFailMessage("Expected result not to have errors")
+                .isFalse();
+        List<MavenProject> actualReactorProjects = result.get().getSortedProjects();
+        assertEquals(2, actualReactorProjects.size());
+        assertEquals("pom", actualReactorProjects.get(1).getPackaging());
+    }
+
     @BeforeEach
     void before() throws Exception {
         graphBuilder = new DefaultGraphBuilder(
@@ -395,6 +439,16 @@ class DefaultGraphBuilderTest {
         mavenProject.setPomFile(new File(artifactId, "pom.xml"));
         mavenProject.setCollectedProjects(new ArrayList<>());
         return mavenProject;
+    }
+
+    private MavenProject getMavenProject(String artifactId, MavenProject parentProject, String packaging) {
+        MavenProject project = getMavenProject(artifactId);
+        Parent parent = new Parent();
+        parent.setGroupId(parentProject.getGroupId());
+        parent.setArtifactId(parentProject.getArtifactId());
+        project.getModel().setParent(parent);
+        project.setPackaging(packaging);
+        return project;
     }
 
     private Dependency toDependency(MavenProject mavenProject) {

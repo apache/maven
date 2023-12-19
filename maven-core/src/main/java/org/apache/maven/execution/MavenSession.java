@@ -46,18 +46,20 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A Maven execution session.
  *
  */
 public class MavenSession implements Cloneable {
-    private MavenExecutionRequest request;
+    private final MavenExecutionRequest request;
 
-    private MavenExecutionResult result;
+    private final MavenExecutionResult result;
 
-    private RepositorySystemSession repositorySession;
+    private final RepositorySystemSession repositorySystemSession;
 
-    private Properties executionProperties;
+    private final Properties executionProperties;
 
     private ThreadLocal<MavenProject> currentProject = new ThreadLocal<>();
 
@@ -257,7 +259,7 @@ public class MavenSession implements Cloneable {
     }
 
     public RepositorySystemSession getRepositorySession() {
-        return repositorySession;
+        return repositorySystemSession;
     }
 
     private Map<String, MavenProject> projectMap;
@@ -282,7 +284,7 @@ public class MavenSession implements Cloneable {
     // Deprecated
     //
 
-    private PlexusContainer container;
+    private final PlexusContainer container;
 
     private final Settings settings;
 
@@ -292,6 +294,21 @@ public class MavenSession implements Cloneable {
     /** @deprecated This appears not to be used anywhere within Maven itself. */
     public Map<String, MavenProject> getProjectMap() {
         return projectMap;
+    }
+
+    public MavenSession(
+            RepositorySystemSession repositorySystemSession,
+            MavenExecutionRequest request,
+            MavenExecutionResult result) {
+        this.container = null;
+        this.request = requireNonNull(request);
+        this.result = requireNonNull(result);
+        this.settings = adaptSettings(request);
+        this.repositorySystemSession = requireNonNull(repositorySystemSession);
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
     }
 
     @Deprecated
@@ -304,7 +321,11 @@ public class MavenSession implements Cloneable {
         this.request = request;
         this.result = result;
         this.settings = adaptSettings(request);
-        this.repositorySession = repositorySession;
+        this.repositorySystemSession = repositorySession;
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
     }
 
     @Deprecated
@@ -363,6 +384,8 @@ public class MavenSession implements Cloneable {
         this.request.setGoals(goals);
         this.request.setBaseDirectory((executionRootDir != null) ? new File(executionRootDir) : null);
         this.request.setStartTime(startTime);
+        this.result = null;
+        this.repositorySystemSession = null;
     }
 
     @Deprecated
@@ -375,7 +398,12 @@ public class MavenSession implements Cloneable {
         this.request = request;
         this.result = result;
         this.settings = adaptSettings(request);
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
         setProjects(projects);
+        this.repositorySystemSession = null;
     }
 
     /**
@@ -431,12 +459,6 @@ public class MavenSession implements Cloneable {
      */
     @Deprecated
     public Properties getExecutionProperties() {
-        if (executionProperties == null) {
-            executionProperties = new Properties();
-            executionProperties.putAll(request.getSystemProperties());
-            executionProperties.putAll(request.getUserProperties());
-        }
-
         return executionProperties;
     }
 

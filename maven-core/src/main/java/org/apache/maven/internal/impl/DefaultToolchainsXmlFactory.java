@@ -38,12 +38,14 @@ import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
 import org.apache.maven.toolchain.v4.MavenToolchainsStaxWriter;
 
+import static org.apache.maven.internal.impl.Utils.nonNull;
+
 @Named
 @Singleton
 public class DefaultToolchainsXmlFactory implements ToolchainsXmlFactory {
     @Override
     public PersistedToolchains read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
-        Objects.requireNonNull(request, "request can not be null");
+        Objects.requireNonNull(request, "request");
         Reader reader = request.getReader();
         InputStream inputStream = request.getInputStream();
         if (reader == null && inputStream == null) {
@@ -68,8 +70,8 @@ public class DefaultToolchainsXmlFactory implements ToolchainsXmlFactory {
 
     @Override
     public void write(XmlWriterRequest<PersistedToolchains> request) throws XmlWriterException {
-        Objects.requireNonNull(request, "request can not be null");
-        PersistedToolchains content = Objects.requireNonNull(request.getContent(), "content can not be null");
+        nonNull(request, "request");
+        PersistedToolchains content = Objects.requireNonNull(request.getContent(), "content");
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();
         if (writer == null && outputStream == null) {

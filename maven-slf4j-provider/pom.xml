@@ -23,14 +23,14 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-9-SNAPSHOT</version>
+    <version>4.0.0-alpha-11-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-slf4j-provider</artifactId>
 
   <name>Maven SLF4J Simple Provider</name>
   <description>Maven SLF4J provider based on SLF4J's simple provider, extended to support Maven styled colors
-    for levels and stacktraces rendering.</description>
+    for levels and stacktrace rendering.</description>
 
   <dependencies>
     <dependency>

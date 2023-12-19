@@ -34,7 +34,7 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -146,11 +146,14 @@ public abstract class AbstractCoreMavenComponentTestCase {
 
         initRepoSession(configuration);
 
+        DefaultSessionFactory defaultSessionFactory =
+                new DefaultSessionFactory(mock(RepositorySystem.class), null, null, null);
+
         MavenSession session = new MavenSession(
                 getContainer(), configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());
         session.setProjects(projects);
         session.setAllProjects(session.getProjects());
-        session.setSession(new DefaultSession(session, mock(RepositorySystem.class), null, null, null, null));
+        session.setSession(defaultSessionFactory.getSession(session));
 
         return session;
     }

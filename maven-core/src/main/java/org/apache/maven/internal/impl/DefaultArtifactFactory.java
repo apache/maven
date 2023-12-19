@@ -27,7 +27,6 @@ import org.apache.maven.api.services.ArtifactFactory;
 import org.apache.maven.api.services.ArtifactFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
-import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -35,9 +34,8 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultArtifactFactory implements ArtifactFactory {
     @Override
     public Artifact create(@Nonnull ArtifactFactoryRequest request) {
-        nonNull(request, "request can not be null");
-        DefaultSession session =
-                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
+        nonNull(request, "request");
+        InternalSession session = InternalSession.from(request.getSession());
         ArtifactType type = null;
         if (request.getType() != null) {
             type = session.getSession().getArtifactTypeRegistry().get(request.getType());

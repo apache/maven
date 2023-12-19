@@ -447,7 +447,7 @@ public class MavenCli {
         }
 
         if (cliRequest.rootDirectory == null) {
-            slf4jLogger.debug(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
+            slf4jLogger.info(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
         }
     }
 
@@ -1291,8 +1291,19 @@ public class MavenCli {
         request.setResumeFrom(commandLine.getOptionValue(CLIManager.RESUME_FROM));
         enableOnPresentOption(commandLine, CLIManager.RESUME, request::setResume);
         request.setMakeBehavior(determineMakeBehavior(commandLine));
-        request.setCacheNotFound(true);
+        boolean cacheNotFound = !commandLine.hasOption(CLIManager.CACHE_ARTIFACT_NOT_FOUND)
+                || Boolean.parseBoolean(commandLine.getOptionValue(CLIManager.CACHE_ARTIFACT_NOT_FOUND));
+        request.setCacheNotFound(cacheNotFound);
         request.setCacheTransferError(false);
+        boolean strictArtifactDescriptorPolicy = commandLine.hasOption(CLIManager.STRICT_ARTIFACT_DESCRIPTOR_POLICY)
+                && Boolean.parseBoolean(commandLine.getOptionValue(CLIManager.STRICT_ARTIFACT_DESCRIPTOR_POLICY));
+        if (strictArtifactDescriptorPolicy) {
+            request.setIgnoreMissingArtifactDescriptor(false);
+            request.setIgnoreInvalidArtifactDescriptor(false);
+        } else {
+            request.setIgnoreMissingArtifactDescriptor(true);
+            request.setIgnoreInvalidArtifactDescriptor(true);
+        }
 
         performProjectActivation(commandLine, request.getProjectActivation());
         performProfileActivation(commandLine, request.getProfileActivation());
