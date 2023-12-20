@@ -66,6 +66,8 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
+import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
+import org.eclipse.aether.util.graph.manager.TransitiveDependencyManager;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
@@ -101,6 +103,21 @@ public class DefaultRepositorySystemSessionFactory {
      * @since 3.9.0
      */
     private static final String MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE = "maven.repo.local.recordReverseTree";
+
+    /**
+     * User property for selecting dependency manager implementation. Maven3 used "classic" only, that targeted full
+     * backward compatibility with Maven2: it ignores dependency management entries in transitive dependency POMs.
+     * Maven 4 by default uses "transitive" that unlike "classic", obeys dependency management entries deep in
+     * dependency graph as well.
+     * Default: {@code "transitive"}. Accepts values {@code "transitive"} and {@code "classic"}.
+     *
+     * @since 4.0.0
+     */
+    private static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_KEY = "maven.resolver.dependencyManager";
+
+    private static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVE = "transitive";
+
+    private static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_CLASSIC = "classic";
 
     private static final String MAVEN_RESOLVER_TRANSPORT_KEY = "maven.resolver.transport";
 
@@ -391,6 +408,19 @@ public class DefaultRepositorySystemSessionFactory {
         injectMirror(request.getPluginArtifactRepositories(), request.getMirrors());
         injectProxy(proxySelector, request.getPluginArtifactRepositories());
         injectAuthentication(authSelector, request.getPluginArtifactRepositories());
+
+        Object resolverDependencyManager = configProps.getOrDefault(
+                MAVEN_RESOLVER_DEPENDENCY_MANAGER_KEY, MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVE);
+        if (MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVE.equals(resolverDependencyManager)) {
+            session.setDependencyManager(new TransitiveDependencyManager());
+        } else if (MAVEN_RESOLVER_DEPENDENCY_MANAGER_CLASSIC.equals(resolverDependencyManager)) {
+            session.setDependencyManager(new ClassicDependencyManager());
+        } else {
+            throw new IllegalArgumentException("Unknown resolver dependency manager '" + resolverDependencyManager
+                    + "'. Supported managers are: "
+                    + Arrays.asList(
+                            MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVE, MAVEN_RESOLVER_DEPENDENCY_MANAGER_CLASSIC));
+        }
 
         ArrayList<File> paths = new ArrayList<>();
         paths.add(new File(request.getLocalRepository().getBasedir()));
