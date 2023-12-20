@@ -407,7 +407,7 @@ public class DefaultRepositorySystemSessionFactory {
         injectAuthentication(authSelector, request.getPluginArtifactRepositories());
 
         String resolverDependencyManagerTransitivity = (String)
-                configProps.getOrDefault(Boolean.TRUE.toString(), MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY);
+                configProps.getOrDefault(MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY, Boolean.TRUE.toString());
         session.setDependencyManager(
                 new ClassicDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 
