@@ -50,7 +50,7 @@ public class DefaultChecksumAlgorithmServiceTest {
     @Test
     void smokeTest() {
         Collection<String> algNames = service.getChecksumAlgorithmNames();
-        assertEquals(4, algNames.size(), "Expected 4 algorithms but:" + algNames.size());
+        assertEquals(4, algNames.size());
     }
 
     @Test
