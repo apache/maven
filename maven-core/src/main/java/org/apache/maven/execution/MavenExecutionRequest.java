@@ -305,6 +305,16 @@ public interface MavenExecutionRequest {
      */
     MavenExecutionRequest setIgnoreInvalidArtifactDescriptor(boolean ignoreInvalid);
 
+    /**
+     * @since 4.0.0
+     */
+    boolean isIgnoreTransitiveRepositories();
+
+    /**
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setIgnoreTransitiveRepositories(boolean ignoreTransitiveRepositories);
+
     // Profiles
     List<Profile> getProfiles();
 

@@ -1304,6 +1304,8 @@ public class MavenCli {
             request.setIgnoreMissingArtifactDescriptor(true);
             request.setIgnoreInvalidArtifactDescriptor(true);
         }
+        enableOnPresentOption(
+                commandLine, CLIManager.IGNORE_TRANSITIVE_REPOSITORIES, request::setIgnoreTransitiveRepositories);
 
         performProjectActivation(commandLine, request.getProjectActivation());
         performProfileActivation(commandLine, request.getProfileActivation());
