@@ -50,7 +50,7 @@ public class DefaultChecksumAlgorithmServiceTest {
     @Test
     void smokeTest() {
         Collection<String> algNames = service.getChecksumAlgorithmNames();
-        assertTrue(algNames.size() == 4, "Expected 4 algorithms but:" + algNames.size());
+        assertEquals(4, algNames.size(), "Expected 4 algorithms but:" + algNames.size());
     }
 
     @Test
@@ -84,9 +84,8 @@ public class DefaultChecksumAlgorithmServiceTest {
 
     @Test
     void calculateStream() throws IOException {
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8));
         Map<ChecksumAlgorithmService.ChecksumAlgorithm, String> checksums = service.calculate(
-                byteArrayInputStream,
+                new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)),
                 service.select(Arrays.asList("SHA-1", "MD5")));
         assertNotNull(checksums);
         assertEquals(2, checksums.size());
