@@ -25,7 +25,6 @@ import org.apache.maven.api.annotations.Nonnull;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,7 +51,7 @@ public interface ChecksumAlgorithmService extends Service {
      * @throws NullPointerException if passed in list of names is {@code null}.
      */
     @Nonnull
-    List<ChecksumAlgorithm> selectList(@Nonnull Collection<String> algorithmNames);
+    Collection<ChecksumAlgorithm> selectList(@Nonnull Collection<String> algorithmNames);
 
     /**
      * Returns immutable collection of all supported algorithm names.
@@ -70,7 +69,7 @@ public interface ChecksumAlgorithmService extends Service {
      * @throws IOException In case of any problem.
      */
     @Nonnull
-    Map<String, String> calculate(@Nonnull byte[] data, @Nonnull List<ChecksumAlgorithm> algorithms) throws IOException;
+    Map<String, String> calculate(@Nonnull byte[] data, @Nonnull Collection<ChecksumAlgorithm> algorithms) throws IOException;
 
     /**
      * Calculates checksums for specified file.
@@ -82,5 +81,5 @@ public interface ChecksumAlgorithmService extends Service {
      * @throws IOException In case of any problem.
      */
     @Nonnull
-    Map<String, String> calculate(@Nonnull Path file, @Nonnull List<ChecksumAlgorithm> algorithms) throws IOException;
+    Map<String, String> calculate(@Nonnull Path file, @Nonnull Collection<ChecksumAlgorithm> algorithms) throws IOException;
 }

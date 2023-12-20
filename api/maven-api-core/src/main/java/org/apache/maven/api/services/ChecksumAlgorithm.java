@@ -24,12 +24,19 @@ import org.apache.maven.api.annotations.Nonnull;
 import java.nio.ByteBuffer;
 
 /**
- * Checksum algorithms service.
+ * Checksum algorithm, a factory for checksum calculator.
  *
  * @since 4.0.0
  */
 @Experimental
 public interface ChecksumAlgorithm {
+    /**
+     * Returns the algorithm name, usually used as key, never {@code null} value. The name is a standard name of
+     * algorithm (if applicable) or any other designator that is algorithm commonly referred with. Example: "SHA-1".
+     */
+    @Nonnull
+    String getName();
+
     /**
      * Returns the file extension to be used for given checksum file (without leading dot), never {@code null}. The
      * extension should be file and URL path friendly, and may differ from algorithm name.
