@@ -53,7 +53,7 @@ public interface ChecksumAlgorithmService extends Service {
      * @throws NullPointerException if passed in list of names is {@code null}.
      */
     @Nonnull
-    Collection<ChecksumAlgorithm> selectCollection(@Nonnull Collection<String> algorithmNames);
+    Collection<ChecksumAlgorithm> select(@Nonnull Collection<String> algorithmNames);
 
     /**
      * Returns immutable collection of all supported algorithm names.
