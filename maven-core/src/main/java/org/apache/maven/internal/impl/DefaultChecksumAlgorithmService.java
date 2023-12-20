@@ -88,8 +88,10 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
         nonNull(algorithms, "algorithms");
         LinkedHashMap<ChecksumAlgorithm, ChecksumCalculator> algMap = new LinkedHashMap<>();
         algorithms.forEach(f -> algMap.put(f, f.getCalculator()));
+        data.mark();
         for (ChecksumCalculator checksumCalculator : algMap.values()) {
             checksumCalculator.update(data);
+            data.reset();
         }
         LinkedHashMap<ChecksumAlgorithm, String> result = new LinkedHashMap<>();
         algMap.forEach((k, v) -> result.put(k, v.checksum()));
