@@ -69,6 +69,7 @@ public interface ChecksumAlgorithmService extends Service {
      * @param data        The content for which to calculate checksums, must not be {@code null}.
      * @param algorithms  The checksum algorithms to use, must not be {@code null}.
      * @return The calculated checksums, indexed by algorithms, never {@code null}.
+     * @throws NullPointerException if passed in any parameter is {@code null}.
      */
     @Nonnull
     Map<ChecksumAlgorithm, String> calculate(@Nonnull byte[] data, @Nonnull Collection<ChecksumAlgorithm> algorithms);
@@ -79,6 +80,7 @@ public interface ChecksumAlgorithmService extends Service {
      * @param data        The content for which to calculate checksums, must not be {@code null}.
      * @param algorithms  The checksum algorithms to use, must not be {@code null}.
      * @return The calculated checksums, indexed by algorithms, never {@code null}.
+     * @throws NullPointerException if passed in any parameter is {@code null}.
      */
     @Nonnull
     Map<ChecksumAlgorithm, String> calculate(
@@ -90,6 +92,7 @@ public interface ChecksumAlgorithmService extends Service {
      * @param file        The file for which to calculate checksums, must not be {@code null}.
      * @param algorithms  The checksum algorithms to use, must not be {@code null}.
      * @return The calculated checksums, indexed by algorithms, never {@code null}.
+     * @throws NullPointerException if passed in any parameter is {@code null}.
      * @throws IOException In case of any IO problem.
      */
     @Nonnull
@@ -103,6 +106,7 @@ public interface ChecksumAlgorithmService extends Service {
      * @param stream      The stream for which to calculate checksums, must not be {@code null}.
      * @param algorithms  The checksum algorithms to use, must not be {@code null}.
      * @return The calculated checksums, indexed by algorithms, never {@code null}.
+     * @throws NullPointerException if passed in any parameter is {@code null}.
      * @throws IOException In case of any IO problem.
      */
     @Nonnull
@@ -142,8 +146,10 @@ public interface ChecksumAlgorithmService extends Service {
     interface ChecksumCalculator {
         /**
          * Updates the checksum algorithm inner state with input.
+         *
+         * @throws NullPointerException if passed in buffer is {@code null}.
          */
-        void update(ByteBuffer input);
+        void update(@Nonnull ByteBuffer input);
 
         /**
          * Returns the algorithm end result as string, never {@code null}. After invoking this method, this instance should
