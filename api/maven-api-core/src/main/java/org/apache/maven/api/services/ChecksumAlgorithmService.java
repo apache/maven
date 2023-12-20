@@ -18,14 +18,14 @@
  */
 package org.apache.maven.api.services;
 
-import org.apache.maven.api.Service;
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
-
 import java.io.*;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
+
+import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Checksum algorithms service.
@@ -69,7 +69,8 @@ public interface ChecksumAlgorithmService extends Service {
      * @throws IOException In case of any problem.
      */
     @Nonnull
-    Map<String, String> calculate(@Nonnull byte[] data, @Nonnull Collection<ChecksumAlgorithm> algorithms) throws IOException;
+    Map<String, String> calculate(@Nonnull byte[] data, @Nonnull Collection<ChecksumAlgorithm> algorithms)
+            throws IOException;
 
     /**
      * Calculates checksums for specified file.
@@ -81,5 +82,6 @@ public interface ChecksumAlgorithmService extends Service {
      * @throws IOException In case of any problem.
      */
     @Nonnull
-    Map<String, String> calculate(@Nonnull Path file, @Nonnull Collection<ChecksumAlgorithm> algorithms) throws IOException;
+    Map<String, String> calculate(@Nonnull Path file, @Nonnull Collection<ChecksumAlgorithm> algorithms)
+            throws IOException;
 }

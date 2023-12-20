@@ -18,10 +18,10 @@
  */
 package org.apache.maven.api.services;
 
+import java.nio.ByteBuffer;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-
-import java.nio.ByteBuffer;
 
 /**
  * Checksum algorithm, a factory for checksum calculator.
@@ -68,5 +68,4 @@ public interface ChecksumAlgorithm {
         @Nonnull
         String checksum();
     }
-
 }
