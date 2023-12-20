@@ -109,7 +109,9 @@ public class DefaultRepositorySystemSessionFactory {
      * backward compatibility with Maven2: it ignores dependency management entries in transitive dependency POMs.
      * Maven 4 by default uses "transitive" that unlike "classic", obeys dependency management entries deep in
      * dependency graph as well.
-     * Default: {@code "transitive"}. Accepts values {@code "transitive"} and {@code "classic"}.
+     * <p>
+     * Default: {@code "classicTransitive"}. Accepts values {@code "classicTransitive"}, {@code "classic"} and
+     * {@code "transitive"}.
      *
      * @since 4.0.0
      */
@@ -118,6 +120,8 @@ public class DefaultRepositorySystemSessionFactory {
     private static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVE = "transitive";
 
     private static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_CLASSIC = "classic";
+
+    private static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_CLASSIC_TRANSITIVE = "classicTransitive";
 
     private static final String MAVEN_RESOLVER_TRANSPORT_KEY = "maven.resolver.transport";
 
@@ -410,16 +414,20 @@ public class DefaultRepositorySystemSessionFactory {
         injectAuthentication(authSelector, request.getPluginArtifactRepositories());
 
         Object resolverDependencyManager = configProps.getOrDefault(
-                MAVEN_RESOLVER_DEPENDENCY_MANAGER_KEY, MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVE);
-        if (MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVE.equals(resolverDependencyManager)) {
-            session.setDependencyManager(new TransitiveDependencyManager());
+                MAVEN_RESOLVER_DEPENDENCY_MANAGER_KEY, MAVEN_RESOLVER_DEPENDENCY_MANAGER_CLASSIC_TRANSITIVE);
+        if (MAVEN_RESOLVER_DEPENDENCY_MANAGER_CLASSIC_TRANSITIVE.equals(resolverDependencyManager)) {
+            session.setDependencyManager(new ClassicDependencyManager(true));
         } else if (MAVEN_RESOLVER_DEPENDENCY_MANAGER_CLASSIC.equals(resolverDependencyManager)) {
-            session.setDependencyManager(new ClassicDependencyManager());
+            session.setDependencyManager(new ClassicDependencyManager(false));
+        } else if (MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVE.equals(resolverDependencyManager)) {
+            session.setDependencyManager(new TransitiveDependencyManager());
         } else {
             throw new IllegalArgumentException("Unknown resolver dependency manager '" + resolverDependencyManager
-                    + "'. Supported managers are: "
+                    + "'. Supported dependency managers are: "
                     + Arrays.asList(
-                            MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVE, MAVEN_RESOLVER_DEPENDENCY_MANAGER_CLASSIC));
+                            MAVEN_RESOLVER_DEPENDENCY_MANAGER_CLASSIC_TRANSITIVE,
+                            MAVEN_RESOLVER_DEPENDENCY_MANAGER_CLASSIC,
+                            MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVE));
         }
 
         ArrayList<File> paths = new ArrayList<>();
