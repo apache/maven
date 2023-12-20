@@ -44,7 +44,7 @@ class MavenSimpleLoggerTest {
     }
 
     @AfterEach
-    void taerdown() {
+    void tearDown() {
         MessageUtils.setColorEnabled(colorEnabled);
     }
 

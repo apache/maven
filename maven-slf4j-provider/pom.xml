@@ -61,7 +61,7 @@ under the License.
             <artifactItem>
               <groupId>org.slf4j</groupId>
               <artifactId>slf4j-simple</artifactId>
-              <version>${slf4jVersion}</version>
+              <version>${slf4jSimpleVersion}</version>
               <type>jar</type>
               <classifier>sources</classifier>
               <overWrite>false</overWrite>
