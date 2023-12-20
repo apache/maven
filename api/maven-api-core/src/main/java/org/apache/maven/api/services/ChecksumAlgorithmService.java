@@ -84,8 +84,8 @@ public interface ChecksumAlgorithmService extends Service {
      * @throws IOException In case of any problem.
      */
     @Nonnull
-    Map<ChecksumAlgorithm, String> calculate(@Nonnull ByteBuffer data, @Nonnull Collection<ChecksumAlgorithm> algorithms)
-            throws IOException;
+    Map<ChecksumAlgorithm, String> calculate(
+            @Nonnull ByteBuffer data, @Nonnull Collection<ChecksumAlgorithm> algorithms) throws IOException;
 
     /**
      * Calculates checksums for specified file.
@@ -111,8 +111,8 @@ public interface ChecksumAlgorithmService extends Service {
      * @throws IOException In case of any problem.
      */
     @Nonnull
-    Map<ChecksumAlgorithm, String> calculate(@Nonnull InputStream stream, @Nonnull Collection<ChecksumAlgorithm> algorithms)
-            throws IOException;
+    Map<ChecksumAlgorithm, String> calculate(
+            @Nonnull InputStream stream, @Nonnull Collection<ChecksumAlgorithm> algorithms) throws IOException;
 
     /**
      * The checksum algorithm.
