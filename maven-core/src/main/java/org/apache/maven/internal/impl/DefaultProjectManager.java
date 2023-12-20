@@ -32,6 +32,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
+import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.*;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
@@ -104,6 +105,26 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
+    public List<Resource> getResources(Project project) {
+        return getMavenProject(project).getBuild().getDelegate().getResources();
+    }
+
+    @Override
+    public void addResource(Project project, Resource resource) {
+        getMavenProject(project).addResource(new org.apache.maven.model.Resource(resource));
+    }
+
+    @Override
+    public List<Resource> getTestResources(Project project) {
+        return getMavenProject(project).getBuild().getDelegate().getTestResources();
+    }
+
+    @Override
+    public void addTestResource(Project project, Resource resource) {
+        getMavenProject(project).addTestResource(new org.apache.maven.model.Resource(resource));
+    }
+
+    @Override
     public List<RemoteRepository> getRepositories(Project project) {
         return ((DefaultProject) project)
                 .getProject().getRemoteProjectRepositories().stream()
@@ -114,6 +135,15 @@ public class DefaultProjectManager implements ProjectManager {
     @Override
     public void setProperty(Project project, String key, String value) {
         getMavenProject(project).getProperties().setProperty(key, value);
+    }
+
+    @Override
+    public Optional<Project> getExecutionProject(Project project) {
+        // Session keep tracks of the Project per project id,
+        // so we cannot use session.getProject(p) for forked projects
+        // which are temporary clones
+        return Optional.ofNullable(getMavenProject(project).getExecutionProject())
+                .map(p -> new DefaultProject(session, p));
     }
 
     private MavenProject getMavenProject(Project project) {
