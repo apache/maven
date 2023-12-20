@@ -44,15 +44,16 @@ public interface ChecksumAlgorithmService extends Service {
     ChecksumAlgorithm select(@Nonnull String algorithmName);
 
     /**
-     * Returns a list of {@link ChecksumAlgorithm} in same order as algorithm names are ordered, or throws if any of the
-     * algorithm name is not supported. The returned list has equal count of elements as passed in collection of names,
-     * and if names contains duplicated elements, the returned list of algorithms will have duplicates as well.
+     * Returns a collection of {@link ChecksumAlgorithm} in same order as algorithm names are ordered, or throws if
+     * any of the algorithm name is not supported. The returned collection has equal count of elements as passed in
+     * collection of names, and if names contains duplicated elements, the returned list of algorithms will have
+     * duplicates as well.
      *
      * @throws IllegalArgumentException if any asked algorithm name is not supported.
      * @throws NullPointerException if passed in list of names is {@code null}.
      */
     @Nonnull
-    Collection<ChecksumAlgorithm> selectList(@Nonnull Collection<String> algorithmNames);
+    Collection<ChecksumAlgorithm> selectCollection(@Nonnull Collection<String> algorithmNames);
 
     /**
      * Returns immutable collection of all supported algorithm names.
@@ -74,6 +75,19 @@ public interface ChecksumAlgorithmService extends Service {
             throws IOException;
 
     /**
+     * Calculates checksums for specified data.
+     *
+     * @param data        The content for which to calculate checksums, must not be {@code null}.
+     * @param algorithms  The checksum algorithm factories to use, must not be {@code null}.
+     * @return The calculated checksums, indexed by algorithm name, or the exception that occurred while trying to
+     * calculate it, never {@code null}.
+     * @throws IOException In case of any problem.
+     */
+    @Nonnull
+    Map<String, String> calculate(@Nonnull ByteBuffer data, @Nonnull Collection<ChecksumAlgorithm> algorithms)
+            throws IOException;
+
+    /**
      * Calculates checksums for specified file.
      *
      * @param file        The file for which to calculate checksums, must not be {@code null}.
@@ -84,6 +98,20 @@ public interface ChecksumAlgorithmService extends Service {
      */
     @Nonnull
     Map<String, String> calculate(@Nonnull Path file, @Nonnull Collection<ChecksumAlgorithm> algorithms)
+            throws IOException;
+
+    /**
+     * Calculates checksums for specified stream. Upon this method returns, the stream will be depleted (fully read)
+     * but not closed.
+     *
+     * @param stream      The stream for which to calculate checksums, must not be {@code null}.
+     * @param algorithms  The checksum algorithm factories to use, must not be {@code null}.
+     * @return The calculated checksums, indexed by algorithm name, or the exception that occurred while trying to
+     * calculate it, never {@code null}.
+     * @throws IOException In case of any problem.
+     */
+    @Nonnull
+    Map<String, String> calculate(@Nonnull InputStream stream, @Nonnull Collection<ChecksumAlgorithm> algorithms)
             throws IOException;
 
     /**
