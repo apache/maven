@@ -30,6 +30,7 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.TypeRegistry;
+import org.apache.maven.repository.internal.DefaultModelVersionParser;
 import org.eclipse.aether.artifact.ArtifactProperties;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -111,7 +112,7 @@ public class DefaultDependency implements Dependency {
 
     @Override
     public boolean isSnapshot() {
-        return DefaultVersionParser.checkSnapshot(dependency.getArtifact().getVersion());
+        return DefaultModelVersionParser.checkSnapshot(dependency.getArtifact().getVersion());
     }
 
     @Nonnull
