@@ -22,9 +22,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.services.*;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactory;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactorySelector;
-import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmHelper;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
@@ -48,20 +47,6 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
     }
 
     @Override
-    public ChecksumAlgorithm select(String algorithmName) {
-        nonNull(algorithmName, "algorithmName");
-        return new DefaultChecksumAlgorithm(checksumAlgorithmFactorySelector.select(algorithmName));
-    }
-
-    @Override
-    public Collection<ChecksumAlgorithm> select(Collection<String> algorithmNames) {
-        nonNull(algorithmNames, "algorithmNames");
-        return checksumAlgorithmFactorySelector.selectList(new ArrayList<>(algorithmNames)).stream()
-                .map(DefaultChecksumAlgorithm::new)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public Collection<String> getChecksumAlgorithmNames() {
         return checksumAlgorithmFactorySelector.getChecksumAlgorithmFactories().stream()
                 .map(ChecksumAlgorithmFactory::getName)
@@ -69,21 +54,40 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
     }
 
     @Override
-    public Map<ChecksumAlgorithm, String> calculate(byte[] data, Collection<ChecksumAlgorithm> algorithms)
-            throws IOException {
-        nonNull(data, "data");
-        nonNull(algorithms, "algorithms");
-        Map<String, String> checksums = ChecksumAlgorithmHelper.calculate(
-                data,
-                algorithms.stream()
-                        .map(a -> ((DefaultChecksumAlgorithm) a).factory)
-                        .collect(Collectors.toList()));
-        return remap(algorithms, checksums);
+    public ChecksumAlgorithm select(String algorithmName) {
+        nonNull(algorithmName, "algorithmName");
+        try {
+            return new DefaultChecksumAlgorithm(checksumAlgorithmFactorySelector.select(algorithmName));
+        } catch (IllegalArgumentException e) {
+            throw new ChecksumAlgorithmServiceException("unsupported algorithm", e);
+        }
     }
 
     @Override
-    public Map<ChecksumAlgorithm, String> calculate(ByteBuffer data, Collection<ChecksumAlgorithm> algorithms)
-            throws IOException {
+    public Collection<ChecksumAlgorithm> select(Collection<String> algorithmNames) {
+        nonNull(algorithmNames, "algorithmNames");
+        try {
+            return checksumAlgorithmFactorySelector.selectList(new ArrayList<>(algorithmNames)).stream()
+                    .map(DefaultChecksumAlgorithm::new)
+                    .collect(Collectors.toList());
+        } catch (IllegalArgumentException e) {
+            throw new ChecksumAlgorithmServiceException("unsupported algorithm", e);
+        }
+    }
+
+    @Override
+    public Map<ChecksumAlgorithm, String> calculate(byte[] data, Collection<ChecksumAlgorithm> algorithms) {
+        nonNull(data, "data");
+        nonNull(algorithms, "algorithms");
+        try {
+            return calculate(new ByteArrayInputStream(data), algorithms);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e); // really unexpected
+        }
+    }
+
+    @Override
+    public Map<ChecksumAlgorithm, String> calculate(ByteBuffer data, Collection<ChecksumAlgorithm> algorithms) {
         nonNull(data, "data");
         nonNull(algorithms, "algorithms");
         LinkedHashMap<ChecksumAlgorithm, ChecksumCalculator> algMap = new LinkedHashMap<>();
@@ -103,12 +107,9 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
             throws IOException {
         nonNull(file, "file");
         nonNull(algorithms, "algorithms");
-        Map<String, String> checksums = ChecksumAlgorithmHelper.calculate(
-                file.toFile(),
-                algorithms.stream()
-                        .map(a -> ((DefaultChecksumAlgorithm) a).factory)
-                        .collect(Collectors.toList()));
-        return remap(algorithms, checksums);
+        try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(file))) {
+            return calculate(inputStream, algorithms);
+        }
     }
 
     @Override
@@ -130,16 +131,6 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
         }
         LinkedHashMap<ChecksumAlgorithm, String> result = new LinkedHashMap<>();
         algMap.forEach((k, v) -> result.put(k, v.checksum()));
-        return result;
-    }
-
-    private Map<ChecksumAlgorithm, String> remap(
-            Collection<ChecksumAlgorithm> algorithms, Map<String, String> checksums) {
-        LinkedHashMap<ChecksumAlgorithm, String> result = new LinkedHashMap<>();
-        for (ChecksumAlgorithm alg : algorithms) {
-            String checksum = nonNull(checksums.get(alg.getName()), "bug: alg asked but not present");
-            result.put(alg, checksum);
-        }
         return result;
     }
 

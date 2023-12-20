@@ -35,10 +35,18 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 public interface ChecksumAlgorithmService extends Service {
+
+    /**
+     * Returns immutable collection of all supported algorithm names.
+     */
+    @Nonnull
+    Collection<String> getChecksumAlgorithmNames();
+
     /**
      * Returns {@link ChecksumAlgorithm} for given algorithm name, or throws if algorithm not supported.
      *
-     * @throws IllegalArgumentException if asked algorithm name is not supported.
+     * @throws ChecksumAlgorithmServiceException if asked algorithm name is not supported.
+     * @throws NullPointerException if passed in name is {@code null}.
      */
     @Nonnull
     ChecksumAlgorithm select(@Nonnull String algorithmName);
@@ -49,52 +57,40 @@ public interface ChecksumAlgorithmService extends Service {
      * collection of names, and if names contains duplicated elements, the returned list of algorithms will have
      * duplicates as well.
      *
-     * @throws IllegalArgumentException if any asked algorithm name is not supported.
+     * @throws ChecksumAlgorithmServiceException if any asked algorithm name is not supported.
      * @throws NullPointerException if passed in list of names is {@code null}.
      */
     @Nonnull
     Collection<ChecksumAlgorithm> select(@Nonnull Collection<String> algorithmNames);
 
     /**
-     * Returns immutable collection of all supported algorithm names.
+     * Calculates checksums for specified data.
+     *
+     * @param data        The content for which to calculate checksums, must not be {@code null}.
+     * @param algorithms  The checksum algorithms to use, must not be {@code null}.
+     * @return The calculated checksums, indexed by algorithms, never {@code null}.
      */
     @Nonnull
-    Collection<String> getChecksumAlgorithmNames();
+    Map<ChecksumAlgorithm, String> calculate(@Nonnull byte[] data, @Nonnull Collection<ChecksumAlgorithm> algorithms);
 
     /**
      * Calculates checksums for specified data.
      *
      * @param data        The content for which to calculate checksums, must not be {@code null}.
      * @param algorithms  The checksum algorithms to use, must not be {@code null}.
-     * @return The calculated checksums, indexed by algorithms, or the exception that occurred while trying to
-     * calculate it is thrown, never {@code null}.
-     * @throws IOException In case of any problem.
-     */
-    @Nonnull
-    Map<ChecksumAlgorithm, String> calculate(@Nonnull byte[] data, @Nonnull Collection<ChecksumAlgorithm> algorithms)
-            throws IOException;
-
-    /**
-     * Calculates checksums for specified data.
-     *
-     * @param data        The content for which to calculate checksums, must not be {@code null}.
-     * @param algorithms  The checksum algorithms to use, must not be {@code null}.
-     * @return The calculated checksums, indexed by algorithms, or the exception that occurred while trying to
-     * calculate it is thrown, never {@code null}.
-     * @throws IOException In case of any problem.
+     * @return The calculated checksums, indexed by algorithms, never {@code null}.
      */
     @Nonnull
     Map<ChecksumAlgorithm, String> calculate(
-            @Nonnull ByteBuffer data, @Nonnull Collection<ChecksumAlgorithm> algorithms) throws IOException;
+            @Nonnull ByteBuffer data, @Nonnull Collection<ChecksumAlgorithm> algorithms);
 
     /**
      * Calculates checksums for specified file.
      *
      * @param file        The file for which to calculate checksums, must not be {@code null}.
      * @param algorithms  The checksum algorithms to use, must not be {@code null}.
-     * @return The calculated checksums, indexed by algorithms, or the exception that occurred while trying to
-     * calculate it is thrown, never {@code null}.
-     * @throws IOException In case of any problem.
+     * @return The calculated checksums, indexed by algorithms, never {@code null}.
+     * @throws IOException In case of any IO problem.
      */
     @Nonnull
     Map<ChecksumAlgorithm, String> calculate(@Nonnull Path file, @Nonnull Collection<ChecksumAlgorithm> algorithms)
@@ -106,9 +102,8 @@ public interface ChecksumAlgorithmService extends Service {
      *
      * @param stream      The stream for which to calculate checksums, must not be {@code null}.
      * @param algorithms  The checksum algorithms to use, must not be {@code null}.
-     * @return The calculated checksums, indexed by algorithms, or the exception that occurred while trying to
-     * calculate it is thrown, never {@code null}.
-     * @throws IOException In case of any problem.
+     * @return The calculated checksums, indexed by algorithms, never {@code null}.
+     * @throws IOException In case of any IO problem.
      */
     @Nonnull
     Map<ChecksumAlgorithm, String> calculate(
