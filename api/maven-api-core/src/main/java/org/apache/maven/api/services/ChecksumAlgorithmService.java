@@ -65,9 +65,9 @@ public interface ChecksumAlgorithmService extends Service {
      * Calculates checksums for specified data.
      *
      * @param data        The content for which to calculate checksums, must not be {@code null}.
-     * @param algorithms  The checksum algorithm factories to use, must not be {@code null}.
-     * @return The calculated checksums, indexed by algorithm name, or the exception that occurred while trying to
-     * calculate it, never {@code null}.
+     * @param algorithms  The checksum algorithms to use, must not be {@code null}.
+     * @return The calculated checksums, indexed by algorithms, or the exception that occurred while trying to
+     * calculate it is thrown, never {@code null}.
      * @throws IOException In case of any problem.
      */
     @Nonnull
@@ -78,9 +78,9 @@ public interface ChecksumAlgorithmService extends Service {
      * Calculates checksums for specified data.
      *
      * @param data        The content for which to calculate checksums, must not be {@code null}.
-     * @param algorithms  The checksum algorithm factories to use, must not be {@code null}.
-     * @return The calculated checksums, indexed by algorithm name, or the exception that occurred while trying to
-     * calculate it, never {@code null}.
+     * @param algorithms  The checksum algorithms to use, must not be {@code null}.
+     * @return The calculated checksums, indexed by algorithms, or the exception that occurred while trying to
+     * calculate it is thrown, never {@code null}.
      * @throws IOException In case of any problem.
      */
     @Nonnull
@@ -91,9 +91,9 @@ public interface ChecksumAlgorithmService extends Service {
      * Calculates checksums for specified file.
      *
      * @param file        The file for which to calculate checksums, must not be {@code null}.
-     * @param algorithms  The checksum algorithm factories to use, must not be {@code null}.
-     * @return The calculated checksums, indexed by algorithm name, or the exception that occurred while trying to
-     * calculate it, never {@code null}.
+     * @param algorithms  The checksum algorithms to use, must not be {@code null}.
+     * @return The calculated checksums, indexed by algorithms, or the exception that occurred while trying to
+     * calculate it is thrown, never {@code null}.
      * @throws IOException In case of any problem.
      */
     @Nonnull
@@ -105,9 +105,9 @@ public interface ChecksumAlgorithmService extends Service {
      * but not closed.
      *
      * @param stream      The stream for which to calculate checksums, must not be {@code null}.
-     * @param algorithms  The checksum algorithm factories to use, must not be {@code null}.
-     * @return The calculated checksums, indexed by algorithm name, or the exception that occurred while trying to
-     * calculate it, never {@code null}.
+     * @param algorithms  The checksum algorithms to use, must not be {@code null}.
+     * @return The calculated checksums, indexed by algorithms, or the exception that occurred while trying to
+     * calculate it is thrown, never {@code null}.
      * @throws IOException In case of any problem.
      */
     @Nonnull
