@@ -1347,13 +1347,16 @@ public class MavenCli {
             return;
         }
 
-        boolean runningOnCI = isRunningOnCI(cliRequest.getSystemProperties());
-        if (runningOnCI) {
-            slf4jLogger.info("Making this build non-interactive, because the environment variable CI equals \"true\"."
-                    + " Disable this detection by removing that variable or adding --force-interactive.");
+        if (commandLine.hasOption(BATCH_MODE) || commandLine.hasOption(NON_INTERACTIVE)) {
             request.setInteractiveMode(false);
-        } else if (commandLine.hasOption(BATCH_MODE) || commandLine.hasOption(NON_INTERACTIVE)) {
-            request.setInteractiveMode(false);
+        } else {
+            boolean runningOnCI = isRunningOnCI(cliRequest.getSystemProperties());
+            if (runningOnCI) {
+                slf4jLogger.info(
+                        "Making this build non-interactive, because the environment variable CI equals \"true\"."
+                                + " Disable this detection by removing that variable or adding --force-interactive.");
+                request.setInteractiveMode(false);
+            }
         }
     }
 
