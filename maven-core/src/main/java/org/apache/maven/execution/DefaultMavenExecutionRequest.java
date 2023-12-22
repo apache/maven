@@ -166,6 +166,8 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
      */
     private boolean noSnapshotUpdates = false;
 
+    private String globalUpdatePolicy;
+
     private boolean useLegacyLocalRepositoryManager = false;
 
     private Map<String, Object> data;
@@ -214,6 +216,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setExecutionListener(original.getExecutionListener());
         copy.setUseLegacyLocalRepository(original.isUseLegacyLocalRepository());
         copy.setBuilderId(original.getBuilderId());
+        copy.setGlobalUpdatePolicy(original.getGlobalUpdatePolicy());
         return copy;
     }
 
@@ -1167,5 +1170,16 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         }
 
         return data;
+    }
+
+    @Override
+    public MavenExecutionRequest setGlobalUpdatePolicy(String globalUpdatePolicy) {
+        this.globalUpdatePolicy = globalUpdatePolicy;
+        return this;
+    }
+
+    @Override
+    public String getGlobalUpdatePolicy() {
+        return globalUpdatePolicy;
     }
 }
