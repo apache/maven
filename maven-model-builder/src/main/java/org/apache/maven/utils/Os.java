@@ -174,8 +174,7 @@ public class Os {
             case FAMILY_NETWARE:
                 return OS_NAME.contains(FAMILY_NETWARE);
             case FAMILY_DOS:
-                return PATH_SEP.equals(";") && !isFamily(FAMILY_NETWARE)
-                    && !isWindows;
+                return PATH_SEP.equals(";") && !isFamily(FAMILY_NETWARE) && !isWindows;
             case FAMILY_MAC:
                 return OS_NAME.contains(FAMILY_MAC) || OS_NAME.contains(DARWIN);
             case FAMILY_TANDEM:
