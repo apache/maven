@@ -59,6 +59,7 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest extends 
         // build the test project
         verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
         verifier.addCliArgument("verify");
+        verifier.addCliArgument("-X");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
