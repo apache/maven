@@ -34,7 +34,7 @@ public class EarTypeProvider implements Provider<Type> {
     private final Type type;
 
     public EarTypeProvider() {
-        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "ear", null, false, true);
+        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "ear", null, true);
     }
 
     @Override

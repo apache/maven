@@ -34,7 +34,7 @@ public class BomTypeProvider implements Provider<Type> {
     private final Type type;
 
     public BomTypeProvider() {
-        this.type = new DefaultType(NAME, Language.NONE, "pom", null, false, false);
+        this.type = new DefaultType(NAME, Language.NONE, "pom", null, false);
     }
 
     @Override

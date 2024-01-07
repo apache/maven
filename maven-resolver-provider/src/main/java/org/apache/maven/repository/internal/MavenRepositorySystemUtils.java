@@ -39,7 +39,6 @@ import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransform
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
-import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 import static java.util.Objects.requireNonNull;

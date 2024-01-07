@@ -28,22 +28,20 @@ import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultType;
 
 /**
- * Type provider for a JAR file containing test classes. Dependencies of this type are class-path constituents
- * or {@code --patch-module} option values. For any dependency, the choice depends on whether the main JAR file
- * was placed on the class-path or module-path respectively.
+ * Type provider for a JAR file to unconditionally place on the class-path.
+ * Dependencies of this type are class-path constituents only.
  *
- * @see Type#TEST_JAR
+ * @see Type#CLASSPATH_JAR
  */
-@Named(TestJarTypeProvider.NAME)
+@Named(ClasspathJarTypeProvider.NAME)
 @Singleton
-public class TestJarTypeProvider implements Provider<Type> {
-    public static final String NAME = Type.TEST_JAR;
+public class ClasspathJarTypeProvider implements Provider<Type> {
+    public static final String NAME = Type.CLASSPATH_JAR;
 
     private final Type type;
 
-    public TestJarTypeProvider() {
-        this.type = new DefaultType(
-                NAME, Language.JAVA_FAMILY, "jar", "tests", false, JavaPathType.CLASSES, JavaPathType.PATCH_MODULE);
+    public ClasspathJarTypeProvider() {
+        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES);
     }
 
     @Override

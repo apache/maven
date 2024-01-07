@@ -22,19 +22,29 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultType;
 
+/**
+ * Type provider for a JAR file that can be placed either on the class-path or on the module-path.
+ * Dependencies of this type are class-path constituents and module-path constituents.
+ * Only one of those constituents shall be effective for any given dependency.
+ * The choice may depend on heuristic rules.
+ *
+ * @see Type#JAR
+ */
 @Named(JarTypeProvider.NAME)
 @Singleton
 public class JarTypeProvider implements Provider<Type> {
-    public static final String NAME = "jar";
+    public static final String NAME = Type.JAR;
 
     private final Type type;
 
     public JarTypeProvider() {
-        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "jar", null, true, false);
+        this.type = new DefaultType(
+                NAME, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES, JavaPathType.MODULES);
     }
 
     @Override

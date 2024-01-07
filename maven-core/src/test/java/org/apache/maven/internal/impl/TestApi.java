@@ -172,7 +172,7 @@ class TestApi {
 
         assertNotNull(paths);
         assertEquals(10, paths.size());
-        assertTrue(paths.get(0).getFileName().toString().equals("test-extension-1.jar"));
+        assertEquals("test-extension-1.jar", paths.get(0).getFileName().toString());
     }
 
     @Test

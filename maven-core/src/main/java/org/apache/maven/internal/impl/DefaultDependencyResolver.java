@@ -21,19 +21,26 @@ package org.apache.maven.internal.impl;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.*;
+import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.Dependency;
+import org.apache.maven.api.Node;
+import org.apache.maven.api.PathType;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.services.*;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
@@ -69,59 +76,69 @@ public class DefaultDependencyResolver implements DependencyResolver {
         };
     }
 
+    /**
+     * Collects, flattens and resolves the dependencies.
+     *
+     * @param request the request to resolve
+     * @return the result of the resolution
+     */
     @Override
-    public DependencyResolverResult resolve(DependencyResolverRequest request)
+    public DependencyResolverResult resolve(final DependencyResolverRequest request)
             throws DependencyCollectorException, DependencyResolverException, ArtifactResolverException {
-        nonNull(request, "request can not be null");
-        InternalSession session = InternalSession.from(request.getSession());
-
+        nonNull(request, "request");
+        final InternalSession session = InternalSession.from(request.getSession());
+        final Predicate<PathType> filter = request.getPathTypeFilter();
+        final PathModularizationCache cache = new PathModularizationCache(); // TODO: should be project-wide cache.
         if (request.getProject().isPresent()) {
-            DependencyResolutionResult result = resolveDependencies(
+            final DependencyResolutionResult resolved = resolveDependencies(
                     request.getSession(), request.getProject().get(), request.getPathScope());
 
-            Map<org.eclipse.aether.graph.Dependency, org.eclipse.aether.graph.DependencyNode> nodes = stream(
-                            result.getDependencyGraph())
+            final Map<org.eclipse.aether.graph.Dependency, org.eclipse.aether.graph.DependencyNode> nodes = stream(
+                            resolved.getDependencyGraph())
                     .filter(n -> n.getDependency() != null)
                     .collect(Collectors.toMap(DependencyNode::getDependency, n -> n));
 
-            Node root = session.getNode(result.getDependencyGraph());
-            List<Node> dependencies = new ArrayList<>();
-            Map<Dependency, Path> artifacts = new LinkedHashMap<>();
-            List<Path> paths = new ArrayList<>();
-            for (org.eclipse.aether.graph.Dependency dep : result.getResolvedDependencies()) {
-                dependencies.add(session.getNode(nodes.get(dep)));
+            final Node root = session.getNode(resolved.getDependencyGraph());
+            final List<org.eclipse.aether.graph.Dependency> deprendencies = resolved.getResolvedDependencies();
+            final DefaultDependencyResolverResult result =
+                    new DefaultDependencyResolverResult(resolved.getCollectionErrors(), root, deprendencies.size());
+            for (org.eclipse.aether.graph.Dependency dep : deprendencies) {
+                Node node = session.getNode(nodes.get(dep));
                 Path path = dep.getArtifact().getFile().toPath();
-                artifacts.put(session.getDependency(dep), path);
-                paths.add(path);
+                try {
+                    result.addDependency(node, session.getDependency(dep), filter, path, cache);
+                } catch (IOException e) {
+                    throw cannotReadModuleInfo(path, e);
+                }
             }
-            return new DefaultDependencyResolverResult(
-                    result.getCollectionErrors(), root, dependencies, paths, artifacts);
+            return result;
         }
 
-        DependencyCollectorResult collectorResult =
+        final DependencyCollectorResult collectorResult =
                 session.getService(DependencyCollector.class).collect(request);
-        List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getPathScope());
-        List<Dependency> deps =
-                nodes.stream().map(Node::getDependency).filter(Objects::nonNull).collect(Collectors.toList());
-        List<ArtifactCoordinate> coordinates =
-                deps.stream().map(Artifact::toCoordinate).collect(Collectors.toList());
-        Map<Artifact, Path> artifacts = session.resolveArtifacts(coordinates);
-        Map<Dependency, Path> dependencies = new LinkedHashMap<>();
-        List<Path> paths = new ArrayList<>();
-        for (Dependency d : deps) {
-            Path path = artifacts.get(d);
-            if (dependencies.put(d, path) != null) {
-                throw new IllegalStateException("Duplicate key");
+        final List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getPathScope());
+        final List<ArtifactCoordinate> coordinates = nodes.stream()
+                .map(Node::getDependency)
+                .filter(Objects::nonNull)
+                .map(Artifact::toCoordinate)
+                .collect(Collectors.toList());
+        final Map<Artifact, Path> artifacts = session.resolveArtifacts(coordinates);
+        final DefaultDependencyResolverResult result = new DefaultDependencyResolverResult(
+                collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
+        for (Node node : nodes) {
+            Dependency d = node.getDependency();
+            Path path = (d != null) ? artifacts.get(d) : null;
+            try {
+                result.addDependency(node, d, filter, path, cache);
+            } catch (IOException e) {
+                throw cannotReadModuleInfo(path, e);
             }
-            paths.add(path);
         }
-
-        return new DefaultDependencyResolverResult(
-                collectorResult.getExceptions(), collectorResult.getRoot(), nodes, paths, dependencies);
+        return result;
     }
 
-    private Stream<DependencyNode> stream(DependencyNode node) {
-        return Stream.concat(Stream.of(node), node.getChildren().stream().flatMap(this::stream));
+    private static Stream<DependencyNode> stream(final DependencyNode node) {
+        return Stream.concat(Stream.of(node), node.getChildren().stream().flatMap(DefaultDependencyResolver::stream));
     }
 
     private DependencyResolutionResult resolveDependencies(Session session, Project project, PathScope scope) {
@@ -141,7 +158,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         }
     }
 
-    private MavenProject getMavenProject(Project project) {
+    private static MavenProject getMavenProject(final Project project) {
         return ((DefaultProject) project).getProject();
     }
 
@@ -149,49 +166,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return map(scope.dependencyScopes(), DependencyScope::id);
     }
 
-    static class DefaultDependencyResolverResult implements DependencyResolverResult {
-        private final List<Exception> exceptions;
-        private final Node root;
-        private final List<Node> nodes;
-        private final List<Path> paths;
-        private final Map<Dependency, Path> dependencies;
-
-        DefaultDependencyResolverResult(
-                List<Exception> exceptions,
-                Node root,
-                List<Node> nodes,
-                List<Path> paths,
-                Map<Dependency, Path> dependencies) {
-            this.exceptions = exceptions;
-            this.root = root;
-            this.nodes = nodes;
-            this.paths = paths;
-            this.dependencies = dependencies;
-        }
-
-        @Override
-        public List<Exception> getExceptions() {
-            return exceptions;
-        }
-
-        @Override
-        public Node getRoot() {
-            return root;
-        }
-
-        @Override
-        public List<Node> getNodes() {
-            return nodes;
-        }
-
-        @Override
-        public List<Path> getPaths() {
-            return paths;
-        }
-
-        @Override
-        public Map<Dependency, Path> getDependencies() {
-            return dependencies;
-        }
+    private static DependencyResolverException cannotReadModuleInfo(final Path path, final IOException cause) {
+        return new DependencyResolverException("Cannot read module information of " + path, cause);
     }
 }

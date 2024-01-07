@@ -20,10 +20,13 @@ package org.apache.maven.api.services;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.PathScope;
+import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -36,6 +39,16 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
     @Nonnull
     PathScope getPathScope();
+
+    /**
+     * Returns a filter for the types of path (class-path, module-path, …) accepted by the tool.
+     * For example, if a Java tools accepts only class-path elements, then the filter should return
+     * {@code true} for {@link JavaPathType#CLASSES} and {@code false} for {@link JavaPathType#MODULES}.
+     * If no filter is explicitly set, then the default is a filter accepting everything.
+     *
+     * @return a filter for the types of path (class-path, module-path, …) accepted by the tool
+     */
+    Predicate<PathType> getPathTypeFilter();
 
     @Nonnull
     static DependencyResolverRequestBuilder builder() {
@@ -87,6 +100,8 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
     @NotThreadSafe
     class DependencyResolverRequestBuilder extends DependencyCollectorRequestBuilder {
         PathScope pathScope;
+
+        Predicate<PathType> pathTypeFilter;
 
         @Nonnull
         @Override
@@ -158,15 +173,31 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
             return this;
         }
 
+        @Nonnull
+        public DependencyResolverRequestBuilder pathTypeFilter(@Nonnull Predicate<PathType> pathTypeFilter) {
+            this.pathTypeFilter = pathTypeFilter;
+            return this;
+        }
+
         @Override
         public DependencyResolverRequest build() {
             return new DefaultDependencyResolverRequest(
-                    session, project, rootArtifact, root, dependencies, managedDependencies, verbose, pathScope);
+                    session,
+                    project,
+                    rootArtifact,
+                    root,
+                    dependencies,
+                    managedDependencies,
+                    verbose,
+                    pathScope,
+                    pathTypeFilter);
         }
 
         static class DefaultDependencyResolverRequest extends DefaultDependencyCollectorRequest
                 implements DependencyResolverRequest {
             private final PathScope pathScope;
+
+            private final Predicate<PathType> pathTypeFilter;
 
             DefaultDependencyResolverRequest(
                     Session session,
@@ -176,9 +207,11 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
                     Collection<DependencyCoordinate> dependencies,
                     Collection<DependencyCoordinate> managedDependencies,
                     boolean verbose,
-                    PathScope pathScope) {
+                    PathScope pathScope,
+                    Predicate<PathType> pathTypeFilter) {
                 super(session, project, rootArtifact, root, dependencies, managedDependencies, verbose);
                 this.pathScope = nonNull(pathScope, "pathScope cannot be null");
+                this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : (t) -> true;
                 if (verbose) {
                     throw new IllegalArgumentException("verbose cannot be true for resolving dependencies");
                 }
@@ -188,6 +221,11 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
             @Override
             public PathScope getPathScope() {
                 return pathScope;
+            }
+
+            @Override
+            public Predicate<PathType> getPathTypeFilter() {
+                return pathTypeFilter;
             }
         }
     }

@@ -34,7 +34,7 @@ public class RarTypeProvider implements Provider<Type> {
     private final Type type;
 
     public RarTypeProvider() {
-        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "rar", null, false, true);
+        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "rar", null, true);
     }
 
     @Override

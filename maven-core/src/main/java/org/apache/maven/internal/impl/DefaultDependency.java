@@ -34,6 +34,7 @@ import org.eclipse.aether.artifact.ArtifactProperties;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultDependency implements Dependency {
+
     private final InternalSession session;
     private final org.eclipse.aether.graph.Dependency dependency;
     private final String key;

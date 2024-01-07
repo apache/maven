@@ -34,7 +34,7 @@ public class WarTypeProvider implements Provider<Type> {
     private final Type type;
 
     public WarTypeProvider() {
-        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "war", null, false, true);
+        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "war", null, true);
     }
 
     @Override

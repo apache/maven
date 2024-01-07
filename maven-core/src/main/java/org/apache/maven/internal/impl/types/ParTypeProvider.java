@@ -34,7 +34,7 @@ public class ParTypeProvider implements Provider<Type> {
     private final Type type;
 
     public ParTypeProvider() {
-        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "par", null, false, true);
+        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "par", null, true);
     }
 
     @Override

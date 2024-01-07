@@ -18,11 +18,12 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.Map;
 
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Language;
+import org.apache.maven.api.PathType;
 import org.apache.maven.api.Type;
 import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
@@ -37,22 +38,22 @@ public class DefaultType implements Type, ArtifactType {
     private final String extension;
 
     private final String classifier;
-    private final boolean buildPathConstituent;
     private final boolean includesDependencies;
+    private final Set<PathType> pathTypes;
 
     public DefaultType(
             String id,
             Language language,
             String extension,
             String classifier,
-            boolean buildPathConstituent,
-            boolean includesDependencies) {
+            boolean includesDependencies,
+            PathType... pathTypes) {
         this.id = nonNull(id, "id");
         this.language = nonNull(language, "language");
         this.extension = nonNull(extension, "extension");
         this.classifier = classifier;
-        this.buildPathConstituent = buildPathConstituent;
         this.includesDependencies = includesDependencies;
+        this.pathTypes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(pathTypes)));
     }
 
     @Override
@@ -81,13 +82,12 @@ public class DefaultType implements Type, ArtifactType {
     }
 
     @Override
-    public boolean isBuildPathConstituent() {
-        return this.buildPathConstituent;
-    }
-
-    @Override
     public boolean isIncludesDependencies() {
         return this.includesDependencies;
+    }
+
+    public Set<PathType> getPathTypes() {
+        return this.pathTypes;
     }
 
     @Override
@@ -96,7 +96,8 @@ public class DefaultType implements Type, ArtifactType {
         properties.put(ArtifactProperties.TYPE, this.id);
         properties.put(ArtifactProperties.LANGUAGE, this.language.id());
         properties.put(ArtifactProperties.INCLUDES_DEPENDENCIES, String.valueOf(includesDependencies));
-        properties.put(ArtifactProperties.CONSTITUTES_BUILD_PATH, String.valueOf(buildPathConstituent));
+        properties.put(
+                ArtifactProperties.CONSTITUTES_BUILD_PATH, String.valueOf(pathTypes.contains(JavaPathType.CLASSES)));
         return Collections.unmodifiableMap(properties);
     }
 }

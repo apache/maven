@@ -92,8 +92,9 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                             languageRegistry.require(handler.getLanguage()),
                             handler.getExtension(),
                             handler.getClassifier(),
-                            handler.isAddedToClasspath(),
-                            handler.isIncludesDependencies());
+                            handler.isIncludesDependencies()
+                            // TODO: add path types
+                            );
                 });
             }
             return type;
