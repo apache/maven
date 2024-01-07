@@ -32,12 +32,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.lifecycle.internal.DefaultProjectArtifactFactory;
@@ -320,68 +322,85 @@ public class MavenProject implements Cloneable {
         return testCompileSourceRoots;
     }
 
-    public List<String> getCompileClasspathElements() throws DependencyResolutionRequiredException {
-        List<String> list = new ArrayList<>(getArtifacts().size() + 1);
+    // TODO let the scope handler deal with this
+    private static boolean isCompilePathElement(final String scope) {
+        return Artifact.SCOPE_COMPILE.equals(scope)
+                || Artifact.SCOPE_PROVIDED.equals(scope)
+                || Artifact.SCOPE_SYSTEM.equals(scope);
+    }
 
+    // TODO let the scope handler deal with this
+    private static boolean isRuntimePathElement(final String scope) {
+        return Artifact.SCOPE_COMPILE.equals(scope) || Artifact.SCOPE_RUNTIME.equals(scope);
+    }
+
+    // TODO let the scope handler deal with this
+    private static boolean isTestPathElement(final String scope) {
+        return true;
+    }
+
+    /**
+     * Returns a filtered list of classpath elements. This method is invoked when the caller
+     * requested that all dependencies are placed on the classpath, with no module-path element.
+     *
+     * @param scopeFilter a filter returning {@code true} for the artifact scopes to accept.
+     * @param includeTestDir whether to include the test directory in the classpath elements.
+     * @return paths of all artifacts placed on the classpath.
+     * @throws DependencyResolutionRequiredException if an artifact file is used, but has not been resolved
+     */
+    private List<String> getClasspathElements(final Predicate<String> scopeFilter, final boolean includeTestDir)
+            throws DependencyResolutionRequiredException {
+        final List<String> list = new ArrayList<>(getArtifacts().size() + 2);
+        if (includeTestDir) {
+            String d = getBuild().getTestOutputDirectory();
+            if (d != null) {
+                list.add(d);
+            }
+        }
         String d = getBuild().getOutputDirectory();
         if (d != null) {
             list.add(d);
         }
-
         for (Artifact a : getArtifacts()) {
-            if (a.getArtifactHandler().isAddedToClasspath()) {
-                // TODO let the scope handler deal with this
-                if (Artifact.SCOPE_COMPILE.equals(a.getScope())
-                        || Artifact.SCOPE_PROVIDED.equals(a.getScope())
-                        || Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
-                    addArtifactPath(a, list);
+            final File f = a.getFile();
+            if (f != null && scopeFilter.test(a.getScope())) {
+                final ArtifactHandler h = a.getArtifactHandler();
+                if (h.isAddedToClasspath()) {
+                    list.add(f.getPath());
                 }
             }
         }
-
         return list;
     }
 
-    // TODO this checking for file == null happens because the resolver has been confused about the root
-    // artifact or not. things like the stupid dummy artifact coming from surefire.
+    /**
+     * Returns the elements placed on the classpath for compilation.
+     * This method can be invoked when the caller does not support module-path.
+     *
+     * @throws DependencyResolutionRequiredException if an artifact file is used, but has not been resolved
+     */
+    public List<String> getCompileClasspathElements() throws DependencyResolutionRequiredException {
+        return getClasspathElements(MavenProject::isCompilePathElement, false);
+    }
+
+    /**
+     * Returns the elements placed on the classpath for tests.
+     * This method can be invoked when the caller does not support module-path.
+     *
+     * @throws DependencyResolutionRequiredException if an artifact file is used, but has not been resolved
+     */
     public List<String> getTestClasspathElements() throws DependencyResolutionRequiredException {
-        List<String> list = new ArrayList<>(getArtifacts().size() + 2);
-
-        String d = getBuild().getTestOutputDirectory();
-        if (d != null) {
-            list.add(d);
-        }
-
-        d = getBuild().getOutputDirectory();
-        if (d != null) {
-            list.add(d);
-        }
-
-        for (Artifact a : getArtifacts()) {
-            if (a.getArtifactHandler().isAddedToClasspath()) {
-                addArtifactPath(a, list);
-            }
-        }
-
-        return list;
+        return getClasspathElements(MavenProject::isTestPathElement, true);
     }
 
+    /**
+     * Returns the elements placed on the classpath for runtime.
+     * This method can be invoked when the caller does not support module-path.
+     *
+     * @throws DependencyResolutionRequiredException if an artifact file is used, but has not been resolved
+     */
     public List<String> getRuntimeClasspathElements() throws DependencyResolutionRequiredException {
-        List<String> list = new ArrayList<>(getArtifacts().size() + 1);
-
-        String d = getBuild().getOutputDirectory();
-        if (d != null) {
-            list.add(d);
-        }
-
-        for (Artifact a : getArtifacts()) {
-            if (a.getArtifactHandler().isAddedToClasspath()
-                    // TODO let the scope handler deal with this
-                    && (Artifact.SCOPE_COMPILE.equals(a.getScope()) || Artifact.SCOPE_RUNTIME.equals(a.getScope()))) {
-                addArtifactPath(a, list);
-            }
-        }
-        return list;
+        return getClasspathElements(MavenProject::isRuntimePathElement, false);
     }
 
     // ----------------------------------------------------------------------
@@ -1111,13 +1130,6 @@ public class MavenProject implements Cloneable {
         lifecyclePhases.addAll(project.lifecyclePhases);
     }
 
-    private void addArtifactPath(Artifact artifact, List<String> classpath) {
-        File file = artifact.getFile();
-        if (file != null) {
-            classpath.add(file.getPath());
-        }
-    }
-
     private static String getProjectReferenceId(String groupId, String artifactId, String version) {
         StringBuilder buffer = new StringBuilder(128);
         buffer.append(groupId).append(':').append(artifactId).append(':').append(version);
@@ -1347,9 +1359,7 @@ public class MavenProject implements Cloneable {
             // TODO classpath check doesn't belong here - that's the other method
             if (a.getArtifactHandler().isAddedToClasspath()) {
                 // TODO let the scope handler deal with this
-                if (Artifact.SCOPE_COMPILE.equals(a.getScope())
-                        || Artifact.SCOPE_PROVIDED.equals(a.getScope())
-                        || Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
+                if (isCompilePathElement(a.getScope())) {
                     list.add(a);
                 }
             }
@@ -1369,9 +1379,7 @@ public class MavenProject implements Cloneable {
 
         for (Artifact a : getArtifacts()) {
             // TODO let the scope handler deal with this
-            if (Artifact.SCOPE_COMPILE.equals(a.getScope())
-                    || Artifact.SCOPE_PROVIDED.equals(a.getScope())
-                    || Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
+            if (isCompilePathElement(a.getScope())) {
                 Dependency dependency = new Dependency();
 
                 dependency.setArtifactId(a.getArtifactId());
@@ -1437,7 +1445,7 @@ public class MavenProject implements Cloneable {
 
         for (Artifact a : getArtifacts()) {
             // TODO let the scope handler deal with this
-            if (Artifact.SCOPE_COMPILE.equals(a.getScope()) || Artifact.SCOPE_RUNTIME.equals(a.getScope())) {
+            if (isRuntimePathElement(a.getScope())) {
                 Dependency dependency = new Dependency();
 
                 dependency.setArtifactId(a.getArtifactId());
@@ -1459,9 +1467,7 @@ public class MavenProject implements Cloneable {
 
         for (Artifact a : getArtifacts()) {
             // TODO classpath check doesn't belong here - that's the other method
-            if (a.getArtifactHandler().isAddedToClasspath()
-                    // TODO let the scope handler deal with this
-                    && (Artifact.SCOPE_COMPILE.equals(a.getScope()) || Artifact.SCOPE_RUNTIME.equals(a.getScope()))) {
+            if (a.getArtifactHandler().isAddedToClasspath() && isRuntimePathElement(a.getScope())) {
                 list.add(a);
             }
         }
@@ -1481,7 +1487,10 @@ public class MavenProject implements Cloneable {
             if (a.getArtifactHandler().isAddedToClasspath()) {
                 // TODO let the scope handler deal with this
                 if (Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
-                    addArtifactPath(a, list);
+                    File f = a.getFile();
+                    if (f != null) {
+                        list.add(f.getPath());
+                    }
                 }
             }
         }

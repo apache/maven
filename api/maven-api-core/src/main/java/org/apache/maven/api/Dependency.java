@@ -49,5 +49,6 @@ public interface Dependency extends Artifact {
      * @return a {@link DependencyCoordinate}
      */
     @Nonnull
+    @Override
     DependencyCoordinate toCoordinate();
 }

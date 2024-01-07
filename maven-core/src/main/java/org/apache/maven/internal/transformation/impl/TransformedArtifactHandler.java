@@ -36,30 +36,37 @@ class TransformedArtifactHandler implements ArtifactHandler {
         this.packaging = requireNonNull(packaging);
     }
 
+    @Override
     public String getClassifier() {
         return classifier;
     }
 
+    @Override
     public String getDirectory() {
         return null;
     }
 
+    @Override
     public String getExtension() {
         return extension;
     }
 
+    @Override
     public String getLanguage() {
         return "none";
     }
 
+    @Override
     public String getPackaging() {
         return packaging;
     }
 
+    @Override
     public boolean isAddedToClasspath() {
         return false;
     }
 
+    @Override
     public boolean isIncludesDependencies() {
         return false;
     }

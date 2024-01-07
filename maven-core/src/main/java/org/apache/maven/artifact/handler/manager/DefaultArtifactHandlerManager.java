@@ -60,6 +60,7 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
         }
     }
 
+    @Override
     public ArtifactHandler getArtifactHandler(String id) {
         return allHandlers.computeIfAbsent(id, k -> {
             Type type = typeRegistry.getType(id);
@@ -75,6 +76,7 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
         });
     }
 
+    @Override
     public void addHandlers(Map<String, ArtifactHandler> handlers) {
         throw new UnsupportedOperationException("Adding handlers programmatically is not supported anymore");
     }
