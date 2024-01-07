@@ -18,7 +18,10 @@
  */
 package org.apache.maven.api;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -33,27 +36,209 @@ import org.apache.maven.api.annotations.Nonnull;
 @Immutable
 public interface DependencyProperties {
     /**
-     * Boolean flag telling that dependency contains all of its dependencies. Value of this key should be parsed with
-     * {@link Boolean#parseBoolean(String)} to obtain value.
+     * Keys in the dependency properties map.
+     * Each key can be associated to values of a specific class.
+     *
+     * @param  <V>  type of value associated to the key
+     */
+    class Key<V> {
+        /**
+         * The keys that are defined in this {@code DependencyProperties} map.
+         * Accesses to this map shall be synchronized on the map.
+         *
+         * @see #intern()
+         */
+        private static final Map<String, Key<?>> INTERNS = new HashMap<>();
+
+        /**
+         * Value returned by {@link #name()}.
+         */
+        @Nonnull
+        private final String name;
+
+        /**
+         * Value returned by {@link #valueType()}.
+         */
+        @Nonnull
+        private final Class<V> valueType;
+
+        /**
+         * Creates a new key.
+         *
+         * @param name name of the key
+         * @param valueType type of value associated to the key
+         */
+        public Key(@Nonnull final String name, @Nonnull final Class<V> valueType) {
+            this.name = Objects.requireNonNull(name);
+            this.valueType = Objects.requireNonNull(valueType);
+        }
+
+        /**
+         * If a key exists in the {@linkplain #intern() intern pool} for the given name, returns that key.
+         * Otherwise, if the {@code defaultType} is non-null, creates a key for values of the specified type.
+         * Otherwise, returns {@code null}.
+         *
+         * @param name name of the key to search or create
+         * @param defaultType value type of the key to create if none exist for the given name, or {@code null}
+         * @return key found or created, or {@code null} if no key was found and {@code defaultType} is null
+         *
+         * @see #intern()
+         */
+        public static Key<?> forName(String name, Class<?> defaultType) {
+            Key<?> key;
+            synchronized (INTERNS) {
+                key = INTERNS.get(name);
+            }
+            if (key == null && defaultType != null) {
+                key = new Key<>(name, defaultType);
+            }
+            return key;
+        }
+
+        /**
+         * {@return the name of the key}.
+         */
+        @Nonnull
+        public String name() {
+            return name;
+        }
+
+        /**
+         * {@return the type of value associated to the key}.
+         */
+        @Nonnull
+        public Class<V> valueType() {
+            return valueType;
+        }
+
+        /**
+         * {@return a canonical representation of this key}. A pool of keys, initially empty, is maintained privately.
+         * When the {@code intern()} method is invoked, if the pool already contains a key equal to this {@code Key}
+         * as determined by the {@link #equals(Object)} method, then the key from the pool is returned. Otherwise,
+         * if no key exist in the pool for this key {@linkplain #name() name}, then this {@code Key} object is added
+         * to the pool and {@code this} is returned. Otherwise an {@link IllegalStateException} is thrown.
+         *
+         * @throws IllegalStateException if a key exists in the pool for the same name but a different class of values.
+         *
+         * @see String#intern()
+         */
+        @SuppressWarnings("unchecked")
+        public Key<V> intern() {
+            Key<?> previous;
+            synchronized (INTERNS) {
+                previous = INTERNS.putIfAbsent(name, this);
+            }
+            if (previous == null) {
+                return this;
+            }
+            if (equals(previous)) {
+                return (Key<V>) previous;
+            }
+            throw new IllegalStateException("Key " + name + " already exists for a different class of values.");
+        }
+
+        /**
+         * {@return a string representation of this key}.
+         * By default, this is the name of this key.
+         */
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        /**
+         * {@return an hash code value for this key}.
+         */
+        @Override
+        public int hashCode() {
+            return 7 + name.hashCode() + 31 * valueType.hashCode();
+        }
+
+        /**
+         * Compares this key with the given object for equality.
+         * Two keys are considered equal if they have the same name
+         * and are associated to values of the same class.
+         *
+         * @param obj the object to compare with this key
+         * @return whether the given object is equal to this key
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj != null && getClass() == obj.getClass()) {
+                final Key<?> other = (Key<?>) obj;
+                return name.equals(other.name) && valueType.equals(other.valueType);
+            }
+            return false;
+        }
+    }
+
+    /**
+     * The dependency type. The {@linkplain Key#name() name} of this property
+     * is equal to the {@code ArtifactProperties.TYPE} value.
+     */
+    Key<String> TYPE = new Key<>("type", String.class).intern();
+
+    /**
+     * The dependency language. The {@linkplain Key#name() name} of this property
+     * is equal to the {@code ArtifactProperties.LANGUAGE} value.
+     */
+    Key<String> LANGUAGE = new Key<>("language", String.class).intern();
+
+    /**
+     * Boolean flag telling that dependency contains all of its dependencies.
      * <p>
      * <em>Important: this flag must be kept in sync with resolver! (as is used during collection)</em>
      */
-    String FLAG_INCLUDES_DEPENDENCIES = "includesDependencies";
+    Key<Boolean> FLAG_INCLUDES_DEPENDENCIES = new Key<>("includesDependencies", Boolean.class).intern();
 
     /**
-     * Boolean flag telling that dependency is meant to be placed on class path. Value of this key should be parsed with
-     * {@link Boolean#parseBoolean(String)} to obtain value.
+     * Boolean flag telling that dependency is meant to be placed on class path.
      */
-    String FLAG_CLASS_PATH_CONSTITUENT = "classPathConstituent";
+    Key<Boolean> FLAG_CLASS_PATH_CONSTITUENT = new Key<>("classPathConstituent", Boolean.class).intern();
 
     /**
-     * Returns immutable "map view" of all the properties.
+     * {@return the keys of all properties in this map}.
      */
-    @Nonnull
-    Map<String, String> asMap();
+    Set<Key<?>> keys();
+
+    /**
+     * Returns the value associated to the given key.
+     *
+     * @param <V> type of value to get
+     * @param key key of the value to get
+     * @return value associated to the given key, or {@code null} if none
+     */
+    <V> V get(@Nonnull Key<V> key);
+
+    /**
+     * Returns the value associated to the given key, or the given default value if none.
+     *
+     * @param <V> type of value to get
+     * @param key key of the value to get
+     * @param defaultValue the value to return is none is associated to the given key, or {@code null}
+     * @return value associated to the given key, or {@code null} if none and the default is null
+     */
+    <V> V getOrDefault(@Nonnull Key<V> key, V defaultValue);
 
     /**
      * Returns {@code true} if given flag is {@code true}.
+     * An absence of value is interpreted as {@code false}.
+     *
+     * @param flag the property to check
+     * @return whether the value associated to the given key is non-null and true
      */
-    boolean checkFlag(@Nonnull String flag);
+    default boolean checkFlag(@Nonnull Key<Boolean> flag) {
+        return Boolean.TRUE.equals(get(flag));
+    }
+
+    /**
+     * {@return an immutable "map view" of all the properties}.
+     * This method is provided for compatibility with API working with {@link String}.
+     * The type-safe method expecting {@link Key} arguments should be preferred.
+     */
+    @Nonnull
+    Map<String, String> asMap();
 }

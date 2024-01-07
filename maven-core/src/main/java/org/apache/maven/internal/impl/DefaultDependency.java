@@ -18,7 +18,10 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
@@ -36,6 +39,17 @@ import org.eclipse.aether.artifact.ArtifactProperties;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultDependency implements Dependency {
+    /**
+     * A mapping from {@link ArtifactProperties} values to {@link DependencyProperties} values.
+     * Used for conversion from Eclipse model to Maven model of dependency properties.
+     */
+    private static final Map<Class<?>, Function<String, Object>> VALUE_CONVERTERS = new HashMap<>(4);
+
+    static {
+        VALUE_CONVERTERS.put(String.class, String::valueOf);
+        VALUE_CONVERTERS.put(Boolean.class, Boolean::valueOf);
+    }
+
     private final InternalSession session;
     private final org.eclipse.aether.graph.Dependency dependency;
     private final DependencyProperties dependencyProperties;
@@ -45,8 +59,16 @@ public class DefaultDependency implements Dependency {
             @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency) {
         this.session = nonNull(session, "session");
         this.dependency = nonNull(dependency, "dependency");
-        this.dependencyProperties =
-                new DefaultDependencyProperties(dependency.getArtifact().getProperties());
+        DefaultDependencyProperties.Builder builder = new DefaultDependencyProperties.Builder();
+        for (Map.Entry<String, String> entry :
+                dependency.getArtifact().getProperties().entrySet()) {
+            DependencyProperties.Key<?> key = DependencyProperties.Key.forName(entry.getKey(), String.class);
+            Function<String, Object> vc = VALUE_CONVERTERS.get(key.valueType());
+            if (vc != null) {
+                builder.checkAndSet(key, vc.apply(entry.getValue()));
+            }
+        }
+        this.dependencyProperties = builder.build();
         this.key = getGroupId()
                 + ':'
                 + getArtifactId()

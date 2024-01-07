@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -78,19 +77,15 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                 type = legacyTypes.computeIfAbsent(id, k -> {
                     // Copy data as the ArtifactHandler is not immutable, but Type should be.
                     ArtifactHandler handler = manager.getArtifactHandler(id);
-                    ArrayList<String> flags = new ArrayList<>();
+                    DefaultDependencyProperties.Builder flags = new DefaultDependencyProperties.Builder();
                     if (handler.isAddedToClasspath()) {
-                        flags.add(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
+                        flags.setFlag(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
                     }
                     if (handler.isIncludesDependencies()) {
-                        flags.add(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
+                        flags.setFlag(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
                     }
                     return new DefaultType(
-                            id,
-                            handler.getLanguage(),
-                            handler.getExtension(),
-                            handler.getClassifier(),
-                            new DefaultDependencyProperties(flags));
+                            id, handler.getLanguage(), handler.getExtension(), handler.getClassifier(), flags.build());
                 });
             }
             return type;

@@ -18,12 +18,10 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Type;
-import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -46,20 +44,21 @@ public class DefaultType implements Type, ArtifactType {
         this.extension = nonNull(extension, "extension");
         this.classifier = classifier;
         nonNull(dependencyProperties, "dependencyProperties");
-        HashMap<String, String> props = new HashMap<>(dependencyProperties.asMap());
-        props.put(ArtifactProperties.TYPE, id);
-        props.put(ArtifactProperties.LANGUAGE, language);
-        this.dependencyProperties = new DefaultDependencyProperties(props);
+        DefaultDependencyProperties.Builder props = new DefaultDependencyProperties.Builder()
+                .setAll(dependencyProperties)
+                .set(DependencyProperties.TYPE, id)
+                .set(DependencyProperties.LANGUAGE, language);
+        this.dependencyProperties = props.build();
     }
 
     @Override
     public String getId() {
-        return dependencyProperties.asMap().get(ArtifactProperties.TYPE);
+        return dependencyProperties.get(DependencyProperties.TYPE);
     }
 
     @Override
     public String getLanguage() {
-        return dependencyProperties.asMap().get(ArtifactProperties.LANGUAGE);
+        return dependencyProperties.get(DependencyProperties.LANGUAGE);
     }
 
     @Override
