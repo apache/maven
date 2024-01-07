@@ -75,43 +75,49 @@ public class DefaultDependencyResolver implements DependencyResolver {
         };
     }
 
+    /**
+     * Collects, flattens and resolves the dependencies.
+     *
+     * @param request the request to resolve
+     * @return the result of the resolution
+     */
     @Override
-    public DependencyResolverResult resolve(DependencyResolverRequest request)
+    public DependencyResolverResult resolve(final DependencyResolverRequest request)
             throws DependencyCollectorException, DependencyResolverException, ArtifactResolverException {
-        nonNull(request, "request can not be null");
-        InternalSession session = InternalSession.from(request.getSession());
+        nonNull(request, "request");
+        final InternalSession session = InternalSession.from(request.getSession());
 
         if (request.getProject().isPresent()) {
-            DependencyResolutionResult result = resolveDependencies(
+            final DependencyResolutionResult resolved = resolveDependencies(
                     request.getSession(), request.getProject().get(), request.getResolutionScope());
 
-            Map<org.eclipse.aether.graph.Dependency, org.eclipse.aether.graph.DependencyNode> nodes = stream(
-                            result.getDependencyGraph())
+            final Map<org.eclipse.aether.graph.Dependency, org.eclipse.aether.graph.DependencyNode> nodes = stream(
+                            resolved.getDependencyGraph())
                     .filter(n -> n.getDependency() != null)
                     .collect(Collectors.toMap(DependencyNode::getDependency, n -> n));
 
-            Node root = session.getNode(result.getDependencyGraph());
+            final Node root = session.getNode(resolved.getDependencyGraph());
             List<Node> dependencies = new ArrayList<>();
             Map<Dependency, Path> artifacts = new LinkedHashMap<>();
             List<Path> paths = new ArrayList<>();
-            for (org.eclipse.aether.graph.Dependency dep : result.getResolvedDependencies()) {
+            for (org.eclipse.aether.graph.Dependency dep : resolved.getResolvedDependencies()) {
                 dependencies.add(session.getNode(nodes.get(dep)));
                 Path path = dep.getArtifact().getFile().toPath();
                 artifacts.put(session.getDependency(dep), path);
                 paths.add(path);
             }
             return new DefaultDependencyResolverResult(
-                    result.getCollectionErrors(), root, dependencies, paths, artifacts);
+                    resolved.getCollectionErrors(), root, dependencies, paths, artifacts);
         }
 
-        DependencyCollectorResult collectorResult =
+        final DependencyCollectorResult collectorResult =
                 session.getService(DependencyCollector.class).collect(request);
-        List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getResolutionScope());
+        final List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getResolutionScope());
         List<Dependency> deps =
                 nodes.stream().map(Node::getDependency).filter(Objects::nonNull).collect(Collectors.toList());
         List<ArtifactCoordinate> coordinates =
                 deps.stream().map(Artifact::toCoordinate).collect(Collectors.toList());
-        Map<Artifact, Path> artifacts = session.resolveArtifacts(coordinates);
+        final Map<Artifact, Path> artifacts = session.resolveArtifacts(coordinates);
         Map<Dependency, Path> dependencies = new LinkedHashMap<>();
         List<Path> paths = new ArrayList<>();
         for (Dependency d : deps) {
@@ -126,11 +132,12 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 collectorResult.getExceptions(), collectorResult.getRoot(), nodes, paths, dependencies);
     }
 
-    private Stream<DependencyNode> stream(DependencyNode node) {
-        return Stream.concat(Stream.of(node), node.getChildren().stream().flatMap(this::stream));
+    private static Stream<DependencyNode> stream(final DependencyNode node) {
+        return Stream.concat(Stream.of(node), node.getChildren().stream().flatMap(DefaultDependencyResolver::stream));
     }
 
-    private DependencyResolutionResult resolveDependencies(Session session, Project project, ResolutionScope scope) {
+    private static DependencyResolutionResult resolveDependencies(
+            final Session session, final Project project, final ResolutionScope scope) {
         Collection<String> toResolve = toScopes(scope);
         try {
             LifecycleDependencyResolver lifecycleDependencyResolver =
@@ -147,57 +154,11 @@ public class DefaultDependencyResolver implements DependencyResolver {
         }
     }
 
-    private MavenProject getMavenProject(Project project) {
+    private static MavenProject getMavenProject(final Project project) {
         return ((DefaultProject) project).getProject();
     }
 
-    private Collection<String> toScopes(ResolutionScope scope) {
+    private static Collection<String> toScopes(final ResolutionScope scope) {
         return map(scope.scopes(), Scope::id);
-    }
-
-    static class DefaultDependencyResolverResult implements DependencyResolverResult {
-        private final List<Exception> exceptions;
-        private final Node root;
-        private final List<Node> nodes;
-        private final List<Path> paths;
-        private final Map<Dependency, Path> dependencies;
-
-        DefaultDependencyResolverResult(
-                List<Exception> exceptions,
-                Node root,
-                List<Node> nodes,
-                List<Path> paths,
-                Map<Dependency, Path> dependencies) {
-            this.exceptions = exceptions;
-            this.root = root;
-            this.nodes = nodes;
-            this.paths = paths;
-            this.dependencies = dependencies;
-        }
-
-        @Override
-        public List<Exception> getExceptions() {
-            return exceptions;
-        }
-
-        @Override
-        public Node getRoot() {
-            return root;
-        }
-
-        @Override
-        public List<Node> getNodes() {
-            return nodes;
-        }
-
-        @Override
-        public List<Path> getPaths() {
-            return paths;
-        }
-
-        @Override
-        public Map<Dependency, Path> getDependencies() {
-            return dependencies;
-        }
     }
 }
