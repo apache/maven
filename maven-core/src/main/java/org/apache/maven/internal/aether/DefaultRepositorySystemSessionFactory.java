@@ -456,14 +456,12 @@ public class DefaultRepositorySystemSessionFactory {
                     filters.add(new HighestVersionFilter());
                 } else if (expression.startsWith("h(") && expression.endsWith(")")) {
                     int num = Integer.parseInt(expression.substring(2, expression.length() - 1));
-                    // MRESOLVER-450
-                    // filters.add(new HighestVersionFilter(num));
+                    filters.add(new HighestVersionFilter(num));
                 } else if ("l".equals(expression)) {
                     filters.add(new LowestVersionFilter());
                 } else if (expression.startsWith("l(") && expression.endsWith(")")) {
                     int num = Integer.parseInt(expression.substring(2, expression.length() - 1));
-                    // MRESOLVER-450
-                    // filters.add(new LowestVersionFilter(num));
+                    filters.add(new LowestVersionFilter(num));
                 } else if ("s".equals(expression)) {
                     filters.add(new ContextualSnapshotVersionFilter());
                 } else if (expression.startsWith("e(") && expression.endsWith(")")) {
