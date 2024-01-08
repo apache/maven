@@ -62,4 +62,9 @@ public interface ModelVersionParser {
      */
     @Nonnull
     VersionConstraint parseVersionConstraint(@Nonnull String constraint);
+
+    /**
+     * Checks whether a given artifact version is considered a {@code SNAPSHOT} or not.
+     */
+    boolean isSnapshot(@Nonnull String version);
 }

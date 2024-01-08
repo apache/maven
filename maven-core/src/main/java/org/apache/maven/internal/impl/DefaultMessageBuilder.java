@@ -36,111 +36,36 @@ public class DefaultMessageBuilder implements MessageBuilder {
     }
 
     @Override
-    @Nonnull
-    public MessageBuilder trace(Object o) {
-        return a(o);
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder debug(Object o) {
-        return a(o);
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder info(Object o) {
-        return a(o);
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder warning(Object o) {
-        return a(o);
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder error(Object o) {
-        return a(o);
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder success(Object o) {
-        return a(o);
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder failure(Object o) {
-        return a(o);
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder strong(Object o) {
-        return a(o);
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder mojo(Object o) {
-        return a(o);
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder project(Object o) {
-        return a(o);
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder a(char[] chars, int i, int i1) {
-        buffer.append(chars, i, i1);
+    public MessageBuilder style(String style) {
         return this;
     }
 
     @Override
-    @Nonnull
-    public MessageBuilder a(char[] chars) {
-        buffer.append(chars);
+    public MessageBuilder resetStyle() {
         return this;
     }
 
     @Override
-    @Nonnull
-    public MessageBuilder a(CharSequence charSequence, int i, int i1) {
-        buffer.append(charSequence, i, i1);
+    public MessageBuilder append(CharSequence cs) {
+        buffer.append(cs);
         return this;
     }
 
     @Override
-    @Nonnull
-    public MessageBuilder a(CharSequence charSequence) {
-        buffer.append(charSequence);
+    public MessageBuilder append(CharSequence cs, int start, int end) {
+        buffer.append(cs, start, end);
         return this;
     }
 
     @Override
-    @Nonnull
-    public MessageBuilder a(Object o) {
-        buffer.append(o);
+    public MessageBuilder append(char c) {
+        buffer.append(c);
         return this;
     }
 
     @Override
-    @Nonnull
-    public MessageBuilder newline() {
-        buffer.append(System.getProperty("line.separator"));
-        return this;
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder format(String s, Object... objects) {
-        buffer.append(String.format(s, objects));
+    public MessageBuilder setLength(int length) {
+        buffer.setLength(length);
         return this;
     }
 
@@ -153,10 +78,5 @@ public class DefaultMessageBuilder implements MessageBuilder {
     @Override
     public String toString() {
         return build();
-    }
-
-    @Override
-    public void setLength(int length) {
-        buffer.setLength(length);
     }
 }

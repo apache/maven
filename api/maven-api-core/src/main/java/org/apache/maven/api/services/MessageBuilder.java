@@ -26,7 +26,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0.0
  * @see MessageBuilderFactory
  */
-public interface MessageBuilder {
+public interface MessageBuilder extends Appendable {
 
     /**
      * Append message content in trace style.
@@ -36,7 +36,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder trace(Object message);
+    default MessageBuilder trace(Object message) {
+        return style(".trace:-bold,f:magenta", message);
+    }
 
     /**
      * Append message content in debug style.
@@ -46,7 +48,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder debug(Object message);
+    default MessageBuilder debug(Object message) {
+        return style(".debug:-bold,f:cyan", message);
+    }
 
     /**
      * Append message content in info style.
@@ -56,7 +60,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder info(Object message);
+    default MessageBuilder info(Object message) {
+        return style(".info:-bold,f:blue", message);
+    }
 
     /**
      * Append message content in warning style.
@@ -66,7 +72,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder warning(Object message);
+    default MessageBuilder warning(Object message) {
+        return style(".warning:-bold,f:yellow", message);
+    }
 
     /**
      * Append message content in error style.
@@ -76,7 +84,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder error(Object message);
+    default MessageBuilder error(Object message) {
+        return style(".error:-bold,f:red", message);
+    }
 
     /**
      * Append message content in success style.
@@ -86,7 +96,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder success(Object message);
+    default MessageBuilder success(Object message) {
+        return style(".success:-bold,f:green", message);
+    }
 
     /**
      * Append message content in failure style.
@@ -96,7 +108,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder failure(Object message);
+    default MessageBuilder failure(Object message) {
+        return style(".failure:-bold,f:red", message);
+    }
 
     /**
      * Append message content in strong style.
@@ -106,7 +120,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder strong(Object message);
+    default MessageBuilder strong(Object message) {
+        return style(".strong:-bold", message);
+    }
 
     /**
      * Append message content in mojo style.
@@ -116,7 +132,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder mojo(Object message);
+    default MessageBuilder mojo(Object message) {
+        return style(".mojo:-f:green", message);
+    }
 
     /**
      * Append message content in project style.
@@ -126,11 +144,35 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder project(Object message);
+    default MessageBuilder project(Object message) {
+        return style(".project:-f:cyan", message);
+    }
+
+    @Nonnull
+    default MessageBuilder style(String style, Object message) {
+        return style(style).a(message).resetStyle();
+    }
+
+    MessageBuilder style(String style);
+
+    MessageBuilder resetStyle();
 
     //
     // message building methods modelled after Ansi methods
     //
+
+    @Nonnull
+    @Override
+    MessageBuilder append(CharSequence cs);
+
+    @Nonnull
+    @Override
+    MessageBuilder append(CharSequence cs, int start, int end);
+
+    @Nonnull
+    @Override
+    MessageBuilder append(char c);
+
     /**
      * Append content to the message buffer.
      *
@@ -140,7 +182,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder a(char[] value, int offset, int len);
+    default MessageBuilder a(char[] value, int offset, int len) {
+        return append(String.valueOf(value, offset, len));
+    }
 
     /**
      * Append content to the message buffer.
@@ -149,7 +193,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder a(char[] value);
+    default MessageBuilder a(char[] value) {
+        return append(String.valueOf(value));
+    }
 
     /**
      * Append content to the message buffer.
@@ -160,7 +206,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder a(CharSequence value, int start, int end);
+    default MessageBuilder a(CharSequence value, int start, int end) {
+        return append(value, start, end);
+    }
 
     /**
      * Append content to the message buffer.
@@ -169,7 +217,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder a(CharSequence value);
+    default MessageBuilder a(CharSequence value) {
+        return append(value);
+    }
 
     /**
      * Append content to the message buffer.
@@ -178,7 +228,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder a(Object value);
+    default MessageBuilder a(Object value) {
+        return append(String.valueOf(value));
+    }
 
     /**
      * Append newline to the message buffer.
@@ -186,7 +238,9 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder newline();
+    default MessageBuilder newline() {
+        return append(System.lineSeparator());
+    }
 
     /**
      * Append formatted content to the buffer.
@@ -197,7 +251,17 @@ public interface MessageBuilder {
      * @return the current builder
      */
     @Nonnull
-    MessageBuilder format(String pattern, Object... args);
+    default MessageBuilder format(String pattern, Object... args) {
+        return append(String.format(pattern, args));
+    }
+
+    /**
+     * Set the buffer length.
+     *
+     * @param length the new length
+     * @return the current builder
+     */
+    MessageBuilder setLength(int length);
 
     /**
      * Return the built message.
@@ -206,11 +270,4 @@ public interface MessageBuilder {
      */
     @Nonnull
     String build();
-
-    /**
-     * Set the buffer length.
-     *
-     * @param length the new length
-     */
-    void setLength(int length);
 }

@@ -28,7 +28,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.cli.jansi.MessageUtils;
+import org.apache.maven.cli.jline.MessageUtils;
 
 /**
  */
@@ -120,6 +120,8 @@ public class CLIManager {
     public static final String CACHE_ARTIFACT_NOT_FOUND = "canf";
 
     public static final String STRICT_ARTIFACT_DESCRIPTOR_POLICY = "sadp";
+
+    public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
 
     /** This option is deprecated and may be repurposed as Java debug in a future version.
      * Use {@code -X/--verbose} instead. */
@@ -322,6 +324,10 @@ public class CLIManager {
                 .longOpt("strict-artifact-descriptor-policy")
                 .hasArg()
                 .desc("Defines 'strict' artifact descriptor policy. Supported values are 'true', 'false' (default).")
+                .build());
+        options.addOption(Option.builder(IGNORE_TRANSITIVE_REPOSITORIES)
+                .longOpt("ignore-transitive-repositories")
+                .desc("If set, Maven will ignore remote repositories introduced by transitive dependencies.")
                 .build());
 
         // Adding this back to make Maven fail if used

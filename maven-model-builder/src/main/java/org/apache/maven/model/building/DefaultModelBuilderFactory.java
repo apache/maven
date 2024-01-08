@@ -367,6 +367,12 @@ public class DefaultModelBuilderFactory {
             public VersionConstraint parseVersionConstraint(String constraint) {
                 throw new IllegalArgumentException("constraint not supported by this parser");
             }
+
+            @Override
+            public boolean isSnapshot(String version) {
+                requireNonNull(version, "version");
+                return version.endsWith("SNAPSHOT");
+            }
         };
     }
 

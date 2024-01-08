@@ -16,40 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.jansi;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.services.MessageBuilder;
-import org.apache.maven.api.services.MessageBuilderFactory;
 
 @Experimental
-@Named
-@Singleton
-public class JansiMessageBuilderFactory implements MessageBuilderFactory {
+public class ChecksumAlgorithmServiceException extends MavenException {
 
-    @Override
-    public boolean isColorEnabled() {
-        return MessageUtils.isColorEnabled();
-    }
+    private static final long serialVersionUID = 1201171469179367694L;
 
-    @Override
-    public int getTerminalWidth() {
-        return MessageUtils.getTerminalWidth();
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder builder() {
-        return builder(new StringBuilder());
-    }
-
-    @Override
-    @Nonnull
-    public MessageBuilder builder(@Nonnull StringBuilder stringBuilder) {
-        return MessageUtils.builder(stringBuilder);
+    public ChecksumAlgorithmServiceException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
