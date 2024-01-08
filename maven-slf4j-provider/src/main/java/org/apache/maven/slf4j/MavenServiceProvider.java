@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.slf4j.impl;
+package org.apache.maven.slf4j;
 
 import org.slf4j.ILoggerFactory;
 import org.slf4j.IMarkerFactory;

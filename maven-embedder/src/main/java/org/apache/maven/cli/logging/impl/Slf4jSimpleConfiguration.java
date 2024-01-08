@@ -19,7 +19,7 @@
 package org.apache.maven.cli.logging.impl;
 
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
-import org.slf4j.impl.MavenSlf4jSimpleFriend;
+import org.slf4j.simple.MavenSlf4jSimpleFriend;
 
 /**
  * Configuration for slf4j-simple.

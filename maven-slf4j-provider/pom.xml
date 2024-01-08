@@ -61,13 +61,12 @@ under the License.
             <artifactItem>
               <groupId>org.slf4j</groupId>
               <artifactId>slf4j-simple</artifactId>
-              <version>${slf4jSimpleVersion}</version>
+              <version>${slf4jVersion}</version>
               <type>jar</type>
               <classifier>sources</classifier>
               <overWrite>false</overWrite>
               <outputDirectory>${project.build.directory}/generated-sources/slf4j-simple</outputDirectory>
-              <includes>org/slf4j/impl/*.java</includes>
-              <excludes>org/slf4j/impl/StaticLoggerBinder*</excludes>
+              <includes>org/slf4j/simple/*.java</includes>
             </artifactItem>
           </artifactItems>
         </configuration>
