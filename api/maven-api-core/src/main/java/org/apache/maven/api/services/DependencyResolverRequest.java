@@ -20,9 +20,12 @@ package org.apache.maven.api.services;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.JavaPathType;
+import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.Session;
@@ -36,6 +39,14 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
     @Nonnull
     ResolutionScope getResolutionScope();
+
+    /**
+     * {@return a filter for the types of path (class-path, module-path, …) accepted by the tool}.
+     * For example, if a Java tools accepts only class-path elements, then the filter should return
+     * {@code true} for {@link JavaPathType#CLASSES} and {@code false} for {@link JavaPathType#MODULES}.
+     * If no filter is explicitly set, then the default is a filter accepting everything.
+     */
+    Predicate<PathType> getPathTypeFilter();
 
     @Nonnull
     static DependencyResolverRequestBuilder builder() {
@@ -87,7 +98,9 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
     @NotThreadSafe
     class DependencyResolverRequestBuilder extends DependencyCollectorRequestBuilder {
-        ResolutionScope resolutionScope;
+        private ResolutionScope resolutionScope;
+
+        private Predicate<PathType> pathTypeFilter;
 
         @Nonnull
         @Override
@@ -159,15 +172,31 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
             return this;
         }
 
+        @Nonnull
+        public DependencyResolverRequestBuilder pathTypeFilter(@Nonnull Predicate<PathType> pathTypeFilter) {
+            this.pathTypeFilter = pathTypeFilter;
+            return this;
+        }
+
         @Override
         public DependencyResolverRequest build() {
             return new DefaultDependencyResolverRequest(
-                    session, project, rootArtifact, root, dependencies, managedDependencies, verbose, resolutionScope);
+                    session,
+                    project,
+                    rootArtifact,
+                    root,
+                    dependencies,
+                    managedDependencies,
+                    verbose,
+                    resolutionScope,
+                    pathTypeFilter);
         }
 
         static class DefaultDependencyResolverRequest extends DefaultDependencyCollectorRequest
                 implements DependencyResolverRequest {
             private final ResolutionScope resolutionScope;
+
+            private final Predicate<PathType> pathTypeFilter;
 
             DefaultDependencyResolverRequest(
                     Session session,
@@ -177,9 +206,11 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
                     Collection<DependencyCoordinate> dependencies,
                     Collection<DependencyCoordinate> managedDependencies,
                     boolean verbose,
-                    ResolutionScope resolutionScope) {
+                    ResolutionScope resolutionScope,
+                    Predicate<PathType> pathTypeFilter) {
                 super(session, project, rootArtifact, root, dependencies, managedDependencies, verbose);
                 this.resolutionScope = nonNull(resolutionScope, "resolutionScope cannot be null");
+                this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : (t) -> true;
                 if (verbose) {
                     throw new IllegalArgumentException("verbose cannot be true for resolving dependencies");
                 }
@@ -189,6 +220,11 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
             @Override
             public ResolutionScope getResolutionScope() {
                 return resolutionScope;
+            }
+
+            @Override
+            public Predicate<PathType> getPathTypeFilter() {
+                return pathTypeFilter;
             }
         }
     }
