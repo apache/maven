@@ -53,5 +53,16 @@ public interface ArtifactHandler {
 
     String getLanguage();
 
+    /**
+     * Specifies if the artifact contains java classes and can be added to the classpath.
+     * Whether the artifact <em>should</em> be added to the classpath depends on other
+     * dependency properties.
+     *
+     * @return if the artifact <em>can</em> be added to the class path
+     *
+     * @deprecated A value of {@code true} does not mean that the dependency <em>should</em>
+     * be placed on the classpath. See {@code JavaPathType} instead for better analysis.
+     */
+    @Deprecated
     boolean isAddedToClasspath();
 }

@@ -88,6 +88,7 @@ public class ProjectArtifact extends DefaultArtifact implements ArtifactWithDepe
         }
 
         @Override
+        @Deprecated
         public boolean isAddedToClasspath() {
             return false;
         }

@@ -378,7 +378,11 @@ public class MavenProject implements Cloneable {
      * This method can be invoked when the caller does not support module-path.
      *
      * @throws DependencyResolutionRequiredException if an artifact file is used, but has not been resolved
+     *
+     * @deprecated This method is unreliable because it does not consider other dependency properties.
+     * See {@link org.apache.maven.api.JavaPathType} instead for better analysis.
      */
+    @Deprecated
     public List<String> getCompileClasspathElements() throws DependencyResolutionRequiredException {
         return getClasspathElements(MavenProject::isCompilePathElement, false);
     }
@@ -388,7 +392,11 @@ public class MavenProject implements Cloneable {
      * This method can be invoked when the caller does not support module-path.
      *
      * @throws DependencyResolutionRequiredException if an artifact file is used, but has not been resolved
+     *
+     * @deprecated This method is unreliable because it does not consider other dependency properties.
+     * See {@link org.apache.maven.api.JavaPathType} instead for better analysis.
      */
+    @Deprecated
     public List<String> getTestClasspathElements() throws DependencyResolutionRequiredException {
         return getClasspathElements(MavenProject::isTestPathElement, true);
     }
@@ -398,7 +406,11 @@ public class MavenProject implements Cloneable {
      * This method can be invoked when the caller does not support module-path.
      *
      * @throws DependencyResolutionRequiredException if an artifact file is used, but has not been resolved
+     *
+     * @deprecated This method is unreliable because it does not consider other dependency properties.
+     * See {@link org.apache.maven.api.JavaPathType} instead for better analysis.
      */
+    @Deprecated
     public List<String> getRuntimeClasspathElements() throws DependencyResolutionRequiredException {
         return getClasspathElements(MavenProject::isRuntimePathElement, false);
     }

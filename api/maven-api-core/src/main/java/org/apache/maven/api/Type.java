@@ -30,7 +30,7 @@ import org.apache.maven.api.model.Dependency;
  * <p>
  * It provides information about the file type (or extension) of the associated artifact,
  * its default classifier, and how the artifact will be used in the build when creating
- * classpaths.
+ * class-paths or module-paths.
  * <p>
  * For example, the type {@code java-source} has a {@code jar} extension and a
  * {@code sources} classifier. The artifact and its dependencies should be added
@@ -80,11 +80,16 @@ public interface Type {
     String getClassifier();
 
     /**
-     * Specifies if the artifact contains java classes and should be
-     * added to the classpath.
+     * Specifies if the artifact contains java classes and can be added to the classpath.
+     * Whether the artifact <em>should</em> be added to the classpath depends on other
+     * {@linkplain #getDependencyProperties() dependency properties}.
      *
-     * @return if the artifact should be added to the class path
+     * @return if the artifact <em>can</em> be added to the class path
+     *
+     * @deprecated A value of {@code true} does not mean that the dependency <em>should</em>
+     * be placed on the classpath. See {@link JavaPathType} instead for better analysis.
      */
+    @Deprecated
     default boolean isAddedToClassPath() {
         return getDependencyProperties().checkFlag(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
     }

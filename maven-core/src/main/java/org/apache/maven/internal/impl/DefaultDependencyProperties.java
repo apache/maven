@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.JavaPathType;
+import org.apache.maven.api.PathType;
 import org.apache.maven.api.annotations.Nonnull;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -141,6 +143,7 @@ public class DefaultDependencyProperties implements DependencyProperties {
      */
     protected DefaultDependencyProperties(@Nonnull final Map<Key<?>, Object> properties) {
         this.properties = nonNull(properties, "properties");
+        addCompatibility();
     }
 
     /**
@@ -154,6 +157,27 @@ public class DefaultDependencyProperties implements DependencyProperties {
         properties = new HashMap<>(count + count / 3);
         for (Key<Boolean> flag : flags) {
             properties.put(flag, Boolean.TRUE);
+        }
+        addCompatibility();
+    }
+
+    /**
+     * @deprecated Bridge with deprecated flag. To be removed if deprecated flag is removed.
+     */
+    @Deprecated
+    private void addCompatibility() {
+        PathType[] types = get(PATH_TYPES);
+        if (types != null) {
+            boolean found = false;
+            for (PathType type : types) {
+                if (type.equals(JavaPathType.CLASSES)) {
+                    found = true;
+                    break;
+                }
+            }
+            properties.put(FLAG_CLASS_PATH_CONSTITUENT, found);
+        } else if (checkFlag(FLAG_CLASS_PATH_CONSTITUENT)) {
+            properties.put(PATH_TYPES, new PathType[] {JavaPathType.CLASSES});
         }
     }
 

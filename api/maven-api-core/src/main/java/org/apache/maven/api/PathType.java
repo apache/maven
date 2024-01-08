@@ -35,6 +35,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * <p>Path types are often exclusive. For example, a dependency should not be both
  * on the Java class-path and on the Java module-path.</p>
  *
+ * @see DependencyProperties#PATH_TYPES
  * @see org.apache.maven.api.services.DependencyResolverResult#getDispatchedPaths()
  *
  * @since 4.0.0

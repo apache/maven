@@ -50,12 +50,40 @@ public final class JavaPathType extends PathType {
     /**
      * The path identified by the Java {@code --class-path} option.
      * Used for compilation, execution and Javadoc among others.
+     *
+     * <h4>Context-sensitive interpretation</h4>
+     * A dependency with this path type will not necessarily be placed on the class-path.
+     * There is two circumstances where the dependency may be nevertheless placed somewhere else:
+     *
+     * <ul>
+     *   <li>If {@link #MODULES} path type is also set, then the dependency can be placed either on the
+     *       class-path or on the module-path, but only one of those. The choice is up to the plugin,
+     *       possibly using heuristic rules (Maven 3 behavior).</li>
+     *   <li>If a {@link #patchModule(String)} is also set and the main JAR file was placed on the module-path,
+     *       then the test dependency will be placed on the Java {@code --patch-module} option instead of the
+     *       class-path.</li>
+     * </ul>
      */
     public static final JavaPathType CLASSES = new JavaPathType("CLASSES", "--class-path", null);
 
     /**
      * The path identified by the Java {@code --module-path} option.
      * Used for compilation, execution and Javadoc among others.
+     *
+     * <h4>Context-sensitive interpretation</h4>
+     * A dependency with this flag will not necessarily be placed on the module-path.
+     * There is two circumstances where the dependency may be nevertheless placed somewhere else:
+     *
+     * <ul>
+     *   <li>If {@link #CLASSES} path type is also set, then the dependency <em>should</em> be placed on the
+     *       module-path, but is nevertheless compatible with placement on the class-path. Compatibility can
+     *       be achieved, for example, by repeating in the {@code META-INF/services/} directory the services
+     *       that are declared in the {@code module-info.class} file. In that case, the path type can be chosen
+     *       by the plugin.</li>
+     *   <li>If a {@link #patchModule(String)} is also set and the main JAR file was placed on the module-path,
+     *       then the test dependency will be placed on the Java {@code --patch-module} option instead of the
+     *       module-path.</li>
+     * </ul>
      */
     public static final JavaPathType MODULES = new JavaPathType("MODULES", "--module-path", null);
 
@@ -103,6 +131,11 @@ public final class JavaPathType extends PathType {
      * Creates a path identified by the Java {@code --patch-module} option.
      * Contrarily to the other types of paths, this path is applied to only
      * one specific module. Used for compilation and execution among others.
+     *
+     * <h4>Context-sensitive interpretation</h4>
+     * This path type makes sense only when a main module is added on the module-path by another dependency.
+     * In no main module is found, the patch dependency may be added on the class-path or module-path
+     * depending on whether {@link #CLASSES} or {@link #MODULES} is present.
      *
      * @param moduleName name of the module on which to apply the path
      * @return an identification of the patch-module path for the given module.

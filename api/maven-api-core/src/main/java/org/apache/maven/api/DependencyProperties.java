@@ -188,6 +188,20 @@ public interface DependencyProperties {
     Key<String> LANGUAGE = new Key<>("language", String.class).intern();
 
     /**
+     * Types of path (class-path, module-path, …) where the dependency can be placed.
+     * For most deterministic builds, the array length should be 1. In such case,
+     * the dependency will be unconditionally placed on the specified type of path
+     * and no heuristic rule will be involved.
+     *
+     * <p>It is nevertheless common to specify two or more types of path. For example,
+     * a Java library may be compatible with either the class-path or the module-path,
+     * and the user may have provided no instruction about which type to use. In such
+     * case, the plugin may apply rules for choosing a path. See for example
+     * {@link JavaPathType#CLASSES} and {@link JavaPathType#MODULES}.</p>
+     */
+    Key<PathType[]> PATH_TYPES = new Key<>("pathTypes", PathType[].class).intern();
+
+    /**
      * Boolean flag telling that dependency contains all of its dependencies.
      * <p>
      * <em>Important: this flag must be kept in sync with resolver! (as is used during collection)</em>
@@ -196,7 +210,10 @@ public interface DependencyProperties {
 
     /**
      * Boolean flag telling that dependency is meant to be placed on class path.
+     *
+     * @deprecated Use {@link #PATH_TYPES} and {@link JavaPathType#CLASSES} instead.
      */
+    @Deprecated
     Key<Boolean> FLAG_CLASS_PATH_CONSTITUENT = new Key<>("classPathConstituent", Boolean.class).intern();
 
     /**
