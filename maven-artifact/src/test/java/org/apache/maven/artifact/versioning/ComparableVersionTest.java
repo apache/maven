@@ -399,7 +399,7 @@ class ComparableVersionTest {
         ComparableVersion sp2 = new ComparableVersion("1.0-sp-1-redhat");
         ComparableVersion sp3 = new ComparableVersion("1.0-sp.1-redhat");
         assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp1);
-        assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp2);
-        assertTrue(f.compareTo(sp1) < 0, "expected " + f + " < " + sp3);
+        assertTrue(f.compareTo(sp2) < 0, "expected " + f + " < " + sp2);
+        assertTrue(f.compareTo(sp3) < 0, "expected " + f + " < " + sp3);
     }
 }
