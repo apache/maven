@@ -109,6 +109,11 @@ public class Os {
     /**
      * OS family that can be tested for. {@value}
      */
+    private static final String FAMILY_OS390 = "os/390";
+
+    /**
+     * OS family that can be tested for. {@value}
+     */
     private static final String FAMILY_OS400 = "os/400";
 
     /**
@@ -169,7 +174,7 @@ public class Os {
             case FAMILY_NETWARE:
                 return OS_NAME.contains(FAMILY_NETWARE);
             case FAMILY_DOS:
-                return PATH_SEP.equals(";") && !isFamily(FAMILY_NETWARE);
+                return PATH_SEP.equals(";") && !isFamily(FAMILY_NETWARE) && !isWindows;
             case FAMILY_MAC:
                 return OS_NAME.contains(FAMILY_MAC) || OS_NAME.contains(DARWIN);
             case FAMILY_TANDEM:
@@ -177,9 +182,9 @@ public class Os {
             case FAMILY_UNIX:
                 return PATH_SEP.equals(":")
                         && !isFamily(FAMILY_OPENVMS)
-                        && (!isFamily(FAMILY_MAC) || OS_NAME.endsWith("x") || OS_NAME.contains(DARWIN));
+                        && (!isFamily(FAMILY_MAC) || OS_NAME.endsWith("x"));
             case FAMILY_ZOS:
-                return OS_NAME.contains(FAMILY_ZOS) || OS_NAME.contains("os/390");
+                return OS_NAME.contains(FAMILY_ZOS) || OS_NAME.contains(FAMILY_OS390);
             case FAMILY_OS400:
                 return OS_NAME.contains(FAMILY_OS400);
             case FAMILY_OPENVMS:
