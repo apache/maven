@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.Test;
  * @author Brett Porter
  *
  */
+@Disabled("Disabled for MNG-7977")
 public class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenIntegrationTestCase {
 
     public MavenITmng1088ReactorPluginResolutionTest() {
