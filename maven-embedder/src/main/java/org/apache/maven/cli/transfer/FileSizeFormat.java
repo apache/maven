@@ -20,6 +20,8 @@ package org.apache.maven.cli.transfer;
 
 import java.util.Locale;
 
+import org.apache.maven.api.services.MessageBuilder;
+
 /**
  * Formats file size with the associated <a href="https://en.wikipedia.org/wiki/Metric_prefix">SI</a> prefix
  * (GB, MB, kB) and using the patterns <code>#0.0</code> for numbers between 1 and 10
@@ -140,6 +142,38 @@ public class FileSizeFormat {
             builder.append(Math.round(scaledSize));
         } else {
             builder.append(Math.round(scaledSize * 10d) / 10d);
+        }
+
+        if (!omitSymbol) {
+            builder.append(" ").append(unit.symbol());
+        }
+    }
+
+    public void format(MessageBuilder builder, long size) {
+        format(builder, size, null, false);
+    }
+
+    public void format(MessageBuilder builder, long size, ScaleUnit unit) {
+        format(builder, size, unit, false);
+    }
+
+    @SuppressWarnings("checkstyle:magicnumber")
+    private void format(MessageBuilder builder, long size, ScaleUnit unit, boolean omitSymbol) {
+        if (size < 0L) {
+            throw new IllegalArgumentException("file size cannot be negative: " + size);
+        }
+        if (unit == null) {
+            unit = ScaleUnit.getScaleUnit(size);
+        }
+
+        double scaledSize = (double) size / unit.bytes();
+
+        if (unit == ScaleUnit.BYTE) {
+            builder.append(Long.toString(size));
+        } else if (scaledSize < 0.05d || scaledSize >= 10.0d) {
+            builder.append(Long.toString(Math.round(scaledSize)));
+        } else {
+            builder.append(Double.toString(Math.round(scaledSize * 10d) / 10d));
         }
 
         if (!omitSymbol) {

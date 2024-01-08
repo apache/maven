@@ -24,6 +24,7 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.repository.internal.DefaultModelVersionParser;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
@@ -94,7 +95,7 @@ public class DefaultArtifact implements Artifact {
 
     @Override
     public boolean isSnapshot() {
-        return DefaultVersionParser.checkSnapshot(artifact.getVersion());
+        return DefaultModelVersionParser.checkSnapshot(artifact.getVersion());
     }
 
     @Nonnull

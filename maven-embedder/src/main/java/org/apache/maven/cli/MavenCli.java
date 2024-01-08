@@ -58,8 +58,8 @@ import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
 import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
-import org.apache.maven.cli.jansi.JansiMessageBuilderFactory;
-import org.apache.maven.cli.jansi.MessageUtils;
+import org.apache.maven.cli.jline.JLineMessageBuilderFactory;
+import org.apache.maven.cli.jline.MessageUtils;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
@@ -188,7 +188,7 @@ public class MavenCli {
     // This supports painless invocation by the Verifier during embedded execution of the core ITs
     public MavenCli(ClassWorld classWorld) {
         this.classWorld = classWorld;
-        this.messageBuilderFactory = new JansiMessageBuilderFactory();
+        this.messageBuilderFactory = new JLineMessageBuilderFactory();
     }
 
     public static void main(String[] args) {
@@ -1304,6 +1304,8 @@ public class MavenCli {
             request.setIgnoreMissingArtifactDescriptor(true);
             request.setIgnoreInvalidArtifactDescriptor(true);
         }
+        enableOnPresentOption(
+                commandLine, CLIManager.IGNORE_TRANSITIVE_REPOSITORIES, request::setIgnoreTransitiveRepositories);
 
         performProjectActivation(commandLine, request.getProjectActivation());
         performProfileActivation(commandLine, request.getProfileActivation());
@@ -1345,13 +1347,16 @@ public class MavenCli {
             return;
         }
 
-        boolean runningOnCI = isRunningOnCI(cliRequest.getSystemProperties());
-        if (runningOnCI) {
-            slf4jLogger.info("Making this build non-interactive, because the environment variable CI equals \"true\"."
-                    + " Disable this detection by removing that variable or adding --force-interactive.");
+        if (commandLine.hasOption(BATCH_MODE) || commandLine.hasOption(NON_INTERACTIVE)) {
             request.setInteractiveMode(false);
-        } else if (commandLine.hasOption(BATCH_MODE) || commandLine.hasOption(NON_INTERACTIVE)) {
-            request.setInteractiveMode(false);
+        } else {
+            boolean runningOnCI = isRunningOnCI(cliRequest.getSystemProperties());
+            if (runningOnCI) {
+                slf4jLogger.info(
+                        "Making this build non-interactive, because the environment variable CI equals \"true\"."
+                                + " Disable this detection by removing that variable or adding --force-interactive.");
+                request.setInteractiveMode(false);
+            }
         }
     }
 
@@ -1671,7 +1676,7 @@ public class MavenCli {
     //
 
     protected TransferListener getConsoleTransferListener(boolean printResourceNames) {
-        return new ConsoleMavenTransferListener(System.out, printResourceNames);
+        return new ConsoleMavenTransferListener(messageBuilderFactory, System.out, printResourceNames);
     }
 
     protected TransferListener getBatchTransferListener() {

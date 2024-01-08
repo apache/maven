@@ -21,7 +21,8 @@ package org.apache.maven.cli.transfer;
 import java.io.PrintStream;
 import java.util.Locale;
 
-import org.apache.maven.cli.jansi.MessageUtils;
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -31,31 +32,27 @@ import org.eclipse.aether.transfer.TransferResource;
  * AbstractMavenTransferListener
  */
 public abstract class AbstractMavenTransferListener extends AbstractTransferListener {
+    public static final String STYLE = ".transfer:-faint";
 
-    private static final String ESC = "\u001B";
-    private static final String ANSI_DARK_SET = ESC + "[90m";
-    private static final String ANSI_DARK_RESET = ESC + "[0m";
+    protected final MessageBuilderFactory messageBuilderFactory;
+    protected final PrintStream out;
 
-    protected PrintStream out;
-
-    protected AbstractMavenTransferListener(PrintStream out) {
+    protected AbstractMavenTransferListener(MessageBuilderFactory messageBuilderFactory, PrintStream out) {
+        this.messageBuilderFactory = messageBuilderFactory;
         this.out = out;
     }
 
     @Override
     public void transferInitiated(TransferEvent event) {
-        String darkOn = MessageUtils.isColorEnabled() ? ANSI_DARK_SET : "";
-        String darkOff = MessageUtils.isColorEnabled() ? ANSI_DARK_RESET : "";
-
         String action = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();
-        StringBuilder message = new StringBuilder();
-        message.append(darkOn).append(action).append(' ').append(direction).append(' ');
-        message.append(darkOff).append(resource.getRepositoryId());
-        message.append(darkOn).append(": ").append(resource.getRepositoryUrl());
-        message.append(darkOff).append(resource.getResourceName());
+        MessageBuilder message = messageBuilderFactory.builder();
+        message.style(STYLE).append(action).append(' ').append(direction).append(' ');
+        message.resetStyle().append(resource.getRepositoryId());
+        message.style(STYLE).append(": ").append(resource.getRepositoryUrl());
+        message.resetStyle().append(resource.getResourceName());
 
         out.println(message.toString());
     }
@@ -70,9 +67,6 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
     @Override
     public void transferSucceeded(TransferEvent event) {
-        String darkOn = MessageUtils.isColorEnabled() ? ANSI_DARK_SET : "";
-        String darkOff = MessageUtils.isColorEnabled() ? ANSI_DARK_RESET : "";
-
         String action = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
@@ -80,13 +74,12 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         long contentLength = event.getTransferredBytes();
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
-        StringBuilder message = new StringBuilder();
-        message.append(action).append(darkOn).append(' ').append(direction).append(' ');
-        message.append(darkOff).append(resource.getRepositoryId());
-        message.append(darkOn).append(": ").append(resource.getRepositoryUrl());
-        message.append(darkOff).append(resource.getResourceName());
-        message.append(darkOn).append(" (");
-        format.format(message, contentLength);
+        MessageBuilder message = messageBuilderFactory.builder();
+        message.append(action).style(STYLE).append(' ').append(direction).append(' ');
+        message.resetStyle().append(resource.getRepositoryId());
+        message.style(STYLE).append(": ").append(resource.getRepositoryUrl());
+        message.resetStyle().append(resource.getResourceName());
+        message.style(STYLE).append(" (").append(format.format(contentLength));
 
         long duration = System.currentTimeMillis() - resource.getTransferStartTime();
         if (duration > 0L) {
@@ -96,7 +89,7 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
             message.append("/s");
         }
 
-        message.append(')').append(darkOff);
+        message.append(')').resetStyle();
         out.println(message.toString());
     }
 }

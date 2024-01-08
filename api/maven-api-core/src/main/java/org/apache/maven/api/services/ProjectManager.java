@@ -30,6 +30,7 @@ import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.model.Resource;
 
 /**
  * Interface to manage the project during its lifecycle.
@@ -75,7 +76,18 @@ public interface ProjectManager extends Service {
 
     void addTestCompileSourceRoot(Project project, String sourceRoot);
 
+    List<Resource> getResources(Project project);
+
+    void addResource(Project project, Resource resource);
+
+    List<Resource> getTestResources(Project project);
+
+    void addTestResource(Project project, Resource resource);
+
     List<RemoteRepository> getRepositories(Project project);
 
     void setProperty(Project project, String key, String value);
+
+    @Nonnull
+    Optional<Project> getExecutionProject(@Nonnull Project project);
 }

@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
@@ -41,8 +42,9 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     private boolean printResourceNames;
     private int lastLength;
 
-    public ConsoleMavenTransferListener(PrintStream out, boolean printResourceNames) {
-        super(out);
+    public ConsoleMavenTransferListener(
+            MessageBuilderFactory messageBuilderFactory, PrintStream out, boolean printResourceNames) {
+        super(messageBuilderFactory, out);
         this.printResourceNames = printResourceNames;
     }
 
