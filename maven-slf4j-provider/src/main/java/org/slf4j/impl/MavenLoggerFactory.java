@@ -30,13 +30,15 @@ import org.slf4j.Logger;
 public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4jWrapperFactory {
     private LogLevelRecorder logLevelRecorder = null;
 
+    public MavenLoggerFactory() {}
+
     @Override
     public void setLogLevelRecorder(LogLevelRecorder logLevelRecorder) {
         if (this.logLevelRecorder != null) {
             throw new IllegalStateException("LogLevelRecorder has already been set.");
         }
-
         this.logLevelRecorder = logLevelRecorder;
+        reset();
     }
 
     @Override

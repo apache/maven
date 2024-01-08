@@ -19,7 +19,6 @@
 package org.apache.maven.cli.logging.impl;
 
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
-import org.slf4j.MavenSlf4jFriend;
 import org.slf4j.impl.MavenSlf4jSimpleFriend;
 
 /**
@@ -50,7 +49,6 @@ public class Slf4jSimpleConfiguration extends BaseSlf4jConfiguration {
     @Override
     public void activate() {
         // property for root logger level or System.out redirection need to be taken into account
-        MavenSlf4jFriend.reset();
         MavenSlf4jSimpleFriend.init();
     }
 }
