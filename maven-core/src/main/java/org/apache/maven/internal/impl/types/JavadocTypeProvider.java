@@ -22,25 +22,24 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
+/**
+ * Type provider for javadoc packaged in a JAR file.
+ *
+ * @see Type#JAVADOC
+ */
 @Named(JavadocTypeProvider.NAME)
 @Singleton
 public class JavadocTypeProvider implements Provider<Type> {
-    public static final String NAME = "javadoc";
+    public static final String NAME = Type.JAVADOC;
 
     private final Type type;
 
     public JavadocTypeProvider() {
-        this.type = new DefaultType(
-                NAME,
-                Type.LANGUAGE_JAVA,
-                "jar",
-                "javadoc",
-                new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
+        this.type = new DefaultType(NAME, Type.LANGUAGE_JAVA, "jar", "javadoc", JavaPathType.CLASSES);
     }
 
     @Override

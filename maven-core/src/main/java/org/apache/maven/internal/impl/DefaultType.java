@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 import java.util.Map;
 
 import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.PathType;
 import org.apache.maven.api.Type;
 import org.eclipse.aether.artifact.ArtifactType;
 
@@ -49,6 +50,16 @@ public class DefaultType implements Type, ArtifactType {
                 .set(DependencyProperties.TYPE, id)
                 .set(DependencyProperties.LANGUAGE, language);
         this.dependencyProperties = props.build();
+    }
+
+    public DefaultType(String id, String language, String extension, String classifier, PathType... pathTypes) {
+        this.extension = nonNull(extension, "extension");
+        this.classifier = classifier;
+        dependencyProperties = new DefaultDependencyProperties.Builder()
+                .set(DependencyProperties.TYPE, id)
+                .set(DependencyProperties.LANGUAGE, language)
+                .set(DependencyProperties.PATH_TYPES, pathTypes)
+                .build();
     }
 
     @Override

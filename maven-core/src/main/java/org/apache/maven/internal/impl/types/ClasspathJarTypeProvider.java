@@ -27,22 +27,20 @@ import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultType;
 
 /**
- * Type provider for a JAR file that can be placed either on the class-path or on the module-path.
- * Dependencies of this type are class-path constituents and module-path constituents.
- * Only one of those constituents shall be effective for any given dependency.
- * The choice may depend on heuristic rules.
+ * Type provider for a JAR file to unconditionally place on the class-path.
+ * Dependencies of this type are class-path constituents only.
  *
- * @see Type#JAR
+ * @see Type#CLASSPATH_JAR
  */
-@Named(JarTypeProvider.NAME)
+@Named(ClasspathJarTypeProvider.NAME)
 @Singleton
-public class JarTypeProvider implements Provider<Type> {
-    public static final String NAME = Type.JAR;
+public class ClasspathJarTypeProvider implements Provider<Type> {
+    public static final String NAME = Type.CLASSPATH_JAR;
 
     private final Type type;
 
-    public JarTypeProvider() {
-        this.type = new DefaultType(NAME, Type.LANGUAGE_JAVA, "jar", null, JavaPathType.CLASSES, JavaPathType.MODULES);
+    public ClasspathJarTypeProvider() {
+        this.type = new DefaultType(NAME, Type.LANGUAGE_JAVA, "jar", null, JavaPathType.CLASSES);
     }
 
     @Override

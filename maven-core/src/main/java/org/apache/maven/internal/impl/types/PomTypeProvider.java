@@ -26,10 +26,15 @@ import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
+/**
+ * Type provider for a POM file.
+ *
+ * @see Type#POM
+ */
 @Named(PomTypeProvider.NAME)
 @Singleton
 public class PomTypeProvider implements Provider<Type> {
-    public static final String NAME = "pom";
+    public static final String NAME = Type.POM;
 
     private final Type type;
 

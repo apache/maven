@@ -279,6 +279,9 @@ final class DefaultDependencyResolverResult implements DependencyResolverResult 
     private boolean containsPatches(final PathType[] types) {
         if (types != null) {
             for (PathType type : types) {
+                if (JavaPathType.PATCH_MODULE.equals(type)) {
+                    return true;
+                }
                 if (type instanceof JavaPathType
                         && ((JavaPathType) type).moduleName().isPresent()) {
                     return true;

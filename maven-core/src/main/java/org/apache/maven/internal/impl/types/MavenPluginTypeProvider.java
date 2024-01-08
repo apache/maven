@@ -22,25 +22,24 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
+/**
+ * Type provider for a Maven plugin.
+ *
+ * @see Type#MAVEN_PLUGIN
+ */
 @Named(MavenPluginTypeProvider.NAME)
 @Singleton
 public class MavenPluginTypeProvider implements Provider<Type> {
-    public static final String NAME = "maven-plugin";
+    public static final String NAME = Type.MAVEN_PLUGIN;
 
     private final Type type;
 
     public MavenPluginTypeProvider() {
-        this.type = new DefaultType(
-                NAME,
-                Type.LANGUAGE_JAVA,
-                "jar",
-                null,
-                new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
+        this.type = new DefaultType(NAME, Type.LANGUAGE_JAVA, "jar", null, JavaPathType.CLASSES);
     }
 
     @Override

@@ -46,6 +46,55 @@ public interface Type {
     String LANGUAGE_JAVA = "java";
 
     /**
+     * Artifact type name for a POM file.
+     */
+    String POM = "pom";
+
+    /**
+     * Artifact type name for a JAR file that can be placed either on the class-path or on the module-path.
+     * The path (classes or modules) is chosen by the plugin, possibly using heuristic rules.
+     * This is the behavior of Maven 3.
+     */
+    String JAR = "jar";
+
+    /**
+     * Artifact type name for a JAR file to unconditionally place on the class-path.
+     * If the JAR is modular, its module information are ignored.
+     * This type is new in Maven 4.
+     */
+    String CLASSPATH_JAR = "classpath-jar";
+
+    /**
+     * Artifact type name for a JAR file to unconditionally place on the module-path.
+     * If the JAR is not modular, then it is loaded by Java as an unnamed module.
+     * This type is new in Maven 4.
+     */
+    String MODULAR_JAR = "modular-jar";
+
+    /**
+     * Artifact type name for source code packaged in a JAR file.
+     */
+    String JAVA_SOURCE = "java-source";
+
+    /**
+     * Artifact type name for javadoc packaged in a JAR file.
+     */
+    String JAVADOC = "javadoc";
+
+    /**
+     * Artifact type name for a Maven plugin.
+     */
+    String MAVEN_PLUGIN = "maven-plugin";
+
+    /**
+     * Artifact type name for a JAR file containing test classes. If the main artifact is placed on the class-path
+     * ({@value #JAR} or {@value #CLASSPATH_JAR} types), then the test artifact will also be placed on the class-path.
+     * Otherwise, if the main artifact is placed on the module-path ({@value #JAR} or {@value #MODULAR_JAR} types),
+     * then the test artifact will be added using {@code --patch-module} option.
+     */
+    String TEST_JAR = "test-jar";
+
+    /**
      * Returns the dependency type id.
      * The id uniquely identifies this <i>dependency type</i>.
      *

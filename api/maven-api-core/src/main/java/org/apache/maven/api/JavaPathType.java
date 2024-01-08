@@ -94,6 +94,15 @@ public final class JavaPathType extends PathType {
             new JavaPathType("UPGRADE_MODULES", "--upgrade-module-path", null);
 
     /**
+     * The path identified by the Java {@code --patch-module} option.
+     * Note that this option is incomplete, because it must be followed by a module name.
+     * Use this type only when the module to patch is unknown.
+     *
+     * @see #patchModule(String)
+     */
+    public static final JavaPathType PATCH_MODULE = new JavaPathType("PATCH_MODULE", "--patch-module", null);
+
+    /**
      * The path identified by the Java {@code --processor-path} option.
      */
     public static final JavaPathType PROCESSOR_CLASSES =

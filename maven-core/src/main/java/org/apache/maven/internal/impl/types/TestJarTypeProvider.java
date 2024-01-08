@@ -22,25 +22,27 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
+/**
+ * Type provider for a JAR file containing test classes. Dependencies of this type are class-path constituents
+ * or {@code --patch-module} option values. For any dependency, the choice depends on whether the main JAR file
+ * was placed on the class-path or module-path respectively.
+ *
+ * @see Type#TEST_JAR
+ */
 @Named(TestJarTypeProvider.NAME)
 @Singleton
 public class TestJarTypeProvider implements Provider<Type> {
-    public static final String NAME = "test-jar";
+    public static final String NAME = Type.TEST_JAR;
 
     private final Type type;
 
     public TestJarTypeProvider() {
         this.type = new DefaultType(
-                NAME,
-                Type.LANGUAGE_JAVA,
-                "jar",
-                "tests",
-                new DefaultDependencyProperties(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT));
+                NAME, Type.LANGUAGE_JAVA, "jar", "tests", JavaPathType.CLASSES, JavaPathType.PATCH_MODULE);
     }
 
     @Override
