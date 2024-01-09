@@ -107,7 +107,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         this.standardDelegate = null;
         this.delegates = null;
         this.mojoExecutionConfigurators =
-                Collections.singletonMap("default", new DefaultMojoExecutionConfigurator(null));
+                Collections.singletonMap("default", new DefaultMojoExecutionConfigurator());
     }
 
     @Override

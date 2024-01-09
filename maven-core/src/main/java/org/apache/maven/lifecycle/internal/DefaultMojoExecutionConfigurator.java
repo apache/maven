@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.impl.DefaultMessageBuilderFactory;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.model.Plugin;
@@ -43,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.Arrays.stream;
+import static java.util.Objects.requireNonNull;
 
 /**
  * @since 3.3.1, MNG-5753
@@ -54,15 +56,20 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
 
     private final MessageBuilderFactory messageBuilderFactory;
 
+    /**
+     * Default ctor is used in IT and most probably some 3rd party code. For those cases, we do provide sane defaults
+     * but given this is a component, injection should be used, replacing direct instantiation.
+     *
+     * @deprecated Do not use this ctor directly, inject this component instead.
+     */
     @Deprecated
     public DefaultMojoExecutionConfigurator() {
-        this.messageBuilderFactory = null; // used in test ctor of DefaultLifecycleExecutionPlanCalculator and some ITs
+        this.messageBuilderFactory = new DefaultMessageBuilderFactory();
     }
 
     @Inject
     public DefaultMojoExecutionConfigurator(MessageBuilderFactory messageBuilderFactory) {
-        this.messageBuilderFactory =
-                messageBuilderFactory; // in test ctor DefaultLifecycleExecutionPlanCalculator it is null
+        this.messageBuilderFactory = requireNonNull(messageBuilderFactory);
     }
 
     @Override
