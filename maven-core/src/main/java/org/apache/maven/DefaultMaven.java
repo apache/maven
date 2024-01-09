@@ -91,17 +91,17 @@ public class DefaultMaven implements Maven {
 
     protected ProjectBuilder projectBuilder;
 
-    private LifecycleStarter lifecycleStarter;
+    private final LifecycleStarter lifecycleStarter;
 
-    protected PlexusContainer container;
+    private final PlexusContainer container;
 
-    private ExecutionEventCatapult eventCatapult;
+    private final ExecutionEventCatapult eventCatapult;
 
-    private LegacySupport legacySupport;
+    private final LegacySupport legacySupport;
 
-    private SessionScope sessionScope;
+    private final SessionScope sessionScope;
 
-    private DefaultRepositorySystemSessionFactory repositorySessionFactory;
+    private final DefaultRepositorySystemSessionFactory repositorySessionFactory;
 
     private final GraphBuilder graphBuilder;
 
@@ -328,7 +328,7 @@ public class DefaultMaven implements Maven {
             try {
                 afterSessionEnd(session);
             } catch (MavenExecutionException e) {
-                return addExceptionToResult(result, e);
+                addExceptionToResult(result, e);
             }
         }
 

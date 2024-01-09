@@ -43,7 +43,7 @@ public class DependencyContext {
 
     private final Collection<String> scopesToResolveForAggregatedProjects;
 
-    private volatile Collection<?> lastDependencyArtifacts = new ArrayList<>();
+    private volatile Collection<?> lastDependencyArtifacts = Collections.emptyList();
 
     private volatile int lastDependencyArtifactCount = -1;
 
