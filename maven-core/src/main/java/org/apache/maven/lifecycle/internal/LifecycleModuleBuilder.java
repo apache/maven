@@ -53,6 +53,7 @@ public class LifecycleModuleBuilder {
     private final ExecutionEventCatapult eventCatapult;
     private final ProjectExecutionListener projectExecutionListener;
     private final ConsumerPomArtifactTransformer consumerPomArtifactTransformer;
+
     @Inject
     public LifecycleModuleBuilder(
             MojoExecutor mojoExecutor,

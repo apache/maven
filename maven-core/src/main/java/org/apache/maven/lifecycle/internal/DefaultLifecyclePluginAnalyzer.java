@@ -67,8 +67,7 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
     private final DefaultLifecycles defaultLifeCycles;
 
     @Inject
-    public DefaultLifecyclePluginAnalyzer(
-            PlexusContainer plexusContainer, DefaultLifecycles defaultLifeCycles) {
+    public DefaultLifecyclePluginAnalyzer(PlexusContainer plexusContainer, DefaultLifecycles defaultLifeCycles) {
         this.plexusContainer = requireNonNull(plexusContainer);
         this.defaultLifeCycles = requireNonNull(defaultLifeCycles);
     }

@@ -56,7 +56,8 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
 
     @Inject
     public DefaultMojoExecutionConfigurator(MessageBuilderFactory messageBuilderFactory) {
-        this.messageBuilderFactory = messageBuilderFactory; // in test ctor DefaultLifecycleExecutionPlanCalculator it is null
+        this.messageBuilderFactory =
+                messageBuilderFactory; // in test ctor DefaultLifecycleExecutionPlanCalculator it is null
     }
 
     @Override
