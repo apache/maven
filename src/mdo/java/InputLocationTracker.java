@@ -16,32 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.settings;
+package ${package};
 
-import java.io.Serializable;
-
-/**
- * Class InputSource.
- */
-public class InputSource implements Serializable {
-
-    private final String location;
-
-    public InputSource(String location) {
-        this.location = location;
-    }
-
-    /**
-     * Get the path/URL of the settings definition or {@code null} if unknown.
-     *
-     * @return the location
-     */
-    public String getLocation() {
-        return this.location;
-    }
-
-    @Override
-    public String toString() {
-        return getLocation();
-    }
+public interface InputLocationTracker {
+    InputLocation getLocation(Object field);
 }

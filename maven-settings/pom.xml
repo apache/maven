@@ -81,6 +81,7 @@ under the License.
               </templates>
               <params combine.children="append">
                 <param>locationTracking=true</param>
+                <param>generateLocationClasses=true</param>
               </params>
             </configuration>
           </execution>
