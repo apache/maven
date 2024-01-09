@@ -20,8 +20,6 @@ package org.apache.maven.lifecycle.internal;
 
 import java.util.Objects;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * A Maven task, at this level is merely just an opaque string.
  * <p>
@@ -34,7 +32,7 @@ public abstract class Task {
     private final String value;
 
     public Task(String value) {
-        this.value = requireNonNull(value, "value");
+        this.value = Objects.requireNonNull(value, "value");
     }
 
     public String getValue() {
@@ -43,8 +41,12 @@ public abstract class Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Task)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Task)) {
+            return false;
+        }
         Task task = (Task) o;
         return Objects.equals(getClass(), task.getClass()) && Objects.equals(value, task.value);
     }
