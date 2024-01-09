@@ -46,6 +46,7 @@ public class DefaultProjectManager implements ProjectManager {
 
     private final InternalSession session;
     private final ArtifactManager artifactManager;
+
     @Inject
     public DefaultProjectManager(InternalSession session, ArtifactManager artifactManager) {
         this.session = session;
