@@ -18,47 +18,44 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
- * Describes the required task segment as provided on the maven command line; i.e. "clean jetty:run install"
- *
+ * A Maven task, at this level is merely just an opaque string.
+ * <p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
- * @since 3.0
+ * @since 4.0.0
  */
-public final class TaskSegment {
+public abstract class Task {
 
-    // Can be both "LifeCycleTask" (clean/install) and "GoalTask" (org.mortbay.jetty:maven-jetty-plugin:6.1.19:run)
+    private final String value;
 
-    private final List<Task> tasks;
-
-    private final boolean aggregating;
-
-    public TaskSegment(boolean aggregating) {
-        this.aggregating = aggregating;
-        tasks = new ArrayList<>();
+    public Task(String value) {
+        this.value = requireNonNull(value, "value");
     }
 
-    public TaskSegment(boolean aggregating, Task... tasks) {
-        this.aggregating = aggregating;
-        this.tasks = new ArrayList<>(Arrays.asList(tasks));
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Task)) return false;
+        Task task = (Task) o;
+        return Objects.equals(getClass(), task.getClass()) && Objects.equals(value, task.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getClass(), value);
     }
 
     @Override
     public String toString() {
-        return getTasks().toString();
+        return value;
     }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    public boolean isAggregating() {
-        return aggregating;
-    }
-
-    // TODO Consider throwing UnsupportedSomething on hashCode/equals
 }

@@ -19,27 +19,14 @@
 package org.apache.maven.lifecycle.internal;
 
 /**
- * <p>
- * A task that is a lifecycle
+ * A task that is a lifecycle.
  * </p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
  */
-public final class LifecycleTask {
-
-    private final String lifecyclePhase;
-
+public final class LifecycleTask extends Task {
     public LifecycleTask(String lifecyclePhase) {
-        this.lifecyclePhase = lifecyclePhase;
-    }
-
-    @Override
-    public String toString() {
-        return getLifecyclePhase();
-    }
-
-    public String getLifecyclePhase() {
-        return lifecyclePhase;
+        super(lifecyclePhase);
     }
 }
