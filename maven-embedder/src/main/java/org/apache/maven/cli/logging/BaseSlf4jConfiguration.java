@@ -34,6 +34,6 @@ public class BaseSlf4jConfiguration implements Slf4jConfiguration {
     }
 
     public void activate() {
-        LOGGER.warn("reset(): operation not supported");
+        LOGGER.warn("activate(): operation not supported");
     }
 }

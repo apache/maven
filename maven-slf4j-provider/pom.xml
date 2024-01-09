@@ -66,8 +66,7 @@ under the License.
               <classifier>sources</classifier>
               <overWrite>false</overWrite>
               <outputDirectory>${project.build.directory}/generated-sources/slf4j-simple</outputDirectory>
-              <includes>org/slf4j/impl/*.java</includes>
-              <excludes>org/slf4j/impl/StaticLoggerBinder*</excludes>
+              <includes>org/slf4j/simple/*.java</includes>
             </artifactItem>
           </artifactItems>
         </configuration>
