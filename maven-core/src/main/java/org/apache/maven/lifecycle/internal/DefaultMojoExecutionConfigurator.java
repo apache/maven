@@ -54,6 +54,11 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
 
     private final MessageBuilderFactory messageBuilderFactory;
 
+    @Deprecated
+    public DefaultMojoExecutionConfigurator() {
+        this.messageBuilderFactory = null; // used in test ctor of DefaultLifecycleExecutionPlanCalculator and some ITs
+    }
+
     @Inject
     public DefaultMojoExecutionConfigurator(MessageBuilderFactory messageBuilderFactory) {
         this.messageBuilderFactory =
