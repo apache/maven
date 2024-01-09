@@ -179,9 +179,9 @@ under the License.
           <type>String</type>
           <description>
             Defines a default phase to bind a Mojo execution to if the user does not explicitly set a phase in the POM.
-            &lt;h4>Note:&lt;/h4> This will not automagically make a Mojo run when the plugin declaration is added
+            &lt;p>&lt;b>Note:&lt;/b> This will not automagically make a Mojo run when the plugin declaration is added
             to the POM. It merely enables the user to omit the {@code &lt;phase&gt;} element from the
-            surrounding {@code &lt;execution&gt;} element.
+            surrounding {@code &lt;execution&gt;} element.&lt;/p>
           </description>
         </field>
         <field>
