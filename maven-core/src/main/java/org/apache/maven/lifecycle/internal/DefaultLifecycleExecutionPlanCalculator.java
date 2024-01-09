@@ -112,7 +112,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
 
     @Override
     public MavenExecutionPlan calculateExecutionPlan(
-            MavenSession session, MavenProject project, List<Object> tasks, boolean setup)
+            MavenSession session, MavenProject project, List<Task> tasks, boolean setup)
             throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
                     PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
                     NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException {
@@ -130,7 +130,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
     }
 
     @Override
-    public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<Object> tasks)
+    public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<Task> tasks)
             throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
                     PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
                     NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException {
@@ -199,15 +199,15 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         calculateForkedExecutions(mojoExecution, session, project, alreadyPlannedExecutions);
     }
 
-    public List<MojoExecution> calculateMojoExecutions(MavenSession session, MavenProject project, List<Object> tasks)
+    public List<MojoExecution> calculateMojoExecutions(MavenSession session, MavenProject project, List<Task> tasks)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
                     MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
                     PluginVersionResolutionException, LifecyclePhaseNotFoundException {
         final List<MojoExecution> mojoExecutions = new ArrayList<>();
 
-        for (Object task : tasks) {
+        for (Task task : tasks) {
             if (task instanceof GoalTask) {
-                String pluginGoal = ((GoalTask) task).pluginGoal;
+                String pluginGoal = task.getValue();
 
                 String executionId = "default-cli";
                 int executionIdx = pluginGoal.indexOf('@');
@@ -221,7 +221,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
 
                 mojoExecutions.add(mojoExecution);
             } else if (task instanceof LifecycleTask) {
-                String lifecyclePhase = ((LifecycleTask) task).getLifecyclePhase();
+                String lifecyclePhase = task.getValue();
 
                 Map<String, List<MojoExecution>> phaseToMojoMapping =
                         calculateLifecycleMappings(session, project, lifecyclePhase);
