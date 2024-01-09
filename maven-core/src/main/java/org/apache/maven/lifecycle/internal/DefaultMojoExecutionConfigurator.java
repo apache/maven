@@ -52,8 +52,12 @@ import static java.util.Arrays.stream;
 public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurator {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private final MessageBuilderFactory messageBuilderFactory;
+
     @Inject
-    MessageBuilderFactory messageBuilderFactory;
+    public DefaultMojoExecutionConfigurator(MessageBuilderFactory messageBuilderFactory) {
+        this.messageBuilderFactory = messageBuilderFactory; // in test ctor DefaultLifecycleExecutionPlanCalculator it is null
+    }
 
     @Override
     public void configure(MavenProject project, MojoExecution mojoExecution, boolean allowPluginLevelConfig) {
