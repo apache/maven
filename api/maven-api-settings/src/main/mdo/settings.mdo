@@ -566,7 +566,8 @@
           <version>1.1.0+</version>
           <type>String</type>
           <defaultValue>default</defaultValue>
-          <description>The layout of the mirror repository. Since Maven 3.</description>
+          <description>The layout of the mirror repository.
+            @since Maven 3.</description>
         </field>
         <field>
           <name>mirrorOfLayouts</name>
@@ -575,7 +576,8 @@
           <defaultValue>default,legacy</defaultValue>
           <description>
             The layouts of repositories being mirrored. This value can be used to restrict the usage
-            of the mirror to repositories with a matching layout (apart from a matching id). Since Maven 3.
+            of the mirror to repositories with a matching layout (apart from a matching id).
+            @since Maven 3.
           </description>
         </field>
         <field>

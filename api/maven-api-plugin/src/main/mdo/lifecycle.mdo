@@ -23,15 +23,15 @@ under the License.
   xml.schemaLocation="http://maven.apache.org/xsd/lifecycle-${version}.xsd">
   <id>lifecycle</id>
   <name>Lifecycle</name>
-  <description><![CDATA[
+  <description>
     Configuration of custom lifecycle mappings for the plugin, as generally stored in
     {@code META-INF/maven/lifecycle.xml} in a plugin's jar artifact.
-  ]]></description>
+  </description>
   <classes>
     <class rootElement="true" xml.tagName="lifecycles" xsd.compositor="sequence">
       <name>LifecycleConfiguration</name>
       <version>1.0.0</version>
-      <description><![CDATA[Root element of the {@code lifecycle.xml} file.]]></description>
+      <description>Root element of the {@code lifecycle.xml} file.</description>
       <fields>
         <field>
           <name>lifecycles</name>
@@ -46,9 +46,7 @@ under the License.
     <class>
       <name>Lifecycle</name>
       <version>1.0.0</version>
-      <description><![CDATA[
-        A custom lifecycle mapping definition.
-      ]]></description>
+      <description>A custom lifecycle mapping definition.</description>
       <fields>
         <field>
           <name>id</name>

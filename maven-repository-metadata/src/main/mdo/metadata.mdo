@@ -69,7 +69,7 @@ under the License.
           <name>version</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description><![CDATA[The base version (ie. ending in <code>-SNAPSHOT</code>) when this directory represents a "groupId/artifactId/version" for a SNAPSHOT.]]></description>
+          <description>The base version (i.e. ending in {@code -SNAPSHOT}) when this directory represents a "groupId/artifactId/version" for a SNAPSHOT.</description>
         </field>
         <field xdoc.separator="blank">
           <name>plugins</name>
