@@ -57,7 +57,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
         verifier.setAutoclean(false);
         verifier.addCliArgument("-q");
         verifier.addCliArgument("-U");
-        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=false");
+        verifier.addCliArgument("-Dmaven.buildconsumer=false");
         verifier.addCliArgument("verify");
         verifier.execute();
 
@@ -93,7 +93,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
         verifier.setAutoclean(false);
         verifier.addCliArgument("-q");
         verifier.addCliArgument("-U");
-        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=true");
+        verifier.addCliArgument("-Dmaven.buildconsumer=true");
         verifier.addCliArgument("verify");
         verifier.execute();
 

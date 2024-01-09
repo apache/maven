@@ -48,7 +48,7 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
         verifier.setAutoclean(false);
         verifier.deleteDirectory("repo");
         verifier.deleteArtifacts("org.apache.maven.its.mng1021");
-        verifier.addCliArgument("-Dmaven.experimental.buildconsumer=false");
+        verifier.addCliArgument("-Dmaven.buildconsumer=false");
         verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
