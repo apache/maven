@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.eclipse.aether.transfer.TransferCancelledException;
@@ -37,7 +38,11 @@ import org.eclipse.aether.transfer.TransferResource;
  */
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
-    public static final int MIN_DELAY_BETWEEN_UPDATES = 50;
+    public static final long MAX_DELAY_BETWEEN_UPDATES_MILLIS = 100;
+    public static final long MIN_DELAY_BETWEEN_UPDATES_MILLIS = 50;
+    public static final long MIN_DELAY_BETWEEN_UPDATES_NANOS =
+            TimeUnit.MILLISECONDS.toNanos(MIN_DELAY_BETWEEN_UPDATES_MILLIS);
+
     private final Map<TransferResource, TransferEvent> transfers =
             new ConcurrentSkipListMap<>(Comparator.comparing(TransferResource::getResourceName));
     private final FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
@@ -108,11 +113,11 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     void update() {
         synchronized (lock) {
             try {
-                long t0 = System.currentTimeMillis();
+                long t0 = System.nanoTime();
                 while (true) {
-                    lock.wait(100);
-                    long t1 = System.currentTimeMillis();
-                    if (t1 - t0 > MIN_DELAY_BETWEEN_UPDATES) {
+                    lock.wait(MAX_DELAY_BETWEEN_UPDATES_MILLIS);
+                    long t1 = System.nanoTime();
+                    if (t1 >= t0 + MIN_DELAY_BETWEEN_UPDATES_NANOS) {
                         doUpdate();
                         t0 = t1;
                     }
