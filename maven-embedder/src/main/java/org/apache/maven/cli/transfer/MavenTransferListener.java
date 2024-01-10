@@ -31,7 +31,10 @@ import org.eclipse.aether.transfer.TransferListener;
 import static java.util.Objects.requireNonNull;
 
 /**
- * AbstractMavenTransferListener
+ * A {@link TransferListener} implementation that wraps another delegate {@link TransferListener} but makes it run
+ * on single thread, keeping the listener logic simple.
+ *
+ * @since 4.0.0
  */
 public final class MavenTransferListener extends AbstractTransferListener {
     private static final int QUEUE_SIZE = 1024;
