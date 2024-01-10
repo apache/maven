@@ -29,16 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -78,6 +69,7 @@ class ReactorReader implements MavenWorkspaceReader {
     private final WorkspaceRepository repository;
     // groupId -> (artifactId -> (version -> project)))
     private Map<String, Map<String, Map<String, MavenProject>>> projects;
+    private Map<String, Map<String, Map<String, MavenProject>>> allProjects;
     private Path projectLocalRepository;
     // projectId -> Deque<lifecycle>
     private final Map<String, Deque<String>> lifecycles = new ConcurrentHashMap<>();
@@ -117,7 +109,17 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     public List<String> findVersions(Artifact artifact) {
-        return getProjects()
+        List<String> versions = getProjects()
+                .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
+                .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
+                .values()
+                .stream()
+                .map(MavenProject::getVersion)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        if (!versions.isEmpty()) {
+            return versions;
+        }
+        return getAllProjects()
                 .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
                 .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
                 .values()
@@ -452,20 +454,37 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private MavenProject getProject(Artifact artifact) {
-        return getProjects()
+        return getAllProjects()
                 .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
                 .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
                 .getOrDefault(artifact.getBaseVersion(), null);
     }
 
     // groupId -> (artifactId -> (version -> project)))
-    private Map<String, Map<String, Map<String, MavenProject>>> getProjects() {
+    private Map<String, Map<String, Map<String, MavenProject>>> getAllProjects() {
         // compute the projects mapping
-        if (projects == null) {
+        if (allProjects == null) {
             List<MavenProject> allProjects = session.getAllProjects();
             if (allProjects != null) {
                 Map<String, Map<String, Map<String, MavenProject>>> map = new HashMap<>();
                 allProjects.forEach(project -> map.computeIfAbsent(project.getGroupId(), k -> new HashMap<>())
+                        .computeIfAbsent(project.getArtifactId(), k -> new HashMap<>())
+                        .put(project.getVersion(), project));
+                this.allProjects = map;
+            } else {
+                return Collections.emptyMap();
+            }
+        }
+        return allProjects;
+    }
+
+    private Map<String, Map<String, Map<String, MavenProject>>> getProjects() {
+        // compute the projects mapping
+        if (projects == null) {
+            List<MavenProject> projects = session.getProjects();
+            if (projects != null) {
+                Map<String, Map<String, Map<String, MavenProject>>> map = new HashMap<>();
+                projects.forEach(project -> map.computeIfAbsent(project.getGroupId(), k -> new HashMap<>())
                         .computeIfAbsent(project.getArtifactId(), k -> new HashMap<>())
                         .put(project.getVersion(), project));
                 this.projects = map;

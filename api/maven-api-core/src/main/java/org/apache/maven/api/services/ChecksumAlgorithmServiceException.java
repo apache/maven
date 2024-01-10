@@ -16,21 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.slf4j.impl;
+package org.apache.maven.api.services;
 
-import org.slf4j.ILoggerFactory;
-import org.slf4j.LoggerFactory;
+import org.apache.maven.api.annotations.Experimental;
 
-/**
- * Utility for Maven to access Slf4j-Simple internals through package access.
- * Use with precaution, since this is not normally intended for production use.
- */
-public class MavenSlf4jSimpleFriend {
-    public static void init() {
-        SimpleLogger.init();
-        ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
-        if (loggerFactory instanceof SimpleLoggerFactory) {
-            ((SimpleLoggerFactory) loggerFactory).reset();
-        }
+@Experimental
+public class ChecksumAlgorithmServiceException extends MavenException {
+
+    private static final long serialVersionUID = 1201171469179367694L;
+
+    public ChecksumAlgorithmServiceException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

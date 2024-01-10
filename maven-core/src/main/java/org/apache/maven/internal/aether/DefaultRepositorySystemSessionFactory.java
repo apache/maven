@@ -372,6 +372,7 @@ public class DefaultRepositorySystemSessionFactory {
         session.setUserProperties(request.getUserProperties());
         session.setSystemProperties(request.getSystemProperties());
         session.setConfigProperties(configProps);
+        session.setIgnoreArtifactDescriptorRepositories(request.isIgnoreTransitiveRepositories());
 
         session.setTransferListener(request.getTransferListener());
 

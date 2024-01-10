@@ -16,13 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.slf4j.impl;
+package org.apache.maven.slf4j;
 
 import java.io.PrintStream;
 
 import org.apache.maven.api.services.MessageBuilder;
+import org.slf4j.simple.SimpleLogger;
 
-import static org.apache.maven.cli.jansi.MessageUtils.builder;
+import static org.apache.maven.cli.jline.MessageUtils.builder;
 
 /**
  * Logger for Maven, that support colorization of levels and stacktraces. This class implements 2 methods introduced in

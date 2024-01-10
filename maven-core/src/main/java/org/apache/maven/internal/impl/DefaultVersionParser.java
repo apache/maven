@@ -22,11 +22,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.regex.Pattern;
-
 import org.apache.maven.api.Version;
+import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParser;
+import org.apache.maven.model.version.ModelVersionParser;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
@@ -36,13 +36,10 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 @Named
 @Singleton
 public class DefaultVersionParser implements VersionParser {
-    private static final String SNAPSHOT = "SNAPSHOT";
-    private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$");
-
-    private final org.apache.maven.model.version.VersionParser modelVersionParser;
+    private final ModelVersionParser modelVersionParser;
 
     @Inject
-    public DefaultVersionParser(org.apache.maven.model.version.VersionParser modelVersionParser) {
+    public DefaultVersionParser(ModelVersionParser modelVersionParser) {
         this.modelVersionParser = nonNull(modelVersionParser, "modelVersionParser");
     }
 
@@ -57,11 +54,12 @@ public class DefaultVersionParser implements VersionParser {
     }
 
     @Override
-    public boolean isSnapshot(String version) {
-        return checkSnapshot(version);
+    public VersionConstraint parseVersionConstraint(String constraint) {
+        return modelVersionParser.parseVersionConstraint(constraint);
     }
 
-    static boolean checkSnapshot(String version) {
-        return version.endsWith(SNAPSHOT) || SNAPSHOT_TIMESTAMP.matcher(version).matches();
+    @Override
+    public boolean isSnapshot(String version) {
+        return modelVersionParser.isSnapshot(version);
     }
 }

@@ -112,8 +112,15 @@ public class DefaultDependencyResolver implements DependencyResolver {
         List<ArtifactCoordinate> coordinates =
                 deps.stream().map(Artifact::toCoordinate).collect(Collectors.toList());
         Map<Artifact, Path> artifacts = session.resolveArtifacts(coordinates);
-        Map<Dependency, Path> dependencies = deps.stream().collect(Collectors.toMap(d -> d, artifacts::get));
-        List<Path> paths = new ArrayList<>(dependencies.values());
+        Map<Dependency, Path> dependencies = new LinkedHashMap<>();
+        List<Path> paths = new ArrayList<>();
+        for (Dependency d : deps) {
+            Path path = artifacts.get(d);
+            if (dependencies.put(d, path) != null) {
+                throw new IllegalStateException("Duplicate key");
+            }
+            paths.add(path);
+        }
 
         return new DefaultDependencyResolverResult(
                 collectorResult.getExceptions(), collectorResult.getRoot(), nodes, paths, dependencies);

@@ -99,6 +99,10 @@ under the License.
     <exportedPackage>org.codehaus.plexus.logging</exportedPackage>
     <exportedPackage>org.codehaus.plexus.personality</exportedPackage>
 
+    <!-- plexus-interactivity-api -->
+    <exportedPackage>org.codehaus.plexus.components.interactivity</exportedPackage>
+    <exportedPackage>org.fusesource.jansi.Ansi</exportedPackage>
+
     <!-- javax.inject (JSR-330) -->
     <exportedPackage>javax.inject.*</exportedPackage>
     <!-- javax.enterprise.inject (JSR-299): Must never be exported if needed at plugin level, plugin adds it

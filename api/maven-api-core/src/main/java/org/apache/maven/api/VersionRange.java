@@ -20,6 +20,7 @@ package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * A range of versions.
@@ -28,9 +29,6 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 public interface VersionRange {
-
-    // TODO: v4: add access to the version information
-
     /**
      * Determines whether the specified version is contained within this range.
      *
@@ -40,9 +38,36 @@ public interface VersionRange {
     boolean contains(@Nonnull Version version);
 
     /**
+     * Returns the upper boundary of this range, or {@code null} if none.
+     */
+    @Nullable
+    Boundary getUpperBoundary();
+
+    /**
+     * Returns the lower boundary of this range, or {@code null} if none.
+     */
+    @Nullable
+    Boundary getLowerBoundary();
+
+    /**
      * Returns a string representation of this version range
      * @return the string representation of this version range
      */
     @Nonnull
     String asString();
+
+    /**
+     * Represents range boundary.
+     */
+    interface Boundary {
+        /**
+         * The bounding version.
+         */
+        Version getVersion();
+
+        /**
+         * Returns {@code true} if version is included of the range.
+         */
+        boolean isInclusive();
+    }
 }

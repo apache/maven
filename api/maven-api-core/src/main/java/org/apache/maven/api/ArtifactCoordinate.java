@@ -62,7 +62,7 @@ public interface ArtifactCoordinate {
      * @return the version
      */
     @Nonnull
-    VersionRange getVersion();
+    VersionConstraint getVersion();
 
     /**
      * The extension of the artifact.

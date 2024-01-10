@@ -76,7 +76,7 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.model.version.VersionParser;
+import org.apache.maven.model.version.ModelVersionParser;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
@@ -110,7 +110,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final ModelVersionProcessor versionProcessor;
     private final ModelSourceTransformer transformer;
-    private final VersionParser versionParser;
+    private final ModelVersionParser versionParser;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -134,7 +134,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             ModelVersionProcessor versionProcessor,
             ModelSourceTransformer transformer,
-            VersionParser versionParser) {
+            ModelVersionParser versionParser) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
         this.modelNormalizer = modelNormalizer;
