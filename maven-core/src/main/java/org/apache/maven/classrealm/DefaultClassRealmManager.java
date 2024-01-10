@@ -88,7 +88,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     public DefaultClassRealmManager(
             CoreRealm coreRealm, List<ClassRealmManagerDelegate> delegates, CoreExports exports) {
         this.world = coreRealm.getClassWorld();
-        this.containerRealm = coreRealm.getCoreRealm();
+        this.containerRealm = coreRealm.getRealm();
         this.delegates = delegates;
 
         Map<String, ClassLoader> foreignImports = exports.getExportedPackages();

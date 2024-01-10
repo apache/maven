@@ -38,7 +38,7 @@ public class CoreExportsProvider implements Provider<CoreExports> {
 
     @Inject
     public CoreExportsProvider(CoreRealm coreRealm) {
-        this(new CoreExports(CoreExtensionEntry.discoverFrom(coreRealm.getCoreRealm())));
+        this(new CoreExports(CoreExtensionEntry.discoverFrom(coreRealm.getRealm())));
     }
 
     public CoreExportsProvider(CoreExports exports) {

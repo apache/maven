@@ -38,7 +38,7 @@ public class DefaultCoreRealm implements CoreRealm {
     }
 
     @Override
-    public ClassRealm getCoreRealm() {
+    public ClassRealm getRealm() {
         return container.getContainerRealm();
     }
 }

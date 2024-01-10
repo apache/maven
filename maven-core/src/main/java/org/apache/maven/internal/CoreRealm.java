@@ -37,7 +37,7 @@ public interface CoreRealm {
      * @return the class realm of core.
      */
     @Nonnull
-    ClassRealm getCoreRealm();
+    ClassRealm getRealm();
 
     /**
      * Shorthand method to obtain the {@link ClassWorld} used for Maven Core.
@@ -46,6 +46,6 @@ public interface CoreRealm {
      */
     @Nonnull
     default ClassWorld getClassWorld() {
-        return getCoreRealm().getWorld();
+        return getRealm().getWorld();
     }
 }
