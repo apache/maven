@@ -34,13 +34,15 @@ import static java.util.Objects.requireNonNull;
  * AbstractMavenTransferListener
  */
 public final class MavenTransferListener extends AbstractTransferListener {
+    private static final int QUEUE_SIZE = 1024;
+    private static final int BATCH_MAX_SIZE = 500;
     private final TransferListener transferListener;
     private final ArrayBlockingQueue<TransferEvent> eventQueue;
     private final Consumer<List<TransferEvent>> consumer;
 
     public MavenTransferListener(TransferListener transferListener) {
         this.transferListener = requireNonNull(transferListener);
-        this.eventQueue = new ArrayBlockingQueue<>(1024);
+        this.eventQueue = new ArrayBlockingQueue<>(QUEUE_SIZE);
         this.consumer = new MavenTransferEventDMX(transferListener);
         Thread updater = new Thread(this::feedConsumer);
         updater.setDaemon(true);
@@ -52,11 +54,11 @@ public final class MavenTransferListener extends AbstractTransferListener {
     }
 
     private void feedConsumer() {
-        final ArrayList<TransferEvent> batch = new ArrayList<>();
+        final ArrayList<TransferEvent> batch = new ArrayList<>(BATCH_MAX_SIZE);
         try {
             while (true) {
                 batch.clear();
-                if (eventQueue.drainTo(batch) == 0) {
+                if (eventQueue.drainTo(batch, BATCH_MAX_SIZE) == 0) {
                     batch.add(eventQueue.take());
                 }
                 consumer.accept(batch);
