@@ -52,7 +52,7 @@ abstract class XMLElementEvaluator<T> {
     /**
      * Evaluates the XPointer on the root XMLElement and returns the resulting XMLElement or null.
      *
-     * @return an XMLElement from the resultant evaluation of the root XMLElement or null if evaluation fails.
+     * @return an XMLElement from the evaluation of the root XMLElement or null if evaluation fails.
      */
     public XMLElement<T> evaluate() {
         if (xpointer.hasPointerParts()) { // Scheme based pointer.

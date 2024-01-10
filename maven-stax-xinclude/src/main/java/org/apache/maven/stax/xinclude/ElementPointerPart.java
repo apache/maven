@@ -167,17 +167,15 @@ class ElementPointerPart implements PointerPart {
     static ElementPointerPart parseFromString(final String schemeData) throws InvalidXPointerException {
         List<Integer> childSequence;
         String elementID = null;
-        int startChar;
-        int endChar;
 
         // Find an NCName if it exists?
-        startChar = schemeData.indexOf("/");
+        int startChar = schemeData.indexOf("/");
         // -1 Only an NCName. 0 No NCName. > 1 An NCName.
 
         switch (startChar) {
             case -1: // Only an NCName.
                 elementID = schemeData;
-                if (!NCName.isValid(elementID)) {
+                if (XPointerParser.isInvalidNCName(elementID)) {
                     throw new InvalidXPointerException("Invalid NCName in the XPointer", schemeData);
                 }
                 return new ElementPointerPart(elementID);
@@ -185,7 +183,7 @@ class ElementPointerPart implements PointerPart {
                 break;
             default: // An NCName.
                 elementID = schemeData.substring(0, startChar);
-                if (!NCName.isValid(elementID)) {
+                if (XPointerParser.isInvalidNCName(elementID)) {
                     throw new InvalidXPointerException("Invalid NCName in the XPointer", schemeData, 0, startChar);
                 }
                 break;
@@ -194,7 +192,7 @@ class ElementPointerPart implements PointerPart {
         // Find remaining child sequence.
         childSequence = new ArrayList<>();
 
-        endChar = schemeData.indexOf("/", startChar + 1);
+        int endChar = schemeData.indexOf("/", startChar + 1);
         // -1 Only single child sequence element. > 0 A childSequence.
 
         if (endChar < 0) { // Only single child sequence element.

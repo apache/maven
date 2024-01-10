@@ -26,8 +26,8 @@ under the License.
   </parent>
 
   <artifactId>maven-stax-xinclude</artifactId>
-  <name>Implementation of Maven API XML</name>
-  <description>Provides the implementation classes for the Maven API XML</description>
+  <name>Maven StaX XInclude implementation</name>
+  <description>Provides the classes for StaX XInclude implementation</description>
 
   <dependencies>
     <dependency>

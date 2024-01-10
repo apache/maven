@@ -22,6 +22,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
 
+import com.ctc.wstx.io.WstxInputData;
+
 /**
  * This class parses a String to the XPointer Framework specification for shorthand and scheme based pointers.
  * For scheme based pointers each know pointer part
@@ -66,7 +68,7 @@ final class XPointerParser {
                     if (shortHandPointerName == null) {
                         throw new InvalidXPointerException("Invalid Shorthand XPointer", xpointerString);
                     }
-                    if (!NCName.isValid(shortHandPointerName)) {
+                    if (isInvalidNCName(shortHandPointerName)) {
                         throw new InvalidXPointerException(
                                 "Shorthand XPointer is not a valid NCName: " + shortHandPointerName, xpointerString);
                     }
@@ -153,6 +155,10 @@ final class XPointerParser {
                     throw new InvalidXPointerException("Invalid XPointer expression", xpointerString);
             }
         }
+    }
+
+    public static boolean isInvalidNCName(String stValue) {
+        return WstxInputData.findIllegalNameChar(stValue, true, true) >= 0;
     }
 
     /**
@@ -504,33 +510,13 @@ final class XPointerParser {
          */
         private static int scanNCName(String data, int endOffset, int currentOffset) {
             int ch = data.charAt(currentOffset);
-            if (ch >= 0x80) {
-                if (!NCName.is11NameStartChar(ch, true)) {
-                    return currentOffset;
-                }
-            } else {
-                byte chartype = ASCII_CHAR_MAP[ch];
-                if (chartype != CHARTYPE_LETTER && chartype != CHARTYPE_UNDERSCORE) {
-                    return currentOffset;
-                }
+            if (!WstxInputData.isNameStartChar((char) ch, true, true)) {
+                return currentOffset;
             }
-
-            // while (currentOffset++ < endOffset) {
             while (++currentOffset < endOffset) {
                 ch = data.charAt(currentOffset);
-                if (ch >= 0x80) {
-                    if (!NCName.is11NameChar(ch, true)) {
-                        break;
-                    }
-                } else {
-                    byte chartype = ASCII_CHAR_MAP[ch];
-                    if (chartype != CHARTYPE_LETTER
-                            && chartype != CHARTYPE_DIGIT
-                            && chartype != CHARTYPE_PERIOD
-                            && chartype != CHARTYPE_MINUS
-                            && chartype != CHARTYPE_UNDERSCORE) {
-                        break;
-                    }
+                if (!WstxInputData.isNameChar((char) ch, true, true)) {
+                    break;
                 }
             }
             return currentOffset;

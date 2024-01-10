@@ -79,7 +79,7 @@ class DOMXMLElementEvaluator extends XMLElementEvaluator<Element> {
     /**
      * Evaluates the XPointer on the root Element and returns the resulting Element or null.
      *
-     * @return an Element from the resultant evaluation of the root Element or null if evaluation fails
+     * @return an Element from the evaluation of the root Element or null if evaluation fails
      */
     public Element evaluateElement() {
         XMLElement<Element> element = evaluate();

@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
@@ -62,13 +61,11 @@ public class DefaultModelReader implements ModelReader {
     public Model read(File input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
 
-        try (InputStream in = Files.newInputStream(input.toPath())) {
-            Model model = read(in, input.toPath(), options);
+        Model model = read(null, input, options);
 
-            model.setPomFile(input);
+        model.setPomFile(input);
 
-            return model;
-        }
+        return model;
     }
 
     @Override
@@ -109,7 +106,7 @@ public class DefaultModelReader implements ModelReader {
         return value instanceof Boolean && (Boolean) value;
     }
 
-    private Model read(InputStream input, Path pomFile, Map<String, ?> options) throws IOException {
+    private Model read(InputStream input, File pomFile, Map<String, ?> options) throws IOException {
         try {
             InputSource source = getSource(options);
             boolean strict = isStrict(options);
@@ -117,17 +114,13 @@ public class DefaultModelReader implements ModelReader {
 
             Source xmlSource;
             if (pomFile != null) {
-                if (input != null) {
-                    xmlSource = new StaxPathInputSource(pomFile, input);
-                } else {
-                    xmlSource = new Stax2FileSource(pomFile.toFile());
-                }
+                xmlSource = new Stax2FileSource(pomFile);
             } else {
                 xmlSource = new StreamSource(input);
             }
 
             XMLStreamReader parser;
-            // We only support xml entities and xinclude when reading a file in strict mode
+            // We only support general external entities and XInclude when reading a file in strict mode
             if (pomFile != null && strict && getXInclude(options)) {
                 parser = XInclude.xinclude(xmlSource, new LocalXmlResolver(rootDirectory));
             } else {
@@ -173,20 +166,6 @@ public class DefaultModelReader implements ModelReader {
                     e);
         } catch (Exception e) {
             throw new IOException("Unable to transform pom", e);
-        }
-    }
-
-    private static class StaxPathInputSource extends Stax2FileSource {
-        private final InputStream input;
-
-        StaxPathInputSource(Path pomFile, InputStream input) {
-            super(pomFile.toFile());
-            this.input = input;
-        }
-
-        @Override
-        public InputStream constructInputStream() throws IOException {
-            return input;
         }
     }
 }

@@ -45,7 +45,6 @@ import static org.apache.maven.project.ProjectBuildingResultWithLocationMatcher.
 import static org.apache.maven.project.ProjectBuildingResultWithProblemMessageMatcher.projectBuildingResultWithProblemMessage;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
@@ -234,8 +233,8 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 getContainer().lookup(org.apache.maven.project.ProjectBuilder.class);
 
         // single project build entry point
-        Exception ex = assertThrows(Exception.class, () -> projectBuilder.build(pomFile, configuration));
-        assertThat(ex.getMessage(), containsString("expected START_TAG or END_TAG, not CHARACTERS"));
+        ProjectBuildingException ex =
+                assertThrows(ProjectBuildingException.class, () -> projectBuilder.build(pomFile, configuration));
 
         // multi projects build entry point
         ProjectBuildingException pex = assertThrows(
@@ -244,9 +243,6 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(1, pex.getResults().size());
         assertNotNull(pex.getResults().get(0).getPomFile());
         assertThat(pex.getResults().get(0).getProblems().size(), greaterThan(0));
-        assertThat(
-                pex.getResults(),
-                contains(projectBuildingResultWithProblemMessage("expected START_TAG or END_TAG, not CHARACTERS")));
     }
 
     @Test

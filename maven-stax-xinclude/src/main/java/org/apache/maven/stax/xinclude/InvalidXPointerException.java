@@ -19,7 +19,7 @@
 package org.apache.maven.stax.xinclude;
 
 /**
- * This class represents Exceptions that can happen during parsing an XPointer Expression.
+ * This class represents Exceptions that can happen while parsing an XPointer Expression.
  * <p>
  * This class is based upon a class of the same name in Apache Woden.
  */
