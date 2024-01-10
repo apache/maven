@@ -30,7 +30,6 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 /**
  * Exception in the plugin manager.
- *
  */
 public class PluginManagerException extends Exception {
 
@@ -96,7 +95,7 @@ public class PluginManagerException extends Exception {
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException(Plugin plugin, String message, PlexusConfigurationException cause) {
+    public PluginManagerException(Plugin plugin, String message, Exception cause) {
         super(message, cause);
 
         pluginGroupId = plugin.getGroupId();
@@ -104,12 +103,24 @@ public class PluginManagerException extends Exception {
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException(Plugin plugin, String message, ComponentRepositoryException cause) {
-        super(message, cause);
+    /**
+     * Constructor.
+     *
+     * @deprecated Left for binary compatibility.
+     */
+    @Deprecated
+    public PluginManagerException(Plugin plugin, String message, PlexusConfigurationException cause) {
+        this(plugin, message, (Exception) cause);
+    }
 
-        pluginGroupId = plugin.getGroupId();
-        pluginArtifactId = plugin.getArtifactId();
-        pluginVersion = plugin.getVersion();
+    /**
+     * Constructor.
+     *
+     * @deprecated Left for binary compatibility.
+     */
+    @Deprecated
+    public PluginManagerException(Plugin plugin, String message, ComponentRepositoryException cause) {
+        this(plugin, message, (Exception) cause);
     }
 
     public PluginManagerException(
@@ -137,12 +148,14 @@ public class PluginManagerException extends Exception {
         goal = mojoDescriptor.getGoal();
     }
 
+    /**
+     * Constructor.
+     *
+     * @deprecated Left for binary compatibility.
+     */
+    @Deprecated
     public PluginManagerException(Plugin plugin, String message, PlexusContainerException cause) {
-        super(message, cause);
-
-        pluginGroupId = plugin.getGroupId();
-        pluginArtifactId = plugin.getArtifactId();
-        pluginVersion = plugin.getVersion();
+        this(plugin, message, (Exception) cause);
     }
 
     public PluginManagerException(Plugin plugin, String message, MavenProject project) {

@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
@@ -40,8 +42,6 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,13 +62,13 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final PlexusContainer plexusContainer;
+    private final Lookup lookup;
 
     private final DefaultLifecycles defaultLifeCycles;
 
     @Inject
-    public DefaultLifecyclePluginAnalyzer(PlexusContainer plexusContainer, DefaultLifecycles defaultLifeCycles) {
-        this.plexusContainer = requireNonNull(plexusContainer);
+    public DefaultLifecyclePluginAnalyzer(Lookup lookup, DefaultLifecycles defaultLifeCycles) {
+        this.lookup = requireNonNull(lookup);
         this.defaultLifeCycles = requireNonNull(defaultLifeCycles);
     }
 
@@ -129,8 +129,8 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
      */
     private LifecycleMapping lookupLifecycleMapping(final String packaging) {
         try {
-            return plexusContainer.lookup(LifecycleMapping.class, packaging);
-        } catch (ComponentLookupException e) {
+            return lookup.lookup(LifecycleMapping.class, packaging);
+        } catch (LookupException e) {
             if (e.getCause() instanceof NoSuchElementException) {
                 return null;
             }

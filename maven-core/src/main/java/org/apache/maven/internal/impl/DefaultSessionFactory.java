@@ -23,10 +23,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.SessionData;
 
@@ -35,7 +35,7 @@ import org.eclipse.aether.SessionData;
 public class DefaultSessionFactory {
     private final RepositorySystem repositorySystem;
     private final MavenRepositorySystem mavenRepositorySystem;
-    private final PlexusContainer plexusContainer;
+    private final Lookup lookup;
     private final RuntimeInformation runtimeInformation;
 
     @Inject
@@ -43,11 +43,11 @@ public class DefaultSessionFactory {
     public DefaultSessionFactory(
             RepositorySystem repositorySystem,
             MavenRepositorySystem mavenRepositorySystem,
-            PlexusContainer plexusContainer,
+            Lookup lookup,
             RuntimeInformation runtimeInformation) {
         this.repositorySystem = repositorySystem;
         this.mavenRepositorySystem = mavenRepositorySystem;
-        this.plexusContainer = plexusContainer;
+        this.lookup = lookup;
         this.runtimeInformation = runtimeInformation;
     }
 
@@ -58,6 +58,6 @@ public class DefaultSessionFactory {
 
     private Session newSession(MavenSession mavenSession) {
         return new DefaultSession(
-                mavenSession, repositorySystem, null, mavenRepositorySystem, plexusContainer, runtimeInformation);
+                mavenSession, repositorySystem, null, mavenRepositorySystem, lookup, runtimeInformation);
     }
 }
