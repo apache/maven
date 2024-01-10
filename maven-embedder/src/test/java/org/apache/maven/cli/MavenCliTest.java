@@ -37,6 +37,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
 import org.apache.maven.cli.jline.MessageUtils;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
+import org.apache.maven.cli.transfer.MavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -642,6 +643,9 @@ class MavenCliTest {
         cli.logging(request);
 
         TransferListener transferListener = cli.populateRequest(request).getTransferListener();
+        if (transferListener instanceof MavenTransferListener) {
+            transferListener = ((MavenTransferListener) transferListener).getTransferListener();
+        }
 
         assertThat(transferListener.getClass(), is(expectedSubClass));
     }

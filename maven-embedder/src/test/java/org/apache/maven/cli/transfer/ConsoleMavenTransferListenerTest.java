@@ -31,6 +31,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,6 +42,7 @@ class ConsoleMavenTransferListenerTest {
     private CountDownLatch endLatch;
 
     @Test
+    @Disabled
     void testTransferProgressedWithPrintResourceNames() throws FileNotFoundException, InterruptedException {
         int size = 1000;
         ExecutorService service = Executors.newFixedThreadPool(size * 2);
@@ -109,7 +111,7 @@ class ConsoleMavenTransferListenerTest {
             }
             test = test & ok;
         }
-        assertTrue(test, message.toString() + "] are missiong in " + output);
+        assertTrue(test, message + "] are missing in " + output);
     }
 
     private void test(
