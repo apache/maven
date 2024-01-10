@@ -16,36 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.extension.internal;
+package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import java.util.Objects;
-
 import org.apache.maven.api.services.RealmService;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
-/**
- * CoreExportsProvider
- */
 @Named
 @Singleton
-public class CoreExportsProvider implements Provider<CoreExports> {
+public class DefaultRealmService implements RealmService {
 
-    private final CoreExports exports;
+    private final PlexusContainer container;
 
     @Inject
-    public CoreExportsProvider(RealmService realmService) {
-        this(new CoreExports(CoreExtensionEntry.discoverFrom(realmService.getCoreRealm())));
+    public DefaultRealmService(PlexusContainer container) {
+        this.container = container;
     }
 
-    public CoreExportsProvider(CoreExports exports) {
-        this.exports = Objects.requireNonNull(exports);
-    }
-
-    public CoreExports get() {
-        return exports;
+    @Override
+    public ClassRealm getCoreRealm() {
+        return container.getContainerRealm();
     }
 }

@@ -16,36 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.extension.internal;
+package org.apache.maven.api.services;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
-import java.util.Objects;
-
-import org.apache.maven.api.services.RealmService;
+import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
- * CoreExportsProvider
+ * Access to {@link ClassRealm}.
+ *
+ * @since 4.0.0
  */
-@Named
-@Singleton
-public class CoreExportsProvider implements Provider<CoreExports> {
+@Experimental
+public interface RealmService extends Service {
 
-    private final CoreExports exports;
+    /**
+     * Obtain the {@link ClassRealm} used for Maven Core.
+     *
+     * @return the class realm of core.
+     */
+    @Nonnull
+    ClassRealm getCoreRealm();
 
-    @Inject
-    public CoreExportsProvider(RealmService realmService) {
-        this(new CoreExports(CoreExtensionEntry.discoverFrom(realmService.getCoreRealm())));
-    }
-
-    public CoreExportsProvider(CoreExports exports) {
-        this.exports = Objects.requireNonNull(exports);
-    }
-
-    public CoreExports get() {
-        return exports;
+    /**
+     * Shorthand method to obtain the {@link ClassWorld} used for Maven Core.
+     *
+     * @return the class world in use.
+     */
+    @Nonnull
+    default ClassWorld getClassWorld() {
+        return getCoreRealm().getWorld();
     }
 }
