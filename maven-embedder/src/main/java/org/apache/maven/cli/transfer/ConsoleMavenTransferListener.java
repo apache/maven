@@ -24,8 +24,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -40,100 +43,140 @@ import org.eclipse.aether.transfer.TransferResource;
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
     public static final long MAX_DELAY_BETWEEN_UPDATES_MILLIS = 100;
-    public static final long MIN_DELAY_BETWEEN_UPDATES_MILLIS = 50;
+    public static final long MAX_DELAY_BETWEEN_UPDATES_NANOS =
+            TimeUnit.MILLISECONDS.toNanos(MAX_DELAY_BETWEEN_UPDATES_MILLIS);
+    public static final long MIN_DELAY_BETWEEN_UPDATES_MILLIS = 10;
     public static final long MIN_DELAY_BETWEEN_UPDATES_NANOS =
             TimeUnit.MILLISECONDS.toNanos(MIN_DELAY_BETWEEN_UPDATES_MILLIS);
+    public static final long MAX_ALIVE_THREAD_MILLIS = 5000;
+    public static final long MAX_ALIVE_THREAD_NANOS = TimeUnit.MILLISECONDS.toNanos(MAX_ALIVE_THREAD_MILLIS);
 
-    private final Map<TransferResource, TransferEvent> transfers =
+    private final Map<TransferResource, TransferEvent> ongoing =
             new ConcurrentSkipListMap<>(Comparator.comparing(TransferResource::getResourceName));
+    private final Map<TransferResource, TransferEvent> done =
+            new ConcurrentSkipListMap<>(Comparator.comparing(TransferResource::getResourceName));
+
+    private final BlockingQueue<TransferEvent> queue = new LinkedBlockingQueue<>();
+
     private final FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
     private final ThreadLocal<MessageBuilder> buffers;
 
     private final boolean printResourceNames;
     private int lastLength;
-    private final Object lock = new Object();
-    private final Thread updater;
+    private final AtomicReference<Thread> updater = new AtomicReference<>();
 
     public ConsoleMavenTransferListener(
             MessageBuilderFactory messageBuilderFactory, PrintStream out, boolean printResourceNames) {
         super(messageBuilderFactory, out);
         this.printResourceNames = printResourceNames;
         buffers = ThreadLocal.withInitial(() -> messageBuilderFactory.builder(128));
-        updater = new Thread(this::update);
-        updater.setDaemon(true);
-        updater.start();
     }
 
     @Override
     public void transferInitiated(TransferEvent event) {
-        transfers.put(event.getResource(), event);
-        synchronized (lock) {
-            lock.notifyAll();
-        }
+        ongoing.put(event.getResource(), event);
+        queue.add(event);
+        startThread();
     }
 
     @Override
     public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
-        transfers.put(event.getResource(), event);
-        synchronized (lock) {
-            lock.notifyAll();
-        }
+        ongoing.put(event.getResource(), event);
+        queue.add(event);
+        startThread();
     }
 
     @Override
     public void transferProgressed(TransferEvent event) throws TransferCancelledException {
-        transfers.put(event.getResource(), event);
-        synchronized (lock) {
-            lock.notifyAll();
-        }
+        ongoing.put(event.getResource(), event);
+        queue.add(event);
+        startThread();
     }
 
     @Override
     public void transferSucceeded(TransferEvent event) {
-        transfers.put(event.getResource(), event);
-        synchronized (lock) {
-            if (transfers.size() == 1) {
-                doUpdate();
-            } else {
-                lock.notifyAll();
+        done.put(event.getResource(), event);
+        ongoing.remove(event.getResource(), event);
+        queue.add(event);
+        if (ongoing.isEmpty()) {
+            synchronized (queue) {
+                doUpdate(queue);
             }
+        } else {
+            startThread();
         }
     }
 
     @Override
     public void transferFailed(TransferEvent event) {
-        transfers.put(event.getResource(), event);
-        synchronized (lock) {
-            if (transfers.size() == 1) {
-                doUpdate();
-            } else {
-                lock.notifyAll();
+        done.put(event.getResource(), event);
+        ongoing.remove(event.getResource(), event);
+        queue.add(event);
+        if (ongoing.isEmpty()) {
+            synchronized (queue) {
+                doUpdate(queue);
+            }
+        } else {
+            startThread();
+        }
+    }
+
+    void startThread() {
+        Thread thread = updater.get();
+        if (thread == null) {
+            synchronized (this) {
+                thread = updater.get();
+                if (thread == null) {
+                    thread = new Thread(this::update);
+                    thread.setDaemon(true);
+                    thread.start();
+                    updater.set(thread);
+                }
             }
         }
     }
 
     void update() {
-        synchronized (lock) {
-            try {
-                long t0 = System.nanoTime();
-                while (true) {
-                    lock.wait(MAX_DELAY_BETWEEN_UPDATES_MILLIS);
-                    long t1 = System.nanoTime();
-                    if (t1 >= t0 + MIN_DELAY_BETWEEN_UPDATES_NANOS) {
-                        doUpdate();
-                        t0 = t1;
-                    }
+        try {
+            long t0 = System.nanoTime();
+            long mt = t0 + MAX_DELAY_BETWEEN_UPDATES_NANOS;
+            long le = t0;
+            long t1 = t0;
+            Map<TransferResource, TransferEvent> transfers = new LinkedHashMap<>();
+            while (t1 < le + MAX_ALIVE_THREAD_NANOS) {
+                TransferEvent event = queue.poll(mt - t0, TimeUnit.NANOSECONDS);
+                t1 = System.nanoTime();
+                while (event != null) {
+                    le = t1;
+                    transfers.put(event.getResource(), event);
+                    event = queue.poll();
                 }
-            } catch (InterruptedException e) {
-                // ignore
+                if (t1 >= t0 + MIN_DELAY_BETWEEN_UPDATES_NANOS) {
+                    doUpdate(transfers);
+                    t0 = t1;
+                    mt = t0 + MAX_DELAY_BETWEEN_UPDATES_NANOS;
+                }
             }
+        } catch (InterruptedException e) {
+            // ignore
+        } finally {
+            updater.set(null);
         }
     }
 
-    void doUpdate() {
+    void doUpdate(BlockingQueue<TransferEvent> queue) {
+        Map<TransferResource, TransferEvent> transfers = new LinkedHashMap<>();
+        TransferEvent event = queue.poll();
+        while (event != null) {
+            transfers.put(event.getResource(), event);
+            event = queue.poll();
+        }
+        doUpdate(transfers);
+    }
+
+    void doUpdate(Map<TransferResource, TransferEvent> transfers) {
         MessageBuilder buffer = buffers.get();
 
-        Map<TransferResource, TransferEvent> transfers = new LinkedHashMap<>(this.transfers);
         for (Iterator<Map.Entry<TransferResource, TransferEvent>> it =
                         transfers.entrySet().iterator();
                 it.hasNext(); ) {
@@ -148,7 +191,6 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
                 continue;
             }
             it.remove();
-            this.transfers.compute(entry.getKey(), (r, e) -> (e == event ? null : e));
             if (buffer.length() > 0) {
                 if (lastLength > 0) {
                     pad(buffer, lastLength - buffer.length());
