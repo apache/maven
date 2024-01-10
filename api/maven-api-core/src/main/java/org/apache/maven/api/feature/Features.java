@@ -65,11 +65,11 @@ public final class Features {
     }
 
     public static boolean xinclude(@Nullable Properties userProperties) {
-        return doGet(userProperties, XINCLUDE, true);
+        return doGet(userProperties, XINCLUDE, false);
     }
 
     public static boolean xinclude(@Nullable Map<String, String> userProperties) {
-        return doGet(userProperties, XINCLUDE, true);
+        return doGet(userProperties, XINCLUDE, false);
     }
 
     public static boolean xinclude(@Nullable Session session) {
