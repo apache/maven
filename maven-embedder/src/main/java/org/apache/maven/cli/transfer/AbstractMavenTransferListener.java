@@ -44,11 +44,14 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
     @Override
     public void transferInitiated(TransferEvent event) {
+        transferInitiated(messageBuilderFactory.builder(), event);
+    }
+
+    protected void transferInitiated(MessageBuilder message, TransferEvent event) {
         String action = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();
-        MessageBuilder message = messageBuilderFactory.builder();
         message.style(STYLE).append(action).append(' ').append(direction).append(' ');
         message.resetStyle().append(resource.getRepositoryId());
         message.style(STYLE).append(": ").append(resource.getRepositoryUrl());
@@ -59,10 +62,10 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
     @Override
     public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
-        transferCorrupted(new StringBuilder(), event);
+        transferCorrupted(messageBuilderFactory.builder(), event);
     }
 
-    protected void transferCorrupted(StringBuilder message, TransferEvent event) throws TransferCancelledException {
+    protected void transferCorrupted(MessageBuilder message, TransferEvent event) throws TransferCancelledException {
         TransferResource resource = event.getResource();
         // TODO This needs to be colorized
         message.append("[WARNING] ")
@@ -77,6 +80,10 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
     @Override
     public void transferSucceeded(TransferEvent event) {
+        transferSucceeded(messageBuilderFactory.builder(), event);
+    }
+
+    protected void transferSucceeded(MessageBuilder message, TransferEvent event) {
         String action = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
@@ -84,7 +91,6 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         long contentLength = event.getTransferredBytes();
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
-        MessageBuilder message = messageBuilderFactory.builder();
         message.append(action).style(STYLE).append(' ').append(direction).append(' ');
         message.resetStyle().append(resource.getRepositoryId());
         message.style(STYLE).append(": ").append(resource.getRepositoryUrl());

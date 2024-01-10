@@ -207,4 +207,25 @@ public class FileSizeFormat {
             format(builder, progressedSize, unit, false);
         }
     }
+
+    public void formatProgress(MessageBuilder builder, long progressedSize, long size) {
+        if (progressedSize < 0L) {
+            throw new IllegalArgumentException("progressed file size cannot be negative: " + size);
+        }
+        if (size >= 0 && progressedSize > size) {
+            throw new IllegalArgumentException(
+                    "progressed file size cannot be greater than size: " + progressedSize + " > " + size);
+        }
+
+        if (size >= 0L && progressedSize != size) {
+            ScaleUnit unit = ScaleUnit.getScaleUnit(size);
+            format(builder, progressedSize, unit, true);
+            builder.append("/");
+            format(builder, size, unit, false);
+        } else {
+            ScaleUnit unit = ScaleUnit.getScaleUnit(progressedSize);
+
+            format(builder, progressedSize, unit, false);
+        }
+    }
 }

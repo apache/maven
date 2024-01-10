@@ -70,6 +70,11 @@ public class DefaultMessageBuilder implements MessageBuilder {
     }
 
     @Override
+    public int length() {
+        return buffer.length();
+    }
+
+    @Override
     @Nonnull
     public String build() {
         return buffer.toString();

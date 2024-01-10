@@ -264,6 +264,12 @@ public interface MessageBuilder extends Appendable {
     MessageBuilder setLength(int length);
 
     /**
+     * Returns the current length of the message.
+     * @return the current length
+     */
+    int length();
+
+    /**
      * Return the built message.
      *
      * @return the message

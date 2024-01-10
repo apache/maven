@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -46,7 +47,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     private final Map<TransferResource, TransferEvent> transfers =
             new ConcurrentSkipListMap<>(Comparator.comparing(TransferResource::getResourceName));
     private final FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
-    private final ThreadLocal<StringBuilder> buffers = ThreadLocal.withInitial(() -> new StringBuilder(128));
+    private final ThreadLocal<MessageBuilder> buffers;
 
     private final boolean printResourceNames;
     private int lastLength;
@@ -57,6 +58,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
             MessageBuilderFactory messageBuilderFactory, PrintStream out, boolean printResourceNames) {
         super(messageBuilderFactory, out);
         this.printResourceNames = printResourceNames;
+        buffers = ThreadLocal.withInitial(() -> messageBuilderFactory.builder(128));
         updater = new Thread(this::update);
         updater.setDaemon(true);
         updater.start();
@@ -129,7 +131,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     }
 
     void doUpdate() {
-        StringBuilder buffer = buffers.get();
+        MessageBuilder buffer = buffers.get();
 
         Map<TransferResource, TransferEvent> transfers = new LinkedHashMap<>(this.transfers);
         for (Iterator<Map.Entry<TransferResource, TransferEvent>> it =
@@ -160,7 +162,9 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
             for (Map.Entry<TransferResource, TransferEvent> entry : transfers.entrySet()) {
                 TransferEvent event = entry.getValue();
                 if (buffer.length() == 0) {
-                    buffer.append("Progress (").append(transfers.size()).append("): ");
+                    buffer.append("Progress (")
+                            .append(Integer.toString(transfers.size()))
+                            .append("): ");
                 } else {
                     buffer.append(" | ");
                 }
@@ -196,7 +200,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     @Override
     protected void println(Object message) {}
 
-    private void pad(StringBuilder buffer, int spaces) {
+    private void pad(MessageBuilder buffer, int spaces) {
         String block = "                                        ";
         while (spaces > 0) {
             int n = Math.min(spaces, block.length());

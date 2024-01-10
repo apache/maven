@@ -252,6 +252,11 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory, Prompt
         }
 
         @Override
+        public int length() {
+            return builder.length();
+        }
+
+        @Override
         public String build() {
             return builder.toAnsi(MessageUtils.terminal);
         }
