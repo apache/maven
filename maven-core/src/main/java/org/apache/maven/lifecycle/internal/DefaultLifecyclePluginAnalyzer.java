@@ -26,11 +26,9 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.maven.api.services.Lookup;
-import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
@@ -128,14 +126,7 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
      * from current module and for example not extensions coming from other modules.
      */
     private LifecycleMapping lookupLifecycleMapping(final String packaging) {
-        try {
-            return lookup.lookup(LifecycleMapping.class, packaging);
-        } catch (LookupException e) {
-            if (e.getCause() instanceof NoSuchElementException) {
-                return null;
-            }
-            throw new RuntimeException(e);
-        }
+        return lookup.lookupOptional(LifecycleMapping.class, packaging).orElse(null);
     }
 
     private void parseLifecyclePhaseDefinitions(Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals) {

@@ -429,16 +429,8 @@ public class DefaultMaven implements Maven {
 
     private <T> Collection<T> getExtensionComponents(Collection<MavenProject> projects, Class<T> role) {
         Collection<T> foundComponents = new LinkedHashSet<>();
-
-        try {
-            foundComponents.addAll(lookup.lookupList(role));
-        } catch (LookupException e) {
-            // this is just silly, lookupList should return an empty list!
-            logger.warn("Failed to lookup {}: {}", role, e.getMessage());
-        }
-
+        foundComponents.addAll(lookup.lookupList(role));
         foundComponents.addAll(getProjectScopedExtensionComponents(projects, role));
-
         return foundComponents;
     }
 
@@ -458,13 +450,7 @@ public class DefaultMaven implements Maven {
 
                 if (projectRealm != null && scannedRealms.add(projectRealm)) {
                     currentThread.setContextClassLoader(projectRealm);
-
-                    try {
-                        foundComponents.addAll(lookup.lookupList(role));
-                    } catch (LookupException e) {
-                        // this is just silly, lookupList should return an empty list!
-                        logger.warn("Failed to lookup {}: {}", role, e.getMessage());
-                    }
+                    foundComponents.addAll(lookup.lookupList(role));
                 }
             }
             return foundComponents;
