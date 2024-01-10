@@ -75,6 +75,7 @@ import org.apache.maven.session.scope.internal.SessionScope;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
@@ -100,6 +101,8 @@ public class DefaultMaven implements Maven {
 
     private final DefaultRepositorySystemSessionFactory repositorySessionFactory;
 
+    private final WorkspaceReader workspaceRepository;
+
     private final GraphBuilder graphBuilder;
 
     private final BuildResumptionAnalyzer buildResumptionAnalyzer;
@@ -121,6 +124,7 @@ public class DefaultMaven implements Maven {
             LegacySupport legacySupport,
             SessionScope sessionScope,
             DefaultRepositorySystemSessionFactory repositorySessionFactory,
+            @Nullable @Named("ide") WorkspaceReader workspaceRepository,
             @Named(GraphBuilder.HINT) GraphBuilder graphBuilder,
             BuildResumptionAnalyzer buildResumptionAnalyzer,
             BuildResumptionDataRepository buildResumptionDataRepository,
@@ -132,6 +136,7 @@ public class DefaultMaven implements Maven {
         this.legacySupport = legacySupport;
         this.sessionScope = sessionScope;
         this.repositorySessionFactory = repositorySessionFactory;
+        this.workspaceRepository = workspaceRepository;
         this.graphBuilder = graphBuilder;
         this.buildResumptionAnalyzer = buildResumptionAnalyzer;
         this.buildResumptionDataRepository = buildResumptionDataRepository;
@@ -238,8 +243,15 @@ public class DefaultMaven implements Maven {
         }
 
         try {
+            List<WorkspaceReader> readers = new ArrayList<>();
             WorkspaceReader reactorReader = lookup.lookup(WorkspaceReader.class, ReactorReader.HINT);
-            chainedWorkspaceReader.setReaders(Collections.singletonList(reactorReader));
+            readers.add(reactorReader);
+            if (request.getWorkspaceReader() != null) {
+                readers.add(request.getWorkspaceReader());
+            } else if (workspaceRepository != null) {
+                readers.add(workspaceRepository);
+            }
+            chainedWorkspaceReader.setReaders(readers);
         } catch (LookupException e) {
             return addExceptionToResult(result, e);
         }
