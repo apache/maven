@@ -43,6 +43,8 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Prerequisites;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.LookupException;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumptionAnalyzer;
 import org.apache.maven.execution.BuildResumptionDataRepository;
@@ -69,10 +71,7 @@ import org.apache.maven.model.building.Result;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.session.scope.internal.SessionScope;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.repository.WorkspaceReader;
@@ -89,11 +88,9 @@ import static java.util.stream.Collectors.toSet;
 public class DefaultMaven implements Maven {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected ProjectBuilder projectBuilder;
+    private final Lookup lookup;
 
     private final LifecycleStarter lifecycleStarter;
-
-    private final PlexusContainer container;
 
     private final ExecutionEventCatapult eventCatapult;
 
@@ -118,9 +115,8 @@ public class DefaultMaven implements Maven {
     @Inject
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultMaven(
-            ProjectBuilder projectBuilder,
+            Lookup lookup,
             LifecycleStarter lifecycleStarter,
-            PlexusContainer container,
             ExecutionEventCatapult eventCatapult,
             LegacySupport legacySupport,
             SessionScope sessionScope,
@@ -130,9 +126,8 @@ public class DefaultMaven implements Maven {
             BuildResumptionDataRepository buildResumptionDataRepository,
             SuperPomProvider superPomProvider,
             DefaultSessionFactory defaultSessionFactory) {
-        this.projectBuilder = projectBuilder;
+        this.lookup = lookup;
         this.lifecycleStarter = lifecycleStarter;
-        this.container = container;
         this.eventCatapult = eventCatapult;
         this.legacySupport = legacySupport;
         this.sessionScope = sessionScope;
@@ -243,9 +238,9 @@ public class DefaultMaven implements Maven {
         }
 
         try {
-            WorkspaceReader reactorReader = container.lookup(WorkspaceReader.class, ReactorReader.HINT);
+            WorkspaceReader reactorReader = lookup.lookup(WorkspaceReader.class, ReactorReader.HINT);
             chainedWorkspaceReader.setReaders(Collections.singletonList(reactorReader));
-        } catch (ComponentLookupException e) {
+        } catch (LookupException e) {
             return addExceptionToResult(result, e);
         }
 
@@ -266,7 +261,7 @@ public class DefaultMaven implements Maven {
 
         try {
             setupWorkspaceReader(session, chainedWorkspaceReader);
-        } catch (ComponentLookupException e) {
+        } catch (LookupException e) {
             return addExceptionToResult(result, e);
         }
         try {
@@ -335,12 +330,11 @@ public class DefaultMaven implements Maven {
         return result;
     }
 
-    private void setupWorkspaceReader(MavenSession session, MavenChainedWorkspaceReader chainedWorkspaceReader)
-            throws ComponentLookupException {
+    private void setupWorkspaceReader(MavenSession session, MavenChainedWorkspaceReader chainedWorkspaceReader) {
         // Desired order of precedence for workspace readers before querying the local artifact repositories
         Set<WorkspaceReader> workspaceReaders = new LinkedHashSet<>();
         // 1) Reactor workspace reader
-        WorkspaceReader reactorReader = container.lookup(WorkspaceReader.class, ReactorReader.HINT);
+        WorkspaceReader reactorReader = lookup.lookup(WorkspaceReader.class, ReactorReader.HINT);
         workspaceReaders.add(reactorReader);
         // 2) Repository system session-scoped workspace reader
         for (WorkspaceReader repoWorkspaceReader : chainedWorkspaceReader.getReaders()) {
@@ -437,8 +431,8 @@ public class DefaultMaven implements Maven {
         Collection<T> foundComponents = new LinkedHashSet<>();
 
         try {
-            foundComponents.addAll(container.lookupList(role));
-        } catch (ComponentLookupException e) {
+            foundComponents.addAll(lookup.lookupList(role));
+        } catch (LookupException e) {
             // this is just silly, lookupList should return an empty list!
             logger.warn("Failed to lookup {}: {}", role, e.getMessage());
         }
@@ -466,8 +460,8 @@ public class DefaultMaven implements Maven {
                     currentThread.setContextClassLoader(projectRealm);
 
                     try {
-                        foundComponents.addAll(container.lookupList(role));
-                    } catch (ComponentLookupException e) {
+                        foundComponents.addAll(lookup.lookupList(role));
+                    } catch (LookupException e) {
                         // this is just silly, lookupList should return an empty list!
                         logger.warn("Failed to lookup {}: {}", role, e.getMessage());
                     }
