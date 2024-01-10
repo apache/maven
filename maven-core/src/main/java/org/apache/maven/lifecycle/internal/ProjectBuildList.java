@@ -76,6 +76,7 @@ public class ProjectBuildList implements Iterable<ProjectSegment> {
                 .orElse(null);
     }
 
+    @Override
     public Iterator<ProjectSegment> iterator() {
         return items.iterator();
     }

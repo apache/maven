@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.maven.internal.impl.DefaultLookup;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.testing.PlexusTest;
@@ -93,7 +94,7 @@ class DefaultLifecyclesTest {
         PlexusContainer mockedPlexusContainer = mock(PlexusContainer.class);
         when(mockedPlexusContainer.lookupMap(Lifecycle.class)).thenReturn(lifeCycles);
 
-        DefaultLifecycles dl = new DefaultLifecycles(mockedPlexusContainer);
+        DefaultLifecycles dl = new DefaultLifecycles(new DefaultLookup(mockedPlexusContainer));
 
         assertThat(dl.getLifeCycles().get(0).getId(), is("clean"));
         assertThat(dl.getLifeCycles().get(1).getId(), is("default"));

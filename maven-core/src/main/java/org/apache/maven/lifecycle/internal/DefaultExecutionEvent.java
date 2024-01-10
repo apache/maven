@@ -44,22 +44,27 @@ class DefaultExecutionEvent implements ExecutionEvent {
         this.exception = exception;
     }
 
+    @Override
     public Type getType() {
         return type;
     }
 
+    @Override
     public MavenSession getSession() {
         return session;
     }
 
+    @Override
     public MavenProject getProject() {
         return session.getCurrentProject();
     }
 
+    @Override
     public MojoExecution getMojoExecution() {
         return mojoExecution;
     }
 
+    @Override
     public Exception getException() {
         return exception;
     }

@@ -114,7 +114,7 @@ class TestApi {
                 repositorySystem,
                 Collections.emptyList(),
                 mavenRepositorySystem,
-                plexusContainer,
+                new DefaultLookup(plexusContainer),
                 runtimeInformation);
         DefaultLocalRepository localRepository =
                 new DefaultLocalRepository(new LocalRepository("target/test-classes/apiv4-repo"));
