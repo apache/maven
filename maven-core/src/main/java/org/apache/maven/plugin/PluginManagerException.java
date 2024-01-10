@@ -95,14 +95,6 @@ public class PluginManagerException extends Exception {
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException(Plugin plugin, String message, Exception cause) {
-        super(message, cause);
-
-        pluginGroupId = plugin.getGroupId();
-        pluginArtifactId = plugin.getArtifactId();
-        pluginVersion = plugin.getVersion();
-    }
-
     /**
      * Constructor.
      *
@@ -110,7 +102,7 @@ public class PluginManagerException extends Exception {
      */
     @Deprecated
     public PluginManagerException(Plugin plugin, String message, PlexusConfigurationException cause) {
-        this(plugin, message, (Exception) cause);
+        this(plugin, message, (Throwable) cause);
     }
 
     /**
@@ -120,7 +112,7 @@ public class PluginManagerException extends Exception {
      */
     @Deprecated
     public PluginManagerException(Plugin plugin, String message, ComponentRepositoryException cause) {
-        this(plugin, message, (Exception) cause);
+        this(plugin, message, (Throwable) cause);
     }
 
     public PluginManagerException(
@@ -155,7 +147,7 @@ public class PluginManagerException extends Exception {
      */
     @Deprecated
     public PluginManagerException(Plugin plugin, String message, PlexusContainerException cause) {
-        this(plugin, message, (Exception) cause);
+        this(plugin, message, (Throwable) cause);
     }
 
     public PluginManagerException(Plugin plugin, String message, MavenProject project) {
