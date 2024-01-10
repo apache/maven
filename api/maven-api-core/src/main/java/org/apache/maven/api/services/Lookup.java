@@ -30,7 +30,7 @@ public interface Lookup extends Service {
      * Performs a lookup for given typed component.
      *
      * @param type The component type.
-     * @return The component or {@code null} if no such component.
+     * @return The component.
      * @param <T> The component type.
      * @throws LookupException if no such component or there is some provisioning related issue.
      */
@@ -42,7 +42,7 @@ public interface Lookup extends Service {
      *
      * @param type The component type.
      * @param name The component name.
-     * @return The component or {@code null} if no such component.
+     * @return The component.
      * @param <T> The component type.
      * @throws LookupException if no such component or there is some provisioning related issue.
      */
@@ -53,7 +53,7 @@ public interface Lookup extends Service {
      * Performs a lookup for optional typed component.
      *
      * @param type The component type.
-     * @return The component or {@code null} if no such component.
+     * @return Optional carrying component or empty optional if no such component.
      * @param <T> The component type.
      * @throws LookupException if there is some provisioning related issue.
      */
@@ -65,7 +65,7 @@ public interface Lookup extends Service {
      *
      * @param type The component type.
      * @param name The component name.
-     * @return The component or {@code null} if no such component.
+     * @return Optional carrying component or empty optional if no such component.
      * @param <T> The component type.
      * @throws LookupException if there is some provisioning related issue.
      */
