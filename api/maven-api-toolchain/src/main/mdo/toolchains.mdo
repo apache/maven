@@ -35,8 +35,8 @@
     <p>With {@code jdk} toolchain, for example, instead of being stuck with the JDK used to run Maven, all plugins can use
     the same other JDK instance without hardcoding absolute paths into the {@code pom.xml}
     and without configuring every plugin that require path to JDK tools.</p>
-    <p>See the <a href="/guides/mini/guide-using-toolchains.html">Guide to Using Toolchains</a> for
-    more information.</p>
+
+    @see <a href="/guides/mini/guide-using-toolchains.html">Guide to Using Toolchains</a>
     ]]></description>
 
   <defaults>

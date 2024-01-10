@@ -554,8 +554,8 @@
             These dependencies are used to construct a classpath for your
             project during the build process. They are automatically downloaded from the
             repositories defined in this project.
-            See &lt;a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
-            dependency mechanism&lt;/a> for more information.
+
+            @see &lt;a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">Dependency mechanism&lt;/a>
           </description>
           <association>
             <type>Dependency</type>
@@ -608,7 +608,7 @@
     <class>
       <name>PluginContainer</name>
       <version>3.0.0+</version>
-      <description>Contains the plugins informations for the project.</description>
+      <description>Contains the plugins information for the project.</description>
       <fields>
         <field>
           <name>plugins</name>
@@ -702,7 +702,7 @@
       <name>PluginConfiguration</name>
       <version>3.0.0+</version>
       <superClass>PluginContainer</superClass>
-      <description>Contains the plugins management informations for the project.</description>
+      <description>Contains the plugins management information for the project.</description>
       <fields>
         <!-- [ jdcasey:06-Mar-2005 ] Added to handle version management, etc. for
           | plugins to be used in sub-projects. -->
@@ -1331,8 +1331,9 @@
         The {@code <exclusion>} element contains information required to exclude
         an artifact to the project.
         <p>
-        The {@code groupId} and {@code artifactId} fields are interpreted as glob patterns,
-        see {@link java.nio.file.FileSystem#getPathMatcher}.
+        The {@code groupId} and {@code artifactId} fields are interpreted as glob patterns.
+
+        @see java.nio.file.FileSystem#getPathMatcher
         ]]>
       </description>
       <fields>
@@ -1762,7 +1763,7 @@
       <name>Scm</name>
       <version>4.0.0+</version>
       <description>
-        The {@code &lt;scm>} element contains informations required to the SCM
+        The {@code &lt;scm>} element contains information required to the SCM
         (Source Control Management) of the project.
       </description>
       <fields>
@@ -1773,12 +1774,12 @@
             <![CDATA[
             The source control management system URL
             that describes the repository and how to connect to the
-            repository. For more information, see the
-            <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
-            and <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
+            repository.
             This connection is read-only.
             <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             scm's {@code child.scm.connection.inherit.append.path="false"}
+            @see <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
+            @see <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>
             ]]>
           </description>
           <type>String</type>
@@ -2252,9 +2253,9 @@
             <li>{@code combine.children}: available values are {@code merge} (default) and {@code append},</li>
             <li>{@code combine.self}: available values are {@code merge} (default) and {@code override}.</li>
             </ul>
-            <p>See <a href="https://maven.apache.org/pom.html#Plugins">POM Reference documentation</a> and
-            <a href="https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html">Xpp3DomUtils</a>
-            for more information.</p>
+
+            @see <a href="https://maven.apache.org/pom.html#Plugins">POM Reference documentation</a>
+            @see <a href="https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html">Xpp3DomUtils</a>
             ]]>
           </description>
           <name>configuration</name>
@@ -2280,7 +2281,7 @@
       <version>4.0.0+</version>
       <superClass>ConfigurationContainer</superClass>
       <description>
-        The {@code &lt;plugin>} element contains informations required for a plugin.
+        The {@code &lt;plugin>} element contains information required for a plugin.
       </description>
       <fields>
         <field>
@@ -2902,7 +2903,7 @@
       <superClass>ConfigurationContainer</superClass>
       <description>
         <![CDATA[
-        The {@code <plugin>} element in {@code <reporting><plugins>} contains informations required for a report plugin.
+        The {@code <plugin>} element in {@code <reporting><plugins>} contains information required for a report plugin.
         ]]>
       </description>
       <fields>
