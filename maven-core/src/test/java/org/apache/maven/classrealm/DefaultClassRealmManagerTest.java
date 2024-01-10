@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.maven.extension.internal.CoreExports;
-import org.apache.maven.internal.impl.DefaultRealmService;
+import org.apache.maven.internal.impl.internal.DefaultCoreRealm;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
@@ -57,7 +57,7 @@ class DefaultClassRealmManagerTest {
         exportedPackages.add("group1:artifact1");
 
         return new DefaultClassRealmManager(
-                new DefaultRealmService(container),
+                new DefaultCoreRealm(container),
                 new ArrayList<ClassRealmManagerDelegate>(),
                 new CoreExports(new ClassRealm(null, "test", null), new HashSet<String>(), exportedPackages));
     }

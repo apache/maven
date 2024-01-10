@@ -33,10 +33,10 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.maven.api.services.RealmService;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.extension.internal.CoreExports;
+import org.apache.maven.internal.CoreRealm;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -86,9 +86,9 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
     @Inject
     public DefaultClassRealmManager(
-            RealmService realmService, List<ClassRealmManagerDelegate> delegates, CoreExports exports) {
-        this.world = realmService.getClassWorld();
-        this.containerRealm = realmService.getCoreRealm();
+            CoreRealm coreRealm, List<ClassRealmManagerDelegate> delegates, CoreExports exports) {
+        this.world = coreRealm.getClassWorld();
+        this.containerRealm = coreRealm.getCoreRealm();
         this.delegates = delegates;
 
         Map<String, ClassLoader> foreignImports = exports.getExportedPackages();

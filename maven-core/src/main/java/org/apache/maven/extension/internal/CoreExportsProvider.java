@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 
 import java.util.Objects;
 
-import org.apache.maven.api.services.RealmService;
+import org.apache.maven.internal.CoreRealm;
 
 /**
  * CoreExportsProvider
@@ -37,8 +37,8 @@ public class CoreExportsProvider implements Provider<CoreExports> {
     private final CoreExports exports;
 
     @Inject
-    public CoreExportsProvider(RealmService realmService) {
-        this(new CoreExports(CoreExtensionEntry.discoverFrom(realmService.getCoreRealm())));
+    public CoreExportsProvider(CoreRealm coreRealm) {
+        this(new CoreExports(CoreExtensionEntry.discoverFrom(coreRealm.getCoreRealm())));
     }
 
     public CoreExportsProvider(CoreExports exports) {

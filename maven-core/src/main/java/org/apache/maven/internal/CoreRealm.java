@@ -16,21 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.internal;
 
-import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
- * Access to {@link ClassRealm}.
+ * Access to core {@link ClassRealm}.
  *
  * @since 4.0.0
  */
 @Experimental
-public interface RealmService extends Service {
+public interface CoreRealm {
 
     /**
      * Obtain the {@link ClassRealm} used for Maven Core.

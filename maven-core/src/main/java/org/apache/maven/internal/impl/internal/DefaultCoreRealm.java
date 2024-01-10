@@ -16,24 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.internal.impl.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.services.RealmService;
+import org.apache.maven.internal.CoreRealm;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 @Named
 @Singleton
-public class DefaultRealmService implements RealmService {
+public class DefaultCoreRealm implements CoreRealm {
 
     private final PlexusContainer container;
 
     @Inject
-    public DefaultRealmService(PlexusContainer container) {
+    public DefaultCoreRealm(PlexusContainer container) {
         this.container = container;
     }
 
