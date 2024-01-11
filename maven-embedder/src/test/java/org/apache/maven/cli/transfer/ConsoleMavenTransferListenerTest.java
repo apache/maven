@@ -18,7 +18,7 @@
  */
 package org.apache.maven.cli.transfer;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +30,7 @@ import org.apache.maven.cli.jline.JLineMessageBuilderFactory;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
+import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.aether.transfer.TransferResource;
 import org.junit.jupiter.api.Test;
 
@@ -41,14 +42,14 @@ class ConsoleMavenTransferListenerTest {
     private CountDownLatch endLatch;
 
     @Test
-    void testTransferProgressedWithPrintResourceNames() throws FileNotFoundException, InterruptedException {
+    void testTransferProgressedWithPrintResourceNames() throws Exception {
         int size = 1000;
         ExecutorService service = Executors.newFixedThreadPool(size * 2);
         startLatch = new CountDownLatch(size);
         endLatch = new CountDownLatch(size);
         Map<String, String> output = new ConcurrentHashMap<String, String>();
 
-        ConsoleMavenTransferListener listener = new ConsoleMavenTransferListener(
+        TransferListener listener = new SimplexTransferListener(new ConsoleMavenTransferListener(
                 new JLineMessageBuilderFactory(),
                 new PrintStream(System.out) {
 
@@ -68,8 +69,9 @@ class ConsoleMavenTransferListenerTest {
                         System.out.print(o);
                     }
                 },
-                true);
-        TransferResource resource = new TransferResource(null, null, "http://maven.org/test/test-resource", null, null);
+                true));
+        TransferResource resource =
+                new TransferResource(null, null, "http://maven.org/test/test-resource", new File(""), null);
         resource.setContentLength(size - 1);
 
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false); // no close handle
@@ -99,6 +101,12 @@ class ConsoleMavenTransferListenerTest {
             e.printStackTrace();
         }
 
+        // despite all are back, we need to make sure all the events are processed (are async)
+        // this one should block until all processed
+        listener.transferSucceeded(new TransferEvent.Builder(session, resource)
+                .setType(TransferEvent.EventType.SUCCEEDED)
+                .build());
+
         StringBuilder message = new StringBuilder("Messages [");
         boolean test = true;
         for (int i = 0; i < 999; i++) {
@@ -109,15 +117,16 @@ class ConsoleMavenTransferListenerTest {
             }
             test = test & ok;
         }
-        assertTrue(test, message.toString() + "] are missiong in " + output);
+        assertTrue(test, message + "] are missing in " + output);
     }
 
     private void test(
-            ConsoleMavenTransferListener listener,
+            TransferListener listener,
             DefaultRepositorySystemSession session,
             TransferResource resource,
             final int bytes) {
         TransferEvent event = new TransferEvent.Builder(session, resource)
+                .setType(TransferEvent.EventType.PROGRESSED)
                 .setTransferredBytes(bytes)
                 .build();
         startLatch.countDown();

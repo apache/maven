@@ -64,9 +64,7 @@ import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
 import org.apache.maven.cli.logging.Slf4jStdoutLogger;
-import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
-import org.apache.maven.cli.transfer.QuietMavenTransferListener;
-import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
+import org.apache.maven.cli.transfer.*;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -1678,7 +1676,8 @@ public class MavenCli {
     //
 
     protected TransferListener getConsoleTransferListener(boolean printResourceNames) {
-        return new ConsoleMavenTransferListener(messageBuilderFactory, System.out, printResourceNames);
+        return new SimplexTransferListener(
+                new ConsoleMavenTransferListener(messageBuilderFactory, System.out, printResourceNames));
     }
 
     protected TransferListener getBatchTransferListener() {
