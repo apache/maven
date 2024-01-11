@@ -176,7 +176,7 @@ under the License.
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusTestingVersion>1.0.0</plexusTestingVersion>
     <plexusXmlVersion>4.0.1</plexusXmlVersion>
-    <resolverVersion>2.0.0-alpha-5</resolverVersion>
+    <resolverVersion>2.0.0-alpha-6</resolverVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <sisuVersion>0.9.0.M2</sisuVersion>
     <slf4jVersion>2.0.11</slf4jVersion>
