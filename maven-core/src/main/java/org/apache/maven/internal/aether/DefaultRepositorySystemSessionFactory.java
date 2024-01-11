@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -59,6 +60,9 @@ import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.ProxySelector;
@@ -67,6 +71,7 @@ import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
+import org.eclipse.aether.util.graph.version.*;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
@@ -75,6 +80,10 @@ import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.Version;
+import org.eclipse.aether.version.VersionRange;
+import org.eclipse.aether.version.VersionScheme;
 import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +93,25 @@ import org.slf4j.LoggerFactory;
  */
 @Named
 public class DefaultRepositorySystemSessionFactory {
+    /**
+     * User property for version filters expression, a semicolon separated list of filters to apply. By default, no version
+     * filter is applied (like in Maven 3).
+     * <p>
+     * Supported filters:
+     * <ul>
+     *     <li>"h" or "h(num)" - highest version or top list of highest ones filter</li>
+     *     <li>"l" or "l(num)" - lowest version or bottom list of lowest ones filter</li>
+     *     <li>"s" - contextual snapshot filter</li>
+     *     <li>"e(G:A:V)" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li>
+     * </ul>
+     * Example filter expression: {@code "h(5);s;e(org.foo:bar:1)} will cause: ranges are filtered for "top 5" (instead
+     * full range), snapshots are banned if root project is not a snapshot, and if range for {@code org.foo:bar} is
+     * being processed, version 1 is omitted.
+     *
+     * @since 4.0.0
+     */
+    private static final String MAVEN_VERSION_FILTERS = "maven.versionFilters";
+
     /**
      * User property for chained LRM: list of "tail" local repository paths (separated by comma), to be used with
      * {@link ChainedLocalRepositoryManager}.
@@ -162,6 +190,8 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final TypeRegistry typeRegistry;
 
+    private final VersionScheme versionScheme;
+
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
     public DefaultRepositorySystemSessionFactory(
@@ -171,7 +201,8 @@ public class DefaultRepositorySystemSessionFactory {
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
             RuntimeInformation runtimeInformation,
-            TypeRegistry typeRegistry) {
+            TypeRegistry typeRegistry,
+            VersionScheme versionScheme) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.workspaceRepository = workspaceRepository;
@@ -179,6 +210,7 @@ public class DefaultRepositorySystemSessionFactory {
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.runtimeInformation = runtimeInformation;
         this.typeRegistry = typeRegistry;
+        this.versionScheme = versionScheme;
     }
 
     @Deprecated
@@ -221,6 +253,11 @@ public class DefaultRepositorySystemSessionFactory {
 
         session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
                 request.isIgnoreMissingArtifactDescriptor(), request.isIgnoreInvalidArtifactDescriptor()));
+
+        VersionFilter versionFilter = buildVersionFilter((String) configProps.get(MAVEN_VERSION_FILTERS));
+        if (versionFilter != null) {
+            session.setVersionFilter(versionFilter);
+        }
 
         session.setArtifactTypeRegistry(RepositoryUtils.newArtifactTypeRegistry(artifactHandlerManager));
 
@@ -426,6 +463,72 @@ public class DefaultRepositorySystemSessionFactory {
         return session;
     }
 
+    private VersionFilter buildVersionFilter(String filterExpression) {
+        ArrayList<VersionFilter> filters = new ArrayList<>();
+        if (filterExpression != null) {
+            List<String> expressions = Arrays.stream(filterExpression.split(";"))
+                    .filter(s -> s != null && !s.trim().isEmpty())
+                    .collect(Collectors.toList());
+            for (String expression : expressions) {
+                if ("h".equals(expression)) {
+                    filters.add(new HighestVersionFilter());
+                } else if (expression.startsWith("h(") && expression.endsWith(")")) {
+                    int num = Integer.parseInt(expression.substring(2, expression.length() - 1));
+                    filters.add(new HighestVersionFilter(num));
+                } else if ("l".equals(expression)) {
+                    filters.add(new LowestVersionFilter());
+                } else if (expression.startsWith("l(") && expression.endsWith(")")) {
+                    int num = Integer.parseInt(expression.substring(2, expression.length() - 1));
+                    filters.add(new LowestVersionFilter(num));
+                } else if ("s".equals(expression)) {
+                    filters.add(new ContextualSnapshotVersionFilter());
+                } else if (expression.startsWith("e(") && expression.endsWith(")")) {
+                    Artifact artifact = new DefaultArtifact(expression.substring(2, expression.length() - 1));
+                    VersionRange versionRange =
+                            artifact.getVersion().contains(",") ? parseVersionRange(artifact.getVersion()) : null;
+                    Predicate<Artifact> predicate = a -> {
+                        if (artifact.getGroupId().equals(a.getGroupId())
+                                && artifact.getArtifactId().equals(a.getArtifactId())) {
+                            if (versionRange != null) {
+                                Version v = parseVersion(a.getVersion());
+                                return !versionRange.containsVersion(v);
+                            } else {
+                                return !artifact.getVersion().equals(a.getVersion());
+                            }
+                        }
+                        return true;
+                    };
+                    filters.add(new PredicateVersionFilter(predicate));
+                } else {
+                    throw new IllegalArgumentException("Unsupported filter expression: " + expression);
+                }
+            }
+        }
+        if (filters.isEmpty()) {
+            return null;
+        } else if (filters.size() == 1) {
+            return filters.get(0);
+        } else {
+            return ChainedVersionFilter.newInstance(filters);
+        }
+    }
+
+    private Version parseVersion(String spec) {
+        try {
+            return versionScheme.parseVersion(spec);
+        } catch (InvalidVersionSpecificationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private VersionRange parseVersionRange(String spec) {
+        try {
+            return versionScheme.parseVersionRange(spec);
+        } catch (InvalidVersionSpecificationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Map<?, ?> getPropertiesFromRequestedProfiles(MavenExecutionRequest request) {
         HashSet<String> activeProfileId =
                 new HashSet<>(request.getProfileActivation().getRequiredActiveProfileIds());
@@ -508,7 +611,7 @@ public class DefaultRepositorySystemSessionFactory {
         return null;
     }
 
-    public void injectAuthentication(AuthenticationSelector selector, List<ArtifactRepository> repositories) {
+    private void injectAuthentication(AuthenticationSelector selector, List<ArtifactRepository> repositories) {
         if (repositories != null && selector != null) {
             for (ArtifactRepository repository : repositories) {
                 repository.setAuthentication(getAuthentication(selector, repository));
