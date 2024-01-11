@@ -375,7 +375,7 @@ class XIncludeStreamReader extends StreamReaderDelegate {
                 }
 
                 StreamReaderDelegate sr = new StreamReaderDelegate() {
-                    int state = 0;
+                    private int state = 0;
 
                     @Override
                     protected XMLStreamReader getDelegate() {
@@ -462,6 +462,7 @@ class XIncludeStreamReader extends StreamReaderDelegate {
     private static final int TRANSFER_BUFFER_SIZE = 8192;
 
     private static long transferTo(Reader in, Writer out) throws IOException {
+        // TODO: JDK10: in.transferTo(out);
         Objects.requireNonNull(out, "out");
         long transferred = 0;
         char[] buffer = new char[TRANSFER_BUFFER_SIZE];

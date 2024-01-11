@@ -23,10 +23,10 @@ import javax.xml.stream.XMLStreamReader;
 
 class FragmentReader extends StreamReaderDelegate {
 
-    XMLStreamReader delegate;
-    int depth;
-    int current = START_DOCUMENT;
-    int state = 0;
+    private final XMLStreamReader delegate;
+    private int depth;
+    private int current = START_DOCUMENT;
+    private int state = 0;
 
     FragmentReader(XMLStreamReader delegate) {
         this.delegate = delegate;
