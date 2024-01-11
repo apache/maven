@@ -312,7 +312,8 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
                 .setBaseDirectory(new File(""))
                 .setLocalRepository(repo);
 
-        DefaultRepositorySystemSession repositorySession = new DefaultRepositorySystemSession();
+        DefaultRepositorySystemSession repositorySession =
+                new DefaultRepositorySystemSession(h -> false); // no close handle
         repositorySession.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory()
                 .newInstance(repositorySession, new LocalRepository(repo.getUrl())));
         MavenSession session =
