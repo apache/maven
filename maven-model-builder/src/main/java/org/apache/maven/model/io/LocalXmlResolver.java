@@ -55,29 +55,30 @@ public class LocalXmlResolver implements XMLResolver {
         } catch (URISyntaxException e) {
             throw new XMLStreamException("Invalid syntax for baseURI URI: " + baseURI, e);
         }
-        URI sysUri;
+        URI systemIDUri;
         try {
-            sysUri = new URI(systemID).normalize();
+            systemIDUri = new URI(systemID).normalize();
         } catch (URISyntaxException e) {
             throw new XMLStreamException("Invalid syntax for systemID URI: " + systemID, e);
         }
-        if (sysUri.getScheme() != null) {
+        if (systemIDUri.getScheme() != null) {
             throw new XMLStreamException("systemID must be a relative URI: " + systemID);
         }
         Path base = Paths.get(baseUri).normalize();
         if (!base.startsWith(rootDirectory)) {
             return null;
         }
-        Path sys = Paths.get(sysUri.getSchemeSpecificPart()).normalize();
-        if (sys.isAbsolute()) {
+        Path systemIDPath = Paths.get(systemIDUri.getSchemeSpecificPart()).normalize();
+        if (systemIDPath.isAbsolute()) {
             throw new XMLStreamException("systemID must be a relative path: " + systemID);
         }
-        Path res = base.resolveSibling(sys).normalize();
-        if (!res.startsWith(rootDirectory)) {
-            throw new XMLStreamException("systemID cannot refer to outside rootDirectory: " + systemID);
+        Path resourcePath = base.resolveSibling(systemIDPath).normalize();
+        if (!resourcePath.startsWith(rootDirectory)) {
+            throw new XMLStreamException("systemID cannot refer to a path outside rootDirectory: " + systemID);
         }
         try {
-            return new StreamSource(Files.newInputStream(res), res.toUri().toASCIIString());
+            return new StreamSource(
+                    Files.newInputStream(resourcePath), resourcePath.toUri().toASCIIString());
         } catch (IOException e) {
             throw new XMLStreamException("Unable to create Source for " + systemID + ": " + e.getMessage(), e);
         }
