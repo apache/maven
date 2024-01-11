@@ -65,7 +65,10 @@ class LifecycleModuleBuilderTest {
         mavenExecutionRequest.setExecutionListener(new AbstractExecutionListener());
         mavenExecutionRequest.setGoals(Arrays.asList("clean"));
         final MavenSession session = new MavenSession(
-                null, new DefaultRepositorySystemSession(), mavenExecutionRequest, defaultMavenExecutionResult);
+                null,
+                new DefaultRepositorySystemSession(h -> false),
+                mavenExecutionRequest,
+                defaultMavenExecutionResult);
         final ProjectDependencyGraphStub dependencyGraphStub = new ProjectDependencyGraphStub();
         session.setProjectDependencyGraph(dependencyGraphStub);
         session.setProjects(dependencyGraphStub.getSortedProjects());
