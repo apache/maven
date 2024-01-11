@@ -49,7 +49,7 @@ class ConsoleMavenTransferListenerTest {
         endLatch = new CountDownLatch(size);
         Map<String, String> output = new ConcurrentHashMap<String, String>();
 
-        TransferListener listener = new MavenTransferListener(new ConsoleMavenTransferListener(
+        TransferListener listener = new SimplexTransferListener(new ConsoleMavenTransferListener(
                 new JLineMessageBuilderFactory(),
                 new PrintStream(System.out) {
 

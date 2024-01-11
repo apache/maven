@@ -41,19 +41,18 @@ import static java.util.Objects.requireNonNull;
  *
  * @since 4.0.0
  */
-public final class MavenTransferListener extends AbstractTransferListener {
+public final class SimplexTransferListener extends AbstractTransferListener {
     private static final int QUEUE_SIZE = 1024;
     private static final int BATCH_MAX_SIZE = 500;
     private final TransferListener delegate;
     private final int batchMaxSize;
     private final boolean blockOnLastEvent;
-    private final ArrayBlockingQueue<AsyncExchange> eventQueue;
-    private final Demuxer demuxer;
+    private final ArrayBlockingQueue<Exchange> eventQueue;
 
     /**
      * Constructor that makes passed in delegate run on single thread, and will block on last event.
      */
-    public MavenTransferListener(TransferListener delegate) {
+    public SimplexTransferListener(TransferListener delegate) {
         this(delegate, QUEUE_SIZE, BATCH_MAX_SIZE, true);
     }
 
@@ -65,7 +64,7 @@ public final class MavenTransferListener extends AbstractTransferListener {
      * @param batchMaxSize The maximum batch size delegate should receive (default {@code 500}).
      * @param blockOnLastEvent Should this listener block on last transfer end (completed or corrupted) block? (default {@code true}).
      */
-    public MavenTransferListener(TransferListener delegate, int queueSize, int batchMaxSize, boolean blockOnLastEvent) {
+    public SimplexTransferListener(TransferListener delegate, int queueSize, int batchMaxSize, boolean blockOnLastEvent) {
         this.delegate = requireNonNull(delegate);
         if (queueSize < 1 || batchMaxSize < 1) {
             throw new IllegalArgumentException("Queue and batch sizes must be greater than 1");
@@ -74,7 +73,6 @@ public final class MavenTransferListener extends AbstractTransferListener {
         this.blockOnLastEvent = blockOnLastEvent;
 
         this.eventQueue = new ArrayBlockingQueue<>(queueSize);
-        this.demuxer = new Demuxer(delegate);
         Thread updater = new Thread(this::feedConsumer);
         updater.setDaemon(true);
         updater.start();
@@ -85,14 +83,14 @@ public final class MavenTransferListener extends AbstractTransferListener {
     }
 
     private void feedConsumer() {
-        final ArrayList<AsyncExchange> batch = new ArrayList<>(batchMaxSize);
+        final ArrayList<Exchange> batch = new ArrayList<>(batchMaxSize);
         try {
             while (true) {
                 batch.clear();
                 if (eventQueue.drainTo(batch, BATCH_MAX_SIZE) == 0) {
                     batch.add(eventQueue.take());
                 }
-                demuxer.demux(batch);
+                demux(delegate, batch);
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -101,11 +99,11 @@ public final class MavenTransferListener extends AbstractTransferListener {
 
     private void put(TransferEvent event, boolean last) {
         try {
-            AsyncExchange exchange;
+            Exchange exchange;
             if (blockOnLastEvent && last) {
-                exchange = new SyncExchange(event);
+                exchange = new BlockingExchange(event);
             } else {
-                exchange = new AsyncExchange(event);
+                exchange = new Exchange(event);
             }
             eventQueue.put(exchange);
             exchange.waitForProcessed();
@@ -149,10 +147,10 @@ public final class MavenTransferListener extends AbstractTransferListener {
         put(event, ongoing.isEmpty());
     }
 
-    private static class AsyncExchange {
+    private static class Exchange {
         private final TransferEvent event;
 
-        private AsyncExchange(TransferEvent event) {
+        private Exchange(TransferEvent event) {
             this.event = event;
         }
 
@@ -165,10 +163,10 @@ public final class MavenTransferListener extends AbstractTransferListener {
         }
     }
 
-    private static class SyncExchange extends AsyncExchange {
+    private static class BlockingExchange extends Exchange {
         private final CountDownLatch latch = new CountDownLatch(1);
 
-        private SyncExchange(TransferEvent event) {
+        private BlockingExchange(TransferEvent event) {
             super(event);
         }
 
@@ -184,45 +182,37 @@ public final class MavenTransferListener extends AbstractTransferListener {
         }
     }
 
-    private static class Demuxer {
-        private final TransferListener delegate;
-
-        private Demuxer(TransferListener delegate) {
-            this.delegate = delegate;
-        }
-
-        public void demux(List<AsyncExchange> exchanges) {
-            for (AsyncExchange exchange : exchanges) {
-                exchange.process(transferEvent -> {
-                    TransferEvent.EventType type = transferEvent.getType();
-                    try {
-                        switch (type) {
-                            case INITIATED:
-                                delegate.transferInitiated(transferEvent);
-                                break;
-                            case STARTED:
-                                delegate.transferStarted(transferEvent);
-                                break;
-                            case PROGRESSED:
-                                delegate.transferProgressed(transferEvent);
-                                break;
-                            case CORRUPTED:
-                                delegate.transferCorrupted(transferEvent);
-                                break;
-                            case SUCCEEDED:
-                                delegate.transferSucceeded(transferEvent);
-                                break;
-                            case FAILED:
-                                delegate.transferFailed(transferEvent);
-                                break;
-                            default:
-                                throw new IllegalArgumentException("Type: " + type);
-                        }
-                    } catch (TransferCancelledException e) {
-                        // we do not cancel, ignore it
+    private static void demux(TransferListener delegate, List<Exchange> exchanges) {
+        for (Exchange exchange : exchanges) {
+            exchange.process(transferEvent -> {
+                TransferEvent.EventType type = transferEvent.getType();
+                try {
+                    switch (type) {
+                        case INITIATED:
+                            delegate.transferInitiated(transferEvent);
+                            break;
+                        case STARTED:
+                            delegate.transferStarted(transferEvent);
+                            break;
+                        case PROGRESSED:
+                            delegate.transferProgressed(transferEvent);
+                            break;
+                        case CORRUPTED:
+                            delegate.transferCorrupted(transferEvent);
+                            break;
+                        case SUCCEEDED:
+                            delegate.transferSucceeded(transferEvent);
+                            break;
+                        case FAILED:
+                            delegate.transferFailed(transferEvent);
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Type: " + type);
                     }
-                });
-            }
+                } catch (TransferCancelledException e) {
+                    // we do not cancel, ignore it
+                }
+            });
         }
     }
 }

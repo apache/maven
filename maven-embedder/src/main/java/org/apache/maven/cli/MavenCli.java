@@ -1676,7 +1676,7 @@ public class MavenCli {
     //
 
     protected TransferListener getConsoleTransferListener(boolean printResourceNames) {
-        return new MavenTransferListener(
+        return new SimplexTransferListener(
                 new ConsoleMavenTransferListener(messageBuilderFactory, System.out, printResourceNames));
     }
 
