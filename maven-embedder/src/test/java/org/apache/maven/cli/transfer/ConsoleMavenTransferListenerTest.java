@@ -72,7 +72,7 @@ class ConsoleMavenTransferListenerTest {
         TransferResource resource = new TransferResource(null, null, "http://maven.org/test/test-resource", null, null);
         resource.setContentLength(size - 1);
 
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false); // no close handle
 
         // warm up
         test(listener, session, resource, 0);
