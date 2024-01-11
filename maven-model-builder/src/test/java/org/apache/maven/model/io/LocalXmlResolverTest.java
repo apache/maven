@@ -90,7 +90,7 @@ public class LocalXmlResolverTest {
                 assertThrows(XMLStreamException.class, () -> new LocalXmlResolver(Paths.get("/users/base"))
                         .resolveEntity(null, "../../bar.xml", "file:/users/base/foo/pom.xml", null));
         assertTrue(
-                exception.getMessage().contains("systemID cannot refer to outside rootDirectory"),
+                exception.getMessage().contains("systemID cannot refer to a path outside rootDirectory"),
                 exception.getMessage());
     }
 
