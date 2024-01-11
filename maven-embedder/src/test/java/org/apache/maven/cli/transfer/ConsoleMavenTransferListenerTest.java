@@ -30,8 +30,8 @@ import org.apache.maven.cli.jline.JLineMessageBuilderFactory;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
+import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.aether.transfer.TransferResource;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +42,6 @@ class ConsoleMavenTransferListenerTest {
     private CountDownLatch endLatch;
 
     @Test
-    @Disabled
     void testTransferProgressedWithPrintResourceNames() throws FileNotFoundException, InterruptedException {
         int size = 1000;
         ExecutorService service = Executors.newFixedThreadPool(size * 2);
@@ -50,7 +49,7 @@ class ConsoleMavenTransferListenerTest {
         endLatch = new CountDownLatch(size);
         Map<String, String> output = new ConcurrentHashMap<String, String>();
 
-        ConsoleMavenTransferListener listener = new ConsoleMavenTransferListener(
+        TransferListener listener = new MavenTransferListener(new ConsoleMavenTransferListener(
                 new JLineMessageBuilderFactory(),
                 new PrintStream(System.out) {
 
@@ -70,7 +69,7 @@ class ConsoleMavenTransferListenerTest {
                         System.out.print(o);
                     }
                 },
-                true);
+                true));
         TransferResource resource = new TransferResource(null, null, "http://maven.org/test/test-resource", null, null);
         resource.setContentLength(size - 1);
 
@@ -115,11 +114,12 @@ class ConsoleMavenTransferListenerTest {
     }
 
     private void test(
-            ConsoleMavenTransferListener listener,
+            TransferListener listener,
             DefaultRepositorySystemSession session,
             TransferResource resource,
             final int bytes) {
         TransferEvent event = new TransferEvent.Builder(session, resource)
+                .setType(TransferEvent.EventType.PROGRESSED)
                 .setTransferredBytes(bytes)
                 .build();
         startLatch.countDown();

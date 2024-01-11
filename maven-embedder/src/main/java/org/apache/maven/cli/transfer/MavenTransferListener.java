@@ -35,32 +35,57 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * A {@link TransferListener} implementation that wraps another delegate {@link TransferListener} but makes it run
- * on single thread, keeping the listener logic simple.
+ * on single thread, keeping the listener logic simple. This listener also blocks on last transfer event to allow
+ * output to perform possible cleanup. It spawns a daemon thread to consume queued events that may fall in even
+ * concurrently.
  *
  * @since 4.0.0
  */
 public final class MavenTransferListener extends AbstractTransferListener {
     private static final int QUEUE_SIZE = 1024;
     private static final int BATCH_MAX_SIZE = 500;
-    private final TransferListener transferListener;
+    private final TransferListener delegate;
+    private final int batchMaxSize;
+    private final boolean blockOnLastEvent;
     private final ArrayBlockingQueue<AsyncExchange> eventQueue;
     private final Demuxer demuxer;
 
-    public MavenTransferListener(TransferListener transferListener) {
-        this.transferListener = requireNonNull(transferListener);
-        this.eventQueue = new ArrayBlockingQueue<>(QUEUE_SIZE);
-        this.demuxer = new Demuxer(transferListener);
+    /**
+     * Constructor that makes passed in delegate run on single thread, and will block on last event.
+     */
+    public MavenTransferListener(TransferListener delegate) {
+        this(delegate, QUEUE_SIZE, BATCH_MAX_SIZE, true);
+    }
+
+    /**
+     * Constructor that may alter behaviour of this listener.
+     *
+     * @param delegate The delegate that should run on single thread.
+     * @param queueSize The event queue size (default {@code 1024}).
+     * @param batchMaxSize The maximum batch size delegate should receive (default {@code 500}).
+     * @param blockOnLastEvent Should this listener block on last transfer end (completed or corrupted) block? (default {@code true}).
+     */
+    public MavenTransferListener(TransferListener delegate, int queueSize, int batchMaxSize, boolean blockOnLastEvent) {
+        this.delegate = requireNonNull(delegate);
+        if (queueSize < 1 || batchMaxSize < 1) {
+            throw new IllegalArgumentException("Queue and batch sizes must be greater than 1");
+        }
+        this.batchMaxSize = batchMaxSize;
+        this.blockOnLastEvent = blockOnLastEvent;
+
+        this.eventQueue = new ArrayBlockingQueue<>(queueSize);
+        this.demuxer = new Demuxer(delegate);
         Thread updater = new Thread(this::feedConsumer);
         updater.setDaemon(true);
         updater.start();
     }
 
-    public TransferListener getTransferListener() {
-        return transferListener;
+    public TransferListener getDelegate() {
+        return delegate;
     }
 
     private void feedConsumer() {
-        final ArrayList<AsyncExchange> batch = new ArrayList<>(BATCH_MAX_SIZE);
+        final ArrayList<AsyncExchange> batch = new ArrayList<>(batchMaxSize);
         try {
             while (true) {
                 batch.clear();
@@ -77,7 +102,7 @@ public final class MavenTransferListener extends AbstractTransferListener {
     private void put(TransferEvent event, boolean last) {
         try {
             AsyncExchange exchange;
-            if (last) {
+            if (blockOnLastEvent && last) {
                 exchange = new SyncExchange(event);
             } else {
                 exchange = new AsyncExchange(event);
