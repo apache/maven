@@ -18,7 +18,7 @@
  */
 package org.apache.maven.cli.transfer;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,7 +42,7 @@ class ConsoleMavenTransferListenerTest {
     private CountDownLatch endLatch;
 
     @Test
-    void testTransferProgressedWithPrintResourceNames() throws FileNotFoundException, InterruptedException {
+    void testTransferProgressedWithPrintResourceNames() throws Exception {
         int size = 1000;
         ExecutorService service = Executors.newFixedThreadPool(size * 2);
         startLatch = new CountDownLatch(size);
@@ -70,7 +70,8 @@ class ConsoleMavenTransferListenerTest {
                     }
                 },
                 true));
-        TransferResource resource = new TransferResource(null, null, "http://maven.org/test/test-resource", null, null);
+        TransferResource resource =
+                new TransferResource(null, null, "http://maven.org/test/test-resource", new File(""), null);
         resource.setContentLength(size - 1);
 
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false); // no close handle

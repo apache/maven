@@ -30,6 +30,8 @@ import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -42,6 +44,7 @@ import static java.util.Objects.requireNonNull;
  * @since 4.0.0
  */
 public final class SimplexTransferListener extends AbstractTransferListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimplexTransferListener.class);
     private static final int QUEUE_SIZE = 1024;
     private static final int BATCH_MAX_SIZE = 500;
     private final TransferListener delegate;
@@ -98,6 +101,40 @@ public final class SimplexTransferListener extends AbstractTransferListener {
         }
     }
 
+    private void demux(List<Exchange> exchanges) {
+        for (Exchange exchange : exchanges) {
+            exchange.process(transferEvent -> {
+                TransferEvent.EventType type = transferEvent.getType();
+                try {
+                    switch (type) {
+                        case INITIATED:
+                            delegate.transferInitiated(transferEvent);
+                            break;
+                        case STARTED:
+                            delegate.transferStarted(transferEvent);
+                            break;
+                        case PROGRESSED:
+                            delegate.transferProgressed(transferEvent);
+                            break;
+                        case CORRUPTED:
+                            delegate.transferCorrupted(transferEvent);
+                            break;
+                        case SUCCEEDED:
+                            delegate.transferSucceeded(transferEvent);
+                            break;
+                        case FAILED:
+                            delegate.transferFailed(transferEvent);
+                            break;
+                        default:
+                            LOGGER.warn("Invalid TransferEvent.EventType={}; ignoring it", type);
+                    }
+                } catch (TransferCancelledException e) {
+                    ongoing.put(transferEvent.getResource().getFile(), Boolean.FALSE);
+                }
+            });
+        }
+    }
+
     private void put(TransferEvent event, boolean last) {
         try {
             Exchange exchange;
@@ -122,17 +159,26 @@ public final class SimplexTransferListener extends AbstractTransferListener {
     }
 
     @Override
-    public void transferStarted(TransferEvent event) {
+    public void transferStarted(TransferEvent event) throws TransferCancelledException {
+        if (ongoing.get(event.getResource().getFile()) == Boolean.FALSE) {
+            throw new TransferCancelledException();
+        }
         put(event, false);
     }
 
     @Override
-    public void transferProgressed(TransferEvent event) {
+    public void transferProgressed(TransferEvent event) throws TransferCancelledException {
+        if (ongoing.get(event.getResource().getFile()) == Boolean.FALSE) {
+            throw new TransferCancelledException();
+        }
         put(event, false);
     }
 
     @Override
-    public void transferCorrupted(TransferEvent event) {
+    public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
+        if (ongoing.get(event.getResource().getFile()) == Boolean.FALSE) {
+            throw new TransferCancelledException();
+        }
         put(event, false);
     }
 
@@ -180,40 +226,6 @@ public final class SimplexTransferListener extends AbstractTransferListener {
         @Override
         public void waitForProcessed() throws InterruptedException {
             latch.await();
-        }
-    }
-
-    private void demux(List<Exchange> exchanges) {
-        for (Exchange exchange : exchanges) {
-            exchange.process(transferEvent -> {
-                TransferEvent.EventType type = transferEvent.getType();
-                try {
-                    switch (type) {
-                        case INITIATED:
-                            delegate.transferInitiated(transferEvent);
-                            break;
-                        case STARTED:
-                            delegate.transferStarted(transferEvent);
-                            break;
-                        case PROGRESSED:
-                            delegate.transferProgressed(transferEvent);
-                            break;
-                        case CORRUPTED:
-                            delegate.transferCorrupted(transferEvent);
-                            break;
-                        case SUCCEEDED:
-                            delegate.transferSucceeded(transferEvent);
-                            break;
-                        case FAILED:
-                            delegate.transferFailed(transferEvent);
-                            break;
-                        default:
-                            throw new IllegalArgumentException("Type: " + type);
-                    }
-                } catch (TransferCancelledException e) {
-                    // we do not cancel, ignore it
-                }
-            });
         }
     }
 }
