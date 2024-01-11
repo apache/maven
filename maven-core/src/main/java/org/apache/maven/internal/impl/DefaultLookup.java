@@ -24,6 +24,8 @@ import javax.inject.Singleton;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
@@ -55,6 +57,30 @@ public class DefaultLookup implements Lookup {
         try {
             return container.lookup(type, name);
         } catch (ComponentLookupException e) {
+            throw new LookupException(e);
+        }
+    }
+
+    @Override
+    public <T> Optional<T> lookupOptional(Class<T> type) {
+        try {
+            return Optional.of(container.lookup(type));
+        } catch (ComponentLookupException e) {
+            if (e.getCause() instanceof NoSuchElementException) {
+                return Optional.empty();
+            }
+            throw new LookupException(e);
+        }
+    }
+
+    @Override
+    public <T> Optional<T> lookupOptional(Class<T> type, String name) {
+        try {
+            return Optional.of(container.lookup(type, name));
+        } catch (ComponentLookupException e) {
+            if (e.getCause() instanceof NoSuchElementException) {
+                return Optional.empty();
+            }
             throw new LookupException(e);
         }
     }

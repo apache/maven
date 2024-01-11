@@ -40,6 +40,8 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * <p>
  * Calculates the task segments in the build
@@ -62,6 +64,7 @@ public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegme
         this.lifecyclePluginResolver = lifecyclePluginResolver;
     }
 
+    @Override
     public List<TaskSegment> calculateTaskSegments(MavenSession session)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
                     MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
@@ -69,9 +72,9 @@ public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegme
 
         MavenProject rootProject = session.getTopLevelProject();
 
-        List<String> tasks = session.getGoals();
+        List<String> tasks = requireNonNull(session.getGoals()); // session never returns null, but empty list
 
-        if ((tasks == null || tasks.isEmpty())
+        if (tasks.isEmpty()
                 && (rootProject.getDefaultGoal() != null
                         && !rootProject.getDefaultGoal().isEmpty())) {
             tasks = Stream.of(rootProject.getDefaultGoal().split("\\s+"))
@@ -82,6 +85,7 @@ public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegme
         return calculateTaskSegments(session, tasks);
     }
 
+    @Override
     public List<TaskSegment> calculateTaskSegments(MavenSession session, List<String> tasks)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
                     MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
@@ -122,6 +126,7 @@ public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegme
         return taskSegments;
     }
 
+    @Override
     public boolean requiresProject(MavenSession session) {
         List<String> goals = session.getGoals();
         if (goals != null) {

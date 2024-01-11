@@ -36,10 +36,12 @@ import org.apache.maven.plugin.MojoExecution;
 @Singleton
 public class DefaultExecutionEventCatapult implements ExecutionEventCatapult {
 
+    @Override
     public void fire(ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution) {
         fire(eventType, session, mojoExecution, null);
     }
 
+    @Override
     public void fire(
             ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution, Exception exception) {
         ExecutionListener listener = session.getRequest().getExecutionListener();

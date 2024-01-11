@@ -16,13 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.slf4j.impl;
+package org.apache.maven.slf4j;
 
 import java.util.Optional;
 
 import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.slf4j.Logger;
+import org.slf4j.simple.SimpleLoggerFactory;
 
 /**
  * LogFactory for Maven which can create a simple logger or one which, if set, fails the build on a severity threshold.
@@ -30,13 +31,15 @@ import org.slf4j.Logger;
 public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4jWrapperFactory {
     private LogLevelRecorder logLevelRecorder = null;
 
+    public MavenLoggerFactory() {}
+
     @Override
     public void setLogLevelRecorder(LogLevelRecorder logLevelRecorder) {
         if (this.logLevelRecorder != null) {
             throw new IllegalStateException("LogLevelRecorder has already been set.");
         }
-
         this.logLevelRecorder = logLevelRecorder;
+        reset();
     }
 
     @Override
@@ -44,15 +47,7 @@ public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4
         return Optional.ofNullable(logLevelRecorder);
     }
 
-    /**
-     * Return an appropriate {@link MavenSimpleLogger} instance by name.
-     */
-    @Override
-    public Logger getLogger(String name) {
-        return loggerMap.computeIfAbsent(name, this::getNewLoggingInstance);
-    }
-
-    private Logger getNewLoggingInstance(String name) {
+    protected Logger createLogger(String name) {
         if (logLevelRecorder == null) {
             return new MavenSimpleLogger(name);
         } else {

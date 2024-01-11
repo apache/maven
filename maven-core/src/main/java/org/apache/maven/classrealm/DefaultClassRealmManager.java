@@ -36,10 +36,9 @@ import java.util.TreeMap;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.extension.internal.CoreExports;
+import org.apache.maven.internal.CoreRealm;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.codehaus.plexus.MutablePlexusContainer;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -87,9 +86,9 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
     @Inject
     public DefaultClassRealmManager(
-            PlexusContainer container, List<ClassRealmManagerDelegate> delegates, CoreExports exports) {
-        this.world = ((MutablePlexusContainer) container).getClassWorld();
-        this.containerRealm = container.getContainerRealm();
+            CoreRealm coreRealm, List<ClassRealmManagerDelegate> delegates, CoreExports exports) {
+        this.world = coreRealm.getClassWorld();
+        this.containerRealm = coreRealm.getRealm();
         this.delegates = delegates;
 
         Map<String, ClassLoader> foreignImports = exports.getExportedPackages();

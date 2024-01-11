@@ -372,7 +372,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
 
         LifecycleTask task = new LifecycleTask("generate-sources");
         MavenExecutionPlan executionPlan = lifeCycleExecutionPlanCalculator.calculateExecutionPlan(
-                session, session.getCurrentProject(), Arrays.asList((Object) task), false);
+                session, session.getCurrentProject(), Arrays.asList(task), false);
 
         MojoExecution execution = executionPlan.getMojoExecutions().get(0);
         assertEquals("maven-it-plugin", execution.getArtifactId(), execution.toString());

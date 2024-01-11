@@ -35,7 +35,6 @@ import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.*;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.sisu.Typed;
 
 import static org.apache.maven.internal.impl.Utils.map;
@@ -47,13 +46,11 @@ public class DefaultProjectManager implements ProjectManager {
 
     private final InternalSession session;
     private final ArtifactManager artifactManager;
-    private final PlexusContainer container;
 
     @Inject
-    public DefaultProjectManager(InternalSession session, ArtifactManager artifactManager, PlexusContainer container) {
+    public DefaultProjectManager(InternalSession session, ArtifactManager artifactManager) {
         this.session = session;
         this.artifactManager = artifactManager;
-        this.container = container;
     }
 
     @Nonnull

@@ -33,7 +33,7 @@ public final class TaskSegment {
 
     // Can be both "LifeCycleTask" (clean/install) and "GoalTask" (org.mortbay.jetty:maven-jetty-plugin:6.1.19:run)
 
-    private final List<Object> tasks;
+    private final List<Task> tasks;
 
     private final boolean aggregating;
 
@@ -42,7 +42,7 @@ public final class TaskSegment {
         tasks = new ArrayList<>();
     }
 
-    public TaskSegment(boolean aggregating, Object... tasks) {
+    public TaskSegment(boolean aggregating, Task... tasks) {
         this.aggregating = aggregating;
         this.tasks = new ArrayList<>(Arrays.asList(tasks));
     }
@@ -52,7 +52,7 @@ public final class TaskSegment {
         return getTasks().toString();
     }
 
-    public List<Object> getTasks() {
+    public List<Task> getTasks() {
         return tasks;
     }
 

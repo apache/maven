@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.slf4j.impl;
+package org.apache.maven.slf4j;
 
 import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.slf4j.event.Level;

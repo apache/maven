@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -41,7 +42,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
-import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
@@ -504,11 +504,11 @@ class ReactorReader implements MavenWorkspaceReader {
     @SuppressWarnings("unused")
     static class ReactorReaderSpy implements EventSpy {
 
-        final PlexusContainer container;
+        private final Lookup lookup;
 
         @Inject
-        ReactorReaderSpy(PlexusContainer container) {
-            this.container = container;
+        ReactorReaderSpy(Lookup lookup) {
+            this.lookup = lookup;
         }
 
         @Override
@@ -518,7 +518,7 @@ class ReactorReader implements MavenWorkspaceReader {
         @SuppressWarnings("checkstyle:MissingSwitchDefault")
         public void onEvent(Object event) throws Exception {
             if (event instanceof ExecutionEvent) {
-                ReactorReader reactorReader = container.lookup(ReactorReader.class);
+                ReactorReader reactorReader = lookup.lookup(ReactorReader.class);
                 reactorReader.processEvent((ExecutionEvent) event);
             }
         }

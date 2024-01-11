@@ -35,7 +35,6 @@ import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.session.scope.internal.SessionScope;
 
 /**
  * <p>
@@ -54,7 +53,6 @@ public class LifecycleModuleBuilder {
     private final ExecutionEventCatapult eventCatapult;
     private final ProjectExecutionListener projectExecutionListener;
     private final ConsumerPomArtifactTransformer consumerPomArtifactTransformer;
-    private final SessionScope sessionScope;
 
     @Inject
     public LifecycleModuleBuilder(
@@ -62,14 +60,12 @@ public class LifecycleModuleBuilder {
             BuilderCommon builderCommon,
             ExecutionEventCatapult eventCatapult,
             List<ProjectExecutionListener> listeners,
-            ConsumerPomArtifactTransformer consumerPomArtifactTransformer,
-            SessionScope sessionScope) {
+            ConsumerPomArtifactTransformer consumerPomArtifactTransformer) {
         this.mojoExecutor = mojoExecutor;
         this.builderCommon = builderCommon;
         this.eventCatapult = eventCatapult;
         this.projectExecutionListener = new CompoundProjectExecutionListener(listeners);
         this.consumerPomArtifactTransformer = consumerPomArtifactTransformer;
-        this.sessionScope = sessionScope;
     }
 
     public void buildProject(

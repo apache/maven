@@ -44,10 +44,7 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.AbstractSession;
-import org.apache.maven.internal.impl.DefaultMojoExecution;
-import org.apache.maven.internal.impl.DefaultProject;
-import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.*;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
@@ -394,8 +391,8 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         mavenSession.getRequest().setRootDirectory(rootDirectory);
         mavenSession.getRequest().setTopDirectory(rootDirectory);
 
-        DefaultSession session =
-                new DefaultSession(mavenSession, mock(RepositorySystem.class), null, null, container, null);
+        DefaultSession session = new DefaultSession(
+                mavenSession, mock(RepositorySystem.class), null, null, new DefaultLookup(container), null);
 
         MojoExecution mojoExecution = newMojoExecution(session);
 
@@ -434,8 +431,8 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     private DefaultSession newSession() throws Exception {
-        DefaultSession session =
-                new DefaultSession(newMavenSession(), mock(RepositorySystem.class), null, null, container, null);
+        DefaultSession session = new DefaultSession(
+                newMavenSession(), mock(RepositorySystem.class), null, null, new DefaultLookup(container), null);
         return session;
     }
 

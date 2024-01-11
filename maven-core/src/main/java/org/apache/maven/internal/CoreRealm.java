@@ -16,17 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.lifecycle.internal;
+package org.apache.maven.internal;
+
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
- * A task that is a lifecycle.
- * <p>
- * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
+ * Access to core {@link ClassRealm}.
  *
- * @since 3.0
+ * @since 4.0.0
  */
-public final class LifecycleTask extends Task {
-    public LifecycleTask(String lifecyclePhase) {
-        super(lifecyclePhase);
+@Experimental
+public interface CoreRealm {
+
+    /**
+     * Obtain the {@link ClassRealm} used for Maven Core.
+     *
+     * @return the class realm of core.
+     */
+    @Nonnull
+    ClassRealm getRealm();
+
+    /**
+     * Shorthand method to obtain the {@link ClassWorld} used for Maven Core.
+     *
+     * @return the class world in use.
+     */
+    @Nonnull
+    default ClassWorld getClassWorld() {
+        return getRealm().getWorld();
     }
 }
