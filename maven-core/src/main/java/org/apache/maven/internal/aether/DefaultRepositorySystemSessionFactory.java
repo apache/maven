@@ -71,6 +71,7 @@ import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.util.graph.version.*;
+import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
@@ -129,6 +130,19 @@ public class DefaultRepositorySystemSessionFactory {
      * @since 3.9.0
      */
     private static final String MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE = "maven.repo.local.recordReverseTree";
+
+    /**
+     * User property for selecting dependency manager behaviour regarding transitive dependencies and dependency
+     * management entries in their POMs. Maven 3 targeted full backward compatibility with Maven2, hence it ignored
+     * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default, hence
+     * unlike Maven2, obeys dependency management entries deep in dependency graph as well.
+     * <p>
+     * Default: {@code "true"}.
+     *
+     * @since 4.0.0
+     */
+    private static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY =
+            "maven.resolver.dependencyManagerTransitivity";
 
     private static final String MAVEN_RESOLVER_TRANSPORT_KEY = "maven.resolver.transport";
 
@@ -429,6 +443,11 @@ public class DefaultRepositorySystemSessionFactory {
         injectMirror(request.getPluginArtifactRepositories(), request.getMirrors());
         injectProxy(proxySelector, request.getPluginArtifactRepositories());
         injectAuthentication(authSelector, request.getPluginArtifactRepositories());
+
+        String resolverDependencyManagerTransitivity = (String)
+                configProps.getOrDefault(MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY, Boolean.TRUE.toString());
+        session.setDependencyManager(
+                new ClassicDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 
         ArrayList<File> paths = new ArrayList<>();
         paths.add(new File(request.getLocalRepository().getBasedir()));
