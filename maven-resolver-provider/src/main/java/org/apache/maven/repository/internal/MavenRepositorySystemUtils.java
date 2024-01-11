@@ -63,7 +63,7 @@ public final class MavenRepositorySystemUtils {
      */
     @Deprecated
     public static DefaultRepositorySystemSession newSession() {
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false); // no close handle
 
         DependencyTraverser depTraverser = new FatArtifactTraverser();
         session.setDependencyTraverser(depTraverser);
