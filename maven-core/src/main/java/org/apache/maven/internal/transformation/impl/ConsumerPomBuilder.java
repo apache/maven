@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
@@ -36,5 +35,5 @@ import org.eclipse.aether.RepositorySystemSession;
 interface ConsumerPomBuilder {
 
     Model build(RepositorySystemSession session, MavenProject project, Path src)
-            throws ModelBuildingException, ComponentLookupException, IOException, XMLStreamException;
+            throws ModelBuildingException, IOException, XMLStreamException;
 }

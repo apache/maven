@@ -231,7 +231,7 @@ public class MojoDescriptorCreator {
         }
 
         return pluginManager.getMojoDescriptor(
-                plugin, goal.toString(), project.getRemotePluginRepositories(), session.getRepositorySession());
+                plugin, goal, project.getRemotePluginRepositories(), session.getRepositorySession());
     }
 
     // TODO take repo mans into account as one may be aggregating prefixes of many

@@ -16,17 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.lifecycle.internal;
+package org.slf4j.simple;
+
+import org.slf4j.ILoggerFactory;
+import org.slf4j.LoggerFactory;
 
 /**
- * A task that is a lifecycle.
- * <p>
- * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
- *
- * @since 3.0
+ * Utility for Maven to access Slf4j-Simple internals through package access.
+ * Use with precaution, since this is not normally intended for production use.
  */
-public final class LifecycleTask extends Task {
-    public LifecycleTask(String lifecyclePhase) {
-        super(lifecyclePhase);
+public class MavenSlf4jSimpleFriend {
+    public static void init() {
+        SimpleLogger.init();
+        ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
+        if (loggerFactory instanceof SimpleLoggerFactory) {
+            ((SimpleLoggerFactory) loggerFactory).reset();
+        }
     }
 }

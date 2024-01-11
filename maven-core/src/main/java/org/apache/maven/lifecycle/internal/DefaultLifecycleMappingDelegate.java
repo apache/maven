@@ -60,6 +60,7 @@ public class DefaultLifecycleMappingDelegate implements LifecycleMappingDelegate
         this.pluginManager = pluginManager;
     }
 
+    @Override
     public Map<String, List<MojoExecution>> calculateLifecycleMappings(
             MavenSession session, MavenProject project, Lifecycle lifecycle, String lifecyclePhase)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,

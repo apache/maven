@@ -45,6 +45,7 @@ import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.InternalSession;
@@ -83,6 +84,7 @@ import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.ExtensionDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
@@ -450,8 +452,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                                     }
                                 }
                             },
-                            new SessionScopeModule(container),
-                            new MojoExecutionScopeModule(container),
+                            new SessionScopeModule(container.lookup(SessionScope.class)),
+                            new MojoExecutionScopeModule(container.lookup(MojoExecutionScope.class)),
                             new PluginConfigurationModule(plugin.getDelegate()));
         } catch (ComponentLookupException | CycleDetectedInComponentGraphException e) {
             throw new PluginContainerException(

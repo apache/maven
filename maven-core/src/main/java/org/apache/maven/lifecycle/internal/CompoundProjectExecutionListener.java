@@ -31,24 +31,28 @@ class CompoundProjectExecutionListener implements ProjectExecutionListener {
         this.listeners = listeners; // NB this is live injected collection
     }
 
+    @Override
     public void beforeProjectExecution(ProjectExecutionEvent event) throws LifecycleExecutionException {
         for (ProjectExecutionListener listener : listeners) {
             listener.beforeProjectExecution(event);
         }
     }
 
+    @Override
     public void beforeProjectLifecycleExecution(ProjectExecutionEvent event) throws LifecycleExecutionException {
         for (ProjectExecutionListener listener : listeners) {
             listener.beforeProjectLifecycleExecution(event);
         }
     }
 
+    @Override
     public void afterProjectExecutionSuccess(ProjectExecutionEvent event) throws LifecycleExecutionException {
         for (ProjectExecutionListener listener : listeners) {
             listener.afterProjectExecutionSuccess(event);
         }
     }
 
+    @Override
     public void afterProjectExecutionFailure(ProjectExecutionEvent event) {
         for (ProjectExecutionListener listener : listeners) {
             listener.afterProjectExecutionFailure(event);

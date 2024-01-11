@@ -41,7 +41,6 @@ import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.v4.MavenStaxWriter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -113,7 +112,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
     }
 
     void transform(MavenProject project, RepositorySystemSession session, Path src, Path tgt)
-            throws ModelBuildingException, ComponentLookupException, XMLStreamException, IOException {
+            throws ModelBuildingException, XMLStreamException, IOException {
         Model model = builder.build(session, project, src);
         write(model, tgt);
     }

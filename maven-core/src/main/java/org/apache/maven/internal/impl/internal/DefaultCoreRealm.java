@@ -16,21 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.slf4j.impl;
+package org.apache.maven.internal.impl.internal;
 
-import org.slf4j.ILoggerFactory;
-import org.slf4j.LoggerFactory;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-/**
- * Utility for Maven to access Slf4j-Simple internals through package access.
- * Use with precaution, since this is not normally intended for production use.
- */
-public class MavenSlf4jSimpleFriend {
-    public static void init() {
-        SimpleLogger.init();
-        ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
-        if (loggerFactory instanceof SimpleLoggerFactory) {
-            ((SimpleLoggerFactory) loggerFactory).reset();
-        }
+import org.apache.maven.internal.CoreRealm;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+
+@Named
+@Singleton
+public class DefaultCoreRealm implements CoreRealm {
+
+    private final PlexusContainer container;
+
+    @Inject
+    public DefaultCoreRealm(PlexusContainer container) {
+        this.container = container;
+    }
+
+    @Override
+    public ClassRealm getRealm() {
+        return container.getContainerRealm();
     }
 }
