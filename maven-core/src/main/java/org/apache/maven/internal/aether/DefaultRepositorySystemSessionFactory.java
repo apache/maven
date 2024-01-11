@@ -93,7 +93,7 @@ import org.slf4j.LoggerFactory;
 @Named
 public class DefaultRepositorySystemSessionFactory {
     /**
-     * User property for version filters expression, a comma separated list of filters to apply. By default no version
+     * User property for version filters expression, a semicolon separated list of filters to apply. By default, no version
      * filter is applied (like in Maven 3).
      * <p>
      * Supported filters:
@@ -103,7 +103,7 @@ public class DefaultRepositorySystemSessionFactory {
      *     <li>"s" - contextual snapshot filter</li>
      *     <li>"e(G:A:V)" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li>
      * </ul>
-     * Example filter expression: {@code "h(5),s,e(org.foo:bar:1)} will cause: ranges are filtered for "top 5" (instead
+     * Example filter expression: {@code "h(5);s;e(org.foo:bar:1)} will cause: ranges are filtered for "top 5" (instead
      * full range), snapshots are banned if root project is not a snapshot, and if range for {@code org.foo:bar} is
      * being processed, version 1 is omitted.
      *
@@ -448,7 +448,7 @@ public class DefaultRepositorySystemSessionFactory {
         ArrayList<VersionFilter> filters = new ArrayList<>();
         String filterExpression = (String) configProps.get(MAVEN_VERSION_FILTERS);
         if (filterExpression != null) {
-            List<String> expressions = Arrays.stream(filterExpression.split(","))
+            List<String> expressions = Arrays.stream(filterExpression.split(";"))
                     .filter(s -> s != null && !s.trim().isEmpty())
                     .collect(Collectors.toList());
             for (String expression : expressions) {
