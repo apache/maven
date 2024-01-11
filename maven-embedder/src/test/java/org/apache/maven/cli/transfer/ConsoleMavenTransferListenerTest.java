@@ -101,6 +101,12 @@ class ConsoleMavenTransferListenerTest {
             e.printStackTrace();
         }
 
+        // despite all are back, we need to make sure all the events are processed (are async)
+        // this one should block until all processed
+        listener.transferSucceeded(new TransferEvent.Builder(session, resource)
+                .setType(TransferEvent.EventType.SUCCEEDED)
+                .build());
+
         StringBuilder message = new StringBuilder("Messages [");
         boolean test = true;
         for (int i = 0; i < 999; i++) {
