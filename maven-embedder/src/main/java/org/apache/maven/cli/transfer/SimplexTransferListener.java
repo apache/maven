@@ -64,7 +64,8 @@ public final class SimplexTransferListener extends AbstractTransferListener {
      * @param batchMaxSize The maximum batch size delegate should receive (default {@code 500}).
      * @param blockOnLastEvent Should this listener block on last transfer end (completed or corrupted) block? (default {@code true}).
      */
-    public SimplexTransferListener(TransferListener delegate, int queueSize, int batchMaxSize, boolean blockOnLastEvent) {
+    public SimplexTransferListener(
+            TransferListener delegate, int queueSize, int batchMaxSize, boolean blockOnLastEvent) {
         this.delegate = requireNonNull(delegate);
         if (queueSize < 1 || batchMaxSize < 1) {
             throw new IllegalArgumentException("Queue and batch sizes must be greater than 1");
@@ -90,7 +91,7 @@ public final class SimplexTransferListener extends AbstractTransferListener {
                 if (eventQueue.drainTo(batch, BATCH_MAX_SIZE) == 0) {
                     batch.add(eventQueue.take());
                 }
-                demux(delegate, batch);
+                demux(batch);
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -182,7 +183,7 @@ public final class SimplexTransferListener extends AbstractTransferListener {
         }
     }
 
-    private static void demux(TransferListener delegate, List<Exchange> exchanges) {
+    private void demux(List<Exchange> exchanges) {
         for (Exchange exchange : exchanges) {
             exchange.process(transferEvent -> {
                 TransferEvent.EventType type = transferEvent.getType();
