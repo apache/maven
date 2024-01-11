@@ -240,7 +240,7 @@ public class DefaultRepositorySystemSessionFactory {
         session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
                 request.isIgnoreMissingArtifactDescriptor(), request.isIgnoreInvalidArtifactDescriptor()));
 
-        VersionFilter versionFilter = buildVersionFilter(configProps);
+        VersionFilter versionFilter = buildVersionFilter((String) configProps.get(MAVEN_VERSION_FILTERS));
         if (versionFilter != null) {
             session.setVersionFilter(versionFilter);
         }
@@ -444,9 +444,8 @@ public class DefaultRepositorySystemSessionFactory {
         return session;
     }
 
-    private VersionFilter buildVersionFilter(Map<Object, Object> configProps) {
+    private VersionFilter buildVersionFilter(String filterExpression) {
         ArrayList<VersionFilter> filters = new ArrayList<>();
-        String filterExpression = (String) configProps.get(MAVEN_VERSION_FILTERS);
         if (filterExpression != null) {
             List<String> expressions = Arrays.stream(filterExpression.split(";"))
                     .filter(s -> s != null && !s.trim().isEmpty())
@@ -593,7 +592,7 @@ public class DefaultRepositorySystemSessionFactory {
         return null;
     }
 
-    public void injectAuthentication(AuthenticationSelector selector, List<ArtifactRepository> repositories) {
+    private void injectAuthentication(AuthenticationSelector selector, List<ArtifactRepository> repositories) {
         if (repositories != null && selector != null) {
             for (ArtifactRepository repository : repositories) {
                 repository.setAuthentication(getAuthentication(selector, repository));

@@ -41,15 +41,14 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.util.graph.version.*;
 import org.eclipse.aether.version.VersionScheme;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * UT for {@link DefaultRepositorySystemSessionFactory}.
@@ -406,6 +405,66 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 "Unknown resolver transport 'illegal'. Supported transports are: wagon, apache, jdk, auto",
                 exception.getMessage());
         properties.remove("maven.resolver.transport");
+    }
+
+    @Test
+    void versionFilteringTest() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                artifactHandlerManager,
+                aetherRepositorySystem,
+                null,
+                settingsDecrypter,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme);
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        VersionFilter versionFilter;
+
+        // single one
+        request.getUserProperties().put("maven.versionFilters", "s");
+        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
+        assertNotNull(versionFilter);
+        assertTrue(versionFilter instanceof ContextualSnapshotVersionFilter);
+
+        request.getUserProperties().put("maven.versionFilters", "h");
+        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
+        assertNotNull(versionFilter);
+        assertTrue(versionFilter instanceof HighestVersionFilter);
+
+        request.getUserProperties().put("maven.versionFilters", "h(5)");
+        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
+        assertNotNull(versionFilter);
+        assertTrue(versionFilter instanceof HighestVersionFilter);
+
+        request.getUserProperties().put("maven.versionFilters", "l");
+        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
+        assertNotNull(versionFilter);
+        assertTrue(versionFilter instanceof LowestVersionFilter);
+
+        request.getUserProperties().put("maven.versionFilters", "l(5)");
+        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
+        assertNotNull(versionFilter);
+        assertTrue(versionFilter instanceof LowestVersionFilter);
+
+        request.getUserProperties().put("maven.versionFilters", "e(g:a:v)");
+        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
+        assertNotNull(versionFilter);
+        assertTrue(versionFilter instanceof PredicateVersionFilter);
+
+        request.getUserProperties().put("maven.versionFilters", "e(g:a:[1,2])");
+        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
+        assertNotNull(versionFilter);
+        assertTrue(versionFilter instanceof PredicateVersionFilter);
+
+        // chained
+        request.getUserProperties().put("maven.versionFilters", "h(5);s;e(org.foo:bar:1)");
+        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
+        assertNotNull(versionFilter);
+        assertTrue(versionFilter instanceof ChainedVersionFilter);
     }
 
     protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {
