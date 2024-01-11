@@ -369,7 +369,7 @@ public class RepositoryUtils {
             }
             newSession = new DefaultRepositorySystemSession(session);
         } else {
-            newSession = new DefaultRepositorySystemSession();
+            newSession = new DefaultRepositorySystemSession(h -> false); // no close handle used
         }
 
         final LocalRepositoryManager llrm =
