@@ -55,42 +55,15 @@ public class DefaultModelCache implements ModelCache {
         this.cache = cache;
     }
 
-    public Object get(Source path, String tag) {
-        return get(new SourceCacheKey(path, tag));
+    public <T> T computeIfAbsent(
+            String groupId, String artifactId, String version, String tag, Supplier<Supplier<T>> data) {
+        Object obj = computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), (Supplier) data);
+        return (T) obj;
     }
 
-    public void put(Source path, String tag, Object data) {
-        put(new SourceCacheKey(path, tag), data);
-    }
-
-    @Override
-    public Object get(String groupId, String artifactId, String version, String tag) {
-        return get(new GavCacheKey(groupId, artifactId, version, tag));
-    }
-
-    @Override
-    public void put(String groupId, String artifactId, String version, String tag, Object data) {
-        put(new GavCacheKey(groupId, artifactId, version, tag), data);
-    }
-
-    protected Object get(Object key) {
-        Supplier<?> s = cache.get(key);
-        return s != null ? s.get() : null;
-    }
-
-    protected void put(Object key, Object data) {
-        cache.put(key, () -> data);
-    }
-
-    @Override
-    public Object computeIfAbsent(
-            String groupId, String artifactId, String version, String tag, Supplier<Supplier<?>> data) {
-        return computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), data);
-    }
-
-    @Override
-    public Object computeIfAbsent(Source path, String tag, Supplier<Supplier<?>> data) {
-        return computeIfAbsent(new SourceCacheKey(path, tag), data);
+    public <T> T computeIfAbsent(Source path, String tag, Supplier<Supplier<T>> data) {
+        Object obj = computeIfAbsent(new SourceCacheKey(path, tag), (Supplier) data);
+        return (T) obj;
     }
 
     protected Object computeIfAbsent(Object key, Supplier<Supplier<?>> data) {

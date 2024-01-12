@@ -118,14 +118,8 @@ under the License.
               <exclude>org.apache.maven.model.building.DefaultModelProcessor#setModelLocator(org.apache.maven.model.locator.ModelLocator):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.building.DefaultModelProcessor#setModelReader(org.apache.maven.model.io.ModelReader):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.building.DefaultModelProcessor#DefaultModelProcessor():CONSTRUCTOR_REMOVED</exclude>
-              <exclude>org.apache.maven.model.building.ModelCache#get(org.apache.maven.building.Source,java.lang.String):METHOD_NEW_DEFAULT</exclude>
-              <exclude>org.apache.maven.model.building.ModelCache#get(org.apache.maven.building.Source,org.apache.maven.model.building.ModelCacheTag):METHOD_NEW_DEFAULT</exclude>
-              <exclude>org.apache.maven.model.building.ModelCache#get(java.lang.String,java.lang.String,java.lang.String,org.apache.maven.model.building.ModelCacheTag):METHOD_NEW_DEFAULT</exclude>
-              <exclude>org.apache.maven.model.building.ModelCache#put(org.apache.maven.building.Source,java.lang.String,java.lang.Object):METHOD_NEW_DEFAULT</exclude>
-              <exclude>org.apache.maven.model.building.ModelCache#put(org.apache.maven.building.Source,org.apache.maven.model.building.ModelCacheTag,java.lang.Object):METHOD_NEW_DEFAULT</exclude>
-              <exclude>org.apache.maven.model.building.ModelCache#put(java.lang.String,java.lang.String,java.lang.String,org.apache.maven.model.building.ModelCacheTag,java.lang.Object):METHOD_NEW_DEFAULT</exclude>
-              <exclude>org.apache.maven.model.building.ModelCache#computeIfAbsent(java.lang.String,java.lang.String,java.lang.String,org.apache.maven.model.building.ModelCacheTag,java.util.function.Supplier):METHOD_NEW_DEFAULT</exclude>
-              <exclude>org.apache.maven.model.building.ModelCache#computeIfAbsent(org.apache.maven.building.Source,org.apache.maven.model.building.ModelCacheTag,java.util.function.Supplier):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.building.ModelCache#get(java.lang.String,java.lang.String,java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.building.ModelCache#put(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.Object):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.composition.DependencyManagementImporter#importManagement(org.apache.maven.model.Model,java.util.List,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.composition.DefaultDependencyManagementImporter#importManagement(org.apache.maven.model.Model,java.util.List,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.inheritance.DefaultInheritanceAssembler</exclude>

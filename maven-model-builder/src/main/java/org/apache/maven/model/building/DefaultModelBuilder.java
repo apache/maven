@@ -1870,11 +1870,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             String version,
             ModelCacheTag<T> tag,
             Callable<T> supplier) {
-        return doWithCache(cache, supplier, s -> cache.computeIfAbsent(groupId, artifactId, version, tag, s));
+        return doWithCache(cache, supplier, s -> cache.computeIfAbsent(groupId, artifactId, version, tag.getName(), s));
     }
 
     private static <T> T cache(ModelCache cache, Source source, ModelCacheTag<T> tag, Callable<T> supplier) {
-        return doWithCache(cache, supplier, s -> cache.computeIfAbsent(source, tag, s));
+        return doWithCache(cache, supplier, s -> cache.computeIfAbsent(source, tag.getName(), s));
     }
 
     private static <T> T doWithCache(

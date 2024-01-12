@@ -26,122 +26,13 @@ import org.apache.maven.building.Source;
  * Caches auxiliary data used during model building like already processed raw/effective models. The data in the cache
  * is meant for exclusive consumption by the model builder and is opaque to the cache implementation. The cache key is
  * formed by a combination of group id, artifact id, version and tag. The first three components generally refer to the
- * identify of a model. The tag allows for further classification of the associated data on the sole discretion of the
+ * identity of a model. The tag allows for further classification of the associated data on the sole discretion of the
  * model builder.
  *
  */
 public interface ModelCache {
-    /**
-     * Puts the specified data into the cache.
-     *
-     * @param path The path of the cache record, must not be {@code null}.
-     * @param tag The tag of the cache record, must not be {@code null}.
-     * @param data The data to store in the cache, must not be {@code null}.
-     * @since 4.0.0
-     */
-    default void put(Source path, String tag, Object data) {
-        // only useful for ReactorModelCache
-    }
 
-    /**
-     * Gets the specified data from the cache.
-     *
-     * @param path The path of the cache record, must not be {@code null}.
-     * @param tag The tag of the cache record, must not be {@code null}.
-     * @return The requested data or {@code null} if none was present in the cache.
-     * @since 4.0.0
-     */
-    default Object get(Source path, String tag) {
-        // only useful for ReactorModelCache
-        return null;
-    }
+    <T> T computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<Supplier<T>> data);
 
-    /**
-     * Puts the specified data into the cache.
-     *
-     * @param groupId The group id of the cache record, must not be {@code null}.
-     * @param artifactId The artifact id of the cache record, must not be {@code null}.
-     * @param version The version of the cache record, must not be {@code null}.
-     * @param tag The tag of the cache record, must not be {@code null}.
-     * @param data The data to store in the cache, must not be {@code null}.
-     */
-    void put(String groupId, String artifactId, String version, String tag, Object data);
-
-    /**
-     * Gets the specified data from the cache.
-     *
-     * @param groupId The group id of the cache record, must not be {@code null}.
-     * @param artifactId The artifact id of the cache record, must not be {@code null}.
-     * @param version The version of the cache record, must not be {@code null}.
-     * @param tag The tag of the cache record, must not be {@code null}.
-     * @return The requested data or {@code null} if none was present in the cache.
-     */
-    Object get(String groupId, String artifactId, String version, String tag);
-
-    /**
-     * Puts the specified data into the cache.
-     *
-     * @param path The path of the cache record, must not be {@code null}.
-     * @param tag The tag of the cache record, must not be {@code null}.
-     * @param data The data to store in the cache, must not be {@code null}.
-     * @since 4.0.0
-     */
-    default <T> void put(Source path, ModelCacheTag<T> tag, T data) {
-        put(path, tag.getName(), tag.intoCache(data));
-    }
-
-    /**
-     * Gets the specified data from the cache.
-     *
-     * @param path The path of the cache record, must not be {@code null}.
-     * @param tag The tag of the cache record, must not be {@code null}.
-     * @return The requested data or {@code null} if none was present in the cache.
-     * @since 4.0.0
-     */
-    default <T> T get(Source path, ModelCacheTag<T> tag) {
-        Object obj = get(path, tag.getName());
-        return (obj != null) ? tag.fromCache(tag.getType().cast(obj)) : null;
-    }
-
-    /**
-     * Puts the specified data into the cache.
-     *
-     * @param groupId The group id of the cache record, must not be {@code null}.
-     * @param artifactId The artifact id of the cache record, must not be {@code null}.
-     * @param version The version of the cache record, must not be {@code null}.
-     * @param tag The tag of the cache record, must not be {@code null}.
-     * @param data The data to store in the cache, must not be {@code null}.
-     */
-    default <T> void put(String groupId, String artifactId, String version, ModelCacheTag<T> tag, T data) {
-        put(groupId, artifactId, version, tag.getName(), tag.intoCache(data));
-    }
-
-    /**
-     * Gets the specified data from the cache.
-     *
-     * @param groupId The group id of the cache record, must not be {@code null}.
-     * @param artifactId The artifact id of the cache record, must not be {@code null}.
-     * @param version The version of the cache record, must not be {@code null}.
-     * @param tag The tag of the cache record, must not be {@code null}.
-     * @return The requested data or {@code null} if none was present in the cache.
-     */
-    default <T> T get(String groupId, String artifactId, String version, ModelCacheTag<T> tag) {
-        Object obj = get(groupId, artifactId, version, tag.getName());
-        return (obj != null) ? tag.fromCache(tag.getType().cast(obj)) : null;
-    }
-
-    default <T> T computeIfAbsent(
-            String groupId, String artifactId, String version, ModelCacheTag<T> tag, Supplier<Supplier<T>> data) {
-        Object obj = computeIfAbsent(groupId, artifactId, version, tag.getName(), (Supplier) data);
-        return (obj != null) ? tag.fromCache(tag.getType().cast(obj)) : null;
-    }
-
-    default <T> T computeIfAbsent(Source path, ModelCacheTag<T> tag, Supplier<Supplier<T>> data) {
-        Object obj = computeIfAbsent(path, tag.getName(), (Supplier) data);
-        return (obj != null) ? tag.fromCache(tag.getType().cast(obj)) : null;
-    }
-
-    Object computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<Supplier<?>> data);
-
-    Object computeIfAbsent(Source path, String tag, Supplier<Supplier<?>> data);
+    <T> T computeIfAbsent(Source path, String tag, Supplier<Supplier<T>> data);
 }
