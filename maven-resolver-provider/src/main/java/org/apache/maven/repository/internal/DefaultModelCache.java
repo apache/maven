@@ -18,79 +18,57 @@
  */
 package org.apache.maven.repository.internal;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 import org.apache.maven.building.Source;
 import org.apache.maven.model.building.ModelCache;
+import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositorySystemSession;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A model builder cache backed by the repository system cache.
  *
  */
 public class DefaultModelCache implements ModelCache {
-
     private static final String KEY = DefaultModelCache.class.getName();
 
-    private final Map<Object, Supplier<?>> cache;
-
+    @SuppressWarnings("unchecked")
     public static ModelCache newInstance(RepositorySystemSession session) {
-        Map<Object, Supplier<?>> cache;
-        if (session.getCache() == null) {
+        ConcurrentHashMap<Object, Supplier<?>> cache;
+        RepositoryCache repositoryCache = session.getCache();
+        if (repositoryCache == null) {
             cache = new ConcurrentHashMap<>();
         } else {
-            cache = (Map) session.getCache().get(session, KEY);
-            if (cache == null) {
-                cache = new ConcurrentHashMap<>();
-                session.getCache().put(session, KEY, cache);
-            }
+            cache = (ConcurrentHashMap<Object, Supplier<?>>)
+                    repositoryCache.computeIfAbsent(session, KEY, ConcurrentHashMap::new);
         }
         return new DefaultModelCache(cache);
     }
 
-    private DefaultModelCache(Map<Object, Supplier<?>> cache) {
-        this.cache = cache;
-    }
+    private final ConcurrentMap<Object, Supplier<?>> cache;
 
-    public Object get(Source path, String tag) {
-        return get(new SourceCacheKey(path, tag));
-    }
-
-    public void put(Source path, String tag, Object data) {
-        put(new SourceCacheKey(path, tag), data);
+    private DefaultModelCache(ConcurrentMap<Object, Supplier<?>> cache) {
+        this.cache = requireNonNull(cache);
     }
 
     @Override
-    public Object get(String groupId, String artifactId, String version, String tag) {
-        return get(new GavCacheKey(groupId, artifactId, version, tag));
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public <T> T computeIfAbsent(
+            String groupId, String artifactId, String version, String tag, Supplier<Supplier<T>> data) {
+        Object obj = computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), (Supplier) data);
+        return (T) obj;
     }
 
     @Override
-    public void put(String groupId, String artifactId, String version, String tag, Object data) {
-        put(new GavCacheKey(groupId, artifactId, version, tag), data);
-    }
-
-    protected Object get(Object key) {
-        Supplier<?> s = cache.get(key);
-        return s != null ? s.get() : null;
-    }
-
-    protected void put(Object key, Object data) {
-        cache.put(key, () -> data);
-    }
-
-    @Override
-    public Object computeIfAbsent(
-            String groupId, String artifactId, String version, String tag, Supplier<Supplier<?>> data) {
-        return computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), data);
-    }
-
-    @Override
-    public Object computeIfAbsent(Source path, String tag, Supplier<Supplier<?>> data) {
-        return computeIfAbsent(new SourceCacheKey(path, tag), data);
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public <T> T computeIfAbsent(Source path, String tag, Supplier<Supplier<T>> data) {
+        Object obj = computeIfAbsent(new SourceCacheKey(path, tag), (Supplier) data);
+        return (T) obj;
     }
 
     protected Object computeIfAbsent(Object key, Supplier<Supplier<?>> data) {
