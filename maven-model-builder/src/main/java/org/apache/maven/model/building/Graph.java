@@ -28,16 +28,12 @@ import java.util.List;
 import java.util.Map;
 
 class Graph {
-    private enum DfsState {
-        VISITING,
-        VISITED
-    }
 
-    final Map<String, List<String>> vertices = new LinkedHashMap<>();
+    final Map<String, List<String>> graph = new LinkedHashMap<>();
 
     synchronized void addEdge(String from, String to) throws CycleDetectedException {
-        vertices.computeIfAbsent(from, l -> new ArrayList<>()).add(to);
-        List<String> cycle = visitCycle(vertices, Collections.singleton(to), new HashMap<>(), new LinkedList<>());
+        graph.computeIfAbsent(from, l -> new ArrayList<>()).add(to);
+        List<String> cycle = visitCycle(graph, Collections.singleton(to), new HashMap<>(), new LinkedList<>());
         if (cycle != null) {
             // remove edge which introduced cycle
             throw new CycleDetectedException(
@@ -45,27 +41,34 @@ class Graph {
         }
     }
 
+    private enum DfsState {
+        VISITING,
+        VISITED
+    }
+
     private static List<String> visitCycle(
             Map<String, List<String>> graph,
             Collection<String> children,
             Map<String, DfsState> stateMap,
             LinkedList<String> cycle) {
-        for (String v : children) {
-            DfsState state = stateMap.putIfAbsent(v, DfsState.VISITING);
-            if (state == null) {
-                cycle.addLast(v);
-                List<String> ret = visitCycle(graph, graph.get(v), stateMap, cycle);
-                if (ret != null) {
+        if (children != null) {
+            for (String v : children) {
+                DfsState state = stateMap.putIfAbsent(v, DfsState.VISITING);
+                if (state == null) {
+                    cycle.addLast(v);
+                    List<String> ret = visitCycle(graph, graph.get(v), stateMap, cycle);
+                    if (ret != null) {
+                        return ret;
+                    }
+                    cycle.removeLast();
+                    stateMap.put(v, DfsState.VISITED);
+                } else if (state == DfsState.VISITING) {
+                    // we are already visiting this vertex, this mean we have a cycle
+                    int pos = cycle.lastIndexOf(v);
+                    List<String> ret = cycle.subList(pos, cycle.size());
+                    ret.add(v);
                     return ret;
                 }
-                cycle.removeLast();
-                stateMap.put(v, DfsState.VISITED);
-            } else if (state == DfsState.VISITING) {
-                // we are already visiting this vertex, this mean we have a cycle
-                int pos = cycle.lastIndexOf(v);
-                List<String> ret = cycle.subList(pos, cycle.size());
-                ret.add(v);
-                return ret;
             }
         }
         return null;
