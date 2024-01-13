@@ -571,7 +571,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 }
             }
 
-            return interimResults.parallelStream()
+            return interimResults.stream()
                     .map(interimResult -> doBuild(projectIndex, interimResult))
                     .flatMap(List::stream)
                     .collect(Collectors.toList());
