@@ -33,65 +33,28 @@ class Graph {
         VISITED
     }
 
-    final Map<String, Vertex> vertices = new LinkedHashMap<>();
+    final Map<String, List<String>> vertices = new LinkedHashMap<>();
 
-    public Vertex getVertex(String id) {
-        return vertices.get(id);
-    }
-
-    public Collection<Vertex> getVertices() {
-        return vertices.values();
-    }
-
-    Vertex addVertex(String label) {
-        return vertices.computeIfAbsent(label, Vertex::new);
-    }
-
-    void addEdge(Vertex from, Vertex to) throws CycleDetectedException {
-        from.children.add(to);
-        to.parents.add(from);
-        List<String> cycle = findCycle(to);
+    synchronized void addEdge(String from, String to) throws CycleDetectedException {
+        vertices.computeIfAbsent(from, l -> new ArrayList<>()).add(to);
+        List<String> cycle = visitCycle(vertices, Collections.singleton(to), new HashMap<>(), new LinkedList<>());
         if (cycle != null) {
             // remove edge which introduced cycle
-            removeEdge(from, to);
             throw new CycleDetectedException(
-                    "Edge between '" + from.label + "' and '" + to.label + "' introduces to cycle in the graph", cycle);
+                    "Edge between '" + from + "' and '" + to + "' introduces to cycle in the graph", cycle);
         }
-    }
-
-    void removeEdge(Vertex from, Vertex to) {
-        from.children.remove(to);
-        to.parents.remove(from);
-    }
-
-    List<String> visitAll() {
-        return visitAll(vertices.values(), new HashMap<>(), new ArrayList<>());
-    }
-
-    List<String> findCycle(Vertex vertex) {
-        return visitCycle(Collections.singleton(vertex), new HashMap<>(), new LinkedList<>());
-    }
-
-    private static List<String> visitAll(
-            Collection<Vertex> children, Map<Vertex, DfsState> stateMap, List<String> list) {
-        for (Vertex v : children) {
-            DfsState state = stateMap.putIfAbsent(v, DfsState.VISITING);
-            if (state == null) {
-                visitAll(v.children, stateMap, list);
-                stateMap.put(v, DfsState.VISITED);
-                list.add(v.label);
-            }
-        }
-        return list;
     }
 
     private static List<String> visitCycle(
-            Collection<Vertex> children, Map<Vertex, DfsState> stateMap, LinkedList<String> cycle) {
-        for (Vertex v : children) {
+            Map<String, List<String>> graph,
+            Collection<String> children,
+            Map<String, DfsState> stateMap,
+            LinkedList<String> cycle) {
+        for (String v : children) {
             DfsState state = stateMap.putIfAbsent(v, DfsState.VISITING);
             if (state == null) {
-                cycle.addLast(v.label);
-                List<String> ret = visitCycle(v.children, stateMap, cycle);
+                cycle.addLast(v);
+                List<String> ret = visitCycle(graph, graph.get(v), stateMap, cycle);
                 if (ret != null) {
                     return ret;
                 }
@@ -99,35 +62,13 @@ class Graph {
                 stateMap.put(v, DfsState.VISITED);
             } else if (state == DfsState.VISITING) {
                 // we are already visiting this vertex, this mean we have a cycle
-                int pos = cycle.lastIndexOf(v.label);
+                int pos = cycle.lastIndexOf(v);
                 List<String> ret = cycle.subList(pos, cycle.size());
-                ret.add(v.label);
+                ret.add(v);
                 return ret;
             }
         }
         return null;
-    }
-
-    static class Vertex {
-        final String label;
-        final List<Vertex> children = new ArrayList<>();
-        final List<Vertex> parents = new ArrayList<>();
-
-        Vertex(String label) {
-            this.label = label;
-        }
-
-        String getLabel() {
-            return label;
-        }
-
-        List<Vertex> getChildren() {
-            return children;
-        }
-
-        List<Vertex> getParents() {
-            return parents;
-        }
     }
 
     public static class CycleDetectedException extends Exception {
