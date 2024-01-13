@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultTransformerContext.GAKey;
@@ -43,8 +45,9 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
     private final Graph dag = new Graph();
     private final DefaultModelBuilder defaultModelBuilder;
     private final DefaultTransformerContext context;
-
     private final Map<String, Set<FileModelSource>> mappedSources = new ConcurrentHashMap<>(64);
+    private final AtomicBoolean fullReactorLoaded = new AtomicBoolean(false);
+    private final CountDownLatch fullReactorLoadedLatch = new CountDownLatch(1);
 
     DefaultTransformerContextBuilder(DefaultModelBuilder defaultModelBuilder) {
         this.defaultModelBuilder = defaultModelBuilder;
@@ -59,9 +62,6 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
         // We must assume the TransformerContext was created using this.newTransformerContextBuilder()
         DefaultModelProblemCollector problems = (DefaultModelProblemCollector) collector;
         return new TransformerContext() {
-
-            private volatile boolean fullReactorLoaded;
-
             @Override
             public Path locate(Path path) {
                 return context.locate(path);
@@ -118,13 +118,14 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
             }
 
             private void loadFullReactor() {
-                if (!fullReactorLoaded) {
-                    synchronized (this) {
-                        if (!fullReactorLoaded) {
-                            doLoadFullReactor();
-                            fullReactorLoaded = true;
-                        }
-                    }
+                if (fullReactorLoaded.compareAndSet(false, true)) {
+                    doLoadFullReactor();
+                    fullReactorLoadedLatch.countDown();
+                }
+                try {
+                    fullReactorLoadedLatch.await();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
             }
 

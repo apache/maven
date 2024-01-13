@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.model.building.ModelCache;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.util.ConfigUtils;
 
 /**
  * Default implementation of {@link ModelCacheFactory}.
@@ -30,8 +31,17 @@ import org.eclipse.aether.RepositorySystemSession;
 @Singleton
 @Named
 public class DefaultModelCacheFactory implements ModelCacheFactory {
+    /**
+     * Flag that makes possible to shut down model cache use, mostly useful
+     * for debugging and/or thread dumps. Default value: {@code true}.
+     */
+    private static final String USE_MODEL_CACHE = "maven.modelBuilder.useModelCache";
+
     @Override
     public ModelCache createCache(RepositorySystemSession session) {
-        return DefaultModelCache.newInstance(session);
+        if (ConfigUtils.getBoolean(session, true, USE_MODEL_CACHE)) {
+            return DefaultModelCache.newInstance(session);
+        }
+        return null;
     }
 }
