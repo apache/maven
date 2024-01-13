@@ -185,9 +185,7 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
 
     private boolean addEdge(Path from, Path p, DefaultModelProblemCollector problems) {
         try {
-            synchronized (dag) {
-                dag.addEdge(dag.addVertex(from.toString()), dag.addVertex(p.toString()));
-            }
+            dag.addEdge(from.toString(), p.toString());
             return true;
         } catch (Graph.CycleDetectedException e) {
             problems.add(new DefaultModelProblem(
