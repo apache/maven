@@ -119,8 +119,11 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
 
             private void loadFullReactor() {
                 if (fullReactorLoaded.compareAndSet(false, true)) {
-                    doLoadFullReactor();
-                    fullReactorLoadedLatch.countDown();
+                    try {
+                        doLoadFullReactor();
+                    } finally {
+                        fullReactorLoadedLatch.countDown();
+                    }
                 }
                 try {
                     fullReactorLoadedLatch.await();
