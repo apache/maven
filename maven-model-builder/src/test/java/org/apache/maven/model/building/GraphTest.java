@@ -18,8 +18,13 @@
  */
 package org.apache.maven.model.building;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class GraphTest {
@@ -29,5 +34,28 @@ public class GraphTest {
         Graph graph = new Graph();
         graph.addEdge("a1", "a2");
         assertThrows(Graph.CycleDetectedException.class, () -> graph.addEdge("a2", "a1"));
+    }
+
+    @Test
+    public void test() {
+        Graph map = new Graph(16, 0.75f, 2);
+        map.add("a", "b");
+        map.add("a", "c");
+        map.add("a", "d");
+        assertEquals(Arrays.asList("b", "c", "d"), toList(map.get("a")));
+        map.add("b", "c");
+        assertEquals(Arrays.asList("b", "c", "d"), toList(map.get("a")));
+        assertEquals(Arrays.asList("c"), toList(map.get("b")));
+        map.add("a", "e");
+        assertEquals(Arrays.asList("b", "c", "d", "e"), toList(map.get("a")));
+        assertEquals(Arrays.asList("c"), toList(map.get("b")));
+    }
+
+    private static List<String> toList(Iterable<String> col) {
+        List<String> l = new ArrayList<>();
+        for (String s : col) {
+            l.add(s);
+        }
+        return l;
     }
 }
