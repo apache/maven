@@ -47,6 +47,7 @@ public class Graph {
      * The array of values.
      */
     private transient Object[] blocks;
+
     private transient int nextBlock;
     private final int blockSize;
     /**
