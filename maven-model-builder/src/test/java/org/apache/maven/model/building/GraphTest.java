@@ -18,9 +18,7 @@
  */
 package org.apache.maven.model.building;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -64,12 +62,12 @@ public class GraphTest {
     }
 
     @Test
-    public void testPerf() throws IOException  {
+    public void testPerf() throws IOException {
         List<String[]> data = new ArrayList<>();
         String k = null;
         for (String line : Files.readAllLines(Paths.get("src/test/resources/dag.txt"))) {
             if (line.startsWith("\t")) {
-                data.add(new String[] {  k, line.trim() });
+                data.add(new String[] {k, line.trim()});
             } else {
                 k = line;
             }
@@ -134,12 +132,12 @@ public class GraphTest {
         }
 
         double average = 0.0;
-        for(double p: ratios){
+        for (double p : ratios) {
             average += p;
         }
         average /= ratios.size();
         double variance = 0.0;
-        for(double p: ratios){
+        for (double p : ratios) {
             variance += (p - average) * (p - average);
         }
         variance /= ratios.size();
@@ -156,7 +154,7 @@ public class GraphTest {
             if (cycle != null) {
                 // remove edge which introduced cycle
                 throw new CycleDetectedException(
-                    "Edge between '" + from + "' and '" + to + "' introduces to cycle in the graph", cycle);
+                        "Edge between '" + from + "' and '" + to + "' introduces to cycle in the graph", cycle);
             }
         }
 
@@ -166,10 +164,10 @@ public class GraphTest {
         }
 
         private static List<String> visitCycle(
-            Map<String, List<String>> graph,
-            Collection<String> children,
-            Map<String, DfsState> stateMap,
-            LinkedList<String> cycle) {
+                Map<String, List<String>> graph,
+                Collection<String> children,
+                Map<String, DfsState> stateMap,
+                LinkedList<String> cycle) {
             if (children != null) {
                 for (String v : children) {
                     DfsState state = stateMap.putIfAbsent(v, DfsState.VISITING);
