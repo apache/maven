@@ -88,7 +88,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class DefaultProjectBuilder implements ProjectBuilder {
     public static final String BUILDER_PARALLELISM = "maven.projectBuilder.parallelism";
-    public static final int DEFAULT_BUILDER_PARALLELISM = 4;
+    public static final int DEFAULT_BUILDER_PARALLELISM = 1;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ModelBuilder modelBuilder;
