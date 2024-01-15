@@ -18,14 +18,13 @@
  */
 package org.apache.maven.model.building;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.io.BufferedWriter;
+import java.io.IOException;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Graph implementation to detect cycles.
@@ -33,7 +32,7 @@ import java.util.Objects;
 public class Graph {
 
     /** The initial default size of a hash table. */
-    public static final int DEFAULT_INITIAL_SIZE = 16;
+    public static final int DEFAULT_INITIAL_SIZE = 32;
     /** The default load factor of a hash table. */
     public static final float DEFAULT_LOAD_FACTOR = .75f;
 
@@ -70,6 +69,8 @@ public class Graph {
      * Number of entries in the set.
      */
     private int size;
+
+    private final ReentrantLock lock = new ReentrantLock();
 
     /**
      * Creates a new hash map with initial expected {@link Graph#DEFAULT_INITIAL_SIZE} entries
@@ -108,8 +109,13 @@ public class Graph {
     }
 
     public void addEdge(String from, String to) throws CycleDetectedException {
-        add(from, to);
-        List<String> cycle = visitCycle(Collections.singleton(to), new HashMap<>(), new LinkedList<>());
+        lock.lock();
+        try {
+            add(from, to);
+        } finally {
+            lock.unlock();
+        }
+        List<String> cycle = visitCycle(table, blocks, mask, Collections.singleton(to), new HashMap<>(), new LinkedList<>());
         if (cycle != null) {
             // remove edge which introduced cycle
             throw new CycleDetectedException(
@@ -117,75 +123,111 @@ public class Graph {
         }
     }
 
-    synchronized void add(final String k, final String v) {
-        int pos = murmurHash3(Objects.requireNonNull(k).hashCode()) & mask;
+    void add(final String k, final String v) {
         Object[] table = this.table;
-        while (table[pos * 2] != null) {
-            if ((Objects.equals(table[pos * 2], k))) {
-                int block = (Integer) table[pos * 2 + 1];
-                for (int j = 0; j < blockSize; j++) {
-                    if (blocks[block + j] == null) {
-                        blocks[block + j] = v;
-                        return;
-                    } else if (blocks[block + j] instanceof Link) {
-                        block = ((Link) blocks[block + j]).block;
-                        j = 0;
-                    }
-                }
-                Object last = blocks[block + blockSize - 1];
-                int next = reserve();
-                blocks[block + blockSize - 1] = new Link(next);
-                block = next;
-                blocks[block] = last;
-                blocks[block + 1] = v;
+        int mask = this.mask;
+        int pos = murmurHash3(k.hashCode()) & mask;
+        int pos2 = pos << 1;
+        while (table[pos2] != null) {
+            if ((Objects.equals(table[pos2], k))) {
+                int block = (Integer) table[pos2 + 1];
+                addToBlock(v, block);
                 return;
             }
             pos = (pos + 1) & mask;
+            pos2 = pos << 1;
         }
         int block = reserve();
-        table[pos * 2] = k;
-        table[pos * 2 + 1] = block;
-        blocks[block] = v;
+        table[pos2] = k;
+        table[pos2 + 1] = block;
+        addToBlock(v, block);
         if (++size >= maxFill) {
-            rehash(arraySize(size + 1, f));
+            rehash(arraySize(size + 1, f) * 2);
+        }
+    }
+
+    private void addToBlock(String v, int block) {
+        for (int j = 0; j < blockSize; j++) {
+            if (blocks[block + j] == null) {
+                blocks[block + j] = v;
+                return;
+            } else if (blocks[block + j] instanceof Link) {
+                block = ((Link) blocks[block + j]).block;
+                j = 0;
+            }
+        }
+        Object last = blocks[block + blockSize - 1];
+        int next = reserve();
+        blocks[block + blockSize - 1] = new Link(next);
+        block = next;
+        blocks[block] = last;
+        blocks[block + 1] = v;
+    }
+
+    Set<String> keySet() {
+        return new AbstractSet<String>() {
+            @Override
+            public Iterator<String> iterator() {
+                return new KeySetIterator();
+            }
+
+            @Override
+            public int size() {
+                return size;
+            }
+        };
+    }
+
+    private class KeySetIterator implements Iterator<String> {
+        final Object[] table = Graph.this.table;
+        int i = 0;
+
+        KeySetIterator() {
+            while (i < table.length && table[i] == null) {
+                i += 2;
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return i < table.length;
+        }
+
+        @Override
+        public String next() {
+            String s = (String) table[i];
+            do {
+                i += 2;
+            } while (i < table.length && table[i] == null);
+            return s;
         }
     }
 
     Iterable<String> get(final Object k) {
-        int pos = murmurHash3(Objects.requireNonNull(k).hashCode()) & mask;
-        Object[] table = this.table;
-        Object[] blocks = this.blocks;
-        while (table[pos * 2] != null) {
-            if ((Objects.equals(table[pos * 2], k))) {
-                int block = (Integer) table[pos * 2 + 1];
-                return () -> new Iterator<String>() {
-                    int cur = block;
-                    int max = cur + blockSize;
+        return get(table, blocks, mask, k);
+    }
 
-                    @Override
-                    public boolean hasNext() {
-                        return cur < max && blocks[cur] != null;
-                    }
-
-                    @Override
-                    public String next() {
-                        String v = (String) blocks[cur++];
-                        if (blocks[cur] instanceof Link) {
-                            cur = ((Link) blocks[cur]).block;
-                            max = cur + blockSize;
-                        }
-                        return v;
-                    }
-                };
+    Iterable<String> get(Object[] table, Object[] blocks, int mask, final Object k) {
+        int pos = murmurHash3(k.hashCode()) & mask;
+        int pos2 = pos << 1;
+        while (table[pos2] != null) {
+            if ((k.equals(table[pos2]))) {
+                Object v = table[pos2 + 1];
+                if (v == null) {
+                    return null;
+                }
+                int block = (Integer) v;
+                return () -> new ValuesIterator(blocks, block);
             }
             pos = (pos + 1) & mask;
+            pos2 = pos << 1;
         }
         return null;
     }
 
     private int reserve() {
         if (nextBlock * blockSize >= blocks.length) {
-            blocks = Arrays.copyOf(blocks, blocks.length * 2);
+            blocks = Arrays.copyOf(blocks, blocks.length * 4);
         }
         return blockSize * nextBlock++;
     }
@@ -205,7 +247,7 @@ public class Graph {
         String k;
         final Object[] table = this.table;
         final int newMask = newN - 1;
-        final Object[] newTable = new Object[newN];
+        final Object[] newTable = new Object[newN * 2];
         for (int j = size; j-- != 0; ) {
             while (table[i * 2] == null) {
                 i++;
@@ -292,6 +334,21 @@ public class Graph {
         return (int) s;
     }
 
+    public void store() {
+        try (BufferedWriter w = Files.newBufferedWriter(Paths.get("dag.txt"))) {
+            for (String k : keySet()) {
+                w.write(k);
+                w.newLine();
+                for (String v : get(k)) {
+                    w.write("\t" + v);
+                    w.newLine();
+                }
+            }
+        } catch (IOException e) {
+            // ignore
+        }
+    }
+
     static class Link {
         final int block;
 
@@ -305,14 +362,14 @@ public class Graph {
         VISITED
     }
 
-    private List<String> visitCycle(
+    private List<String> visitCycle(Object[] table, Object[] blocks, int mask,
             Iterable<String> children, Map<String, DfsState> stateMap, LinkedList<String> cycle) {
         if (children != null) {
             for (String v : children) {
                 DfsState state = stateMap.putIfAbsent(v, DfsState.VISITING);
                 if (state == null) {
                     cycle.addLast(v);
-                    List<String> ret = visitCycle(get(v), stateMap, cycle);
+                    List<String> ret = visitCycle(table, blocks, mask, get(table, blocks, mask, v), stateMap, cycle);
                     if (ret != null) {
                         return ret;
                     }
@@ -346,5 +403,48 @@ public class Graph {
         public String getMessage() {
             return super.getMessage() + " " + String.join(" --> ", cycle);
         }
+    }
+
+    private class ValuesIterator implements Iterator<String> {
+        private final Object[] blocks;
+        private final int block;
+        int cur;
+        int max;
+        String next;
+
+        public ValuesIterator(Object[] blocks, int block) {
+            this.blocks = blocks;
+            this.block = block;
+            cur = block;
+            max = cur + blockSize;
+            next = adv();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        @Override
+        public String next() {
+            String n = next;
+            cur++;
+            next = adv();
+            return n;
+        }
+
+        private String adv() {
+            while (cur < max && cur < blocks.length) {
+                Object v = blocks[cur];
+                if (v instanceof Link) {
+                    cur = ((Link) v).block;
+                    max = cur + blockSize;
+                } else {
+                    return (String) v;
+                }
+            }
+            return null;
+        }
+
     }
 }
