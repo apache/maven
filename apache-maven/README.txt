@@ -22,7 +22,7 @@
   -------------------
 
   JDK:
-    1.7 or above (this is to execute Maven - it still allows you to build against 1.3
+    8 or above (this is to execute Maven - it still allows you to build against 1.3
     and prior JDK's).
   Memory:
     No minimum requirement.
