@@ -16,22 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.aether;
+package org.apache.maven.internal.aether.extender;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.session.RepositorySystemSessionExtender;
+import org.apache.maven.internal.aether.RepositorySystemSessionExtender;
 import org.apache.maven.settings.Mirror;
-import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.MirrorSelector;
@@ -49,7 +49,7 @@ public class LegacyRepositorySystemSessionExtender implements RepositorySystemSe
     @Override
     public void extend(
             MavenExecutionRequest mavenExecutionRequest,
-            SessionBuilder sessionBuilder,
+            Map<Object, Object> configProperties,
             MirrorSelector mirrorSelector,
             ProxySelector proxySelector,
             AuthenticationSelector authenticationSelector) {

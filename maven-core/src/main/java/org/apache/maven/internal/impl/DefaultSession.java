@@ -118,6 +118,12 @@ public class DefaultSession extends AbstractSession {
 
     @Nonnull
     @Override
+    public Map<String, Object> getConfigProperties() {
+        return session.getConfigProperties();
+    }
+
+    @Nonnull
+    @Override
     public Version getMavenVersion() {
         return parseVersion(runtimeInformation.getMavenVersion());
     }

@@ -43,7 +43,6 @@ import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.apache.maven.session.RepositorySystemSessionExtender;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -417,9 +416,6 @@ public class DefaultRepositorySystemSessionFactory {
                     + MAVEN_RESOLVER_TRANSPORT_AUTO);
         }
 
-        sessionBuilder.setUserProperties(request.getUserProperties());
-        sessionBuilder.setSystemProperties(request.getSystemProperties());
-        sessionBuilder.setConfigProperties(configProps);
         sessionBuilder.setIgnoreArtifactDescriptorRepositories(request.isIgnoreTransitiveRepositories());
 
         sessionBuilder.setTransferListener(request.getTransferListener());
@@ -450,8 +446,12 @@ public class DefaultRepositorySystemSessionFactory {
         sessionBuilder.withLocalRepositoryBaseDirectories(paths);
 
         for (RepositorySystemSessionExtender extender : extenders.values()) {
-            extender.extend(request, sessionBuilder, mirrorSelector, proxySelector, authSelector);
+            extender.extend(request, configProps, mirrorSelector, proxySelector, authSelector);
         }
+
+        sessionBuilder.setUserProperties(request.getUserProperties());
+        sessionBuilder.setSystemProperties(request.getSystemProperties());
+        sessionBuilder.setConfigProperties(configProps);
 
         return sessionBuilder;
     }

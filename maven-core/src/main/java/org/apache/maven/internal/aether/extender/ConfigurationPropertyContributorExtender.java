@@ -16,24 +16,46 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.session;
+package org.apache.maven.internal.aether.extender;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.util.Map;
+
+import org.apache.maven.api.spi.session.ConfigurationPropertyContributor;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
+import org.apache.maven.internal.aether.RepositorySystemSessionExtender;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.MirrorSelector;
 import org.eclipse.aether.repository.ProxySelector;
 
 /**
- * Component able to "extend" session in some way.
+ * Extender that manages {@link org.apache.maven.api.spi.session.ConfigurationPropertyContributor}.
  *
  * @since 4.0.0
  */
-public interface RepositorySystemSessionExtender {
-    void extend(
+@Named
+@Singleton
+public class ConfigurationPropertyContributorExtender implements RepositorySystemSessionExtender {
+    private final Map<String, ConfigurationPropertyContributor> configurationPropertyContributors;
+
+    @Inject
+    public ConfigurationPropertyContributorExtender(
+            Map<String, ConfigurationPropertyContributor> configurationPropertyContributors) {
+        this.configurationPropertyContributors = configurationPropertyContributors;
+    }
+
+    @Override
+    public void extend(
             MavenExecutionRequest mavenExecutionRequest,
-            SessionBuilder sessionBuilder,
+            Map<Object, Object> configProperties,
             MirrorSelector mirrorSelector,
             ProxySelector proxySelector,
-            AuthenticationSelector authenticationSelector);
+            AuthenticationSelector authenticationSelector) {
+        for (ConfigurationPropertyContributor contributor : configurationPropertyContributors.values()) {
+            contributor.contribute(configProperties);
+        }
+    }
 }
