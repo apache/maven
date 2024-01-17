@@ -118,7 +118,7 @@ public class DefaultSession extends AbstractSession {
 
     @Nonnull
     @Override
-    public Map<String, Object> getConfigProperties() {
+    public Map<String, Object> getEffectiveProperties() {
         return session.getConfigProperties();
     }
 

@@ -73,13 +73,15 @@ public interface Session {
     Map<String, String> getSystemProperties();
 
     /**
-     * Gets the immutable config properties to use for interpolation. The config properties are collected from
-     * {@link #getUserProperties()} and the {@link #getSystemProperties()} and more.
+     * Gets the immutable effective properties to use for interpolation. The effective properties are collected from
+     * {@link #getSystemProperties()} and {@link #getUserProperties()} in this order, and more.
+     * <p>
+     * These properties are "effective" in a way they are built obeying all "user overrides" and others.
      *
      * @return the config properties, never {@code null}
      */
     @Nonnull
-    Map<String, Object> getConfigProperties();
+    Map<String, Object> getEffectiveProperties();
 
     /**
      * Returns the current maven version
