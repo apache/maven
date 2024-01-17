@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -39,7 +40,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.CyclicDependencyException;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -124,7 +124,7 @@ class DefaultArtifactCollectorTest {
                 res.getArtifacts(),
                 "Check artifact list");
 
-        ArtifactFilter filter = new ExclusionSetFilter(new String[] {"b"});
+        Predicate<Artifact> filter = new ExclusionSetFilter(new String[] {"b"});
         res = collect(a, filter);
         assertEquals(createSet(new Object[] {a.artifact, c.artifact}), res.getArtifacts(), "Check artifact list");
     }
@@ -705,7 +705,7 @@ class DefaultArtifactCollectorTest {
         return collect(artifacts, null);
     }
 
-    private ArtifactResolutionResult collect(Set<Artifact> artifacts, ArtifactFilter filter)
+    private ArtifactResolutionResult collect(Set<Artifact> artifacts, Predicate<Artifact> filter)
             throws ArtifactResolutionException {
         return artifactCollector.collect(
                 artifacts, projectArtifact.artifact, null, null, null, source, filter, Collections.emptyList(), null);
@@ -724,7 +724,8 @@ class DefaultArtifactCollectorTest {
                 null);
     }
 
-    private ArtifactResolutionResult collect(ArtifactSpec a, ArtifactFilter filter) throws ArtifactResolutionException {
+    private ArtifactResolutionResult collect(ArtifactSpec a, Predicate<Artifact> filter)
+            throws ArtifactResolutionException {
         return artifactCollector.collect(
                 Collections.singleton(a.artifact),
                 projectArtifact.artifact,
@@ -850,7 +851,7 @@ class DefaultArtifactCollectorTest {
                 ArtifactFactory artifactFactory,
                 Set<Artifact> dependencies,
                 String inheritedScope,
-                ArtifactFilter dependencyFilter)
+                Predicate<Artifact> dependencyFilter)
                 throws InvalidVersionSpecificationException {
             Set<Artifact> projectArtifacts = new HashSet<>();
 
@@ -878,7 +879,7 @@ class DefaultArtifactCollectorTest {
                             d.isOptional());
                 }
 
-                if (artifact != null && (dependencyFilter == null || dependencyFilter.include(artifact))) {
+                if (artifact != null && (dependencyFilter == null || dependencyFilter.test(artifact))) {
                     artifact.setDependencyFilter(dependencyFilter);
 
                     projectArtifacts.add(artifact);

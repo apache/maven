@@ -24,7 +24,7 @@ import org.apache.maven.artifact.Artifact;
  * Filter to only retain objects in the given artifactScope or better.
  *
  */
-abstract class AbstractScopeArtifactFilter implements ArtifactFilter {
+abstract class AbstractScopeArtifactFilter extends ArtifactFilterSupport {
 
     private boolean compileScope;
 
@@ -62,7 +62,8 @@ abstract class AbstractScopeArtifactFilter implements ArtifactFilter {
         }
     }
 
-    public boolean include(Artifact artifact) {
+    @Override
+    public boolean test(Artifact artifact) {
         if (Artifact.SCOPE_COMPILE.equals(artifact.getScope())) {
             return compileScope;
         } else if (Artifact.SCOPE_RUNTIME.equals(artifact.getScope())) {

@@ -21,6 +21,7 @@ package org.apache.maven.repository.legacy.resolver;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -28,7 +29,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionListener;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 
 /**
@@ -46,7 +46,7 @@ public interface LegacyArtifactCollector {
             Map<String, Artifact> managedVersions,
             ArtifactResolutionRequest repositoryRequest,
             ArtifactMetadataSource source,
-            ArtifactFilter filter,
+            Predicate<Artifact> filter,
             List<ResolutionListener> listeners,
             List<ConflictResolver> conflictResolvers);
 
@@ -57,7 +57,7 @@ public interface LegacyArtifactCollector {
             ArtifactRepository localRepository,
             List<ArtifactRepository> remoteRepositories,
             ArtifactMetadataSource source,
-            ArtifactFilter filter,
+            Predicate<Artifact> filter,
             List<ResolutionListener> listeners,
             List<ConflictResolver> conflictResolvers);
 
@@ -70,6 +70,6 @@ public interface LegacyArtifactCollector {
             ArtifactRepository localRepository,
             List<ArtifactRepository> remoteRepositories,
             ArtifactMetadataSource source,
-            ArtifactFilter filter,
+            Predicate<Artifact> filter,
             List<ResolutionListener> listeners);
 }

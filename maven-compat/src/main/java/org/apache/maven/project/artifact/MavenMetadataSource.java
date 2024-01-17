@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -51,7 +52,6 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutio
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -100,7 +100,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
     private final MavenMetadataCache cache;
     private final LegacySupport legacySupport;
 
-    private MavenRepositorySystem mavenRepositorySystem;
+    private final MavenRepositorySystem mavenRepositorySystem;
 
     @Inject
     public MavenMetadataSource(
@@ -332,7 +332,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         try {
             String inheritedScope = (owner != null) ? owner.getScope() : null;
 
-            ArtifactFilter inheritedFilter = (owner != null) ? owner.getDependencyFilter() : null;
+            Predicate<Artifact> inheritedFilter = (owner != null) ? owner.getDependencyFilter() : null;
 
             return createDependencyArtifact(artifactFactory, dependency, inheritedScope, inheritedFilter);
         } catch (InvalidVersionSpecificationException e) {
@@ -342,7 +342,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
     }
 
     private static Artifact createDependencyArtifact(
-            ArtifactFactory factory, Dependency dependency, String inheritedScope, ArtifactFilter inheritedFilter)
+            ArtifactFactory factory, Dependency dependency, String inheritedScope, Predicate<Artifact> inheritedFilter)
             throws InvalidVersionSpecificationException {
         String effectiveScope = getEffectiveScope(dependency.getScope(), inheritedScope);
 
@@ -361,7 +361,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
                 effectiveScope,
                 dependency.isOptional());
 
-        if (inheritedFilter != null && !inheritedFilter.include(dependencyArtifact)) {
+        if (inheritedFilter != null && !inheritedFilter.test(dependencyArtifact)) {
             return null;
         }
 
@@ -402,8 +402,9 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         return effectiveScope;
     }
 
-    private static ArtifactFilter createDependencyFilter(Dependency dependency, ArtifactFilter inheritedFilter) {
-        ArtifactFilter effectiveFilter = inheritedFilter;
+    private static Predicate<Artifact> createDependencyFilter(
+            Dependency dependency, Predicate<Artifact> inheritedFilter) {
+        Predicate<Artifact> effectiveFilter = inheritedFilter;
 
         if (!dependency.getExclusions().isEmpty()) {
             effectiveFilter = new ExclusionArtifactFilter(dependency.getExclusions());
@@ -486,7 +487,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
             ArtifactFactory artifactFactory,
             List<Dependency> dependencies,
             String inheritedScope,
-            ArtifactFilter dependencyFilter,
+            Predicate<Artifact> dependencyFilter,
             MavenProject project)
             throws InvalidDependencyVersionException {
         Set<Artifact> artifacts = new LinkedHashSet<>();
@@ -608,7 +609,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
                         }
 
                         if (artifact.getDependencyFilter() != null
-                                && !artifact.getDependencyFilter().include(artifact)) {
+                                && !artifact.getDependencyFilter().test(artifact)) {
                             return null;
                         }
 

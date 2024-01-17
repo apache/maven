@@ -20,11 +20,11 @@ package org.apache.maven.artifact.resolver;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 /**
  * Artifact collector - takes a set of original artifacts and resolves all of the best versions to use
@@ -40,7 +40,7 @@ public interface ArtifactCollector extends org.apache.maven.repository.legacy.re
             ArtifactRepository localRepository,
             List<ArtifactRepository> remoteRepositories,
             ArtifactMetadataSource source,
-            ArtifactFilter filter,
+            Predicate<Artifact> filter,
             List<ResolutionListener> listeners)
             throws ArtifactResolutionException;
 }

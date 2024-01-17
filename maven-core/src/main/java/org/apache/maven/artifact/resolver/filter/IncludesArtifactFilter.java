@@ -30,14 +30,15 @@ import org.apache.maven.artifact.Artifact;
  * Filter to include from a list of artifact patterns.
  *
  */
-public class IncludesArtifactFilter implements ArtifactFilter {
+public class IncludesArtifactFilter extends ArtifactFilterSupport {
     private final Set<String> patterns;
 
     public IncludesArtifactFilter(List<String> patterns) {
         this.patterns = new LinkedHashSet<>(patterns);
     }
 
-    public boolean include(Artifact artifact) {
+    @Override
+    public boolean test(Artifact artifact) {
         String id = artifact.getGroupId() + ":" + artifact.getArtifactId();
 
         boolean matched = false;

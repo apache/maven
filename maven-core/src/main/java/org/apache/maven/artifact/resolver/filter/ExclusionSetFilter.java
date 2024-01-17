@@ -26,8 +26,8 @@ import org.apache.maven.artifact.Artifact;
 
 /**
  */
-public class ExclusionSetFilter implements ArtifactFilter {
-    private Set<String> excludes;
+public class ExclusionSetFilter extends ArtifactFilterSupport {
+    private final Set<String> excludes;
 
     public ExclusionSetFilter(String[] excludes) {
         this.excludes = new LinkedHashSet<>(Arrays.asList(excludes));
@@ -37,7 +37,8 @@ public class ExclusionSetFilter implements ArtifactFilter {
         this.excludes = excludes;
     }
 
-    public boolean include(Artifact artifact) {
+    @Override
+    public boolean test(Artifact artifact) {
         String id = artifact.getArtifactId();
 
         if (excludes.contains(id)) {

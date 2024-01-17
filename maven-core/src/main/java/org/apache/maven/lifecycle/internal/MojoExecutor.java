@@ -35,10 +35,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Predicate;
 
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -380,7 +380,7 @@ public class MojoExecutor {
             }
         }
 
-        ArtifactFilter artifactFilter = getArtifactFilter(mojoDescriptor);
+        Predicate<Artifact> artifactFilter = getArtifactFilter(mojoDescriptor);
         List<MavenProject> projectsToResolve = LifecycleDependencyResolver.getProjects(
                 session.getCurrentProject(), session, mojoDescriptor.isAggregator());
         for (MavenProject projectToResolve : projectsToResolve) {
@@ -388,7 +388,7 @@ public class MojoExecutor {
         }
     }
 
-    private ArtifactFilter getArtifactFilter(MojoDescriptor mojoDescriptor) {
+    private Predicate<Artifact> getArtifactFilter(MojoDescriptor mojoDescriptor) {
         String scopeToResolve = mojoDescriptor.getDependencyResolutionRequired();
         String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();
 

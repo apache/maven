@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -111,7 +112,7 @@ public class MavenProject implements Cloneable {
 
     private Set<Artifact> resolvedArtifacts;
 
-    private ArtifactFilter artifactFilter;
+    private Predicate<Artifact> artifactFilter;
 
     private Set<Artifact> artifacts;
 
@@ -619,7 +620,7 @@ public class MavenProject implements Cloneable {
             } else {
                 artifacts = new LinkedHashSet<>(resolvedArtifacts.size() * 2);
                 for (Artifact artifact : resolvedArtifacts) {
-                    if (artifactFilter.include(artifact)) {
+                    if (artifactFilter.test(artifact)) {
                         artifacts.add(artifact);
                     }
                 }
@@ -1218,10 +1219,15 @@ public class MavenProject implements Cloneable {
      *
      * @param artifactFilter The artifact filter, may be {@code null} to exclude all artifacts.
      */
-    public void setArtifactFilter(ArtifactFilter artifactFilter) {
+    public void setArtifactFilter(Predicate<Artifact> artifactFilter) {
         this.artifactFilter = artifactFilter;
         this.artifacts = null;
         this.artifactMap = null;
+    }
+
+    @Deprecated
+    public void setArtifactFilter(ArtifactFilter artifactFilter) {
+        setArtifactFilter((Predicate<Artifact>) artifactFilter);
     }
 
     /**
@@ -1312,6 +1318,13 @@ public class MavenProject implements Cloneable {
 
     @Deprecated
     public Set<Artifact> createArtifacts(ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter filter)
+            throws InvalidDependencyVersionException {
+        return createArtifacts(artifactFactory, inheritedScope, (Predicate<Artifact>) filter);
+    }
+
+    @Deprecated
+    public Set<Artifact> createArtifacts(
+            ArtifactFactory artifactFactory, String inheritedScope, Predicate<Artifact> filter)
             throws InvalidDependencyVersionException {
         return DefaultProjectArtifactFactory.createArtifacts(
                 artifactFactory, getModel().getDependencies(), inheritedScope, filter, this);

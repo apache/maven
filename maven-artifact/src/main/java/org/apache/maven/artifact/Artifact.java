@@ -21,12 +21,12 @@ package org.apache.maven.artifact;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -105,9 +105,9 @@ public interface Artifact extends Comparable<Artifact> {
 
     void setDownloadUrl(String downloadUrl);
 
-    ArtifactFilter getDependencyFilter();
+    Predicate<Artifact> getDependencyFilter();
 
-    void setDependencyFilter(ArtifactFilter artifactFilter);
+    void setDependencyFilter(Predicate<Artifact> artifactFilter);
 
     ArtifactHandler getArtifactHandler();
 

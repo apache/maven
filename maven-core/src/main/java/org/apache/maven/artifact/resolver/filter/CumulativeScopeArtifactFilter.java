@@ -31,7 +31,7 @@ import java.util.Set;
  */
 public class CumulativeScopeArtifactFilter extends AbstractScopeArtifactFilter {
 
-    private Set<String> scopes;
+    private final Set<String> scopes;
 
     /**
      * Create a new filter with the specified scopes and their implied scopes enabled.

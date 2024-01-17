@@ -20,11 +20,11 @@ package org.apache.maven.artifact;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Predicate;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
@@ -51,7 +51,7 @@ public class DefaultArtifact implements Artifact {
 
     private String downloadUrl;
 
-    private ArtifactFilter dependencyFilter;
+    private Predicate<Artifact> dependencyFilter;
 
     private ArtifactHandler artifactHandler;
 
@@ -389,11 +389,11 @@ public class DefaultArtifact implements Artifact {
         this.downloadUrl = downloadUrl;
     }
 
-    public ArtifactFilter getDependencyFilter() {
+    public Predicate<Artifact> getDependencyFilter() {
         return dependencyFilter;
     }
 
-    public void setDependencyFilter(ArtifactFilter artifactFilter) {
+    public void setDependencyFilter(Predicate<Artifact> artifactFilter) {
         dependencyFilter = artifactFilter;
     }
 

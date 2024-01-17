@@ -32,19 +32,16 @@ import org.apache.maven.model.Exclusion;
 /**
  * Filter to exclude from a list of artifact patterns.
  */
-public class ExclusionArtifactFilter implements ArtifactFilter {
-
-    private final List<Exclusion> exclusions;
+public class ExclusionArtifactFilter extends ArtifactFilterSupport {
     private final List<Predicate<Artifact>> predicates;
 
     public ExclusionArtifactFilter(List<Exclusion> exclusions) {
-        this.exclusions = exclusions;
         this.predicates =
                 exclusions.stream().map(ExclusionArtifactFilter::toPredicate).collect(Collectors.toList());
     }
 
     @Override
-    public boolean include(Artifact artifact) {
+    public boolean test(Artifact artifact) {
         return predicates.stream().noneMatch(p -> p.test(artifact));
     }
 

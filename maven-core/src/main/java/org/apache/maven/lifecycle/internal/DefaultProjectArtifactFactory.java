@@ -26,11 +26,11 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -60,7 +60,7 @@ public class DefaultProjectArtifactFactory implements ProjectArtifactFactory {
             ArtifactFactory artifactFactory,
             List<Dependency> dependencies,
             String inheritedScope,
-            ArtifactFilter dependencyFilter,
+            Predicate<Artifact> dependencyFilter,
             MavenProject project)
             throws InvalidDependencyVersionException {
         Set<Artifact> artifacts = new LinkedHashSet<>();
@@ -82,7 +82,7 @@ public class DefaultProjectArtifactFactory implements ProjectArtifactFactory {
     }
 
     private static Artifact createDependencyArtifact(
-            ArtifactFactory factory, Dependency dependency, String inheritedScope, ArtifactFilter inheritedFilter)
+            ArtifactFactory factory, Dependency dependency, String inheritedScope, Predicate<Artifact> inheritedFilter)
             throws InvalidVersionSpecificationException {
         String effectiveScope = getEffectiveScope(dependency.getScope(), inheritedScope);
 
@@ -101,7 +101,7 @@ public class DefaultProjectArtifactFactory implements ProjectArtifactFactory {
                 effectiveScope,
                 dependency.isOptional());
 
-        if (inheritedFilter != null && !inheritedFilter.include(dependencyArtifact)) {
+        if (inheritedFilter != null && !inheritedFilter.test(dependencyArtifact)) {
             return null;
         }
 
@@ -142,8 +142,9 @@ public class DefaultProjectArtifactFactory implements ProjectArtifactFactory {
         return effectiveScope;
     }
 
-    private static ArtifactFilter createDependencyFilter(Dependency dependency, ArtifactFilter inheritedFilter) {
-        ArtifactFilter effectiveFilter = inheritedFilter;
+    private static Predicate<Artifact> createDependencyFilter(
+            Dependency dependency, Predicate<Artifact> inheritedFilter) {
+        Predicate<Artifact> effectiveFilter = inheritedFilter;
 
         if (!dependency.getExclusions().isEmpty()) {
             effectiveFilter = new ExclusionArtifactFilter(dependency.getExclusions());

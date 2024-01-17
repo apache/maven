@@ -30,6 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -43,7 +44,6 @@ import org.apache.maven.artifact.resolver.ResolutionListener;
 import org.apache.maven.artifact.resolver.ResolutionListenerForDepMgmt;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
@@ -93,7 +93,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
             ArtifactRepository localRepository,
             List<ArtifactRepository> remoteRepositories,
             ArtifactMetadataSource source,
-            ArtifactFilter filter,
+            Predicate<Artifact> filter,
             List<ResolutionListener> listeners,
             List<ConflictResolver> conflictResolvers) {
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();
@@ -111,7 +111,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
             Map<String, Artifact> managedVersions,
             ArtifactResolutionRequest repositoryRequest,
             ArtifactMetadataSource source,
-            ArtifactFilter filter,
+            Predicate<Artifact> filter,
             List<ResolutionListener> listeners,
             List<ConflictResolver> conflictResolvers) {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
@@ -233,7 +233,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
             ManagedVersionMap managedVersions,
             ArtifactResolutionRequest request,
             ArtifactMetadataSource source,
-            ArtifactFilter filter,
+            Predicate<Artifact> filter,
             List<ResolutionListener> listeners,
             List<ConflictResolver> conflictResolvers)
             throws ArtifactResolutionException {
@@ -435,7 +435,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
                                     // for the artifact; otherwise we may end up with unwanted
                                     // dependencies.
                                     Artifact ma = managedVersions.get(childKey);
-                                    ArtifactFilter managedExclusionFilter = ma.getDependencyFilter();
+                                    Predicate<Artifact> managedExclusionFilter = ma.getDependencyFilter();
                                     if (null != managedExclusionFilter) {
                                         if (null != artifact.getDependencyFilter()) {
                                             AndArtifactFilter aaf = new AndArtifactFilter();
@@ -498,7 +498,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
 
                             if (parentArtifact != null
                                     && parentArtifact.getDependencyFilter() != null
-                                    && !parentArtifact.getDependencyFilter().include(artifact)) {
+                                    && !parentArtifact.getDependencyFilter().test(artifact)) {
                                 // MNG-3769: the [probably relocated] artifact is excluded.
                                 // We could process exclusions on relocated artifact details in the
                                 // MavenMetadataSource.createArtifacts(..) step, BUT that would
@@ -725,7 +725,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
             ArtifactRepository localRepository,
             List<ArtifactRepository> remoteRepositories,
             ArtifactMetadataSource source,
-            ArtifactFilter filter,
+            Predicate<Artifact> filter,
             List<ResolutionListener> listeners) {
         return collect(
                 artifacts,
@@ -745,7 +745,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
             ArtifactRepository localRepository,
             List<ArtifactRepository> remoteRepositories,
             ArtifactMetadataSource source,
-            ArtifactFilter filter,
+            Predicate<Artifact> filter,
             List<ResolutionListener> listeners) {
         return collect(
                 artifacts, originatingArtifact, null, localRepository, remoteRepositories, source, filter, listeners);

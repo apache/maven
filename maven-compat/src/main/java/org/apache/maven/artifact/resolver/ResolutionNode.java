@@ -24,10 +24,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 
@@ -79,7 +79,7 @@ public class ResolutionNode {
     }
 
     public void addDependencies(
-            Set<Artifact> artifacts, List<ArtifactRepository> remoteRepositories, ArtifactFilter filter)
+            Set<Artifact> artifacts, List<ArtifactRepository> remoteRepositories, Predicate<Artifact> filter)
             throws CyclicDependencyException, OverConstrainedVersionException {
         if (artifacts != null && !artifacts.isEmpty()) {
             children = new ArrayList<>(artifacts.size());
@@ -192,11 +192,11 @@ public class ResolutionNode {
         }
     }
 
-    public boolean filterTrail(ArtifactFilter filter) throws OverConstrainedVersionException {
+    public boolean filterTrail(Predicate<Artifact> filter) throws OverConstrainedVersionException {
         boolean success = true;
         if (filter != null) {
             for (Artifact artifact : getTrail()) {
-                if (!filter.include(artifact)) {
+                if (!filter.test(artifact)) {
                     success = false;
                 }
             }

@@ -18,19 +18,20 @@
  */
 package org.apache.maven.artifact.resolver.filter;
 
-import java.util.function.Predicate;
+import java.util.*;
 
 import org.apache.maven.artifact.Artifact;
 
 /**
- * This is a plain predicate.
+ * Support for transition. Once {@link ArtifactFilter} is gone, just remove this class and make subclasses plain
+ * {@link java.util.function.Predicate}.
+ *
+ * @since 2.0.0
  */
-@Deprecated
-public interface ArtifactFilter extends Predicate<Artifact> {
-    boolean include(Artifact artifact);
-
-    @Override
-    default boolean test(Artifact artifact) {
-        return include(artifact);
+abstract class ArtifactFilterSupport implements ArtifactFilter {
+    public final boolean include(Artifact artifact) {
+        return test(artifact);
     }
+
+    public abstract boolean test(Artifact artifact);
 }

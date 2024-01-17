@@ -21,12 +21,12 @@ package org.apache.maven.project.artifact;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -161,12 +161,12 @@ public class ActiveProjectArtifact implements Artifact {
     }
 
     /** {@inheritDoc} */
-    public ArtifactFilter getDependencyFilter() {
+    public Predicate<Artifact> getDependencyFilter() {
         return artifact.getDependencyFilter();
     }
 
     /** {@inheritDoc} */
-    public void setDependencyFilter(ArtifactFilter artifactFilter) {
+    public void setDependencyFilter(Predicate<Artifact> artifactFilter) {
         artifact.setDependencyFilter(artifactFilter);
     }
 

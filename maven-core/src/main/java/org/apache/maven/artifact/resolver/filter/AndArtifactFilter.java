@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.artifact.Artifact;
 
@@ -30,33 +31,34 @@ import org.apache.maven.artifact.Artifact;
  * Apply multiple filters.
  *
  */
-public class AndArtifactFilter implements ArtifactFilter {
-    private Set<ArtifactFilter> filters;
+public class AndArtifactFilter extends ArtifactFilterSupport {
+    private final Set<Predicate<Artifact>> filters;
 
     public AndArtifactFilter() {
         this.filters = new LinkedHashSet<>();
     }
 
-    public AndArtifactFilter(List<ArtifactFilter> filters) {
+    public AndArtifactFilter(List<Predicate<Artifact>> filters) {
         this.filters = new LinkedHashSet<>(filters);
     }
 
-    public boolean include(Artifact artifact) {
+    @Override
+    public boolean test(Artifact artifact) {
         boolean include = true;
-        for (Iterator<ArtifactFilter> i = filters.iterator(); i.hasNext() && include; ) {
-            ArtifactFilter filter = i.next();
-            if (!filter.include(artifact)) {
+        for (Iterator<Predicate<Artifact>> i = filters.iterator(); i.hasNext() && include; ) {
+            Predicate<Artifact> filter = i.next();
+            if (!filter.test(artifact)) {
                 include = false;
             }
         }
         return include;
     }
 
-    public void add(ArtifactFilter artifactFilter) {
+    public void add(Predicate<Artifact> artifactFilter) {
         filters.add(artifactFilter);
     }
 
-    public List<ArtifactFilter> getFilters() {
+    public List<Predicate<Artifact>> getFilters() {
         return new ArrayList<>(filters);
     }
 
