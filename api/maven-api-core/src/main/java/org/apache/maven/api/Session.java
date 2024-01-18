@@ -74,8 +74,9 @@ public interface Session {
     Map<String, String> getSystemProperties();
 
     /**
-     * Gets the effective properties to use for interpolation.
+     * Each invocation create a new map of effective properties. To be used in interpolation.
      *
+     * @param project {@link Project} or {@code null}.
      * @return the effective properties, never {@code null}
      */
     @Nonnull
