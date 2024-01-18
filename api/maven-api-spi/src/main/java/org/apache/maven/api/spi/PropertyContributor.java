@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.spi.session;
+package org.apache.maven.api.spi;
 
 import java.util.Map;
 

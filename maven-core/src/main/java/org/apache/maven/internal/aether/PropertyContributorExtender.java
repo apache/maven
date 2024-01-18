@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.api.spi.session.PropertyContributor;
+import org.apache.maven.api.spi.PropertyContributor;
 import org.apache.maven.execution.MavenExecutionRequest;
 
 /**
@@ -36,11 +36,11 @@ import org.apache.maven.execution.MavenExecutionRequest;
  */
 @Named
 @Singleton
-class EffectivePropertyContributorExtender implements MavenExecutionRequestExtender {
+class PropertyContributorExtender implements MavenExecutionRequestExtender {
     private final Map<String, PropertyContributor> effectivePropertyContributors;
 
     @Inject
-    EffectivePropertyContributorExtender(Map<String, PropertyContributor> effectivePropertyContributors) {
+    PropertyContributorExtender(Map<String, PropertyContributor> effectivePropertyContributors) {
         this.effectivePropertyContributors = effectivePropertyContributors;
     }
 

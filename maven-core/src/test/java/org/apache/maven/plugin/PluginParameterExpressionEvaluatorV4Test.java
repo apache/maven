@@ -310,7 +310,6 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
 
         DefaultRepositorySystemSession repositorySession =
                 new DefaultRepositorySystemSession(h -> false); // no close handle
-        repositorySession.setSystemProperties(properties);
         repositorySession.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory()
                 .newInstance(repositorySession, new LocalRepository(repo.getUrl())));
         MavenSession session =

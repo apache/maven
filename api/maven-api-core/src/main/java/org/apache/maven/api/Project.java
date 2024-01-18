@@ -137,6 +137,8 @@ public interface Project {
 
     /**
      * Returns the project properties as immutable map.
+     *
+     * @see org.apache.maven.api.services.ProjectManager#setProperty(Project, String, String)
      */
     @Nonnull
     Map<String, String> getProperties();
