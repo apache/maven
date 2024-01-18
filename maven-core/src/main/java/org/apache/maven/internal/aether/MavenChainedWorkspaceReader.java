@@ -32,6 +32,9 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * A maven workspace reader that delegates to a chain of other readers, effectively aggregating their contents.
+ * <p>
+ * This class, while technically is not immutable, should be considered as such once set up. If not mutated, it is also
+ * thread-safe. <em>The mutation of this class instances should happen beforehand their use in session</em>.
  */
 public class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
 
@@ -96,7 +99,7 @@ public class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
         return Collections.unmodifiableList(new ArrayList<>(versions));
     }
 
-    public synchronized void setReaders(Collection<WorkspaceReader> readers) {
+    public void setReaders(Collection<WorkspaceReader> readers) {
         requireNonNull(readers, "readers");
         // skip possible null entries
         this.readers = Collections.unmodifiableList(
@@ -105,11 +108,11 @@ public class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
         this.repository = new WorkspaceRepository(key.getContentType(), key);
     }
 
-    public synchronized List<WorkspaceReader> getReaders() {
+    public List<WorkspaceReader> getReaders() {
         return readers;
     }
 
-    public synchronized void addReader(WorkspaceReader workspaceReader) {
+    public void addReader(WorkspaceReader workspaceReader) {
         requireNonNull(workspaceReader, "workspaceReader");
         ArrayList<WorkspaceReader> newReaders = new ArrayList<>(this.readers);
         newReaders.add(workspaceReader);
