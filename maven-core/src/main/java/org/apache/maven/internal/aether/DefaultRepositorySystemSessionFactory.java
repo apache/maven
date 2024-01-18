@@ -179,7 +179,9 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
 
     private final VersionScheme versionScheme;
 
-    private final Map<String, RepositorySystemSessionExtender> extenders;
+    private final Map<String, MavenExecutionRequestExtender> requestExtenders;
+
+    private final Map<String, RepositorySystemSessionExtender> sessionExtenders;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -191,7 +193,8 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
             RuntimeInformation runtimeInformation,
             TypeRegistry typeRegistry,
             VersionScheme versionScheme,
-            Map<String, RepositorySystemSessionExtender> extenders) {
+            Map<String, MavenExecutionRequestExtender> requestExtenders,
+            Map<String, RepositorySystemSessionExtender> sessionExtenders) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.settingsDecrypter = settingsDecrypter;
@@ -199,7 +202,8 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         this.runtimeInformation = runtimeInformation;
         this.typeRegistry = typeRegistry;
         this.versionScheme = versionScheme;
-        this.extenders = extenders;
+        this.requestExtenders = requestExtenders;
+        this.sessionExtenders = sessionExtenders;
     }
 
     @Deprecated
@@ -207,22 +211,27 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         return newRepositorySessionBuilder(request).build();
     }
 
-    @SuppressWarnings("checkstyle:methodLength")
+    @SuppressWarnings({"checkstyle:methodLength"})
     public SessionBuilder newRepositorySessionBuilder(MavenExecutionRequest request) {
         requireNonNull(request, "request");
+
+        // apply MavenExecutionRequestExtenders
+        for (MavenExecutionRequestExtender requestExtender : requestExtenders.values()) {
+            requestExtender.extend(request);
+        }
+
         SessionBuilder sessionBuilder = MavenRepositorySystemUtils.newSession(
                 repoSystem.createSessionBuilder(), new TypeRegistryAdapter(typeRegistry));
         sessionBuilder.setCache(request.getRepositoryCache());
 
+        // this map is read ONLY to get config from (profiles + env + system + user)
+        Map<String, String> mergedProps = createMergedProperties(request);
+
+        // configProps map is kept "pristine", is written ONLY, the mandatory resolver config
         Map<String, Object> configProps = new LinkedHashMap<>();
         configProps.put(ConfigurationProperties.USER_AGENT, getUserAgent());
         configProps.put(ConfigurationProperties.INTERACTIVE, request.isInteractiveMode());
         configProps.put("maven.startTime", request.getStartTime());
-        // First add properties populated from settings.xml
-        configProps.putAll(getPropertiesFromRequestedProfiles(request));
-        // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
-        putAll(request.getSystemProperties(), configProps);
-        putAll(request.getUserProperties(), configProps);
 
         sessionBuilder.setOffline(request.isOffline());
         sessionBuilder.setChecksumPolicy(request.getGlobalChecksumPolicy());
@@ -244,7 +253,7 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         sessionBuilder.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
                 request.isIgnoreMissingArtifactDescriptor(), request.isIgnoreInvalidArtifactDescriptor()));
 
-        VersionFilter versionFilter = buildVersionFilter((String) configProps.get(MAVEN_VERSION_FILTERS));
+        VersionFilter versionFilter = buildVersionFilter(mergedProps.get(MAVEN_VERSION_FILTERS));
         if (versionFilter != null) {
             sessionBuilder.setVersionFilter(versionFilter);
         }
@@ -379,7 +388,7 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         }
         sessionBuilder.setAuthenticationSelector(authSelector);
 
-        Object transport = configProps.getOrDefault(MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
+        Object transport = mergedProps.getOrDefault(MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
         if (MAVEN_RESOLVER_TRANSPORT_DEFAULT.equals(transport)) {
             // The "default" mode (user did not set anything) from now on defaults to AUTO
         } else if (MAVEN_RESOLVER_TRANSPORT_JDK.equals(transport)) {
@@ -413,21 +422,21 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
 
         RepositoryListener repositoryListener = eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger));
 
-        boolean recordReverseTree = configProps.containsKey(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE)
-                && Boolean.parseBoolean((String) configProps.get(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE));
+        boolean recordReverseTree = Boolean.parseBoolean(
+                mergedProps.getOrDefault(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE, Boolean.FALSE.toString()));
         if (recordReverseTree) {
             repositoryListener = new ChainedRepositoryListener(repositoryListener, new ReverseTreeRepositoryListener());
         }
         sessionBuilder.setRepositoryListener(repositoryListener);
 
-        String resolverDependencyManagerTransitivity = (String)
-                configProps.getOrDefault(MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY, Boolean.TRUE.toString());
+        String resolverDependencyManagerTransitivity =
+                mergedProps.getOrDefault(MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY, Boolean.TRUE.toString());
         sessionBuilder.setDependencyManager(
                 new ClassicDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 
         ArrayList<File> paths = new ArrayList<>();
         paths.add(new File(request.getLocalRepository().getBasedir()));
-        String localRepoTail = (String) configProps.get(MAVEN_REPO_LOCAL_TAIL);
+        String localRepoTail = mergedProps.get(MAVEN_REPO_LOCAL_TAIL);
         if (localRepoTail != null) {
             Arrays.stream(localRepoTail.split(","))
                     .filter(p -> p != null && !p.trim().isEmpty())
@@ -436,21 +445,21 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         }
         sessionBuilder.withLocalRepositoryBaseDirectories(paths);
 
-        for (RepositorySystemSessionExtender extender : extenders.values()) {
+        for (RepositorySystemSessionExtender extender : sessionExtenders.values()) {
             extender.extend(request, configProps, mirrorSelector, proxySelector, authSelector);
         }
 
+        // at this point we have "config" with pure MANDATORY resolver config, so resolver final config properties are
+        // mergedProperties + configProperties
+        HashMap<String, Object> finalConfigProperties = new HashMap<>();
+        finalConfigProperties.putAll(mergedProps);
+        finalConfigProperties.putAll(configProps);
+
         sessionBuilder.setUserProperties(request.getUserProperties());
         sessionBuilder.setSystemProperties(request.getSystemProperties());
-        sessionBuilder.setConfigProperties(configProps);
+        sessionBuilder.setConfigProperties(finalConfigProperties);
 
         return sessionBuilder;
-    }
-
-    private void putAll(Properties source, Map<String, Object> target) {
-        for (Map.Entry<Object, Object> e : source.entrySet()) {
-            target.put(String.valueOf(e.getKey()), e.getValue());
-        }
     }
 
     private VersionFilter buildVersionFilter(String filterExpression) {
@@ -519,7 +528,17 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         }
     }
 
-    private Map<String, Object> getPropertiesFromRequestedProfiles(MavenExecutionRequest request) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private Map<String, String> createMergedProperties(MavenExecutionRequest request) {
+        // this throwaway map is really ONLY to get config from (profiles + env + system + user)
+        Map<String, String> mergedProps = new HashMap<>();
+        mergedProps.putAll(getPropertiesFromRequestedProfiles(request));
+        mergedProps.putAll(new HashMap<String, String>((Map) request.getSystemProperties()));
+        mergedProps.putAll(new HashMap<String, String>((Map) request.getUserProperties()));
+        return mergedProps;
+    }
+
+    private Map<String, String> getPropertiesFromRequestedProfiles(MavenExecutionRequest request) {
         HashSet<String> activeProfileId =
                 new HashSet<>(request.getProfileActivation().getRequiredActiveProfileIds());
         activeProfileId.addAll(request.getProfileActivation().getOptionalActiveProfileIds());
@@ -528,7 +547,9 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
                 .filter(profile -> activeProfileId.contains(profile.getId()))
                 .map(ModelBase::getProperties)
                 .flatMap(properties -> properties.entrySet().stream())
-                .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), Map.Entry::getValue, (k1, k2) -> k2));
+                .filter(e -> e.getValue() != null)
+                .collect(Collectors.toMap(
+                        e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()), (k1, k2) -> k2));
     }
 
     private String getUserAgent() {

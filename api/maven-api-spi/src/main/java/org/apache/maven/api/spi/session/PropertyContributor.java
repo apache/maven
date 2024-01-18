@@ -20,21 +20,18 @@ package org.apache.maven.api.spi.session;
 
 import java.util.Map;
 
-import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * Component able to contribute to Maven session effective properties. This SPI component is invoked
+ * Component able to contribute to Maven session user properties. This SPI component is invoked
  * very early, while there is no session created yet.
  */
 @Experimental
-public interface EffectivePropertyContributor {
+public interface PropertyContributor {
     /**
-     * Invoked just before session is created with a mutable map that carries collected effective properties so far.
-     * Values set here will override everything coming from {@link Session#getSystemProperties()} and
-     * {@link Session#getUserProperties()} and can be queried via {@link Session#getEffectiveProperties()}.
+     * Invoked just before session is created with a mutable map that carries collected user properties so far.
      *
-     * @param effectiveProperties The mutable effective properties, never {@code null}.
+     * @param userProperties The mutable user properties, never {@code null}.
      */
-    void contribute(Map<String, Object> effectiveProperties);
+    void contribute(Map<String, String> userProperties);
 }

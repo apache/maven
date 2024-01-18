@@ -90,6 +90,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
+                Collections.emptyMap(),
                 Collections.emptyMap());
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
@@ -114,6 +115,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
+                Collections.emptyMap(),
                 Collections.emptyMap());
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
@@ -150,6 +152,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
+                Collections.emptyMap(),
                 Collections.emptyMap());
 
         PlexusConfiguration plexusConfiguration = (PlexusConfiguration) systemSessionFactory
@@ -194,6 +197,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
+                Collections.emptyMap(),
                 Collections.emptyMap());
 
         Map<String, String> headers = (Map<String, String>) systemSessionFactory
@@ -232,6 +236,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
+                Collections.emptyMap(),
                 Collections.emptyMap());
 
         int connectionTimeout = (Integer) systemSessionFactory
@@ -274,6 +279,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
+                Collections.emptyMap(),
                 Collections.emptyMap());
 
         int connectionTimeout = (Integer) systemSessionFactory
@@ -310,6 +316,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
+                Collections.emptyMap(),
                 Collections.emptyMap());
 
         int requestTimeout = (Integer) systemSessionFactory
@@ -352,6 +359,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
+                Collections.emptyMap(),
                 Collections.emptyMap());
 
         int requestTimeout = (Integer) systemSessionFactory
@@ -371,6 +379,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
+                Collections.emptyMap(),
                 Collections.emptyMap());
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
@@ -418,6 +427,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
+                Collections.emptyMap(),
                 Collections.emptyMap());
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();

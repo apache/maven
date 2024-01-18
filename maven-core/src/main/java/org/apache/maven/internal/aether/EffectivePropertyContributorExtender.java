@@ -22,38 +22,37 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
-import org.apache.maven.api.spi.session.EffectivePropertyContributor;
+import org.apache.maven.api.spi.session.PropertyContributor;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.eclipse.aether.repository.AuthenticationSelector;
-import org.eclipse.aether.repository.MirrorSelector;
-import org.eclipse.aether.repository.ProxySelector;
 
 /**
- * Extender that manages {@link EffectivePropertyContributor}.
+ * Extender that manages {@link PropertyContributor}.
  *
  * @since 4.0.0
  */
 @Named
 @Singleton
-class EffectivePropertyContributorExtender implements RepositorySystemSessionExtender {
-    private final Map<String, EffectivePropertyContributor> effectivePropertyContributors;
+class EffectivePropertyContributorExtender implements MavenExecutionRequestExtender {
+    private final Map<String, PropertyContributor> effectivePropertyContributors;
 
     @Inject
-    EffectivePropertyContributorExtender(Map<String, EffectivePropertyContributor> effectivePropertyContributors) {
+    EffectivePropertyContributorExtender(Map<String, PropertyContributor> effectivePropertyContributors) {
         this.effectivePropertyContributors = effectivePropertyContributors;
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
-    public void extend(
-            MavenExecutionRequest mavenExecutionRequest,
-            Map<String, Object> configProperties,
-            MirrorSelector mirrorSelector,
-            ProxySelector proxySelector,
-            AuthenticationSelector authenticationSelector) {
-        for (EffectivePropertyContributor contributor : effectivePropertyContributors.values()) {
-            contributor.contribute(configProperties);
+    public void extend(MavenExecutionRequest mavenExecutionRequest) {
+        HashMap<String, String> userPropertiesMap = new HashMap<>((Map) mavenExecutionRequest.getUserProperties());
+        for (PropertyContributor contributor : effectivePropertyContributors.values()) {
+            contributor.contribute(userPropertiesMap);
         }
+        Properties newProperties = new Properties();
+        newProperties.putAll(userPropertiesMap);
+        mavenExecutionRequest.setUserProperties(newProperties);
     }
 }
