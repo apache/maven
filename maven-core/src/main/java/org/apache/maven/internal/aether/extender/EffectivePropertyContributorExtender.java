@@ -39,12 +39,12 @@ import org.eclipse.aether.repository.ProxySelector;
 @Named
 @Singleton
 public class EffectivePropertyContributorExtender implements RepositorySystemSessionExtender {
-    private final Map<String, EffectivePropertyContributor> configurationPropertyContributors;
+    private final Map<String, EffectivePropertyContributor> effectivePropertyContributors;
 
     @Inject
     public EffectivePropertyContributorExtender(
-            Map<String, EffectivePropertyContributor> configurationPropertyContributors) {
-        this.configurationPropertyContributors = configurationPropertyContributors;
+            Map<String, EffectivePropertyContributor> effectivePropertyContributors) {
+        this.effectivePropertyContributors = effectivePropertyContributors;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class EffectivePropertyContributorExtender implements RepositorySystemSes
             MirrorSelector mirrorSelector,
             ProxySelector proxySelector,
             AuthenticationSelector authenticationSelector) {
-        for (EffectivePropertyContributor contributor : configurationPropertyContributors.values()) {
+        for (EffectivePropertyContributor contributor : effectivePropertyContributors.values()) {
             contributor.contribute(configProperties);
         }
     }
