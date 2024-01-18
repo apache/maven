@@ -108,13 +108,13 @@ public class DefaultSession extends AbstractSession {
     @Nonnull
     @Override
     public Map<String, String> getUserProperties() {
-        return new PropertiesAsMap(mavenSession.getUserProperties());
+        return Collections.unmodifiableMap(new PropertiesAsMap(mavenSession.getUserProperties()));
     }
 
     @Nonnull
     @Override
     public Map<String, String> getSystemProperties() {
-        return new PropertiesAsMap(mavenSession.getSystemProperties());
+        return Collections.unmodifiableMap(new PropertiesAsMap(mavenSession.getSystemProperties()));
     }
 
     @Nonnull

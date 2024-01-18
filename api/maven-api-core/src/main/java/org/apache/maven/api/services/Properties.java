@@ -32,7 +32,7 @@ import org.apache.maven.api.annotations.Nullable;
 public interface Properties extends Service {
 
     /**
-     * Each invocation create a new map of effective properties using passed in parameters. To be used in interpolation.
+     * Each invocation computes a new map of effective properties. To be used in interpolation.
      *
      * @param session {@link Session}, never {@code null}.
      * @param project {@link Project} or {@code null}.

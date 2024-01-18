@@ -56,7 +56,7 @@ public interface Session {
     SessionData getData();
 
     /**
-     * Gets the copy of user properties to use for interpolation. The user properties have been configured directly
+     * Returns immutable user properties to use for interpolation. The user properties have been configured directly
      * by the user, e.g. via the {@code -Dkey=value} parameter on the command line.
      *
      * @return the user properties, never {@code null}
@@ -65,7 +65,7 @@ public interface Session {
     Map<String, String> getUserProperties();
 
     /**
-     * Gets the copy of system properties to use for interpolation. The system properties are collected from the
+     * Returns immutable system properties to use for interpolation. The system properties are collected from the
      * runtime environment such as {@link System#getProperties()} and environment variables.
      *
      * @return the system properties, never {@code null}
@@ -74,7 +74,7 @@ public interface Session {
     Map<String, String> getSystemProperties();
 
     /**
-     * Each invocation create a new map of effective properties. To be used in interpolation.
+     * Each invocation computes a new map of effective properties. To be used in interpolation.
      *
      * @param project {@link Project} or {@code null}.
      * @return the effective properties, never {@code null}
