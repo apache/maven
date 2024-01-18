@@ -35,6 +35,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -99,9 +100,16 @@ public class BootstrapCoreExtensionManager {
     public List<CoreExtensionEntry> loadCoreExtensions(
             MavenExecutionRequest request, Set<String> providedArtifacts, List<CoreExtension> extensions)
             throws Exception {
+        MavenChainedWorkspaceReader chainedWorkspaceReader = new MavenChainedWorkspaceReader();
+        if (request.getWorkspaceReader() != null) {
+            chainedWorkspaceReader.addReader(request.getWorkspaceReader());
+        }
+        if (ideWorkspaceReader != null) {
+            chainedWorkspaceReader.addReader(ideWorkspaceReader);
+        }
         try (CloseableSession repoSession = repositorySystemSessionFactory
                 .newRepositorySessionBuilder(request)
-                .setWorkspaceReader(ideWorkspaceReader)
+                .setWorkspaceReader(chainedWorkspaceReader)
                 .build()) {
             List<RemoteRepository> repositories = RepositoryUtils.toRepos(request.getPluginArtifactRepositories());
             Interpolator interpolator = createInterpolator(request);
