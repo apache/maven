@@ -20,10 +20,7 @@ package org.apache.maven.internal.impl;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.*;
@@ -152,6 +149,11 @@ public class DefaultProject implements Project {
     @Override
     public List<RemoteRepository> getRemotePluginRepositories() {
         return new MappedList<>(project.getRemotePluginRepositories(), session::getRemoteRepository);
+    }
+
+    @Override
+    public Map<String, String> getProperties() {
+        return new PropertiesAsMap(project.getProperties());
     }
 
     @Nonnull

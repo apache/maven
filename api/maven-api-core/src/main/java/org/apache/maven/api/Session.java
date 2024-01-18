@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.DependencyCoordinateFactory;
@@ -73,15 +74,12 @@ public interface Session {
     Map<String, String> getSystemProperties();
 
     /**
-     * Gets the immutable effective properties to use for interpolation. The effective properties are collected from
-     * {@link #getSystemProperties()} and {@link #getUserProperties()} in this order, and more.
-     * <p>
-     * These properties are "effective" in a way they are built obeying all "user overrides" and others.
+     * Gets the effective properties to use for interpolation.
      *
-     * @return the config properties, never {@code null}
+     * @return the effective properties, never {@code null}
      */
     @Nonnull
-    Map<String, Object> getEffectiveProperties();
+    Map<String, String> getEffectiveProperties(@Nullable Project project);
 
     /**
      * Returns the current maven version

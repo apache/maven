@@ -35,6 +35,7 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.services.MavenException;
+import org.apache.maven.api.services.Properties;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -107,19 +108,19 @@ public class DefaultSession extends AbstractSession {
     @Nonnull
     @Override
     public Map<String, String> getUserProperties() {
-        return session.getUserProperties();
+        return new PropertiesAsMap(mavenSession.getUserProperties());
     }
 
     @Nonnull
     @Override
     public Map<String, String> getSystemProperties() {
-        return session.getSystemProperties();
+        return new PropertiesAsMap(mavenSession.getSystemProperties());
     }
 
     @Nonnull
     @Override
-    public Map<String, Object> getEffectiveProperties() {
-        return session.getConfigProperties();
+    public Map<String, String> getEffectiveProperties(@Nullable Project project) {
+        return getService(Properties.class).effectiveProperties(this, project);
     }
 
     @Nonnull

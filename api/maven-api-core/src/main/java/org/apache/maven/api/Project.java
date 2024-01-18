@@ -20,6 +20,7 @@ package org.apache.maven.api;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -133,4 +134,10 @@ public interface Project {
 
     @Nonnull
     List<RemoteRepository> getRemotePluginRepositories();
+
+    /**
+     * Returns the effective project properties.
+     */
+    @Nonnull
+    Map<String, String> getProperties();
 }
