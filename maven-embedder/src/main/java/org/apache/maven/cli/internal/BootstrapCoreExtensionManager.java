@@ -100,16 +100,9 @@ public class BootstrapCoreExtensionManager {
     public List<CoreExtensionEntry> loadCoreExtensions(
             MavenExecutionRequest request, Set<String> providedArtifacts, List<CoreExtension> extensions)
             throws Exception {
-        MavenChainedWorkspaceReader chainedWorkspaceReader = new MavenChainedWorkspaceReader();
-        if (request.getWorkspaceReader() != null) {
-            chainedWorkspaceReader.addReader(request.getWorkspaceReader());
-        }
-        if (ideWorkspaceReader != null) {
-            chainedWorkspaceReader.addReader(ideWorkspaceReader);
-        }
         try (CloseableSession repoSession = repositorySystemSessionFactory
                 .newRepositorySessionBuilder(request)
-                .setWorkspaceReader(chainedWorkspaceReader)
+                .setWorkspaceReader(new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader))
                 .build()) {
             List<RemoteRepository> repositories = RepositoryUtils.toRepos(request.getPluginArtifactRepositories());
             Interpolator interpolator = createInterpolator(request);

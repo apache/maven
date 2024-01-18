@@ -19,12 +19,7 @@
 package org.apache.maven.internal.aether;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.maven.model.Model;
@@ -103,7 +98,9 @@ public class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
 
     public synchronized void setReaders(Collection<WorkspaceReader> readers) {
         requireNonNull(readers, "readers");
-        this.readers = Collections.unmodifiableList(new ArrayList<>(readers));
+        // skip possible null entries
+        this.readers = Collections.unmodifiableList(
+                new ArrayList<>(readers.stream().filter(Objects::nonNull).collect(Collectors.toList())));
         Key key = new Key(this.readers);
         this.repository = new WorkspaceRepository(key.getContentType(), key);
     }

@@ -214,13 +214,8 @@ public class DefaultMaven implements Maven {
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        MavenChainedWorkspaceReader chainedWorkspaceReader = new MavenChainedWorkspaceReader();
-        if (request.getWorkspaceReader() != null) {
-            chainedWorkspaceReader.addReader(request.getWorkspaceReader());
-        }
-        if (ideWorkspaceReader != null) {
-            chainedWorkspaceReader.addReader(ideWorkspaceReader);
-        }
+        MavenChainedWorkspaceReader chainedWorkspaceReader =
+                new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
         try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
             MavenSession session = new MavenSession(closeableSession, request, result);
             session.setSession(defaultSessionFactory.getSession(session));
