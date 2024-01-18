@@ -34,7 +34,6 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.DefaultLookup;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -148,7 +147,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
         initRepoSession(configuration);
 
         DefaultSessionFactory defaultSessionFactory =
-                new DefaultSessionFactory(mock(RepositorySystem.class), null, new DefaultLookup(container), null);
+                new DefaultSessionFactory(mock(RepositorySystem.class), null, null, null);
 
         MavenSession session = new MavenSession(
                 getContainer(), configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());

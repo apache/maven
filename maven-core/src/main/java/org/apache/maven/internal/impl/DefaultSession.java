@@ -20,11 +20,7 @@ package org.apache.maven.internal.impl;
 
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -35,7 +31,6 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.services.MavenException;
-import org.apache.maven.api.services.Properties;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -120,7 +115,12 @@ public class DefaultSession extends AbstractSession {
     @Nonnull
     @Override
     public Map<String, String> getEffectiveProperties(@Nullable Project project) {
-        return getService(Properties.class).effectiveProperties(this, project);
+        HashMap<String, String> result = new HashMap<>(new PropertiesAsMap(mavenSession.getSystemProperties()));
+        if (project != null) {
+            result.putAll(project.getProperties());
+        }
+        result.putAll(new PropertiesAsMap(mavenSession.getUserProperties()));
+        return result;
     }
 
     @Nonnull
