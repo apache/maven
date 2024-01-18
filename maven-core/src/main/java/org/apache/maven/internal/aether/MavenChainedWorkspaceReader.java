@@ -101,14 +101,22 @@ public class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
         return Collections.unmodifiableList(new ArrayList<>(versions));
     }
 
-    public void setReaders(Collection<WorkspaceReader> readers) {
+    public synchronized void setReaders(Collection<WorkspaceReader> readers) {
+        requireNonNull(readers, "readers");
         this.readers = Collections.unmodifiableList(new ArrayList<>(readers));
         Key key = new Key(this.readers);
         this.repository = new WorkspaceRepository(key.getContentType(), key);
     }
 
-    public List<WorkspaceReader> getReaders() {
+    public synchronized List<WorkspaceReader> getReaders() {
         return readers;
+    }
+
+    public synchronized void addReader(WorkspaceReader workspaceReader) {
+        requireNonNull(workspaceReader, "workspaceReader");
+        ArrayList<WorkspaceReader> newReaders = new ArrayList<>(this.readers);
+        newReaders.add(workspaceReader);
+        setReaders(newReaders);
     }
 
     private static class Key {

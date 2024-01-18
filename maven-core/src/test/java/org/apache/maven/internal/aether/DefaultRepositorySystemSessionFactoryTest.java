@@ -84,7 +84,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
@@ -108,7 +107,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
@@ -144,7 +142,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
@@ -188,7 +185,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
@@ -226,7 +222,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
@@ -268,7 +263,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
@@ -304,7 +298,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
@@ -346,7 +339,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
@@ -365,7 +357,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
@@ -412,7 +403,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
