@@ -142,7 +142,6 @@ public class DefaultMaven implements Maven {
         this.superPomProvider = superPomProvider;
         this.ideWorkspaceReader = ideWorkspaceReader;
         this.defaultSessionFactory = defaultSessionFactory;
-
         this.projectSelector = new ProjectSelector(); // if necessary switch to DI
     }
 
