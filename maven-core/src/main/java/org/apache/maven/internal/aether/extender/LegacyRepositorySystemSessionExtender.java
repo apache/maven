@@ -49,7 +49,7 @@ public class LegacyRepositorySystemSessionExtender implements RepositorySystemSe
     @Override
     public void extend(
             MavenExecutionRequest mavenExecutionRequest,
-            Map<Object, Object> configProperties,
+            Map<String, Object> configProperties,
             MirrorSelector mirrorSelector,
             ProxySelector proxySelector,
             AuthenticationSelector authenticationSelector) {

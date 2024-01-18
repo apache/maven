@@ -26,14 +26,14 @@ import org.eclipse.aether.repository.MirrorSelector;
 import org.eclipse.aether.repository.ProxySelector;
 
 /**
- * Component able to "extend" session in some way.
+ * Internal component able to "extend" session in some way.
  *
  * @since 4.0.0
  */
 public interface RepositorySystemSessionExtender {
     void extend(
             MavenExecutionRequest mavenExecutionRequest,
-            Map<Object, Object> configProperties,
+            Map<String, Object> configProperties,
             MirrorSelector mirrorSelector,
             ProxySelector proxySelector,
             AuthenticationSelector authenticationSelector);

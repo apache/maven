@@ -38,7 +38,6 @@ import org.apache.maven.api.Session;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.configuration.internal.EnhancedComponentConfigurator;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -85,9 +84,6 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
 
     @Inject
     PlexusContainer container;
-
-    @Inject
-    private MavenRepositorySystem factory;
 
     private Path rootDirectory;
 
@@ -314,6 +310,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
 
         DefaultRepositorySystemSession repositorySession =
                 new DefaultRepositorySystemSession(h -> false); // no close handle
+        repositorySession.setSystemProperties(properties);
         repositorySession.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory()
                 .newInstance(repositorySession, new LocalRepository(repo.getUrl())));
         MavenSession session =

@@ -22,13 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -220,15 +214,15 @@ public class DefaultRepositorySystemSessionFactory {
                 repoSystem.createSessionBuilder(), new TypeRegistryAdapter(typeRegistry));
         sessionBuilder.setCache(request.getRepositoryCache());
 
-        Map<Object, Object> configProps = new LinkedHashMap<>();
+        Map<String, Object> configProps = new LinkedHashMap<>();
         configProps.put(ConfigurationProperties.USER_AGENT, getUserAgent());
         configProps.put(ConfigurationProperties.INTERACTIVE, request.isInteractiveMode());
         configProps.put("maven.startTime", request.getStartTime());
         // First add properties populated from settings.xml
         configProps.putAll(getPropertiesFromRequestedProfiles(request));
         // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
-        configProps.putAll(request.getSystemProperties());
-        configProps.putAll(request.getUserProperties());
+        putAll(request.getSystemProperties(), configProps);
+        putAll(request.getUserProperties(), configProps);
 
         sessionBuilder.setOffline(request.isOffline());
         sessionBuilder.setChecksumPolicy(request.getGlobalChecksumPolicy());
@@ -456,6 +450,12 @@ public class DefaultRepositorySystemSessionFactory {
         return sessionBuilder;
     }
 
+    private void putAll(Properties source, Map<String, Object> target) {
+        for (Map.Entry<Object, Object> e : source.entrySet()) {
+            target.put(String.valueOf(e.getKey()), e.getValue());
+        }
+    }
+
     private VersionFilter buildVersionFilter(String filterExpression) {
         ArrayList<VersionFilter> filters = new ArrayList<>();
         if (filterExpression != null) {
@@ -522,7 +522,7 @@ public class DefaultRepositorySystemSessionFactory {
         }
     }
 
-    private Map<?, ?> getPropertiesFromRequestedProfiles(MavenExecutionRequest request) {
+    private Map<String, Object> getPropertiesFromRequestedProfiles(MavenExecutionRequest request) {
         HashSet<String> activeProfileId =
                 new HashSet<>(request.getProfileActivation().getRequiredActiveProfileIds());
         activeProfileId.addAll(request.getProfileActivation().getOptionalActiveProfileIds());
@@ -531,7 +531,7 @@ public class DefaultRepositorySystemSessionFactory {
                 .filter(profile -> activeProfileId.contains(profile.getId()))
                 .map(ModelBase::getProperties)
                 .flatMap(properties -> properties.entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (k1, k2) -> k2));
+                .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), Map.Entry::getValue, (k1, k2) -> k2));
     }
 
     private String getUserAgent() {

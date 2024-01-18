@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import java.util.Map;
 
-import org.apache.maven.api.spi.session.ConfigurationPropertyContributor;
+import org.apache.maven.api.spi.session.EffectivePropertyContributor;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.aether.RepositorySystemSessionExtender;
 import org.eclipse.aether.repository.AuthenticationSelector;
@@ -32,29 +32,29 @@ import org.eclipse.aether.repository.MirrorSelector;
 import org.eclipse.aether.repository.ProxySelector;
 
 /**
- * Extender that manages {@link org.apache.maven.api.spi.session.ConfigurationPropertyContributor}.
+ * Extender that manages {@link EffectivePropertyContributor}.
  *
  * @since 4.0.0
  */
 @Named
 @Singleton
-public class ConfigurationPropertyContributorExtender implements RepositorySystemSessionExtender {
-    private final Map<String, ConfigurationPropertyContributor> configurationPropertyContributors;
+public class EffectivePropertyContributorExtender implements RepositorySystemSessionExtender {
+    private final Map<String, EffectivePropertyContributor> configurationPropertyContributors;
 
     @Inject
-    public ConfigurationPropertyContributorExtender(
-            Map<String, ConfigurationPropertyContributor> configurationPropertyContributors) {
+    public EffectivePropertyContributorExtender(
+            Map<String, EffectivePropertyContributor> configurationPropertyContributors) {
         this.configurationPropertyContributors = configurationPropertyContributors;
     }
 
     @Override
     public void extend(
             MavenExecutionRequest mavenExecutionRequest,
-            Map<Object, Object> configProperties,
+            Map<String, Object> configProperties,
             MirrorSelector mirrorSelector,
             ProxySelector proxySelector,
             AuthenticationSelector authenticationSelector) {
-        for (ConfigurationPropertyContributor contributor : configurationPropertyContributors.values()) {
+        for (EffectivePropertyContributor contributor : configurationPropertyContributors.values()) {
             contributor.contribute(configProperties);
         }
     }
