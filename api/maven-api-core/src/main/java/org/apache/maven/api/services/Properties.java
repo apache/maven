@@ -32,8 +32,9 @@ import org.apache.maven.api.annotations.Nullable;
 public interface Properties extends Service {
 
     /**
-     * Creates a {@link org.apache.maven.api.Project} from a POM file.
+     * Creates map of effective properties using passed in parameters.
      *
+     * @param session {@link Session}, never {@code null}.
      * @param project {@link Project} or {@code null}.
      * @return the {@link Map} containing the effective properties.
      * @throws IllegalArgumentException if an argument is {@code null} or invalid
