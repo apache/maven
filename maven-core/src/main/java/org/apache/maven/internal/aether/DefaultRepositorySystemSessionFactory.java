@@ -54,7 +54,6 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.repository.RepositoryPolicy;
-import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.version.*;
@@ -70,7 +69,6 @@ import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionRange;
 import org.eclipse.aether.version.VersionScheme;
-import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,8 +164,6 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final RepositorySystem repoSystem;
 
-    private final WorkspaceReader workspaceRepository;
-
     private final SettingsDecrypter settingsDecrypter;
 
     private final EventSpyDispatcher eventSpyDispatcher;
@@ -185,7 +181,6 @@ public class DefaultRepositorySystemSessionFactory {
     public DefaultRepositorySystemSessionFactory(
             ArtifactHandlerManager artifactHandlerManager,
             RepositorySystem repoSystem,
-            @Nullable @Named("ide") WorkspaceReader workspaceRepository,
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
             RuntimeInformation runtimeInformation,
@@ -194,7 +189,6 @@ public class DefaultRepositorySystemSessionFactory {
             Map<String, RepositorySystemSessionExtender> extenders) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
-        this.workspaceRepository = workspaceRepository;
         this.settingsDecrypter = settingsDecrypter;
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.runtimeInformation = runtimeInformation;
@@ -250,9 +244,6 @@ public class DefaultRepositorySystemSessionFactory {
         }
 
         sessionBuilder.setArtifactTypeRegistry(RepositoryUtils.newArtifactTypeRegistry(artifactHandlerManager));
-
-        sessionBuilder.setWorkspaceReader(
-                request.getWorkspaceReader() != null ? request.getWorkspaceReader() : workspaceRepository);
 
         DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
         decrypt.setProxies(request.getProxies());
