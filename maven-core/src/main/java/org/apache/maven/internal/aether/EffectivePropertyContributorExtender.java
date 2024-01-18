@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.aether.extender;
+package org.apache.maven.internal.aether;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.apache.maven.api.spi.session.EffectivePropertyContributor;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.internal.aether.RepositorySystemSessionExtender;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.MirrorSelector;
 import org.eclipse.aether.repository.ProxySelector;
@@ -38,12 +37,11 @@ import org.eclipse.aether.repository.ProxySelector;
  */
 @Named
 @Singleton
-public class EffectivePropertyContributorExtender implements RepositorySystemSessionExtender {
+class EffectivePropertyContributorExtender implements RepositorySystemSessionExtender {
     private final Map<String, EffectivePropertyContributor> effectivePropertyContributors;
 
     @Inject
-    public EffectivePropertyContributorExtender(
-            Map<String, EffectivePropertyContributor> effectivePropertyContributors) {
+    EffectivePropertyContributorExtender(Map<String, EffectivePropertyContributor> effectivePropertyContributors) {
         this.effectivePropertyContributors = effectivePropertyContributors;
     }
 

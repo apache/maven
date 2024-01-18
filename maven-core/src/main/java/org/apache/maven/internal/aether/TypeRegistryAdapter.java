@@ -26,10 +26,10 @@ import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 
 import static java.util.Objects.requireNonNull;
 
-public class TypeRegistryAdapter implements ArtifactTypeRegistry {
+class TypeRegistryAdapter implements ArtifactTypeRegistry {
     private final TypeRegistry typeRegistry;
 
-    public TypeRegistryAdapter(TypeRegistry typeRegistry) {
+    TypeRegistryAdapter(TypeRegistry typeRegistry) {
         this.typeRegistry = requireNonNull(typeRegistry, "typeRegistry");
     }
 

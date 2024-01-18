@@ -16,25 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.aether;
-
-import java.util.Map;
+package org.apache.maven.resolver;
 
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.eclipse.aether.repository.AuthenticationSelector;
-import org.eclipse.aether.repository.MirrorSelector;
-import org.eclipse.aether.repository.ProxySelector;
+import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 
 /**
- * Strictly internal component able to "extend" session in some way.
+ * Factory for Resolver session.
  *
  * @since 4.0.0
  */
-interface RepositorySystemSessionExtender {
-    void extend(
-            MavenExecutionRequest mavenExecutionRequest,
-            Map<String, Object> configProperties,
-            MirrorSelector mirrorSelector,
-            ProxySelector proxySelector,
-            AuthenticationSelector authenticationSelector);
+public interface RepositorySystemSessionFactory {
+    /**
+     * Creates "ready to use" session builder instance. The factory does not set up one thing: the
+     * {@link org.eclipse.aether.repository.WorkspaceReader}s, that is caller duty to figure out. Workspace readers
+     * should be set up as very last thing before using resolver session, that is built by invoking
+     * {@link SessionBuilder#build()} method.
+     *
+     * @param request The maven execution request, must not be {@code null}.
+     * @return The session builder "ready to use" without workspace readers.
+     */
+    SessionBuilder newRepositorySessionBuilder(MavenExecutionRequest request);
 }

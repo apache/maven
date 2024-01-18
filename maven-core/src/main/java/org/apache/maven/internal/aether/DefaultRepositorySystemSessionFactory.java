@@ -20,6 +20,7 @@ package org.apache.maven.internal.aether;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.*;
@@ -36,6 +37,7 @@ import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -72,11 +74,14 @@ import org.eclipse.aether.version.VersionScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * @since 3.3.0
  */
 @Named
-public class DefaultRepositorySystemSessionFactory {
+@Singleton
+class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFactory {
     /**
      * User property for version filters expression, a semicolon separated list of filters to apply. By default, no version
      * filter is applied (like in Maven 3).
@@ -178,7 +183,7 @@ public class DefaultRepositorySystemSessionFactory {
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
-    public DefaultRepositorySystemSessionFactory(
+    DefaultRepositorySystemSessionFactory(
             ArtifactHandlerManager artifactHandlerManager,
             RepositorySystem repoSystem,
             SettingsDecrypter settingsDecrypter,
@@ -204,6 +209,7 @@ public class DefaultRepositorySystemSessionFactory {
 
     @SuppressWarnings("checkstyle:methodLength")
     public SessionBuilder newRepositorySessionBuilder(MavenExecutionRequest request) {
+        requireNonNull(request, "request");
         SessionBuilder sessionBuilder = MavenRepositorySystemUtils.newSession(
                 repoSystem.createSessionBuilder(), new TypeRegistryAdapter(typeRegistry));
         sessionBuilder.setCache(request.getRepositoryCache());

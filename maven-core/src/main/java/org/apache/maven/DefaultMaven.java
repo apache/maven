@@ -59,8 +59,6 @@ import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.graph.ProjectSelector;
-import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
-import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -71,6 +69,8 @@ import org.apache.maven.model.building.Result;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.resolver.MavenChainedWorkspaceReader;
+import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
@@ -99,7 +99,7 @@ public class DefaultMaven implements Maven {
 
     private final SessionScope sessionScope;
 
-    private final DefaultRepositorySystemSessionFactory repositorySessionFactory;
+    private final RepositorySystemSessionFactory repositorySessionFactory;
 
     private final GraphBuilder graphBuilder;
 
@@ -123,7 +123,7 @@ public class DefaultMaven implements Maven {
             ExecutionEventCatapult eventCatapult,
             LegacySupport legacySupport,
             SessionScope sessionScope,
-            DefaultRepositorySystemSessionFactory repositorySessionFactory,
+            RepositorySystemSessionFactory repositorySessionFactory,
             @Named(GraphBuilder.HINT) GraphBuilder graphBuilder,
             BuildResumptionAnalyzer buildResumptionAnalyzer,
             BuildResumptionDataRepository buildResumptionDataRepository,

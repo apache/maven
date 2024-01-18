@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.aether.extender;
+package org.apache.maven.internal.aether;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,7 +30,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.internal.aether.RepositorySystemSessionExtender;
 import org.apache.maven.settings.Mirror;
 import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
@@ -45,7 +44,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  */
 @Named
 @Singleton
-public class LegacyRepositorySystemSessionExtender implements RepositorySystemSessionExtender {
+class LegacyRepositorySystemSessionExtender implements RepositorySystemSessionExtender {
     @Override
     public void extend(
             MavenExecutionRequest mavenExecutionRequest,

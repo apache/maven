@@ -27,10 +27,10 @@ import java.util.List;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingResult;
+import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +46,7 @@ public class ModelBuilderTest {
     MavenRepositorySystem repositorySystem;
 
     @Inject
-    DefaultRepositorySystemSessionFactory repositorySessionFactory;
+    RepositorySystemSessionFactory repositorySessionFactory;
 
     @Test
     void testModelBuilder() throws Exception {
@@ -54,7 +54,9 @@ public class ModelBuilderTest {
         mavenRequest.setLocalRepository(repositorySystem.createLocalRepository(new File("target/test-repo/")));
 
         DefaultProjectBuildingRequest request = new DefaultProjectBuildingRequest();
-        request.setRepositorySession(repositorySessionFactory.newRepositorySession(mavenRequest));
+        request.setRepositorySession(repositorySessionFactory
+                .newRepositorySessionBuilder(mavenRequest)
+                .build());
         List<ProjectBuildingResult> results = projectBuilder.build(
                 Collections.singletonList(new File("src/test/resources/projects/tree/pom.xml")), true, request);
 
