@@ -136,7 +136,7 @@ public interface Project {
     List<RemoteRepository> getRemotePluginRepositories();
 
     /**
-     * Returns the effective project properties.
+     * Returns the project properties as immutable map.
      */
     @Nonnull
     Map<String, String> getProperties();

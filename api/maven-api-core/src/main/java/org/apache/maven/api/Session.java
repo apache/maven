@@ -78,6 +78,7 @@ public interface Session {
      *
      * @param project {@link Project} or {@code null}.
      * @return the effective properties, never {@code null}
+     * @see org.apache.maven.api.services.Properties#effectiveProperties(Session, Project)
      */
     @Nonnull
     Map<String, String> getEffectiveProperties(@Nullable Project project);

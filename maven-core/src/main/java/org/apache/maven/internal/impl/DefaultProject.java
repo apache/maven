@@ -153,7 +153,7 @@ public class DefaultProject implements Project {
 
     @Override
     public Map<String, String> getProperties() {
-        return new PropertiesAsMap(project.getProperties());
+        return Collections.unmodifiableMap(new PropertiesAsMap(project.getProperties()));
     }
 
     @Nonnull
