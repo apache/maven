@@ -35,6 +35,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -50,9 +51,11 @@ import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
+import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,17 +80,21 @@ public class BootstrapCoreExtensionManager {
 
     private final ClassRealm parentRealm;
 
+    private final WorkspaceReader ideWorkspaceReader;
+
     @Inject
     public BootstrapCoreExtensionManager(
             DefaultPluginDependenciesResolver pluginDependenciesResolver,
             DefaultRepositorySystemSessionFactory repositorySystemSessionFactory,
             CoreExports coreExports,
-            PlexusContainer container) {
+            PlexusContainer container,
+            @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader) {
         this.pluginDependenciesResolver = pluginDependenciesResolver;
         this.repositorySystemSessionFactory = repositorySystemSessionFactory;
         this.coreExports = coreExports;
         this.classWorld = ((DefaultPlexusContainer) container).getClassWorld();
         this.parentRealm = container.getContainerRealm();
+        this.ideWorkspaceReader = ideWorkspaceReader;
     }
 
     public List<CoreExtensionEntry> loadCoreExtensions(
@@ -95,6 +102,7 @@ public class BootstrapCoreExtensionManager {
             throws Exception {
         try (CloseableSession repoSession = repositorySystemSessionFactory
                 .newRepositorySessionBuilder(request)
+                .setWorkspaceReader(new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader))
                 .build()) {
             List<RemoteRepository> repositories = RepositoryUtils.toRepos(request.getPluginArtifactRepositories());
             Interpolator interpolator = createInterpolator(request);
