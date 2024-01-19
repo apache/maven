@@ -595,8 +595,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         .map(listFuture -> {
                             try {
                                 return listFuture.get();
-                            } catch (InterruptedException | ExecutionException e) {
+                            } catch (InterruptedException e) {
                                 uncheckedThrow(e);
+                                return null;
+                            } catch (ExecutionException e) {
+                                uncheckedThrow(e.getCause());
                                 return null;
                             }
                         })
