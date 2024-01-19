@@ -75,6 +75,19 @@ public interface Session {
 
     /**
      * Each invocation computes a new map of effective properties. To be used in interpolation.
+     * <p>
+     * Effective properties are computed from system, user and optionally project properties, layered with
+     * defined precedence onto each other to achieve proper precedence. Precedence is defined as:
+     * <ul>
+     *     <li>System properties (lowest precedence)</li>
+     *     <li>Project properties (optional)</li>
+     *     <li>User properties (highest precedence)</li>
+     * </ul>
+     * Note: Project properties contains properties injected from profiles, if applicable. Their precedence is
+     * {@code profile > project}, hence active profile may override project property.
+     * <p>
+     * Caller of this method should decide is there a project in scope (hence, project instance needs to be passed)
+     * or not. It depends on what caller wants to achieve.
      *
      * @param project {@link Project} or {@code null}.
      * @return the effective properties, never {@code null}
