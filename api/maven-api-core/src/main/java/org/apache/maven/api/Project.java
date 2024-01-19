@@ -72,7 +72,7 @@ public interface Project {
 
     /**
      * Returns the project artifacts, that is, the project POM artifact and the artifact produced by this project.
-     * The list may have 1 or 2 elements (never less than 1, never more than 2), depending on project packaging. If
+     * The list may have one or two elements (never less than 1, never more than 2), depending on project packaging. If
      * artifact files exists, they are registered to {@link org.apache.maven.api.services.ArtifactManager}.
      *
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
