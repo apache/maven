@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -1870,39 +1868,32 @@ public class DefaultModelBuilder implements ModelBuilder {
             String version,
             ModelCacheTag<T> tag,
             Callable<T> supplier) {
-        return doWithCache(cache, supplier, s -> cache.computeIfAbsent(groupId, artifactId, version, tag.getName(), s));
+        Supplier<T> s = asSupplier(supplier);
+        if (cache == null) {
+            return s.get();
+        } else {
+            return cache.computeIfAbsent(groupId, artifactId, version, tag.getName(), s);
+        }
     }
 
     private static <T> T cache(ModelCache cache, Source source, ModelCacheTag<T> tag, Callable<T> supplier) {
-        return doWithCache(cache, supplier, s -> cache.computeIfAbsent(source, tag.getName(), s));
+        Supplier<T> s = asSupplier(supplier);
+        if (cache == null) {
+            return s.get();
+        } else {
+            return cache.computeIfAbsent(source, tag.getName(), s);
+        }
     }
 
-    private static <T> T doWithCache(
-            ModelCache cache, Callable<T> supplier, Function<Supplier<Supplier<T>>, T> asyncSupplierConsumer) {
-        if (cache != null) {
-            return asyncSupplierConsumer.apply(() -> {
-                ForkJoinTask<T> task = ForkJoinTask.adapt(supplier);
-                task.fork();
-                return () -> {
-                    task.quietlyJoin();
-                    if (task.isCompletedAbnormally()) {
-                        Throwable e = task.getException();
-                        while (e instanceof RuntimeException && e.getCause() != null) {
-                            e = e.getCause();
-                        }
-                        uncheckedThrow(e);
-                    }
-                    return task.getRawResult();
-                };
-            });
-        } else {
+    private static <T> Supplier<T> asSupplier(Callable<T> supplier) {
+        return () -> {
             try {
                 return supplier.call();
             } catch (Exception e) {
                 uncheckedThrow(e);
                 return null;
             }
-        }
+        };
     }
 
     static <T extends Throwable> void uncheckedThrow(Throwable t) throws T {

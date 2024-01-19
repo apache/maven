@@ -32,7 +32,7 @@ import org.apache.maven.building.Source;
  */
 public interface ModelCache {
 
-    <T> T computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<Supplier<T>> data);
+    <T> T computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<T> data);
 
-    <T> T computeIfAbsent(Source path, String tag, Supplier<Supplier<T>> data);
+    <T> T computeIfAbsent(Source path, String tag, Supplier<T> data);
 }
