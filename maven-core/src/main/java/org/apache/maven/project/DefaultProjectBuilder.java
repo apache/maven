@@ -225,8 +225,23 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
 
         ExecutorService createExecutor(int parallelism) {
+            //
+            // We need an executor that will not block.
+            // We can't use work stealing, as we are building a graph
+            // and this could lead to cycles where a thread waits for
+            // a task to finish, then execute another one which waits
+            // for the initial task...
+            // In order to work around that problem, we override the
+            // invokeAll method, so that whenever the method is called,
+            // the pool core size will be incremented before submitting
+            // all the tasks, then the thread will block waiting for all
+            // those subtasks to finish.
+            // This ensures the number of running workers is no more than
+            // the defined parallism, while making sure the pool will not
+            // be exhausted
+            //
             return new ThreadPoolExecutor(
-                    parallelism, Integer.MAX_VALUE, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(128)) {
+                    parallelism, Integer.MAX_VALUE, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>()) {
                 final AtomicInteger parked = new AtomicInteger();
 
                 @Override
