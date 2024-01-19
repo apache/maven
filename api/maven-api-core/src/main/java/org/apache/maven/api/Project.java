@@ -81,9 +81,12 @@ public interface Project {
     /**
      * Returns the project artifact, that is the artifact produced by this project build. This artifact MAY be same
      * as the one returned by {@link #getPomArtifact()}, if the project is actually not producing any main artifact.
+     * The existence of artifact backing file depends on which lifecycle step this method was invoked, as the file
+     * may not yet be built.
      * <p>
      * If only non-POM artifacts are needed, better use {@link #getArtifacts()} method: if that method returns list
-     * having one element, the methods {@link #getPomArtifact()} and this one will return same artifact.
+     * having one element, the methods {@link #getPomArtifact()} and this one will return same artifact. For non-POM
+     * artifacts one would filter for results having two elements, and would consume second element of the list.
      *
      * @see #getArtifacts()
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
