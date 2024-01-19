@@ -68,8 +68,8 @@ public interface Project {
     String getPackaging();
 
     /**
-     * Returns the project POM artifact, that is the artifact of the POM of this project. Every project have POM
-     * artifact, while the existence of backing POM file is NOT a requirement (i.e. for some transient projects).
+     * Returns the project POM artifact, which is the artifact of the POM of this project. Every project have a POM
+     * artifact, even if the existence of backing POM file is NOT a requirement (i.e. for some transient projects).
      *
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
@@ -102,7 +102,7 @@ public interface Project {
      * The list may have one or two elements (never less than 1, never more than 2), depending on project packaging.
      * <p>
      * The list's first element is ALWAYS the project POM artifact. Presence of second element in the list depends
-     * solely on this project packaging.
+     * solely on the project packaging.
      *
      * @see #getPackaging()
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
