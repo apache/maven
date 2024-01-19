@@ -37,24 +37,58 @@ import org.apache.maven.api.model.Model;
 @Experimental
 public interface Project {
 
+    /**
+     * Returns the project groupId.
+     */
     @Nonnull
     String getGroupId();
 
+    /**
+     * Returns the project artifactId.
+     */
     @Nonnull
     String getArtifactId();
 
+    /**
+     * Returns the project version.
+     */
     @Nonnull
     String getVersion();
 
+    /**
+     * Returns the project packaging.
+     */
     @Nonnull
     String getPackaging();
 
+    /**
+     * Returns the project artifact, that is the artifact produced by this project. If the artifact file exists, it is
+     * registered to {@link org.apache.maven.api.services.ArtifactManager}.
+     *
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     */
     @Nonnull
     Artifact getArtifact();
 
+    /**
+     * Returns the project artifacts, that is, the project POM artifact and the artifact produced by this project.
+     * The list may have 1 or 2 elements (never less than 1, never more than 2), depending on project packaging. If
+     * artifact files exists, they are registered to {@link org.apache.maven.api.services.ArtifactManager}.
+     *
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     */
+    @Nonnull
+    List<Artifact> getArtifacts();
+
+    /**
+     * Returns the project model.
+     */
     @Nonnull
     Model getModel();
 
+    /**
+     * Shorthand for {@link #getModel()#getBuild()}.
+     */
     @Nonnull
     default Build getBuild() {
         Build build = getModel().getBuild();
@@ -71,17 +105,29 @@ public interface Project {
     @Nonnull
     Optional<Path> getPomPath();
 
+    /**
+     * Returns the project base directory.
+     */
     @Nonnull
     default Optional<Path> getBasedir() {
         return getPomPath().map(Path::getParent);
     }
 
+    /**
+     * Returns the project direct dependencies.
+     */
     @Nonnull
     List<DependencyCoordinate> getDependencies();
 
+    /**
+     * Returns the project managed dependencies.
+     */
     @Nonnull
     List<DependencyCoordinate> getManagedDependencies();
 
+    /**
+     * Returns the project ID, usable as key.
+     */
     @Nonnull
     default String getId() {
         return getModel().getId();
@@ -126,12 +172,21 @@ public interface Project {
     @Nonnull
     Path getRootDirectory();
 
+    /**
+     * Returns project parent project, if any.
+     */
     @Nonnull
     Optional<Project> getParent();
 
+    /**
+     * Returns project remote repositories (directly specified or inherited).
+     */
     @Nonnull
     List<RemoteRepository> getRemoteProjectRepositories();
 
+    /**
+     * Returns project remote plugin repositories (directly specified or inherited).
+     */
     @Nonnull
     List<RemoteRepository> getRemotePluginRepositories();
 
