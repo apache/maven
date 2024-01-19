@@ -97,7 +97,8 @@ public class DefaultProject implements Project {
             Artifact apiProjectArtifact = session.getArtifact(projectArtifact);
             result.add(apiProjectArtifact);
             if (projectArtifact.getFile() != null) {
-                artifactManagerService.setPath(apiProjectArtifact, projectArtifact.getFile().toPath());
+                artifactManagerService.setPath(
+                        apiProjectArtifact, projectArtifact.getFile().toPath());
             }
         }
         return result;
