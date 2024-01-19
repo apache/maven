@@ -20,16 +20,10 @@ package org.apache.maven.internal.aether;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -37,15 +31,13 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.Authentication;
-import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -63,10 +55,6 @@ import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.VersionFilter;
-import org.eclipse.aether.repository.AuthenticationContext;
-import org.eclipse.aether.repository.AuthenticationSelector;
-import org.eclipse.aether.repository.ProxySelector;
-import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
@@ -86,11 +74,14 @@ import org.eclipse.aether.version.VersionScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * @since 3.3.0
  */
 @Named
-public class DefaultRepositorySystemSessionFactory {
+@Singleton
+class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFactory {
     /**
      * User property for version filters expression, a semicolon separated list of filters to apply. By default, no version
      * filter is applied (like in Maven 3).
@@ -188,16 +179,22 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final VersionScheme versionScheme;
 
+    private final Map<String, MavenExecutionRequestExtender> requestExtenders;
+
+    private final Map<String, RepositorySystemSessionExtender> sessionExtenders;
+
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
-    public DefaultRepositorySystemSessionFactory(
+    DefaultRepositorySystemSessionFactory(
             ArtifactHandlerManager artifactHandlerManager,
             RepositorySystem repoSystem,
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
             RuntimeInformation runtimeInformation,
             TypeRegistry typeRegistry,
-            VersionScheme versionScheme) {
+            VersionScheme versionScheme,
+            Map<String, MavenExecutionRequestExtender> requestExtenders,
+            Map<String, RepositorySystemSessionExtender> sessionExtenders) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.settingsDecrypter = settingsDecrypter;
@@ -205,6 +202,8 @@ public class DefaultRepositorySystemSessionFactory {
         this.runtimeInformation = runtimeInformation;
         this.typeRegistry = typeRegistry;
         this.versionScheme = versionScheme;
+        this.requestExtenders = requestExtenders;
+        this.sessionExtenders = sessionExtenders;
     }
 
     @Deprecated
@@ -212,25 +211,31 @@ public class DefaultRepositorySystemSessionFactory {
         return newRepositorySessionBuilder(request).build();
     }
 
-    @SuppressWarnings("checkstyle:methodLength")
+    @SuppressWarnings({"checkstyle:methodLength"})
     public SessionBuilder newRepositorySessionBuilder(MavenExecutionRequest request) {
-        SessionBuilder session = MavenRepositorySystemUtils.newSession(
-                repoSystem.createSessionBuilder(), new TypeRegistryAdapter(typeRegistry));
-        session.setCache(request.getRepositoryCache());
+        requireNonNull(request, "request");
 
-        Map<Object, Object> configProps = new LinkedHashMap<>();
+        // apply MavenExecutionRequestExtenders
+        for (MavenExecutionRequestExtender requestExtender : requestExtenders.values()) {
+            requestExtender.extend(request);
+        }
+
+        SessionBuilder sessionBuilder = MavenRepositorySystemUtils.newSession(
+                repoSystem.createSessionBuilder(), new TypeRegistryAdapter(typeRegistry));
+        sessionBuilder.setCache(request.getRepositoryCache());
+
+        // this map is read ONLY to get config from (profiles + env + system + user)
+        Map<String, String> mergedProps = createMergedProperties(request);
+
+        // configProps map is kept "pristine", is written ONLY, the mandatory resolver config
+        Map<String, Object> configProps = new LinkedHashMap<>();
         configProps.put(ConfigurationProperties.USER_AGENT, getUserAgent());
         configProps.put(ConfigurationProperties.INTERACTIVE, request.isInteractiveMode());
         configProps.put("maven.startTime", request.getStartTime());
-        // First add properties populated from settings.xml
-        configProps.putAll(getPropertiesFromRequestedProfiles(request));
-        // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
-        configProps.putAll(request.getSystemProperties());
-        configProps.putAll(request.getUserProperties());
 
-        session.setOffline(request.isOffline());
-        session.setChecksumPolicy(request.getGlobalChecksumPolicy());
-        session.setUpdatePolicy(
+        sessionBuilder.setOffline(request.isOffline());
+        sessionBuilder.setChecksumPolicy(request.getGlobalChecksumPolicy());
+        sessionBuilder.setUpdatePolicy(
                 request.isNoSnapshotUpdates()
                         ? RepositoryPolicy.UPDATE_POLICY_NEVER
                         : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null);
@@ -242,18 +247,18 @@ public class DefaultRepositorySystemSessionFactory {
         errorPolicy |= request.isCacheTransferError()
                 ? ResolutionErrorPolicy.CACHE_TRANSFER_ERROR
                 : ResolutionErrorPolicy.CACHE_DISABLED;
-        session.setResolutionErrorPolicy(
+        sessionBuilder.setResolutionErrorPolicy(
                 new SimpleResolutionErrorPolicy(errorPolicy, errorPolicy | ResolutionErrorPolicy.CACHE_NOT_FOUND));
 
-        session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
+        sessionBuilder.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
                 request.isIgnoreMissingArtifactDescriptor(), request.isIgnoreInvalidArtifactDescriptor()));
 
-        VersionFilter versionFilter = buildVersionFilter((String) configProps.get(MAVEN_VERSION_FILTERS));
+        VersionFilter versionFilter = buildVersionFilter(mergedProps.get(MAVEN_VERSION_FILTERS));
         if (versionFilter != null) {
-            session.setVersionFilter(versionFilter);
+            sessionBuilder.setVersionFilter(versionFilter);
         }
 
-        session.setArtifactTypeRegistry(RepositoryUtils.newArtifactTypeRegistry(artifactHandlerManager));
+        sessionBuilder.setArtifactTypeRegistry(RepositoryUtils.newArtifactTypeRegistry(artifactHandlerManager));
 
         DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
         decrypt.setProxies(request.getProxies());
@@ -277,7 +282,7 @@ public class DefaultRepositorySystemSessionFactory {
                     mirror.getMirrorOf(),
                     mirror.getMirrorOfLayouts());
         }
-        session.setMirrorSelector(mirrorSelector);
+        sessionBuilder.setMirrorSelector(mirrorSelector);
 
         DefaultProxySelector proxySelector = new DefaultProxySelector();
         for (Proxy proxy : decrypted.getProxies()) {
@@ -288,7 +293,7 @@ public class DefaultRepositorySystemSessionFactory {
                             proxy.getProtocol(), proxy.getHost(), proxy.getPort(), authBuilder.build()),
                     proxy.getNonProxyHosts());
         }
-        session.setProxySelector(proxySelector);
+        sessionBuilder.setProxySelector(proxySelector);
 
         // Note: we do NOT use WagonTransportConfigurationKeys here as Maven Core does NOT depend on Wagon Transport
         // and this is okay and "good thing".
@@ -381,9 +386,9 @@ public class DefaultRepositorySystemSessionFactory {
             configProps.put("aether.transport.wagon.perms.fileMode." + server.getId(), server.getFilePermissions());
             configProps.put("aether.transport.wagon.perms.dirMode." + server.getId(), server.getDirectoryPermissions());
         }
-        session.setAuthenticationSelector(authSelector);
+        sessionBuilder.setAuthenticationSelector(authSelector);
 
-        Object transport = configProps.getOrDefault(MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
+        Object transport = mergedProps.getOrDefault(MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
         if (MAVEN_RESOLVER_TRANSPORT_DEFAULT.equals(transport)) {
             // The "default" mode (user did not set anything) from now on defaults to AUTO
         } else if (MAVEN_RESOLVER_TRANSPORT_JDK.equals(transport)) {
@@ -411,47 +416,50 @@ public class DefaultRepositorySystemSessionFactory {
                     + MAVEN_RESOLVER_TRANSPORT_AUTO);
         }
 
-        session.setUserProperties(request.getUserProperties());
-        session.setSystemProperties(request.getSystemProperties());
-        session.setConfigProperties(configProps);
-        session.setIgnoreArtifactDescriptorRepositories(request.isIgnoreTransitiveRepositories());
+        sessionBuilder.setIgnoreArtifactDescriptorRepositories(request.isIgnoreTransitiveRepositories());
 
-        session.setTransferListener(request.getTransferListener());
+        sessionBuilder.setTransferListener(request.getTransferListener());
 
         RepositoryListener repositoryListener = eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger));
 
-        boolean recordReverseTree = configProps.containsKey(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE)
-                && Boolean.parseBoolean((String) configProps.get(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE));
+        boolean recordReverseTree = Boolean.parseBoolean(
+                mergedProps.getOrDefault(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE, Boolean.FALSE.toString()));
         if (recordReverseTree) {
             repositoryListener = new ChainedRepositoryListener(repositoryListener, new ReverseTreeRepositoryListener());
         }
-        session.setRepositoryListener(repositoryListener);
+        sessionBuilder.setRepositoryListener(repositoryListener);
 
-        injectMirror(request.getRemoteRepositories(), request.getMirrors());
-        injectProxy(proxySelector, request.getRemoteRepositories());
-        injectAuthentication(authSelector, request.getRemoteRepositories());
-
-        injectMirror(request.getPluginArtifactRepositories(), request.getMirrors());
-        injectProxy(proxySelector, request.getPluginArtifactRepositories());
-        injectAuthentication(authSelector, request.getPluginArtifactRepositories());
-
-        String resolverDependencyManagerTransitivity = (String)
-                configProps.getOrDefault(MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY, Boolean.TRUE.toString());
-        session.setDependencyManager(
+        String resolverDependencyManagerTransitivity =
+                mergedProps.getOrDefault(MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY, Boolean.TRUE.toString());
+        sessionBuilder.setDependencyManager(
                 new ClassicDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 
         ArrayList<File> paths = new ArrayList<>();
         paths.add(new File(request.getLocalRepository().getBasedir()));
-        String localRepoTail = (String) configProps.get(MAVEN_REPO_LOCAL_TAIL);
+        String localRepoTail = mergedProps.get(MAVEN_REPO_LOCAL_TAIL);
         if (localRepoTail != null) {
             Arrays.stream(localRepoTail.split(","))
                     .filter(p -> p != null && !p.trim().isEmpty())
                     .map(File::new)
                     .forEach(paths::add);
         }
-        session.withLocalRepositoryBaseDirectories(paths);
+        sessionBuilder.withLocalRepositoryBaseDirectories(paths);
 
-        return session;
+        for (RepositorySystemSessionExtender extender : sessionExtenders.values()) {
+            extender.extend(request, configProps, mirrorSelector, proxySelector, authSelector);
+        }
+
+        // at this point we have "config" with pure MANDATORY resolver config, so resolver final config properties are
+        // mergedProperties + configProperties
+        HashMap<String, Object> finalConfigProperties = new HashMap<>();
+        finalConfigProperties.putAll(mergedProps);
+        finalConfigProperties.putAll(configProps);
+
+        sessionBuilder.setUserProperties(request.getUserProperties());
+        sessionBuilder.setSystemProperties(request.getSystemProperties());
+        sessionBuilder.setConfigProperties(finalConfigProperties);
+
+        return sessionBuilder;
     }
 
     private VersionFilter buildVersionFilter(String filterExpression) {
@@ -520,7 +528,17 @@ public class DefaultRepositorySystemSessionFactory {
         }
     }
 
-    private Map<?, ?> getPropertiesFromRequestedProfiles(MavenExecutionRequest request) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private Map<String, String> createMergedProperties(MavenExecutionRequest request) {
+        // this throwaway map is really ONLY to get config from (profiles + env + system + user)
+        Map<String, String> mergedProps = new HashMap<>();
+        mergedProps.putAll(getPropertiesFromRequestedProfiles(request));
+        mergedProps.putAll(new HashMap<String, String>((Map) request.getSystemProperties()));
+        mergedProps.putAll(new HashMap<String, String>((Map) request.getUserProperties()));
+        return mergedProps;
+    }
+
+    private Map<String, String> getPropertiesFromRequestedProfiles(MavenExecutionRequest request) {
         HashSet<String> activeProfileId =
                 new HashSet<>(request.getProfileActivation().getRequiredActiveProfileIds());
         activeProfileId.addAll(request.getProfileActivation().getOptionalActiveProfileIds());
@@ -529,7 +547,9 @@ public class DefaultRepositorySystemSessionFactory {
                 .filter(profile -> activeProfileId.contains(profile.getId()))
                 .map(ModelBase::getProperties)
                 .flatMap(properties -> properties.entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (k1, k2) -> k2));
+                .filter(e -> e.getValue() != null)
+                .collect(Collectors.toMap(
+                        e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()), (k1, k2) -> k2));
     }
 
     private String getUserAgent() {
@@ -537,96 +557,5 @@ public class DefaultRepositorySystemSessionFactory {
         version = version.isEmpty() ? version : "/" + version;
         return "Apache-Maven" + version + " (Java " + System.getProperty("java.version") + "; "
                 + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")";
-    }
-
-    private void injectMirror(List<ArtifactRepository> repositories, List<Mirror> mirrors) {
-        if (repositories != null && mirrors != null) {
-            for (ArtifactRepository repository : repositories) {
-                Mirror mirror = MavenRepositorySystem.getMirror(repository, mirrors);
-                injectMirror(repository, mirror);
-            }
-        }
-    }
-
-    private void injectMirror(ArtifactRepository repository, Mirror mirror) {
-        if (mirror != null) {
-            ArtifactRepository original = MavenRepositorySystem.createArtifactRepository(
-                    repository.getId(),
-                    repository.getUrl(),
-                    repository.getLayout(),
-                    repository.getSnapshots(),
-                    repository.getReleases());
-
-            repository.setMirroredRepositories(Collections.singletonList(original));
-
-            repository.setId(mirror.getId());
-            repository.setUrl(mirror.getUrl());
-
-            if (mirror.getLayout() != null && !mirror.getLayout().isEmpty()) {
-                repository.setLayout(original.getLayout());
-            }
-
-            repository.setBlocked(mirror.isBlocked());
-        }
-    }
-
-    private void injectProxy(ProxySelector selector, List<ArtifactRepository> repositories) {
-        if (repositories != null && selector != null) {
-            for (ArtifactRepository repository : repositories) {
-                repository.setProxy(getProxy(selector, repository));
-            }
-        }
-    }
-
-    private org.apache.maven.repository.Proxy getProxy(ProxySelector selector, ArtifactRepository repository) {
-        if (selector != null) {
-            RemoteRepository repo = RepositoryUtils.toRepo(repository);
-            org.eclipse.aether.repository.Proxy proxy = selector.getProxy(repo);
-            if (proxy != null) {
-                org.apache.maven.repository.Proxy p = new org.apache.maven.repository.Proxy();
-                p.setHost(proxy.getHost());
-                p.setProtocol(proxy.getType());
-                p.setPort(proxy.getPort());
-                if (proxy.getAuthentication() != null) {
-                    repo = new RemoteRepository.Builder(repo).setProxy(proxy).build();
-                    AuthenticationContext authCtx = AuthenticationContext.forProxy(null, repo);
-                    p.setUserName(authCtx.get(AuthenticationContext.USERNAME));
-                    p.setPassword(authCtx.get(AuthenticationContext.PASSWORD));
-                    p.setNtlmDomain(authCtx.get(AuthenticationContext.NTLM_DOMAIN));
-                    p.setNtlmHost(authCtx.get(AuthenticationContext.NTLM_WORKSTATION));
-                    authCtx.close();
-                }
-                return p;
-            }
-        }
-        return null;
-    }
-
-    private void injectAuthentication(AuthenticationSelector selector, List<ArtifactRepository> repositories) {
-        if (repositories != null && selector != null) {
-            for (ArtifactRepository repository : repositories) {
-                repository.setAuthentication(getAuthentication(selector, repository));
-            }
-        }
-    }
-
-    private Authentication getAuthentication(AuthenticationSelector selector, ArtifactRepository repository) {
-        if (selector != null) {
-            RemoteRepository repo = RepositoryUtils.toRepo(repository);
-            org.eclipse.aether.repository.Authentication auth = selector.getAuthentication(repo);
-            if (auth != null) {
-                repo = new RemoteRepository.Builder(repo)
-                        .setAuthentication(auth)
-                        .build();
-                AuthenticationContext authCtx = AuthenticationContext.forRepository(null, repo);
-                Authentication result = new Authentication(
-                        authCtx.get(AuthenticationContext.USERNAME), authCtx.get(AuthenticationContext.PASSWORD));
-                result.setPrivateKey(authCtx.get(AuthenticationContext.PRIVATE_KEY_PATH));
-                result.setPassphrase(authCtx.get(AuthenticationContext.PRIVATE_KEY_PASSPHRASE));
-                authCtx.close();
-                return result;
-            }
-        }
-        return null;
     }
 }

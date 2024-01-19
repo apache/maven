@@ -34,10 +34,10 @@ import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
-import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
-import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
+import org.apache.maven.resolver.MavenChainedWorkspaceReader;
+import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -72,7 +72,7 @@ public class BootstrapCoreExtensionManager {
 
     private final DefaultPluginDependenciesResolver pluginDependenciesResolver;
 
-    private final DefaultRepositorySystemSessionFactory repositorySystemSessionFactory;
+    private final RepositorySystemSessionFactory repositorySystemSessionFactory;
 
     private final CoreExports coreExports;
 
@@ -85,7 +85,7 @@ public class BootstrapCoreExtensionManager {
     @Inject
     public BootstrapCoreExtensionManager(
             DefaultPluginDependenciesResolver pluginDependenciesResolver,
-            DefaultRepositorySystemSessionFactory repositorySystemSessionFactory,
+            RepositorySystemSessionFactory repositorySystemSessionFactory,
             CoreExports coreExports,
             PlexusContainer container,
             @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader) {

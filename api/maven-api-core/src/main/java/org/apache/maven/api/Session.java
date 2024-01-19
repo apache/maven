@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.DependencyCoordinateFactory;
@@ -55,8 +56,8 @@ public interface Session {
     SessionData getData();
 
     /**
-     * Gets the user properties to use for interpolation. The user properties have been configured directly by the user,
-     * e.g. via the {@code -Dkey=value} parameter on the command line.
+     * Returns immutable user properties to use for interpolation. The user properties have been configured directly
+     * by the user, e.g. via the {@code -Dkey=value} parameter on the command line.
      *
      * @return the user properties, never {@code null}
      */
@@ -64,13 +65,36 @@ public interface Session {
     Map<String, String> getUserProperties();
 
     /**
-     * Gets the system properties to use for interpolation. The system properties are collected from the runtime
-     * environment such as {@link System#getProperties()} and environment variables.
+     * Returns immutable system properties to use for interpolation. The system properties are collected from the
+     * runtime environment such as {@link System#getProperties()} and environment variables
+     * (prefixed with {@code env.}).
      *
      * @return the system properties, never {@code null}
      */
     @Nonnull
     Map<String, String> getSystemProperties();
+
+    /**
+     * Each invocation computes a new map of effective properties. To be used in interpolation.
+     * <p>
+     * Effective properties are computed from system, user and optionally project properties, layered with
+     * defined precedence onto each other to achieve proper precedence. Precedence is defined as:
+     * <ul>
+     *     <li>System properties (lowest precedence)</li>
+     *     <li>Project properties (optional)</li>
+     *     <li>User properties (highest precedence)</li>
+     * </ul>
+     * Note: Project properties contains properties injected from profiles, if applicable. Their precedence is
+     * {@code profile > project}, hence active profile property may override project property.
+     * <p>
+     * The caller of this method should decide whether there is a project in scope (hence, a project instance
+     * needs to be passed) or not.
+     *
+     * @param project {@link Project} or {@code null}.
+     * @return the effective properties, never {@code null}
+     */
+    @Nonnull
+    Map<String, String> getEffectiveProperties(@Nullable Project project);
 
     /**
      * Returns the current maven version

@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Project;
@@ -54,15 +53,15 @@ import org.codehaus.plexus.component.configurator.expression.TypeAwareExpression
  * @see MojoExecution
  */
 public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpressionEvaluator {
-    private Session session;
+    private final Session session;
 
-    private MojoExecution mojoExecution;
+    private final MojoExecution mojoExecution;
 
-    private Project project;
+    private final Project project;
 
-    private Path basedir;
+    private final Path basedir;
 
-    private Properties properties;
+    private final Map<String, String> properties;
 
     public PluginParameterExpressionEvaluatorV4(Session session, Project project) {
         this(session, project, null);
@@ -71,15 +70,8 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
     public PluginParameterExpressionEvaluatorV4(Session session, Project project, MojoExecution mojoExecution) {
         this.session = session;
         this.mojoExecution = mojoExecution;
-        this.properties = new Properties();
+        this.properties = session.getEffectiveProperties(project);
         this.project = project;
-
-        //
-        // Maven4: We may want to evaluate how this is used but we add these separate as the
-        // getExecutionProperties is deprecated in MavenSession.
-        //
-        this.properties.putAll(session.getUserProperties());
-        this.properties.putAll(session.getSystemProperties());
 
         Path basedir = null;
 
@@ -198,11 +190,7 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
                 // to run a single test so I want to specify that class on the cli as
                 // a parameter.
 
-                value = properties.getProperty(expression);
-            }
-
-            if ((value == null) && ((project != null) && (project.getModel().getProperties() != null))) {
-                value = project.getModel().getProperties().get(expression);
+                value = properties.get(expression);
             }
         }
 
