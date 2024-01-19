@@ -88,7 +88,7 @@ public interface Project {
     Model getModel();
 
     /**
-     * Shorthand for {@link #getModel()#getBuild()}.
+     * Shorthand method.
      */
     @Nonnull
     default Build getBuild() {
