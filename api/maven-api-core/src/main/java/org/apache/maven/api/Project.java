@@ -79,7 +79,7 @@ public interface Project {
     }
 
     /**
-     * Returns the project artifact, that is the artifact produced by this project build. This artifact MAY be same
+     * Returns the project artifact, which is the artifact produced by this project build. This artifact MAY be same
      * as the one returned by {@link #getPomArtifact()}, if the project is actually not producing any main artifact.
      * The existence of artifact backing file depends on which lifecycle step this method was invoked, as the file
      * may not yet be built.
