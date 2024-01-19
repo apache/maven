@@ -87,7 +87,7 @@ public interface Session {
      * Note: Project properties contains properties injected from profiles, if applicable. Their precedence is
      * {@code profile > project}, hence active profile property may override project property.
      * <p>
-     * The caller of this method should decide whether there is a project in scope (hence, a project instance 
+     * The caller of this method should decide whether there is a project in scope (hence, a project instance
      * needs to be passed) or not.
      *
      * @param project {@link Project} or {@code null}.
