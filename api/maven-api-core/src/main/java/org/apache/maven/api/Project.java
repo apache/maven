@@ -57,6 +57,12 @@ public interface Project {
 
     /**
      * Returns the project packaging.
+     * <p>
+     * Note: unlike in legacy code, logical checks against string representing packaging (returned by this method)
+     * are NOT recommended (i.e. {@code "pom".equals(project.getPackaging)} and alike). Use method
+     * {@link #getArtifacts()} to gain access to POM or build artifact.
+     *
+     * @see #getArtifacts()
      */
     @Nonnull
     String getPackaging();
@@ -73,9 +79,10 @@ public interface Project {
      * Returns the project artifacts, that is, the project POM artifact and the artifact produced by this project build.
      * The list may have one or two elements (never less than 1, never more than 2), depending on project packaging.
      * <p>
-     * The list 1st element is ALWAYS the project POM artifact. The existence of 2nd element depends on this project
-     * packaging.
+     * The list 1st element is ALWAYS the project POM artifact. Presence of 2nd element in the list depends solely on
+     * this project packaging.
      *
+     * @see #getPackaging()
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
     @Nonnull
