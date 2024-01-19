@@ -56,7 +56,11 @@ public class DefaultProjectManager implements ProjectManager {
     @Nonnull
     @Override
     public Optional<Path> getPath(Project project) {
-        return artifactManager.getPath(project.getArtifact());
+        Optional<Artifact> mainArtifact = project.getMainArtifact();
+        if (mainArtifact.isPresent()) {
+            return artifactManager.getPath(mainArtifact.get());
+        }
+        return Optional.empty();
     }
 
     @Nonnull

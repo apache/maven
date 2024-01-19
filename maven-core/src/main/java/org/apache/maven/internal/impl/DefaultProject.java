@@ -81,7 +81,7 @@ public class DefaultProject implements Project {
         if (!ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
             result.add(session.getArtifact(projectArtifact));
         }
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class DefaultProject implements Project {
         ArrayList<Artifact> result = new ArrayList<>(2);
         result.addAll(getArtifacts());
         result.addAll(session.getService(ProjectManager.class).getAttachedArtifacts(this));
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
     @Nonnull
@@ -156,12 +156,14 @@ public class DefaultProject implements Project {
 
     @Override
     public List<RemoteRepository> getRemoteProjectRepositories() {
-        return new MappedList<>(project.getRemoteProjectRepositories(), session::getRemoteRepository);
+        return Collections.unmodifiableList(
+                new MappedList<>(project.getRemoteProjectRepositories(), session::getRemoteRepository));
     }
 
     @Override
     public List<RemoteRepository> getRemotePluginRepositories() {
-        return new MappedList<>(project.getRemotePluginRepositories(), session::getRemoteRepository);
+        return Collections.unmodifiableList(
+                new MappedList<>(project.getRemotePluginRepositories(), session::getRemoteRepository));
     }
 
     @Override

@@ -79,22 +79,16 @@ public interface Project {
     }
 
     /**
-     * Returns the project artifact, which is the artifact produced by this project build. This artifact MAY be same
-     * as the one returned by {@link #getPomArtifact()}, if the project is actually not producing any main artifact.
-     * The existence of artifact backing file depends on which lifecycle step this method was invoked, as the file
-     * may not yet be built.
-     * <p>
-     * If only non-POM artifacts are needed, better use {@link #getArtifacts()} method: if that method returns list
-     * having one element, the methods {@link #getPomArtifact()} and this one will return same artifact. For non-POM
-     * artifacts one would filter for results having two elements, and would consume second element of the list.
+     * Returns the project main artifact, which is the artifact produced by this project build, if applicable.
+     * This artifact MAY be absent if the project is actually not producing any main artifact (i.e. "pom" packaging).
      *
-     * @see #getArtifacts()
+     * @see #getPackaging()
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
     @Nonnull
-    default Artifact getArtifact() {
+    default Optional<Artifact> getMainArtifact() {
         List<Artifact> artifacts = getArtifacts();
-        return artifacts.get(artifacts.size() - 1);
+        return artifacts.size() == 2 ? Optional.of(artifacts.get(1)) : Optional.empty();
     }
 
     /**
@@ -111,12 +105,12 @@ public interface Project {
     List<Artifact> getArtifacts();
 
     /**
-     * Returns project's all artifacts. The list contains all artifacts, even the attached ones, if any. Hence, the
-     * list returned by this method depends on which lifecycle step of the build was it invoked. The head of returned
-     * list is result of {@link #getArtifacts()} method, so same applies here: the list can have minimum of one
-     * element. The maximum number of elements is in turn dependent on build configuration and lifecycle phase when
-     * this method was invoked (i.e. is javadoc jar built and attached, is sources jar built attached, are all the
-     * artifact signed, etc.).
+     * Returns project's all artifacts as immutable list. The list contains all artifacts, even the attached ones,
+     * if any. Hence, the list returned by this method depends on which lifecycle step of the build was it invoked.
+     * The head of returned list is result of {@link #getArtifacts()} method, so same applies here: the list can have
+     * minimum of one element. The maximum number of elements is in turn dependent on build configuration and lifecycle
+     * phase when this method was invoked (i.e. is javadoc jar built and attached, is sources jar built attached, are
+     * all the artifact signed, etc.).
      * <p>
      * This method is shorthand for {@link #getArtifacts()} and
      * {@link org.apache.maven.api.services.ProjectManager#getAttachedArtifacts(Project)} methods.
@@ -224,13 +218,13 @@ public interface Project {
     Optional<Project> getParent();
 
     /**
-     * Returns project remote repositories (directly specified or inherited).
+     * Returns immutable list of project remote repositories (directly specified or inherited).
      */
     @Nonnull
     List<RemoteRepository> getRemoteProjectRepositories();
 
     /**
-     * Returns project remote plugin repositories (directly specified or inherited).
+     * Returns immutable list of project remote plugin repositories (directly specified or inherited).
      */
     @Nonnull
     List<RemoteRepository> getRemotePluginRepositories();
