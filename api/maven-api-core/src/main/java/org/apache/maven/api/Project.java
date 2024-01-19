@@ -76,7 +76,7 @@ public interface Project {
     Artifact getArtifact();
 
     /**
-     * Returns the project artifacts, that is, the project POM artifact and the artifact produced by this project build.
+     * Returns the project artifacts which are the project POM artifact and the artifact produced by this project build.
      * The list may have one or two elements (never less than 1, never more than 2), depending on project packaging.
      * <p>
      * The list's first element is ALWAYS the project POM artifact. Presence of second element in the list depends
