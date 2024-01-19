@@ -66,7 +66,8 @@ public interface Session {
 
     /**
      * Returns immutable system properties to use for interpolation. The system properties are collected from the
-     * runtime environment such as {@link System#getProperties()} and environment variables.
+     * runtime environment such as {@link System#getProperties()} and environment variables
+     * (prefixed with {@code env.}).
      *
      * @return the system properties, never {@code null}
      */
@@ -84,7 +85,7 @@ public interface Session {
      *     <li>User properties (highest precedence)</li>
      * </ul>
      * Note: Project properties contains properties injected from profiles, if applicable. Their precedence is
-     * {@code profile > project}, hence active profile may override project property.
+     * {@code profile > project}, hence active profile property may override project property.
      * <p>
      * Caller of this method should decide is there a project in scope (hence, project instance needs to be passed)
      * or not. It depends on what caller wants to achieve.
