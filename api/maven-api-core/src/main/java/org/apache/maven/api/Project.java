@@ -114,13 +114,13 @@ public interface Project {
     }
 
     /**
-     * Returns the project direct dependencies.
+     * Returns the project direct dependencies (directly specified or inherited).
      */
     @Nonnull
     List<DependencyCoordinate> getDependencies();
 
     /**
-     * Returns the project managed dependencies.
+     * Returns the project managed dependencies (directly specified or inherited).
      */
     @Nonnull
     List<DependencyCoordinate> getManagedDependencies();
