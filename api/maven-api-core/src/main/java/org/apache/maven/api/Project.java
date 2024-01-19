@@ -92,13 +92,16 @@ public interface Project {
     }
 
     /**
-     * Returns the project artifacts which are the project POM artifact and the artifact produced by this project build.
-     * The list may have one or two elements (never less than 1, never more than 2), depending on project packaging.
+     * Returns the project artifacts as immutable list. Elements are the project POM artifact and the artifact
+     * produced by this project build, if applicable. Hence, the returned list may have one or two elements
+     * (never less than 1, never more than 2), depending on project packaging.
      * <p>
      * The list's first element is ALWAYS the project POM artifact. Presence of second element in the list depends
      * solely on the project packaging.
      *
      * @see #getPackaging()
+     * @see #getPomArtifact()
+     * @see #getMainArtifact()
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
     @Nonnull
