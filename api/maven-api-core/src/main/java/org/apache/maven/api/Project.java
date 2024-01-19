@@ -68,12 +68,31 @@ public interface Project {
     String getPackaging();
 
     /**
-     * Returns the project artifact, that is the artifact produced by this project build.
+     * Returns the project POM artifact, that is the artifact of the POM of this project. Every project have POM
+     * artifact, while the existence of backing POM file is NOT a requirement (i.e. for some transient projects).
      *
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
     @Nonnull
-    Artifact getArtifact();
+    default Artifact getPomArtifact() {
+        return getArtifacts().get(0);
+    }
+
+    /**
+     * Returns the project artifact, that is the artifact produced by this project build. This artifact MAY be same
+     * as the one returned by {@link #getPomArtifact()}, if the project is actually not producing any main artifact.
+     * <p>
+     * If only non-POM artifacts are needed, better use {@link #getArtifacts()} method: if that method returns list
+     * having one element, the methods {@link #getPomArtifact()} and this one will return same artifact.
+     *
+     * @see #getArtifacts()
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     */
+    @Nonnull
+    default Artifact getArtifact() {
+        List<Artifact> artifacts = getArtifacts();
+        return artifacts.get(artifacts.size() - 1);
+    }
 
     /**
      * Returns the project artifacts which are the project POM artifact and the artifact produced by this project build.
@@ -87,6 +106,21 @@ public interface Project {
      */
     @Nonnull
     List<Artifact> getArtifacts();
+
+    /**
+     * Returns project's all artifacts. The list contains all artifacts, even the attached ones, if any. Hence, the
+     * list returned by this method depends on which lifecycle step of the build was it invoked. The head of returned
+     * list is result of {@link #getArtifacts()} method, so same applies here: the list can have minimum of one
+     * element. The maximum number of elements is in turn dependent on build configuration and lifecycle phase when
+     * this method was invoked (i.e. is javadoc jar built and attached, is sources jar built attached, are all the
+     * artifact signed, etc.).
+     * <p>
+     * This method is shorthand for {@link #getArtifacts()} and
+     * {@link org.apache.maven.api.services.ProjectManager#getAttachedArtifacts(Project)} methods.
+     *
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     */
+    List<Artifact> getAllArtifacts();
 
     /**
      * Returns the project model.
