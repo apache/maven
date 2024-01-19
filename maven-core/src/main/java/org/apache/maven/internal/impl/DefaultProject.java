@@ -28,7 +28,6 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
@@ -73,12 +72,7 @@ public class DefaultProject implements Project {
     @Nonnull
     @Override
     public Artifact getArtifact() {
-        org.eclipse.aether.artifact.Artifact projectArtifact = RepositoryUtils.toArtifact(project.getArtifact());
-        Artifact apiProjectArtifact = session.getArtifact(projectArtifact);
-        Path path =
-                projectArtifact.getFile() != null ? projectArtifact.getFile().toPath() : null;
-        session.getService(ArtifactManager.class).setPath(apiProjectArtifact, path);
-        return apiProjectArtifact;
+        return session.getArtifact(RepositoryUtils.toArtifact(project.getArtifact()));
     }
 
     @Nonnull
@@ -87,19 +81,10 @@ public class DefaultProject implements Project {
         org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(new ProjectArtifact(project));
         org.eclipse.aether.artifact.Artifact projectArtifact = RepositoryUtils.toArtifact(project.getArtifact());
 
-        final ArtifactManager artifactManagerService = session.getService(ArtifactManager.class);
         ArrayList<Artifact> result = new ArrayList<>(2);
-        Artifact apiPomArtifact = session.getArtifact(pomArtifact);
-        result.add(apiPomArtifact);
-        getPomPath().ifPresent(p -> artifactManagerService.setPath(apiPomArtifact, p));
-
+        result.add(session.getArtifact(pomArtifact));
         if (!ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
-            Artifact apiProjectArtifact = session.getArtifact(projectArtifact);
-            result.add(apiProjectArtifact);
-            if (projectArtifact.getFile() != null) {
-                artifactManagerService.setPath(
-                        apiProjectArtifact, projectArtifact.getFile().toPath());
-            }
+            result.add(session.getArtifact(projectArtifact));
         }
         return result;
     }

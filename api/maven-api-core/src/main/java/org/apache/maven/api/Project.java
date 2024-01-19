@@ -62,8 +62,7 @@ public interface Project {
     String getPackaging();
 
     /**
-     * Returns the project artifact, that is the artifact produced by this project. If the artifact file exists, it is
-     * registered to {@link org.apache.maven.api.services.ArtifactManager}.
+     * Returns the project artifact, that is the artifact produced by this project build.
      *
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
@@ -71,9 +70,11 @@ public interface Project {
     Artifact getArtifact();
 
     /**
-     * Returns the project artifacts, that is, the project POM artifact and the artifact produced by this project.
-     * The list may have one or two elements (never less than 1, never more than 2), depending on project packaging. If
-     * artifact files exists, they are registered to {@link org.apache.maven.api.services.ArtifactManager}.
+     * Returns the project artifacts, that is, the project POM artifact and the artifact produced by this project build.
+     * The list may have one or two elements (never less than 1, never more than 2), depending on project packaging.
+     * <p>
+     * The list 1st element is ALWAYS the project POM artifact. The existence of 2nd element depends on this project
+     * packaging.
      *
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
