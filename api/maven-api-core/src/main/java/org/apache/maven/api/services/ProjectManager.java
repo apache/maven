@@ -40,10 +40,9 @@ import org.apache.maven.api.model.Resource;
 @Experimental
 public interface ProjectManager extends Service {
     /**
-     * Returns the path to the resolved file in the local repository
-     * if the artifact has been resolved.
+     * Returns the path to the built project artifact file, if the project has been built.
      *
-     * @return the path of the resolved artifact
+     * @return the path of the built project artifact
      */
     @Nonnull
     Optional<Path> getPath(Project project);
