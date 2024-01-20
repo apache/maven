@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.maven.api.DependencyProperties;
@@ -115,13 +116,15 @@ public class DefaultDependencyProperties implements DependencyProperties {
          * @throws IllegalStateException if the dependency properties have already been built
          */
         public Builder setAll(@Nonnull DependencyProperties source) {
-            source.keys().forEach((key) -> checkAndSet(key, source.get(key)));
+            source.keys().forEach((key) -> source.get(key).ifPresent((value) -> checkAndSet(key, value)));
             return this;
         }
 
         /**
-         * {@return the dependency properties with the values previously set}.
+         * Returns the dependency properties with the values previously set.
          * This method  can be invoked only once.
+         *
+         * @return the dependency properties with the values previously set
          */
         @Nonnull
         public DefaultDependencyProperties build() {
@@ -166,7 +169,7 @@ public class DefaultDependencyProperties implements DependencyProperties {
      */
     @Deprecated
     private void addCompatibility() {
-        PathType[] types = get(PATH_TYPES);
+        PathType[] types = get(PATH_TYPES).orElse(null);
         if (types != null) {
             boolean found = false;
             for (PathType type : types) {
@@ -182,7 +185,9 @@ public class DefaultDependencyProperties implements DependencyProperties {
     }
 
     /**
-     * {@return the keys of all properties in this map}.
+     * Returns the keys of all properties in this map.
+     *
+     * @return the keys of all properties in this map
      */
     @Override
     public Set<Key<?>> keys() {
@@ -194,11 +199,11 @@ public class DefaultDependencyProperties implements DependencyProperties {
      *
      * @param <V> type of value to get
      * @param key key of the value to get
-     * @return value associated to the given key, or {@code null} if none
+     * @return value associated to the given key
      */
     @Override
-    public <V> V get(Key<V> key) {
-        return key.valueType().cast(properties.get(key));
+    public <V> Optional<V> get(Key<V> key) {
+        return Optional.ofNullable(key.valueType().cast(properties.get(key)));
     }
 
     /**
@@ -217,8 +222,10 @@ public class DefaultDependencyProperties implements DependencyProperties {
     private transient Map<String, String> mapView;
 
     /**
-     * {@return an immutable "map view" of all the properties}.
+     * Returns an immutable "map view" of all the properties.
      * This is computed when first needed
+     *
+     * @return an immutable "map view" of all the properties
      */
     @Nonnull
     @Override
@@ -235,7 +242,9 @@ public class DefaultDependencyProperties implements DependencyProperties {
     }
 
     /**
-     * {@return a string representation of the key-value mapping}.
+     * Returns a string representation of the key-value mapping.
+     *
+     * @return a string representation of the key-value mapping
      */
     @Override
     public String toString() {

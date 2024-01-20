@@ -62,7 +62,9 @@ public class DefaultDependency implements Dependency {
         DefaultDependencyProperties.Builder builder = new DefaultDependencyProperties.Builder();
         for (Map.Entry<String, String> entry :
                 dependency.getArtifact().getProperties().entrySet()) {
-            DependencyProperties.Key<?> key = DependencyProperties.Key.forName(entry.getKey(), String.class);
+            String name = entry.getKey();
+            DependencyProperties.Key<?> key = DependencyProperties.Key.forName(name)
+                    .orElseGet(() -> new DependencyProperties.Key<>(name, String.class));
             Function<String, Object> vc = VALUE_CONVERTERS.get(key.valueType());
             if (vc != null) {
                 builder.checkAndSet(key, vc.apply(entry.getValue()));

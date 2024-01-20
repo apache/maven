@@ -41,10 +41,12 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
     ResolutionScope getResolutionScope();
 
     /**
-     * {@return a filter for the types of path (class-path, module-path, …) accepted by the tool}.
+     * Returns a filter for the types of path (class-path, module-path, …) accepted by the tool.
      * For example, if a Java tools accepts only class-path elements, then the filter should return
      * {@code true} for {@link JavaPathType#CLASSES} and {@code false} for {@link JavaPathType#MODULES}.
      * If no filter is explicitly set, then the default is a filter accepting everything.
+     *
+     * @return a filter for the types of path (class-path, module-path, …) accepted by the tool
      */
     Predicate<PathType> getPathTypeFilter();
 

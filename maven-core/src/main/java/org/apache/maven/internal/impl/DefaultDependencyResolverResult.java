@@ -228,7 +228,8 @@ final class DefaultDependencyResolverResult implements DependencyResolverResult 
          * been added on the module-type.
          */
         final DependencyProperties properties = dep.getDependencyProperties();
-        final PathType[] pathTypes = properties.get(DependencyProperties.PATH_TYPES);
+        final PathType[] pathTypes =
+                properties.get(DependencyProperties.PATH_TYPES).orElse(null);
         if (containsPatches(pathTypes)) {
             if (outputModules == null) {
                 // For telling users that it is too late for setting the output directory.

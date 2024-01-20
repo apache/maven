@@ -18,14 +18,17 @@
  */
 package org.apache.maven.api;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Dependency properties supported by Maven Core.
@@ -48,7 +51,7 @@ public interface DependencyProperties {
          *
          * @see #intern()
          */
-        private static final Map<String, Key<?>> INTERNS = new HashMap<>();
+        private static final ConcurrentMap<String, Key<?>> INTERNS = new ConcurrentHashMap<>();
 
         /**
          * Value returned by {@link #name()}.
@@ -68,35 +71,25 @@ public interface DependencyProperties {
          * @param name name of the key
          * @param valueType type of value associated to the key
          */
-        public Key(@Nonnull final String name, @Nonnull final Class<V> valueType) {
+        public Key(@Nonnull String name, @Nonnull Class<V> valueType) {
             this.name = Objects.requireNonNull(name);
             this.valueType = Objects.requireNonNull(valueType);
         }
 
         /**
          * If a key exists in the {@linkplain #intern() intern pool} for the given name, returns that key.
-         * Otherwise, if the {@code defaultType} is non-null, creates a key for values of the specified type.
-         * Otherwise, returns {@code null}.
          *
-         * @param name name of the key to search or create
-         * @param defaultType value type of the key to create if none exist for the given name, or {@code null}
-         * @return key found or created, or {@code null} if no key was found and {@code defaultType} is null
-         *
-         * @see #intern()
+         * @param name name of the key to search
+         * @return key for the given name
          */
-        public static Key<?> forName(String name, Class<?> defaultType) {
-            Key<?> key;
-            synchronized (INTERNS) {
-                key = INTERNS.get(name);
-            }
-            if (key == null && defaultType != null) {
-                key = new Key<>(name, defaultType);
-            }
-            return key;
+        public static Optional<Key<?>> forName(@Nonnull String name) {
+            return Optional.ofNullable(INTERNS.get(name));
         }
 
         /**
-         * {@return the name of the key}.
+         * Returns the name of the key.
+         *
+         * @return the name of the key
          */
         @Nonnull
         public String name() {
@@ -104,7 +97,9 @@ public interface DependencyProperties {
         }
 
         /**
-         * {@return the type of value associated to the key}.
+         * Returns the type of value associated to the key.
+         *
+         * @return the type of value associated to the key
          */
         @Nonnull
         public Class<V> valueType() {
@@ -112,22 +107,20 @@ public interface DependencyProperties {
         }
 
         /**
-         * {@return a canonical representation of this key}. A pool of keys, initially empty, is maintained privately.
+         * Returns a canonical representation of this key. A pool of keys, initially empty, is maintained privately.
          * When the {@code intern()} method is invoked, if the pool already contains a key equal to this {@code Key}
          * as determined by the {@link #equals(Object)} method, then the key from the pool is returned. Otherwise,
          * if no key exist in the pool for this key {@linkplain #name() name}, then this {@code Key} object is added
          * to the pool and {@code this} is returned. Otherwise an {@link IllegalStateException} is thrown.
          *
+         * @return a canonical representation of this key
          * @throws IllegalStateException if a key exists in the pool for the same name but a different class of values.
          *
          * @see String#intern()
          */
         @SuppressWarnings("unchecked")
         public Key<V> intern() {
-            Key<?> previous;
-            synchronized (INTERNS) {
-                previous = INTERNS.putIfAbsent(name, this);
-            }
+            Key<?> previous = INTERNS.putIfAbsent(name, this);
             if (previous == null) {
                 return this;
             }
@@ -138,8 +131,10 @@ public interface DependencyProperties {
         }
 
         /**
-         * {@return a string representation of this key}.
+         * Returns a string representation of this key.
          * By default, this is the name of this key.
+         *
+         * @return a string representation of this key
          */
         @Override
         public String toString() {
@@ -147,7 +142,9 @@ public interface DependencyProperties {
         }
 
         /**
-         * {@return an hash code value for this key}.
+         * Returns an hash code value for this key}.
+         *
+         * @return an hash code value for this key
          */
         @Override
         public int hashCode() {
@@ -217,7 +214,9 @@ public interface DependencyProperties {
     Key<Boolean> FLAG_CLASS_PATH_CONSTITUENT = new Key<>("classPathConstituent", Boolean.class).intern();
 
     /**
-     * {@return the keys of all properties in this map}.
+     * Returns the keys of all properties in this map.
+     *
+     * @return the keys of all properties in this map
      */
     Set<Key<?>> keys();
 
@@ -226,9 +225,9 @@ public interface DependencyProperties {
      *
      * @param <V> type of value to get
      * @param key key of the value to get
-     * @return value associated to the given key, or {@code null} if none
+     * @return value associated to the given key
      */
-    <V> V get(@Nonnull Key<V> key);
+    <V> Optional<V> get(@Nonnull Key<V> key);
 
     /**
      * Returns the value associated to the given key, or the given default value if none.
@@ -238,7 +237,8 @@ public interface DependencyProperties {
      * @param defaultValue the value to return is none is associated to the given key, or {@code null}
      * @return value associated to the given key, or {@code null} if none and the default is null
      */
-    <V> V getOrDefault(@Nonnull Key<V> key, V defaultValue);
+    @Nullable
+    <V> V getOrDefault(@Nonnull Key<V> key, @Nullable V defaultValue);
 
     /**
      * Returns {@code true} if given flag is {@code true}.
@@ -248,13 +248,15 @@ public interface DependencyProperties {
      * @return whether the value associated to the given key is non-null and true
      */
     default boolean checkFlag(@Nonnull Key<Boolean> flag) {
-        return Boolean.TRUE.equals(get(flag));
+        return getOrDefault(flag, Boolean.FALSE);
     }
 
     /**
-     * {@return an immutable "map view" of all the properties}.
+     * Returns an immutable "map view" of all the properties.
      * This method is provided for compatibility with API working with {@link String}.
      * The type-safe method expecting {@link Key} arguments should be preferred.
+     *
+     * @return an immutable "map view" of all the properties
      */
     @Nonnull
     Map<String, String> asMap();

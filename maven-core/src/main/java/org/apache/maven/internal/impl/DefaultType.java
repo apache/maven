@@ -64,12 +64,12 @@ public class DefaultType implements Type, ArtifactType {
 
     @Override
     public String getId() {
-        return dependencyProperties.get(DependencyProperties.TYPE);
+        return dependencyProperties.get(DependencyProperties.TYPE).orElse(null);
     }
 
     @Override
     public String getLanguage() {
-        return dependencyProperties.get(DependencyProperties.LANGUAGE);
+        return dependencyProperties.get(DependencyProperties.LANGUAGE).orElse(null);
     }
 
     @Override

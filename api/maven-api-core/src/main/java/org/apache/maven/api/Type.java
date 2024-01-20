@@ -137,6 +137,7 @@ public interface Type {
      *
      * @deprecated A value of {@code true} does not mean that the dependency <em>should</em>
      * be placed on the classpath. See {@link JavaPathType} instead for better analysis.
+     * This method will be removed before 4.0.0 GA.
      */
     @Deprecated
     default boolean isAddedToClassPath() {
