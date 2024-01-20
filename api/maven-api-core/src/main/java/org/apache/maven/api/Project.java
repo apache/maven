@@ -136,8 +136,14 @@ public interface Project {
      * Returns the project base directory.
      */
     @Nonnull
-    default Optional<Path> getBasedir() {
-        return getPomPath().map(Path::getParent);
+    Optional<Path> getBasedir();
+
+    /**
+     * Enforces presence of the project base directory and returns it.
+     */
+    @Nonnull
+    default Path requireBasedir() {
+        return getBasedir().orElseThrow(() -> new IllegalStateException("Project basedir not given"));
     }
 
     /**

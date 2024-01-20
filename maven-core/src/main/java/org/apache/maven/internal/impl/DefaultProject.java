@@ -102,6 +102,15 @@ public class DefaultProject implements Project {
         return Optional.ofNullable(file).map(File::toPath);
     }
 
+    @Override
+    public Optional<Path> getBasedir() {
+        File basedir = project.getBasedir();
+        if (basedir == null) {
+            return Optional.empty();
+        }
+        return Optional.of(basedir.toPath());
+    }
+
     @Nonnull
     @Override
     public List<DependencyCoordinate> getDependencies() {
@@ -125,13 +134,12 @@ public class DefaultProject implements Project {
 
     @Override
     public boolean isTopProject() {
-        return getBasedir().isPresent()
-                && getBasedir().get().equals(getSession().getTopDirectory());
+        return getBasedir().equals(getSession().getTopDirectory());
     }
 
     @Override
     public boolean isRootProject() {
-        return getBasedir().isPresent() && getBasedir().get().equals(getRootDirectory());
+        return getBasedir().equals(getRootDirectory());
     }
 
     @Override

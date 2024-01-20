@@ -71,11 +71,11 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
-    public List<Artifact> getAllArtifacts(Project project) {
+    public Collection<Artifact> getAllArtifacts(Project project) {
         ArrayList<Artifact> result = new ArrayList<>(2);
         result.addAll(project.getArtifacts());
         result.addAll(getAttachedArtifacts(project));
-        return Collections.unmodifiableList(result);
+        return Collections.unmodifiableCollection(result);
     }
 
     @Override
