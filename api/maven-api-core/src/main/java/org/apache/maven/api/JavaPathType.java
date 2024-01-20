@@ -30,8 +30,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * The option of a Java command-line tool where to place the paths to some dependencies.
  * A {@code PathType} can identify the class-path, the module-path, the patches for a specific module,
- * or another kind of path. This class is like an enumeration, except that it is extensible:
- * plugins can define their own kinds of path.
+ * or another kind of path.
  *
  * <p>One path type is handled in a special way: unlike other options,
  * the paths specified in a {@code --patch-module} Java option is effective only for a specified module.
@@ -46,7 +45,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0.0
  */
 @Experimental
-public final class JavaPathType extends PathType {
+public enum JavaPathType implements PathType {
     /**
      * The path identified by the Java {@code --class-path} option.
      * Used for compilation, execution and Javadoc among others.
@@ -64,7 +63,7 @@ public final class JavaPathType extends PathType {
      *       class-path.</li>
      * </ul>
      */
-    public static final JavaPathType CLASSES = new JavaPathType("CLASSES", "--class-path", null);
+    CLASSES("--class-path"),
 
     /**
      * The path identified by the Java {@code --module-path} option.
@@ -85,13 +84,12 @@ public final class JavaPathType extends PathType {
      *       {@code --module-path} option.</li>
      * </ul>
      */
-    public static final JavaPathType MODULES = new JavaPathType("MODULES", "--module-path", null);
+    MODULES("--module-path"),
 
     /**
      * The path identified by the Java {@code --upgrade-module-path} option.
      */
-    public static final JavaPathType UPGRADE_MODULES =
-            new JavaPathType("UPGRADE_MODULES", "--upgrade-module-path", null);
+    UPGRADE_MODULES("--upgrade-module-path"),
 
     /**
      * The path identified by the Java {@code --patch-module} option.
@@ -100,41 +98,32 @@ public final class JavaPathType extends PathType {
      *
      * @see #patchModule(String)
      */
-    public static final JavaPathType PATCH_MODULE = new JavaPathType("PATCH_MODULE", "--patch-module", null);
+    PATCH_MODULE("--patch-module"),
 
     /**
      * The path identified by the Java {@code --processor-path} option.
      */
-    public static final JavaPathType PROCESSOR_CLASSES =
-            new JavaPathType("PROCESSOR_CLASSES", "--processor-path", null);
+    PROCESSOR_CLASSES("--processor-path"),
 
     /**
      * The path identified by the Java {@code --processor-module-path} option.
      */
-    public static final JavaPathType PROCESSOR_MODULES =
-            new JavaPathType("PROCESSOR_MODULES", "--processor-module-path", null);
+    PROCESSOR_MODULES("--processor-module-path"),
 
     /**
      * The path identified by the Java {@code -agentpath} option.
      */
-    public static final JavaPathType AGENT = new JavaPathType("AGENT", "-agentpath", null);
+    AGENT("-agentpath"),
 
     /**
      * The path identified by the Javadoc {@code -doclet} option.
      */
-    public static final JavaPathType DOCLET = new JavaPathType("DOCLET", "-doclet", null);
+    DOCLET("-doclet"),
 
     /**
      * The path identified by the Javadoc {@code -tagletpath} option.
      */
-    public static final JavaPathType TAGLETS = new JavaPathType("TAGLETS", "-tagletpath", null);
-
-    /**
-     * All predefined enumeration values.
-     */
-    private static final JavaPathType[] VALUES = {
-        CLASSES, MODULES, UPGRADE_MODULES, PROCESSOR_CLASSES, PROCESSOR_MODULES, AGENT, DOCLET, TAGLETS
-    };
+    TAGLETS("-tagletpath");
 
     /**
      * Creates a path identified by the Java {@code --patch-module} option.
@@ -149,88 +138,46 @@ public final class JavaPathType extends PathType {
      * @param moduleName name of the module on which to apply the path
      * @return an identification of the patch-module path for the given module.
      *
-     * @see #moduleName()
-     * @see #toString()
+     * @see Modular#moduleName()
      */
     @Nonnull
-    public static JavaPathType patchModule(final String moduleName) {
-        return new JavaPathType("patchModule", "--patch-module", Objects.requireNonNull(moduleName));
+    public static Modular patchModule(@Nonnull String moduleName) {
+        return PATCH_MODULE.new Modular(moduleName);
     }
 
     /**
-     * Creates a path for the specified option. If the {@code option} argument is one of the options
-     * associated to above-listed enumeration values, then that value is returned. Otherwise, this
-     * method returns a new {@code JavaPathType} instance for the given option.
+     * The tools option for this path, or {@code null} if none.
      *
-     * @param name the programmatic name of the new path type
-     * @param option the option associated to the path type, or {@code null} if none
-     * @return path type for the given option
+     * @see #option()
      */
-    @Nonnull
-    public static JavaPathType forOption(final String name, final String option) {
-        for (final JavaPathType value : VALUES) {
-            if (value.option.equals(option)) {
-                return value;
-            }
-        }
-        return new JavaPathType(name, option, null);
-    }
-
-    /**
-     * Name of the module to patch, or {@code null} if this path type is not for the {@code --patch-module} option.
-     */
-    private final String moduleName;
+    private final String option;
 
     /**
      * Creates a new enumeration value for a path associated to the given tool option.
      *
-     * @param name the programmatic name of this path type
      * @param option the Java tools option for this path, or {@code null} if none
-     * @param moduleName name of the module to patch, or {@code null} if none
      */
-    private JavaPathType(final String name, final String option, final String moduleName) {
-        super(name, option);
-        this.moduleName = moduleName;
+    JavaPathType(String option) {
+        this.option = option;
     }
 
     /**
-     * Returns the name of the module on which this option applies.
-     * This is present only for instances created by {@link #patchModule(String)}.
+     * Returns the name of the tool option for this path. For example, if this path type
+     * is {@link #MODULES}, then this method returns {@code "--module-path"}. The option
+     * does not include the {@linkplain Modular#moduleName() module name} on which it applies.
      *
-     * @return name of the module on which this option applies
-     */
-    @Nonnull
-    public Optional<String> moduleName() {
-        return Optional.ofNullable(moduleName);
-    }
-
-    /**
-     * Returns the programmatic name of this path type, including the class name and module to patch if any.
-     * For example, if this type is {@link #MODULES}, then this method returns {@code JavaPathType.MODULES}.
-     * If this type was created by {@code patchModule("foo.bar")}, then this method returns
-     * {@code JavaPathType.patchModule("foo.bar")}.
-     *
-     * @return the programmatic name together with the module name on which it applies
-     *
-     * @see #name()
-     * @see #moduleName()
+     * @return the name of the tool option for this path type
      */
     @Nonnull
     @Override
-    public String toString() {
-        String s = super.toString();
-        if (moduleName != null) {
-            s = s + "(\"" + moduleName + "\")";
-        }
-        return s;
+    public Optional<String> option() {
+        return Optional.ofNullable(option);
     }
 
     /**
-     * Returns the option followed by a string representation of the given path elements. For example,
-     * if this type is {@link #MODULES}, then the option is {@code "--module-path"}. But if this type is
-     * {@code patchModule("foo.bar")}, then the option is {@code "--patch-module foo.bar"}. The option is followed
-     * by the given path elements, separated by the {@linkplain File#separatorChar platform-specific separator}.
-     * If the given {@code paths} argument contains no element, then this method returns an empty string.
+     * Returns the option followed by a string representation of the given path elements.
+     * For example, if this type is {@link #MODULES}, then the option is {@code "--module-path"}
+     * followed by the specified path elements.
      *
      * @param paths the path to format as a tool option
      * @return the option associated to this path type followed by the given path elements,
@@ -240,6 +187,13 @@ public final class JavaPathType extends PathType {
     @Nonnull
     @Override
     public String option(final Iterable<? extends Path> paths) {
+        return format(null, paths);
+    }
+
+    /**
+     * Implementation shared with {@link Modular}.
+     */
+    final String format(final String moduleName, final Iterable<? extends Path> paths) {
         if (option == null) {
             throw new IllegalStateException("No option is associated to this path type.");
         }
@@ -253,30 +207,123 @@ public final class JavaPathType extends PathType {
     }
 
     /**
-     * Returns a hash code value for this type.
+     * Type of a path which is applied to only one specific Java module.
+     * The main case is the Java {@code --patch-module} option.
      *
-     * @return a hash code value
+     * @see #PATCH_MODULE
+     * @see #patchModule(String)
      */
-    @Override
-    public int hashCode() {
-        return super.hashCode() + 37 * Objects.hashCode(moduleName);
-    }
+    public final class Modular implements PathType {
+        /**
+         * Name of the module for which a path is specified.
+         */
+        @Nonnull
+        private final String moduleName;
 
-    /**
-     * Compares this type with the given object for equality.
-     *
-     * @param obj the object to compare with this type
-     * @return whether the two objects are equal
-     */
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj == this) {
-            return true;
+        /**
+         * Creates a new path type for the specified module.
+         *
+         * @param moduleName name of the module for which a path is specified
+         */
+        private Modular(@Nonnull String moduleName) {
+            this.moduleName = Objects.requireNonNull(moduleName);
         }
-        if (super.equals(obj)) {
-            final JavaPathType other = (JavaPathType) obj;
-            return Objects.equals(moduleName, other.moduleName);
+
+        /**
+         * Returns the type of path without indication about the target module.
+         * This is usually {@link #PATCH_MODULE}.
+         *
+         * @return type of path without indication about the target module
+         */
+        @Nonnull
+        public JavaPathType rawType() {
+            return JavaPathType.this;
         }
-        return false;
+
+        /**
+         * Returns the name of the tool option for this path, not including the module name.
+         *
+         * @return name of the tool option for this path, not including the module name
+         */
+        @Nonnull
+        @Override
+        public String name() {
+            return JavaPathType.this.name();
+        }
+
+        /**
+         * Returns the name of the module for which a path is specified
+         *
+         * @return name of the module for which a path is specified
+         */
+        @Nonnull
+        public String moduleName() {
+            return moduleName;
+        }
+
+        /**
+         * Returns the name of the tool option for this path.
+         * The option does not include the {@linkplain #moduleName() module name} on which it applies.
+         *
+         * @return the name of the tool option for this path type
+         */
+        @Nonnull
+        @Override
+        public Optional<String> option() {
+            return JavaPathType.this.option();
+        }
+
+        /**
+         * Returns the option followed by a string representation of the given path elements.
+         * The path elements are separated by an option-specific or platform-specific separator.
+         * If the given {@code paths} argument contains no element, then this method returns an empty string.
+         *
+         * @param paths the path to format as a string
+         * @return the option associated to this path type followed by the given path elements,
+         *         or an empty string if there is no path element.
+         */
+        @Nonnull
+        @Override
+        public String option(Iterable<? extends Path> paths) {
+            return format(moduleName, paths);
+        }
+
+        /**
+         * Returns the programmatic name of this path type, including the module to patch.
+         * For example, if this type was created by {@code JavaPathType.patchModule("foo.bar")},
+         * then this method returns {@code "PATCH_MODULE:foo.bar")}.
+         *
+         * @return the programmatic name together with the module name on which it applies
+         */
+        @Nonnull
+        @Override
+        public String toString() {
+            return name() + ':' + moduleName;
+        }
+
+        /**
+         * Returns a hash code value for this type.
+         *
+         * @return a hash code value
+         */
+        @Override
+        public int hashCode() {
+            return JavaPathType.this.hashCode() + 37 * moduleName.hashCode();
+        }
+
+        /**
+         * Compares this type with the given object for equality.
+         *
+         * @param obj the object to compare with this type
+         * @return whether the two objects are equal
+         */
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof Modular) {
+                Modular other = (Modular) obj;
+                return rawType().equals(other.rawType()) && moduleName.equals(other.moduleName);
+            }
+            return false;
+        }
     }
 }
