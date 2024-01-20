@@ -47,8 +47,25 @@ public interface ProjectManager extends Service {
     @Nonnull
     Optional<Path> getPath(Project project);
 
+    /**
+     * Returns an immutable collection of attached artifacts for given project.
+     */
     @Nonnull
     Collection<Artifact> getAttachedArtifacts(Project project);
+
+    /**
+     * Returns project's all artifacts as immutable collection. The list contains all artifacts, even the attached ones,
+     * if any. Hence, the list returned by this method depends on which lifecycle step of the build was it invoked.
+     * The head of returned list is result of {@link Project#getArtifacts()} method, so same applies here: the list can have
+     * minimum of one element. The maximum number of elements is in turn dependent on build configuration and lifecycle
+     * phase when this method was invoked (i.e. is javadoc jar built and attached, is sources jar built attached, are
+     * all the artifact signed, etc.).
+     * <p>
+     * This method is shorthand for {@link Project#getArtifacts()} and {@link #getAttachedArtifacts(Project)} methods.
+     *
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     */
+    Collection<Artifact> getAllArtifacts(Project project);
 
     default void attachArtifact(Session session, Project project, Path path) {
         String name = path.getFileName().toString();

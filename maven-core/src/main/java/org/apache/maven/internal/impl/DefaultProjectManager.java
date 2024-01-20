@@ -22,10 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -71,6 +68,14 @@ public class DefaultProjectManager implements ProjectManager {
                 getMavenProject(project).getAttachedArtifacts(),
                 a -> session.getArtifact(RepositoryUtils.toArtifact(a)));
         return Collections.unmodifiableCollection(attached);
+    }
+
+    @Override
+    public List<Artifact> getAllArtifacts(Project project) {
+        ArrayList<Artifact> result = new ArrayList<>(2);
+        result.addAll(project.getArtifacts());
+        result.addAll(getAttachedArtifacts(project));
+        return Collections.unmodifiableList(result);
     }
 
     @Override

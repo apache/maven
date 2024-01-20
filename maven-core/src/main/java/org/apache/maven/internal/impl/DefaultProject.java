@@ -28,7 +28,6 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
@@ -81,14 +80,6 @@ public class DefaultProject implements Project {
         if (!ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
             result.add(session.getArtifact(projectArtifact));
         }
-        return Collections.unmodifiableList(result);
-    }
-
-    @Override
-    public List<Artifact> getAllArtifacts() {
-        ArrayList<Artifact> result = new ArrayList<>(2);
-        result.addAll(getArtifacts());
-        result.addAll(session.getService(ProjectManager.class).getAttachedArtifacts(this));
         return Collections.unmodifiableList(result);
     }
 

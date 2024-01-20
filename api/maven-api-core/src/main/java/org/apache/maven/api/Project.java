@@ -108,21 +108,6 @@ public interface Project {
     List<Artifact> getArtifacts();
 
     /**
-     * Returns project's all artifacts as immutable list. The list contains all artifacts, even the attached ones,
-     * if any. Hence, the list returned by this method depends on which lifecycle step of the build was it invoked.
-     * The head of returned list is result of {@link #getArtifacts()} method, so same applies here: the list can have
-     * minimum of one element. The maximum number of elements is in turn dependent on build configuration and lifecycle
-     * phase when this method was invoked (i.e. is javadoc jar built and attached, is sources jar built attached, are
-     * all the artifact signed, etc.).
-     * <p>
-     * This method is shorthand for {@link #getArtifacts()} and
-     * {@link org.apache.maven.api.services.ProjectManager#getAttachedArtifacts(Project)} methods.
-     *
-     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
-     */
-    List<Artifact> getAllArtifacts();
-
-    /**
      * Returns the project model.
      */
     @Nonnull
