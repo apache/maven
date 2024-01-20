@@ -206,14 +206,6 @@ public interface DependencyProperties {
     Key<Boolean> FLAG_INCLUDES_DEPENDENCIES = new Key<>("includesDependencies", Boolean.class).intern();
 
     /**
-     * Boolean flag telling that dependency is meant to be placed on class path.
-     *
-     * @deprecated Use {@link #PATH_TYPES} and {@link JavaPathType#CLASSES} instead.
-     */
-    @Deprecated
-    Key<Boolean> FLAG_CLASS_PATH_CONSTITUENT = new Key<>("classPathConstituent", Boolean.class).intern();
-
-    /**
      * Returns the keys of all properties in this map.
      *
      * @return the keys of all properties in this map

@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.TypeRegistry;
@@ -79,7 +80,7 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                     ArtifactHandler handler = manager.getArtifactHandler(id);
                     DefaultDependencyProperties.Builder flags = new DefaultDependencyProperties.Builder();
                     if (handler.isAddedToClasspath()) {
-                        flags.setFlag(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
+                        flags.set(DependencyProperties.PATH_TYPES, new JavaPathType[] {JavaPathType.CLASSES});
                     }
                     if (handler.isIncludesDependencies()) {
                         flags.setFlag(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);

@@ -129,22 +129,6 @@ public interface Type {
     String getClassifier();
 
     /**
-     * Specifies if the artifact contains java classes and can be added to the classpath.
-     * Whether the artifact <em>should</em> be added to the classpath depends on other
-     * {@linkplain #getDependencyProperties() dependency properties}.
-     *
-     * @return if the artifact <em>can</em> be added to the class path
-     *
-     * @deprecated A value of {@code true} does not mean that the dependency <em>should</em>
-     * be placed on the classpath. See {@link JavaPathType} instead for better analysis.
-     * This method will be removed before 4.0.0 GA.
-     */
-    @Deprecated
-    default boolean isAddedToClassPath() {
-        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
-    }
-
-    /**
      * Specifies if the artifact already embeds its own dependencies.
      * This is the case for JEE packages or similar artifacts such as
      * WARs, EARs, etc.
