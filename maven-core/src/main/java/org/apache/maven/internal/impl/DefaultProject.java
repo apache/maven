@@ -134,12 +134,13 @@ public class DefaultProject implements Project {
 
     @Override
     public boolean isTopProject() {
-        return getBasedir().equals(getSession().getTopDirectory());
+        return getBasedir().isPresent()
+                && getBasedir().get().equals(getSession().getTopDirectory());
     }
 
     @Override
     public boolean isRootProject() {
-        return getBasedir().equals(getRootDirectory());
+        return getBasedir().isPresent() && getBasedir().get().equals(getRootDirectory());
     }
 
     @Override
