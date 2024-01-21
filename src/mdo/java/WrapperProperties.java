@@ -44,7 +44,7 @@ class WrapperProperties extends Properties {
     public interface SerializableConsumer<T> extends java.util.function.Consumer<T>, java.io.Serializable {}
     public interface SerializableSupplier<T> extends java.util.function.Supplier<T>, java.io.Serializable {}
 
-    final Supplier<Map<String, String>> getter;
+    final SerializableSupplier<Map<String, String>> getter;
     final SerializableConsumer<Properties> setter;
 
     WrapperProperties(SerializableSupplier<Map<String, String>> getter, SerializableConsumer<Properties> setter) {
