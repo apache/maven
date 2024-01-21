@@ -41,10 +41,13 @@ import java.util.function.Supplier;
 
 class WrapperProperties extends Properties {
 
-    final Supplier<Map<String, String>> getter;
-    final Consumer<Properties> setter;
+    public interface SerializableConsumer<T> extends java.util.function.Consumer<T>, java.io.Serializable {}
+    public interface SerializableSupplier<T> extends java.util.function.Supplier<T>, java.io.Serializable {}
 
-    WrapperProperties(Supplier<Map<String, String>> getter, Consumer<Properties> setter) {
+    final Supplier<Map<String, String>> getter;
+    final SerializableConsumer<Properties> setter;
+
+    WrapperProperties(SerializableSupplier<Map<String, String>> getter, SerializableConsumer<Properties> setter) {
         this.getter = getter;
         this.setter = setter;
     }

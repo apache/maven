@@ -27,16 +27,21 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 class WrapperList<T, U> extends AbstractList<T> {
-    private final Supplier<List<U>> getter;
-    private final Consumer<List<U>> setter;
-    private final Function<U, T> mapper;
-    private final Function<T, U> revMapper;
+    public interface SerializableConsumer<T> extends java.util.function.Consumer<T>, java.io.Serializable {}
+    public interface SerializableFunction<U, T> extends java.util.function.Function<U, T>, java.io.Serializable {}
+    public interface SerializableSupplier<T> extends java.util.function.Supplier<T>, java.io.Serializable {}
 
-    WrapperList(List<U> list, Function<U, T> mapper, Function<T, U> revMapper) {
+
+    private final SerializableSupplier<List<U>> getter;
+    private final SerializableConsumer<List<U>> setter;
+    private final SerializableFunction<U, T> mapper;
+    private final SerializableFunction<T, U> revMapper;
+
+    WrapperList(List<U> list, SerializableFunction<U, T> mapper, SerializableFunction<T, U> revMapper) {
         this(() -> list, null, mapper, revMapper);
     }
 
-    WrapperList(Supplier<List<U>> getter, Consumer<List<U>> setter, Function<U, T> mapper, Function<T, U> revMapper) {
+    WrapperList(SerializableSupplier<List<U>> getter, SerializableConsumer<List<U>> setter, SerializableFunction<U, T> mapper, SerializableFunction<T, U> revMapper) {
         this.getter = getter;
         this.setter = setter;
         this.mapper = mapper;
