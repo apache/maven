@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.apache.maven.api.JavaPathType;
@@ -96,17 +97,14 @@ final class PathModularizationCache {
      * <p>If the dependency can be a constituent of both the class-path and the module-path,
      * then the path type is determined by checking if the dependency is modular.</p>
      *
-     * @param types types of path where a dependency can be placed, or {@code null} if unspecified
-     * @param filter filter the paths accepted by the tool which will consume the path.
+     * @param types types of path where a dependency can be placed
+     * @param filter filter the paths accepted by the tool which will consume the path
      * @param path path to the JAR file or output directory of the dependency
      * @return where to place the dependency, or an empty value if the placement cannot be determined
      * @throws IOException if an error occurred while reading module information
      */
-    Optional<PathType> selectPathType(final PathType[] types, final Predicate<PathType> filter, final Path path)
+    Optional<PathType> selectPathType(final Set<PathType> types, final Predicate<PathType> filter, final Path path)
             throws IOException {
-        if (types == null) {
-            return Optional.empty();
-        }
         PathType selected = null;
         boolean classes = false;
         boolean modules = false;

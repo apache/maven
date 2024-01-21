@@ -228,8 +228,8 @@ final class DefaultDependencyResolverResult implements DependencyResolverResult 
          * been added on the module-type.
          */
         final DependencyProperties properties = dep.getDependencyProperties();
-        final PathType[] pathTypes =
-                properties.get(DependencyProperties.PATH_TYPES).orElse(null);
+        final Set<PathType> pathTypes =
+                properties.getOrDefault(DependencyProperties.PATH_TYPES, Collections.emptySet());
         if (containsPatches(pathTypes)) {
             if (outputModules == null) {
                 // For telling users that it is too late for setting the output directory.
@@ -275,17 +275,15 @@ final class DefaultDependencyResolverResult implements DependencyResolverResult 
     }
 
     /**
-     * Returns whether the given array of path types contains at least one patch for a module.
+     * Returns whether the given set of path types contains at least one patch for a module.
      */
-    private boolean containsPatches(final PathType[] types) {
-        if (types != null) {
-            for (PathType type : types) {
-                if (type instanceof JavaPathType.Modular) {
-                    type = ((JavaPathType.Modular) type).rawType();
-                }
-                if (JavaPathType.PATCH_MODULE.equals(type)) {
-                    return true;
-                }
+    private boolean containsPatches(final Set<PathType> types) {
+        for (PathType type : types) {
+            if (type instanceof JavaPathType.Modular) {
+                type = ((JavaPathType.Modular) type).rawType();
+            }
+            if (JavaPathType.PATCH_MODULE.equals(type)) {
+                return true;
             }
         }
         return false;

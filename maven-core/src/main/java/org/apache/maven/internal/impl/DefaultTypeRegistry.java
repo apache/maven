@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -80,7 +81,7 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                     ArtifactHandler handler = manager.getArtifactHandler(id);
                     DefaultDependencyProperties.Builder flags = new DefaultDependencyProperties.Builder();
                     if (handler.isAddedToClasspath()) {
-                        flags.set(DependencyProperties.PATH_TYPES, new JavaPathType[] {JavaPathType.CLASSES});
+                        flags.set(DependencyProperties.PATH_TYPES, Collections.singleton(JavaPathType.CLASSES));
                     }
                     if (handler.isIncludesDependencies()) {
                         flags.setFlag(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);

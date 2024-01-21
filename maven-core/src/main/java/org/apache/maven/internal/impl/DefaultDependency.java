@@ -43,11 +43,17 @@ public class DefaultDependency implements Dependency {
      * A mapping from {@link ArtifactProperties} values to {@link DependencyProperties} values.
      * Used for conversion from Eclipse model to Maven model of dependency properties.
      */
-    private static final Map<Class<?>, Function<String, Object>> VALUE_CONVERTERS = new HashMap<>(4);
+    private static final Map<Class<?>, Function<String, Object>> VALUE_CONVERTERS = new HashMap<>(12);
 
     static {
         VALUE_CONVERTERS.put(String.class, String::valueOf);
         VALUE_CONVERTERS.put(Boolean.class, Boolean::valueOf);
+        VALUE_CONVERTERS.put(Byte.class, Byte::valueOf);
+        VALUE_CONVERTERS.put(Short.class, Short::valueOf);
+        VALUE_CONVERTERS.put(Integer.class, Integer::valueOf);
+        VALUE_CONVERTERS.put(Long.class, Long::valueOf);
+        VALUE_CONVERTERS.put(Float.class, Float::valueOf);
+        VALUE_CONVERTERS.put(Double.class, Double::valueOf);
     }
 
     private final InternalSession session;

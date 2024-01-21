@@ -58,7 +58,7 @@ public class DefaultType implements Type, ArtifactType {
         dependencyProperties = new DefaultDependencyProperties.Builder()
                 .set(DependencyProperties.TYPE, id)
                 .set(DependencyProperties.LANGUAGE, language)
-                .set(DependencyProperties.PATH_TYPES, pathTypes)
+                .setElements(DependencyProperties.PATH_TYPES, pathTypes)
                 .build();
     }
 

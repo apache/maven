@@ -18,8 +18,10 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -82,6 +84,8 @@ public class DefaultDependencyProperties implements DependencyProperties {
 
         /**
          * Checks the type of the given value, then associates to the given key.
+         * Note that if {@code <V>} is a collection such as {@code Set<PathType>},
+         * then this method cannot verify that all elements are of the expected type.
          *
          * @param <V> type of value to add
          * @param key key of the value to add
@@ -90,8 +94,25 @@ public class DefaultDependencyProperties implements DependencyProperties {
          * @throws ClassCastException if the given value is not of type {@code <V>}
          * @throws IllegalStateException if the dependency properties have already been built
          */
+        @Nonnull
         public <V> Builder checkAndSet(@Nonnull Key<V> key, @Nonnull Object value) {
             return set(key, key.valueType().cast(value));
+        }
+
+        /**
+         * Associates the given set of values to the given key.
+         * If a set was already defined for the given key, the new set replaces it.
+         *
+         * @param <E> type of elements in the set
+         * @param key key of the set to add
+         * @param values the elements in the set
+         * @return {@code this} for method call chaining
+         * @throws IllegalStateException if the dependency properties have already been built
+         */
+        @Nonnull
+        @SafeVarargs
+        public final <E> Builder setElements(@Nonnull Key<Set<E>> key, @Nonnull E... values) {
+            return set(key, Collections.unmodifiableSet(new HashSet<>(Arrays.asList(values))));
         }
 
         /**
@@ -113,6 +134,7 @@ public class DefaultDependencyProperties implements DependencyProperties {
          * @return {@code this} for method call chaining
          * @throws IllegalStateException if the dependency properties have already been built
          */
+        @Nonnull
         public Builder setAll(@Nonnull DependencyProperties source) {
             source.keys().forEach((key) -> source.get(key).ifPresent((value) -> checkAndSet(key, value)));
             return this;

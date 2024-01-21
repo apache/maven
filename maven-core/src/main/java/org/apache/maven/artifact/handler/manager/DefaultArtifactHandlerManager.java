@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.JavaPathType;
-import org.apache.maven.api.PathType;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -67,14 +66,6 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
     public ArtifactHandler getArtifactHandler(String id) {
         return allHandlers.computeIfAbsent(id, k -> {
             Type type = typeRegistry.getType(id);
-            boolean isAddedToClasspath = false;
-            for (PathType p :
-                    type.getDependencyProperties().getOrDefault(DependencyProperties.PATH_TYPES, new PathType[0])) {
-                if (JavaPathType.CLASSES.equals(p)) {
-                    isAddedToClasspath = true;
-                    break;
-                }
-            }
             return new DefaultArtifactHandler(
                     id,
                     type.getExtension(),
@@ -83,7 +74,9 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
                     null,
                     type.isIncludesDependencies(),
                     type.getLanguage(),
-                    isAddedToClasspath); // TODO: watch out for module path
+                    type.getDependencyProperties()
+                            .checkContains(DependencyProperties.PATH_TYPES, JavaPathType.CLASSES));
+            // TODO: watch out for module path
         });
     }
 

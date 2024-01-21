@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -196,7 +197,8 @@ public interface DependencyProperties {
      * case, the plugin may apply rules for choosing a path. See for example
      * {@link JavaPathType#CLASSES} and {@link JavaPathType#MODULES}.</p>
      */
-    Key<PathType[]> PATH_TYPES = new Key<>("pathTypes", PathType[].class).intern();
+    @SuppressWarnings("unchecked")
+    Key<Set<PathType>> PATH_TYPES = (Key) new Key<>("pathTypes", Set.class).intern();
 
     /**
      * Boolean flag telling that dependency contains all of its dependencies.
@@ -230,7 +232,9 @@ public interface DependencyProperties {
      * @return value associated to the given key, or {@code null} if none and the default is null
      */
     @Nullable
-    <V> V getOrDefault(@Nonnull Key<V> key, @Nullable V defaultValue);
+    default <V> V getOrDefault(@Nonnull Key<V> key, @Nullable V defaultValue) {
+        return get(key).orElse(defaultValue);
+    }
 
     /**
      * Returns {@code true} if given flag is {@code true}.
@@ -241,6 +245,19 @@ public interface DependencyProperties {
      */
     default boolean checkFlag(@Nonnull Key<Boolean> flag) {
         return getOrDefault(flag, Boolean.FALSE);
+    }
+
+    /**
+     * Returns {@code true} if the set associated to the given key contains the specified element.
+     * An absence of set is interpreted as an empty set, which results in {@code false}.
+     *
+     * @param <E> type of elements contained in the set
+     * @param flag the property to check
+     * @param value value to check in the set identified by the flag
+     * @return {@code true} if a set is associated to the given key and contains the given value
+     */
+    default <E> boolean checkContains(@Nonnull Key<Set<E>> flag, E value) {
+        return getOrDefault(flag, Collections.emptySet()).contains(value);
     }
 
     /**
