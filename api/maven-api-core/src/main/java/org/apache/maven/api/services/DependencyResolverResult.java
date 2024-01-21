@@ -55,12 +55,12 @@ public interface DependencyResolverResult extends DependencyCollectorResult {
      * In the case of Java tools, the map may also contain {@code --patch-module} options, which are
      * {@linkplain org.apache.maven.api.JavaPathType#patchModule(String) handled in a special way}.
      *
-     * <h4>Design note</h4>
+     * <p><b>Design note:</b>
      * All types of path are determined together because they are sometime mutually exclusive.
      * For example, an artifact of type {@value org.apache.maven.api.Type#JAR} can be placed
      * either on the class-path or on the module-path. The project needs to make a choice
      * (possibly using heuristic rules), then to add the dependency in only one of the options
-     * identified by {@link PathType}.
+     * identified by {@link PathType}.</p>
      *
      * @return file paths to place on the different tool options
      */

@@ -101,8 +101,9 @@ final class PathModularization {
      * be null instead of the actual module name. This option can avoid the cost of reading module
      * descriptors when only the modules existence needs to be verified.</p>
      *
-     * <h4>Algorithm</h4>
+     * <p><b>Algorithm:</b>
      * If the given path is a directory, then there is a choice:
+     * </p>
      * <ul>
      *   <li><b>Package hierarchy:</b> if a {@code module-info.class} file is found at the root,
      *       then builds a singleton map with the module name declared in that descriptor.</li>

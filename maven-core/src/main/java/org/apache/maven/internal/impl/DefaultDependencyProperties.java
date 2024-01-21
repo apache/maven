@@ -63,9 +63,10 @@ public class DefaultDependencyProperties implements DependencyProperties {
          * Associates the given value to the given key.
          * If a value was already defined for the given key, the new value replaces it.
          *
-         * <h4>Implementation note</h4>
+         * <p><b>Implementation note:</b>
          * All setter methods in {@code Builder} ultimately delegate to this method.
          * This architecture provides a single point that subclasses can override.
+         * </p>
          *
          * @param <V> type of value to add
          * @param key key of the value to add

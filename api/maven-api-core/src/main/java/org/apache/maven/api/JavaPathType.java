@@ -50,10 +50,10 @@ public enum JavaPathType implements PathType {
      * The path identified by the Java {@code --class-path} option.
      * Used for compilation, execution and Javadoc among others.
      *
-     * <h4>Context-sensitive interpretation</h4>
+     * <p><b>Context-sensitive interpretation:</b>
      * A dependency with this path type will not necessarily be placed on the class-path.
      * There are two circumstances where the dependency may nevertheless be placed somewhere else:
-     *
+     * </p>
      * <ul>
      *   <li>If {@link #MODULES} path type is also set, then the dependency can be placed either on the
      *       class-path or on the module-path, but only one of those. The choice is up to the plugin,
@@ -69,10 +69,10 @@ public enum JavaPathType implements PathType {
      * The path identified by the Java {@code --module-path} option.
      * Used for compilation, execution and Javadoc among others.
      *
-     * <h4>Context-sensitive interpretation</h4>
+     * <p><b>Context-sensitive interpretation:</b>
      * A dependency with this flag will not necessarily be placed on the module-path.
      * There are two circumstances where the dependency may nevertheless be placed somewhere else:
-     *
+     * </p>
      * <ul>
      *   <li>If {@link #CLASSES} path type is also set, then the dependency <em>should</em> be placed on the
      *       module-path, but is also compatible with placement on the class-path. Compatibility can
@@ -130,10 +130,11 @@ public enum JavaPathType implements PathType {
      * Contrarily to the other types of paths, this path is applied to only
      * one specific module. Used for compilation and execution among others.
      *
-     * <h4>Context-sensitive interpretation</h4>
+     * <p><b>Context-sensitive interpretation:</b>
      * This path type makes sense only when a main module is added on the module-path by another dependency.
      * In no main module is found, the patch dependency may be added on the class-path or module-path
      * depending on whether {@link #CLASSES} or {@link #MODULES} is present.
+     * </p>
      *
      * @param moduleName name of the module on which to apply the path
      * @return an identification of the patch-module path for the given module.

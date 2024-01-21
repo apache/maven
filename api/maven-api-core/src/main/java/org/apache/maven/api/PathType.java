@@ -65,9 +65,9 @@ public interface PathType {
      * The path elements are separated by an option-specific or platform-specific separator.
      * If the given {@code paths} argument contains no element, then this method returns an empty string.
      *
-     * <h4>Examples</h4>
+     * <p><b>Examples:</b>
      * If {@code paths} is a list containing two elements, {@code path1} and {@code path2}, then:
-     *
+     * </p>
      * <ul>
      *   <li>If this type is {@link JavaPathType#MODULES}, then this method returns
      *       {@code "--module-path path1:path2"} on Unix or {@code "--module-path path1;path2"} on Windows.</li>
