@@ -18,26 +18,20 @@
  */
 package org.apache.maven.model.building;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class Graph {
 
-    final Map<String, List<String>> graph = new LinkedHashMap<>();
+    final Map<String, Set<String>> graph = new LinkedHashMap<>();
 
     synchronized void addEdge(String from, String to) throws CycleDetectedException {
-        graph.computeIfAbsent(from, l -> new ArrayList<>()).add(to);
-        List<String> cycle = visitCycle(graph, Collections.singleton(to), new HashMap<>(), new LinkedList<>());
-        if (cycle != null) {
-            // remove edge which introduced cycle
-            throw new CycleDetectedException(
-                    "Edge between '" + from + "' and '" + to + "' introduces to cycle in the graph", cycle);
+        if (graph.computeIfAbsent(from, l -> new HashSet<>()).add(to)) {
+            List<String> cycle = visitCycle(graph, Collections.singleton(to), new HashMap<>(), new LinkedList<>());
+            if (cycle != null) {
+                // remove edge which introduced cycle
+                throw new CycleDetectedException(
+                        "Edge between '" + from + "' and '" + to + "' introduces to cycle in the graph", cycle);
+            }
         }
     }
 
@@ -47,7 +41,7 @@ class Graph {
     }
 
     private static List<String> visitCycle(
-            Map<String, List<String>> graph,
+            Map<String, Set<String>> graph,
             Collection<String> children,
             Map<String, DfsState> stateMap,
             LinkedList<String> cycle) {

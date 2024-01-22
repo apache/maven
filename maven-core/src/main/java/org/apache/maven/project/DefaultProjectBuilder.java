@@ -25,9 +25,8 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -88,7 +87,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class DefaultProjectBuilder implements ProjectBuilder {
     public static final String BUILDER_PARALLELISM = "maven.projectBuilder.parallelism";
-    public static final int DEFAULT_BUILDER_PARALLELISM = 1;
+    public static final int DEFAULT_BUILDER_PARALLELISM = Runtime.getRuntime().availableProcessors() / 2 + 1;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ModelBuilder modelBuilder;
@@ -208,14 +207,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private final List<RemoteRepository> repositories;
         private final ReactorModelPool modelPool;
         private final TransformerContextBuilder transformerContextBuilder;
-        private final ForkJoinPool forkJoinPool;
+        private final ExecutorService executor;
 
         BuildSession(ProjectBuildingRequest request, boolean localProjects) {
             this.request = request;
             this.session =
                     RepositoryUtils.overlay(request.getLocalRepository(), request.getRepositorySession(), repoSystem);
             this.repositories = RepositoryUtils.toRepos(request.getRemoteRepositories());
-            this.forkJoinPool = new ForkJoinPool(getParallelism(request));
+            this.executor = createExecutor(getParallelism(request));
             if (localProjects) {
                 this.modelPool = new ReactorModelPool();
                 this.transformerContextBuilder = modelBuilder.newTransformerContextBuilder();
@@ -225,9 +224,42 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
         }
 
+        ExecutorService createExecutor(int parallelism) {
+            //
+            // We need an executor that will not block.
+            // We can't use work stealing, as we are building a graph
+            // and this could lead to cycles where a thread waits for
+            // a task to finish, then execute another one which waits
+            // for the initial task...
+            // In order to work around that problem, we override the
+            // invokeAll method, so that whenever the method is called,
+            // the pool core size will be incremented before submitting
+            // all the tasks, then the thread will block waiting for all
+            // those subtasks to finish.
+            // This ensures the number of running workers is no more than
+            // the defined parallism, while making sure the pool will not
+            // be exhausted
+            //
+            return new ThreadPoolExecutor(
+                    parallelism, Integer.MAX_VALUE, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>()) {
+                final AtomicInteger parked = new AtomicInteger();
+
+                @Override
+                public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
+                        throws InterruptedException {
+                    setCorePoolSize(parallelism + parked.incrementAndGet());
+                    try {
+                        return super.invokeAll(tasks);
+                    } finally {
+                        setCorePoolSize(parallelism + parked.decrementAndGet());
+                    }
+                }
+            };
+        }
+
         @Override
         public void close() {
-            this.forkJoinPool.shutdownNow();
+            this.executor.shutdownNow();
         }
 
         private int getParallelism(ProjectBuildingRequest request) {
@@ -355,18 +387,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
 
         List<ProjectBuildingResult> build(List<File> pomFiles, boolean recursive) throws ProjectBuildingException {
-            ForkJoinTask<List<ProjectBuildingResult>> task = forkJoinPool.submit(() -> doBuild(pomFiles, recursive));
-
-            // ForkJoinTask.getException rewraps the exception in a weird way
-            // which cause an additional layer of exception, so try to unwrap it
-            task.quietlyJoin();
-            if (task.isCompletedAbnormally()) {
-                Throwable e = task.getException();
-                Throwable c = e.getCause();
-                uncheckedThrow(c != null && c.getClass() == e.getClass() ? c : e);
-            }
-
-            List<ProjectBuildingResult> results = task.getRawResult();
+            List<ProjectBuildingResult> results = doBuild(pomFiles, recursive);
             if (results.stream()
                     .flatMap(r -> r.getProblems().stream())
                     .anyMatch(p -> p.getSeverity() != ModelProblem.Severity.WARNING)) {
@@ -417,14 +438,21 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 Set<File> aggregatorFiles,
                 boolean root,
                 boolean recursive) {
-            List<ForkJoinTask<InterimResult>> tasks = pomFiles.stream()
-                    .map(pomFile -> ForkJoinTask.adapt(
+            List<Callable<InterimResult>> tasks = pomFiles.stream()
+                    .map(pomFile -> ((Callable<InterimResult>)
                             () -> build(projectIndex, pomFile, concat(aggregatorFiles, pomFile), root, recursive)))
                     .collect(Collectors.toList());
-
-            return ForkJoinTask.invokeAll(tasks).stream()
-                    .map(ForkJoinTask::getRawResult)
-                    .collect(Collectors.toList());
+            try {
+                List<Future<InterimResult>> futures = executor.invokeAll(tasks);
+                List<InterimResult> list = new ArrayList<>();
+                for (Future<InterimResult> future : futures) {
+                    InterimResult interimResult = future.get();
+                    list.add(interimResult);
+                }
+                return list;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         private <T> Set<T> concat(Set<T> set, T elem) {
@@ -571,10 +599,31 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 }
             }
 
-            return interimResults.parallelStream()
-                    .map(interimResult -> doBuild(projectIndex, interimResult))
-                    .flatMap(List::stream)
+            List<Callable<List<ProjectBuildingResult>>> callables = interimResults.stream()
+                    .map(interimResult ->
+                            (Callable<List<ProjectBuildingResult>>) () -> doBuild(projectIndex, interimResult))
                     .collect(Collectors.toList());
+
+            try {
+                List<Future<List<ProjectBuildingResult>>> futures = executor.invokeAll(callables);
+                return futures.stream()
+                        .map(listFuture -> {
+                            try {
+                                return listFuture.get();
+                            } catch (InterruptedException e) {
+                                uncheckedThrow(e);
+                                return null;
+                            } catch (ExecutionException e) {
+                                uncheckedThrow(e.getCause());
+                                return null;
+                            }
+                        })
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList());
+            } catch (InterruptedException e) {
+                uncheckedThrow(e);
+                return null;
+            }
         }
 
         private List<ProjectBuildingResult> doBuild(Map<File, MavenProject> projectIndex, InterimResult interimResult) {

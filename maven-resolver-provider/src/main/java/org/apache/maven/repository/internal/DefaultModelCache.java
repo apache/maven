@@ -57,23 +57,19 @@ public class DefaultModelCache implements ModelCache {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T> T computeIfAbsent(
-            String groupId, String artifactId, String version, String tag, Supplier<Supplier<T>> data) {
-        Object obj = computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), (Supplier) data);
-        return (T) obj;
+    @SuppressWarnings({"unchecked"})
+    public <T> T computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<T> data) {
+        return (T) computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), data);
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T> T computeIfAbsent(Source path, String tag, Supplier<Supplier<T>> data) {
-        Object obj = computeIfAbsent(new SourceCacheKey(path, tag), (Supplier) data);
-        return (T) obj;
+    @SuppressWarnings({"unchecked"})
+    public <T> T computeIfAbsent(Source path, String tag, Supplier<T> data) {
+        return (T) computeIfAbsent(new SourceCacheKey(path, tag), data);
     }
 
-    protected Object computeIfAbsent(Object key, Supplier<Supplier<?>> data) {
-        Supplier<?> s = cache.computeIfAbsent(key, k -> data.get());
-        return s != null ? s.get() : null;
+    protected Object computeIfAbsent(Object key, Supplier<?> data) {
+        return cache.computeIfAbsent(key, k -> new CachingSupplier<>(data)).get();
     }
 
     static class GavCacheKey {
@@ -167,5 +163,48 @@ public class DefaultModelCache implements ModelCache {
         public int hashCode() {
             return hash;
         }
+    }
+
+    static class CachingSupplier<T> implements Supplier<T> {
+        final Supplier<T> supplier;
+        volatile Object value;
+
+        CachingSupplier(Supplier<T> supplier) {
+            this.supplier = supplier;
+        }
+
+        @Override
+        @SuppressWarnings({"unchecked", "checkstyle:InnerAssignment"})
+        public T get() {
+            Object v;
+            if ((v = value) == null) {
+                synchronized (this) {
+                    if ((v = value) == null) {
+                        try {
+                            v = value = supplier.get();
+                        } catch (Exception e) {
+                            v = value = new AltRes(e);
+                        }
+                    }
+                }
+            }
+            if (v instanceof AltRes) {
+                uncheckedThrow(((AltRes) v).t);
+            }
+            return (T) v;
+        }
+
+        static class AltRes {
+            final Throwable t;
+
+            AltRes(Throwable t) {
+                this.t = t;
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T extends Throwable> void uncheckedThrow(Throwable t) throws T {
+        throw (T) t; // rely on vacuous cast
     }
 }
