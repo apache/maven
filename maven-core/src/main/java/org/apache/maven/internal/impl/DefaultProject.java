@@ -28,9 +28,10 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.artifact.ProjectArtifact;
+import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
 public class DefaultProject implements Project {
 
@@ -70,13 +71,16 @@ public class DefaultProject implements Project {
 
     @Nonnull
     @Override
-    public Artifact getArtifact() {
-        org.eclipse.aether.artifact.Artifact resolverArtifact = RepositoryUtils.toArtifact(project.getArtifact());
-        Artifact artifact = session.getArtifact(resolverArtifact);
-        Path path =
-                resolverArtifact.getFile() != null ? resolverArtifact.getFile().toPath() : null;
-        session.getService(ArtifactManager.class).setPath(artifact, path);
-        return artifact;
+    public List<Artifact> getArtifacts() {
+        org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(new ProjectArtifact(project));
+        org.eclipse.aether.artifact.Artifact projectArtifact = RepositoryUtils.toArtifact(project.getArtifact());
+
+        ArrayList<Artifact> result = new ArrayList<>(2);
+        result.add(session.getArtifact(pomArtifact));
+        if (!ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
+            result.add(session.getArtifact(projectArtifact));
+        }
+        return Collections.unmodifiableList(result);
     }
 
     @Nonnull
@@ -96,6 +100,15 @@ public class DefaultProject implements Project {
     public Optional<Path> getPomPath() {
         File file = project.getFile();
         return Optional.ofNullable(file).map(File::toPath);
+    }
+
+    @Override
+    public Optional<Path> getBasedir() {
+        File basedir = project.getBasedir();
+        if (basedir == null) {
+            return Optional.empty();
+        }
+        return Optional.of(basedir.toPath());
     }
 
     @Nonnull
@@ -143,12 +156,14 @@ public class DefaultProject implements Project {
 
     @Override
     public List<RemoteRepository> getRemoteProjectRepositories() {
-        return new MappedList<>(project.getRemoteProjectRepositories(), session::getRemoteRepository);
+        return Collections.unmodifiableList(
+                new MappedList<>(project.getRemoteProjectRepositories(), session::getRemoteRepository));
     }
 
     @Override
     public List<RemoteRepository> getRemotePluginRepositories() {
-        return new MappedList<>(project.getRemotePluginRepositories(), session::getRemoteRepository);
+        return Collections.unmodifiableList(
+                new MappedList<>(project.getRemotePluginRepositories(), session::getRemoteRepository));
     }
 
     @Override

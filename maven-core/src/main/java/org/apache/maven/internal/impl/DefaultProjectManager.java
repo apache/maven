@@ -22,10 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -56,7 +53,11 @@ public class DefaultProjectManager implements ProjectManager {
     @Nonnull
     @Override
     public Optional<Path> getPath(Project project) {
-        return artifactManager.getPath(project.getArtifact());
+        Optional<Artifact> mainArtifact = project.getMainArtifact();
+        if (mainArtifact.isPresent()) {
+            return artifactManager.getPath(mainArtifact.get());
+        }
+        return Optional.empty();
     }
 
     @Nonnull
@@ -67,6 +68,14 @@ public class DefaultProjectManager implements ProjectManager {
                 getMavenProject(project).getAttachedArtifacts(),
                 a -> session.getArtifact(RepositoryUtils.toArtifact(a)));
         return Collections.unmodifiableCollection(attached);
+    }
+
+    @Override
+    public Collection<Artifact> getAllArtifacts(Project project) {
+        ArrayList<Artifact> result = new ArrayList<>(2);
+        result.addAll(project.getArtifacts());
+        result.addAll(getAttachedArtifacts(project));
+        return Collections.unmodifiableCollection(result);
     }
 
     @Override

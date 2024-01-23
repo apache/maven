@@ -37,24 +37,85 @@ import org.apache.maven.api.model.Model;
 @Experimental
 public interface Project {
 
+    /**
+     * Returns the project groupId.
+     */
     @Nonnull
     String getGroupId();
 
+    /**
+     * Returns the project artifactId.
+     */
     @Nonnull
     String getArtifactId();
 
+    /**
+     * Returns the project version.
+     */
     @Nonnull
     String getVersion();
 
+    /**
+     * Returns the project packaging.
+     * <p>
+     * Note: unlike in legacy code, logical checks against string representing packaging (returned by this method)
+     * are NOT recommended (code like {@code "pom".equals(project.getPackaging)} must be avoided). Use method
+     * {@link #getArtifacts()} to gain access to POM or build artifact.
+     *
+     * @see #getArtifacts()
+     */
     @Nonnull
     String getPackaging();
 
+    /**
+     * Returns the project POM artifact, which is the artifact of the POM of this project. Every project have a POM
+     * artifact, even if the existence of backing POM file is NOT a requirement (i.e. for some transient projects).
+     *
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     */
     @Nonnull
-    Artifact getArtifact();
+    default Artifact getPomArtifact() {
+        return getArtifacts().get(0);
+    }
 
+    /**
+     * Returns the project main artifact, which is the artifact produced by this project build, if applicable.
+     * This artifact MAY be absent if the project is actually not producing any main artifact (i.e. "pom" packaging).
+     *
+     * @see #getPackaging()
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     */
+    @Nonnull
+    default Optional<Artifact> getMainArtifact() {
+        List<Artifact> artifacts = getArtifacts();
+        return artifacts.size() == 2 ? Optional.of(artifacts.get(1)) : Optional.empty();
+    }
+
+    /**
+     * Returns the project artifacts as immutable list. Elements are the project POM artifact and the artifact
+     * produced by this project build, if applicable. Hence, the returned list may have one or two elements
+     * (never less than 1, never more than 2), depending on project packaging.
+     * <p>
+     * The list's first element is ALWAYS the project POM artifact. Presence of second element in the list depends
+     * solely on the project packaging.
+     *
+     * @see #getPackaging()
+     * @see #getPomArtifact()
+     * @see #getMainArtifact()
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     */
+    @Nonnull
+    List<Artifact> getArtifacts();
+
+    /**
+     * Returns the project model.
+     */
     @Nonnull
     Model getModel();
 
+    /**
+     * Shorthand method.
+     */
     @Nonnull
     default Build getBuild() {
         Build build = getModel().getBuild();
@@ -71,17 +132,35 @@ public interface Project {
     @Nonnull
     Optional<Path> getPomPath();
 
+    /**
+     * Returns the project base directory.
+     */
     @Nonnull
-    default Optional<Path> getBasedir() {
-        return getPomPath().map(Path::getParent);
+    Optional<Path> getBasedir();
+
+    /**
+     * Enforces presence of the project base directory and returns it.
+     */
+    @Nonnull
+    default Path requireBasedir() {
+        return getBasedir().orElseThrow(() -> new IllegalStateException("Project basedir not given"));
     }
 
+    /**
+     * Returns the project direct dependencies (directly specified or inherited).
+     */
     @Nonnull
     List<DependencyCoordinate> getDependencies();
 
+    /**
+     * Returns the project managed dependencies (directly specified or inherited).
+     */
     @Nonnull
     List<DependencyCoordinate> getManagedDependencies();
 
+    /**
+     * Returns the project ID, usable as key.
+     */
     @Nonnull
     default String getId() {
         return getModel().getId();
@@ -126,12 +205,21 @@ public interface Project {
     @Nonnull
     Path getRootDirectory();
 
+    /**
+     * Returns project parent project, if any.
+     */
     @Nonnull
     Optional<Project> getParent();
 
+    /**
+     * Returns immutable list of project remote repositories (directly specified or inherited).
+     */
     @Nonnull
     List<RemoteRepository> getRemoteProjectRepositories();
 
+    /**
+     * Returns immutable list of project remote plugin repositories (directly specified or inherited).
+     */
     @Nonnull
     List<RemoteRepository> getRemotePluginRepositories();
 
