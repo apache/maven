@@ -23,7 +23,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Project;
@@ -76,12 +75,8 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
         Path basedir = null;
 
         if (project != null) {
-            Optional<Path> projectFile = project.getBasedir();
-
-            // this should always be the case for non-super POM instances...
-            if (projectFile.isPresent()) {
-                basedir = projectFile.get().toAbsolutePath();
-            }
+            Path projectFile = project.getBasedir();
+            basedir = projectFile.toAbsolutePath();
         }
 
         if (basedir == null) {

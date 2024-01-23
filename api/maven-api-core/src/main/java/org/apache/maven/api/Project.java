@@ -124,26 +124,28 @@ public interface Project {
 
     /**
      * Returns the path to the pom file for this project.
-     * A project is usually read from the file system and this will point to
-     * the file.  In some cases, a transient project can be created which
-     * will not point to an actual pom file.
+     * A project is usually read from a file named {@code pom.xml},
+     * which contains the {@linkplain #getModel() model} in an XML form.
+     * When a custom {@code org.apache.maven.api.spi.ModelParser} is used,
+     * the path may point to a non XML file.
+     * <p>
+     * The POM path is also used to define the {@linkplain #getBasedir() base directory}
+     * of the project.
+     *
      * @return the path of the pom
+     * @see #getBasedir()
      */
     @Nonnull
-    Optional<Path> getPomPath();
+    Path getPomPath();
 
     /**
-     * Returns the project base directory.
+     * Returns the project's base directory.
+     *
+     * @see #getPomPath()
      */
     @Nonnull
-    Optional<Path> getBasedir();
-
-    /**
-     * Enforces presence of the project base directory and returns it.
-     */
-    @Nonnull
-    default Path requireBasedir() {
-        return getBasedir().orElseThrow(() -> new IllegalStateException("Project basedir not given"));
+    default Path getBasedir() {
+        return getPomPath().getParent();
     }
 
     /**
