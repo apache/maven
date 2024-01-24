@@ -22,8 +22,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import jakarta.inject.Scope;
-
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -31,6 +29,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Indicates that annotated component should be instantiated before session execution starts
  * and discarded after session execution completes.
+ *
+ * TODO: this is currently not implemented
  *
  * @since 4.0.0
  */

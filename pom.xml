@@ -105,6 +105,7 @@ under the License.
     <module>maven-model</module>
     <module>maven-model-builder</module>
     <module>api</module>
+    <module>maven-di</module>
     <module>maven-xml-impl</module>
     <module>maven-core</module>
     <module>maven-settings</module>
@@ -255,6 +256,16 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-xml</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-di</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-di</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

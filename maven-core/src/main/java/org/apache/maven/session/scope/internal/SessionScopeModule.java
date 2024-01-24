@@ -46,7 +46,7 @@ public class SessionScopeModule extends AbstractModule {
     @Override
     protected void configure() {
         bindScope(SessionScoped.class, scope);
-        bindScope(org.apache.maven.api.di.SessionScoped.class, scope);
+        // bindScope(org.apache.maven.api.di.SessionScoped.class, scope);
         bind(SessionScope.class).toInstance(scope);
 
         bind(MavenSession.class)

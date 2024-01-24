@@ -33,6 +33,7 @@
 
   <modules>
     <module>maven-api-meta</module>
+    <module>maven-api-di</module>
     <module>maven-api-xml</module>
     <module>maven-api-model</module>
     <module>maven-api-plugin</module>

@@ -16,26 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.di;
+package org.apache.maven.di;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.lang.annotation.Annotation;
+import java.util.function.Supplier;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+public interface Scope {
 
-/**
- * Indicates that the annotated bean has a lifespan limited to a given mojo execution,
- * which means each mojo execution will result in a different instance being injected.
- *
- * TODO: this is currently not implemented
- *
- * @since 4.0.0
- */
-@Scope
-@Documented
-@Retention(RUNTIME)
-@Target({TYPE, METHOD})
-public @interface MojoExecutionScoped {}
+    <T> Supplier<T> scope(Key<T> key, Annotation scope, Supplier<T> unscoped);
+}
