@@ -18,31 +18,59 @@
  */
 package org.apache.maven.api;
 
-import java.util.Collection;
-
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Build path. Build path is calculated for given {@link Project} and {@link BuildPathScope}.
+ * Project scope.
+ * <p>
+ * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
+ * can be used as keys.
  *
  * @since 4.0.0
  */
 @Experimental
 @Immutable
-public interface BuildPath {
+@SuppressWarnings("checkstyle:magicnumber")
+public interface ProjectScope extends Comparable<ProjectScope> {
     @Nonnull
-    Project project();
+    String id();
 
-    @Nonnull
-    BuildPathScope buildPathScope();
+    int ordinal();
 
-    @Nonnull
-    default Language language() {
-        return project().getLanguage();
+    @Override
+    default int compareTo(ProjectScope o) {
+        return this.ordinal() - o.ordinal();
     }
 
-    @Nonnull
-    Collection<Artifact> getArtifacts();
+    /**
+     * Main scope.
+     */
+    ProjectScope MAIN = new ProjectScope() {
+        @Override
+        public String id() {
+            return "main";
+        }
+
+        @Override
+        public int ordinal() {
+            return 10;
+        }
+    };
+
+    /**
+     * Test scope.
+     */
+    ProjectScope TEST = new ProjectScope() {
+        @Override
+        public String id() {
+            return "test";
+        }
+
+        @Override
+        public int ordinal() {
+            return 20;
+        }
+    };
 }

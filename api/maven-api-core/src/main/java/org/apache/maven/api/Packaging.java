@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api;
 
+import java.util.Collection;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
@@ -30,14 +32,28 @@ import org.apache.maven.api.annotations.Nonnull;
 @Experimental
 @Immutable
 public interface Packaging {
+    /**
+     * The packaging id.
+     */
     @Nonnull
     String id();
 
+    /**
+     * The language of this packaging.
+     */
     @Nonnull
     default Language language() {
         return getType().getLanguage();
     }
 
+    /**
+     * The type of main artifact produced by this packaging.
+     */
     @Nonnull
     Type getType();
+
+    /**
+     * Returns the ordered list of {@link BuildPathScope}s.
+     */
+    Collection<BuildPathScope> buildPathScopes();
 }

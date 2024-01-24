@@ -76,7 +76,17 @@ public interface Project {
      * @see #getArtifacts()
      */
     @Nonnull
-    String getPackaging();
+    Packaging getPackaging();
+
+    /**
+     * Returns the project language. It is by default determined by {@link #getPackaging()}.
+     *
+     * @see #getPackaging()
+     */
+    @Nonnull
+    default Language getLanguage() {
+        return getPackaging().language();
+    }
 
     /**
      * Returns the project POM artifact, which is the artifact of the POM of this project. Every project have a POM

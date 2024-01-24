@@ -38,6 +38,10 @@ public interface DependencyScope {
 
     boolean isTransitive();
 
+    /**
+     * None. Allows you to declare dependencies (for example to alter reactor build order) but in reality dependencies
+     * in this scope are not part of any build path scope.
+     */
     DependencyScope NONE = new DependencyScope() {
         @Override
         public String id() {
@@ -50,6 +54,9 @@ public interface DependencyScope {
         }
     };
 
+    /**
+     * Compile only.
+     */
     DependencyScope COMPILE_ONLY = new DependencyScope() {
         @Override
         public String id() {
@@ -62,6 +69,9 @@ public interface DependencyScope {
         }
     };
 
+    /**
+     * Compile.
+     */
     DependencyScope COMPILE = new DependencyScope() {
         @Override
         public String id() {
@@ -74,6 +84,9 @@ public interface DependencyScope {
         }
     };
 
+    /**
+     * Runtime.
+     */
     DependencyScope RUNTIME = new DependencyScope() {
         @Override
         public String id() {
@@ -86,6 +99,9 @@ public interface DependencyScope {
         }
     };
 
+    /**
+     * Provided.
+     */
     DependencyScope PROVIDED = new DependencyScope() {
         @Override
         public String id() {
@@ -98,6 +114,9 @@ public interface DependencyScope {
         }
     };
 
+    /**
+     * Test compile only.
+     */
     DependencyScope TEST_ONLY = new DependencyScope() {
         @Override
         public String id() {
@@ -110,6 +129,9 @@ public interface DependencyScope {
         }
     };
 
+    /**
+     * Test.
+     */
     DependencyScope TEST = new DependencyScope() {
         @Override
         public String id() {
@@ -122,6 +144,9 @@ public interface DependencyScope {
         }
     };
 
+    /**
+     * Test runtime.
+     */
     DependencyScope TEST_RUNTIME = new DependencyScope() {
         @Override
         public String id() {
@@ -134,6 +159,12 @@ public interface DependencyScope {
         }
     };
 
+    /**
+     * System scope.
+     * <p>
+     * Important: this scope {@code id} MUST BE KEPT in sync with label in
+     * {@code org.eclipse.aether.util.artifact.Scopes#SYSTEM}.
+     */
     DependencyScope SYSTEM = new DependencyScope() {
         @Override
         public String id() {

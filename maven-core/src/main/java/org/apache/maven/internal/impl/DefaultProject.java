@@ -27,6 +27,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.PackagingManager;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
@@ -38,10 +39,12 @@ public class DefaultProject implements Project {
 
     private final InternalSession session;
     private final MavenProject project;
+    private final Packaging packaging;
 
     public DefaultProject(InternalSession session, MavenProject project) {
         this.session = session;
         this.project = project;
+        this.packaging = session.getService(PackagingManager.class).requirePackaging(project.getPackaging());
     }
 
     public InternalSession getSession() {
@@ -86,8 +89,8 @@ public class DefaultProject implements Project {
 
     @Nonnull
     @Override
-    public String getPackaging() {
-        return project.getPackaging();
+    public Packaging getPackaging() {
+        return packaging;
     }
 
     @Nonnull
