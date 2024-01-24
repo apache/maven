@@ -29,7 +29,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
@@ -191,7 +190,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
 
     private ModelResolver newModelResolver() throws Exception {
         final File localRepo = new File(this.getLocalRepository().getBasedir());
-        final DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
+        final DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(h -> false);
         repoSession.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));
 
         return new ProjectModelResolver(

@@ -26,10 +26,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.PluginValidationManager;
+import org.apache.maven.repository.internal.scopes.MavenDependencyScopes;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
-import org.eclipse.aether.util.artifact.JavaScopes;
 
 /**
  * Detects Maven3 dependencies scope.
@@ -51,7 +51,8 @@ class MavenScopeDependenciesValidator extends AbstractMavenPluginDependenciesVal
             Artifact pluginArtifact,
             ArtifactDescriptorResult artifactDescriptorResult) {
         Set<String> mavenArtifacts = artifactDescriptorResult.getDependencies().stream()
-                .filter(d -> !JavaScopes.PROVIDED.equals(d.getScope()) && !JavaScopes.TEST.equals(d.getScope()))
+                .filter(d -> !MavenDependencyScopes.PROVIDED.equals(d.getScope())
+                        && !MavenDependencyScopes.TEST.equals(d.getScope()))
                 .map(org.eclipse.aether.graph.Dependency::getArtifact)
                 .filter(a -> "org.apache.maven".equals(a.getGroupId()))
                 .filter(a -> !DefaultPluginValidationManager.EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA.contains(
