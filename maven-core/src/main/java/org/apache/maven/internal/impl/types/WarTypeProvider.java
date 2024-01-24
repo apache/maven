@@ -22,9 +22,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.ArtifactProperties;
+import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultDependencyProperties;
+import org.apache.maven.internal.impl.DefaultArtifactProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
 @Named(WarTypeProvider.NAME)
@@ -37,10 +38,10 @@ public class WarTypeProvider implements Provider<Type> {
     public WarTypeProvider() {
         this.type = new DefaultType(
                 NAME,
-                Type.LANGUAGE_JAVA,
+                Language.JAVA_FAMILY,
                 "war",
                 null,
-                new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
+                new DefaultArtifactProperties(ArtifactProperties.FLAG_INCLUDES_DEPENDENCIES));
     }
 
     @Override

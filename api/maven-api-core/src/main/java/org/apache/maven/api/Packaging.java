@@ -18,42 +18,26 @@
  */
 package org.apache.maven.api;
 
-import java.util.Map;
-
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Dependency properties supported by Maven Core.
+ * Interface representing a Maven project packaging.
  *
  * @since 4.0.0
  */
 @Experimental
 @Immutable
-public interface DependencyProperties {
-    /**
-     * Boolean flag telling that dependency contains all of its dependencies. Value of this key should be parsed with
-     * {@link Boolean#parseBoolean(String)} to obtain value.
-     * <p>
-     * <em>Important: this flag must be kept in sync with resolver! (as is used during collection)</em>
-     */
-    String FLAG_INCLUDES_DEPENDENCIES = "includesDependencies";
-
-    /**
-     * Boolean flag telling that dependency is meant to be placed on class path. Value of this key should be parsed with
-     * {@link Boolean#parseBoolean(String)} to obtain value.
-     */
-    String FLAG_CLASS_PATH_CONSTITUENT = "classPathConstituent";
-
-    /**
-     * Returns immutable "map view" of all the properties.
-     */
+public interface Packaging {
     @Nonnull
-    Map<String, String> asMap();
+    String id();
 
-    /**
-     * Returns {@code true} if given flag is {@code true}.
-     */
-    boolean checkFlag(@Nonnull String flag);
+    @Nonnull
+    default Language language() {
+        return getType().getLanguage();
+    }
+
+    @Nonnull
+    Type getType();
 }

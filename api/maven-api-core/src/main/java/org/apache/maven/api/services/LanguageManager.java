@@ -16,30 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl.types;
+package org.apache.maven.api.services;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import java.util.Optional;
 
 import org.apache.maven.api.Language;
-import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultArtifactProperties;
-import org.apache.maven.internal.impl.DefaultType;
+import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Nonnull;
 
-@Named(BomTypeProvider.NAME)
-@Singleton
-public class BomTypeProvider implements Provider<Type> {
-    public static final String NAME = "bom";
+public interface LanguageManager extends Service {
+    @Nonnull
+    Optional<Language> lookupLanguageFamily(String id);
 
-    private final Type type;
-
-    public BomTypeProvider() {
-        this.type = new DefaultType(NAME, Language.NONE, "pom", null, new DefaultArtifactProperties());
-    }
-
-    @Override
-    public Type get() {
-        return type;
+    default Language requireLanguageFamily(String id) {
+        return lookupLanguageFamily(id).orElseThrow(() -> new IllegalArgumentException("Unknown language"));
     }
 }

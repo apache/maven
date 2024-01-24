@@ -53,5 +53,9 @@ public interface ArtifactHandler {
 
     String getLanguage();
 
+    /**
+     * IMPORTANT: this is WRONGLY NAMED method (and/or remnant for Maven2).
+     * Its meaning is "is added to build path", that is used to create classpath/modulepath/etc.
+     */
     boolean isAddedToClasspath();
 }

@@ -16,30 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl.types;
+package org.apache.maven.internal.impl.language;
 
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.maven.api.Language;
-import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultArtifactProperties;
-import org.apache.maven.internal.impl.DefaultType;
+import org.apache.maven.api.services.LanguageManager;
 
-@Named(BomTypeProvider.NAME)
+/**
+ * TODO: this is session scoped as SPI can contribute.
+ */
+@Named
 @Singleton
-public class BomTypeProvider implements Provider<Type> {
-    public static final String NAME = "bom";
-
-    private final Type type;
-
-    public BomTypeProvider() {
-        this.type = new DefaultType(NAME, Language.NONE, "pom", null, new DefaultArtifactProperties());
-    }
-
+public class DefaultLanguageManager implements LanguageManager {
     @Override
-    public Type get() {
-        return type;
+    public Optional<Language> lookupLanguageFamily(String id) {
+        if (Objects.equals(Language.NONE.id(), id)) {
+            return Optional.of(Language.NONE);
+        }
+        // TODO: this is now just a shortcut; elaborate this, probably with some SPI LanguageSupport
+        if (Objects.equals(Language.JAVA_FAMILY.id(), id)) {
+            return Optional.of(Language.JAVA_FAMILY);
+        }
+        return Optional.empty();
     }
 }

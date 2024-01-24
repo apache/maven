@@ -385,6 +385,9 @@ public interface Session {
      * Checks whether a given artifact version is considered a {@code SNAPSHOT} or not.
      * <p>
      * Shortcut for {@code getService(ArtifactManager.class).isSnapshot(...)}.
+     * <p>
+     * In case there is {@link Artifact} in scope, the recommended way to perform this check is
+     * use of {@link Artifact#isSnapshot()} instead.
      *
      * @see org.apache.maven.api.services.VersionParser#isSnapshot(String)
      */

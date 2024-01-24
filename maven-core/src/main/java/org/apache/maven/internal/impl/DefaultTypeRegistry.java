@@ -26,9 +26,10 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.ArtifactProperties;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.services.LanguageManager;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.LegacyArtifactHandlerManager;
@@ -42,6 +43,8 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistry {
     private final Map<String, Type> types;
 
+    private final LanguageManager languageManager;
+
     private final ConcurrentHashMap<String, Type> usedTypes;
 
     private final ConcurrentHashMap<String, Type> legacyTypes;
@@ -49,8 +52,10 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     private final LegacyArtifactHandlerManager manager;
 
     @Inject
-    public DefaultTypeRegistry(Map<String, Type> types, LegacyArtifactHandlerManager manager) {
+    public DefaultTypeRegistry(
+            Map<String, Type> types, LanguageManager languageManager, LegacyArtifactHandlerManager manager) {
         this.types = nonNull(types, "types");
+        this.languageManager = nonNull(languageManager, "languageManager");
         this.usedTypes = new ConcurrentHashMap<>();
         this.legacyTypes = new ConcurrentHashMap<>();
         this.manager = nonNull(manager, "artifactHandlerManager");
@@ -80,17 +85,17 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                     ArtifactHandler handler = manager.getArtifactHandler(id);
                     ArrayList<String> flags = new ArrayList<>();
                     if (handler.isAddedToClasspath()) {
-                        flags.add(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
+                        flags.add(ArtifactProperties.FLAG_BUILD_PATH_CONSTITUENT);
                     }
                     if (handler.isIncludesDependencies()) {
-                        flags.add(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
+                        flags.add(ArtifactProperties.FLAG_INCLUDES_DEPENDENCIES);
                     }
                     return new DefaultType(
                             id,
-                            handler.getLanguage(),
+                            languageManager.requireLanguageFamily(handler.getLanguage()),
                             handler.getExtension(),
                             handler.getClassifier(),
-                            new DefaultDependencyProperties(flags));
+                            new DefaultArtifactProperties(flags));
                 });
             }
             return type;

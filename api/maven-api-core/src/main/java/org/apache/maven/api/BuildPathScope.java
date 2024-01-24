@@ -16,30 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl.types;
+package org.apache.maven.api;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import java.util.Collection;
 
-import org.apache.maven.api.Language;
-import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultArtifactProperties;
-import org.apache.maven.internal.impl.DefaultType;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
 
-@Named(BomTypeProvider.NAME)
-@Singleton
-public class BomTypeProvider implements Provider<Type> {
-    public static final String NAME = "bom";
+/**
+ * Build path scope.
+ * <p>
+ * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
+ * can be used as keys.
+ *
+ * @since 4.0.0
+ */
+@Experimental
+@Immutable
+public interface BuildPathScope {
+    @Nonnull
+    String id();
 
-    private final Type type;
+    @Nonnull
+    Language language();
 
-    public BomTypeProvider() {
-        this.type = new DefaultType(NAME, Language.NONE, "pom", null, new DefaultArtifactProperties());
-    }
-
-    @Override
-    public Type get() {
-        return type;
-    }
+    @Nonnull
+    Collection<DependencyScope> getDependencyScopes();
 }

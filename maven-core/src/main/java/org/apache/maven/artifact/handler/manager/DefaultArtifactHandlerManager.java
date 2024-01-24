@@ -70,9 +70,13 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
                     null,
                     null,
                     type.isIncludesDependencies(),
-                    type.getLanguage(),
-                    type.isAddedToClassPath()); // TODO: watch out for module path
+                    type.getLanguage().id(),
+                    type.isBuildPathConstituent());
         });
+
+        // Note: here, type decides is artifact added to "build path" (for example during resolution)
+        // and "build path" is intermediate data that is used to create actual Java classpath/modulepath
+        // but to create those, proper filtering should happen via Type properties.
     }
 
     public void addHandlers(Map<String, ArtifactHandler> handlers) {

@@ -22,9 +22,9 @@ import java.util.Objects;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactProperties;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.repository.internal.DefaultModelVersionParser;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
@@ -34,11 +34,13 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultArtifact implements Artifact {
     private final @Nonnull InternalSession session;
     private final @Nonnull org.eclipse.aether.artifact.Artifact artifact;
+    private final @Nonnull ArtifactProperties artifactProperties;
     private final String key;
 
     public DefaultArtifact(@Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
         this.session = nonNull(session, "session");
         this.artifact = nonNull(artifact, "artifact");
+        this.artifactProperties = new DefaultArtifactProperties(artifact.getProperties());
         this.key = getGroupId()
                 + ':'
                 + getArtifactId()
@@ -95,7 +97,12 @@ public class DefaultArtifact implements Artifact {
 
     @Override
     public boolean isSnapshot() {
-        return DefaultModelVersionParser.checkSnapshot(artifact.getVersion());
+        return artifact.isSnapshot();
+    }
+
+    @Override
+    public ArtifactProperties getArtifactProperties() {
+        return artifactProperties;
     }
 
     @Nonnull
