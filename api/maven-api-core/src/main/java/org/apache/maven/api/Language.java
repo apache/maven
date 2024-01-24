@@ -60,6 +60,7 @@ public interface Language {
         }
     };
 
+    // TODO: this should be moved out from here to Java Support (builtin into core)
     Language JAVA_FAMILY = new Language() {
         @Override
         public String id() {
