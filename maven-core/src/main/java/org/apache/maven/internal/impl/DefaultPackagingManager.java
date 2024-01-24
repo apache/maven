@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import java.util.*;
 
-import org.apache.maven.api.BuildPathScope;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.services.PackagingManager;
@@ -67,15 +66,6 @@ public class DefaultPackagingManager implements PackagingManager {
             @Override
             public Type getType() {
                 return type;
-            }
-
-            @Override
-            public Collection<BuildPathScope> buildPathScopes() {
-                return Collections.unmodifiableList(Arrays.asList(
-                        BuildPathScope.MAIN_COMPILE,
-                        BuildPathScope.MAIN_RUNTIME,
-                        BuildPathScope.TEST_COMPILE,
-                        BuildPathScope.TEST_RUNTIME));
             }
         });
     }

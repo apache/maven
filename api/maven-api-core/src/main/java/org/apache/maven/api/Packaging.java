@@ -51,9 +51,4 @@ public interface Packaging {
      */
     @Nonnull
     Type getType();
-
-    /**
-     * Returns the ordered list of {@link BuildPathScope}s.
-     */
-    Collection<BuildPathScope> buildPathScopes();
 }
