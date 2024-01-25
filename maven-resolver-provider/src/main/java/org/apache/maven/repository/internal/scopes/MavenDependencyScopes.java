@@ -29,7 +29,7 @@ public final class MavenDependencyScopes {
     /**
      * Important: keep this label in sync with Resolver.
      *
-     * TODO: once Resolver 2.0.0-alpha-7 is out, use org.eclipse.aether.util.artifact.Scopes#SYSTEM
+     * TODO: once Resolver 2.0.0-alpha-7 is out, use org.eclipse.aether.util.artifact.DependencyScopes#SYSTEM
      */
     public static final String SYSTEM = "system";
 
