@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +48,7 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.repository.internal.MavenSessionBuilderSupplier;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
@@ -105,7 +106,11 @@ class TestApi {
 
     @BeforeEach
     void setup() {
-        RepositorySystemSession rss = MavenRepositorySystemUtils.newSession();
+        // create session with any local repo, is redefined anyway below
+        RepositorySystemSession rss = new MavenSessionBuilderSupplier(repositorySystem)
+                .get()
+                .withLocalRepositoryBaseDirectories(new File("target"))
+                .build();
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
         DefaultMavenExecutionResult meres = new DefaultMavenExecutionResult();
         MavenSession ms = new MavenSession(rss, mer, meres);

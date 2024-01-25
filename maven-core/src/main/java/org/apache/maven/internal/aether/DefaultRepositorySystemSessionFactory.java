@@ -36,7 +36,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.ModelBase;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.repository.internal.MavenSessionBuilderSupplier;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
@@ -220,8 +220,8 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
             requestExtender.extend(request);
         }
 
-        SessionBuilder sessionBuilder = MavenRepositorySystemUtils.newSession(
-                repoSystem.createSessionBuilder(), new TypeRegistryAdapter(typeRegistry));
+        SessionBuilder sessionBuilder = new MavenSessionBuilderSupplier(repoSystem).get();
+        sessionBuilder.setArtifactTypeRegistry(new TypeRegistryAdapter(typeRegistry));
         sessionBuilder.setCache(request.getRepositoryCache());
 
         // this map is read ONLY to get config from (profiles + env + system + user)

@@ -18,10 +18,13 @@
  */
 package org.apache.maven.repository.internal;
 
+import java.util.function.Supplier;
+
 import org.apache.maven.repository.internal.scopes.MavenDependencyContextRefiner;
 import org.apache.maven.repository.internal.scopes.MavenScopeDeriver;
 import org.apache.maven.repository.internal.scopes.MavenScopeSelector;
-import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifactType;
@@ -29,6 +32,7 @@ import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
+import org.eclipse.aether.resolution.ArtifactDescriptorPolicy;
 import org.eclipse.aether.util.artifact.DefaultArtifactTypeRegistry;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
@@ -45,59 +49,45 @@ import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A utility class to assist in setting up a Maven-like repository system. <em>Note:</em> This component is meant to
- * assist those clients that employ the repository system outside of an IoC container, Maven plugins should instead
- * always use regular dependency injection to acquire the repository system.
+ * A simple {@link Supplier} of {@link SessionBuilder} instances, that on each call supplies newly
+ * constructed instance. To create session out of builder, use {@link SessionBuilder#build()}. For proper closing
+ * of sessions, use {@link CloseableSession#close()} method on built instance(s).
+ * <p>
+ * Extend this class and override methods to customize, if needed.
  *
- * @deprecated See {@link MavenSessionBuilderSupplier}
+ * @since 4.0.0
  */
-@Deprecated
-public final class MavenRepositorySystemUtils {
+public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
+    protected final RepositorySystem repositorySystem;
 
-    private MavenRepositorySystemUtils() {
-        // hide constructor
+    public MavenSessionBuilderSupplier(RepositorySystem repositorySystem) {
+        this.repositorySystem = requireNonNull(repositorySystem);
     }
 
-    /**
-     * This method is deprecated, nobody should use it.
-     *
-     * @deprecated This method is here only for legacy uses (like UTs), nothing else should use it.
-     */
-    @Deprecated
-    public static DefaultRepositorySystemSession newSession() {
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false); // no close handle
+    protected DependencyTraverser getDependencyTraverser() {
+        return new FatArtifactTraverser();
+    }
 
-        DependencyTraverser depTraverser = new FatArtifactTraverser();
-        session.setDependencyTraverser(depTraverser);
+    protected DependencyManager getDependencyManager() {
+        return new ClassicDependencyManager(true); // same default as in Maven4
+    }
 
-        DependencyManager depManager = new ClassicDependencyManager();
-        session.setDependencyManager(depManager);
-
-        DependencySelector depFilter = new AndDependencySelector(
+    protected DependencySelector getDependencySelector() {
+        return new AndDependencySelector(
                 new ScopeDependencySelector("test", "provided"),
                 new OptionalDependencySelector(),
                 new ExclusionDependencySelector());
-        session.setDependencySelector(depFilter);
-
-        DependencyGraphTransformer transformer = new ConflictResolver(
-                new NearestVersionSelector(), new MavenScopeSelector(),
-                new SimpleOptionalitySelector(), new MavenScopeDeriver());
-        transformer = new ChainedDependencyGraphTransformer(transformer, new MavenDependencyContextRefiner());
-        session.setDependencyGraphTransformer(transformer);
-
-        session.setArtifactTypeRegistry(newArtifactTypeRegistry());
-
-        session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, true));
-
-        return session;
     }
 
-    /**
-     * Creates new Maven-like {@link ArtifactTypeRegistry}. This method should not be used from Maven.
-     *
-     * @since 4.0.0
-     */
-    public static ArtifactTypeRegistry newArtifactTypeRegistry() {
+    protected DependencyGraphTransformer getDependencyGraphTransformer() {
+        return new ChainedDependencyGraphTransformer(
+                new ConflictResolver(
+                        new NearestVersionSelector(), new MavenScopeSelector(),
+                        new SimpleOptionalitySelector(), new MavenScopeDeriver()),
+                new MavenDependencyContextRefiner());
+    }
+
+    protected ArtifactTypeRegistry getArtifactTypeRegistry() {
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
         stereotypes.add(new DefaultArtifactType("pom"));
         stereotypes.add(new DefaultArtifactType("maven-plugin", "jar", "", "java"));
@@ -114,40 +104,33 @@ public final class MavenRepositorySystemUtils {
         return stereotypes;
     }
 
+    protected ArtifactDescriptorPolicy getArtifactDescriptorPolicy() {
+        return new SimpleArtifactDescriptorPolicy(true, true);
+    }
+
+    protected void configureSessionBuilder(SessionBuilder session) {
+        session.setDependencyTraverser(getDependencyTraverser());
+        session.setDependencyManager(getDependencyManager());
+        session.setDependencySelector(getDependencySelector());
+        session.setDependencyGraphTransformer(getDependencyGraphTransformer());
+        session.setArtifactTypeRegistry(getArtifactTypeRegistry());
+        session.setArtifactDescriptorPolicy(getArtifactDescriptorPolicy());
+    }
+
     /**
      * Creates a new Maven-like repository system session by initializing the session with values typical for
      * Maven-based resolution. In more detail, this method configures settings relevant for the processing of dependency
      * graphs, most other settings remain at their generic default value. Use the various setters to further configure
-     * the session with authentication, mirror, proxy and other information required for your environment.
+     * the session with authentication, mirror, proxy and other information required for your environment. At least,
+     * local repository manager needs to be configured to make session be able to create session instance.
      *
-     * @return The new repository system session, never {@code null}.
-     * @since 4.0.0
+     * @return SessionBuilder configured with minimally required things for "Maven-based resolution". At least LRM must
+     * be set on builder to make it able to create session instances.
      */
-    public static SessionBuilder newSession(SessionBuilder session, ArtifactTypeRegistry artifactTypeRegistry) {
-        requireNonNull(session, "null sessionBuilder");
-        requireNonNull(artifactTypeRegistry, "null artifactTypeRegistry");
-
-        DependencyTraverser depTraverser = new FatArtifactTraverser();
-        session.setDependencyTraverser(depTraverser);
-
-        DependencyManager depManager = new ClassicDependencyManager();
-        session.setDependencyManager(depManager);
-
-        DependencySelector depFilter = new AndDependencySelector(
-                new ScopeDependencySelector("test", "provided"),
-                new OptionalDependencySelector(),
-                new ExclusionDependencySelector());
-        session.setDependencySelector(depFilter);
-
-        DependencyGraphTransformer transformer = new ConflictResolver(
-                new NearestVersionSelector(), new MavenScopeSelector(),
-                new SimpleOptionalitySelector(), new MavenScopeDeriver());
-        transformer = new ChainedDependencyGraphTransformer(transformer, new MavenDependencyContextRefiner());
-        session.setDependencyGraphTransformer(transformer);
-        session.setArtifactTypeRegistry(artifactTypeRegistry);
-
-        session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, true));
-
-        return session;
+    @Override
+    public SessionBuilder get() {
+        SessionBuilder builder = repositorySystem.createSessionBuilder();
+        configureSessionBuilder(builder);
+        return builder;
     }
 }
