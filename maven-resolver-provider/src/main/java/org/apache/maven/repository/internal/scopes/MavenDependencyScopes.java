@@ -18,6 +18,8 @@
  */
 package org.apache.maven.repository.internal.scopes;
 
+import org.eclipse.aether.util.artifact.DependencyScopes;
+
 /**
  * The dependency scopes used for Java dependencies in Maven. This class defines labels only, that are doing pass-thru
  * over Resolver.
@@ -28,10 +30,8 @@ public final class MavenDependencyScopes {
 
     /**
      * Important: keep this label in sync with Resolver.
-     *
-     * TODO: once Resolver 2.0.0-alpha-7 is out, use org.eclipse.aether.util.artifact.DependencyScopes#SYSTEM
      */
-    public static final String SYSTEM = "system";
+    public static final String SYSTEM = DependencyScopes.SYSTEM;
 
     public static final String COMPILE_ONLY = "compile-only";
 
