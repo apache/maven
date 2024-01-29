@@ -35,8 +35,5 @@
       <item name="META-INF/maven/lifecycle.xml" href="lifecycle-mappings.html"/>
       <item name="META-INF/maven/plugin.xml" href="plugin.html"/>
     </menu>
-
-    <menu ref="parent"/>
-    <menu ref="reports"/>
   </body>
 </project>
