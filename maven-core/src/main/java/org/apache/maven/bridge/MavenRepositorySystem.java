@@ -63,6 +63,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * @author Jason van Zyl
+ * @since 3.2.3
  */
 @Component(role = MavenRepositorySystem.class, hint = "default")
 public class MavenRepositorySystem {
@@ -677,15 +678,15 @@ public class MavenRepositorySystem {
     /**
      * This method checks if the pattern matches the originalRepository. Valid patterns:
      * <ul>
-     * <li>{@code *} = everything,</li>
-     * <li>{@code external:*} = everything not on the localhost and not file based,</li>
-     * <li>{@code external:http:*} = any repository not on the localhost using HTTP,</li>
-     * <li>{@code repo,repo1} = {@code repo} or {@code repo1},</li>
-     * <li>{@code *,!repo1} = everything except {@code repo1}.</li>
+     * <li>{@code *} (since 2.0.5)= everything,</li>
+     * <li>{@code external:*}  (since 2.0.9)= everything not on the localhost and not file based,</li>
+     * <li>{@code external:http:*} (since 3.8.0)= any repository not on the localhost using HTTP,</li>
+     * <li>{@code repo,repo1}  (since 2.0.9)= {@code repo} or {@code repo1},</li>
+     * <li>{@code *,!repo1} (since 2.0.9)= everything except {@code repo1}.</li>
      * </ul>
      *
      * @param originalRepository to compare for a match.
-     * @param pattern used for match. Currently only '*' is supported.
+     * @param pattern used for match.
      * @return true if the repository is a match to this pattern.
      */
     static boolean matchPattern(ArtifactRepository originalRepository, String pattern) {
