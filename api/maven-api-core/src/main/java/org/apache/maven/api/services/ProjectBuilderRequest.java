@@ -21,8 +21,6 @@ package org.apache.maven.api.services;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -35,6 +33,8 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 /**
  * Request used to build a {@link org.apache.maven.api.Project} using
  * the {@link ProjectBuilder} service.
+ *
+ * TODO: add validationLevel, activeProfileIds, inactiveProfileIds, resolveDependencies
  *
  * @since 4.0.0
  */
@@ -51,19 +51,11 @@ public interface ProjectBuilderRequest {
     @Nonnull
     Optional<Source> getSource();
 
-    @Nonnull
-    Optional<Artifact> getArtifact();
-
-    @Nonnull
-    Optional<ArtifactCoordinate> getCoordinate();
-
     boolean isAllowStubModel();
 
     boolean isRecursive();
 
     boolean isProcessPlugins();
-
-    boolean isResolveDependencies();
 
     @Nonnull
     static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull Source source) {
@@ -82,22 +74,6 @@ public interface ProjectBuilderRequest {
     }
 
     @Nonnull
-    static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull Artifact artifact) {
-        return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .artifact(nonNull(artifact, "artifact cannot be null"))
-                .build();
-    }
-
-    @Nonnull
-    static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinate coordinate) {
-        return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .coordinate(nonNull(coordinate, "coordinate cannot be null"))
-                .build();
-    }
-
-    @Nonnull
     static ProjectBuilderRequestBuilder builder() {
         return new ProjectBuilderRequestBuilder();
     }
@@ -107,12 +83,9 @@ public interface ProjectBuilderRequest {
         Session session;
         Path path;
         Source source;
-        Artifact artifact;
-        ArtifactCoordinate coordinate;
         boolean allowStubModel;
         boolean recursive;
         boolean processPlugins = true;
-        boolean resolveDependencies = true;
 
         ProjectBuilderRequestBuilder() {}
 
@@ -131,69 +104,36 @@ public interface ProjectBuilderRequest {
             return this;
         }
 
-        public ProjectBuilderRequestBuilder artifact(Artifact artifact) {
-            this.artifact = artifact;
-            return this;
-        }
-
-        public ProjectBuilderRequestBuilder coordinate(ArtifactCoordinate coordinate) {
-            this.coordinate = coordinate;
-            return this;
-        }
-
         public ProjectBuilderRequestBuilder processPlugins(boolean processPlugins) {
             this.processPlugins = processPlugins;
             return this;
         }
 
-        public ProjectBuilderRequestBuilder resolveDependencies(boolean resolveDependencies) {
-            this.resolveDependencies = resolveDependencies;
-            return this;
-        }
-
         public ProjectBuilderRequest build() {
-            return new DefaultProjectBuilderRequest(
-                    session,
-                    path,
-                    source,
-                    artifact,
-                    coordinate,
-                    allowStubModel,
-                    recursive,
-                    processPlugins,
-                    resolveDependencies);
+            return new DefaultProjectBuilderRequest(session, path, source, allowStubModel, recursive, processPlugins);
         }
 
         private static class DefaultProjectBuilderRequest extends BaseRequest implements ProjectBuilderRequest {
             private final Path path;
             private final Source source;
-            private final Artifact artifact;
-            private final ArtifactCoordinate coordinate;
             private final boolean allowStubModel;
             private final boolean recursive;
             private final boolean processPlugins;
-            private final boolean resolveDependencies;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultProjectBuilderRequest(
                     @Nonnull Session session,
                     @Nullable Path path,
                     @Nullable Source source,
-                    @Nullable Artifact artifact,
-                    @Nullable ArtifactCoordinate coordinate,
                     boolean allowStubModel,
                     boolean recursive,
-                    boolean processPlugins,
-                    boolean resolveDependencies) {
+                    boolean processPlugins) {
                 super(session);
                 this.path = path;
                 this.source = source;
-                this.artifact = artifact;
-                this.coordinate = coordinate;
                 this.allowStubModel = allowStubModel;
                 this.recursive = recursive;
                 this.processPlugins = processPlugins;
-                this.resolveDependencies = resolveDependencies;
             }
 
             @Nonnull
@@ -206,18 +146,6 @@ public interface ProjectBuilderRequest {
             @Override
             public Optional<Source> getSource() {
                 return Optional.ofNullable(source);
-            }
-
-            @Nonnull
-            @Override
-            public Optional<Artifact> getArtifact() {
-                return Optional.ofNullable(artifact);
-            }
-
-            @Nonnull
-            @Override
-            public Optional<ArtifactCoordinate> getCoordinate() {
-                return Optional.ofNullable(coordinate);
             }
 
             @Override
@@ -233,11 +161,6 @@ public interface ProjectBuilderRequest {
             @Override
             public boolean isProcessPlugins() {
                 return processPlugins;
-            }
-
-            @Override
-            public boolean isResolveDependencies() {
-                return resolveDependencies;
             }
         }
     }

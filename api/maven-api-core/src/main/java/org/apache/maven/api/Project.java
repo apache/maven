@@ -20,7 +20,6 @@ package org.apache.maven.api;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -29,10 +28,24 @@ import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
 
 /**
- * Interface representing a Maven project.
- * Projects can be built using the {@link org.apache.maven.api.services.ProjectBuilder} service.
+ * Interface representing a Maven project which can be created using the
+ * {@link org.apache.maven.api.services.ProjectBuilder} service.
+ * Such objects are immutable and plugin that wish to modify such objects
+ * need to do so using the {@link org.apache.maven.api.services.ProjectManager}
+ * service.
+ * <p>
+ * Projects are created using the {@code ProjectBuilder} either from a POM file
+ * (usually named {@code pom.xml}) on the file system or by loading the POM
+ * associated to an artifact coordinate in a repository.  In the first case,
+ * the {@link #getPomPath()} will point to the POM file and the
+ * {@link #getBasedir()} to the directory parent containing the
+ * POM file.  If the project is loaded from a repository, both these values
+ * will be {@link Optional#empty()}.
+ * </p>
  *
  * @since 4.0.0
+ * @see org.apache.maven.api.services.ProjectManager
+ * @see org.apache.maven.api.services.ProjectBuilder
  */
 @Experimental
 public interface Project {
@@ -139,14 +152,14 @@ public interface Project {
     Path getPomPath();
 
     /**
-     * Returns the project's base directory.
+     * Returns the project base directory, i.e. the directory containing the project.
+     * A project is usually read from the file system and this will point to
+     * the directory containing the POM file.
      *
-     * @see #getPomPath()
+     * @return the path of the directory containing the project
      */
     @Nonnull
-    default Path getBasedir() {
-        return getPomPath().getParent();
-    }
+    Path getBasedir();
 
     /**
      * Returns the project direct dependencies (directly specified or inherited).
@@ -167,12 +180,6 @@ public interface Project {
     default String getId() {
         return getModel().getId();
     }
-
-    /**
-     * @deprecated use {@link #isTopProject()} instead
-     */
-    @Deprecated
-    boolean isExecutionRoot();
 
     /**
      * Returns a boolean indicating if the project is the top level project for
@@ -212,24 +219,4 @@ public interface Project {
      */
     @Nonnull
     Optional<Project> getParent();
-
-    /**
-     * Returns immutable list of project remote repositories (directly specified or inherited).
-     */
-    @Nonnull
-    List<RemoteRepository> getRemoteProjectRepositories();
-
-    /**
-     * Returns immutable list of project remote plugin repositories (directly specified or inherited).
-     */
-    @Nonnull
-    List<RemoteRepository> getRemotePluginRepositories();
-
-    /**
-     * Returns the project properties as immutable map.
-     *
-     * @see org.apache.maven.api.services.ProjectManager#setProperty(Project, String, String)
-     */
-    @Nonnull
-    Map<String, String> getProperties();
 }

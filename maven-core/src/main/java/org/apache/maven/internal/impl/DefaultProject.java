@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -32,6 +31,8 @@ import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultProject implements Project {
 
@@ -98,8 +99,12 @@ public class DefaultProject implements Project {
     @Nonnull
     @Override
     public Path getPomPath() {
-        File file = project.getFile();
-        return file.toPath();
+        return nonNull(project.getFile(), "pomPath").toPath();
+    }
+
+    @Override
+    public Path getBasedir() {
+        return nonNull(project.getBasedir(), "basedir").toPath();
     }
 
     @Nonnull
@@ -116,11 +121,6 @@ public class DefaultProject implements Project {
             return new MappedList<>(dependencyManagement.getDependencies(), this::toDependency);
         }
         return Collections.emptyList();
-    }
-
-    @Override
-    public boolean isExecutionRoot() {
-        return project.isExecutionRoot();
     }
 
     @Override
@@ -142,23 +142,6 @@ public class DefaultProject implements Project {
     public Optional<Project> getParent() {
         MavenProject parent = project.getParent();
         return parent != null ? Optional.of(session.getProject(parent)) : Optional.empty();
-    }
-
-    @Override
-    public List<RemoteRepository> getRemoteProjectRepositories() {
-        return Collections.unmodifiableList(
-                new MappedList<>(project.getRemoteProjectRepositories(), session::getRemoteRepository));
-    }
-
-    @Override
-    public List<RemoteRepository> getRemotePluginRepositories() {
-        return Collections.unmodifiableList(
-                new MappedList<>(project.getRemotePluginRepositories(), session::getRemoteRepository));
-    }
-
-    @Override
-    public Map<String, String> getProperties() {
-        return Collections.unmodifiableMap(new PropertiesAsMap(project.getProperties()));
     }
 
     @Nonnull

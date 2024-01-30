@@ -20,8 +20,6 @@ package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -70,33 +68,5 @@ public interface ProjectBuilder extends Service {
     @Nonnull
     default ProjectBuilderResult build(@Nonnull Session session, @Nonnull Path path) {
         return build(ProjectBuilderRequest.build(session, path));
-    }
-
-    /**
-     * Creates a {@link org.apache.maven.api.Project} from an artifact.
-     *
-     * @param session the {@link Session}, must not be {@code null}
-     * @param artifact the {@link Artifact}, must not be {@code null}
-     * @throws ProjectBuilderException if the project cannot be created
-     * @throws IllegalArgumentException if an argument is {@code null} or invalid
-     * @see #build(ProjectBuilderRequest)
-     */
-    @Nonnull
-    default ProjectBuilderResult build(@Nonnull Session session, @Nonnull Artifact artifact) {
-        return build(ProjectBuilderRequest.build(session, artifact));
-    }
-
-    /**
-     * Creates a {@link org.apache.maven.api.Project} from a coordinate.
-     *
-     * @param session the {@link Session}, must not be {@code null}
-     * @param coordinate the {@link ArtifactCoordinate}, must not be {@code null}
-     * @throws ProjectBuilderException if the project cannot be created
-     * @throws IllegalArgumentException if an argument is {@code null} or invalid
-     * @see #build(ProjectBuilderRequest)
-     */
-    @Nonnull
-    default ProjectBuilderResult build(@Nonnull Session session, @Nonnull ArtifactCoordinate coordinate) {
-        return build(ProjectBuilderRequest.build(session, coordinate));
     }
 }

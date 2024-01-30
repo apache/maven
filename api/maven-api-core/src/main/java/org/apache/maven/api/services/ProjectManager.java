@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
@@ -30,6 +31,7 @@ import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Resource;
 
 /**
@@ -100,9 +102,38 @@ public interface ProjectManager extends Service {
 
     void addTestResource(Project project, Resource resource);
 
-    List<RemoteRepository> getRepositories(Project project);
+    /**
+     * Returns an immutable list of project remote repositories (directly specified or inherited).
+     *
+     * @param project the project
+     */
+    @Nonnull
+    List<RemoteRepository> getRemoteProjectRepositories(@Nonnull Project project);
 
-    void setProperty(Project project, String key, String value);
+    /**
+     * Returns an immutable list of project remote plugin repositories (directly specified or inherited).
+     *
+     * @param project the project
+     */
+    @Nonnull
+    List<RemoteRepository> getRemotePluginRepositories(@Nonnull Project project);
+
+    /**
+     * Returns an immutable map of the project properties.
+     *
+     * @see #setProperty(Project, String, String)
+     */
+    @Nonnull
+    Map<String, String> getProperties(@Nonnull Project project);
+
+    /**
+     * Set a given project property.
+     *
+     * @param project the project to modify
+     * @param key they property's key
+     * @param value the value or {@code null} to unset the property
+     */
+    void setProperty(@Nonnull Project project, @Nonnull String key, @Nullable String value);
 
     @Nonnull
     Optional<Project> getExecutionProject(@Nonnull Project project);

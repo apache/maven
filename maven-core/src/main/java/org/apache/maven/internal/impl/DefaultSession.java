@@ -117,7 +117,8 @@ public class DefaultSession extends AbstractSession {
     public Map<String, String> getEffectiveProperties(@Nullable Project project) {
         HashMap<String, String> result = new HashMap<>(new PropertiesAsMap(mavenSession.getSystemProperties()));
         if (project != null) {
-            result.putAll(project.getProperties());
+            result.putAll(
+                    new PropertiesAsMap(((DefaultProject) project).getProject().getProperties()));
         }
         result.putAll(new PropertiesAsMap(mavenSession.getUserProperties()));
         return result;
