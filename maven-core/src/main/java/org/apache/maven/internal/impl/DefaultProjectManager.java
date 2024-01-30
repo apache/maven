@@ -23,7 +23,6 @@ import javax.inject.Named;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.*;
@@ -131,16 +130,31 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
-    public List<RemoteRepository> getRepositories(Project project) {
-        return ((DefaultProject) project)
-                .getProject().getRemoteProjectRepositories().stream()
-                        .map(session::getRemoteRepository)
-                        .collect(Collectors.toList());
+    public List<RemoteRepository> getRemoteProjectRepositories(Project project) {
+        return Collections.unmodifiableList(new MappedList<>(
+                ((DefaultProject) project).getProject().getRemoteProjectRepositories(), session::getRemoteRepository));
+    }
+
+    @Override
+    public List<RemoteRepository> getRemotePluginRepositories(Project project) {
+        return Collections.unmodifiableList(new MappedList<>(
+                ((DefaultProject) project).getProject().getRemotePluginRepositories(), session::getRemoteRepository));
     }
 
     @Override
     public void setProperty(Project project, String key, String value) {
-        getMavenProject(project).getProperties().setProperty(key, value);
+        Properties properties = getMavenProject(project).getProperties();
+        if (value == null) {
+            properties.remove(key);
+        } else {
+            properties.setProperty(key, value);
+        }
+    }
+
+    @Override
+    public Map<String, String> getProperties(Project project) {
+        return Collections.unmodifiableMap(
+                new PropertiesAsMap(((DefaultProject) project).getProject().getProperties()));
     }
 
     @Override

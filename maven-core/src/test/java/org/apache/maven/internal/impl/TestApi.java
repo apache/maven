@@ -155,7 +155,6 @@ class TestApi {
                         .session(session)
                         .path(session.getPathForLocalArtifact(artifact))
                         .processPlugins(false)
-                        .resolveDependencies(false)
                         .build())
                 .getProject()
                 .get();
@@ -191,7 +190,6 @@ class TestApi {
                         .session(session)
                         .path(session.getPathForLocalArtifact(pom))
                         .processPlugins(false)
-                        .resolveDependencies(false)
                         .build())
                 .getProject()
                 .get();

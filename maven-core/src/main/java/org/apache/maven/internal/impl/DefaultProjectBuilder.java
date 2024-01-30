@@ -31,9 +31,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.annotations.Nonnull;
@@ -44,7 +41,6 @@ import org.apache.maven.api.services.ProjectBuilderException;
 import org.apache.maven.api.services.ProjectBuilderRequest;
 import org.apache.maven.api.services.ProjectBuilderResult;
 import org.apache.maven.api.services.Source;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource2;
@@ -85,22 +81,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 Source source = request.getSource().get();
                 ModelSource2 modelSource = new SourceWrapper(source);
                 res = builder.build(modelSource, req);
-            } else if (request.getArtifact().isPresent()) {
-                Artifact a = request.getArtifact().get();
-                org.eclipse.aether.artifact.Artifact aetherArtifact = session.toArtifact(a);
-                org.apache.maven.artifact.Artifact artifact = RepositoryUtils.toArtifact(aetherArtifact);
-                res = builder.build(artifact, request.isAllowStubModel(), req);
-            } else if (request.getCoordinate().isPresent()) {
-                ArtifactCoordinate c = request.getCoordinate().get();
-                org.apache.maven.artifact.Artifact artifact = new DefaultArtifact(
-                        c.getGroupId(),
-                        c.getArtifactId(),
-                        c.getVersion().asString(),
-                        null,
-                        c.getExtension(),
-                        c.getClassifier(),
-                        null);
-                res = builder.build(artifact, request.isAllowStubModel(), req);
             } else {
                 throw new IllegalArgumentException("Invalid request");
             }
