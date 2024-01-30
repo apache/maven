@@ -34,13 +34,11 @@ import org.apache.maven.api.model.Model;
  * need to do so using the {@link org.apache.maven.api.services.ProjectManager}
  * service.
  * <p>
- * Projects are created using the {@code ProjectBuilder} either from a POM file
- * (usually named {@code pom.xml}) on the file system or by loading the POM
- * associated to an artifact coordinate in a repository.  In the first case,
- * the {@link #getPomPath()} will point to the POM file and the
+ * Projects are created using the {@code ProjectBuilder} from a POM file
+ * (usually named {@code pom.xml}) on the file system.
+ * The {@link #getPomPath()} will point to the POM file and the
  * {@link #getBasedir()} to the directory parent containing the
- * POM file.  If the project is loaded from a repository, both these values
- * will be {@link Optional#empty()}.
+ * POM file.
  * </p>
  *
  * @since 4.0.0
