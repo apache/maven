@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Immutable
-public interface Packaging {
+public interface Packaging extends ExtensibleEnum {
     /**
      * The packaging id.
      */

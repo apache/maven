@@ -20,7 +20,8 @@ package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
-import org.apache.maven.api.annotations.Nonnull;
+
+import static org.apache.maven.api.ExtensibleEnums.projectScope;
 
 /**
  * Project scope.
@@ -32,45 +33,16 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Immutable
-@SuppressWarnings("checkstyle:magicnumber")
-public interface ProjectScope extends Comparable<ProjectScope> {
-    @Nonnull
-    String id();
-
-    int ordinal();
-
-    @Override
-    default int compareTo(ProjectScope o) {
-        return this.ordinal() - o.ordinal();
-    }
+@SuppressWarnings("checkstyle:InterfaceIsType")
+public interface ProjectScope extends ExtensibleEnum {
 
     /**
      * Main scope.
      */
-    ProjectScope MAIN = new ProjectScope() {
-        @Override
-        public String id() {
-            return "main";
-        }
-
-        @Override
-        public int ordinal() {
-            return 10;
-        }
-    };
+    ProjectScope MAIN = projectScope("main");
 
     /**
      * Test scope.
      */
-    ProjectScope TEST = new ProjectScope() {
-        @Override
-        public String id() {
-            return "test";
-        }
-
-        @Override
-        public int ordinal() {
-            return 20;
-        }
-    };
+    ProjectScope TEST = projectScope("test");
 }

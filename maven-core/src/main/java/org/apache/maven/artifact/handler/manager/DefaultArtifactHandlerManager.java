@@ -62,7 +62,7 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
 
     public ArtifactHandler getArtifactHandler(String id) {
         return allHandlers.computeIfAbsent(id, k -> {
-            Type type = typeRegistry.getType(id);
+            Type type = typeRegistry.require(id);
             return new DefaultArtifactHandler(
                     id,
                     type.getExtension(),

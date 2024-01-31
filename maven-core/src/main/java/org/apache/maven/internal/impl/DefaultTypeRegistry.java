@@ -24,12 +24,13 @@ import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.services.LanguageManager;
+import org.apache.maven.api.services.LanguageRegistry;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.LegacyArtifactHandlerManager;
@@ -43,7 +44,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistry {
     private final Map<String, Type> types;
 
-    private final LanguageManager languageManager;
+    private final LanguageRegistry languageRegistry;
 
     private final ConcurrentHashMap<String, Type> usedTypes;
 
@@ -53,9 +54,9 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
 
     @Inject
     public DefaultTypeRegistry(
-            Map<String, Type> types, LanguageManager languageManager, LegacyArtifactHandlerManager manager) {
+            Map<String, Type> types, LanguageRegistry languageRegistry, LegacyArtifactHandlerManager manager) {
         this.types = nonNull(types, "types");
-        this.languageManager = nonNull(languageManager, "languageManager");
+        this.languageRegistry = nonNull(languageRegistry, "languageRegistry");
         this.usedTypes = new ConcurrentHashMap<>();
         this.legacyTypes = new ConcurrentHashMap<>();
         this.manager = nonNull(manager, "artifactHandlerManager");
@@ -73,8 +74,13 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     }
 
     @Override
+    public Optional<Type> lookup(String id) {
+        return Optional.of(require(id));
+    }
+
+    @Override
     @Nonnull
-    public Type getType(String id) {
+    public Type require(String id) {
         nonNull(id, "id");
         return usedTypes.computeIfAbsent(id, i -> {
             Type type = types.get(id);
@@ -92,7 +98,7 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                     }
                     return new DefaultType(
                             id,
-                            languageManager.requireLanguageFamily(handler.getLanguage()),
+                            languageRegistry.require(handler.getLanguage()),
                             handler.getExtension(),
                             handler.getClassifier(),
                             new DefaultDependencyProperties(flags));

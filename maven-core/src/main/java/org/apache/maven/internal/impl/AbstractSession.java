@@ -518,4 +518,34 @@ public abstract class AbstractSession implements InternalSession {
     public List<Version> resolveVersionRange(ArtifactCoordinate artifact) {
         return getService(VersionRangeResolver.class).resolve(this, artifact).getVersions();
     }
+
+    @Override
+    public Type requireType(String id) {
+        return getService(TypeRegistry.class).require(id);
+    }
+
+    @Override
+    public Language requireLanguage(String id) {
+        return getService(LanguageRegistry.class).require(id);
+    }
+
+    @Override
+    public Packaging requirePackaging(String id) {
+        return getService(PackagingRegistry.class).require(id);
+    }
+
+    @Override
+    public ProjectScope requireProjectScope(String id) {
+        return getService(ProjectScopeRegistry.class).require(id);
+    }
+
+    @Override
+    public DependencyScope requireDependencyScope(String id) {
+        return getService(DependencyScopeRegistry.class).require(id);
+    }
+
+    @Override
+    public BuildPathScope requireBuildPathScope(String id) {
+        return getService(BuildPathScopeRegistry.class).require(id);
+    }
 }

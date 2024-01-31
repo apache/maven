@@ -16,28 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.api.spi;
 
-import org.apache.maven.api.Type;
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.DependencyScope;
 
-/**
- * Access to {@link Type} registry.
- *
- * @since 4.0.0
- */
-@Experimental
-public interface TypeRegistry extends ExtensibleEnumRegistry<Type> {
-
-    /**
-     * Obtain the {@link Type} from the specified {@code id}.
-     * If no type is known for {@code id}, the registry will
-     * create a custom {@code Type} for it.
-     *
-     * @param id the id of the type to retrieve
-     * @return the type
-     */
-    @Nonnull
-    Type require(@Nonnull String id);
-}
+public interface DependencyScopeProvider extends ExtensibleEnumProvider<DependencyScope> {}

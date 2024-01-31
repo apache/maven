@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.Type;
-import org.apache.maven.api.services.PackagingManager;
+import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 
@@ -36,24 +36,24 @@ import org.apache.maven.lifecycle.mapping.LifecycleMapping;
  */
 @Named
 @Singleton
-public class DefaultPackagingManager implements PackagingManager {
+public class DefaultPackagingRegistry implements PackagingRegistry {
     private final Map<String, LifecycleMapping> lifecycleMappings;
 
     private final TypeRegistry typeRegistry;
 
     @Inject
-    public DefaultPackagingManager(Map<String, LifecycleMapping> lifecycleMappings, TypeRegistry typeRegistry) {
+    public DefaultPackagingRegistry(Map<String, LifecycleMapping> lifecycleMappings, TypeRegistry typeRegistry) {
         this.lifecycleMappings = lifecycleMappings;
         this.typeRegistry = typeRegistry;
     }
 
     @Override
-    public Optional<Packaging> lookupPackaging(String id) {
+    public Optional<Packaging> lookup(String id) {
         LifecycleMapping lifecycleMapping = lifecycleMappings.get(id);
         if (lifecycleMapping == null) {
             return Optional.empty();
         }
-        Type type = typeRegistry.getType(id);
+        Type type = typeRegistry.require(id);
         if (type == null) {
             return Optional.empty();
         }

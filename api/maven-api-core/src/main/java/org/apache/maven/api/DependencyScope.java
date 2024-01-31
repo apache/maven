@@ -20,7 +20,8 @@ package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
-import org.apache.maven.api.annotations.Nonnull;
+
+import static org.apache.maven.api.ExtensibleEnums.dependencyScope;
 
 /**
  * Dependency scope.
@@ -32,9 +33,7 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Immutable
-public interface DependencyScope {
-    @Nonnull
-    String id();
+public interface DependencyScope extends ExtensibleEnum {
 
     boolean isTransitive();
 
@@ -42,122 +41,42 @@ public interface DependencyScope {
      * None. Allows you to declare dependencies (for example to alter reactor build order) but in reality dependencies
      * in this scope are not part of any build path scope.
      */
-    DependencyScope NONE = new DependencyScope() {
-        @Override
-        public String id() {
-            return "none";
-        }
-
-        @Override
-        public boolean isTransitive() {
-            return false;
-        }
-    };
+    DependencyScope NONE = dependencyScope("none", false);
 
     /**
      * Compile only.
      */
-    DependencyScope COMPILE_ONLY = new DependencyScope() {
-        @Override
-        public String id() {
-            return "compile-only";
-        }
-
-        @Override
-        public boolean isTransitive() {
-            return false;
-        }
-    };
+    DependencyScope COMPILE_ONLY = dependencyScope("compile-only", false);
 
     /**
      * Compile.
      */
-    DependencyScope COMPILE = new DependencyScope() {
-        @Override
-        public String id() {
-            return "compile";
-        }
-
-        @Override
-        public boolean isTransitive() {
-            return true;
-        }
-    };
+    DependencyScope COMPILE = dependencyScope("compile", true);
 
     /**
      * Runtime.
      */
-    DependencyScope RUNTIME = new DependencyScope() {
-        @Override
-        public String id() {
-            return "runtime";
-        }
-
-        @Override
-        public boolean isTransitive() {
-            return true;
-        }
-    };
+    DependencyScope RUNTIME = dependencyScope("runtime", true);
 
     /**
      * Provided.
      */
-    DependencyScope PROVIDED = new DependencyScope() {
-        @Override
-        public String id() {
-            return "provided";
-        }
-
-        @Override
-        public boolean isTransitive() {
-            return false;
-        }
-    };
+    DependencyScope PROVIDED = dependencyScope("provided", false);
 
     /**
      * Test compile only.
      */
-    DependencyScope TEST_ONLY = new DependencyScope() {
-        @Override
-        public String id() {
-            return "test-only";
-        }
-
-        @Override
-        public boolean isTransitive() {
-            return false;
-        }
-    };
+    DependencyScope TEST_ONLY = dependencyScope("test-only", false);
 
     /**
      * Test.
      */
-    DependencyScope TEST = new DependencyScope() {
-        @Override
-        public String id() {
-            return "test";
-        }
-
-        @Override
-        public boolean isTransitive() {
-            return false;
-        }
-    };
+    DependencyScope TEST = dependencyScope("test", false);
 
     /**
      * Test runtime.
      */
-    DependencyScope TEST_RUNTIME = new DependencyScope() {
-        @Override
-        public String id() {
-            return "test-runtime";
-        }
-
-        @Override
-        public boolean isTransitive() {
-            return false;
-        }
-    };
+    DependencyScope TEST_RUNTIME = dependencyScope("test-runtime", true);
 
     /**
      * System scope.
@@ -165,15 +84,5 @@ public interface DependencyScope {
      * Important: this scope {@code id} MUST BE KEPT in sync with label in
      * {@code org.eclipse.aether.util.artifact.Scopes#SYSTEM}.
      */
-    DependencyScope SYSTEM = new DependencyScope() {
-        @Override
-        public String id() {
-            return "system";
-        }
-
-        @Override
-        public boolean isTransitive() {
-            return false;
-        }
-    };
+    DependencyScope SYSTEM = dependencyScope("system", false);
 }

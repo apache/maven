@@ -73,7 +73,7 @@ public class DefaultDependencyCoordinate implements DependencyCoordinate {
         String type = dependency
                 .getArtifact()
                 .getProperty(ArtifactProperties.TYPE, dependency.getArtifact().getExtension());
-        return session.getService(TypeRegistry.class).getType(type);
+        return session.requireType(type);
     }
 
     @Nonnull

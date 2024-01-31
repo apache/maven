@@ -16,19 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.api.spi;
 
-import java.util.Optional;
+import org.apache.maven.api.BuildPathScope;
 
-import org.apache.maven.api.Language;
-import org.apache.maven.api.Service;
-import org.apache.maven.api.annotations.Nonnull;
-
-public interface LanguageManager extends Service {
-    @Nonnull
-    Optional<Language> lookupLanguageFamily(String id);
-
-    default Language requireLanguageFamily(String id) {
-        return lookupLanguageFamily(id).orElseThrow(() -> new IllegalArgumentException("Unknown language"));
-    }
-}
+public interface BuildPathScopeProvider extends ExtensibleEnumProvider<BuildPathScope> {}

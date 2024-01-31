@@ -31,6 +31,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.BuildPathScopeRegistry;
 import org.apache.maven.api.services.DependencyCoordinateFactory;
 import org.apache.maven.api.settings.Settings;
 
@@ -501,4 +502,17 @@ public interface Session {
      */
     @Nonnull
     VersionConstraint parseVersionConstraint(@Nonnull String versionConstraint);
+
+    Type requireType(String id);
+
+    Language requireLanguage(String id);
+
+    Packaging requirePackaging(String id);
+
+    ProjectScope requireProjectScope(String id);
+
+    DependencyScope requireDependencyScope(String id);
+
+    BuildPathScope requireBuildPathScope(String id);
+
 }

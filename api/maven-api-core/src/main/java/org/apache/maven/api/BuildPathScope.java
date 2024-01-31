@@ -18,14 +18,13 @@
  */
 package org.apache.maven.api;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+
+import static org.apache.maven.api.ExtensibleEnums.buildPathScope;
 
 /**
  * Build path scope.
@@ -37,114 +36,38 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Immutable
-public interface BuildPathScope {
-    @Nonnull
-    String id();
+public interface BuildPathScope extends ExtensibleEnum {
 
     @Nonnull
     ProjectScope projectScope();
 
     @Nonnull
-    Collection<DependencyScope> getDependencyScopes();
+    Set<DependencyScope> getDependencyScopes();
 
-    default BuildPathScope union(BuildPathScope other) {
-        return new BuildPathScope() {
-            @Override
-            public String id() {
-                return BuildPathScope.this.id() + "+" + other.id();
-            }
+    BuildPathScope MAIN_COMPILE = buildPathScope(
+            "main-compile",
+            ProjectScope.MAIN,
+            DependencyScope.COMPILE_ONLY,
+            DependencyScope.COMPILE,
+            DependencyScope.PROVIDED);
 
-            @Override
-            public ProjectScope projectScope() {
-                return BuildPathScope.this.projectScope().compareTo(other.projectScope()) < 1
-                        ? other.projectScope()
-                        : BuildPathScope.this.projectScope();
-            }
+    BuildPathScope MAIN_RUNTIME =
+            buildPathScope("main-runtime", ProjectScope.MAIN, DependencyScope.COMPILE, DependencyScope.RUNTIME);
 
-            @Override
-            public Collection<DependencyScope> getDependencyScopes() {
-                HashSet<DependencyScope> result = new HashSet<>(BuildPathScope.this.getDependencyScopes());
-                result.addAll(other.getDependencyScopes());
-                return result;
-            }
-        };
-    }
+    BuildPathScope TEST_COMPILE = buildPathScope(
+            "test-compile",
+            ProjectScope.TEST,
+            DependencyScope.COMPILE,
+            DependencyScope.PROVIDED,
+            DependencyScope.TEST_ONLY,
+            DependencyScope.TEST);
 
-    BuildPathScope MAIN_COMPILE = new BuildPathScope() {
-        @Override
-        public String id() {
-            return "main-compile";
-        }
-
-        @Override
-        public ProjectScope projectScope() {
-            return ProjectScope.MAIN;
-        }
-
-        @Override
-        public Collection<DependencyScope> getDependencyScopes() {
-            return Collections.unmodifiableList(
-                    Arrays.asList(DependencyScope.COMPILE_ONLY, DependencyScope.COMPILE, DependencyScope.PROVIDED));
-        }
-    };
-
-    BuildPathScope MAIN_RUNTIME = new BuildPathScope() {
-        @Override
-        public String id() {
-            return "main-runtime";
-        }
-
-        @Override
-        public ProjectScope projectScope() {
-            return ProjectScope.MAIN;
-        }
-
-        @Override
-        public Collection<DependencyScope> getDependencyScopes() {
-            return Collections.unmodifiableList(Arrays.asList(DependencyScope.COMPILE, DependencyScope.RUNTIME));
-        }
-    };
-
-    BuildPathScope TEST_COMPILE = new BuildPathScope() {
-        @Override
-        public String id() {
-            return "test-compile";
-        }
-
-        @Override
-        public ProjectScope projectScope() {
-            return ProjectScope.TEST;
-        }
-
-        @Override
-        public Collection<DependencyScope> getDependencyScopes() {
-            return Collections.unmodifiableList(Arrays.asList(
-                    DependencyScope.COMPILE,
-                    DependencyScope.PROVIDED,
-                    DependencyScope.TEST_ONLY,
-                    DependencyScope.TEST));
-        }
-    };
-
-    BuildPathScope TEST_RUNTIME = new BuildPathScope() {
-        @Override
-        public String id() {
-            return "test-runtime";
-        }
-
-        @Override
-        public ProjectScope projectScope() {
-            return ProjectScope.TEST;
-        }
-
-        @Override
-        public Collection<DependencyScope> getDependencyScopes() {
-            return Collections.unmodifiableList(Arrays.asList(
-                    DependencyScope.COMPILE,
-                    DependencyScope.RUNTIME,
-                    DependencyScope.PROVIDED,
-                    DependencyScope.TEST,
-                    DependencyScope.TEST_RUNTIME));
-        }
-    };
+    BuildPathScope TEST_RUNTIME = buildPathScope(
+            "test-runtime",
+            ProjectScope.TEST,
+            DependencyScope.COMPILE,
+            DependencyScope.RUNTIME,
+            DependencyScope.PROVIDED,
+            DependencyScope.TEST,
+            DependencyScope.TEST_RUNTIME);
 }

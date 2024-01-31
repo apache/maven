@@ -18,26 +18,9 @@
  */
 package org.apache.maven.api.services;
 
-import org.apache.maven.api.Type;
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.ProjectScope;
 
 /**
- * Access to {@link Type} registry.
- *
- * @since 4.0.0
+ * Manager for {@link ProjectScope}.
  */
-@Experimental
-public interface TypeRegistry extends ExtensibleEnumRegistry<Type> {
-
-    /**
-     * Obtain the {@link Type} from the specified {@code id}.
-     * If no type is known for {@code id}, the registry will
-     * create a custom {@code Type} for it.
-     *
-     * @param id the id of the type to retrieve
-     * @return the type
-     */
-    @Nonnull
-    Type require(@Nonnull String id);
-}
+public interface ProjectScopeRegistry extends ExtensibleEnumRegistry<ProjectScope> {}

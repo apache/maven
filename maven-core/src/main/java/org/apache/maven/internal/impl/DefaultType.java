@@ -57,8 +57,13 @@ public class DefaultType implements Type, ArtifactType {
     }
 
     @Override
-    public String getId() {
+    public String id() {
         return dependencyProperties.asMap().get(ArtifactProperties.TYPE);
+    }
+
+    @Override
+    public String getId() {
+        return id();
     }
 
     @Override

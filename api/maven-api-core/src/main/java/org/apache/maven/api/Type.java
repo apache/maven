@@ -40,7 +40,7 @@ import org.apache.maven.api.model.Dependency;
  */
 @Experimental
 @Immutable
-public interface Type {
+public interface Type extends ExtensibleEnum {
     /**
      * Returns the dependency type id.
      * The id uniquely identifies this <i>dependency type</i>.
@@ -48,7 +48,7 @@ public interface Type {
      * @return the id of this type, never {@code null}.
      */
     @Nonnull
-    String getId();
+    String id();
 
     /**
      * Returns the dependency type language.

@@ -35,16 +35,12 @@ public interface DependencyProperties {
     /**
      * Boolean flag telling that dependency contains all of its dependencies. Value of this key should be parsed with
      * {@link Boolean#parseBoolean(String)} to obtain value.
-     * <p>
-     * <em>Important: this flag must be kept in sync with resolver! (as is used during collection)</em>
      */
     String FLAG_INCLUDES_DEPENDENCIES = "includesDependencies";
 
     /**
      * Boolean flag telling that dependency is meant to be part of build path. Value of this key should be parsed with
      * {@link Boolean#parseBoolean(String)} to obtain value.
-     * <p>
-     * <em>Important: this flag must be kept in sync with resolver! (as is used during collection)</em>
      */
     String FLAG_BUILD_PATH_CONSTITUENT = "constitutesBuildPath";
 

@@ -16,32 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import java.util.Objects;
-import java.util.Optional;
+package org.apache.maven.api.spi;
 
 import org.apache.maven.api.Language;
-import org.apache.maven.api.services.LanguageManager;
 
-/**
- * TODO: this is session scoped as SPI can contribute.
- */
-@Named
-@Singleton
-public class DefaultLanguageManager implements LanguageManager {
-    @Override
-    public Optional<Language> lookupLanguageFamily(String id) {
-        if (Objects.equals(Language.NONE.id(), id)) {
-            return Optional.of(Language.NONE);
-        }
-        // TODO: this is now just a shortcut; elaborate this, probably with some SPI LanguageSupport
-        if (Objects.equals(Language.JAVA_FAMILY.id(), id)) {
-            return Optional.of(Language.JAVA_FAMILY);
-        }
-        return Optional.empty();
-    }
-}
+public interface LanguageProvider extends ExtensibleEnumProvider<Language> {}

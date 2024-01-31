@@ -18,17 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import java.util.Optional;
+import org.apache.maven.api.DependencyScope;
 
-import org.apache.maven.api.Packaging;
-import org.apache.maven.api.Service;
-import org.apache.maven.api.annotations.Nonnull;
-
-public interface PackagingManager extends Service {
-    @Nonnull
-    Optional<Packaging> lookupPackaging(String id);
-
-    default Packaging requirePackaging(String id) {
-        return lookupPackaging(id).orElseThrow(() -> new IllegalArgumentException("Unknown packaging"));
-    }
-}
+public interface DependencyScopeRegistry extends ExtensibleEnumRegistry<DependencyScope> {}

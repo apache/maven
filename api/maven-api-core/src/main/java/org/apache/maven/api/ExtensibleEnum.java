@@ -18,30 +18,20 @@
  */
 package org.apache.maven.api;
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
-
-import static org.apache.maven.api.ExtensibleEnums.language;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Language.
- * <p>
  * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
  * can be used as keys.
- *
- * @since 4.0.0
  */
-@Experimental
-@Immutable
-@SuppressWarnings("checkstyle:InterfaceIsType")
-public interface Language extends ExtensibleEnum {
+public interface ExtensibleEnum {
 
     /**
-     * The "none" language. It is not versioned, family is same to itself, and compatible with itself only.
-     * In turn, every {@link Language} implementation must be compatible with {@code NONE} language.
+     * The {@code id} uniquely represents a value for this extensible enum.
+     * This id should be used to compute the equality and hash code for the instance.
+     *
+     * @return the id
      */
-    Language NONE = language("none");
-
-    // TODO: this should be moved out from here to Java Support (builtin into core)
-    Language JAVA_FAMILY = language("java");
+    @Nonnull
+    String id();
 }

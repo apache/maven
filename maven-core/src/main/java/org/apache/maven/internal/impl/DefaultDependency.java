@@ -102,7 +102,7 @@ public class DefaultDependency implements Dependency {
         String type = dependency
                 .getArtifact()
                 .getProperty(ArtifactProperties.TYPE, dependency.getArtifact().getExtension());
-        return session.getService(TypeRegistry.class).getType(type);
+        return session.requireType(type);
     }
 
     @Override

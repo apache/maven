@@ -150,8 +150,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
         initRepoSession(configuration);
 
         DefaultSessionFactory defaultSessionFactory =
-                new DefaultSessionFactory(mock(RepositorySystem.class),
-                        null, new DefaultLookup(container), null);
+                new DefaultSessionFactory(mock(RepositorySystem.class), null, new DefaultLookup(container), null);
 
         MavenSession session = new MavenSession(
                 getContainer(), configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());
