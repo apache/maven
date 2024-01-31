@@ -22,10 +22,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.ArtifactProperties;
+import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultArtifactProperties;
+import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
 @Named(RarTypeProvider.NAME)
@@ -41,7 +41,7 @@ public class RarTypeProvider implements Provider<Type> {
                 Language.JAVA_FAMILY,
                 "rar",
                 null,
-                new DefaultArtifactProperties(ArtifactProperties.FLAG_INCLUDES_DEPENDENCIES));
+                new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
     }
 
     @Override

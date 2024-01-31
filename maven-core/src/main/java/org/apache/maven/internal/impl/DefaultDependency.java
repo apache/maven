@@ -20,25 +20,33 @@ package org.apache.maven.internal.impl;
 
 import java.util.Objects;
 
-import org.apache.maven.api.*;
+import org.apache.maven.api.Artifact;
+import org.apache.maven.api.Dependency;
+import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.Scope;
+import org.apache.maven.api.Type;
+import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.TypeRegistry;
+import org.apache.maven.repository.internal.DefaultModelVersionParser;
+import org.eclipse.aether.artifact.ArtifactProperties;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultDependency implements Dependency {
     private final InternalSession session;
     private final org.eclipse.aether.graph.Dependency dependency;
-    private final ArtifactProperties artifactProperties;
+    private final DependencyProperties dependencyProperties;
     private final String key;
 
     public DefaultDependency(
             @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency) {
         this.session = nonNull(session, "session");
         this.dependency = nonNull(dependency, "dependency");
-        this.artifactProperties =
-                new DefaultArtifactProperties(dependency.getArtifact().getProperties());
+        this.dependencyProperties =
+                new DefaultDependencyProperties(dependency.getArtifact().getProperties());
         this.key = getGroupId()
                 + ':'
                 + getArtifactId()
@@ -93,20 +101,18 @@ public class DefaultDependency implements Dependency {
     public Type getType() {
         String type = dependency
                 .getArtifact()
-                .getProperty(
-                        org.eclipse.aether.artifact.ArtifactProperties.TYPE,
-                        dependency.getArtifact().getExtension());
+                .getProperty(ArtifactProperties.TYPE, dependency.getArtifact().getExtension());
         return session.getService(TypeRegistry.class).getType(type);
     }
 
     @Override
-    public ArtifactProperties getArtifactProperties() {
-        return artifactProperties;
+    public DependencyProperties getDependencyProperties() {
+        return dependencyProperties;
     }
 
     @Override
     public boolean isSnapshot() {
-        return dependency.getArtifact().isSnapshot();
+        return DefaultModelVersionParser.checkSnapshot(dependency.getArtifact().getVersion());
     }
 
     @Nonnull

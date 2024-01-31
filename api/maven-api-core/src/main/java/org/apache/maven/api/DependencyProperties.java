@@ -25,13 +25,13 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Artifact properties supported by Maven Core.
+ * Dependency properties supported by Maven Core.
  *
  * @since 4.0.0
  */
 @Experimental
 @Immutable
-public interface ArtifactProperties {
+public interface DependencyProperties {
     /**
      * Boolean flag telling that dependency contains all of its dependencies. Value of this key should be parsed with
      * {@link Boolean#parseBoolean(String)} to obtain value.

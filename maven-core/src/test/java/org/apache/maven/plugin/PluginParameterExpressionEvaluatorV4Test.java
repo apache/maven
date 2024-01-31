@@ -32,8 +32,9 @@ import java.util.Properties;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.*;
+import org.apache.maven.api.Artifact;
 import org.apache.maven.api.MojoExecution;
+import org.apache.maven.api.Session;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;

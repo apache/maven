@@ -106,14 +106,6 @@ public interface Artifact {
     boolean isSnapshot();
 
     /**
-     * The artifact properties.
-     *
-     * @return the artifact properties, never {@code null}
-     */
-    @Nonnull
-    ArtifactProperties getArtifactProperties();
-
-    /**
      * Shortcut for {@code session.createArtifactCoordinate(artifact)}
      *
      * @return an {@link ArtifactCoordinate}

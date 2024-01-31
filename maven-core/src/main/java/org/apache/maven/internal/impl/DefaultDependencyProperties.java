@@ -18,9 +18,13 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.maven.api.ArtifactProperties;
+import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.annotations.Nonnull;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -28,14 +32,14 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 /**
  * Default implementation of artifact properties.
  */
-public class DefaultArtifactProperties implements ArtifactProperties {
+public class DefaultDependencyProperties implements DependencyProperties {
     private final Map<String, String> properties;
 
-    public DefaultArtifactProperties(String... flags) {
+    public DefaultDependencyProperties(String... flags) {
         this(Arrays.asList(flags));
     }
 
-    public DefaultArtifactProperties(@Nonnull Collection<String> flags) {
+    public DefaultDependencyProperties(@Nonnull Collection<String> flags) {
         nonNull(flags, "flags");
         HashMap<String, String> map = new HashMap<>();
         for (String flag : flags) {
@@ -44,7 +48,7 @@ public class DefaultArtifactProperties implements ArtifactProperties {
         this.properties = Collections.unmodifiableMap(map);
     }
 
-    public DefaultArtifactProperties(@Nonnull Map<String, String> properties) {
+    public DefaultDependencyProperties(@Nonnull Map<String, String> properties) {
         this.properties = Collections.unmodifiableMap(nonNull(properties, "properties"));
     }
 

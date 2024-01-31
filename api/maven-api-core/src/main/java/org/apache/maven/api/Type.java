@@ -82,7 +82,7 @@ public interface Type {
      * @return if the artifact should be added to the build path
      */
     default boolean isBuildPathConstituent() {
-        return getArtifactProperties().checkFlag(ArtifactProperties.FLAG_BUILD_PATH_CONSTITUENT);
+        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_BUILD_PATH_CONSTITUENT);
     }
 
     /**
@@ -93,7 +93,7 @@ public interface Type {
      * @return if the artifact's dependencies are included in the artifact
      */
     default boolean isIncludesDependencies() {
-        return getArtifactProperties().checkFlag(ArtifactProperties.FLAG_INCLUDES_DEPENDENCIES);
+        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
     }
 
     /**
@@ -102,5 +102,5 @@ public interface Type {
      * @return the default properties, never {@code null}.
      */
     @Nonnull
-    ArtifactProperties getArtifactProperties();
+    DependencyProperties getDependencyProperties();
 }

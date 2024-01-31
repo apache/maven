@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.api.ArtifactProperties;
+import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.LanguageManager;
@@ -85,17 +85,17 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                     ArtifactHandler handler = manager.getArtifactHandler(id);
                     ArrayList<String> flags = new ArrayList<>();
                     if (handler.isAddedToClasspath()) {
-                        flags.add(ArtifactProperties.FLAG_BUILD_PATH_CONSTITUENT);
+                        flags.add(DependencyProperties.FLAG_BUILD_PATH_CONSTITUENT);
                     }
                     if (handler.isIncludesDependencies()) {
-                        flags.add(ArtifactProperties.FLAG_INCLUDES_DEPENDENCIES);
+                        flags.add(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
                     }
                     return new DefaultType(
                             id,
                             languageManager.requireLanguageFamily(handler.getLanguage()),
                             handler.getExtension(),
                             handler.getClassifier(),
-                            new DefaultArtifactProperties(flags));
+                            new DefaultDependencyProperties(flags));
                 });
             }
             return type;

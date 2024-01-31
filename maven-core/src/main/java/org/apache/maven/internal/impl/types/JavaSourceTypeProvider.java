@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultArtifactProperties;
+import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
 @Named(JavaSourceTypeProvider.NAME)
@@ -35,7 +35,7 @@ public class JavaSourceTypeProvider implements Provider<Type> {
     private final Type type;
 
     public JavaSourceTypeProvider() {
-        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "jar", "sources", new DefaultArtifactProperties());
+        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "jar", "sources", new DefaultDependencyProperties());
     }
 
     @Override

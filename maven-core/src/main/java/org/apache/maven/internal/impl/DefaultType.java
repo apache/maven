@@ -21,9 +21,10 @@ package org.apache.maven.internal.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.maven.api.ArtifactProperties;
+import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
+import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -35,25 +36,29 @@ public class DefaultType implements Type, ArtifactType {
 
     private final String classifier;
 
-    private final ArtifactProperties artifactProperties;
+    private final DependencyProperties dependencyProperties;
 
     public DefaultType(
-            String id, Language language, String extension, String classifier, ArtifactProperties artifactProperties) {
+            String id,
+            Language language,
+            String extension,
+            String classifier,
+            DependencyProperties dependencyProperties) {
         nonNull(id, "id");
         nonNull(language, "language");
         this.language = language;
         this.extension = nonNull(extension, "extension");
         this.classifier = classifier;
-        nonNull(artifactProperties, "artifactProperties");
-        HashMap<String, String> props = new HashMap<>(artifactProperties.asMap());
-        props.put(org.eclipse.aether.artifact.ArtifactProperties.TYPE, id);
-        props.put(org.eclipse.aether.artifact.ArtifactProperties.LANGUAGE, language.id());
-        this.artifactProperties = new DefaultArtifactProperties(props);
+        nonNull(dependencyProperties, "dependencyProperties");
+        HashMap<String, String> props = new HashMap<>(dependencyProperties.asMap());
+        props.put(ArtifactProperties.TYPE, id);
+        props.put(ArtifactProperties.LANGUAGE, language.id());
+        this.dependencyProperties = new DefaultDependencyProperties(props);
     }
 
     @Override
     public String getId() {
-        return artifactProperties.asMap().get(org.eclipse.aether.artifact.ArtifactProperties.TYPE);
+        return dependencyProperties.asMap().get(ArtifactProperties.TYPE);
     }
 
     @Override
@@ -72,12 +77,12 @@ public class DefaultType implements Type, ArtifactType {
     }
 
     @Override
-    public ArtifactProperties getArtifactProperties() {
-        return artifactProperties;
+    public DependencyProperties getDependencyProperties() {
+        return dependencyProperties;
     }
 
     @Override
     public Map<String, String> getProperties() {
-        return getArtifactProperties().asMap();
+        return getDependencyProperties().asMap();
     }
 }

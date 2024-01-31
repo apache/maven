@@ -22,7 +22,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.Type;

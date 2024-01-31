@@ -18,7 +18,10 @@
  */
 package org.apache.maven.api.services;
 
-import org.apache.maven.api.*;
+import org.apache.maven.api.Service;
+import org.apache.maven.api.Version;
+import org.apache.maven.api.VersionConstraint;
+import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -63,9 +66,6 @@ public interface VersionParser extends Service {
 
     /**
      * Checks whether a given artifact version is considered a {@code SNAPSHOT} or not.
-     * <p>
-     * In case there is {@link Artifact} in scope, the recommended way to perform this check is
-     * use of {@link Artifact#isSnapshot()} instead.
      */
     boolean isSnapshot(@Nonnull String version);
 }
