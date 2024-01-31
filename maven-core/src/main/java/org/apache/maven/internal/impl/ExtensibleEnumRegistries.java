@@ -54,29 +54,6 @@ public class ExtensibleEnumRegistries {
 
     @Named
     @SessionScoped
-    public static class DefaultDependencyScopeRegistry
-            extends DefaultExtensibleEnumRegistry<DependencyScope, DependencyScopeProvider>
-            implements DependencyScopeRegistry {
-
-        @Inject
-        public DefaultDependencyScopeRegistry(List<DependencyScopeProvider> providers) {
-            super(
-                    providers,
-                    DependencyScope.NONE,
-                    DependencyScope.EMPTY,
-                    DependencyScope.COMPILE_ONLY,
-                    DependencyScope.COMPILE,
-                    DependencyScope.RUNTIME,
-                    DependencyScope.PROVIDED,
-                    DependencyScope.TEST_ONLY,
-                    DependencyScope.TEST,
-                    DependencyScope.TEST_RUNTIME,
-                    DependencyScope.SYSTEM);
-        }
-    }
-
-    @Named
-    @SessionScoped
     public static class DefaultProjectScopeRegistry
             extends DefaultExtensibleEnumRegistry<ProjectScope, ProjectScopeProvider> implements ProjectScopeRegistry {
 

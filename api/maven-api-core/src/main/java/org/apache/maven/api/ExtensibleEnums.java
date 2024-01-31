@@ -26,10 +26,6 @@ abstract class ExtensibleEnums {
         return new DefaultLanguage(id);
     }
 
-    static DependencyScope dependencyScope(String id, boolean transitive) {
-        return new DefaultDependencyScope(id, transitive);
-    }
-
     static BuildPathScope buildPathScope(String id, ProjectScope projectScope, DependencyScope... dependencyScopes) {
         return new DefaultBuildPathScope(id, projectScope, dependencyScopes);
     }
@@ -63,20 +59,6 @@ abstract class ExtensibleEnums {
         @Override
         public String toString() {
             return getClass().getSimpleName() + "[" + id() + "]";
-        }
-    }
-
-    private static class DefaultDependencyScope extends DefaultExtensibleEnum implements DependencyScope {
-        private final boolean transitive;
-
-        DefaultDependencyScope(String id, boolean transitive) {
-            super(id);
-            this.transitive = transitive;
-        }
-
-        @Override
-        public boolean isTransitive() {
-            return transitive;
         }
     }
 

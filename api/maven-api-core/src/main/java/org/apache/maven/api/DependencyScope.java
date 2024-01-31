@@ -18,10 +18,14 @@
  */
 package org.apache.maven.api;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
-
-import static org.apache.maven.api.ExtensibleEnums.dependencyScope;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Dependency scope.
@@ -33,55 +37,53 @@ import static org.apache.maven.api.ExtensibleEnums.dependencyScope;
  */
 @Experimental
 @Immutable
-public interface DependencyScope extends ExtensibleEnum {
-
-    boolean isTransitive();
+public enum DependencyScope {
 
     /**
      * None. Allows you to declare dependencies (for example to alter reactor build order) but in reality dependencies
      * in this scope are not part of any build path scope.
      */
-    DependencyScope NONE = dependencyScope("none", false);
+    NONE("none", false),
 
     /**
      * Empty scope.
      */
-    DependencyScope EMPTY = dependencyScope("", false);
+    EMPTY("", false),
 
     /**
      * Compile only.
      */
-    DependencyScope COMPILE_ONLY = dependencyScope("compile-only", false);
+    COMPILE_ONLY("compile-only", false),
 
     /**
      * Compile.
      */
-    DependencyScope COMPILE = dependencyScope("compile", true);
+    COMPILE("compile", true),
 
     /**
      * Runtime.
      */
-    DependencyScope RUNTIME = dependencyScope("runtime", true);
+    RUNTIME("runtime", true),
 
     /**
      * Provided.
      */
-    DependencyScope PROVIDED = dependencyScope("provided", false);
+    PROVIDED("provided", false),
 
     /**
      * Test compile only.
      */
-    DependencyScope TEST_ONLY = dependencyScope("test-only", false);
+    TEST_ONLY("test-only", false),
 
     /**
      * Test.
      */
-    DependencyScope TEST = dependencyScope("test", false);
+    TEST("test", false),
 
     /**
      * Test runtime.
      */
-    DependencyScope TEST_RUNTIME = dependencyScope("test-runtime", true);
+    TEST_RUNTIME("test-runtime", true),
 
     /**
      * System scope.
@@ -89,5 +91,35 @@ public interface DependencyScope extends ExtensibleEnum {
      * Important: this scope {@code id} MUST BE KEPT in sync with label in
      * {@code org.eclipse.aether.util.artifact.Scopes#SYSTEM}.
      */
-    DependencyScope SYSTEM = dependencyScope("system", false);
+    SYSTEM("system", false);
+
+    private static final Map<String, DependencyScope> IDS = Collections.unmodifiableMap(
+            Stream.of(DependencyScope.values()).collect(Collectors.toMap(s -> s.id, s -> s)));
+
+    public static DependencyScope forId(String id) {
+        return IDS.get(id);
+    }
+
+    private final String id;
+    private final boolean transitive;
+
+    DependencyScope(String id, boolean transitive) {
+        this.id = id;
+        this.transitive = transitive;
+    }
+
+    /**
+     * The {@code id} uniquely represents a value for this extensible enum.
+     * This id should be used to compute the equality and hash code for the instance.
+     *
+     * @return the id
+     */
+    @Nonnull
+    public String id() {
+        return id;
+    }
+
+    public boolean isTransitive() {
+        return transitive;
+    }
 }
