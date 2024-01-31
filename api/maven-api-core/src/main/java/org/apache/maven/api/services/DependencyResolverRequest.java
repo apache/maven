@@ -22,9 +22,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.BuildPathScope;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Project;
-import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -35,7 +35,7 @@ import org.apache.maven.api.annotations.Nullable;
 public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
     @Nonnull
-    ResolutionScope getResolutionScope();
+    BuildPathScope getResolutionScope();
 
     @Nonnull
     static DependencyResolverRequestBuilder builder() {
@@ -44,11 +44,11 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
     @Nonnull
     static DependencyResolverRequest build(Session session, Project project) {
-        return build(session, project, ResolutionScope.PROJECT_RUNTIME);
+        return build(session, project, BuildPathScope.MAIN_RUNTIME);
     }
 
     @Nonnull
-    static DependencyResolverRequest build(Session session, Project project, ResolutionScope scope) {
+    static DependencyResolverRequest build(Session session, Project project, BuildPathScope scope) {
         return new DependencyResolverRequestBuilder()
                 .session(session)
                 .project(project)
@@ -58,11 +58,11 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
     @Nonnull
     static DependencyResolverRequest build(Session session, DependencyCoordinate dependency) {
-        return build(session, dependency, ResolutionScope.PROJECT_RUNTIME);
+        return build(session, dependency, BuildPathScope.MAIN_RUNTIME);
     }
 
     @Nonnull
-    static DependencyResolverRequest build(Session session, DependencyCoordinate dependency, ResolutionScope scope) {
+    static DependencyResolverRequest build(Session session, DependencyCoordinate dependency, BuildPathScope scope) {
         return new DependencyResolverRequestBuilder()
                 .session(session)
                 .dependency(dependency)
@@ -72,12 +72,12 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
     @Nonnull
     static DependencyResolverRequest build(Session session, List<DependencyCoordinate> dependencies) {
-        return build(session, dependencies, ResolutionScope.PROJECT_RUNTIME);
+        return build(session, dependencies, BuildPathScope.MAIN_RUNTIME);
     }
 
     @Nonnull
     static DependencyResolverRequest build(
-            Session session, List<DependencyCoordinate> dependencies, ResolutionScope scope) {
+            Session session, List<DependencyCoordinate> dependencies, BuildPathScope scope) {
         return new DependencyResolverRequestBuilder()
                 .session(session)
                 .dependencies(dependencies)
@@ -87,7 +87,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
     @NotThreadSafe
     class DependencyResolverRequestBuilder extends DependencyCollectorRequestBuilder {
-        ResolutionScope resolutionScope;
+        BuildPathScope resolutionScope;
 
         @Nonnull
         @Override
@@ -154,7 +154,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
         }
 
         @Nonnull
-        public DependencyResolverRequestBuilder resolutionScope(@Nonnull ResolutionScope resolutionScope) {
+        public DependencyResolverRequestBuilder resolutionScope(@Nonnull BuildPathScope resolutionScope) {
             this.resolutionScope = resolutionScope;
             return this;
         }
@@ -167,7 +167,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
         static class DefaultDependencyResolverRequest extends DefaultDependencyCollectorRequest
                 implements DependencyResolverRequest {
-            private final ResolutionScope resolutionScope;
+            private final BuildPathScope resolutionScope;
 
             DefaultDependencyResolverRequest(
                     Session session,
@@ -177,7 +177,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
                     Collection<DependencyCoordinate> dependencies,
                     Collection<DependencyCoordinate> managedDependencies,
                     boolean verbose,
-                    ResolutionScope resolutionScope) {
+                    BuildPathScope resolutionScope) {
                 super(session, project, rootArtifact, root, dependencies, managedDependencies, verbose);
                 this.resolutionScope = nonNull(resolutionScope, "resolutionScope cannot be null");
                 if (verbose) {
@@ -187,7 +187,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
             @Nonnull
             @Override
-            public ResolutionScope getResolutionScope() {
+            public BuildPathScope getResolutionScope() {
                 return resolutionScope;
             }
         }

@@ -24,12 +24,11 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.DependencyProperties;
-import org.apache.maven.api.Scope;
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.repository.internal.DefaultModelVersionParser;
 import org.eclipse.aether.artifact.ArtifactProperties;
 
@@ -117,8 +116,8 @@ public class DefaultDependency implements Dependency {
 
     @Nonnull
     @Override
-    public Scope getScope() {
-        return Scope.get(dependency.getScope());
+    public DependencyScope getScope() {
+        return session.requireDependencyScope(dependency.getScope());
     }
 
     @Nullable

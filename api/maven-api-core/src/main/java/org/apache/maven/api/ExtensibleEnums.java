@@ -97,7 +97,7 @@ abstract class ExtensibleEnums {
         }
 
         @Override
-        public Set<DependencyScope> getDependencyScopes() {
+        public Set<DependencyScope> dependencyScopes() {
             return dependencyScopes;
         }
     }

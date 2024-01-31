@@ -53,7 +53,7 @@ public class DefaultPackagingRegistry implements PackagingRegistry {
         if (lifecycleMapping == null) {
             return Optional.empty();
         }
-        Type type = typeRegistry.require(id);
+        Type type = typeRegistry.lookup(id).orElse(null);
         if (type == null) {
             return Optional.empty();
         }

@@ -39,7 +39,7 @@ public interface Dependency extends Artifact {
     DependencyProperties getDependencyProperties();
 
     @Nonnull
-    Scope getScope();
+    DependencyScope getScope();
 
     boolean isOptional();
 

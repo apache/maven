@@ -42,7 +42,7 @@ public interface BuildPathScope extends ExtensibleEnum {
     ProjectScope projectScope();
 
     @Nonnull
-    Set<DependencyScope> getDependencyScopes();
+    Set<DependencyScope> dependencyScopes();
 
     BuildPathScope MAIN_COMPILE = buildPathScope(
             "main-compile",

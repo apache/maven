@@ -29,6 +29,6 @@ public interface ExtensibleEnumRegistry<T extends ExtensibleEnum> extends Servic
     Optional<T> lookup(String id);
 
     default T require(String id) {
-        return lookup(id).orElseThrow(() -> new IllegalArgumentException("Unknown extensible enum value " + id));
+        return lookup(id).orElseThrow(() -> new IllegalArgumentException("Unknown extensible enum value '" + id + "'"));
     }
 }

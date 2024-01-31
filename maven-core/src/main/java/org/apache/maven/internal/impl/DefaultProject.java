@@ -27,8 +27,6 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.PackagingRegistry;
-import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
@@ -183,8 +181,8 @@ public class DefaultProject implements Project {
 
             @Nonnull
             @Override
-            public Scope getScope() {
-                return Scope.get(dependency.getScope());
+            public DependencyScope getScope() {
+                return session.requireDependencyScope(dependency.getScope());
             }
 
             @Override
