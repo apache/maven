@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
 @Named(PomTypeProvider.NAME)
@@ -35,7 +34,7 @@ public class PomTypeProvider implements Provider<Type> {
     private final Type type;
 
     public PomTypeProvider() {
-        this.type = new DefaultType(NAME, Language.NONE, "pom", null, new DefaultDependencyProperties());
+        this.type = new DefaultType(NAME, Language.NONE, "pom", null, false, false);
     }
 
     @Override

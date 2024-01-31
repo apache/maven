@@ -22,10 +22,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
 @Named(EjbTypeProvider.NAME)
@@ -36,12 +34,7 @@ public class EjbTypeProvider implements Provider<Type> {
     private final Type type;
 
     public EjbTypeProvider() {
-        this.type = new DefaultType(
-                NAME,
-                Language.JAVA_FAMILY,
-                "jar",
-                null,
-                new DefaultDependencyProperties(DependencyProperties.FLAG_BUILD_PATH_CONSTITUENT));
+        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "jar", null, true, false);
     }
 
     @Override

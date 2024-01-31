@@ -18,10 +18,10 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
 import org.eclipse.aether.artifact.ArtifactProperties;
@@ -30,35 +30,34 @@ import org.eclipse.aether.artifact.ArtifactType;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultType implements Type, ArtifactType {
+    private final String id;
+
     private final Language language;
 
     private final String extension;
 
     private final String classifier;
-
-    private final DependencyProperties dependencyProperties;
+    private final boolean buildPathConstituent;
+    private final boolean includesDependencies;
 
     public DefaultType(
             String id,
             Language language,
             String extension,
             String classifier,
-            DependencyProperties dependencyProperties) {
-        nonNull(id, "id");
-        nonNull(language, "language");
-        this.language = language;
+            boolean buildPathConstituent,
+            boolean includesDependencies) {
+        this.id = nonNull(id, "id");
+        this.language = nonNull(language, "language");
         this.extension = nonNull(extension, "extension");
         this.classifier = classifier;
-        nonNull(dependencyProperties, "dependencyProperties");
-        HashMap<String, String> props = new HashMap<>(dependencyProperties.asMap());
-        props.put(ArtifactProperties.TYPE, id);
-        props.put(ArtifactProperties.LANGUAGE, language.id());
-        this.dependencyProperties = new DefaultDependencyProperties(props);
+        this.buildPathConstituent = buildPathConstituent;
+        this.includesDependencies = includesDependencies;
     }
 
     @Override
     public String id() {
-        return dependencyProperties.asMap().get(ArtifactProperties.TYPE);
+        return id;
     }
 
     @Override
@@ -82,12 +81,22 @@ public class DefaultType implements Type, ArtifactType {
     }
 
     @Override
-    public DependencyProperties getDependencyProperties() {
-        return dependencyProperties;
+    public boolean isBuildPathConstituent() {
+        return this.buildPathConstituent;
+    }
+
+    @Override
+    public boolean isIncludesDependencies() {
+        return this.includesDependencies;
     }
 
     @Override
     public Map<String, String> getProperties() {
-        return getDependencyProperties().asMap();
+        Map<String, String> properties = new HashMap<>();
+        properties.put(ArtifactProperties.TYPE, this.id);
+        properties.put(ArtifactProperties.LANGUAGE, this.language.id());
+        properties.put(ArtifactProperties.INCLUDES_DEPENDENCIES, String.valueOf(includesDependencies));
+        properties.put(ArtifactProperties.CONSTITUTES_BUILD_PATH, String.valueOf(buildPathConstituent));
+        return Collections.unmodifiableMap(properties);
     }
 }

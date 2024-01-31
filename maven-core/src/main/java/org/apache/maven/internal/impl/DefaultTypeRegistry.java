@@ -22,12 +22,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.LanguageRegistry;
@@ -89,19 +87,13 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                 type = legacyTypes.computeIfAbsent(id, k -> {
                     // Copy data as the ArtifactHandler is not immutable, but Type should be.
                     ArtifactHandler handler = manager.getArtifactHandler(id);
-                    ArrayList<String> flags = new ArrayList<>();
-                    if (handler.isAddedToClasspath()) {
-                        flags.add(DependencyProperties.FLAG_BUILD_PATH_CONSTITUENT);
-                    }
-                    if (handler.isIncludesDependencies()) {
-                        flags.add(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
-                    }
                     return new DefaultType(
                             id,
                             languageRegistry.require(handler.getLanguage()),
                             handler.getExtension(),
                             handler.getClassifier(),
-                            new DefaultDependencyProperties(flags));
+                            handler.isAddedToClasspath(),
+                            handler.isIncludesDependencies());
                 });
             }
             return type;

@@ -81,9 +81,7 @@ public interface Type extends ExtensibleEnum {
      *
      * @return if the artifact should be added to the build path
      */
-    default boolean isBuildPathConstituent() {
-        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_BUILD_PATH_CONSTITUENT);
-    }
+    boolean isBuildPathConstituent();
 
     /**
      * Specifies if the artifact already embeds its own dependencies.
@@ -92,15 +90,5 @@ public interface Type extends ExtensibleEnum {
      *
      * @return if the artifact's dependencies are included in the artifact
      */
-    default boolean isIncludesDependencies() {
-        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
-    }
-
-    /**
-     * Gets the default properties associated with this type.
-     *
-     * @return the default properties, never {@code null}.
-     */
-    @Nonnull
-    DependencyProperties getDependencyProperties();
+    boolean isIncludesDependencies();
 }

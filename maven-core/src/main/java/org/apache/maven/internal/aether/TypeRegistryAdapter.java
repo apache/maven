@@ -45,7 +45,8 @@ class TypeRegistryAdapter implements ArtifactTypeRegistry {
                     type.getLanguage(),
                     type.getExtension(),
                     type.getClassifier(),
-                    type.getDependencyProperties());
+                    type.isBuildPathConstituent(),
+                    type.isIncludesDependencies());
         }
         return null;
     }
