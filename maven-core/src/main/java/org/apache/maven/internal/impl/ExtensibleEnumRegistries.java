@@ -37,18 +37,18 @@ public class ExtensibleEnumRegistries {
 
     @Named
     @SessionScoped
-    public static class DefaultBuildPathScopeRegistry
-            extends DefaultExtensibleEnumRegistry<BuildPathScope, BuildPathScopeProvider>
-            implements BuildPathScopeRegistry {
+    public static class DefaultPathScopeRegistry
+            extends DefaultExtensibleEnumRegistry<PathScope, PathScopeProvider>
+            implements PathScopeRegistry {
 
         @Inject
-        public DefaultBuildPathScopeRegistry(List<BuildPathScopeProvider> providers) {
+        public DefaultPathScopeRegistry(List<PathScopeProvider> providers) {
             super(
                     providers,
-                    BuildPathScope.MAIN_COMPILE,
-                    BuildPathScope.MAIN_RUNTIME,
-                    BuildPathScope.TEST_COMPILE,
-                    BuildPathScope.TEST_RUNTIME);
+                    PathScope.MAIN_COMPILE,
+                    PathScope.MAIN_RUNTIME,
+                    PathScope.TEST_COMPILE,
+                    PathScope.TEST_RUNTIME);
         }
     }
 

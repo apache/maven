@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.spi;
+package org.apache.maven.api.services;
 
-import org.apache.maven.api.BuildPathScope;
+import org.apache.maven.api.PathScope;
 
-public interface BuildPathScopeProvider extends ExtensibleEnumProvider<BuildPathScope> {}
+public interface PathScopeRegistry extends ExtensibleEnumRegistry<PathScope> {}

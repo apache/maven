@@ -51,7 +51,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultDependencyResolver implements DependencyResolver {
 
     @Override
-    public List<Node> flatten(Session s, Node node, BuildPathScope scope) throws DependencyResolverException {
+    public List<Node> flatten(Session s, Node node, PathScope scope) throws DependencyResolverException {
         InternalSession session = InternalSession.from(s);
         DependencyNode root = cast(AbstractNode.class, node, "node").getDependencyNode();
         List<DependencyNode> dependencies = session.getRepositorySystem()
@@ -60,7 +60,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return map(dependencies, session::getNode);
     }
 
-    private static DependencyFilter getScopeDependencyFilter(BuildPathScope scope) {
+    private static DependencyFilter getScopeDependencyFilter(PathScope scope) {
         Set<String> scopes =
                 scope.dependencyScopes().stream().map(DependencyScope::id).collect(Collectors.toSet());
         return (n, p) -> {
@@ -124,7 +124,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return Stream.concat(Stream.of(node), node.getChildren().stream().flatMap(this::stream));
     }
 
-    private DependencyResolutionResult resolveDependencies(Session session, Project project, BuildPathScope scope) {
+    private DependencyResolutionResult resolveDependencies(Session session, Project project, PathScope scope) {
         Collection<String> toResolve = toScopes(scope);
         try {
             LifecycleDependencyResolver lifecycleDependencyResolver =
@@ -145,7 +145,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return ((DefaultProject) project).getProject();
     }
 
-    private Collection<String> toScopes(BuildPathScope scope) {
+    private Collection<String> toScopes(PathScope scope) {
         return map(scope.dependencyScopes(), DependencyScope::id);
     }
 

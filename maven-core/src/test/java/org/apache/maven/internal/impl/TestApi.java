@@ -194,7 +194,7 @@ class TestApi {
         assertNotNull(root);
 
         DependencyResolverResult result =
-                session.getService(DependencyResolver.class).resolve(session, project, BuildPathScope.MAIN_RUNTIME);
+                session.getService(DependencyResolver.class).resolve(session, project, PathScope.MAIN_RUNTIME);
         assertNotNull(result);
         List<Dependency> deps = new ArrayList<>(result.getDependencies().keySet());
         List<Dependency> deps2 = result.getNodes().stream()

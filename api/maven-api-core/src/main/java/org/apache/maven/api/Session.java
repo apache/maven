@@ -427,11 +427,11 @@ public interface Session {
     /**
      * Shortcut for {@code getService(DependencyResolver.class).flatten(...)}.
      *
-     * @see org.apache.maven.api.services.DependencyResolver#flatten(Session, Node, BuildPathScope)
+     * @see org.apache.maven.api.services.DependencyResolver#flatten(Session, Node, PathScope)
      * @throws org.apache.maven.api.services.DependencyResolverException if the dependency flattening failed
      */
     @Nonnull
-    List<Node> flattenDependencies(@Nonnull Node node, @Nonnull BuildPathScope scope);
+    List<Node> flattenDependencies(@Nonnull Node node, @Nonnull PathScope scope);
 
     @Nonnull
     List<Path> resolveDependencies(@Nonnull DependencyCoordinate dependencyCoordinate);
@@ -440,7 +440,7 @@ public interface Session {
     List<Path> resolveDependencies(@Nonnull List<DependencyCoordinate> dependencyCoordinates);
 
     @Nonnull
-    List<Path> resolveDependencies(@Nonnull Project project, @Nonnull BuildPathScope scope);
+    List<Path> resolveDependencies(@Nonnull Project project, @Nonnull PathScope scope);
 
     /**
      * Resolves an artifact's meta version (if any) to a concrete version. For example, resolves "1.0-SNAPSHOT"
@@ -512,5 +512,5 @@ public interface Session {
 
     DependencyScope requireDependencyScope(String id);
 
-    BuildPathScope requireBuildPathScope(String id);
+    PathScope requireBuildPathScope(String id);
 }

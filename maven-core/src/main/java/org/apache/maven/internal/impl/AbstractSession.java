@@ -462,7 +462,7 @@ public abstract class AbstractSession implements InternalSession {
 
     @Nonnull
     @Override
-    public List<Node> flattenDependencies(@Nonnull Node node, @Nonnull BuildPathScope scope) {
+    public List<Node> flattenDependencies(@Nonnull Node node, @Nonnull PathScope scope) {
         return getService(DependencyResolver.class).flatten(this, node, scope);
     }
 
@@ -477,7 +477,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public List<Path> resolveDependencies(Project project, BuildPathScope scope) {
+    public List<Path> resolveDependencies(Project project, PathScope scope) {
         return getService(DependencyResolver.class)
                 .resolve(this, project, scope)
                 .getPaths();
@@ -545,7 +545,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public BuildPathScope requireBuildPathScope(String id) {
-        return getService(BuildPathScopeRegistry.class).require(id);
+    public PathScope requireBuildPathScope(String id) {
+        return getService(PathScopeRegistry.class).require(id);
     }
 }

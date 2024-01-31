@@ -24,7 +24,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
-import static org.apache.maven.api.ExtensibleEnums.buildPathScope;
+import static org.apache.maven.api.ExtensibleEnums.pathScope;
 
 /**
  * Build path scope.
@@ -36,7 +36,7 @@ import static org.apache.maven.api.ExtensibleEnums.buildPathScope;
  */
 @Experimental
 @Immutable
-public interface BuildPathScope extends ExtensibleEnum {
+public interface PathScope extends ExtensibleEnum {
 
     @Nonnull
     ProjectScope projectScope();
@@ -44,7 +44,7 @@ public interface BuildPathScope extends ExtensibleEnum {
     @Nonnull
     Set<DependencyScope> dependencyScopes();
 
-    BuildPathScope MAIN_COMPILE = buildPathScope(
+    PathScope MAIN_COMPILE = pathScope(
             "main-compile",
             ProjectScope.MAIN,
             DependencyScope.EMPTY,
@@ -52,10 +52,10 @@ public interface BuildPathScope extends ExtensibleEnum {
             DependencyScope.COMPILE,
             DependencyScope.PROVIDED);
 
-    BuildPathScope MAIN_RUNTIME = buildPathScope(
+    PathScope MAIN_RUNTIME = pathScope(
             "main-runtime", ProjectScope.MAIN, DependencyScope.EMPTY, DependencyScope.COMPILE, DependencyScope.RUNTIME);
 
-    BuildPathScope TEST_COMPILE = buildPathScope(
+    PathScope TEST_COMPILE = pathScope(
             "test-compile",
             ProjectScope.TEST,
             DependencyScope.EMPTY,
@@ -64,7 +64,7 @@ public interface BuildPathScope extends ExtensibleEnum {
             DependencyScope.TEST_ONLY,
             DependencyScope.TEST);
 
-    BuildPathScope TEST_RUNTIME = buildPathScope(
+    PathScope TEST_RUNTIME = pathScope(
             "test-runtime",
             ProjectScope.TEST,
             DependencyScope.EMPTY,
