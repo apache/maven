@@ -20,9 +20,9 @@ package org.apache.maven.api.services;
 
 import java.util.List;
 
-import org.apache.maven.api.PathScope;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Node;
+import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;

@@ -37,8 +37,7 @@ public class ExtensibleEnumRegistries {
 
     @Named
     @SessionScoped
-    public static class DefaultPathScopeRegistry
-            extends DefaultExtensibleEnumRegistry<PathScope, PathScopeProvider>
+    public static class DefaultPathScopeRegistry extends DefaultExtensibleEnumRegistry<PathScope, PathScopeProvider>
             implements PathScopeRegistry {
 
         @Inject

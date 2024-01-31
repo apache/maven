@@ -545,7 +545,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public PathScope requireBuildPathScope(String id) {
+    public PathScope requirePathScope(String id) {
         return getService(PathScopeRegistry.class).require(id);
     }
 }

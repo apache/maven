@@ -77,7 +77,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
 
         if (request.getProject().isPresent()) {
             DependencyResolutionResult result = resolveDependencies(
-                    request.getSession(), request.getProject().get(), request.getResolutionScope());
+                    request.getSession(), request.getProject().get(), request.getPathScope());
 
             Map<org.eclipse.aether.graph.Dependency, org.eclipse.aether.graph.DependencyNode> nodes = stream(
                             result.getDependencyGraph())
@@ -100,7 +100,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
 
         DependencyCollectorResult collectorResult =
                 session.getService(DependencyCollector.class).collect(request);
-        List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getResolutionScope());
+        List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getPathScope());
         List<Dependency> deps =
                 nodes.stream().map(Node::getDependency).filter(Objects::nonNull).collect(Collectors.toList());
         List<ArtifactCoordinate> coordinates =

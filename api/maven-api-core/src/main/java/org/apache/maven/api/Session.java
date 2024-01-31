@@ -512,5 +512,5 @@ public interface Session {
 
     DependencyScope requireDependencyScope(String id);
 
-    PathScope requireBuildPathScope(String id);
+    PathScope requirePathScope(String id);
 }
