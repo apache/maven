@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api;
 
+import java.util.Set;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
@@ -34,17 +36,13 @@ import org.apache.maven.api.model.Dependency;
  * <p>
  * For example, the type {@code java-source} has a {@code jar} extension and a
  * {@code sources} classifier. The artifact and its dependencies should be added
- * to the classpath.
+ * to the build path.
  *
  * @since 4.0.0
  */
 @Experimental
 @Immutable
-public interface Type {
-
-    String LANGUAGE_NONE = "none";
-    String LANGUAGE_JAVA = "java";
-
+public interface Type extends ExtensibleEnum {
     /**
      * Artifact type name for a POM file.
      */
@@ -101,14 +99,15 @@ public interface Type {
      * @return the id of this type, never {@code null}.
      */
     @Nonnull
-    String getId();
+    String id();
 
     /**
      * Returns the dependency type language.
      *
      * @return the language of this type, never {@code null}.
      */
-    String getLanguage();
+    @Nonnull
+    Language getLanguage();
 
     /**
      * Get the file extension of artifacts of this type.
@@ -135,15 +134,20 @@ public interface Type {
      *
      * @return if the artifact's dependencies are included in the artifact
      */
-    default boolean isIncludesDependencies() {
-        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
-    }
+    boolean isIncludesDependencies();
 
     /**
-     * Gets the default properties associated with this dependency type.
+     * Types of path (class-path, module-path, …) where the dependency can be placed.
+     * For most deterministic builds, the array length should be 1. In such case,
+     * the dependency will be unconditionally placed on the specified type of path
+     * and no heuristic rule will be involved.
      *
-     * @return the default properties, never {@code null}.
+     * <p>It is nevertheless common to specify two or more types of path. For example,
+     * a Java library may be compatible with either the class-path or the module-path,
+     * and the user may have provided no instruction about which type to use. In such
+     * case, the plugin may apply rules for choosing a path. See for example
+     * {@link JavaPathType#CLASSES} and {@link JavaPathType#MODULES}.</p>
      */
     @Nonnull
-    DependencyProperties getDependencyProperties();
+    Set<PathType> getPathTypes();
 }

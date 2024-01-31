@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Node;
+import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Project;
-import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -35,7 +35,7 @@ import org.apache.maven.api.annotations.Nonnull;
 @Experimental
 public interface DependencyResolver extends Service {
 
-    List<Node> flatten(Session session, Node node, ResolutionScope scope) throws DependencyResolverException;
+    List<Node> flatten(Session session, Node node, PathScope scope) throws DependencyResolverException;
 
     /**
      * This method collects, flattens and resolves the dependencies.
@@ -47,7 +47,7 @@ public interface DependencyResolver extends Service {
      * @throws ArtifactResolverException
      *
      * @see DependencyCollector#collect(DependencyCollectorRequest)
-     * @see #flatten(Session, Node, ResolutionScope)
+     * @see #flatten(Session, Node, PathScope)
      * @see ArtifactResolver#resolve(ArtifactResolverRequest)
      */
     DependencyResolverResult resolve(DependencyResolverRequest request)
@@ -60,7 +60,7 @@ public interface DependencyResolver extends Service {
 
     @Nonnull
     default DependencyResolverResult resolve(
-            @Nonnull Session session, @Nonnull Project project, @Nonnull ResolutionScope scope) {
+            @Nonnull Session session, @Nonnull Project project, @Nonnull PathScope scope) {
         return resolve(DependencyResolverRequest.build(session, project, scope));
     }
 
@@ -71,7 +71,7 @@ public interface DependencyResolver extends Service {
 
     @Nonnull
     default DependencyResolverResult resolve(
-            @Nonnull Session session, @Nonnull DependencyCoordinate dependency, @Nonnull ResolutionScope scope) {
+            @Nonnull Session session, @Nonnull DependencyCoordinate dependency, @Nonnull PathScope scope) {
         return resolve(DependencyResolverRequest.build(session, dependency, scope));
     }
 
@@ -83,9 +83,7 @@ public interface DependencyResolver extends Service {
 
     @Nonnull
     default DependencyResolverResult resolve(
-            @Nonnull Session session,
-            @Nonnull List<DependencyCoordinate> dependencies,
-            @Nonnull ResolutionScope scope) {
+            @Nonnull Session session, @Nonnull List<DependencyCoordinate> dependencies, @Nonnull PathScope scope) {
         return resolve(DependencyResolverRequest.build(session, dependencies, scope));
     }
 }

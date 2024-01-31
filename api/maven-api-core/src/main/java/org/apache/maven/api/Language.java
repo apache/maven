@@ -18,49 +18,30 @@
  */
 package org.apache.maven.api;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+
+import static org.apache.maven.api.ExtensibleEnums.language;
 
 /**
- * Scope for a dependency
+ * Language.
+ * <p>
+ * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
+ * can be used as keys.
  *
  * @since 4.0.0
  */
 @Experimental
-public enum Scope {
-    EMPTY(""),
-    COMPILE_ONLY("compile-only"),
-    COMPILE("compile"),
-    RUNTIME("runtime"),
-    PROVIDED("provided"),
-    TEST_COMPILE_ONLY("test-compile-only"),
-    TEST("test"),
-    TEST_RUNTIME("test-runtime"),
-    IMPORT("import"); // TODO: v4: remove import scope somehow
+@Immutable
+@SuppressWarnings("checkstyle:InterfaceIsType")
+public interface Language extends ExtensibleEnum {
 
-    private final String id;
+    /**
+     * The "none" language. It is not versioned, family is same to itself, and compatible with itself only.
+     * In turn, every {@link Language} implementation must be compatible with {@code NONE} language.
+     */
+    Language NONE = language("none");
 
-    private static final Map<String, Scope> SCOPES;
-
-    static {
-        Map<String, Scope> scopes = new HashMap<>();
-        for (Scope s : Scope.values()) {
-            scopes.put(s.id, s);
-        }
-        SCOPES = scopes;
-    }
-
-    Scope(String id) {
-        this.id = id;
-    }
-
-    public String id() {
-        return this.id;
-    }
-
-    public static Scope get(String scope) {
-        return SCOPES.get(scope);
-    }
+    // TODO: this should be moved out from here to Java Support (builtin into core)
+    Language JAVA_FAMILY = language("java");
 }

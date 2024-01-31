@@ -33,14 +33,13 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.*;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
-import org.apache.maven.api.ResolutionScope;
-import org.apache.maven.api.Scope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.*;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -59,7 +58,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultDependencyResolver implements DependencyResolver {
 
     @Override
-    public List<Node> flatten(Session s, Node node, ResolutionScope scope) throws DependencyResolverException {
+    public List<Node> flatten(Session s, Node node, PathScope scope) throws DependencyResolverException {
         InternalSession session = InternalSession.from(s);
         DependencyNode root = cast(AbstractNode.class, node, "node").getDependencyNode();
         List<DependencyNode> dependencies = session.getRepositorySystem()
@@ -68,8 +67,9 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return map(dependencies, session::getNode);
     }
 
-    private static DependencyFilter getScopeDependencyFilter(ResolutionScope scope) {
-        Set<String> scopes = scope.scopes().stream().map(Scope::id).collect(Collectors.toSet());
+    private static DependencyFilter getScopeDependencyFilter(PathScope scope) {
+        Set<String> scopes =
+                scope.dependencyScopes().stream().map(DependencyScope::id).collect(Collectors.toSet());
         return (n, p) -> {
             org.eclipse.aether.graph.Dependency d = n.getDependency();
             return d == null || scopes.contains(d.getScope());
@@ -91,7 +91,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         final PathModularizationCache cache = new PathModularizationCache(); // TODO: should be project-wide cache.
         if (request.getProject().isPresent()) {
             final DependencyResolutionResult resolved = resolveDependencies(
-                    request.getSession(), request.getProject().get(), request.getResolutionScope());
+                    request.getSession(), request.getProject().get(), request.getPathScope());
 
             final Map<org.eclipse.aether.graph.Dependency, org.eclipse.aether.graph.DependencyNode> nodes = stream(
                             resolved.getDependencyGraph())
@@ -116,7 +116,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
 
         final DependencyCollectorResult collectorResult =
                 session.getService(DependencyCollector.class).collect(request);
-        final List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getResolutionScope());
+        final List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getPathScope());
         final List<ArtifactCoordinate> coordinates = nodes.stream()
                 .map(Node::getDependency)
                 .filter(Objects::nonNull)
@@ -141,8 +141,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return Stream.concat(Stream.of(node), node.getChildren().stream().flatMap(DefaultDependencyResolver::stream));
     }
 
-    private static DependencyResolutionResult resolveDependencies(
-            final Session session, final Project project, final ResolutionScope scope) {
+    private DependencyResolutionResult resolveDependencies(Session session, Project project, PathScope scope) {
         Collection<String> toResolve = toScopes(scope);
         try {
             LifecycleDependencyResolver lifecycleDependencyResolver =
@@ -163,8 +162,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return ((DefaultProject) project).getProject();
     }
 
-    private static Collection<String> toScopes(final ResolutionScope scope) {
-        return map(scope.scopes(), Scope::id);
+    private Collection<String> toScopes(PathScope scope) {
+        return map(scope.dependencyScopes(), DependencyScope::id);
     }
 
     private static DependencyResolverException cannotReadModuleInfo(final Path path, final IOException cause) {

@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.services.TypeRegistry;
@@ -65,7 +64,7 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
     @Override
     public ArtifactHandler getArtifactHandler(String id) {
         return allHandlers.computeIfAbsent(id, k -> {
-            Type type = typeRegistry.getType(id);
+            Type type = typeRegistry.require(id);
             return new DefaultArtifactHandler(
                     id,
                     type.getExtension(),
@@ -73,11 +72,14 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
                     null,
                     null,
                     type.isIncludesDependencies(),
-                    type.getLanguage(),
-                    type.getDependencyProperties()
-                            .checkContains(DependencyProperties.PATH_TYPES, JavaPathType.CLASSES));
+                    type.getLanguage().id(),
+                    type.getPathTypes().contains(JavaPathType.CLASSES));
             // TODO: watch out for module path
         });
+
+        // Note: here, type decides is artifact added to "build path" (for example during resolution)
+        // and "build path" is intermediate data that is used to create actual Java classpath/modulepath
+        // but to create those, proper filtering should happen via Type properties.
     }
 
     @Override

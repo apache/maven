@@ -18,58 +18,57 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.util.*;
 import java.util.Map;
 
-import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.JavaPathType;
+import org.apache.maven.api.Language;
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.Type;
+import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultType implements Type, ArtifactType {
+    private final String id;
+
+    private final Language language;
+
     private final String extension;
 
     private final String classifier;
-
-    private final DependencyProperties dependencyProperties;
+    private final boolean includesDependencies;
+    private final Set<PathType> pathTypes;
 
     public DefaultType(
             String id,
-            String language,
+            Language language,
             String extension,
             String classifier,
-            DependencyProperties dependencyProperties) {
-        nonNull(id, "id");
-        nonNull(language, "language");
+            boolean includesDependencies,
+            PathType... pathTypes) {
+        this.id = nonNull(id, "id");
+        this.language = nonNull(language, "language");
         this.extension = nonNull(extension, "extension");
         this.classifier = classifier;
-        nonNull(dependencyProperties, "dependencyProperties");
-        DefaultDependencyProperties.Builder props = new DefaultDependencyProperties.Builder()
-                .setAll(dependencyProperties)
-                .set(DependencyProperties.TYPE, id)
-                .set(DependencyProperties.LANGUAGE, language);
-        this.dependencyProperties = props.build();
+        this.includesDependencies = includesDependencies;
+        this.pathTypes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(pathTypes)));
     }
 
-    public DefaultType(String id, String language, String extension, String classifier, PathType... pathTypes) {
-        this.extension = nonNull(extension, "extension");
-        this.classifier = classifier;
-        dependencyProperties = new DefaultDependencyProperties.Builder()
-                .set(DependencyProperties.TYPE, id)
-                .set(DependencyProperties.LANGUAGE, language)
-                .setElements(DependencyProperties.PATH_TYPES, pathTypes)
-                .build();
+    @Override
+    public String id() {
+        return id;
     }
 
     @Override
     public String getId() {
-        return dependencyProperties.get(DependencyProperties.TYPE).orElse(null);
+        return id();
     }
 
     @Override
-    public String getLanguage() {
-        return dependencyProperties.get(DependencyProperties.LANGUAGE).orElse(null);
+    public Language getLanguage() {
+        return language;
     }
 
     @Override
@@ -83,12 +82,22 @@ public class DefaultType implements Type, ArtifactType {
     }
 
     @Override
-    public DependencyProperties getDependencyProperties() {
-        return dependencyProperties;
+    public boolean isIncludesDependencies() {
+        return this.includesDependencies;
+    }
+
+    public Set<PathType> getPathTypes() {
+        return this.pathTypes;
     }
 
     @Override
     public Map<String, String> getProperties() {
-        return getDependencyProperties().asMap();
+        Map<String, String> properties = new HashMap<>();
+        properties.put(ArtifactProperties.TYPE, this.id);
+        properties.put(ArtifactProperties.LANGUAGE, this.language.id());
+        properties.put(ArtifactProperties.INCLUDES_DEPENDENCIES, String.valueOf(includesDependencies));
+        properties.put(
+                ArtifactProperties.CONSTITUTES_BUILD_PATH, String.valueOf(pathTypes.contains(JavaPathType.CLASSES)));
+        return Collections.unmodifiableMap(properties);
     }
 }

@@ -23,6 +23,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.JavaPathType;
+import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
 import org.apache.maven.internal.impl.DefaultType;
 
@@ -39,7 +40,7 @@ public class MavenPluginTypeProvider implements Provider<Type> {
     private final Type type;
 
     public MavenPluginTypeProvider() {
-        this.type = new DefaultType(NAME, Type.LANGUAGE_JAVA, "jar", null, JavaPathType.CLASSES);
+        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES);
     }
 
     @Override

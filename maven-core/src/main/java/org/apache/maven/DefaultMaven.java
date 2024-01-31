@@ -59,8 +59,6 @@ import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.graph.ProjectSelector;
-import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
-import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -71,10 +69,13 @@ import org.apache.maven.model.building.Result;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.resolver.MavenChainedWorkspaceReader;
+import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
@@ -98,7 +99,7 @@ public class DefaultMaven implements Maven {
 
     private final SessionScope sessionScope;
 
-    private final DefaultRepositorySystemSessionFactory repositorySessionFactory;
+    private final RepositorySystemSessionFactory repositorySessionFactory;
 
     private final GraphBuilder graphBuilder;
 
@@ -110,6 +111,8 @@ public class DefaultMaven implements Maven {
 
     private final DefaultSessionFactory defaultSessionFactory;
 
+    private final WorkspaceReader ideWorkspaceReader;
+
     private final ProjectSelector projectSelector;
 
     @Inject
@@ -120,12 +123,13 @@ public class DefaultMaven implements Maven {
             ExecutionEventCatapult eventCatapult,
             LegacySupport legacySupport,
             SessionScope sessionScope,
-            DefaultRepositorySystemSessionFactory repositorySessionFactory,
+            RepositorySystemSessionFactory repositorySessionFactory,
             @Named(GraphBuilder.HINT) GraphBuilder graphBuilder,
             BuildResumptionAnalyzer buildResumptionAnalyzer,
             BuildResumptionDataRepository buildResumptionDataRepository,
             SuperPomProvider superPomProvider,
-            DefaultSessionFactory defaultSessionFactory) {
+            DefaultSessionFactory defaultSessionFactory,
+            @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader) {
         this.lookup = lookup;
         this.lifecycleStarter = lifecycleStarter;
         this.eventCatapult = eventCatapult;
@@ -136,6 +140,7 @@ public class DefaultMaven implements Maven {
         this.buildResumptionAnalyzer = buildResumptionAnalyzer;
         this.buildResumptionDataRepository = buildResumptionDataRepository;
         this.superPomProvider = superPomProvider;
+        this.ideWorkspaceReader = ideWorkspaceReader;
         this.defaultSessionFactory = defaultSessionFactory;
         this.projectSelector = new ProjectSelector(); // if necessary switch to DI
     }
@@ -209,7 +214,8 @@ public class DefaultMaven implements Maven {
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        MavenChainedWorkspaceReader chainedWorkspaceReader = new MavenChainedWorkspaceReader();
+        MavenChainedWorkspaceReader chainedWorkspaceReader =
+                new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
         try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
             MavenSession session = new MavenSession(closeableSession, request, result);
             session.setSession(defaultSessionFactory.getSession(session));
@@ -238,8 +244,7 @@ public class DefaultMaven implements Maven {
         }
 
         try {
-            WorkspaceReader reactorReader = lookup.lookup(WorkspaceReader.class, ReactorReader.HINT);
-            chainedWorkspaceReader.setReaders(Collections.singletonList(reactorReader));
+            chainedWorkspaceReader.addReader(lookup.lookup(WorkspaceReader.class, ReactorReader.HINT));
         } catch (LookupException e) {
             return addExceptionToResult(result, e);
         }
@@ -336,7 +341,7 @@ public class DefaultMaven implements Maven {
         // 1) Reactor workspace reader
         WorkspaceReader reactorReader = lookup.lookup(WorkspaceReader.class, ReactorReader.HINT);
         workspaceReaders.add(reactorReader);
-        // 2) Repository system session-scoped workspace reader
+        // 2) Repository system session-scoped workspace reader (contains ide and exec request reader)
         for (WorkspaceReader repoWorkspaceReader : chainedWorkspaceReader.getReaders()) {
             if (repoWorkspaceReader != null && repoWorkspaceReader != reactorReader) {
                 workspaceReaders.add(repoWorkspaceReader);

@@ -16,15 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.aether;
+package org.apache.maven.resolver;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.maven.model.Model;
@@ -37,6 +32,9 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * A maven workspace reader that delegates to a chain of other readers, effectively aggregating their contents.
+ * <p>
+ * This class, while technically is not immutable, should be considered as such once set up. If not mutated, it is also
+ * thread-safe. <em>The mutation of this class instances should happen beforehand their use in session</em>.
  */
 public class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
 
@@ -102,13 +100,23 @@ public class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
     }
 
     public void setReaders(Collection<WorkspaceReader> readers) {
-        this.readers = Collections.unmodifiableList(new ArrayList<>(readers));
+        requireNonNull(readers, "readers");
+        // skip possible null entries
+        this.readers = Collections.unmodifiableList(
+                new ArrayList<>(readers.stream().filter(Objects::nonNull).collect(Collectors.toList())));
         Key key = new Key(this.readers);
         this.repository = new WorkspaceRepository(key.getContentType(), key);
     }
 
     public List<WorkspaceReader> getReaders() {
         return readers;
+    }
+
+    public void addReader(WorkspaceReader workspaceReader) {
+        requireNonNull(workspaceReader, "workspaceReader");
+        ArrayList<WorkspaceReader> newReaders = new ArrayList<>(this.readers);
+        newReaders.add(workspaceReader);
+        setReaders(newReaders);
     }
 
     private static class Key {

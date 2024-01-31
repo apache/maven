@@ -22,9 +22,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.DependencyProperties;
+import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultDependencyProperties;
 import org.apache.maven.internal.impl.DefaultType;
 
 @Named(ParTypeProvider.NAME)
@@ -35,12 +34,7 @@ public class ParTypeProvider implements Provider<Type> {
     private final Type type;
 
     public ParTypeProvider() {
-        this.type = new DefaultType(
-                NAME,
-                Type.LANGUAGE_JAVA,
-                "par",
-                null,
-                new DefaultDependencyProperties(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES));
+        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "par", null, true);
     }
 
     @Override

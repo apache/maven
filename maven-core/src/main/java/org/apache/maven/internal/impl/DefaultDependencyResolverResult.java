@@ -30,10 +30,10 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import org.apache.maven.api.Dependency;
-import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathType;
+import org.apache.maven.api.services.DependencyResolverRequest;
 import org.apache.maven.api.services.DependencyResolverResult;
 
 /**
@@ -227,9 +227,8 @@ final class DefaultDependencyResolverResult implements DependencyResolverResult 
          * because this type depends on whether a module of the same name has already
          * been added on the module-type.
          */
-        final DependencyProperties properties = dep.getDependencyProperties();
-        final Set<PathType> pathTypes =
-                properties.getOrDefault(DependencyProperties.PATH_TYPES, Collections.emptySet());
+        // final DependencyProperties properties = dep.getDependencyProperties();
+        final Set<PathType> pathTypes = dep.getType().getPathTypes();
         if (containsPatches(pathTypes)) {
             if (outputModules == null) {
                 // For telling users that it is too late for setting the output directory.

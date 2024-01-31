@@ -23,7 +23,6 @@ import java.util.Collection;
 import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.services.TypeRegistry;
 import org.eclipse.aether.artifact.ArtifactProperties;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -73,13 +72,13 @@ public class DefaultDependencyCoordinate implements DependencyCoordinate {
         String type = dependency
                 .getArtifact()
                 .getProperty(ArtifactProperties.TYPE, dependency.getArtifact().getExtension());
-        return session.getService(TypeRegistry.class).getType(type);
+        return session.requireType(type);
     }
 
     @Nonnull
     @Override
-    public Scope getScope() {
-        return Scope.get(dependency.getScope());
+    public DependencyScope getScope() {
+        return session.requireDependencyScope(dependency.getScope());
     }
 
     @Nullable

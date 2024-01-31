@@ -18,6 +18,9 @@
  */
 package org.apache.maven.repository.internal;
 
+import org.apache.maven.repository.internal.scopes.MavenDependencyContextRefiner;
+import org.apache.maven.repository.internal.scopes.MavenScopeDeriver;
+import org.apache.maven.repository.internal.scopes.MavenScopeSelector;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
@@ -34,12 +37,8 @@ import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
-import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
-import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
-import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
-import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 import static java.util.Objects.requireNonNull;
@@ -49,7 +48,9 @@ import static java.util.Objects.requireNonNull;
  * assist those clients that employ the repository system outside of an IoC container, Maven plugins should instead
  * always use regular dependency injection to acquire the repository system.
  *
+ * @deprecated See {@link MavenSessionBuilderSupplier}
  */
+@Deprecated
 public final class MavenRepositorySystemUtils {
 
     private MavenRepositorySystemUtils() {
@@ -78,9 +79,9 @@ public final class MavenRepositorySystemUtils {
         session.setDependencySelector(depFilter);
 
         DependencyGraphTransformer transformer = new ConflictResolver(
-                new NearestVersionSelector(), new JavaScopeSelector(),
-                new SimpleOptionalitySelector(), new JavaScopeDeriver());
-        transformer = new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner());
+                new NearestVersionSelector(), new MavenScopeSelector(),
+                new SimpleOptionalitySelector(), new MavenScopeDeriver());
+        transformer = new ChainedDependencyGraphTransformer(transformer, new MavenDependencyContextRefiner());
         session.setDependencyGraphTransformer(transformer);
 
         session.setArtifactTypeRegistry(newArtifactTypeRegistry());
@@ -138,9 +139,9 @@ public final class MavenRepositorySystemUtils {
         session.setDependencySelector(depFilter);
 
         DependencyGraphTransformer transformer = new ConflictResolver(
-                new NearestVersionSelector(), new JavaScopeSelector(),
-                new SimpleOptionalitySelector(), new JavaScopeDeriver());
-        transformer = new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner());
+                new NearestVersionSelector(), new MavenScopeSelector(),
+                new SimpleOptionalitySelector(), new MavenScopeDeriver());
+        transformer = new ChainedDependencyGraphTransformer(transformer, new MavenDependencyContextRefiner());
         session.setDependencyGraphTransformer(transformer);
         session.setArtifactTypeRegistry(artifactTypeRegistry);
 

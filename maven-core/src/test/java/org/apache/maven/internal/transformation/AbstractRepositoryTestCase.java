@@ -22,7 +22,6 @@ import javax.inject.Inject;
 
 import java.net.MalformedURLException;
 
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -57,7 +56,7 @@ public abstract class AbstractRepositoryTestCase {
     }
 
     public static RepositorySystemSession newMavenRepositorySystemSession(RepositorySystem system) {
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false);
 
         LocalRepository localRepo = new LocalRepository("target/local-repo");
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));

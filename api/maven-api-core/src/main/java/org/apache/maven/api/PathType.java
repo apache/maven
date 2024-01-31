@@ -31,7 +31,6 @@ import org.apache.maven.api.annotations.Nonnull;
  * Path types are often exclusive. For example, a dependency should not be
  * both on the Java class-path and on the Java module-path.
  *
- * @see DependencyProperties#PATH_TYPES
  * @see org.apache.maven.api.services.DependencyResolverResult#getDispatchedPaths()
  *
  * @since 4.0.0
@@ -39,15 +38,16 @@ import org.apache.maven.api.annotations.Nonnull;
 @Experimental
 public interface PathType {
     /**
-     * Returns the programmatic name of this path type. For example, if this path type
-     * is {@link JavaPathType#MODULES}, then this method returns {@code "MODULES"}.
+     * Returns the unique name of this path type, including the module to patch if any.
+     * For example, if this type is {@link JavaPathType#MODULES}, then this method returns {@code "MODULES"}.
+     * But if this type was created by {@code JavaPathType.patchModule("foo.bar")}, then this method returns
+     * {@code "PATCH_MODULE:foo.bar"}.
      *
-     * @return the programmatic name of this path type
-     *
+     * @return the programmatic name together with the module name on which it applies
      * @see #toString()
      */
     @Nonnull
-    String name();
+    String id();
 
     /**
      * Returns the name of the tool option for this path. For example, if this path type
@@ -84,12 +84,17 @@ public interface PathType {
     String option(Iterable<? extends Path> paths);
 
     /**
-     * Returns the programmatic name of this path type, including the module to patch if any.
-     * For example, if this type is {@link JavaPathType#MODULES}, then this method returns {@code "MODULES"}.
-     * But if this type was created by {@code JavaPathType.patchModule("foo.bar")}, then this method returns
-     * {@code "PATCH_MODULE:foo.bar")}.
+     * Returns the name of this path type. For example, if this path type
+     * is {@link JavaPathType#MODULES}, then this method returns {@code "MODULES"}.
      *
-     * @return the programmatic name together with the module name on which it applies
+     * @return the programmatic name of this path type
+     */
+    @Nonnull
+    String name();
+
+    /**
+     * Returns a string representation for this extensible enum describing a path type.
+     * For example {@code "PathType[PATCH_MODULE:foo.bar]"}.
      */
     @Nonnull
     @Override

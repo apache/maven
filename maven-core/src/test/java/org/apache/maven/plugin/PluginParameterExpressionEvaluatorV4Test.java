@@ -38,7 +38,6 @@ import org.apache.maven.api.Session;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.configuration.internal.EnhancedComponentConfigurator;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -85,9 +84,6 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
 
     @Inject
     PlexusContainer container;
-
-    @Inject
-    private MavenRepositorySystem factory;
 
     private Path rootDirectory;
 
@@ -190,10 +186,8 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     public void testEscapedVariablePassthrough() throws Exception {
         String var = "${var}";
 
-        Model model = new Model();
-        model.setVersion("1");
-
-        MavenProject project = new MavenProject(model);
+        MavenProject project = createDefaultProject();
+        project.setVersion("1");
 
         ExpressionEvaluator ee = createExpressionEvaluator(project, new Properties());
 
@@ -207,10 +201,8 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         String var = "${var}";
         String key = var + " with version: ${project.version}";
 
-        Model model = new Model();
-        model.setVersion("1");
-
-        MavenProject project = new MavenProject(model);
+        MavenProject project = createDefaultProject();
+        project.setVersion("1");
 
         ExpressionEvaluator ee = createExpressionEvaluator(project, new Properties());
 
@@ -223,11 +215,9 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     public void testMultipleSubExpressionsInLargerExpression() throws Exception {
         String key = "${project.artifactId} with version: ${project.version}";
 
-        Model model = new Model();
-        model.setArtifactId("test");
-        model.setVersion("1");
-
-        MavenProject project = new MavenProject(model);
+        MavenProject project = createDefaultProject();
+        project.setArtifactId("test");
+        project.setVersion("1");
 
         ExpressionEvaluator ee = createExpressionEvaluator(project, new Properties());
 
@@ -240,7 +230,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     public void testMissingPOMPropertyRefInLargerExpression() throws Exception {
         String expr = "/path/to/someproject-${baseVersion}";
 
-        MavenProject project = new MavenProject(new Model());
+        MavenProject project = createDefaultProject();
 
         ExpressionEvaluator ee = createExpressionEvaluator(project, new Properties());
 
@@ -254,13 +244,8 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         String key = "m2.name";
         String checkValue = "value";
 
-        Properties properties = new Properties();
-        properties.setProperty(key, checkValue);
-
-        Model model = new Model();
-        model.setProperties(properties);
-
-        MavenProject project = new MavenProject(model);
+        MavenProject project = createDefaultProject();
+        project.getModel().getProperties().setProperty(key, checkValue);
 
         ExpressionEvaluator ee = createExpressionEvaluator(project, new Properties());
 
@@ -324,14 +309,12 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
 
     @Test
     public void testTwoExpressions() throws Exception {
-        Build build = new Build();
+        MavenProject project = createDefaultProject();
+        Build build = project.getBuild();
         build.setDirectory("expected-directory");
         build.setFinalName("expected-finalName");
 
-        Model model = new Model();
-        model.setBuild(build);
-
-        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator(new MavenProject(model), new Properties());
+        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator(project, new Properties());
 
         Object value = expressionEvaluator.evaluate("${project.build.directory}" + FS + "${project.build.finalName}");
 
@@ -379,7 +362,9 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     private MavenProject createDefaultProject() {
-        return new MavenProject(new Model());
+        MavenProject project = new MavenProject(new Model());
+        project.setFile(new File("pom.xml").getAbsoluteFile());
+        return project;
     }
 
     private ExpressionEvaluator createExpressionEvaluator(MavenProject project, Properties executionProperties)

@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.DependencyCoordinateFactory;
@@ -55,8 +56,8 @@ public interface Session {
     SessionData getData();
 
     /**
-     * Gets the user properties to use for interpolation. The user properties have been configured directly by the user,
-     * e.g. via the {@code -Dkey=value} parameter on the command line.
+     * Returns immutable user properties to use for interpolation. The user properties have been configured directly
+     * by the user, e.g. via the {@code -Dkey=value} parameter on the command line.
      *
      * @return the user properties, never {@code null}
      */
@@ -64,13 +65,36 @@ public interface Session {
     Map<String, String> getUserProperties();
 
     /**
-     * Gets the system properties to use for interpolation. The system properties are collected from the runtime
-     * environment such as {@link System#getProperties()} and environment variables.
+     * Returns immutable system properties to use for interpolation. The system properties are collected from the
+     * runtime environment such as {@link System#getProperties()} and environment variables
+     * (prefixed with {@code env.}).
      *
      * @return the system properties, never {@code null}
      */
     @Nonnull
     Map<String, String> getSystemProperties();
+
+    /**
+     * Each invocation computes a new map of effective properties. To be used in interpolation.
+     * <p>
+     * Effective properties are computed from system, user and optionally project properties, layered with
+     * defined precedence onto each other to achieve proper precedence. Precedence is defined as:
+     * <ul>
+     *     <li>System properties (lowest precedence)</li>
+     *     <li>Project properties (optional)</li>
+     *     <li>User properties (highest precedence)</li>
+     * </ul>
+     * Note: Project properties contains properties injected from profiles, if applicable. Their precedence is
+     * {@code profile > project}, hence active profile property may override project property.
+     * <p>
+     * The caller of this method should decide whether there is a project in scope (hence, a project instance
+     * needs to be passed) or not.
+     *
+     * @param project {@link Project} or {@code null}.
+     * @return the effective properties, never {@code null}
+     */
+    @Nonnull
+    Map<String, String> getEffectiveProperties(@Nullable Project project);
 
     /**
      * Returns the current maven version
@@ -361,6 +385,9 @@ public interface Session {
      * Checks whether a given artifact version is considered a {@code SNAPSHOT} or not.
      * <p>
      * Shortcut for {@code getService(ArtifactManager.class).isSnapshot(...)}.
+     * <p>
+     * In case there is {@link Artifact} in scope, the recommended way to perform this check is
+     * use of {@link Artifact#isSnapshot()} instead.
      *
      * @see org.apache.maven.api.services.VersionParser#isSnapshot(String)
      */
@@ -400,11 +427,11 @@ public interface Session {
     /**
      * Shortcut for {@code getService(DependencyResolver.class).flatten(...)}.
      *
-     * @see org.apache.maven.api.services.DependencyResolver#flatten(Session, Node, ResolutionScope)
+     * @see org.apache.maven.api.services.DependencyResolver#flatten(Session, Node, PathScope)
      * @throws org.apache.maven.api.services.DependencyResolverException if the dependency flattening failed
      */
     @Nonnull
-    List<Node> flattenDependencies(@Nonnull Node node, @Nonnull ResolutionScope scope);
+    List<Node> flattenDependencies(@Nonnull Node node, @Nonnull PathScope scope);
 
     @Nonnull
     List<Path> resolveDependencies(@Nonnull DependencyCoordinate dependencyCoordinate);
@@ -413,7 +440,7 @@ public interface Session {
     List<Path> resolveDependencies(@Nonnull List<DependencyCoordinate> dependencyCoordinates);
 
     @Nonnull
-    List<Path> resolveDependencies(@Nonnull Project project, @Nonnull ResolutionScope scope);
+    List<Path> resolveDependencies(@Nonnull Project project, @Nonnull PathScope scope);
 
     /**
      * Resolves an artifact's meta version (if any) to a concrete version. For example, resolves "1.0-SNAPSHOT"
@@ -474,4 +501,16 @@ public interface Session {
      */
     @Nonnull
     VersionConstraint parseVersionConstraint(@Nonnull String versionConstraint);
+
+    Type requireType(String id);
+
+    Language requireLanguage(String id);
+
+    Packaging requirePackaging(String id);
+
+    ProjectScope requireProjectScope(String id);
+
+    DependencyScope requireDependencyScope(String id);
+
+    PathScope requirePathScope(String id);
 }

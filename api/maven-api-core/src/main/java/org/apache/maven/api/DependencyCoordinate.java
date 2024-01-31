@@ -41,7 +41,7 @@ public interface DependencyCoordinate extends ArtifactCoordinate {
     Type getType();
 
     @Nonnull
-    Scope getScope();
+    DependencyScope getScope();
 
     @Nullable
     Boolean getOptional();

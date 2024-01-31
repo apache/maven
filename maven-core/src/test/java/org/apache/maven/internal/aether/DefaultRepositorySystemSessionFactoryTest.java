@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -84,12 +85,13 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
-                versionScheme);
+                versionScheme,
+                Collections.emptyMap(),
+                Collections.emptyMap());
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());
@@ -108,12 +110,13 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
-                versionScheme);
+                versionScheme,
+                Collections.emptyMap(),
+                Collections.emptyMap());
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());
@@ -144,12 +147,13 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
-                versionScheme);
+                versionScheme,
+                Collections.emptyMap(),
+                Collections.emptyMap());
 
         PlexusConfiguration plexusConfiguration = (PlexusConfiguration) systemSessionFactory
                 .newRepositorySession(request)
@@ -188,12 +192,13 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
-                versionScheme);
+                versionScheme,
+                Collections.emptyMap(),
+                Collections.emptyMap());
 
         Map<String, String> headers = (Map<String, String>) systemSessionFactory
                 .newRepositorySession(request)
@@ -226,12 +231,13 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
-                versionScheme);
+                versionScheme,
+                Collections.emptyMap(),
+                Collections.emptyMap());
 
         int connectionTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -268,12 +274,13 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
-                versionScheme);
+                versionScheme,
+                Collections.emptyMap(),
+                Collections.emptyMap());
 
         int connectionTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -304,12 +311,13 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
-                versionScheme);
+                versionScheme,
+                Collections.emptyMap(),
+                Collections.emptyMap());
 
         int requestTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -346,12 +354,13 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
-                versionScheme);
+                versionScheme,
+                Collections.emptyMap(),
+                Collections.emptyMap());
 
         int requestTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -365,12 +374,13 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
-                versionScheme);
+                versionScheme,
+                Collections.emptyMap(),
+                Collections.emptyMap());
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());
@@ -412,12 +422,13 @@ public class DefaultRepositorySystemSessionFactoryTest {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 artifactHandlerManager,
                 aetherRepositorySystem,
-                null,
                 settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
-                versionScheme);
+                versionScheme,
+                Collections.emptyMap(),
+                Collections.emptyMap());
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());

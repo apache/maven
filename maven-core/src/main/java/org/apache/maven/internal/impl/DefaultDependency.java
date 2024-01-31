@@ -18,65 +18,31 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinate;
-import org.apache.maven.api.DependencyProperties;
-import org.apache.maven.api.Scope;
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.repository.internal.DefaultModelVersionParser;
 import org.eclipse.aether.artifact.ArtifactProperties;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultDependency implements Dependency {
-    /**
-     * A mapping from {@link ArtifactProperties} values to {@link DependencyProperties} values.
-     * Used for conversion from Eclipse model to Maven model of dependency properties.
-     */
-    private static final Map<Class<?>, Function<String, Object>> VALUE_CONVERTERS = new HashMap<>(12);
-
-    static {
-        VALUE_CONVERTERS.put(String.class, String::valueOf);
-        VALUE_CONVERTERS.put(Boolean.class, Boolean::valueOf);
-        VALUE_CONVERTERS.put(Byte.class, Byte::valueOf);
-        VALUE_CONVERTERS.put(Short.class, Short::valueOf);
-        VALUE_CONVERTERS.put(Integer.class, Integer::valueOf);
-        VALUE_CONVERTERS.put(Long.class, Long::valueOf);
-        VALUE_CONVERTERS.put(Float.class, Float::valueOf);
-        VALUE_CONVERTERS.put(Double.class, Double::valueOf);
-    }
 
     private final InternalSession session;
     private final org.eclipse.aether.graph.Dependency dependency;
-    private final DependencyProperties dependencyProperties;
     private final String key;
 
     public DefaultDependency(
             @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency) {
         this.session = nonNull(session, "session");
         this.dependency = nonNull(dependency, "dependency");
-        DefaultDependencyProperties.Builder builder = new DefaultDependencyProperties.Builder();
-        for (Map.Entry<String, String> entry :
-                dependency.getArtifact().getProperties().entrySet()) {
-            String name = entry.getKey();
-            DependencyProperties.Key<?> key = DependencyProperties.Key.forName(name)
-                    .orElseGet(() -> new DependencyProperties.Key<>(name, String.class));
-            Function<String, Object> vc = VALUE_CONVERTERS.get(key.valueType());
-            if (vc != null) {
-                builder.checkAndSet(key, vc.apply(entry.getValue()));
-            }
-        }
-        this.dependencyProperties = builder.build();
         this.key = getGroupId()
                 + ':'
                 + getArtifactId()
@@ -132,12 +98,7 @@ public class DefaultDependency implements Dependency {
         String type = dependency
                 .getArtifact()
                 .getProperty(ArtifactProperties.TYPE, dependency.getArtifact().getExtension());
-        return session.getService(TypeRegistry.class).getType(type);
-    }
-
-    @Override
-    public DependencyProperties getDependencyProperties() {
-        return dependencyProperties;
+        return session.requireType(type);
     }
 
     @Override
@@ -147,8 +108,8 @@ public class DefaultDependency implements Dependency {
 
     @Nonnull
     @Override
-    public Scope getScope() {
-        return Scope.get(dependency.getScope());
+    public DependencyScope getScope() {
+        return session.requireDependencyScope(dependency.getScope());
     }
 
     @Nullable

@@ -38,7 +38,7 @@ import org.apache.maven.api.PathType;
 final class PathModularizationCache {
     /**
      * Module information for each JAR file or output directories.
-     * Cached when first requested for avoiding to decode the module descriptors multiple times.
+     * Cached when first requested to avoid decoding the module descriptors multiple times.
      *
      * @see #getModuleInfo(Path)
      */

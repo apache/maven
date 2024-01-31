@@ -162,6 +162,11 @@ public enum JavaPathType implements PathType {
         this.option = option;
     }
 
+    @Override
+    public String id() {
+        return name();
+    }
+
     /**
      * Returns the name of the tool option for this path. For example, if this path type
      * is {@link #MODULES}, then this method returns {@code "--module-path"}. The option
@@ -207,8 +212,13 @@ public enum JavaPathType implements PathType {
         return joiner.toString();
     }
 
+    @Override
+    public String toString() {
+        return "PathType[" + id() + "]";
+    }
+
     /**
-     * Type of a path which is applied to only one specific Java module.
+     * Type of path which is applied to only one specific Java module.
      * The main case is the Java {@code --patch-module} option.
      *
      * @see #PATCH_MODULE
@@ -230,6 +240,11 @@ public enum JavaPathType implements PathType {
             this.moduleName = Objects.requireNonNull(moduleName);
         }
 
+        @Override
+        public String id() {
+            return JavaPathType.this.name() + ":" + moduleName;
+        }
+
         /**
          * Returns the type of path without indication about the target module.
          * This is usually {@link #PATCH_MODULE}.
@@ -247,7 +262,6 @@ public enum JavaPathType implements PathType {
          * @return name of the tool option for this path, not including the module name
          */
         @Nonnull
-        @Override
         public String name() {
             return JavaPathType.this.name();
         }
@@ -292,39 +306,14 @@ public enum JavaPathType implements PathType {
         /**
          * Returns the programmatic name of this path type, including the module to patch.
          * For example, if this type was created by {@code JavaPathType.patchModule("foo.bar")},
-         * then this method returns {@code "PATCH_MODULE:foo.bar")}.
+         * then this method returns {@code "PathType[PATCH_MODULE:foo.bar]")}.
          *
          * @return the programmatic name together with the module name on which it applies
          */
         @Nonnull
         @Override
         public String toString() {
-            return name() + ':' + moduleName;
-        }
-
-        /**
-         * Returns a hash code value for this type.
-         *
-         * @return a hash code value
-         */
-        @Override
-        public int hashCode() {
-            return JavaPathType.this.hashCode() + 37 * moduleName.hashCode();
-        }
-
-        /**
-         * Compares this type with the given object for equality.
-         *
-         * @param obj the object to compare with this type
-         * @return whether the two objects are equal
-         */
-        @Override
-        public boolean equals(final Object obj) {
-            if (obj instanceof Modular) {
-                Modular other = (Modular) obj;
-                return rawType().equals(other.rawType()) && moduleName.equals(other.moduleName);
-            }
-            return false;
+            return "PathType[" + id() + "]";
         }
     }
 }

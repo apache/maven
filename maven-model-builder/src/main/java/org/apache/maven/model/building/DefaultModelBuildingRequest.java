@@ -252,8 +252,8 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
     public DefaultModelBuildingRequest setSystemProperties(Properties systemProperties) {
         if (systemProperties != null) {
             this.systemProperties = new Properties();
-            synchronized (systemProperties) { // avoid concurrent modification if someone else sets/removes an unrelated
-                // system property
+            // avoid concurrent modification if someone else sets/removes an unrelated system property
+            synchronized (systemProperties) {
                 this.systemProperties.putAll(systemProperties);
             }
         } else {
