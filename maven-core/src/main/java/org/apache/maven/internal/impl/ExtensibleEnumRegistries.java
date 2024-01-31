@@ -63,6 +63,7 @@ public class ExtensibleEnumRegistries {
             super(
                     providers,
                     DependencyScope.NONE,
+                    DependencyScope.EMPTY,
                     DependencyScope.COMPILE_ONLY,
                     DependencyScope.COMPILE,
                     DependencyScope.RUNTIME,

@@ -47,16 +47,18 @@ public interface BuildPathScope extends ExtensibleEnum {
     BuildPathScope MAIN_COMPILE = buildPathScope(
             "main-compile",
             ProjectScope.MAIN,
+            DependencyScope.EMPTY,
             DependencyScope.COMPILE_ONLY,
             DependencyScope.COMPILE,
             DependencyScope.PROVIDED);
 
-    BuildPathScope MAIN_RUNTIME =
-            buildPathScope("main-runtime", ProjectScope.MAIN, DependencyScope.COMPILE, DependencyScope.RUNTIME);
+    BuildPathScope MAIN_RUNTIME = buildPathScope(
+            "main-runtime", ProjectScope.MAIN, DependencyScope.EMPTY, DependencyScope.COMPILE, DependencyScope.RUNTIME);
 
     BuildPathScope TEST_COMPILE = buildPathScope(
             "test-compile",
             ProjectScope.TEST,
+            DependencyScope.EMPTY,
             DependencyScope.COMPILE,
             DependencyScope.PROVIDED,
             DependencyScope.TEST_ONLY,
@@ -65,6 +67,7 @@ public interface BuildPathScope extends ExtensibleEnum {
     BuildPathScope TEST_RUNTIME = buildPathScope(
             "test-runtime",
             ProjectScope.TEST,
+            DependencyScope.EMPTY,
             DependencyScope.COMPILE,
             DependencyScope.RUNTIME,
             DependencyScope.PROVIDED,

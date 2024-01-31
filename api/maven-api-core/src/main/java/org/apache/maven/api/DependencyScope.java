@@ -44,6 +44,11 @@ public interface DependencyScope extends ExtensibleEnum {
     DependencyScope NONE = dependencyScope("none", false);
 
     /**
+     * Empty scope.
+     */
+    DependencyScope EMPTY = dependencyScope("", false);
+
+    /**
      * Compile only.
      */
     DependencyScope COMPILE_ONLY = dependencyScope("compile-only", false);
