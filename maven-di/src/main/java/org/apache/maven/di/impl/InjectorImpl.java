@@ -64,6 +64,13 @@ public class InjectorImpl implements Injector {
         return bind(Key.of(cls), Binding.toInstance(instance));
     }
 
+    @Override
+    public <T> Injector bindInstanceAndInject(Class<T> cls, T instance) {
+        Key<T> key = Key.of(cls);
+        return bind(
+                key, Binding.toInstance(instance).initializeWith(ReflectionUtils.generateInjectingInitializer(key)));
+    }
+
     public <U> Injector bind(Key<U> key, Binding<U> b) {
         Set<Binding<?>> bindingSet = bindings.computeIfAbsent(key, $ -> new HashSet<>());
         bindingSet.add(b);
