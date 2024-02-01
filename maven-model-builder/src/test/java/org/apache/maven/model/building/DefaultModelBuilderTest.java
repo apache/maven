@@ -30,8 +30,7 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  */
@@ -162,5 +161,186 @@ class DefaultModelBuilderTest {
                 ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL,
                 false);
         assertNotNull(res.get());
+    }
+
+    /**
+     * This test has
+     *   - a dependency directly managed to 0.2
+     *   - then a BOM import which manages that same dep to 0.1
+     * This <i>currently</i> results in 0.2 and a warning  (the warning should not be present imho)
+     */
+    @Test
+    void testManagedDependencyBeforeImport() throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new FileModelSource(new File(
+                getClass().getResource("/poms/depmgmt/root-dep-first.xml").getFile())));
+        request.setModelResolver(new BaseModelResolver() {
+            public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
+                    throws UnresolvableModelException {
+                switch (dependency.getManagementKey()) {
+                    case "test:import:pom":
+                        return new FileModelSource(new File(getClass()
+                                .getResource("/poms/depmgmt/import.xml")
+                                .getFile()));
+                    default:
+                        throw new UnresolvableModelException(
+                                "Cannot resolve",
+                                dependency.getGroupId(),
+                                dependency.getArtifactId(),
+                                dependency.getVersion());
+                }
+            }
+        });
+
+        ModelBuildingResult result = builder.build(request);
+        Dependency dep = result.getEffectiveModel().getDelegate().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "test:mydep:jar".equals(d.getManagementKey()))
+                .findFirst()
+                .get();
+        assertEquals("0.2", dep.getVersion());
+        assertEquals(1, result.getProblems().size());
+        ModelProblem problem = result.getProblems().get(0);
+        assertTrue(problem.toString().contains("Ignored POM import"));
+    }
+
+    /**
+     * This test has
+     *   - a BOM import which manages the dep to 0.1
+     *   - then a directly managed dependency to 0.2
+     * This <i>currently</i> results in 0.2 and a warning  (the warning should not be present imho)
+     */
+    @Test
+    void testManagedDependencyAfterImport() throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new FileModelSource(new File(
+                getClass().getResource("/poms/depmgmt/root-dep-last.xml").getFile())));
+        request.setModelResolver(new BaseModelResolver() {
+            public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
+                    throws UnresolvableModelException {
+                switch (dependency.getManagementKey()) {
+                    case "test:import:pom":
+                        return new FileModelSource(new File(getClass()
+                                .getResource("/poms/depmgmt/import.xml")
+                                .getFile()));
+                    default:
+                        throw new UnresolvableModelException(
+                                "Cannot resolve",
+                                dependency.getGroupId(),
+                                dependency.getArtifactId(),
+                                dependency.getVersion());
+                }
+            }
+        });
+
+        ModelBuildingResult result = builder.build(request);
+        Dependency dep = result.getEffectiveModel().getDelegate().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "test:mydep:jar".equals(d.getManagementKey()))
+                .findFirst()
+                .get();
+        assertEquals("0.2", dep.getVersion());
+        assertEquals(1, result.getProblems().size());
+        ModelProblem problem = result.getProblems().get(0);
+        assertTrue(problem.toString().contains("Ignored POM import"));
+    }
+
+    /**
+     * This test has
+     *   - a BOM import which manages dep to 0.3
+     *   - another BOM import which manages the dep to 0.1
+     * This <i>currently</i> results in 0.3 (first wins) and a warning
+     */
+    @Test
+    void testManagedDependencyTwoImports() throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new FileModelSource(new File(
+                getClass().getResource("/poms/depmgmt/root-two-imports.xml").getFile())));
+        request.setModelResolver(new BaseModelResolver() {
+            public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
+                    throws UnresolvableModelException {
+                switch (dependency.getManagementKey()) {
+                    case "test:import:pom":
+                        return new FileModelSource(new File(getClass()
+                                .getResource("/poms/depmgmt/import.xml")
+                                .getFile()));
+                    case "test:other:pom":
+                        return new FileModelSource(new File(getClass()
+                                .getResource("/poms/depmgmt/other-import.xml")
+                                .getFile()));
+                    default:
+                        throw new UnresolvableModelException(
+                                "Cannot resolve",
+                                dependency.getGroupId(),
+                                dependency.getArtifactId(),
+                                dependency.getVersion());
+                }
+            }
+        });
+
+        ModelBuildingResult result = builder.build(request);
+        Dependency dep = result.getEffectiveModel().getDelegate().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "test:mydep:jar".equals(d.getManagementKey()))
+                .findFirst()
+                .get();
+        assertEquals("0.3", dep.getVersion());
+        assertEquals(1, result.getProblems().size());
+        ModelProblem problem = result.getProblems().get(0);
+        assertTrue(problem.toString().contains("Ignored POM import"));
+    }
+
+    /**
+     * This test has
+     *   - a BOM import which itself imports the junit BOM which manages the dep to 0.1
+     *   - a BOM import to the junit BOM which manages the dep to 0.2
+     * This <i>currently</i> results in 0.1 (first wins, unexpected as this is not the closest) and a warning
+     */
+    @Test
+    void testManagedDependencyDistance() throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setLocationTracking(true);
+        request.setModelSource(new FileModelSource(new File(
+                getClass().getResource("/poms/depmgmt/root-distance.xml").getFile())));
+        request.setModelResolver(new BaseModelResolver() {
+            public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
+                    throws UnresolvableModelException {
+                switch (dependency.getManagementKey()) {
+                    case "org.junit:bom:pom":
+                        return new FileModelSource(new File(getClass()
+                                .getResource("/poms/depmgmt/junit-" + dependency.getVersion() + ".xml")
+                                .getFile()));
+                    case "test:other:pom":
+                        return new FileModelSource(new File(getClass()
+                                .getResource("/poms/depmgmt/distant-import.xml")
+                                .getFile()));
+                    default:
+                        throw new UnresolvableModelException(
+                                "Cannot resolve",
+                                dependency.getGroupId(),
+                                dependency.getArtifactId(),
+                                dependency.getVersion());
+                }
+            }
+        });
+
+        ModelBuildingResult result = builder.build(request);
+        Dependency dep = result.getEffectiveModel().getDelegate().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "org.junit:junit:jar".equals(d.getManagementKey()))
+                .findFirst()
+                .get();
+        assertEquals("0.1", dep.getVersion());
+        assertEquals(1, result.getProblems().size());
+        ModelProblem problem = result.getProblems().get(0);
+        assertTrue(problem.toString().contains("Ignored POM import"));
     }
 }
