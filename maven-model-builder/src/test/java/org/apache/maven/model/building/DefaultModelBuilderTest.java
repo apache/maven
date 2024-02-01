@@ -30,8 +30,7 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  */
@@ -162,5 +161,51 @@ class DefaultModelBuilderTest {
                 ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL,
                 false);
         assertNotNull(res.get());
+    }
+
+    @Test
+    void testManagedDependencyBeforeImport() throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new FileModelSource(new File(getClass().getResource("/poms/depmgmt/root-dep-first.xml").getFile())));
+        request.setModelResolver(new BaseModelResolver() {
+            public ModelSource resolveModel(org.apache.maven.model.Dependency dependency) throws UnresolvableModelException {
+                switch (dependency.getManagementKey()) {
+                    case "test:import:pom": return new FileModelSource(new File(getClass().getResource("/poms/depmgmt/import.xml").getFile()));
+                    default: throw new UnresolvableModelException("Cannot resolve", dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
+                }
+            }
+        });
+
+        ModelBuildingResult result = builder.build(request);
+        Dependency dep = result.getEffectiveModel().getDelegate().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "test:mydep:jar".equals(d.getManagementKey()))
+                .findFirst().get();
+        assertEquals("0.2", dep.getVersion());
+    }
+
+    @Test
+    void testManagedDependencyAfterImport() throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new FileModelSource(new File(getClass().getResource("/poms/depmgmt/root-dep-last.xml").getFile())));
+        request.setModelResolver(new BaseModelResolver() {
+            public ModelSource resolveModel(org.apache.maven.model.Dependency dependency) throws UnresolvableModelException {
+                switch (dependency.getManagementKey()) {
+                    case "test:import:pom": return new FileModelSource(new File(getClass().getResource("/poms/depmgmt/import.xml").getFile()));
+                    default: throw new UnresolvableModelException("Cannot resolve", dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
+                }
+            }
+        });
+
+        ModelBuildingResult result = builder.build(request);
+        Dependency dep = result.getEffectiveModel().getDelegate().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "test:mydep:jar".equals(d.getManagementKey()))
+                .findFirst().get();
+        assertEquals("0.2", dep.getVersion());
     }
 }
