@@ -18,7 +18,7 @@
  */
 package org.apache.maven.repository.internal;
 
-import org.apache.maven.model.*;
+import org.apache.maven.model.Model;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
