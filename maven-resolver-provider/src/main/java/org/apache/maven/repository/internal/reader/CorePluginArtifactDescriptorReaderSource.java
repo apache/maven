@@ -18,19 +18,14 @@
  */
 package org.apache.maven.repository.internal.reader;
 
-import org.apache.maven.model.*;
-import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.artifact.ArtifactProperties;
-import org.eclipse.aether.artifact.ArtifactTypeRegistry;
-import org.eclipse.aether.resolution.ArtifactDescriptorResult;
-import org.eclipse.sisu.Priority;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
+import org.apache.maven.model.*;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.ArtifactProperties;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
+import org.eclipse.sisu.Priority;
 
 /**
  * The core source, that populates all elements Maven needs.

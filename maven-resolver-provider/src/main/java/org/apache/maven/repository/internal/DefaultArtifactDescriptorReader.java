@@ -117,7 +117,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                     (ArtifactDescriptorReaderSource) config.get(ArtifactDescriptorReaderSource.class.getName());
             if (delegate == null) {
                 // fallback to legacy
-                delegate = (ArtifactDescriptorReaderSource) config.get(ArtifactDescriptorReaderDelegate.class.getName());
+                delegate =
+                        (ArtifactDescriptorReaderSource) config.get(ArtifactDescriptorReaderDelegate.class.getName());
             }
 
             if (delegate != null) {
