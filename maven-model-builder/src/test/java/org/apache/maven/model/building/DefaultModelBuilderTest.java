@@ -268,4 +268,43 @@ class DefaultModelBuilderTest {
                 .get();
         assertEquals("0.3", dep.getVersion());
     }
+
+    @Test
+    void testManagedDependencyDistance() throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new FileModelSource(new File(
+                getClass().getResource("/poms/depmgmt/root-distance.xml").getFile())));
+        request.setModelResolver(new BaseModelResolver() {
+            public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
+                    throws UnresolvableModelException {
+                switch (dependency.getManagementKey()) {
+                    case "org.junit:bom:pom":
+                        return new FileModelSource(new File(getClass()
+                                .getResource("/poms/depmgmt/junit-" + dependency.getVersion() + ".xml")
+                                .getFile()));
+                    case "test:other:pom":
+                        return new FileModelSource(new File(getClass()
+                                .getResource("/poms/depmgmt/distant-import.xml")
+                                .getFile()));
+                    default:
+                        throw new UnresolvableModelException(
+                                "Cannot resolve",
+                                dependency.getGroupId(),
+                                dependency.getArtifactId(),
+                                dependency.getVersion());
+                }
+            }
+        });
+
+        ModelBuildingResult result = builder.build(request);
+        Dependency dep = result.getEffectiveModel().getDelegate().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "org.junit:junit:jar".equals(d.getManagementKey()))
+                .findFirst()
+                .get();
+        // The managed version should be 0.2 if closest wins
+        assertEquals("0.1", dep.getVersion());
+    }
 }
