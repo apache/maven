@@ -111,15 +111,19 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         Model model = loadPom(session, request, result);
         if (model != null) {
             Map<String, Object> config = session.getConfigProperties();
+
+            // similar logic as before: if configuration contains ArtifactDescriptorReaderSource, use that
             ArtifactDescriptorReaderSource delegate =
-                    (ArtifactDescriptorReaderSource) config.get(ArtifactDescriptorReaderDelegate.class.getName());
+                    (ArtifactDescriptorReaderSource) config.get(ArtifactDescriptorReaderSource.class.getName());
             if (delegate == null) {
-                delegate = (ArtifactDescriptorReaderSource) config.get(ArtifactDescriptorReaderSource.class.getName());
+                // fallback to legacy
+                delegate = (ArtifactDescriptorReaderSource) config.get(ArtifactDescriptorReaderDelegate.class.getName());
             }
 
             if (delegate != null) {
                 delegate.populateResult(session, result, model);
             } else {
+                // the "normal" way is to ask all to populate
                 for (ArtifactDescriptorReaderSource source : artifactDescriptorReaderSources.values()) {
                     source.populateResult(session, result, model);
                 }
