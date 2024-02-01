@@ -28,7 +28,7 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.sisu.Priority;
 
 /**
- * The core source, that populates all elements Maven needs.
+ * The core source, that populates current maven runtime when a plugin is resolved.
  *
  * @since TBD
  */
