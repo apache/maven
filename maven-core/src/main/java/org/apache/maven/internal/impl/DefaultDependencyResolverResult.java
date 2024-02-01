@@ -43,7 +43,7 @@ import org.apache.maven.api.services.DependencyResolverResult;
  *
  * <ul>
  *   <li>{@link #addOutputDirectory(Path, Path, PathModularizationCache)} (optional)</li>
- *   <li>{@link #addDependency(Node, Dependency, Set, Path, PathModularizationCache)}</li>
+ *   <li>{@link #addDependency(Node, Dependency, Predicate, Path, PathModularizationCache)}</li>
  * </ul>
  *
  * @see DefaultDependencyResolver#resolve(DependencyResolverRequest)
@@ -87,7 +87,7 @@ final class DefaultDependencyResolverResult implements DependencyResolverResult 
 
     /**
      * Creates an initially empty result. Callers should add path elements by calls
-     * to {@link #addDependency(Node, Dependency, Path, PathModularizationCache)}.
+     * to {@link #addDependency(Node, Dependency, Predicate, Path, PathModularizationCache)}.
      *
      * @param exceptions the exceptions that occurred while building the dependency graph
      * @param root the root node of the dependency graph
@@ -137,7 +137,7 @@ final class DefaultDependencyResolverResult implements DependencyResolverResult 
      *   </li>
      * </ul>
      *
-     * This method must be invoked before {@link #addDependency(Node, Dependency, Path)}
+     * This method must be invoked before {@link #addDependency(Node, Dependency, Predicate, Path, PathModularizationCache)}
      * if output directories are desired on the class-path or module-path.
      * This method can be invoked at most once.
      *
@@ -145,6 +145,8 @@ final class DefaultDependencyResolverResult implements DependencyResolverResult 
      * @param test the test output directory, or {@code null} if none
      * @param cache cache of module information about each dependency
      * @throws IOException if an error occurred while reading module information
+     *
+     * TODO: this is currently not called
      */
     void addOutputDirectory(final Path main, final Path test, final PathModularizationCache cache) throws IOException {
         if (outputModules != null) {
