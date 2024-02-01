@@ -339,4 +339,52 @@ class DefaultModelBuilderTest {
         ModelProblem problem = result.getProblems().get(0);
         assertTrue(problem.toString().contains("Ignored POM import"));
     }
+
+
+    /**
+     * This test has
+     *   - a BOM import which itself imports the junit BOM which manages the dep to 0.1
+     *   - a BOM import to the junit BOM which manages the dep to 0.2
+     *   - a direct managed dependency to the dep at 0.3 (as suggested by the warning)
+     * This results in 0.3 (explicit managed wins) and no warning
+     */
+    @Test
+    void testManagedDependencyDistanceWithExplicit() throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setLocationTracking(true);
+        request.setModelSource(new FileModelSource(new File(
+                getClass().getResource("/poms/depmgmt/root-distance-explicit.xml").getFile())));
+        request.setModelResolver(new BaseModelResolver() {
+            public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
+                    throws UnresolvableModelException {
+                switch (dependency.getManagementKey()) {
+                    case "org.junit:bom:pom":
+                        return new FileModelSource(new File(getClass()
+                                .getResource("/poms/depmgmt/junit-" + dependency.getVersion() + ".xml")
+                                .getFile()));
+                    case "test:other:pom":
+                        return new FileModelSource(new File(getClass()
+                                .getResource("/poms/depmgmt/distant-import.xml")
+                                .getFile()));
+                    default:
+                        throw new UnresolvableModelException(
+                                "Cannot resolve",
+                                dependency.getGroupId(),
+                                dependency.getArtifactId(),
+                                dependency.getVersion());
+                }
+            }
+        });
+
+        ModelBuildingResult result = builder.build(request);
+        Dependency dep = result.getEffectiveModel().getDelegate().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "org.junit:junit:jar".equals(d.getManagementKey()))
+                .findFirst()
+                .get();
+        assertEquals("0.3", dep.getVersion());
+        assertEquals(0, result.getProblems().size());
+    }
 }

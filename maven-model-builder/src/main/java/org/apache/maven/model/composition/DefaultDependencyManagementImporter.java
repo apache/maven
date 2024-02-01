@@ -49,21 +49,8 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
         if (sources != null && !sources.isEmpty()) {
             Map<String, Dependency> dependencies = new LinkedHashMap<>();
 
-            for (DependencyManagement source : sources) {
-                for (Dependency dependency : source.getDependencies()) {
-                    String key = dependency.getManagementKey();
-                    Dependency present = dependencies.putIfAbsent(key, dependency);
-                    if (present != null && !equals(dependency, present)) {
-                        // TODO: https://issues.apache.org/jira/browse/MNG-8004
-                        problems.add(new ModelProblemCollectorRequest(
-                                        ModelProblem.Severity.WARNING, ModelProblem.Version.V40)
-                                .setMessage("Ignored POM import for: " + toString(dependency) + " as already imported "
-                                        + toString(present)));
-                    }
-                }
-            }
-
             DependencyManagement depMgmt = target.getDependencyManagement();
+
             if (depMgmt != null) {
                 for (Dependency dependency : depMgmt.getDependencies()) {
                     dependencies.put(dependency.getManagementKey(), dependency);
@@ -71,6 +58,24 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
             } else {
                 depMgmt = DependencyManagement.newInstance();
             }
+
+            Set<String> directDependencies = new HashSet<>(dependencies.keySet());
+
+            for (DependencyManagement source : sources) {
+                for (Dependency dependency : source.getDependencies()) {
+                    String key = dependency.getManagementKey();
+                    Dependency present = dependencies.putIfAbsent(key, dependency);
+                    if (present != null && !equals(dependency, present) && !directDependencies.contains(key)) {
+                        // TODO: https://issues.apache.org/jira/browse/MNG-8004
+                        problems.add(new ModelProblemCollectorRequest(
+                                        ModelProblem.Severity.WARNING, ModelProblem.Version.V40)
+                                .setMessage("Ignored POM import for: " + toString(dependency) + " as already imported "
+                                        + toString(present) + ".  Add a the conflicting managed dependency directly "
+                                        + "to the dependencyManagement section of the POM."));
+                    }
+                }
+            }
+
             return target.withDependencyManagement(depMgmt.withDependencies(dependencies.values()));
         }
         return target;
