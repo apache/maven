@@ -49,16 +49,6 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
         if (sources != null && !sources.isEmpty()) {
             Map<String, Dependency> dependencies = new LinkedHashMap<>();
 
-            DependencyManagement depMgmt = target.getDependencyManagement();
-
-            if (depMgmt != null) {
-                for (Dependency dependency : depMgmt.getDependencies()) {
-                    dependencies.put(dependency.getManagementKey(), dependency);
-                }
-            } else {
-                depMgmt = DependencyManagement.newInstance();
-            }
-
             for (DependencyManagement source : sources) {
                 for (Dependency dependency : source.getDependencies()) {
                     String key = dependency.getManagementKey();
@@ -73,6 +63,14 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
                 }
             }
 
+            DependencyManagement depMgmt = target.getDependencyManagement();
+            if (depMgmt != null) {
+                for (Dependency dependency : depMgmt.getDependencies()) {
+                    dependencies.put(dependency.getManagementKey(), dependency);
+                }
+            } else {
+                depMgmt = DependencyManagement.newInstance();
+            }
             return target.withDependencyManagement(depMgmt.withDependencies(dependencies.values()));
         }
         return target;
