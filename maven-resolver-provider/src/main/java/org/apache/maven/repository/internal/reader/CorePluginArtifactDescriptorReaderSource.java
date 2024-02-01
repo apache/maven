@@ -28,7 +28,8 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.sisu.Priority;
 
 /**
- * The core source, that populates current maven runtime when a plugin is resolved.
+ * The core source, that kicks in ONLY when Maven Core is resolving a maven-plugin as part of the build: it populates
+ * the current Maven Runtime dependency Management.
  *
  * @since TBD
  */
