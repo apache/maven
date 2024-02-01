@@ -340,7 +340,6 @@ class DefaultModelBuilderTest {
         assertTrue(problem.toString().contains("Ignored POM import"));
     }
 
-
     /**
      * This test has
      *   - a BOM import which itself imports the junit BOM which manages the dep to 0.1
@@ -355,8 +354,9 @@ class DefaultModelBuilderTest {
 
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
         request.setLocationTracking(true);
-        request.setModelSource(new FileModelSource(new File(
-                getClass().getResource("/poms/depmgmt/root-distance-explicit.xml").getFile())));
+        request.setModelSource(new FileModelSource(new File(getClass()
+                .getResource("/poms/depmgmt/root-distance-explicit.xml")
+                .getFile())));
         request.setModelResolver(new BaseModelResolver() {
             public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
                     throws UnresolvableModelException {
