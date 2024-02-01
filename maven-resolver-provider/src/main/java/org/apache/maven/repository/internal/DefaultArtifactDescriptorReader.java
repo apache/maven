@@ -76,7 +76,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
     private final ModelBuilder modelBuilder;
     private final ModelCacheFactory modelCacheFactory;
     private final Map<String, MavenArtifactRelocationSource> artifactRelocationSources;
-    private final ArtifactDescriptorReaderDelegate delegate;
+    private final Map<String, ArtifactDescriptorReaderSource> artifactDescriptorReaderSources;
 
     @Inject
     public DefaultArtifactDescriptorReader(
@@ -87,7 +87,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             ModelBuilder modelBuilder,
             RepositoryEventDispatcher repositoryEventDispatcher,
             ModelCacheFactory modelCacheFactory,
-            Map<String, MavenArtifactRelocationSource> artifactRelocationSources) {
+            Map<String, MavenArtifactRelocationSource> artifactRelocationSources,
+            Map<String, ArtifactDescriptorReaderSource> artifactDescriptorReaderSources) {
         this.remoteRepositoryManager =
                 Objects.requireNonNull(remoteRepositoryManager, "remoteRepositoryManager cannot be null");
         this.versionResolver = Objects.requireNonNull(versionResolver, "versionResolver cannot be null");
@@ -99,7 +100,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         this.modelCacheFactory = Objects.requireNonNull(modelCacheFactory, "modelCacheFactory cannot be null");
         this.artifactRelocationSources =
                 Objects.requireNonNull(artifactRelocationSources, "artifactRelocationSources cannot be null");
-        this.delegate = new ArtifactDescriptorReaderDelegate();
+        this.artifactDescriptorReaderSources = artifactDescriptorReaderSources;
     }
 
     @Override
@@ -110,14 +111,19 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         Model model = loadPom(session, request, result);
         if (model != null) {
             Map<String, Object> config = session.getConfigProperties();
-            ArtifactDescriptorReaderDelegate delegate =
-                    (ArtifactDescriptorReaderDelegate) config.get(ArtifactDescriptorReaderDelegate.class.getName());
-
+            ArtifactDescriptorReaderSource delegate =
+                    (ArtifactDescriptorReaderSource) config.get(ArtifactDescriptorReaderDelegate.class.getName());
             if (delegate == null) {
-                delegate = this.delegate;
+                delegate = (ArtifactDescriptorReaderSource) config.get(ArtifactDescriptorReaderSource.class.getName());
             }
 
-            delegate.populateResult(session, result, model);
+            if (delegate != null) {
+                delegate.populateResult(session, result, model);
+            } else {
+                for (ArtifactDescriptorReaderSource source : artifactDescriptorReaderSources.values()) {
+                    source.populateResult(session, result, model);
+                }
+            }
         }
 
         return result;
