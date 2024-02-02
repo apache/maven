@@ -101,6 +101,11 @@ public abstract class Binding<T> {
                     return instance;
                 };
             }
+
+            @Override
+            public String toString() {
+                return Binding.this.toString();
+            }
         };
     }
 
@@ -148,6 +153,11 @@ public abstract class Binding<T> {
         public Supplier<T> compile(Function<Key<?>, Supplier<?>> compiler) {
             return () -> instance;
         }
+
+        @Override
+        public String toString() {
+            return "BindingToInstance[" + instance + "]" + getDependencies();
+        }
     }
 
     public static class BindingToConstructor<T> extends Binding<T> {
@@ -168,6 +178,11 @@ public abstract class Binding<T> {
                         .toArray();
                 return constructor.create(args);
             };
+        }
+
+        @Override
+        public String toString() {
+            return "BindingToConstructor[" + constructor + "]" + getDependencies();
         }
     }
 }

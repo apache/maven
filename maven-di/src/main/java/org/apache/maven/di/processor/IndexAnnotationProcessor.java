@@ -23,18 +23,23 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
+import javax.xml.stream.XMLStreamReader;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.ctc.wstx.stax.WstxInputFactory;
 import org.apache.maven.api.di.Qualifier;
+import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeBuilder;
 
 public class IndexAnnotationProcessor implements Processor {
 
@@ -59,6 +64,46 @@ public class IndexAnnotationProcessor implements Processor {
                     }
                 }
             }
+        }
+        for (Element elem : roundEnv.getElementsAnnotatedWith(org.apache.maven.api.plugin.annotations.Mojo.class)) {
+            PackageElement packageElement = environment.getElementUtils().getPackageOf(elem);
+            String packageName = packageElement.getQualifiedName().toString();
+            String generatorClassName = elem.getSimpleName().toString() + "Factory";
+
+            String mojoName = elem.getAnnotation(org.apache.maven.api.plugin.annotations.Mojo.class)
+                    .name();
+
+            try {
+                Reader reader = environment
+                        .getFiler()
+                        .getResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/maven/plugin.xml")
+                        .openReader(true);
+                XMLStreamReader parser = WstxInputFactory.newFactory().createXMLStreamReader(reader);
+                XmlNode plugin = XmlNodeBuilder.build(parser, null);
+                String groupId = plugin.getChild("groupId").getValue();
+                String artifactId = plugin.getChild("artifactId").getValue();
+                String version = plugin.getChild("version").getValue();
+
+                Writer file = environment
+                        .getFiler()
+                        .createSourceFile(packageName + "." + generatorClassName)
+                        .openWriter();
+                file.write("package " + packageName + ";\n");
+                file.write("public class " + generatorClassName + " {\n");
+                file.write("    @org.apache.maven.api.di.Named(\"" + groupId + ":" + artifactId + ":" + version + ":"
+                        + mojoName + "\")\n");
+                file.write("    @org.apache.maven.api.di.Provides\n");
+                file.write("    public static " + ((TypeElement) elem).getQualifiedName() + " create() {\n");
+                file.write("        return new " + ((TypeElement) elem).getQualifiedName() + "();\n");
+                file.write("    }\n");
+                file.write("}\n");
+                file.flush();
+                file.close();
+            } catch (Exception ex) {
+                Logger.getLogger(IndexAnnotationProcessor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            addClassToIndex(packageName + "." + generatorClassName);
         }
         if (roundEnv.processingOver()) {
             flushIndex();

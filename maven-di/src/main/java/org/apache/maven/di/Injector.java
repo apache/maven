@@ -38,11 +38,11 @@ public interface Injector {
 
     <T> Injector bindInstance(Class<T> cls, T instance);
 
-    <T> Injector bindInstanceAndInject(Class<T> cls, T instance);
-
     //
     // Bean access
     //
+
+    <T> void injectInstance(T instance);
 
     <T> T getInstance(Class<T> key);
 

@@ -83,7 +83,7 @@ public final class ReflectionUtils {
         for (Annotation annotation : annotatedElement.getDeclaredAnnotations()) {
             if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
                 if (qualifier != null) {
-                    throw new DIException("More than one name annotation on " + annotatedElement);
+                    throw new DIException("More than one qualifier annotation on " + annotatedElement);
                 }
                 if (annotation instanceof Named) {
                     qualifier = ((Named) annotation).value();
@@ -276,6 +276,18 @@ public final class ReflectionUtils {
     }
 
     public static Key<?>[] toDependencies(@Nullable Type container, Executable executable) {
+        Key<?>[] keys = toArgDependencies(container, executable);
+        if (executable instanceof Constructor || Modifier.isStatic(executable.getModifiers())) {
+            return keys;
+        } else {
+            Key<?>[] nkeys = new Key[keys.length + 1];
+            nkeys[0] = Key.ofType(container);
+            System.arraycopy(keys, 0, nkeys, 1, keys.length);
+            return nkeys;
+        }
+    }
+
+    private static Key<?>[] toArgDependencies(@Nullable Type container, Executable executable) {
         Parameter[] parameters = executable.getParameters();
         Key<?>[] dependencies = new Key<?>[parameters.length];
         if (parameters.length == 0) {
@@ -302,7 +314,16 @@ public final class ReflectionUtils {
         Binding<T> binding = Binding.to(
                 args -> {
                     try {
-                        T result = (T) method.invoke(null, args);
+                        Object instance;
+                        Object[] params;
+                        if (Modifier.isStatic(method.getModifiers())) {
+                            instance = null;
+                            params = args;
+                        } else {
+                            instance = args[0];
+                            params = Arrays.copyOfRange(args, 1, args.length);
+                        }
+                        T result = (T) method.invoke(instance, params);
                         if (result == null) {
                             throw new NullPointerException(
                                     "@Provides method must return non-null result, method " + method);

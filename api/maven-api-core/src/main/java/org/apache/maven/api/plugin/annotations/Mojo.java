@@ -27,7 +27,6 @@ import java.lang.annotation.Target;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.di.Qualifier;
 
 /**
  * This annotation will mark your class as a Mojo (ie. goal in a Maven plugin).
@@ -42,7 +41,6 @@ import org.apache.maven.api.di.Qualifier;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
-@Qualifier
 public @interface Mojo {
     /**
      * goal name (required).

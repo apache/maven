@@ -18,9 +18,7 @@
  */
 package org.apache.maven.di.impl;
 
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.di.Injector;
-import org.apache.maven.di.Key;
 
 /**
  * A runtime exception that is thrown on startup when some static conditions fail
@@ -28,12 +26,6 @@ import org.apache.maven.di.Key;
  * you ask an {@link Injector} for an instance it does not have a {@link Binding binding} for.
  */
 public final class DIException extends RuntimeException {
-    public static DIException cannotConstruct(Key<?> key, @Nullable Binding<?> binding) {
-        return new DIException((binding != null ? "Binding refused to" : "No binding to")
-                + " construct an instance for key "
-                + key.getDisplayString());
-    }
-
     public DIException(String message) {
         super(message);
     }

@@ -20,7 +20,6 @@ package org.apache.maven.di.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.*;
@@ -52,6 +51,14 @@ public class InjectorImpl implements Injector {
         return getCompiledBinding(key).get();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> void injectInstance(T instance) {
+        ReflectionUtils.generateInjectingInitializer(Key.of((Class<T>) instance.getClass()))
+                .compile(this::getCompiledBinding)
+                .accept(instance);
+    }
+
     public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Scope scope) {
         if (scopes.put(scopeAnnotation, scope) != null) {
             throw new DIException(
@@ -60,30 +67,33 @@ public class InjectorImpl implements Injector {
         return this;
     }
 
-    public <U> Injector bindInstance(Class<U> cls, U instance) {
-        return bind(Key.of(cls), Binding.toInstance(instance));
+    public <U> Injector bindInstance(Class<U> clazz, U instance) {
+        Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
+        Binding<U> binding = Binding.toInstance(instance);
+        return doBind(key, binding);
     }
 
     @Override
-    public <T> Injector bindInstanceAndInject(Class<T> cls, T instance) {
-        Key<T> key = Key.of(cls);
-        return bind(
-                key, Binding.toInstance(instance).initializeWith(ReflectionUtils.generateInjectingInitializer(key)));
+    public Injector bindImplicit(Class<?> clazz) {
+        Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
+        Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
+        return doBind(key, binding);
     }
 
-    public <U> Injector bind(Key<U> key, Binding<U> b) {
-        Set<Binding<?>> bindingSet = bindings.computeIfAbsent(key, $ -> new HashSet<>());
-        bindingSet.add(b);
+    private Injector doBind(Key<?> key, Binding<?> binding) {
+        doBindImplicit(key, binding);
+        Class<?> cls = key.getRawType().getSuperclass();
+        while (cls != Object.class && cls != null) {
+            key = Key.of(cls, key.getQualifier());
+            doBindImplicit(key, binding);
+            cls = cls.getSuperclass();
+        }
         return this;
     }
 
-    @Override
-    public Injector bindImplicit(Class<?> moduleClass) {
-        Class<?> cls = moduleClass;
-        while (cls != Object.class && cls != null) {
-            doBindImplicit(cls);
-            cls = cls.getSuperclass();
-        }
+    protected <U> Injector bind(Key<U> key, Binding<U> b) {
+        Set<Binding<?>> bindingSet = bindings.computeIfAbsent(key, $ -> new HashSet<>());
+        bindingSet.add(b);
         return this;
     }
 
@@ -124,7 +134,9 @@ public class InjectorImpl implements Injector {
                 return (() -> (Q) new WrappingMap<>(map, Supplier::get));
             }
         }
-        throw DIException.cannotConstruct(key, null);
+        throw new DIException("No binding to construct an instance for key "
+                + key.getDisplayString() + ".  Existing bindings:\n"
+                + bindings.keySet().stream().map(Key::toString).collect(Collectors.joining("\n - ", " - ", "")));
     }
 
     @SuppressWarnings("unchecked")
@@ -142,10 +154,7 @@ public class InjectorImpl implements Injector {
         return compiled;
     }
 
-    @SuppressWarnings("unchecked")
-    protected void doBindImplicit(Class<?> clazz) {
-        Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
-        Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
+    protected void doBindImplicit(Key<?> key, Binding<?> binding) {
         if (binding != null) {
             // For non-explicit bindings, also bind all their base classes and interfaces according to the @Type
             Set<Key<?>> toBind = new HashSet<>();
@@ -191,35 +200,71 @@ public class InjectorImpl implements Injector {
             toBind.forEach((k -> bind((Key<Object>) k, (Binding<Object>) binding)));
         }
         // Bind inner classes
-        for (Class<?> inner : clazz.getDeclaredClasses()) {
+        for (Class<?> inner : key.getRawType().getDeclaredClasses()) {
             bindImplicit(inner);
         }
         // Bind inner providers
-        for (Method method : clazz.getDeclaredMethods()) {
+        for (Method method : key.getRawType().getDeclaredMethods()) {
             if (method.isAnnotationPresent(Provides.class)) {
-                if (!Modifier.isStatic(method.getModifiers())) {
-                    throw new DIException(
-                            "Found non-static provider method while scanning for statics, method " + method);
-                }
-
                 Object qualifier = ReflectionUtils.qualifierOf(method);
                 Annotation scope = ReflectionUtils.scopeOf(method);
 
                 TypeVariable<Method>[] methodTypeParameters = method.getTypeParameters();
+                if (methodTypeParameters.length != 0) {
+                    throw new DIException("Parameterized method are not supported " + method);
+                }
                 Map<TypeVariable<?>, Type> mapping = new HashMap<>();
                 for (TypeVariable<Method> methodTypeParameter : methodTypeParameters) {
                     mapping.put(methodTypeParameter, methodTypeParameter);
                 }
-                mapping.putAll(Types.getAllTypeBindings(clazz));
+                mapping.putAll(Types.getAllTypeBindings(key.getRawType()));
 
                 Type returnType = Types.bind(method.getGenericReturnType(), mapping);
+                Key<Object> rkey = Key.ofType(returnType, qualifier);
 
-                if (methodTypeParameters.length == 0) {
-                    Key<Object> rkey = Key.ofType(returnType, qualifier);
-                    bind(rkey, ReflectionUtils.bindingFromMethod(method).scope(scope));
+                Set<Class<?>> types;
+                Typed typed = method.getAnnotation(Typed.class);
+                if (typed != null) {
+                    Class<?>[] typesArray = typed.value();
+                    if (typesArray == null || typesArray.length == 0) {
+                        types = new HashSet<>(Arrays.asList(rkey.getRawType().getInterfaces()));
+                        types.add(Object.class);
+                    } else {
+                        types = new HashSet<>(Arrays.asList(typesArray));
+                    }
                 } else {
-                    throw new DIException("Parameterized method are not supported " + method);
+                    types = null;
                 }
+
+                Set<Key<?>> toBind = new HashSet<>();
+                Deque<Key<?>> todo = new ArrayDeque<>();
+                todo.add(rkey);
+
+                Set<Key<?>> done = new HashSet<>();
+                while (!todo.isEmpty()) {
+                    Key<?> type = todo.remove();
+                    if (done.add(type)) {
+                        Class<?> cls = Types.getRawType(type.getType());
+                        Type[] interfaces = cls.getGenericInterfaces();
+                        Arrays.stream(interfaces)
+                                .map(t -> Key.ofType(t, qualifier))
+                                .forEach(todo::add);
+                        Type supercls = cls.getGenericSuperclass();
+                        if (supercls != null) {
+                            todo.add(Key.ofType(supercls, qualifier));
+                        }
+                        if (types == null || types.contains(cls)) {
+                            toBind.add(type);
+                        }
+                    }
+                }
+                // Also bind without the qualifier
+                if (qualifier != null) {
+                    new HashSet<>(toBind).forEach(k -> toBind.add(Key.ofType(k.getType())));
+                }
+
+                Binding<Object> bind = ReflectionUtils.bindingFromMethod(method).scope(scope);
+                toBind.forEach((k -> bind((Key<Object>) k, bind)));
             }
         }
     }
