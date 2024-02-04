@@ -504,6 +504,34 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
+    public Map<PathType, List<Path>> resolveDependencies(
+            @Nonnull DependencyCoordinate dependency,
+            @Nonnull PathScope scope,
+            @Nonnull Collection<PathType> desiredTypes) {
+        return getService(DependencyResolver.class)
+                .resolve(DependencyResolverRequest.builder()
+                        .session(this)
+                        .dependency(dependency)
+                        .pathScope(scope)
+                        .pathTypeFilter(desiredTypes)
+                        .build())
+                .getDispatchedPaths();
+    }
+
+    @Override
+    public Map<PathType, List<Path>> resolveDependencies(
+            @Nonnull Project project, @Nonnull PathScope scope, @Nonnull Collection<PathType> desiredTypes) {
+        return getService(DependencyResolver.class)
+                .resolve(DependencyResolverRequest.builder()
+                        .session(this)
+                        .project(project)
+                        .pathScope(scope)
+                        .pathTypeFilter(desiredTypes)
+                        .build())
+                .getDispatchedPaths();
+    }
+
+    @Override
     public Path getPathForLocalArtifact(@Nonnull Artifact artifact) {
         return getService(LocalRepositoryManager.class).getPathForLocalArtifact(this, getLocalRepository(), artifact);
     }

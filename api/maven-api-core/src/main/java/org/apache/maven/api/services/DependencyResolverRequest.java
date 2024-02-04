@@ -173,10 +173,31 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
             return this;
         }
 
+        /**
+         * Filters the types of paths to include in the result.
+         * The result will contain only the paths of types for which the predicate returned {@code true}.
+         * It is recommended to apply a filter for retaining only the types of paths of interest,
+         * because it can resolve ambiguities when a path could be of many types.
+         *
+         * @param pathTypeFilter predicate evaluating whether a path type should be included in the result
+         * @return {@code this} for method call chaining
+         */
         @Nonnull
         public DependencyResolverRequestBuilder pathTypeFilter(@Nonnull Predicate<PathType> pathTypeFilter) {
             this.pathTypeFilter = pathTypeFilter;
             return this;
+        }
+
+        /**
+         * Specifies the type of paths to include in the result. This is a convenience method for
+         * {@link #pathTypeFilter(Predicate)} using {@link Collection#contains(Object)} as the filter.
+         *
+         * @param desiredTypes the type of paths to include in the result
+         * @return {@code this} for method call chaining
+         */
+        @Nonnull
+        public DependencyResolverRequestBuilder pathTypeFilter(@Nonnull Collection<PathType> desiredTypes) {
+            return pathTypeFilter(desiredTypes::contains);
         }
 
         @Override

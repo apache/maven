@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PlexusTest
@@ -126,6 +128,17 @@ class TestApi {
         sessionScope.seed(InternalSession.class, InternalSession.from(this.session));
     }
 
+    private Project project(Artifact artifact) {
+        return session.getService(ProjectBuilder.class)
+                .build(ProjectBuilderRequest.builder()
+                        .session(session)
+                        .path(session.getPathForLocalArtifact(artifact))
+                        .processPlugins(false)
+                        .build())
+                .getProject()
+                .get();
+    }
+
     @Test
     void testCreateAndResolveArtifact() {
         ArtifactCoordinate coord =
@@ -144,14 +157,7 @@ class TestApi {
     void testBuildProject() {
         Artifact artifact = session.createArtifact("org.codehaus.plexus", "plexus-utils", "1.4.5", "pom");
 
-        Project project = session.getService(ProjectBuilder.class)
-                .build(ProjectBuilderRequest.builder()
-                        .session(session)
-                        .path(session.getPathForLocalArtifact(artifact))
-                        .processPlugins(false)
-                        .build())
-                .getProject()
-                .get();
+        Project project = project(artifact);
         assertNotNull(project);
     }
 
@@ -165,28 +171,43 @@ class TestApi {
 
     @Test
     void testResolveArtifactCoordinateDependencies() {
-        ArtifactCoordinate coord =
-                session.createArtifactCoordinate("org.apache.maven.core.test", "test-extension", "1", "jar");
+        DependencyCoordinate coord = session.createDependencyCoordinate(
+                session.createArtifactCoordinate("org.apache.maven.core.test", "test-extension", "1", "jar"));
 
-        List<Path> paths = session.resolveDependencies(session.createDependencyCoordinate(coord));
+        List<Path> paths = session.resolveDependencies(coord);
 
         assertNotNull(paths);
         assertEquals(10, paths.size());
         assertEquals("test-extension-1.jar", paths.get(0).getFileName().toString());
+
+        // JUnit has an "Automatic-Module-Name", so it appears on the module path.
+        Map<PathType, List<Path>> dispatched = session.resolveDependencies(
+                coord, PathScope.TEST_COMPILE, Arrays.asList(JavaPathType.CLASSES, JavaPathType.MODULES));
+        List<Path> classes = dispatched.get(JavaPathType.CLASSES);
+        List<Path> modules = dispatched.get(JavaPathType.MODULES);
+        assertEquals(2, dispatched.size());
+        assertEquals(8, classes.size()); // "pluxus.pom" and "junit.jar" are excluded.
+        assertEquals(1, modules.size());
+        assertEquals("test-extension-1.jar", classes.get(0).getFileName().toString());
+        assertEquals("junit-4.13.1.jar", modules.get(0).getFileName().toString());
+        assertTrue(paths.containsAll(classes));
+        assertTrue(paths.containsAll(modules));
+
+        // If caller wants only a classpath, JUnit shall move there.
+        dispatched = session.resolveDependencies(coord, PathScope.TEST_COMPILE, Arrays.asList(JavaPathType.CLASSES));
+        classes = dispatched.get(JavaPathType.CLASSES);
+        modules = dispatched.get(JavaPathType.MODULES);
+        assertEquals(1, dispatched.size());
+        assertEquals(9, classes.size());
+        assertNull(modules);
+        assertTrue(paths.containsAll(classes));
     }
 
     @Test
     void testProjectDependencies() {
         Artifact pom = session.createArtifact("org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "pom");
 
-        Project project = session.getService(ProjectBuilder.class)
-                .build(ProjectBuilderRequest.builder()
-                        .session(session)
-                        .path(session.getPathForLocalArtifact(pom))
-                        .processPlugins(false)
-                        .build())
-                .getProject()
-                .get();
+        Project project = project(pom);
         assertNotNull(project);
 
         Artifact artifact = session.createArtifact("org.apache.maven.core.test", "test-extension", "1", "jar");

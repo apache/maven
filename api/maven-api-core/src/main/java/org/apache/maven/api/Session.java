@@ -585,6 +585,36 @@ public interface Session {
     List<Path> resolveDependencies(@Nonnull Project project, @Nonnull PathScope scope);
 
     /**
+     * Shortcut for {@code getService(DependencyResolver.class).resolve(...).getDispatchedPaths()}.
+     *
+     * @param dependencyCoordinate coordinate of the dependency for which to get the paths
+     * @param scope build path scope (main compile, test compile, etc.) of desired paths
+     * @param desiredTypes the type of paths to include in the result
+     * @return paths to the transitive dependencies of the given project
+     *
+     * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, Project, PathScope)
+     */
+    @Nonnull
+    Map<PathType, List<Path>> resolveDependencies(
+            @Nonnull DependencyCoordinate dependencyCoordinate,
+            @Nonnull PathScope scope,
+            @Nonnull Collection<PathType> desiredTypes);
+
+    /**
+     * Shortcut for {@code getService(DependencyResolver.class).resolve(...).getDispatchedPaths()}.
+     *
+     * @param project the project for which to get dependencies
+     * @param scope build path scope (main compile, test compile, etc.) of desired paths
+     * @param desiredTypes the type of paths to include in the result
+     * @return paths to the transitive dependencies of the given project
+     *
+     * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, Project, PathScope)
+     */
+    @Nonnull
+    Map<PathType, List<Path>> resolveDependencies(
+            @Nonnull Project project, @Nonnull PathScope scope, @Nonnull Collection<PathType> desiredTypes);
+
+    /**
      * Resolves an artifact's meta version (if any) to a concrete version. For example, resolves "1.0-SNAPSHOT"
      * to "1.0-20090208.132618-23" or "RELEASE"/"LATEST" to "2.0".
      * <p>
