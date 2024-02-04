@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
@@ -53,40 +54,49 @@ public abstract class AbstractSession implements InternalSession {
     private final Map<org.eclipse.aether.graph.Dependency, Dependency> allDependencies =
             Collections.synchronizedMap(new WeakHashMap<>());
 
+    @Override
     public RemoteRepository getRemoteRepository(org.eclipse.aether.repository.RemoteRepository repository) {
         return allRepositories.computeIfAbsent(repository, DefaultRemoteRepository::new);
     }
 
+    @Override
     public Node getNode(org.eclipse.aether.graph.DependencyNode node) {
         return getNode(node, false);
     }
 
+    @Override
     public Node getNode(org.eclipse.aether.graph.DependencyNode node, boolean verbose) {
         return allNodes.computeIfAbsent(node, n -> new DefaultNode(this, n, verbose));
     }
 
     @Nonnull
+    @Override
     public Artifact getArtifact(@Nonnull org.eclipse.aether.artifact.Artifact artifact) {
         return allArtifacts.computeIfAbsent(artifact, a -> new DefaultArtifact(this, a));
     }
 
     @Nonnull
+    @Override
     public Dependency getDependency(@Nonnull org.eclipse.aether.graph.Dependency dependency) {
         return allDependencies.computeIfAbsent(dependency, d -> new DefaultDependency(this, d));
     }
 
+    @Override
     public List<Project> getProjects(List<MavenProject> projects) {
         return projects == null ? null : map(projects, this::getProject);
     }
 
+    @Override
     public Project getProject(MavenProject project) {
         return allProjects.computeIfAbsent(project.getId(), id -> new DefaultProject(this, project));
     }
 
+    @Override
     public List<org.eclipse.aether.repository.RemoteRepository> toRepositories(List<RemoteRepository> repositories) {
         return repositories == null ? null : map(repositories, this::toRepository);
     }
 
+    @Override
     public org.eclipse.aether.repository.RemoteRepository toRepository(RemoteRepository repository) {
         if (repository instanceof DefaultRemoteRepository) {
             return ((DefaultRemoteRepository) repository).getRepository();
@@ -96,6 +106,7 @@ public abstract class AbstractSession implements InternalSession {
         }
     }
 
+    @Override
     public org.eclipse.aether.repository.LocalRepository toRepository(LocalRepository repository) {
         if (repository instanceof DefaultLocalRepository) {
             return ((DefaultLocalRepository) repository).getRepository();
@@ -105,22 +116,28 @@ public abstract class AbstractSession implements InternalSession {
         }
     }
 
+    @Override
     public List<ArtifactRepository> toArtifactRepositories(List<RemoteRepository> repositories) {
         return repositories == null ? null : map(repositories, this::toArtifactRepository);
     }
 
+    @Override
     public abstract ArtifactRepository toArtifactRepository(RemoteRepository repository);
 
+    @Override
     public List<org.eclipse.aether.graph.Dependency> toDependencies(Collection<DependencyCoordinate> dependencies) {
         return dependencies == null ? null : map(dependencies, this::toDependency);
     }
 
+    @Override
     public abstract org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency);
 
+    @Override
     public List<org.eclipse.aether.artifact.Artifact> toArtifacts(Collection<Artifact> artifacts) {
         return artifacts == null ? null : map(artifacts, this::toArtifact);
     }
 
+    @Override
     public org.eclipse.aether.artifact.Artifact toArtifact(Artifact artifact) {
         File file = getService(ArtifactManager.class)
                 .getPath(artifact)
@@ -142,6 +159,7 @@ public abstract class AbstractSession implements InternalSession {
                 file);
     }
 
+    @Override
     public org.eclipse.aether.artifact.Artifact toArtifact(ArtifactCoordinate coord) {
         if (coord instanceof DefaultArtifactCoordinate) {
             return ((DefaultArtifactCoordinate) coord).getCoordinate();
@@ -335,7 +353,8 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public Map<Artifact, Path> resolveArtifacts(Artifact... artifacts) {
         ArtifactCoordinateFactory acf = getService(ArtifactCoordinateFactory.class);
-        List<ArtifactCoordinate> coords = map(Arrays.asList(artifacts), a -> acf.create(this, a));
+        List<ArtifactCoordinate> coords =
+                Arrays.stream(artifacts).map(a -> acf.create(this, a)).collect(Collectors.toList());
         return resolveArtifacts(coords);
     }
 
@@ -420,6 +439,7 @@ public abstract class AbstractSession implements InternalSession {
      * @see DependencyCoordinateFactory#create(Session, ArtifactCoordinate)
      */
     @Nonnull
+    @Override
     public DependencyCoordinate createDependencyCoordinate(@Nonnull Dependency dependency) {
         return getService(DependencyCoordinateFactory.class).create(this, dependency);
     }

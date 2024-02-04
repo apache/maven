@@ -195,12 +195,20 @@ public interface Session {
     /**
      * Shortcut for {@code getService(RepositoryFactory.class).createLocal(...)}.
      *
+     * @param path location of the local repository to create
+     * @return cache of artifacts downloaded from a remote repository or built locally
+     *
      * @see org.apache.maven.api.services.RepositoryFactory#createLocal(Path)
      */
-    LocalRepository createLocalRepository(Path path);
+    @Nonnull
+    LocalRepository createLocalRepository(@Nonnull Path path);
 
     /**
      * Shortcut for {@code getService(RepositoryFactory.class).createRemote(...)}.
+     *
+     * @param  id identifier of the remote repository to create
+     * @param  url location of the remote repository
+     * @return remote repository that can be used to download or upload artifacts
      *
      * @see org.apache.maven.api.services.RepositoryFactory#createRemote(String, String)
      */
@@ -210,47 +218,75 @@ public interface Session {
     /**
      * Shortcut for {@code getService(RepositoryFactory.class).createRemote(...)}.
      *
+     * @param repository information needed for establishing connections with remote repository
+     * @return remote repository that can be used to download or upload artifacts
+     *
      * @see org.apache.maven.api.services.RepositoryFactory#createRemote(Repository)
      */
     @Nonnull
     RemoteRepository createRemoteRepository(@Nonnull Repository repository);
 
     /**
-     * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
-     *
-     * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String, String, String, String)
-     */
-    ArtifactCoordinate createArtifactCoordinate(String groupId, String artifactId, String version, String extension);
-
-    /**
      * Creates a coordinate out of string that is formatted like:
-     * {@code <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>}
+     * {@code <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>}.
      * <p>
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
      *
      * @param coordString the string having "standard" coordinate.
-     * @return an {@code ArtifactCoordinate}, never {@code null}
+     * @return coordinate used to point to the artifact
+     *
      * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String)
      */
-    ArtifactCoordinate createArtifactCoordinate(String coordString);
+    @Nonnull
+    ArtifactCoordinate createArtifactCoordinate(@Nonnull String coordString);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
      *
+     * @param groupId the group identifier, or {@code null} is unspecified
+     * @param artifactId the artifact identifier, or {@code null} is unspecified
+     * @param version the artifact version, or {@code null} is unspecified
+     * @param extension the artifact extension, or {@code null} is unspecified
+     * @return coordinate used to point to the artifact
+     *
+     * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String, String, String, String)
+     */
+    @Nonnull
+    ArtifactCoordinate createArtifactCoordinate(String groupId, String artifactId, String version, String extension);
+
+    /**
+     * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
+     *
+     * @param groupId the group identifier, or {@code null} is unspecified
+     * @param artifactId the artifact identifier, or {@code null} is unspecified
+     * @param version the artifact version, or {@code null} is unspecified
+     * @param classifier the artifact classifier, or {@code null} is unspecified
+     * @param extension the artifact extension, or {@code null} is unspecified
+     * @param type the artifact type, or {@code null} is unspecified
+     * @return coordinate used to point to the artifact
+     *
      * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String, String, String, String, String, String)
      */
+    @Nonnull
     ArtifactCoordinate createArtifactCoordinate(
             String groupId, String artifactId, String version, String classifier, String extension, String type);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
      *
+     * @param artifact artifact from which to get coordinates
+     * @return coordinate used to point to the artifact
+     *
      * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String, String, String, String, String, String)
      */
-    ArtifactCoordinate createArtifactCoordinate(Artifact artifact);
+    @Nonnull
+    ArtifactCoordinate createArtifactCoordinate(@Nonnull Artifact artifact);
 
     /**
      * Shortcut for {@code getService(DependencyFactory.class).create(...)}.
+     *
+     * @param coordinate artifact coordinate to get as a dependency coordinate
+     * @return dependency coordinate for the given artifact
      *
      * @see DependencyCoordinateFactory#create(Session, ArtifactCoordinate)
      */
@@ -260,6 +296,9 @@ public interface Session {
     /**
      * Shortcut for {@code getService(DependencyFactory.class).create(...)}.
      *
+     * @param dependency dependency for which to get the coordinate
+     * @return coordinate for the given dependency
+     *
      * @see DependencyCoordinateFactory#create(Session, Dependency)
      */
     @Nonnull
@@ -268,84 +307,130 @@ public interface Session {
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
      *
+     * @param groupId the group identifier, or {@code null} is unspecified
+     * @param artifactId the artifact identifier, or {@code null} is unspecified
+     * @param version the artifact version, or {@code null} is unspecified
+     * @param extension the artifact extension, or {@code null} is unspecified
+     * @return artifact with the given coordinates
+     *
      * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String)
      */
+    @Nonnull
     Artifact createArtifact(String groupId, String artifactId, String version, String extension);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
      *
+     * @param groupId the group identifier, or {@code null} is unspecified
+     * @param artifactId the artifact identifier, or {@code null} is unspecified
+     * @param version the artifact version, or {@code null} is unspecified
+     * @param classifier the artifact classifier, or {@code null} is unspecified
+     * @param extension the artifact extension, or {@code null} is unspecified
+     * @param type the artifact type, or {@code null} is unspecified
+     * @return artifact with the given coordinates
+     *
      * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String, String, String)
      */
+    @Nonnull
     Artifact createArtifact(
             String groupId, String artifactId, String version, String classifier, String extension, String type);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
      *
-     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
+     * @param coordinate coordinates of the artifact to resolve
+     * @return requested artifact together with the path to its file
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     *
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
-    Map.Entry<Artifact, Path> resolveArtifact(ArtifactCoordinate coordinate);
+    @Nonnull
+    Map.Entry<Artifact, Path> resolveArtifact(@Nonnull ArtifactCoordinate coordinate);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
      *
-     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
+     * @param coordinates coordinates of all artifacts to resolve
+     * @return requested artifacts together with the paths to their files
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     *
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
-    Map<Artifact, Path> resolveArtifacts(ArtifactCoordinate... coordinates);
+    @Nonnull
+    Map<Artifact, Path> resolveArtifacts(@Nonnull ArtifactCoordinate... coordinates);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
      *
-     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
+     * @param coordinates coordinates of all artifacts to resolve
+     * @return requested artifacts together with the paths to their files
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     *
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
-    Map<Artifact, Path> resolveArtifacts(Collection<? extends ArtifactCoordinate> coordinates);
+    @Nonnull
+    Map<Artifact, Path> resolveArtifacts(@Nonnull Collection<? extends ArtifactCoordinate> coordinates);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
      *
-     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
+     * @param artifact the artifact to resolve
+     * @return requested artifact together with the path to its file
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     *
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
-    Map.Entry<Artifact, Path> resolveArtifact(Artifact artifact);
+    @Nonnull
+    Map.Entry<Artifact, Path> resolveArtifact(@Nonnull Artifact artifact);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
      *
-     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
+     * @param artifacts all artifacts to resolve
+     * @return requested artifacts together with the paths to their files
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     *
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
-    Map<Artifact, Path> resolveArtifacts(Artifact... artifacts);
+    @Nonnull
+    Map<Artifact, Path> resolveArtifacts(@Nonnull Artifact... artifacts);
 
     /**
      * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}.
      *
-     * @see org.apache.maven.api.services.ArtifactInstaller#install(Session, Collection)
+     * @param artifacts the artifacts to install
      * @throws org.apache.maven.api.services.ArtifactInstallerException if the artifacts installation failed
+     *
+     * @see org.apache.maven.api.services.ArtifactInstaller#install(Session, Collection)
      */
-    void installArtifacts(Artifact... artifacts);
+    void installArtifacts(@Nonnull Artifact... artifacts);
 
     /**
      * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}.
      *
-     * @see org.apache.maven.api.services.ArtifactInstaller#install(Session, Collection)
+     * @param artifacts the artifacts to install
      * @throws org.apache.maven.api.services.ArtifactInstallerException if the artifacts installation failed
+     *
+     * @see org.apache.maven.api.services.ArtifactInstaller#install(Session, Collection)
      */
-    void installArtifacts(Collection<Artifact> artifacts);
+    void installArtifacts(@Nonnull Collection<Artifact> artifacts);
 
     /**
      * Shortcut for {@code getService(ArtifactDeployer.class).deploy(...)}.
      *
-     * @see org.apache.maven.api.services.ArtifactDeployer#deploy(Session, RemoteRepository, Collection)
+     * @param repository the repository where to deploy artifacts
+     * @param artifacts the artifacts to deploy
      * @throws org.apache.maven.api.services.ArtifactDeployerException if the artifacts deployment failed
+     *
+     * @see org.apache.maven.api.services.ArtifactDeployer#deploy(Session, RemoteRepository, Collection)
      */
-    void deployArtifact(RemoteRepository repository, Artifact... artifacts);
+    void deployArtifact(@Nonnull RemoteRepository repository, @Nonnull Artifact... artifacts);
 
     /**
      * Shortcut for {@code getService(ArtifactManager.class).setPath(...)}.
+     *
+     * @param artifact the artifact for which to associate a path
+     * @param path path to associate to the given artifact
      *
      * @see org.apache.maven.api.services.ArtifactManager#setPath(Artifact, Path)
      */
@@ -353,6 +438,9 @@ public interface Session {
 
     /**
      * Shortcut for {@code getService(ArtifactManager.class).getPath(...)}.
+     *
+     * @param artifact the artifact for which to get a path
+     * @return path associated to the given artifact
      *
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
@@ -365,6 +453,9 @@ public interface Session {
      * <p>
      * Shortcut for {@code getService(LocalArtifactManager.class).getPathForLocalArtitact(...)}.
      *
+     * @param artifact the artifact for which to get a local path
+     * @return local path associated to the given artifact, or {@code null} if none
+     *
      * @see org.apache.maven.api.services.LocalRepositoryManager#getPathForLocalArtifact(Session, LocalRepository, Artifact)
      */
     Path getPathForLocalArtifact(@Nonnull Artifact artifact);
@@ -375,6 +466,10 @@ public interface Session {
      * the path merely indicates where the artifact would eventually be stored.
      * <p>
      * Shortcut for {@code getService(LocalArtifactManager.class).getPathForRemoteArtifact(...)}.
+     *
+     * @param remote the repository from where artifacts are downloaded
+     * @param artifact the artifact for which to get a path
+     * @return path associated to the given artifact
      *
      * @see org.apache.maven.api.services.LocalRepositoryManager#getPathForRemoteArtifact(Session, LocalRepository, RemoteRepository, Artifact)
      */
@@ -389,12 +484,18 @@ public interface Session {
      * In case there is {@link Artifact} in scope, the recommended way to perform this check is
      * use of {@link Artifact#isSnapshot()} instead.
      *
+     * @param version artifact version
+     * @return whether the given version is a snapshot
+     *
      * @see org.apache.maven.api.services.VersionParser#isSnapshot(String)
      */
     boolean isVersionSnapshot(@Nonnull String version);
 
     /**
      * Shortcut for {@code getService(DependencyCollector.class).collect(...)}
+     *
+     * @param artifact artifact for which to get the dependencies, including transitive ones
+     * @return root node of the dependency graph for the given artifact
      *
      * @see org.apache.maven.api.services.DependencyCollector#collect(Session, Artifact)
      * @throws org.apache.maven.api.services.DependencyCollectorException if the dependency collection failed
@@ -404,6 +505,9 @@ public interface Session {
 
     /**
      * Shortcut for {@code getService(DependencyCollector.class).collect(...)}
+     *
+     * @param project project for which to get the dependencies, including transitive ones
+     * @return root node of the dependency graph for the given project
      *
      * @see org.apache.maven.api.services.DependencyCollector#collect(Session, Project)
      * @throws org.apache.maven.api.services.DependencyCollectorException if the dependency collection failed
@@ -418,6 +522,9 @@ public interface Session {
      * <p>
      * Shortcut for {@code getService(DependencyCollector.class).resolve(...)}
      *
+     * @param dependency dependency for which to get transitive dependencies
+     * @return root node of the dependency graph for the given artifact
+     *
      * @see org.apache.maven.api.services.DependencyCollector#collect(Session, DependencyCoordinate)
      * @throws org.apache.maven.api.services.DependencyCollectorException if the dependency collection failed
      */
@@ -427,18 +534,53 @@ public interface Session {
     /**
      * Shortcut for {@code getService(DependencyResolver.class).flatten(...)}.
      *
-     * @see org.apache.maven.api.services.DependencyResolver#flatten(Session, Node, PathScope)
+     * @param node node for which to get a flattened list
+     * @param scope build path scope (main compile, test compile, etc.) of desired nodes
+     * @return flattened list of node with the given build path scope
      * @throws org.apache.maven.api.services.DependencyResolverException if the dependency flattening failed
+     *
+     * @see org.apache.maven.api.services.DependencyResolver#flatten(Session, Node, PathScope)
+     *
+     * @todo Does the returned list include the given node?
      */
     @Nonnull
     List<Node> flattenDependencies(@Nonnull Node node, @Nonnull PathScope scope);
 
+    /**
+     * Shortcut for {@code getService(DependencyResolver.class).resolve(...).getPaths()}.
+     *
+     * @param dependencyCoordinate coordinate of the dependency for which to get the paths
+     * @return paths to the transitive dependencies of the given dependency
+     *
+     * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, DependencyCoordinate)
+     *
+     * @todo Does the returned list include the path to the given dependency?
+     */
     @Nonnull
     List<Path> resolveDependencies(@Nonnull DependencyCoordinate dependencyCoordinate);
 
+    /**
+     * Shortcut for {@code getService(DependencyResolver.class).resolve(...).getPaths()}.
+     *
+     * @param dependencyCoordinates coordinates of all dependency for which to get the paths
+     * @return paths to the transitive dependencies of the given dependencies
+     *
+     * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, List)
+     *
+     * @todo Does the returned list include the path to the given dependencies?
+     */
     @Nonnull
     List<Path> resolveDependencies(@Nonnull List<DependencyCoordinate> dependencyCoordinates);
 
+    /**
+     * Shortcut for {@code getService(DependencyResolver.class).resolve(...).getPaths()}.
+     *
+     * @param project the project for which to get dependencies
+     * @param scope build path scope (main compile, test compile, etc.) of desired paths
+     * @return paths to the transitive dependencies of the given project
+     *
+     * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, Project, PathScope)
+     */
     @Nonnull
     List<Path> resolveDependencies(@Nonnull Project project, @Nonnull PathScope scope);
 
@@ -448,8 +590,11 @@ public interface Session {
      * <p>
      * Shortcut for {@code getService(VersionResolver.class).resolve(...)}
      *
-     * @see org.apache.maven.api.services.VersionResolver#resolve(Session, ArtifactCoordinate) (String)
+     * @param artifact the artifact for which to resolve the version
+     * @return resolved version of the given artifact
      * @throws org.apache.maven.api.services.VersionResolverException if the resolution failed
+     *
+     * @see org.apache.maven.api.services.VersionResolver#resolve(Session, ArtifactCoordinate) (String)
      */
     @Nonnull
     Version resolveVersion(@Nonnull ArtifactCoordinate artifact);
@@ -462,9 +607,10 @@ public interface Session {
      * In this case though, the result contains simply the (parsed) input version, regardless of the
      * repositories and their contents.
      *
+     * @param artifact the artifact for which to resolve the versions
      * @return a list of resolved {@code Version}s.
-     * @see org.apache.maven.api.services.VersionRangeResolver#resolve(Session, ArtifactCoordinate) (String)
      * @throws org.apache.maven.api.services.VersionRangeResolverException if the resolution failed
+     * @see org.apache.maven.api.services.VersionRangeResolver#resolve(Session, ArtifactCoordinate) (String)
      */
     @Nonnull
     List<Version> resolveVersionRange(@Nonnull ArtifactCoordinate artifact);
@@ -474,8 +620,10 @@ public interface Session {
      * <p>
      * Shortcut for {@code getService(VersionParser.class).parseVersion(...)}.
      *
-     * @see org.apache.maven.api.services.VersionParser#parseVersion(String)
+     * @param version the version string to parse
+     * @return the version parsed from the given string
      * @throws org.apache.maven.api.services.VersionParserException if the parsing failed
+     * @see org.apache.maven.api.services.VersionParser#parseVersion(String)
      */
     @Nonnull
     Version parseVersion(@Nonnull String version);
@@ -485,8 +633,10 @@ public interface Session {
      * <p>
      * Shortcut for {@code getService(VersionParser.class).parseVersionRange(...)}.
      *
-     * @see org.apache.maven.api.services.VersionParser#parseVersionRange(String)
+     * @param versionRange the version string to parse
+     * @return the version range parsed from the given string
      * @throws org.apache.maven.api.services.VersionParserException if the parsing failed
+     * @see org.apache.maven.api.services.VersionParser#parseVersionRange(String)
      */
     @Nonnull
     VersionRange parseVersionRange(@Nonnull String versionRange);
@@ -496,8 +646,10 @@ public interface Session {
      * <p>
      * Shortcut for {@code getService(VersionParser.class).parseVersionConstraint(...)}.
      *
-     * @see org.apache.maven.api.services.VersionParser#parseVersionConstraint(String)
+     * @param versionConstraint the version string to parse
+     * @return the version constraint parsed from the given string
      * @throws org.apache.maven.api.services.VersionParserException if the parsing failed
+     * @see org.apache.maven.api.services.VersionParser#parseVersionConstraint(String)
      */
     @Nonnull
     VersionConstraint parseVersionConstraint(@Nonnull String versionConstraint);
