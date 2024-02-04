@@ -540,8 +540,6 @@ public interface Session {
      * @throws org.apache.maven.api.services.DependencyResolverException if the dependency flattening failed
      *
      * @see org.apache.maven.api.services.DependencyResolver#flatten(Session, Node, PathScope)
-     *
-     * @todo Does the returned list include the given node?
      */
     @Nonnull
     List<Node> flattenDependencies(@Nonnull Node node, @Nonnull PathScope scope);
@@ -553,8 +551,6 @@ public interface Session {
      * @return paths to the transitive dependencies of the given dependency
      *
      * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, DependencyCoordinate)
-     *
-     * @todo Does the returned list include the path to the given dependency?
      */
     @Nonnull
     List<Path> resolveDependencies(@Nonnull DependencyCoordinate dependencyCoordinate);
@@ -566,8 +562,6 @@ public interface Session {
      * @return paths to the transitive dependencies of the given dependencies
      *
      * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, List)
-     *
-     * @todo Does the returned list include the path to the given dependencies?
      */
     @Nonnull
     List<Path> resolveDependencies(@Nonnull List<DependencyCoordinate> dependencyCoordinates);
