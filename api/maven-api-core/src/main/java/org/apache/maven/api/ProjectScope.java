@@ -29,7 +29,7 @@ import static org.apache.maven.api.ExtensibleEnums.projectScope;
  * (i.e. the <i>main</i> artifact) or the ones that will be used when building <i>tests</i>).
  * <p>
  * This extensible enum has two defined values, {@link #MAIN} and {@link #TEST},
- * but can be extended by registering a {@link org.apache.maven.api.spi.ProjectScopeProvider}.
+ * but can be extended by registering a {@code org.apache.maven.api.spi.ProjectScopeProvider}.
  * <p>
  * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
  * can be used as keys.

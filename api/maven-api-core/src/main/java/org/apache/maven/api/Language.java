@@ -27,7 +27,7 @@ import static org.apache.maven.api.ExtensibleEnums.language;
  * Language.
  * <p>
  * This extensible enum has two defined values, {@link #NONE} and {@link #JAVA_FAMILY},
- * but can be extended by registering a {@link org.apache.maven.api.spi.LanguageProvider}.
+ * but can be extended by registering a {@code org.apache.maven.api.spi.LanguageProvider}.
  * <p>
  * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
  * can be used as keys.
