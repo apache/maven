@@ -29,11 +29,14 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Dependency scope.
- * <p>
- * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
- * can be used as keys.
+ * This represents at which time the dependency will be used, for example, at compile time only,
+ * at run time or at test time.  For a given dependency, the scope is directly derived from the
+ * {@link org.apache.maven.api.model.Dependency#getScope()} and will be used when using {@link PathScope}
+ * and the {@link org.apache.maven.api.services.DependencyResolver}.
  *
  * @since 4.0.0
+ * @see org.apache.maven.api.model.Dependency#getScope()
+ * @see org.apache.maven.api.services.DependencyResolver
  */
 @Experimental
 @Immutable
@@ -41,7 +44,7 @@ public enum DependencyScope {
 
     /**
      * None. Allows you to declare dependencies (for example to alter reactor build order) but in reality dependencies
-     * in this scope are not part of any build path scope.
+     * in this scope are not part of any path scope.
      */
     NONE("none", false),
 
@@ -56,12 +59,12 @@ public enum DependencyScope {
     COMPILE_ONLY("compile-only", false),
 
     /**
-     * Compile.
+     * Compile, runtime and test.
      */
     COMPILE("compile", true),
 
     /**
-     * Runtime.
+     * Runtime and test.
      */
     RUNTIME("runtime", true),
 
@@ -76,7 +79,7 @@ public enum DependencyScope {
     TEST_ONLY("test-only", false),
 
     /**
-     * Test.
+     * Test compile and test runtime.
      */
     TEST("test", false),
 

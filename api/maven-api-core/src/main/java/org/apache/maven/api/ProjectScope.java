@@ -25,6 +25,11 @@ import static org.apache.maven.api.ExtensibleEnums.projectScope;
 
 /**
  * Project scope.
+ * Defines the type of source files to compile, usually either the one that compose the output package
+ * (i.e. the <i>main</i> artifact) or the ones that will be used when building <i>tests</i>).
+ * <p>
+ * This extensible enum has two defined values, {@link #MAIN} and {@link #TEST},
+ * but can be extended by registering a {@link org.apache.maven.api.spi.ProjectScopeProvider}.
  * <p>
  * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
  * can be used as keys.

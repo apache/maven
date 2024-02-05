@@ -24,6 +24,9 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Interface representing a Maven project packaging.
+ * <p>
+ * TODO: define how to plug in new packaging definitions using the SPI.
+ *   the packaging are currently defined by Maven 3 {@code Provider<LifecycleMapping>}
  *
  * @since 4.0.0
  */

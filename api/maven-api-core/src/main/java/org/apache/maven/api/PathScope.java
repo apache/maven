@@ -27,12 +27,20 @@ import org.apache.maven.api.annotations.Nonnull;
 import static org.apache.maven.api.ExtensibleEnums.pathScope;
 
 /**
- * Build path scope.
+ * Path scope.
+ * A path scope is used to determine the kind of build or class path that will be built when resolving
+ * dependencies using the {@link org.apache.maven.api.services.DependencyResolver} service.
+ * <p>
+ * This extensible enum has four defined values, {@link #MAIN_COMPILE}, {@link #MAIN_RUNTIME},
+ * {@link #TEST_COMPILE} and {@link #TEST_RUNTIME}, but can be extended by registering a
+ * {@link org.apache.maven.api.spi.PathScopeProvider}.
  * <p>
  * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
  * can be used as keys.
  *
  * @since 4.0.0
+ * @see org.apache.maven.api.services.DependencyResolver
+ * @see DependencyScope
  */
 @Experimental
 @Immutable
