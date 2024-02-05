@@ -18,6 +18,8 @@
  */
 package org.apache.maven.project;
 
+import java.util.Collection;
+
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 
@@ -30,6 +32,10 @@ public class DefaultDependencyResolutionRequest implements DependencyResolutionR
     private DependencyFilter filter;
 
     private RepositorySystemSession session;
+
+    private Collection<String> collectScopesToExclude;
+
+    private Collection<String> resolveScopesToExclude;
 
     public DefaultDependencyResolutionRequest() {
         // enables default constructor
@@ -65,5 +71,21 @@ public class DefaultDependencyResolutionRequest implements DependencyResolutionR
     public DependencyResolutionRequest setRepositorySession(RepositorySystemSession repositorySession) {
         this.session = repositorySession;
         return this;
+    }
+
+    public void setCollectScopesToExclude(Collection<String> collectScopesToExclude) {
+        this.collectScopesToExclude = collectScopesToExclude;
+    }
+
+    public void setResolveScopesToExclude(Collection<String> resolveScopesToExclude) {
+        this.resolveScopesToExclude = resolveScopesToExclude;
+    }
+
+    public Collection<String> getCollectScopesToExclude() {
+        return collectScopesToExclude;
+    }
+
+    public Collection<String> getResolveScopesToExclude() {
+        return resolveScopesToExclude;
     }
 }

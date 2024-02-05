@@ -240,8 +240,11 @@ public class LifecycleDependencyResolver {
         scopesToCollect = new HashSet<>(scopesToCollect);
         scopesToCollect.addAll(scopesToResolve);
 
-        DependencyFilter collectionFilter = new ScopeDependencyFilter(null, negate(scopesToCollect));
-        DependencyFilter resolutionFilter = new ScopeDependencyFilter(null, negate(scopesToResolve));
+        Collection<String> collectScopesToExclude = negate(scopesToCollect);
+        Collection<String> resolveScopesToExclude = negate(scopesToResolve);
+
+        DependencyFilter collectionFilter = new ScopeDependencyFilter(null, collectScopesToExclude);
+        DependencyFilter resolutionFilter = new ScopeDependencyFilter(null, resolveScopesToExclude);
         resolutionFilter = AndDependencyFilter.newInstance(collectionFilter, resolutionFilter);
         resolutionFilter =
                 AndDependencyFilter.newInstance(resolutionFilter, new ReactorDependencyFilter(projectArtifacts));
@@ -251,6 +254,8 @@ public class LifecycleDependencyResolver {
             DefaultDependencyResolutionRequest request =
                     new DefaultDependencyResolutionRequest(project, session.getRepositorySession());
             request.setResolutionFilter(resolutionFilter);
+            request.setCollectScopesToExclude(collectScopesToExclude);
+            request.setResolveScopesToExclude(resolveScopesToExclude);
 
             eventSpyDispatcher.onEvent(request);
 
