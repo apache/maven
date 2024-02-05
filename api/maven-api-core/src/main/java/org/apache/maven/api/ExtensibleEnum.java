@@ -16,29 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl.types;
+package org.apache.maven.api;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import org.apache.maven.api.annotations.Nonnull;
 
-import org.apache.maven.api.Language;
-import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultType;
+/**
+ * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
+ * can be used as keys.
+ */
+public interface ExtensibleEnum {
 
-@Named(EjbTypeProvider.NAME)
-@Singleton
-public class EjbTypeProvider implements Provider<Type> {
-    public static final String NAME = "ejb";
-
-    private final Type type;
-
-    public EjbTypeProvider() {
-        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "jar", null, true, false);
-    }
-
-    @Override
-    public Type get() {
-        return type;
-    }
+    /**
+     * The {@code id} uniquely represents a value for this extensible enum.
+     * This id should be used to compute the equality and hash code for the instance.
+     *
+     * @return the id
+     */
+    @Nonnull
+    String id();
 }

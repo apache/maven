@@ -18,7 +18,7 @@
  */
 package org.apache.maven.repository.internal.scopes;
 
-import org.eclipse.aether.util.artifact.DependencyScopes;
+import org.apache.maven.api.DependencyScope;
 
 /**
  * The dependency scopes used for Java dependencies in Maven. This class defines labels only, that are doing pass-thru
@@ -31,21 +31,23 @@ public final class MavenDependencyScopes {
     /**
      * Important: keep this label in sync with Resolver.
      */
-    public static final String SYSTEM = DependencyScopes.SYSTEM;
+    public static final String SYSTEM = DependencyScope.SYSTEM.id();
 
-    public static final String COMPILE_ONLY = "compile-only";
+    public static final String NONE = DependencyScope.NONE.id();
 
-    public static final String COMPILE = "compile";
+    public static final String COMPILE_ONLY = DependencyScope.COMPILE_ONLY.id();
 
-    public static final String PROVIDED = "provided";
+    public static final String COMPILE = DependencyScope.COMPILE.id();
 
-    public static final String RUNTIME = "runtime";
+    public static final String PROVIDED = DependencyScope.PROVIDED.id();
 
-    public static final String TEST_ONLY = "test-only";
+    public static final String RUNTIME = DependencyScope.RUNTIME.id();
 
-    public static final String TEST = "test";
+    public static final String TEST_ONLY = DependencyScope.TEST_ONLY.id();
 
-    public static final String TEST_RUNTIME = "test-runtime";
+    public static final String TEST = DependencyScope.TEST.id();
+
+    public static final String TEST_RUNTIME = DependencyScope.TEST_RUNTIME.id();
 
     private MavenDependencyScopes() {
         // hide constructor

@@ -462,7 +462,7 @@ public abstract class AbstractSession implements InternalSession {
 
     @Nonnull
     @Override
-    public List<Node> flattenDependencies(@Nonnull Node node, @Nonnull ResolutionScope scope) {
+    public List<Node> flattenDependencies(@Nonnull Node node, @Nonnull PathScope scope) {
         return getService(DependencyResolver.class).flatten(this, node, scope);
     }
 
@@ -477,7 +477,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public List<Path> resolveDependencies(Project project, ResolutionScope scope) {
+    public List<Path> resolveDependencies(Project project, PathScope scope) {
         return getService(DependencyResolver.class)
                 .resolve(this, project, scope)
                 .getPaths();
@@ -517,5 +517,35 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public List<Version> resolveVersionRange(ArtifactCoordinate artifact) {
         return getService(VersionRangeResolver.class).resolve(this, artifact).getVersions();
+    }
+
+    @Override
+    public Type requireType(String id) {
+        return getService(TypeRegistry.class).require(id);
+    }
+
+    @Override
+    public Language requireLanguage(String id) {
+        return getService(LanguageRegistry.class).require(id);
+    }
+
+    @Override
+    public Packaging requirePackaging(String id) {
+        return getService(PackagingRegistry.class).require(id);
+    }
+
+    @Override
+    public ProjectScope requireProjectScope(String id) {
+        return getService(ProjectScopeRegistry.class).require(id);
+    }
+
+    @Override
+    public DependencyScope requireDependencyScope(String id) {
+        return DependencyScope.forId(id);
+    }
+
+    @Override
+    public PathScope requirePathScope(String id) {
+        return getService(PathScopeRegistry.class).require(id);
     }
 }

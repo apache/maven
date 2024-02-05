@@ -16,29 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl.types;
+package org.apache.maven.api.services;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import java.util.Optional;
 
-import org.apache.maven.api.Language;
-import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultType;
+import org.apache.maven.api.ExtensibleEnum;
+import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Nonnull;
 
-@Named(EjbTypeProvider.NAME)
-@Singleton
-public class EjbTypeProvider implements Provider<Type> {
-    public static final String NAME = "ejb";
+public interface ExtensibleEnumRegistry<T extends ExtensibleEnum> extends Service {
+    @Nonnull
+    Optional<T> lookup(String id);
 
-    private final Type type;
-
-    public EjbTypeProvider() {
-        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "jar", null, true, false);
-    }
-
-    @Override
-    public Type get() {
-        return type;
+    default T require(String id) {
+        return lookup(id).orElseThrow(() -> new IllegalArgumentException("Unknown extensible enum value '" + id + "'"));
     }
 }

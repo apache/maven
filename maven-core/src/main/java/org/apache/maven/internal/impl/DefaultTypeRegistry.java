@@ -22,13 +22,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.api.DependencyProperties;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.services.LanguageRegistry;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.LegacyArtifactHandlerManager;
@@ -42,6 +42,8 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistry {
     private final Map<String, Type> types;
 
+    private final LanguageRegistry languageRegistry;
+
     private final ConcurrentHashMap<String, Type> usedTypes;
 
     private final ConcurrentHashMap<String, Type> legacyTypes;
@@ -49,8 +51,10 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     private final LegacyArtifactHandlerManager manager;
 
     @Inject
-    public DefaultTypeRegistry(Map<String, Type> types, LegacyArtifactHandlerManager manager) {
+    public DefaultTypeRegistry(
+            Map<String, Type> types, LanguageRegistry languageRegistry, LegacyArtifactHandlerManager manager) {
         this.types = nonNull(types, "types");
+        this.languageRegistry = nonNull(languageRegistry, "languageRegistry");
         this.usedTypes = new ConcurrentHashMap<>();
         this.legacyTypes = new ConcurrentHashMap<>();
         this.manager = nonNull(manager, "artifactHandlerManager");
@@ -68,8 +72,13 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     }
 
     @Override
+    public Optional<Type> lookup(String id) {
+        return Optional.of(require(id));
+    }
+
+    @Override
     @Nonnull
-    public Type getType(String id) {
+    public Type require(String id) {
         nonNull(id, "id");
         return usedTypes.computeIfAbsent(id, i -> {
             Type type = types.get(id);
@@ -78,19 +87,13 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                 type = legacyTypes.computeIfAbsent(id, k -> {
                     // Copy data as the ArtifactHandler is not immutable, but Type should be.
                     ArtifactHandler handler = manager.getArtifactHandler(id);
-                    ArrayList<String> flags = new ArrayList<>();
-                    if (handler.isAddedToClasspath()) {
-                        flags.add(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
-                    }
-                    if (handler.isIncludesDependencies()) {
-                        flags.add(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
-                    }
                     return new DefaultType(
                             id,
-                            handler.getLanguage(),
+                            languageRegistry.require(handler.getLanguage()),
                             handler.getExtension(),
                             handler.getClassifier(),
-                            new DefaultDependencyProperties(flags));
+                            handler.isAddedToClasspath(),
+                            handler.isIncludesDependencies());
                 });
             }
             return type;

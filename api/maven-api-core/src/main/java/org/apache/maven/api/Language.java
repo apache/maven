@@ -18,34 +18,33 @@
  */
 package org.apache.maven.api;
 
-import java.util.Collection;
-
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
+
+import static org.apache.maven.api.ExtensibleEnums.language;
 
 /**
+ * Language.
+ * <p>
+ * This extensible enum has two defined values, {@link #NONE} and {@link #JAVA_FAMILY},
+ * but can be extended by registering a {@code org.apache.maven.api.spi.LanguageProvider}.
+ * <p>
+ * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
+ * can be used as keys.
  *
  * @since 4.0.0
  */
 @Experimental
 @Immutable
-public interface DependencyCoordinate extends ArtifactCoordinate {
+@SuppressWarnings("checkstyle:InterfaceIsType")
+public interface Language extends ExtensibleEnum {
+
     /**
-     * The type of the artifact.
-     *
-     * @return the type
+     * The "none" language. It is not versioned, family is same to itself, and compatible with itself only.
+     * In turn, every {@link Language} implementation must be compatible with {@code NONE} language.
      */
-    @Nonnull
-    Type getType();
+    Language NONE = language("none");
 
-    @Nonnull
-    DependencyScope getScope();
-
-    @Nullable
-    Boolean getOptional();
-
-    @Nonnull
-    Collection<Exclusion> getExclusions();
+    // TODO: this should be moved out from here to Java Support (builtin into core)
+    Language JAVA_FAMILY = language("java");
 }

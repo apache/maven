@@ -16,29 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl.types;
+package org.apache.maven.api.spi;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import java.util.Collection;
 
-import org.apache.maven.api.Language;
-import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultType;
+import org.apache.maven.api.ExtensibleEnum;
 
-@Named(EjbTypeProvider.NAME)
-@Singleton
-public class EjbTypeProvider implements Provider<Type> {
-    public static final String NAME = "ejb";
+public interface ExtensibleEnumProvider<T extends ExtensibleEnum> {
 
-    private final Type type;
-
-    public EjbTypeProvider() {
-        this.type = new DefaultType(NAME, Language.JAVA_FAMILY, "jar", null, true, false);
-    }
-
-    @Override
-    public Type get() {
-        return type;
-    }
+    Collection<T> provides();
 }

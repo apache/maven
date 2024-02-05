@@ -385,6 +385,9 @@ public interface Session {
      * Checks whether a given artifact version is considered a {@code SNAPSHOT} or not.
      * <p>
      * Shortcut for {@code getService(ArtifactManager.class).isSnapshot(...)}.
+     * <p>
+     * In case there is {@link Artifact} in scope, the recommended way to perform this check is
+     * use of {@link Artifact#isSnapshot()} instead.
      *
      * @see org.apache.maven.api.services.VersionParser#isSnapshot(String)
      */
@@ -424,11 +427,11 @@ public interface Session {
     /**
      * Shortcut for {@code getService(DependencyResolver.class).flatten(...)}.
      *
-     * @see org.apache.maven.api.services.DependencyResolver#flatten(Session, Node, ResolutionScope)
+     * @see org.apache.maven.api.services.DependencyResolver#flatten(Session, Node, PathScope)
      * @throws org.apache.maven.api.services.DependencyResolverException if the dependency flattening failed
      */
     @Nonnull
-    List<Node> flattenDependencies(@Nonnull Node node, @Nonnull ResolutionScope scope);
+    List<Node> flattenDependencies(@Nonnull Node node, @Nonnull PathScope scope);
 
     @Nonnull
     List<Path> resolveDependencies(@Nonnull DependencyCoordinate dependencyCoordinate);
@@ -437,7 +440,7 @@ public interface Session {
     List<Path> resolveDependencies(@Nonnull List<DependencyCoordinate> dependencyCoordinates);
 
     @Nonnull
-    List<Path> resolveDependencies(@Nonnull Project project, @Nonnull ResolutionScope scope);
+    List<Path> resolveDependencies(@Nonnull Project project, @Nonnull PathScope scope);
 
     /**
      * Resolves an artifact's meta version (if any) to a concrete version. For example, resolves "1.0-SNAPSHOT"
@@ -498,4 +501,16 @@ public interface Session {
      */
     @Nonnull
     VersionConstraint parseVersionConstraint(@Nonnull String versionConstraint);
+
+    Type requireType(String id);
+
+    Language requireLanguage(String id);
+
+    Packaging requirePackaging(String id);
+
+    ProjectScope requireProjectScope(String id);
+
+    DependencyScope requireDependencyScope(String id);
+
+    PathScope requirePathScope(String id);
 }

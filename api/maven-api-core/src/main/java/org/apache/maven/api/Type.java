@@ -30,21 +30,17 @@ import org.apache.maven.api.model.Dependency;
  * <p>
  * It provides information about the file type (or extension) of the associated artifact,
  * its default classifier, and how the artifact will be used in the build when creating
- * classpaths.
+ * various build paths.
  * <p>
  * For example, the type {@code java-source} has a {@code jar} extension and a
  * {@code sources} classifier. The artifact and its dependencies should be added
- * to the classpath.
+ * to the build path.
  *
  * @since 4.0.0
  */
 @Experimental
 @Immutable
-public interface Type {
-
-    String LANGUAGE_NONE = "none";
-    String LANGUAGE_JAVA = "java";
-
+public interface Type extends ExtensibleEnum {
     /**
      * Returns the dependency type id.
      * The id uniquely identifies this <i>dependency type</i>.
@@ -52,14 +48,15 @@ public interface Type {
      * @return the id of this type, never {@code null}.
      */
     @Nonnull
-    String getId();
+    String id();
 
     /**
      * Returns the dependency type language.
      *
      * @return the language of this type, never {@code null}.
      */
-    String getLanguage();
+    @Nonnull
+    Language getLanguage();
 
     /**
      * Get the file extension of artifacts of this type.
@@ -80,14 +77,11 @@ public interface Type {
     String getClassifier();
 
     /**
-     * Specifies if the artifact contains java classes and should be
-     * added to the classpath.
+     * Specifies if the artifact should be added to the build path.
      *
-     * @return if the artifact should be added to the class path
+     * @return if the artifact should be added to the build path
      */
-    default boolean isAddedToClassPath() {
-        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_CLASS_PATH_CONSTITUENT);
-    }
+    boolean isBuildPathConstituent();
 
     /**
      * Specifies if the artifact already embeds its own dependencies.
@@ -96,15 +90,5 @@ public interface Type {
      *
      * @return if the artifact's dependencies are included in the artifact
      */
-    default boolean isIncludesDependencies() {
-        return getDependencyProperties().checkFlag(DependencyProperties.FLAG_INCLUDES_DEPENDENCIES);
-    }
-
-    /**
-     * Gets the default properties associated with this dependency type.
-     *
-     * @return the default properties, never {@code null}.
-     */
-    @Nonnull
-    DependencyProperties getDependencyProperties();
+    boolean isIncludesDependencies();
 }

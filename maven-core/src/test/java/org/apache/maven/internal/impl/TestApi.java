@@ -30,13 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
-import org.apache.maven.api.Dependency;
-import org.apache.maven.api.Node;
-import org.apache.maven.api.Project;
-import org.apache.maven.api.ResolutionScope;
-import org.apache.maven.api.Session;
+import org.apache.maven.api.*;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ProjectBuilder;
@@ -200,7 +194,7 @@ class TestApi {
         assertNotNull(root);
 
         DependencyResolverResult result =
-                session.getService(DependencyResolver.class).resolve(session, project, ResolutionScope.PROJECT_RUNTIME);
+                session.getService(DependencyResolver.class).resolve(session, project, PathScope.MAIN_RUNTIME);
         assertNotNull(result);
         List<Dependency> deps = new ArrayList<>(result.getDependencies().keySet());
         List<Dependency> deps2 = result.getNodes().stream()

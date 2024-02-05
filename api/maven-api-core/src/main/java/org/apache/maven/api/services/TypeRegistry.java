@@ -18,7 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import org.apache.maven.api.Service;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -29,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0.0
  */
 @Experimental
-public interface TypeRegistry extends Service {
+public interface TypeRegistry extends ExtensibleEnumRegistry<Type> {
 
     /**
      * Obtain the {@link Type} from the specified {@code id}.
@@ -40,5 +39,5 @@ public interface TypeRegistry extends Service {
      * @return the type
      */
     @Nonnull
-    Type getType(@Nonnull String id);
+    Type require(@Nonnull String id);
 }

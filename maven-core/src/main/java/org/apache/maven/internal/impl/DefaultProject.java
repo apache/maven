@@ -27,7 +27,6 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
@@ -38,10 +37,12 @@ public class DefaultProject implements Project {
 
     private final InternalSession session;
     private final MavenProject project;
+    private final Packaging packaging;
 
     public DefaultProject(InternalSession session, MavenProject project) {
         this.session = session;
         this.project = project;
+        this.packaging = session.requirePackaging(project.getPackaging());
     }
 
     public InternalSession getSession() {
@@ -86,8 +87,8 @@ public class DefaultProject implements Project {
 
     @Nonnull
     @Override
-    public String getPackaging() {
-        return project.getPackaging();
+    public Packaging getPackaging() {
+        return packaging;
     }
 
     @Nonnull
@@ -175,13 +176,13 @@ public class DefaultProject implements Project {
             @Override
             public Type getType() {
                 String type = dependency.getType();
-                return session.getService(TypeRegistry.class).getType(type);
+                return session.requireType(type);
             }
 
             @Nonnull
             @Override
-            public Scope getScope() {
-                return Scope.get(dependency.getScope());
+            public DependencyScope getScope() {
+                return session.requireDependencyScope(dependency.getScope());
             }
 
             @Override

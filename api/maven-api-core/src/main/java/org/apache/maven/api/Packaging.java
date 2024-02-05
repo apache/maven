@@ -18,49 +18,38 @@
  */
 package org.apache.maven.api;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Scope for a dependency
+ * Interface representing a Maven project packaging.
+ * <p>
+ * TODO: define how to plug in new packaging definitions using the SPI.
+ *   the packaging are currently defined by Maven 3 {@code Provider<LifecycleMapping>}
  *
  * @since 4.0.0
  */
 @Experimental
-public enum Scope {
-    EMPTY(""),
-    COMPILE_ONLY("compile-only"),
-    COMPILE("compile"),
-    RUNTIME("runtime"),
-    PROVIDED("provided"),
-    TEST_COMPILE_ONLY("test-compile-only"),
-    TEST("test"),
-    TEST_RUNTIME("test-runtime"),
-    IMPORT("import"); // TODO: v4: remove import scope somehow
+@Immutable
+public interface Packaging extends ExtensibleEnum {
+    /**
+     * The packaging id.
+     */
+    @Nonnull
+    String id();
 
-    private final String id;
-
-    private static final Map<String, Scope> SCOPES;
-
-    static {
-        Map<String, Scope> scopes = new HashMap<>();
-        for (Scope s : Scope.values()) {
-            scopes.put(s.id, s);
-        }
-        SCOPES = scopes;
+    /**
+     * The language of this packaging.
+     */
+    @Nonnull
+    default Language language() {
+        return getType().getLanguage();
     }
 
-    Scope(String id) {
-        this.id = id;
-    }
-
-    public String id() {
-        return this.id;
-    }
-
-    public static Scope get(String scope) {
-        return SCOPES.get(scope);
-    }
+    /**
+     * The type of main artifact produced by this packaging.
+     */
+    @Nonnull
+    Type getType();
 }

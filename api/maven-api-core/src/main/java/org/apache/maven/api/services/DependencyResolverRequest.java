@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Project;
-import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -35,7 +35,7 @@ import org.apache.maven.api.annotations.Nullable;
 public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
     @Nonnull
-    ResolutionScope getResolutionScope();
+    PathScope getPathScope();
 
     @Nonnull
     static DependencyResolverRequestBuilder builder() {
@@ -44,50 +44,49 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
     @Nonnull
     static DependencyResolverRequest build(Session session, Project project) {
-        return build(session, project, ResolutionScope.PROJECT_RUNTIME);
+        return build(session, project, PathScope.MAIN_RUNTIME);
     }
 
     @Nonnull
-    static DependencyResolverRequest build(Session session, Project project, ResolutionScope scope) {
+    static DependencyResolverRequest build(Session session, Project project, PathScope scope) {
         return new DependencyResolverRequestBuilder()
                 .session(session)
                 .project(project)
-                .resolutionScope(scope)
+                .pathScope(scope)
                 .build();
     }
 
     @Nonnull
     static DependencyResolverRequest build(Session session, DependencyCoordinate dependency) {
-        return build(session, dependency, ResolutionScope.PROJECT_RUNTIME);
+        return build(session, dependency, PathScope.MAIN_RUNTIME);
     }
 
     @Nonnull
-    static DependencyResolverRequest build(Session session, DependencyCoordinate dependency, ResolutionScope scope) {
+    static DependencyResolverRequest build(Session session, DependencyCoordinate dependency, PathScope scope) {
         return new DependencyResolverRequestBuilder()
                 .session(session)
                 .dependency(dependency)
-                .resolutionScope(scope)
+                .pathScope(scope)
                 .build();
     }
 
     @Nonnull
     static DependencyResolverRequest build(Session session, List<DependencyCoordinate> dependencies) {
-        return build(session, dependencies, ResolutionScope.PROJECT_RUNTIME);
+        return build(session, dependencies, PathScope.MAIN_RUNTIME);
     }
 
     @Nonnull
-    static DependencyResolverRequest build(
-            Session session, List<DependencyCoordinate> dependencies, ResolutionScope scope) {
+    static DependencyResolverRequest build(Session session, List<DependencyCoordinate> dependencies, PathScope scope) {
         return new DependencyResolverRequestBuilder()
                 .session(session)
                 .dependencies(dependencies)
-                .resolutionScope(scope)
+                .pathScope(scope)
                 .build();
     }
 
     @NotThreadSafe
     class DependencyResolverRequestBuilder extends DependencyCollectorRequestBuilder {
-        ResolutionScope resolutionScope;
+        PathScope pathScope;
 
         @Nonnull
         @Override
@@ -154,20 +153,20 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
         }
 
         @Nonnull
-        public DependencyResolverRequestBuilder resolutionScope(@Nonnull ResolutionScope resolutionScope) {
-            this.resolutionScope = resolutionScope;
+        public DependencyResolverRequestBuilder pathScope(@Nonnull PathScope pathScope) {
+            this.pathScope = pathScope;
             return this;
         }
 
         @Override
         public DependencyResolverRequest build() {
             return new DefaultDependencyResolverRequest(
-                    session, project, rootArtifact, root, dependencies, managedDependencies, verbose, resolutionScope);
+                    session, project, rootArtifact, root, dependencies, managedDependencies, verbose, pathScope);
         }
 
         static class DefaultDependencyResolverRequest extends DefaultDependencyCollectorRequest
                 implements DependencyResolverRequest {
-            private final ResolutionScope resolutionScope;
+            private final PathScope pathScope;
 
             DefaultDependencyResolverRequest(
                     Session session,
@@ -177,9 +176,9 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
                     Collection<DependencyCoordinate> dependencies,
                     Collection<DependencyCoordinate> managedDependencies,
                     boolean verbose,
-                    ResolutionScope resolutionScope) {
+                    PathScope pathScope) {
                 super(session, project, rootArtifact, root, dependencies, managedDependencies, verbose);
-                this.resolutionScope = nonNull(resolutionScope, "resolutionScope cannot be null");
+                this.pathScope = nonNull(pathScope, "pathScope cannot be null");
                 if (verbose) {
                     throw new IllegalArgumentException("verbose cannot be true for resolving dependencies");
                 }
@@ -187,8 +186,8 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest {
 
             @Nonnull
             @Override
-            public ResolutionScope getResolutionScope() {
-                return resolutionScope;
+            public PathScope getPathScope() {
+                return pathScope;
             }
         }
     }
