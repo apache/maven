@@ -124,3 +124,10 @@ jobs:
       - name: Running integration tests
         shell: bash
         run: mvn install -e -B -V -Prun-its,embedded -DmavenDistro="$GITHUB_WORKSPACE/maven/apache-maven/target/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
+
+      - name: Upload artifact on integration testing
+        uses: actions/upload-artifact@v4
+        if: failure() && matrix.os != 'windows-latest'
+        with:
+          name: ${{ github.run_number }}-integration-test-artifact-${{ matrix.os }}-${{ matrix.java }}
+          path: ./maven-integration-testing/core-it-suite/target/test-classes/
