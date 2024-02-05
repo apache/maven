@@ -16,26 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.di;
+package org.apache.maven.di.impl;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import org.apache.maven.di.Injector;
 
 /**
- * Indicates that the annotated bean has a lifespan limited to a given mojo execution,
- * which means each mojo execution will result in a different instance being injected.
- *
- * TODO: this is currently not implemented
- *
- * @since 4.0.0
+ * A runtime exception that is thrown on startup when some static conditions fail
+ * (missing or cyclic dependencies, incorrect annotations etc.) or in runtime when
+ * you ask an {@link Injector} for an instance it does not have a {@link Binding binding} for.
  */
-@Scope
-@Documented
-@Retention(RUNTIME)
-@Target({TYPE, METHOD})
-public @interface MojoExecutionScoped {}
+public final class DIException extends RuntimeException {
+    public DIException(String message) {
+        super(message);
+    }
+
+    public DIException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

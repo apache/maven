@@ -23,19 +23,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Indicates that the annotated bean has a lifespan limited to a given mojo execution,
- * which means each mojo execution will result in a different instance being injected.
- *
- * TODO: this is currently not implemented
- *
- * @since 4.0.0
+ * Can be used on a static method to provide a bean.
  */
-@Scope
-@Documented
+@Target(METHOD)
 @Retention(RUNTIME)
-@Target({TYPE, METHOD})
-public @interface MojoExecutionScoped {}
+@Documented
+public @interface Provides {}

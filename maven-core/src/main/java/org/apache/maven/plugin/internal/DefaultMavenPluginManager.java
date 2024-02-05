@@ -22,31 +22,25 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
+import java.lang.annotation.Annotation;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
+import org.apache.maven.di.Injector;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
+import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
@@ -429,29 +423,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             ((DefaultPlexusContainer) container)
                     .discoverComponents(
                             pluginRealm,
-                            new AbstractModule() {
-                                @Override
-                                protected void configure() {
-                                    if (pluginDescriptor != null) {
-                                        for (MojoDescriptor mojo : pluginDescriptor.getMojos()) {
-                                            if (mojo.isV4Api()) {
-                                                try {
-                                                    mojo.setRealm(pluginRealm);
-                                                    Class<?> cl = mojo.getImplementationClass();
-                                                    if (cl == null) {
-                                                        cl = pluginRealm.loadClass(mojo.getImplementation());
-                                                    }
-                                                    bind(org.apache.maven.api.plugin.Mojo.class)
-                                                            .annotatedWith(Names.named(mojo.getId()))
-                                                            .to((Class) cl);
-                                                } catch (ClassNotFoundException e) {
-                                                    throw new IllegalStateException("Unable to load mojo class", e);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
                             new SessionScopeModule(container.lookup(SessionScope.class)),
                             new MojoExecutionScopeModule(container.lookup(MojoExecutionScope.class)),
                             new PluginConfigurationModule(plugin.getDelegate()));
@@ -528,115 +499,189 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         Thread.currentThread().setContextClassLoader(pluginRealm);
 
         try {
-            T mojo;
-
-            try {
-                mojo = container.lookup(mojoInterface, mojoDescriptor.getRoleHint());
-            } catch (ComponentLookupException e) {
-                Throwable cause = e.getCause();
-                while (cause != null
-                        && !(cause instanceof LinkageError)
-                        && !(cause instanceof ClassNotFoundException)) {
-                    cause = cause.getCause();
-                }
-
-                if ((cause instanceof NoClassDefFoundError) || (cause instanceof ClassNotFoundException)) {
-                    ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
-                    PrintStream ps = new PrintStream(os);
-                    ps.println("Unable to load the mojo '" + mojoDescriptor.getGoal() + "' in the plugin '"
-                            + pluginDescriptor.getId() + "'. A required class is missing: "
-                            + cause.getMessage());
-                    pluginRealm.display(ps);
-
-                    throw new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), cause);
-                } else if (cause instanceof LinkageError) {
-                    ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
-                    PrintStream ps = new PrintStream(os);
-                    ps.println("Unable to load the mojo '" + mojoDescriptor.getGoal() + "' in the plugin '"
-                            + pluginDescriptor.getId() + "' due to an API incompatibility: "
-                            + e.getClass().getName() + ": " + cause.getMessage());
-                    pluginRealm.display(ps);
-
-                    throw new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), cause);
-                }
-
-                throw new PluginContainerException(
-                        mojoDescriptor,
-                        pluginRealm,
-                        "Unable to load the mojo '" + mojoDescriptor.getGoal()
-                                + "' (or one of its required components) from the plugin '"
-                                + pluginDescriptor.getId() + "'",
-                        e);
-            }
-
-            if (mojo instanceof ContextEnabled) {
-                MavenProject project = session.getCurrentProject();
-
-                Map<String, Object> pluginContext = session.getPluginContext(pluginDescriptor, project);
-
-                if (pluginContext != null) {
-                    pluginContext.put("project", project);
-
-                    pluginContext.put("pluginDescriptor", pluginDescriptor);
-
-                    ((ContextEnabled) mojo).setPluginContext(pluginContext);
-                }
-            }
-
-            if (mojo instanceof Mojo) {
-                Logger mojoLogger = LoggerFactory.getLogger(mojoDescriptor.getImplementation());
-                ((Mojo) mojo).setLog(new MojoLogWrapper(mojoLogger));
-            }
-
-            if (mojo instanceof Contextualizable) {
-                pluginValidationManager.reportPluginMojoValidationIssue(
-                        PluginValidationManager.IssueLocality.EXTERNAL,
-                        session,
-                        mojoDescriptor,
-                        mojo.getClass(),
-                        "Mojo implements `Contextualizable` interface from Plexus Container, which is EOL.");
-            }
-
-            XmlNode dom = mojoExecution.getConfiguration() != null
-                    ? mojoExecution.getConfiguration().getDom()
-                    : null;
-
-            PlexusConfiguration pomConfiguration;
-
-            if (dom == null) {
-                pomConfiguration = new DefaultPlexusConfiguration("configuration");
-            } else {
-                pomConfiguration = XmlPlexusConfiguration.toPlexusConfiguration(dom);
-            }
-
-            ExpressionEvaluator expressionEvaluator;
-            InternalSession sessionV4 = InternalSession.from(session.getSession());
             if (mojoDescriptor.isV4Api()) {
-                expressionEvaluator = new PluginParameterExpressionEvaluatorV4(
-                        sessionV4,
-                        sessionV4.getProject(session.getCurrentProject()),
-                        new DefaultMojoExecution(sessionV4, mojoExecution));
+                return loadV4Mojo(mojoInterface, session, mojoExecution, mojoDescriptor, pluginDescriptor, pluginRealm);
             } else {
-                expressionEvaluator = new PluginParameterExpressionEvaluator(session, mojoExecution);
+                return loadV3Mojo(mojoInterface, session, mojoExecution, mojoDescriptor, pluginDescriptor, pluginRealm);
             }
-
-            for (MavenPluginConfigurationValidator validator : configurationValidators) {
-                validator.validate(session, mojoDescriptor, mojo.getClass(), pomConfiguration, expressionEvaluator);
-            }
-
-            populateMojoExecutionFields(
-                    mojo,
-                    mojoExecution.getExecutionId(),
-                    mojoDescriptor,
-                    pluginRealm,
-                    pomConfiguration,
-                    expressionEvaluator);
-
-            return mojo;
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
             container.setLookupRealm(oldLookupRealm);
         }
+    }
+
+    private <T> T loadV4Mojo(
+            Class<T> mojoInterface,
+            MavenSession session,
+            MojoExecution mojoExecution,
+            MojoDescriptor mojoDescriptor,
+            PluginDescriptor pluginDescriptor,
+            ClassRealm pluginRealm)
+            throws PluginContainerException, PluginConfigurationException {
+        T mojo;
+
+        InternalSession sessionV4 = InternalSession.from(session.getSession());
+        Project project = sessionV4.getProject(session.getCurrentProject());
+        org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
+        org.apache.maven.api.plugin.Log log = new DefaultLog(
+                LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getFullGoalName()));
+        try {
+            Set<String> classes = new HashSet<>();
+            try (InputStream is = pluginRealm.getResourceAsStream("META-INF/maven/org.apache.maven.api.di.Inject");
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
+                reader.lines().forEach(classes::add);
+            }
+            Injector injector = Injector.create();
+            // Add known classes
+            // TODO: get those from the existing plexus scopes ?
+            injector.bindInstance(Session.class, sessionV4);
+            injector.bindInstance(Project.class, project);
+            injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
+            injector.bindInstance(org.apache.maven.api.plugin.Log.class, log);
+            // Add plugin classes
+            for (String className : classes) {
+                Class<?> clazz = pluginRealm.loadClass(className);
+                injector.bindImplicit(clazz);
+            }
+            mojo = mojoInterface.cast(injector.getInstance(mojoDescriptor.getImplementationClass()));
+
+        } catch (Exception e) {
+            throw new PluginContainerException(mojoDescriptor, pluginRealm, "Unable to lookup Mojo", e);
+        }
+
+        XmlNode dom = mojoExecution.getConfiguration() != null
+                ? mojoExecution.getConfiguration().getDom()
+                : null;
+
+        PlexusConfiguration pomConfiguration;
+
+        if (dom == null) {
+            pomConfiguration = new DefaultPlexusConfiguration("configuration");
+        } else {
+            pomConfiguration = XmlPlexusConfiguration.toPlexusConfiguration(dom);
+        }
+
+        ExpressionEvaluator expressionEvaluator =
+                new PluginParameterExpressionEvaluatorV4(sessionV4, project, execution);
+
+        for (MavenPluginConfigurationValidator validator : configurationValidators) {
+            validator.validate(session, mojoDescriptor, mojo.getClass(), pomConfiguration, expressionEvaluator);
+        }
+
+        populateMojoExecutionFields(
+                mojo,
+                mojoExecution.getExecutionId(),
+                mojoDescriptor,
+                pluginRealm,
+                pomConfiguration,
+                expressionEvaluator);
+
+        return mojo;
+    }
+
+    private <T> T loadV3Mojo(
+            Class<T> mojoInterface,
+            MavenSession session,
+            MojoExecution mojoExecution,
+            MojoDescriptor mojoDescriptor,
+            PluginDescriptor pluginDescriptor,
+            ClassRealm pluginRealm)
+            throws PluginContainerException, PluginConfigurationException {
+        T mojo;
+
+        try {
+            mojo = container.lookup(mojoInterface, mojoDescriptor.getRoleHint());
+        } catch (ComponentLookupException e) {
+            Throwable cause = e.getCause();
+            while (cause != null && !(cause instanceof LinkageError) && !(cause instanceof ClassNotFoundException)) {
+                cause = cause.getCause();
+            }
+
+            if ((cause instanceof NoClassDefFoundError) || (cause instanceof ClassNotFoundException)) {
+                ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
+                PrintStream ps = new PrintStream(os);
+                ps.println("Unable to load the mojo '" + mojoDescriptor.getGoal() + "' in the plugin '"
+                        + pluginDescriptor.getId() + "'. A required class is missing: "
+                        + cause.getMessage());
+                pluginRealm.display(ps);
+
+                throw new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), cause);
+            } else if (cause instanceof LinkageError) {
+                ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
+                PrintStream ps = new PrintStream(os);
+                ps.println("Unable to load the mojo '" + mojoDescriptor.getGoal() + "' in the plugin '"
+                        + pluginDescriptor.getId() + "' due to an API incompatibility: "
+                        + e.getClass().getName() + ": " + cause.getMessage());
+                pluginRealm.display(ps);
+
+                throw new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), cause);
+            }
+
+            throw new PluginContainerException(
+                    mojoDescriptor,
+                    pluginRealm,
+                    "Unable to load the mojo '" + mojoDescriptor.getGoal()
+                            + "' (or one of its required components) from the plugin '"
+                            + pluginDescriptor.getId() + "'",
+                    e);
+        }
+
+        if (mojo instanceof ContextEnabled) {
+            MavenProject project = session.getCurrentProject();
+
+            Map<String, Object> pluginContext = session.getPluginContext(pluginDescriptor, project);
+
+            if (pluginContext != null) {
+                pluginContext.put("project", project);
+
+                pluginContext.put("pluginDescriptor", pluginDescriptor);
+
+                ((ContextEnabled) mojo).setPluginContext(pluginContext);
+            }
+        }
+
+        if (mojo instanceof Mojo) {
+            Logger mojoLogger = LoggerFactory.getLogger(mojoDescriptor.getImplementation());
+            ((Mojo) mojo).setLog(new MojoLogWrapper(mojoLogger));
+        }
+
+        if (mojo instanceof Contextualizable) {
+            pluginValidationManager.reportPluginMojoValidationIssue(
+                    PluginValidationManager.IssueLocality.EXTERNAL,
+                    session,
+                    mojoDescriptor,
+                    mojo.getClass(),
+                    "Mojo implements `Contextualizable` interface from Plexus Container, which is EOL.");
+        }
+
+        XmlNode dom = mojoExecution.getConfiguration() != null
+                ? mojoExecution.getConfiguration().getDom()
+                : null;
+
+        PlexusConfiguration pomConfiguration;
+
+        if (dom == null) {
+            pomConfiguration = new DefaultPlexusConfiguration("configuration");
+        } else {
+            pomConfiguration = XmlPlexusConfiguration.toPlexusConfiguration(dom);
+        }
+
+        InternalSession sessionV4 = InternalSession.from(session.getSession());
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(session, mojoExecution);
+
+        for (MavenPluginConfigurationValidator validator : configurationValidators) {
+            validator.validate(session, mojoDescriptor, mojo.getClass(), pomConfiguration, expressionEvaluator);
+        }
+
+        populateMojoExecutionFields(
+                mojo,
+                mojoExecution.getExecutionId(),
+                mojoDescriptor,
+                pluginRealm,
+                pomConfiguration,
+                expressionEvaluator);
+
+        return mojo;
     }
 
     private void populateMojoExecutionFields(
@@ -891,5 +936,30 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         DependencyResult root =
                 pluginDependenciesResolver.resolvePlugin(extensionPlugin, null, null, repositories, session);
         return toMavenArtifacts(root);
+    }
+
+    static class NamedImpl implements Named {
+        private final String value;
+
+        NamedImpl(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return this.value;
+        }
+
+        @SuppressWarnings("checkstyle:MagicNumber")
+        public int hashCode() {
+            return 127 * "value".hashCode() ^ this.value.hashCode();
+        }
+
+        public boolean equals(Object o) {
+            return o instanceof Named && this.value.equals(((Named) o).value());
+        }
+
+        public Class<? extends Annotation> annotationType() {
+            return Named.class;
+        }
     }
 }

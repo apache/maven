@@ -23,8 +23,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import com.google.inject.OutOfScopeException;
+import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
