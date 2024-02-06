@@ -89,15 +89,18 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     }
 
     /**
-     * Note: This method produces "surrogate" type registry that is static: it aims users that want to use
+     * This method produces "surrogate" type registry that is static: it aims users that want to use
      * Maven-Resolver without involving Maven Core and related things.
      * <p>
      * This type registry is NOT used by Maven Core: Maven replaces it during Session creation with a type registry
      * that supports extending it (i.e. via Maven Extensions).
+     * <p>
+     * Important: this "static" list of types should be in-sync with core provided types.
      */
     protected ArtifactTypeRegistry getArtifactTypeRegistry() {
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
         stereotypes.add(new DefaultType("pom", Language.NONE, "pom", null, false, false));
+        stereotypes.add(new DefaultType("bom", Language.NONE, "pom", null, false, false));
         stereotypes.add(new DefaultType("maven-plugin", Language.JAVA_FAMILY, "jar", null, true, false));
         stereotypes.add(new DefaultType("jar", Language.JAVA_FAMILY, "jar", null, true, false));
         stereotypes.add(new DefaultType("ejb", Language.JAVA_FAMILY, "jar", null, true, false));
