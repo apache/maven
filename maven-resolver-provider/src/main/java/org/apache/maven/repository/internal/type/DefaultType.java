@@ -37,14 +37,12 @@ import static java.util.Objects.requireNonNull;
  */
 public class DefaultType implements Type, ArtifactType {
     private final String id;
-
     private final Language language;
-
     private final String extension;
-
     private final String classifier;
     private final boolean buildPathConstituent;
     private final boolean includesDependencies;
+    private final Map<String, String> properties;
 
     public DefaultType(
             String id,
@@ -59,6 +57,13 @@ public class DefaultType implements Type, ArtifactType {
         this.classifier = classifier;
         this.buildPathConstituent = buildPathConstituent;
         this.includesDependencies = includesDependencies;
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put(ArtifactProperties.TYPE, id);
+        properties.put(ArtifactProperties.LANGUAGE, language.id());
+        properties.put(MavenArtifactProperties.INCLUDES_DEPENDENCIES, Boolean.toString(includesDependencies));
+        properties.put(MavenArtifactProperties.CONSTITUTES_BUILD_PATH, Boolean.toString(buildPathConstituent));
+        this.properties = Collections.unmodifiableMap(properties);
     }
 
     @Override
@@ -98,11 +103,6 @@ public class DefaultType implements Type, ArtifactType {
 
     @Override
     public Map<String, String> getProperties() {
-        Map<String, String> properties = new HashMap<>();
-        properties.put(ArtifactProperties.TYPE, this.id);
-        properties.put(ArtifactProperties.LANGUAGE, this.language.id());
-        properties.put(MavenArtifactProperties.INCLUDES_DEPENDENCIES, String.valueOf(includesDependencies));
-        properties.put(MavenArtifactProperties.CONSTITUTES_BUILD_PATH, String.valueOf(buildPathConstituent));
-        return Collections.unmodifiableMap(properties);
+        return properties;
     }
 }
