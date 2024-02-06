@@ -35,9 +35,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class FatArtifactTraverser implements DependencyTraverser {
 
-    /**
-     * Creates a new instance of this dependency traverser.
-     */
     public FatArtifactTraverser() {}
 
     @Override
