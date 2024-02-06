@@ -92,7 +92,7 @@ public enum DependencyScope {
      * System scope.
      * <p>
      * Important: this scope {@code id} MUST BE KEPT in sync with label in
-     * {@code org.eclipse.aether.util.artifact.Scopes#SYSTEM}.
+     * {@code org.eclipse.aether.util.artifact.DependencyScopes#SYSTEM}.
      */
     SYSTEM("system", false);
 

@@ -22,15 +22,13 @@ import org.apache.maven.api.DependencyScope;
 
 /**
  * The dependency scopes used for Java dependencies in Maven. This class defines labels only, that are doing pass-thru
- * over Resolver.
+ * over Resolver. The labels are defined in {@link DependencyScope} class, these are here used only for "easier
+ * reachability" in internal classes.
  *
  * @since 4.0.0
  */
 public final class MavenDependencyScopes {
 
-    /**
-     * Important: keep this label in sync with Resolver.
-     */
     public static final String SYSTEM = DependencyScope.SYSTEM.id();
 
     public static final String NONE = DependencyScope.NONE.id();

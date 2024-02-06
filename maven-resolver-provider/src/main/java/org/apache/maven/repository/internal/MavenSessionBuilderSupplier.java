@@ -20,14 +20,16 @@ package org.apache.maven.repository.internal;
 
 import java.util.function.Supplier;
 
+import org.apache.maven.api.Language;
+import org.apache.maven.repository.internal.artifact.FatArtifactTraverser;
 import org.apache.maven.repository.internal.scopes.MavenDependencyContextRefiner;
 import org.apache.maven.repository.internal.scopes.MavenScopeDeriver;
 import org.apache.maven.repository.internal.scopes.MavenScopeSelector;
+import org.apache.maven.repository.internal.type.DefaultType;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
-import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
@@ -43,7 +45,6 @@ import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransform
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
-import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 import static java.util.Objects.requireNonNull;
@@ -87,20 +88,27 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
                 new MavenDependencyContextRefiner());
     }
 
+    /**
+     * Note: This method produces "surrogate" type registry that is static: it aims users that want to use
+     * Maven-Resolver without involving Maven Core and related things.
+     * <p>
+     * This type registry is NOT used by Maven Core: Maven replaces it during Session creation with a type registry
+     * that supports extending it (i.e. via Maven Extensions).
+     */
     protected ArtifactTypeRegistry getArtifactTypeRegistry() {
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
-        stereotypes.add(new DefaultArtifactType("pom"));
-        stereotypes.add(new DefaultArtifactType("maven-plugin", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("jar", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("ejb", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("ejb-client", "jar", "client", "java"));
-        stereotypes.add(new DefaultArtifactType("test-jar", "jar", "tests", "java"));
-        stereotypes.add(new DefaultArtifactType("javadoc", "jar", "javadoc", "java"));
-        stereotypes.add(new DefaultArtifactType("java-source", "jar", "sources", "java", false, false));
-        stereotypes.add(new DefaultArtifactType("war", "war", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("ear", "ear", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("rar", "rar", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("par", "par", "", "java", false, true));
+        stereotypes.add(new DefaultType("pom", Language.NONE, "pom", null, false, false));
+        stereotypes.add(new DefaultType("maven-plugin", Language.JAVA_FAMILY, "jar", null, true, false));
+        stereotypes.add(new DefaultType("jar", Language.JAVA_FAMILY, "jar", null, true, false));
+        stereotypes.add(new DefaultType("ejb", Language.JAVA_FAMILY, "jar", null, true, false));
+        stereotypes.add(new DefaultType("ejb-client", Language.JAVA_FAMILY, "jar", "client", true, false));
+        stereotypes.add(new DefaultType("test-jar", Language.JAVA_FAMILY, "jar", "tests", true, false));
+        stereotypes.add(new DefaultType("javadoc", Language.JAVA_FAMILY, "jar", "javadoc", true, false));
+        stereotypes.add(new DefaultType("java-source", Language.JAVA_FAMILY, "jar", "sources", false, false));
+        stereotypes.add(new DefaultType("war", Language.JAVA_FAMILY, "war", null, false, true));
+        stereotypes.add(new DefaultType("ear", Language.JAVA_FAMILY, "ear", null, false, true));
+        stereotypes.add(new DefaultType("rar", Language.JAVA_FAMILY, "rar", null, false, true));
+        stereotypes.add(new DefaultType("par", Language.JAVA_FAMILY, "par", null, false, true));
         return stereotypes;
     }
 

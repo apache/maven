@@ -37,6 +37,9 @@ import static java.util.Objects.requireNonNull;
  */
 public final class MavenDependencyContextRefiner implements DependencyGraphTransformer {
 
+    public MavenDependencyContextRefiner() {}
+
+    @Override
     public DependencyNode transformGraph(DependencyNode node, DependencyGraphTransformationContext context)
             throws RepositoryException {
         requireNonNull(node, "node cannot be null");

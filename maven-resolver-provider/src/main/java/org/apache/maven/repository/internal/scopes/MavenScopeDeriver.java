@@ -30,9 +30,6 @@ import org.eclipse.aether.util.graph.transformer.ConflictResolver.ScopeDeriver;
  */
 public final class MavenScopeDeriver extends ScopeDeriver {
 
-    /**
-     * Creates a new instance of this scope deriver.
-     */
     public MavenScopeDeriver() {}
 
     @Override

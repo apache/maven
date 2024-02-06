@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
-import org.apache.maven.internal.impl.DefaultType;
+import org.apache.maven.repository.internal.type.DefaultType;
 
 @Named(EjbClientTypeProvider.NAME)
 @Singleton

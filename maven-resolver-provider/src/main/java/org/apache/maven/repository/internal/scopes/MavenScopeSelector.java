@@ -37,9 +37,6 @@ import org.eclipse.aether.util.graph.transformer.ConflictResolver.ScopeSelector;
  */
 public final class MavenScopeSelector extends ScopeSelector {
 
-    /**
-     * Creates a new instance of this scope selector.
-     */
     public MavenScopeSelector() {}
 
     @Override

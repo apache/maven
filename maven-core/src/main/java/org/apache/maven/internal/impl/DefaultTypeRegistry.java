@@ -34,6 +34,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.LegacyArtifactHandlerManager;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.repository.internal.type.DefaultType;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
