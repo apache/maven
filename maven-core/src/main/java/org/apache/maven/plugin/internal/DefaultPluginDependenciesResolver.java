@@ -211,7 +211,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             for (Dependency dependency : plugin.getDependencies()) {
                 org.eclipse.aether.graph.Dependency pluginDep =
                         RepositoryUtils.toDependency(dependency, session.getArtifactTypeRegistry());
-                if (!DependencyScope.SYSTEM.id().equals(pluginDep.getScope())) {
+                if (!DependencyScope.SYSTEM.is(pluginDep.getScope())) {
                     pluginDep = pluginDep.setScope(DependencyScope.RUNTIME.id());
                 }
                 request.addDependency(pluginDep);

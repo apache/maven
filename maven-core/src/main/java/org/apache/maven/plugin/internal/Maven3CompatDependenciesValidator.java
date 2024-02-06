@@ -50,7 +50,7 @@ class Maven3CompatDependenciesValidator extends AbstractMavenPluginDependenciesV
         for (org.eclipse.aether.graph.Dependency dependency : artifactDescriptorResult.getDependencies()) {
             if ("org.apache.maven".equals(dependency.getArtifact().getGroupId())
                     && "maven-compat".equals(dependency.getArtifact().getArtifactId())
-                    && !DependencyScope.TEST.id().equals(dependency.getScope())) {
+                    && !DependencyScope.TEST.is(dependency.getScope())) {
                 pluginValidationManager.reportPluginValidationIssue(
                         PluginValidationManager.IssueLocality.EXTERNAL,
                         session,

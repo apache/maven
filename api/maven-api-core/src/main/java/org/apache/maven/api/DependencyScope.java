@@ -125,4 +125,8 @@ public enum DependencyScope {
     public boolean isTransitive() {
         return transitive;
     }
+
+    public boolean is(String id) {
+        return id().equals(id);
+    }
 }

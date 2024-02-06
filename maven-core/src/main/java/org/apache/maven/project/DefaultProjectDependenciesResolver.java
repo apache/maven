@@ -130,7 +130,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                 Dependency dependency = dependencies.get(key);
                 Collection<Exclusion> exclusions = dependency != null ? dependency.getExclusions() : null;
                 org.eclipse.aether.graph.Dependency dep = RepositoryUtils.toDependency(artifact, exclusions);
-                if (!DependencyScope.SYSTEM.id().equals(dep.getScope())
+                if (!DependencyScope.SYSTEM.is(dep.getScope())
                         && dep.getArtifact().getFile() != null) {
                     // enable re-resolution
                     org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
