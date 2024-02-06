@@ -18,9 +18,9 @@
  */
 package org.apache.maven.api;
 
+import java.util.Set;
+
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
-import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Dependency scope.
@@ -34,24 +34,28 @@ import org.apache.maven.api.annotations.Nonnull;
  * @see org.apache.maven.api.services.DependencyResolver
  */
 @Experimental
-@Immutable
-public interface DependencyScope {
-    /**
-     * The {@code id} uniquely represents a value for this extensible enum.
-     * This id should be used to compute the equality and hash code for the instance.
-     *
-     * @return the id
-     */
-    @Nonnull
-    String id();
+public interface DependencyScopeManager extends Service {
+    String SYSTEM = "system";
 
-    /**
-     * Is scope transitive?
-     */
-    boolean isTransitive();
+    String NONE = "none";
 
-    /**
-     * Does this scope id matched supplied id?
-     */
-    boolean is(String string);
+    String EMPTY = "";
+
+    String COMPILE_ONLY = "compile-only";
+
+    String COMPILE = "compile";
+
+    String PROVIDED = "provided";
+
+    String RUNTIME = "runtime";
+
+    String TEST_ONLY = "test-only";
+
+    String TEST = "test";
+
+    String TEST_RUNTIME = "test-runtime";
+
+    DependencyScope fromString(String string);
+
+    Set<DependencyScope> all();
 }

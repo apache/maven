@@ -66,14 +66,14 @@ public final class MavenDependencyContextRefiner implements DependencyGraphTrans
 
         String scope = dependency.getScope();
 
-        if (MavenDependencyScopes.COMPILE.equals(scope)
-                || MavenDependencyScopes.SYSTEM.equals(scope)
-                || MavenDependencyScopes.PROVIDED.equals(scope)) {
-            return MavenDependencyScopes.COMPILE;
-        } else if (MavenDependencyScopes.RUNTIME.equals(scope)) {
-            return MavenDependencyScopes.RUNTIME;
-        } else if (MavenDependencyScopes.TEST.equals(scope)) {
-            return MavenDependencyScopes.TEST;
+        if (DefaultDependencyScopeManager.COMPILE.is(scope)
+                || DefaultDependencyScopeManager.SYSTEM.is(scope)
+                || DefaultDependencyScopeManager.PROVIDED.is(scope)) {
+            return DefaultDependencyScopeManager.COMPILE.id();
+        } else if (DefaultDependencyScopeManager.RUNTIME.is(scope)) {
+            return DefaultDependencyScopeManager.RUNTIME.id();
+        } else if (DefaultDependencyScopeManager.TEST.is(scope)) {
+            return DefaultDependencyScopeManager.TEST.id();
         }
 
         return null;

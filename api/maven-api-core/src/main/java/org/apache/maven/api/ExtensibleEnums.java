@@ -26,7 +26,7 @@ abstract class ExtensibleEnums {
         return new DefaultLanguage(id);
     }
 
-    static PathScope pathScope(String id, ProjectScope projectScope, DependencyScope... dependencyScopes) {
+    static PathScope pathScope(String id, ProjectScope projectScope, String... dependencyScopes) {
         return new DefaultPathScope(id, projectScope, dependencyScopes);
     }
 
@@ -64,9 +64,9 @@ abstract class ExtensibleEnums {
 
     private static class DefaultPathScope extends DefaultExtensibleEnum implements PathScope {
         private final ProjectScope projectScope;
-        private final Set<DependencyScope> dependencyScopes;
+        private final Set<String> dependencyScopes;
 
-        DefaultPathScope(String id, ProjectScope projectScope, DependencyScope... dependencyScopes) {
+        DefaultPathScope(String id, ProjectScope projectScope, String... dependencyScopes) {
             super(id);
             this.projectScope = Objects.requireNonNull(projectScope);
             this.dependencyScopes =
@@ -79,7 +79,7 @@ abstract class ExtensibleEnums {
         }
 
         @Override
-        public Set<DependencyScope> dependencyScopes() {
+        public Set<String> dependencyScopes() {
             return dependencyScopes;
         }
     }

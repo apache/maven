@@ -22,14 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,8 +54,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
     }
 
     private static DependencyFilter getScopeDependencyFilter(PathScope scope) {
-        Set<String> scopes =
-                scope.dependencyScopes().stream().map(DependencyScope::id).collect(Collectors.toSet());
+        Set<String> scopes = new HashSet<>(scope.dependencyScopes());
         return (n, p) -> {
             org.eclipse.aether.graph.Dependency d = n.getDependency();
             return d == null || scopes.contains(d.getScope());
@@ -146,7 +138,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
     }
 
     private Collection<String> toScopes(PathScope scope) {
-        return map(scope.dependencyScopes(), DependencyScope::id);
+        return scope.dependencyScopes();
     }
 
     static class DefaultDependencyResolverResult implements DependencyResolverResult {

@@ -23,7 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.plugin.PluginValidationManager;
-import org.apache.maven.repository.internal.scopes.MavenDependencyScopes;
+import org.apache.maven.repository.internal.scopes.DefaultDependencyScopeManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
@@ -50,7 +50,7 @@ class Maven3CompatDependenciesValidator extends AbstractMavenPluginDependenciesV
         for (org.eclipse.aether.graph.Dependency dependency : artifactDescriptorResult.getDependencies()) {
             if ("org.apache.maven".equals(dependency.getArtifact().getGroupId())
                     && "maven-compat".equals(dependency.getArtifact().getArtifactId())
-                    && !MavenDependencyScopes.TEST.equals(dependency.getScope())) {
+                    && !DefaultDependencyScopeManager.TEST.is(dependency.getScope())) {
                 pluginValidationManager.reportPluginValidationIssue(
                         PluginValidationManager.IssueLocality.EXTERNAL,
                         session,

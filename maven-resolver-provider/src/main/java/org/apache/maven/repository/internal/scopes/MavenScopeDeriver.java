@@ -24,7 +24,7 @@ import org.eclipse.aether.util.graph.transformer.ConflictResolver.ScopeContext;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver.ScopeDeriver;
 
 /**
- * A scope deriver for use with {@link ConflictResolver} that supports the scopes from {@link MavenDependencyScopes}.
+ * A scope deriver for use with {@link ConflictResolver} that supports the scopes from {@link DefaultDependencyScopeManager}.
  *
  * @since 4.0.0
  */
@@ -43,18 +43,20 @@ public final class MavenScopeDeriver extends ScopeDeriver {
     private String getDerivedScope(String parentScope, String childScope) {
         String derivedScope;
 
-        if (MavenDependencyScopes.SYSTEM.equals(childScope) || MavenDependencyScopes.TEST.equals(childScope)) {
+        if (DefaultDependencyScopeManager.SYSTEM.is(childScope) || DefaultDependencyScopeManager.TEST.is(childScope)) {
             derivedScope = childScope;
-        } else if (parentScope == null || parentScope.isEmpty() || MavenDependencyScopes.COMPILE.equals(parentScope)) {
+        } else if (parentScope == null
+                || parentScope.isEmpty()
+                || DefaultDependencyScopeManager.COMPILE.is(parentScope)) {
             derivedScope = childScope;
-        } else if (MavenDependencyScopes.TEST.equals(parentScope)
-                || MavenDependencyScopes.RUNTIME.equals(parentScope)) {
+        } else if (DefaultDependencyScopeManager.TEST.is(parentScope)
+                || DefaultDependencyScopeManager.RUNTIME.is(parentScope)) {
             derivedScope = parentScope;
-        } else if (MavenDependencyScopes.SYSTEM.equals(parentScope)
-                || MavenDependencyScopes.PROVIDED.equals(parentScope)) {
-            derivedScope = MavenDependencyScopes.PROVIDED;
+        } else if (DefaultDependencyScopeManager.SYSTEM.is(parentScope)
+                || DefaultDependencyScopeManager.PROVIDED.is(parentScope)) {
+            derivedScope = DefaultDependencyScopeManager.PROVIDED.id();
         } else {
-            derivedScope = MavenDependencyScopes.RUNTIME;
+            derivedScope = DefaultDependencyScopeManager.RUNTIME.id();
         }
 
         return derivedScope;
