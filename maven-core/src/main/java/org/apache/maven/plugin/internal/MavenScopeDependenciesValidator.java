@@ -51,8 +51,7 @@ class MavenScopeDependenciesValidator extends AbstractMavenPluginDependenciesVal
             Artifact pluginArtifact,
             ArtifactDescriptorResult artifactDescriptorResult) {
         Set<String> mavenArtifacts = artifactDescriptorResult.getDependencies().stream()
-                .filter(d -> !DependencyScope.PROVIDED.is(d.getScope())
-                        && !DependencyScope.TEST.is(d.getScope()))
+                .filter(d -> !DependencyScope.PROVIDED.is(d.getScope()) && !DependencyScope.TEST.is(d.getScope()))
                 .map(org.eclipse.aether.graph.Dependency::getArtifact)
                 .filter(a -> "org.apache.maven".equals(a.getGroupId()))
                 .filter(a -> !DefaultPluginValidationManager.EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA.contains(
