@@ -69,7 +69,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     }
 
     protected DependencyManager getDependencyManager() {
-        return new ClassicDependencyManager(true); // same default as in Maven4
+        return new ClassicDependencyManager(); // same default as in Maven4
     }
 
     protected DependencySelector getDependencySelector() {

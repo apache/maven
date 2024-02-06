@@ -29,7 +29,7 @@ import org.eclipse.aether.util.graph.transformer.ConflictResolver.ConflictItem;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver.ScopeSelector;
 
 /**
- * A scope selector for use with {@link ConflictResolver} that supports the scopes from {@link MavenDependencyScopes}.
+ * A scope selector for use with {@link ConflictResolver} that supports the scopes from {@link DefaultDependencyScopeManager}.
  * In general, this selector picks the widest scope present among conflicting dependencies where e.g. "compile" is
  * wider than "runtime" which is wider than "test". If however a direct dependency is involved, its scope is selected.
  *
@@ -45,7 +45,7 @@ public final class MavenScopeSelector extends ScopeSelector {
     @Override
     public void selectScope(ConflictContext context) throws RepositoryException {
         String scope = context.getWinner().getDependency().getScope();
-        if (!MavenDependencyScopes.SYSTEM.equals(scope)) {
+        if (!DefaultDependencyScopeManager.SYSTEM.is(scope)) {
             scope = chooseEffectiveScope(context.getItems());
         }
         context.setScope(scope);
@@ -64,21 +64,21 @@ public final class MavenScopeSelector extends ScopeSelector {
 
     private String chooseEffectiveScope(Set<String> scopes) {
         if (scopes.size() > 1) {
-            scopes.remove(MavenDependencyScopes.SYSTEM);
+            scopes.remove(DefaultDependencyScopeManager.SYSTEM.id());
         }
 
         String effectiveScope = "";
 
         if (scopes.size() == 1) {
             effectiveScope = scopes.iterator().next();
-        } else if (scopes.contains(MavenDependencyScopes.COMPILE)) {
-            effectiveScope = MavenDependencyScopes.COMPILE;
-        } else if (scopes.contains(MavenDependencyScopes.RUNTIME)) {
-            effectiveScope = MavenDependencyScopes.RUNTIME;
-        } else if (scopes.contains(MavenDependencyScopes.PROVIDED)) {
-            effectiveScope = MavenDependencyScopes.PROVIDED;
-        } else if (scopes.contains(MavenDependencyScopes.TEST)) {
-            effectiveScope = MavenDependencyScopes.TEST;
+        } else if (scopes.contains(DefaultDependencyScopeManager.COMPILE.id())) {
+            effectiveScope = DefaultDependencyScopeManager.COMPILE.id();
+        } else if (scopes.contains(DefaultDependencyScopeManager.RUNTIME.id())) {
+            effectiveScope = DefaultDependencyScopeManager.RUNTIME.id();
+        } else if (scopes.contains(DefaultDependencyScopeManager.PROVIDED.id())) {
+            effectiveScope = DefaultDependencyScopeManager.PROVIDED.id();
+        } else if (scopes.contains(DefaultDependencyScopeManager.TEST.id())) {
+            effectiveScope = DefaultDependencyScopeManager.TEST.id();
         }
 
         return effectiveScope;

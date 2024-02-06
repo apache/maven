@@ -32,7 +32,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.repository.internal.scopes.MavenDependencyScopes;
+import org.apache.maven.repository.internal.scopes.DefaultDependencyScopeManager;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -211,8 +211,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             for (Dependency dependency : plugin.getDependencies()) {
                 org.eclipse.aether.graph.Dependency pluginDep =
                         RepositoryUtils.toDependency(dependency, session.getArtifactTypeRegistry());
-                if (!MavenDependencyScopes.SYSTEM.equals(pluginDep.getScope())) {
-                    pluginDep = pluginDep.setScope(MavenDependencyScopes.RUNTIME);
+                if (!DefaultDependencyScopeManager.SYSTEM.is(pluginDep.getScope())) {
+                    pluginDep = pluginDep.setScope(DefaultDependencyScopeManager.RUNTIME.id());
                 }
                 request.addDependency(pluginDep);
             }

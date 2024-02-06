@@ -50,35 +50,39 @@ public interface PathScope extends ExtensibleEnum {
     ProjectScope projectScope();
 
     @Nonnull
-    Set<DependencyScope> dependencyScopes();
+    Set<String> dependencyScopes();
 
     PathScope MAIN_COMPILE = pathScope(
             "main-compile",
             ProjectScope.MAIN,
-            DependencyScope.EMPTY,
-            DependencyScope.COMPILE_ONLY,
-            DependencyScope.COMPILE,
-            DependencyScope.PROVIDED);
+            DependencyScopeManager.EMPTY,
+            DependencyScopeManager.COMPILE_ONLY,
+            DependencyScopeManager.COMPILE,
+            DependencyScopeManager.PROVIDED);
 
     PathScope MAIN_RUNTIME = pathScope(
-            "main-runtime", ProjectScope.MAIN, DependencyScope.EMPTY, DependencyScope.COMPILE, DependencyScope.RUNTIME);
+            "main-runtime",
+            ProjectScope.MAIN,
+            DependencyScopeManager.EMPTY,
+            DependencyScopeManager.COMPILE,
+            DependencyScopeManager.RUNTIME);
 
     PathScope TEST_COMPILE = pathScope(
             "test-compile",
             ProjectScope.TEST,
-            DependencyScope.EMPTY,
-            DependencyScope.COMPILE,
-            DependencyScope.PROVIDED,
-            DependencyScope.TEST_ONLY,
-            DependencyScope.TEST);
+            DependencyScopeManager.EMPTY,
+            DependencyScopeManager.COMPILE,
+            DependencyScopeManager.PROVIDED,
+            DependencyScopeManager.TEST_ONLY,
+            DependencyScopeManager.TEST);
 
     PathScope TEST_RUNTIME = pathScope(
             "test-runtime",
             ProjectScope.TEST,
-            DependencyScope.EMPTY,
-            DependencyScope.COMPILE,
-            DependencyScope.RUNTIME,
-            DependencyScope.PROVIDED,
-            DependencyScope.TEST,
-            DependencyScope.TEST_RUNTIME);
+            DependencyScopeManager.EMPTY,
+            DependencyScopeManager.COMPILE,
+            DependencyScopeManager.RUNTIME,
+            DependencyScopeManager.PROVIDED,
+            DependencyScopeManager.TEST,
+            DependencyScopeManager.TEST_RUNTIME);
 }

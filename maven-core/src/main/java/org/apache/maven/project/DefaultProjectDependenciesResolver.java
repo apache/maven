@@ -33,7 +33,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
-import org.apache.maven.repository.internal.scopes.MavenDependencyScopes;
+import org.apache.maven.repository.internal.scopes.DefaultDependencyScopeManager;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -130,7 +130,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                 Dependency dependency = dependencies.get(key);
                 Collection<Exclusion> exclusions = dependency != null ? dependency.getExclusions() : null;
                 org.eclipse.aether.graph.Dependency dep = RepositoryUtils.toDependency(artifact, exclusions);
-                if (!MavenDependencyScopes.SYSTEM.equals(dep.getScope())
+                if (!DefaultDependencyScopeManager.SYSTEM.is(dep.getScope())
                         && dep.getArtifact().getFile() != null) {
                     // enable re-resolution
                     org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
