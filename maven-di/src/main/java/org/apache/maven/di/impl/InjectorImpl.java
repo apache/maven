@@ -18,16 +18,21 @@
  */
 package org.apache.maven.di.impl;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
+import java.net.URL;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.di.Provides;
+import org.apache.maven.api.di.Qualifier;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.di.Typed;
 import org.apache.maven.di.Injector;
@@ -59,6 +64,26 @@ public class InjectorImpl implements Injector {
                 .accept(instance);
     }
 
+    @Override
+    public Injector discover(ClassLoader classLoader) {
+        try {
+            Enumeration<URL> enumeration = classLoader.getResources("META-INF/maven/org.apache.maven.api.di.Inject");
+            while (enumeration.hasMoreElements()) {
+                try (InputStream is = enumeration.nextElement().openStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
+                    for (String line :
+                            reader.lines().filter(l -> !l.startsWith("#")).collect(Collectors.toList())) {
+                        Class<?> clazz = classLoader.loadClass(line);
+                        bindImplicit(clazz);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DIException("Error while discovering DI classes from classLoader", e);
+        }
+        return this;
+    }
+
     public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Scope scope) {
         if (scopes.put(scopeAnnotation, scope) != null) {
             throw new DIException(
@@ -80,7 +105,13 @@ public class InjectorImpl implements Injector {
         return doBind(key, binding);
     }
 
+    private LinkedHashSet<Key<?>> current = new LinkedHashSet<>();
+
     private Injector doBind(Key<?> key, Binding<?> binding) {
+        if (!current.add(key)) {
+            current.add(key);
+            throw new DIException("Circular references: " + current);
+        }
         doBindImplicit(key, binding);
         Class<?> cls = key.getRawType().getSuperclass();
         while (cls != Object.class && cls != null) {
@@ -88,6 +119,7 @@ public class InjectorImpl implements Injector {
             doBindImplicit(key, binding);
             cls = cls.getSuperclass();
         }
+        current.remove(key);
         return this;
     }
 
@@ -157,115 +189,61 @@ public class InjectorImpl implements Injector {
     protected void doBindImplicit(Key<?> key, Binding<?> binding) {
         if (binding != null) {
             // For non-explicit bindings, also bind all their base classes and interfaces according to the @Type
-            Set<Key<?>> toBind = new HashSet<>();
-            Deque<Key<?>> todo = new ArrayDeque<>();
-            todo.add(key);
-
-            Set<Class<?>> types;
-            Typed typed = key.getRawType().getAnnotation(Typed.class);
-            if (typed != null) {
-                Class<?>[] typesArray = typed.value();
-                if (typesArray == null || typesArray.length == 0) {
-                    types = new HashSet<>(Arrays.asList(key.getRawType().getInterfaces()));
-                    types.add(Object.class);
-                } else {
-                    types = new HashSet<>(Arrays.asList(typesArray));
-                }
-            } else {
-                types = null;
-            }
-
-            Set<Key<?>> done = new HashSet<>();
-            while (!todo.isEmpty()) {
-                Key<?> type = todo.remove();
-                if (done.add(type)) {
-                    Class<?> cls = Types.getRawType(type.getType());
-                    Type[] interfaces = cls.getGenericInterfaces();
-                    Arrays.stream(interfaces)
-                            .map(t -> Key.ofType(t, key.getQualifier()))
-                            .forEach(todo::add);
-                    Type supercls = cls.getGenericSuperclass();
-                    if (supercls != null) {
-                        todo.add(Key.ofType(supercls, key.getQualifier()));
-                    }
-                    if (types == null || types.contains(cls)) {
-                        toBind.add(type);
+            Object qualifier = key.getQualifier();
+            Class<?> type = key.getRawType();
+            Set<Class<?>> types = getBoundTypes(type.getAnnotation(Typed.class), type);
+            for (Type t : Types.getAllSuperTypes(type)) {
+                if (types == null || types.contains(Types.getRawType(t))) {
+                    bind(Key.ofType(t, qualifier), binding);
+                    if (qualifier != null) {
+                        bind(Key.ofType(t), binding);
                     }
                 }
             }
-            // Also bind without the qualifier
-            if (key.getQualifier() != null) {
-                new HashSet<>(toBind).forEach(k -> toBind.add(Key.ofType(k.getType())));
-            }
-            toBind.forEach((k -> bind((Key<Object>) k, (Binding<Object>) binding)));
         }
         // Bind inner classes
         for (Class<?> inner : key.getRawType().getDeclaredClasses()) {
-            bindImplicit(inner);
+            boolean hasQualifier = Stream.of(inner.getAnnotations())
+                    .anyMatch(ann -> ann.annotationType().isAnnotationPresent(Qualifier.class));
+            if (hasQualifier) {
+                bindImplicit(inner);
+            }
         }
         // Bind inner providers
         for (Method method : key.getRawType().getDeclaredMethods()) {
             if (method.isAnnotationPresent(Provides.class)) {
-                Object qualifier = ReflectionUtils.qualifierOf(method);
-                Annotation scope = ReflectionUtils.scopeOf(method);
-
-                TypeVariable<Method>[] methodTypeParameters = method.getTypeParameters();
-                if (methodTypeParameters.length != 0) {
+                if (method.getTypeParameters().length != 0) {
                     throw new DIException("Parameterized method are not supported " + method);
                 }
-                Map<TypeVariable<?>, Type> mapping = new HashMap<>();
-                for (TypeVariable<Method> methodTypeParameter : methodTypeParameters) {
-                    mapping.put(methodTypeParameter, methodTypeParameter);
-                }
-                mapping.putAll(Types.getAllTypeBindings(key.getRawType()));
-
-                Type returnType = Types.bind(method.getGenericReturnType(), mapping);
-                Key<Object> rkey = Key.ofType(returnType, qualifier);
-
-                Set<Class<?>> types;
-                Typed typed = method.getAnnotation(Typed.class);
-                if (typed != null) {
-                    Class<?>[] typesArray = typed.value();
-                    if (typesArray == null || typesArray.length == 0) {
-                        types = new HashSet<>(Arrays.asList(rkey.getRawType().getInterfaces()));
-                        types.add(Object.class);
-                    } else {
-                        types = new HashSet<>(Arrays.asList(typesArray));
-                    }
-                } else {
-                    types = null;
-                }
-
-                Set<Key<?>> toBind = new HashSet<>();
-                Deque<Key<?>> todo = new ArrayDeque<>();
-                todo.add(rkey);
-
-                Set<Key<?>> done = new HashSet<>();
-                while (!todo.isEmpty()) {
-                    Key<?> type = todo.remove();
-                    if (done.add(type)) {
-                        Class<?> cls = Types.getRawType(type.getType());
-                        Type[] interfaces = cls.getGenericInterfaces();
-                        Arrays.stream(interfaces)
-                                .map(t -> Key.ofType(t, qualifier))
-                                .forEach(todo::add);
-                        Type supercls = cls.getGenericSuperclass();
-                        if (supercls != null) {
-                            todo.add(Key.ofType(supercls, qualifier));
-                        }
-                        if (types == null || types.contains(cls)) {
-                            toBind.add(type);
-                        }
-                    }
-                }
-                // Also bind without the qualifier
-                if (qualifier != null) {
-                    new HashSet<>(toBind).forEach(k -> toBind.add(Key.ofType(k.getType())));
-                }
-
+                Object qualifier = ReflectionUtils.qualifierOf(method);
+                Annotation scope = ReflectionUtils.scopeOf(method);
+                Type returnType = method.getGenericReturnType();
+                Set<Class<?>> types = getBoundTypes(method.getAnnotation(Typed.class), Types.getRawType(returnType));
                 Binding<Object> bind = ReflectionUtils.bindingFromMethod(method).scope(scope);
-                toBind.forEach((k -> bind((Key<Object>) k, bind)));
+                for (Type t : Types.getAllSuperTypes(returnType)) {
+                    if (types == null || types.contains(Types.getRawType(t))) {
+                        bind(Key.ofType(t, qualifier), bind);
+                        if (qualifier != null) {
+                            bind(Key.ofType(t), bind);
+                        }
+                    }
+                }
             }
+        }
+    }
+
+    private static Set<Class<?>> getBoundTypes(Typed typed, Class<?> clazz) {
+        if (typed != null) {
+            Class<?>[] typesArray = typed.value();
+            if (typesArray == null || typesArray.length == 0) {
+                Set<Class<?>> types = new HashSet<>(Arrays.asList(clazz.getInterfaces()));
+                types.add(Object.class);
+                return types;
+            } else {
+                return new HashSet<>(Arrays.asList(typesArray));
+            }
+        } else {
+            return null;
         }
     }
 

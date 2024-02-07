@@ -526,23 +526,14 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         org.apache.maven.api.plugin.Log log = new DefaultLog(
                 LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getFullGoalName()));
         try {
-            Set<String> classes = new HashSet<>();
-            try (InputStream is = pluginRealm.getResourceAsStream("META-INF/maven/org.apache.maven.api.di.Inject");
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
-                reader.lines().forEach(classes::add);
-            }
             Injector injector = Injector.create();
+            injector.discover(pluginRealm);
             // Add known classes
             // TODO: get those from the existing plexus scopes ?
             injector.bindInstance(Session.class, sessionV4);
             injector.bindInstance(Project.class, project);
             injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
             injector.bindInstance(org.apache.maven.api.plugin.Log.class, log);
-            // Add plugin classes
-            for (String className : classes) {
-                Class<?> clazz = pluginRealm.loadClass(className);
-                injector.bindImplicit(clazz);
-            }
             mojo = mojoInterface.cast(injector.getInstance(mojoDescriptor.getImplementationClass()));
 
         } catch (Exception e) {
