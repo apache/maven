@@ -19,6 +19,7 @@
 package org.apache.maven.api;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 abstract class ExtensibleEnums {
 
@@ -63,24 +64,56 @@ abstract class ExtensibleEnums {
     }
 
     private static class DefaultPathScope extends DefaultExtensibleEnum implements PathScope {
-        private final ProjectScope projectScope;
+        private final Set<ProjectScope> projectScope;
         private final Set<DependencyScope> dependencyScopes;
 
         DefaultPathScope(String id, ProjectScope projectScope, DependencyScope... dependencyScopes) {
+            this(id, Collections.singleton(projectScope), Arrays.asList(dependencyScopes));
+        }
+
+        DefaultPathScope(
+                String id, Collection<ProjectScope> projectScopes, Collection<DependencyScope> dependencyScopes) {
             super(id);
-            this.projectScope = Objects.requireNonNull(projectScope);
-            this.dependencyScopes =
-                    Collections.unmodifiableSet(new HashSet<>(Arrays.asList(Objects.requireNonNull(dependencyScopes))));
+            this.projectScope = Collections.unmodifiableSet(new HashSet<>(projectScopes));
+            this.dependencyScopes = Collections.unmodifiableSet(new HashSet<>(dependencyScopes));
         }
 
         @Override
-        public ProjectScope projectScope() {
+        public Set<ProjectScope> projectScope() {
             return projectScope;
         }
 
         @Override
         public Set<DependencyScope> dependencyScopes() {
             return dependencyScopes;
+        }
+
+        @Override
+        public PathScope merge(PathScope pathScope) {
+            if (pathScope == null || this.equals(pathScope)) {
+                return this;
+            }
+            HashSet<ProjectScope> mergedProjectScopes = new HashSet<>(projectScope);
+            mergedProjectScopes.addAll(pathScope.projectScope());
+            HashSet<DependencyScope> mergedScopes = new HashSet<>(dependencyScopes);
+            mergedScopes.addAll(pathScope.dependencyScopes());
+            return new DefaultPathScope(id() + "+" + pathScope.id(), mergedProjectScopes, mergedScopes);
+        }
+
+        @Override
+        public PathScope merge(DependencyScope... dependencyScope) {
+            HashSet<DependencyScope> mergedScopes = new HashSet<>(dependencyScopes);
+            mergedScopes.addAll(Arrays.asList(dependencyScope));
+            if (mergedScopes.equals(dependencyScopes)) {
+                return this;
+            }
+            return new DefaultPathScope(
+                    id() + "+"
+                            + Arrays.stream(dependencyScope)
+                                    .map(DependencyScope::id)
+                                    .collect(Collectors.joining("+")),
+                    projectScope(),
+                    mergedScopes);
         }
     }
 

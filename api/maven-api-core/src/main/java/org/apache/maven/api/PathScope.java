@@ -28,7 +28,7 @@ import static org.apache.maven.api.ExtensibleEnums.pathScope;
 
 /**
  * Path scope.
- * A path scope is used to determine the kind of build or class path that will be built when resolving
+ * A path scope is used to determine the kind of build path that will be built when resolving
  * dependencies using the {@link org.apache.maven.api.services.DependencyResolver} service.
  * <p>
  * This extensible enum has four defined values, {@link #MAIN_COMPILE}, {@link #MAIN_RUNTIME},
@@ -47,10 +47,14 @@ import static org.apache.maven.api.ExtensibleEnums.pathScope;
 public interface PathScope extends ExtensibleEnum {
 
     @Nonnull
-    ProjectScope projectScope();
+    Set<ProjectScope> projectScope();
 
     @Nonnull
     Set<DependencyScope> dependencyScopes();
+
+    PathScope merge(PathScope pathScope);
+
+    PathScope merge(DependencyScope... dependencyScope);
 
     PathScope MAIN_COMPILE = pathScope(
             "main-compile",

@@ -35,6 +35,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * and the {@link org.apache.maven.api.services.DependencyResolver}.
  *
  * @since 4.0.0
+ * @see PathScope
  * @see org.apache.maven.api.model.Dependency#getScope()
  * @see org.apache.maven.api.services.DependencyResolver
  */
@@ -58,8 +59,6 @@ public enum DependencyScope {
 
     /**
      * Compile only.
-     * <p>
-     * New scope in Maven4: this scope is present only during main compilation.
      */
     COMPILE_ONLY("compile-only", false),
 
@@ -80,8 +79,6 @@ public enum DependencyScope {
 
     /**
      * Test compile only.
-     * <p>
-     * New scope in Maven4: this scope is present only during test compilation.
      */
     TEST_ONLY("test-only", false),
 
@@ -92,8 +89,6 @@ public enum DependencyScope {
 
     /**
      * Test runtime.
-     * <p>
-     * New scope in Maven4: this scope is present only during test runtime.
      */
     TEST_RUNTIME("test-runtime", true),
 
