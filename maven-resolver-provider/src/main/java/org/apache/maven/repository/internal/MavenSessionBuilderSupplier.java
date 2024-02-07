@@ -20,12 +20,11 @@ package org.apache.maven.repository.internal;
 
 import java.util.function.Supplier;
 
-import org.apache.maven.api.Language;
 import org.apache.maven.repository.internal.artifact.FatArtifactTraverser;
 import org.apache.maven.repository.internal.scopes.MavenDependencyContextRefiner;
 import org.apache.maven.repository.internal.scopes.MavenScopeDeriver;
 import org.apache.maven.repository.internal.scopes.MavenScopeSelector;
-import org.apache.maven.repository.internal.type.DefaultType;
+import org.apache.maven.repository.internal.type.DefaultTypeProvider;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
@@ -107,19 +106,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
      */
     protected ArtifactTypeRegistry getArtifactTypeRegistry() {
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
-        stereotypes.add(new DefaultType("pom", Language.NONE, "pom", null, false, false));
-        stereotypes.add(new DefaultType("bom", Language.NONE, "pom", null, false, false));
-        stereotypes.add(new DefaultType("maven-plugin", Language.JAVA_FAMILY, "jar", null, true, false));
-        stereotypes.add(new DefaultType("jar", Language.JAVA_FAMILY, "jar", null, true, false));
-        stereotypes.add(new DefaultType("ejb", Language.JAVA_FAMILY, "jar", null, true, false));
-        stereotypes.add(new DefaultType("ejb-client", Language.JAVA_FAMILY, "jar", "client", true, false));
-        stereotypes.add(new DefaultType("test-jar", Language.JAVA_FAMILY, "jar", "tests", true, false));
-        stereotypes.add(new DefaultType("javadoc", Language.JAVA_FAMILY, "jar", "javadoc", true, false));
-        stereotypes.add(new DefaultType("java-source", Language.JAVA_FAMILY, "jar", "sources", false, false));
-        stereotypes.add(new DefaultType("war", Language.JAVA_FAMILY, "war", null, false, true));
-        stereotypes.add(new DefaultType("ear", Language.JAVA_FAMILY, "ear", null, false, true));
-        stereotypes.add(new DefaultType("rar", Language.JAVA_FAMILY, "rar", null, false, true));
-        stereotypes.add(new DefaultType("par", Language.JAVA_FAMILY, "par", null, false, true));
+        new DefaultTypeProvider().types().forEach(stereotypes::add);
         return stereotypes;
     }
 
