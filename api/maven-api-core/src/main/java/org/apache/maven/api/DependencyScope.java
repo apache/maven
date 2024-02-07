@@ -58,16 +58,18 @@ public enum DependencyScope {
 
     /**
      * Compile only.
+     * <p>
+     * New scope in Maven4: this scope is present only during main compilation.
      */
     COMPILE_ONLY("compile-only", false),
 
     /**
-     * Compile, runtime and test.
+     * Compile.
      */
     COMPILE("compile", true),
 
     /**
-     * Runtime and test.
+     * Runtime.
      */
     RUNTIME("runtime", true),
 
@@ -78,24 +80,25 @@ public enum DependencyScope {
 
     /**
      * Test compile only.
+     * <p>
+     * New scope in Maven4: this scope is present only during test compilation.
      */
     TEST_ONLY("test-only", false),
 
     /**
-     * Test compile and test runtime.
+     * Test.
      */
     TEST("test", false),
 
     /**
      * Test runtime.
+     * <p>
+     * New scope in Maven4: this scope is present only during test runtime.
      */
     TEST_RUNTIME("test-runtime", true),
 
     /**
      * System scope.
-     * <p>
-     * Important: this scope {@code id} MUST BE KEPT in sync with label in
-     * {@code org.eclipse.aether.util.artifact.DependencyScopes#SYSTEM}.
      */
     SYSTEM("system", false);
 
