@@ -54,12 +54,13 @@ public class DefaultDependencyCollector implements DependencyCollector {
 
         Artifact rootArtifact =
                 request.getRootArtifact().map(session::toArtifact).orElse(null);
-        Dependency root = request.getRoot().map(session::toDependency).orElse(null);
+        Dependency root =
+                request.getRoot().map(d -> session.toDependency(d, false)).orElse(null);
         CollectRequest collectRequest = new CollectRequest()
                 .setRootArtifact(rootArtifact)
                 .setRoot(root)
-                .setDependencies(session.toDependencies(request.getDependencies()))
-                .setManagedDependencies(session.toDependencies(request.getManagedDependencies()))
+                .setDependencies(session.toDependencies(request.getDependencies(), false))
+                .setManagedDependencies(session.toDependencies(request.getManagedDependencies(), true))
                 .setRepositories(session.toRepositories(session.getRemoteRepositories()));
 
         RepositorySystemSession systemSession = session.getSession();

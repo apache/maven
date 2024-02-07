@@ -51,7 +51,7 @@ public enum DependencyScope {
     /**
      * Undefined. When no scope is explicitly given, UNDEFINED will be used, but its meaning will depend on
      * whether the DependencyCoordinate is used in dependency management, in which case it means the scope is not
-     * explicitly managed by this dependency management, or as a real dependency, in which case, the scope
+     * explicitly managed by this managed dependency, or as a real dependency, in which case, the scope
      * will default to {@link #COMPILE}.
      */
     UNDEFINED("", false),

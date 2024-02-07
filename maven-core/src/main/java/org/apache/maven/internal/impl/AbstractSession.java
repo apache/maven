@@ -111,11 +111,12 @@ public abstract class AbstractSession implements InternalSession {
 
     public abstract ArtifactRepository toArtifactRepository(RemoteRepository repository);
 
-    public List<org.eclipse.aether.graph.Dependency> toDependencies(Collection<DependencyCoordinate> dependencies) {
-        return dependencies == null ? null : map(dependencies, this::toDependency);
+    public List<org.eclipse.aether.graph.Dependency> toDependencies(
+            Collection<DependencyCoordinate> dependencies, boolean managed) {
+        return dependencies == null ? null : map(dependencies, d -> toDependency(d, managed));
     }
 
-    public abstract org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency);
+    public abstract org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency, boolean managed);
 
     public List<org.eclipse.aether.artifact.Artifact> toArtifacts(Collection<Artifact> artifacts) {
         return artifacts == null ? null : map(artifacts, this::toArtifact);
