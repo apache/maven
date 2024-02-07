@@ -65,6 +65,14 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
         this.repositorySystem = requireNonNull(repositorySystem);
     }
 
+    /**
+     * Package protected constructor, only for use with {@link MavenRepositorySystemUtils}.
+     */
+    @Deprecated
+    MavenSessionBuilderSupplier() {
+        this.repositorySystem = null;
+    }
+
     protected DependencyTraverser getDependencyTraverser() {
         return new FatArtifactTraverser();
     }
