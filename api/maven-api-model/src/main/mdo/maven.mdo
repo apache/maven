@@ -71,10 +71,8 @@
       <name>Model</name>
       <superClass>ModelBase</superClass>
       <description>
-        <![CDATA[
-        The {@code <project>} element is the root of the descriptor.
+        The {@code &lt;project>} element is the root of the descriptor.
         The following table lists all of the possible child elements.
-        ]]>
       </description>
       <version>3.0.0+</version>
       <fields>
@@ -123,11 +121,9 @@
           <version>3.0.0+</version>
           <required>true</required>
           <description>
-            <![CDATA[
             A universally unique identifier for a project. It is normal to
             use a fully-qualified package name to distinguish it from other
             projects with a similar name (eg. {@code org.apache.maven}).
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -152,15 +148,13 @@
           <name>packaging</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
-            The type of artifact this project produces, for example {@code jar}
-              {@code war}
-              {@code ear}
+            The type of artifact this project produces, for example {@code jar},
+              {@code war},
+              {@code ear},
               {@code pom}.
             Plugins can create their own packaging, and
             therefore their own packaging types,
             so this list does not contain all possible types.
-            ]]>
           </description>
           <type>String</type>
           <defaultValue>jar</defaultValue>
@@ -181,10 +175,10 @@
           <name>description</name>
           <version>3.0.0+</version>
           <description>A detailed description of the project, used by Maven whenever it needs to
-            describe the project, such as on the web site. While this element can be specified as
+            describe the project, such as on the website. While this element can be specified as
             CDATA to enable the use of HTML tags within the description, it is discouraged to allow
-            plain text representation. If you need to modify the index page of the generated web
-            site, you are able to specify your own instead of adjusting this text.</description>
+            plain text representation. If you need to modify the index page of the generated website,
+            you are able to specify your own instead of adjusting this text.</description>
           <type>String</type>
         </field>
         <field>
@@ -193,8 +187,8 @@
           <description>
             <![CDATA[
             The URL to the project's homepage.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
-            project's {@code child.project.url.inherit.append.path="false"}
+            <p><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            project's {@code child.project.url.inherit.append.path="false"}</p>
             ]]>
           </description>
           <type>String</type>
@@ -207,8 +201,8 @@
             When children inherit from project's url, append path or not? Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}
-            <br><b>Default value is</b>: {@code true}
-            <br><b>Since</b>: Maven 3.6.1
+            <p><b>Default value is</b>: {@code true}</p>
+            @since Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -217,11 +211,10 @@
           <name>root</name>
           <version>4.1.0+</version>
           <description>
-            <![CDATA[
             Indicates that this project is the root project, located in the upper directory of the source tree.
             This is the directory which may contain the .mvn directory.
-            <br><b>Since</b>: Maven 4.0.0
-            ]]>
+
+            @since Maven 4.0.0
           </description>
           <type>boolean</type>
           <defaultValue>false</defaultValue>
@@ -230,11 +223,9 @@
           <name>preserveModelVersion</name>
           <version>4.1.0+</version>
           <description>
-            <![CDATA[
             Indicates if the build POM for this project should be preserved or downgraded to the lowest
             compatible version.
-            <br><b>Since</b>: Maven 4.0.0
-            ]]>
+            @since Maven 4.0.0
           </description>
           <type>boolean</type>
           <defaultValue>false</defaultValue>
@@ -263,7 +254,7 @@
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            This element describes all of the licenses for this project.
+            This element describes all the licenses for this project.
             Each license is described by a {@code license} element, which
             is then described by additional elements.
             Projects should only list the license(s) that applies to the project
@@ -397,19 +388,16 @@
      * @return The POM file from which this model originated or {@code null} if this model does not belong to a local
      *         project (e.g. describes the metadata of some artifact from the repository).
      */
-    public java.io.File getPomFile()
-    {
-        return ( getDelegate().getPomFile() != null ) ? getDelegate().getPomFile().toFile() : null;
+    public java.io.File getPomFile() {
+        return (getDelegate().getPomFile() != null) ? getDelegate().getPomFile().toFile() : null;
     }
 
-    public void setPomFile( java.io.File pomFile )
-    {
-        update( getDelegate().withPomFile( pomFile != null ? pomFile.toPath() : null ) );
+    public void setPomFile(java.io.File pomFile) {
+        update( getDelegate().withPomFile(pomFile != null ? pomFile.toPath() : null));
     }
 
-    public void setModelEncoding( String modelEncoding )
-    {
-        update( getDelegate().with().modelEncoding( modelEncoding ).build() );
+    public void setModelEncoding(String modelEncoding) {
+        update(getDelegate().with().modelEncoding(modelEncoding).build());
     }
 
     /**
@@ -418,16 +406,14 @@
      * @return The base directory for the corresponding project or {@code null} if this model does not belong to a local
      *         project (e.g. describes the metadata of some artifact from the repository).
      */
-    public java.io.File getProjectDirectory()
-    {
-        return ( getDelegate().getProjectDirectory() != null ) ? getDelegate().getProjectDirectory().toFile() : null;
+    public java.io.File getProjectDirectory() {
+        return (getDelegate().getProjectDirectory() != null) ? getDelegate().getProjectDirectory().toFile() : null;
     }
 
     /**
      * @return the model id as {@code groupId:artifactId:packaging:version}
      */
-    public String getId()
-    {
+    public String getId() {
         StringBuilder id = new StringBuilder( 64 );
 
         id.append( ( getGroupId() == null ) ? "[inherited]" : getGroupId() );
@@ -442,19 +428,16 @@
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getId();
     }
 
-    public boolean isChildProjectUrlInheritAppendPath()
-    {
+    public boolean isChildProjectUrlInheritAppendPath() {
         return getDelegate().isChildProjectUrlInheritAppendPath();
     }
 
-    public void setChildProjectUrlInheritAppendPath( boolean childProjectUrlInheritAppendPath )
-    {
-        delegate = getDelegate().withChildProjectUrlInheritAppendPath( String.valueOf( childProjectUrlInheritAppendPath ) );
+    public void setChildProjectUrlInheritAppendPath(boolean childProjectUrlInheritAppendPath) {
+        delegate = getDelegate().withChildProjectUrlInheritAppendPath(String.valueOf(childProjectUrlInheritAppendPath));
     }
 
             ]]>
@@ -470,9 +453,8 @@
      * @return The base directory for the corresponding project or {@code null} if this model does not belong to a local
      *         project (e.g. describes the metadata of some artifact from the repository).
      */
-    public Path getProjectDirectory()
-    {
-        return ( pomFile != null ) ? pomFile.getParent() : null;
+    public Path getProjectDirectory() {
+        return (pomFile != null) ? pomFile.getParent() : null;
     }
 
     /**
@@ -513,9 +495,7 @@
       <name>ModelBase</name>
       <version>3.0.0+</version>
       <description>
-        <![CDATA[
         Base class for the {@code Model} and the {@code Profile} objects.
-        ]]>
       </description>
       <fields>
         <field xdoc.separator="blank">
@@ -543,11 +523,9 @@
           <name>properties</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             Properties that can be used throughout the POM as a substitution, and
             are used as filters in resources if enabled.
-            The format is {@code <name>value</name>}.
-            ]]>
+            The format is {@code &lt;name>value&lt;/name>}.
           </description>
           <type>Properties</type>
           <association xml.mapStyle="inline">
@@ -572,15 +550,12 @@
           <name>dependencies</name>
           <version>3.0.0+</version>
           <description>
-            <![CDATA[
-            This element describes all of the dependencies associated with a
-            project.
+            This element describes all the dependencies associated with a project.
             These dependencies are used to construct a classpath for your
             project during the build process. They are automatically downloaded from the
             repositories defined in this project.
-            See <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
-            dependency mechanism</a> for more information.
-            ]]>
+
+            @see &lt;a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">Dependency mechanism&lt;/a>
           </description>
           <association>
             <type>Dependency</type>
@@ -611,9 +586,7 @@
           <name>reports</name>
           <version>4.0.0</version>
           <description>
-            <![CDATA[
-             <b>Deprecated</b>. Now ignored by Maven.
-             ]]>
+            @deprecated Now ignored by Maven.
           </description>
           <type>DOM</type>
         </field>
@@ -621,12 +594,10 @@
           <name>reporting</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             This element includes the specification of report plugins to use
             to generate the reports on the Maven-generated site.
             These reports will be run when a user executes {@code mvn site}.
-            All of the reports will be included in the navigation bar for browsing.
-            ]]>
+            All the reports will be included in the navigation bar for browsing.
           </description>
           <association>
             <type>Reporting</type>
@@ -637,7 +608,7 @@
     <class>
       <name>PluginContainer</name>
       <version>3.0.0+</version>
-      <description>Contains the plugins informations for the project.</description>
+      <description>Contains the plugins information for the project.</description>
       <fields>
         <field>
           <name>plugins</name>
@@ -731,7 +702,7 @@
       <name>PluginConfiguration</name>
       <version>3.0.0+</version>
       <superClass>PluginContainer</superClass>
-      <description>Contains the plugins management informations for the project.</description>
+      <description>Contains the plugins management information for the project.</description>
       <fields>
         <!-- [ jdcasey:06-Mar-2005 ] Added to handle version management, etc. for
           | plugins to be used in sub-projects. -->
@@ -783,11 +754,11 @@
         <field>
           <name>resources</name>
           <version>3.0.0+</version>
-          <description><![CDATA[
-            This element describes all of the classpath resources such as properties
+          <description>
+            This element describes all the classpath resources such as properties
             files associated with a project. These resources are often included in the final
             package.
-            The default value is {@code src/main/resources}.]]>
+            The default value is {@code src/main/resources}.
           </description>
           <association>
             <type>Resource</type>
@@ -797,10 +768,10 @@
         <field>
           <name>testResources</name>
           <version>4.0.0+</version>
-          <description><![CDATA[
-            This element describes all of the classpath resources such as properties
+          <description>
+            This element describes all the classpath resources such as properties
             files associated with a project's unit tests.
-            The default value is {@code src/test/resources}.]]>
+            The default value is {@code src/test/resources}.
           </description>
           <association>
             <type>Resource</type>
@@ -810,9 +781,9 @@
         <field>
           <name>directory</name>
           <version>4.0.0+</version>
-          <description><![CDATA[
+          <description>
             The directory where all files generated by the build are placed.
-            The default value is {@code target}.]]>
+            The default value is {@code target}.
           </description>
           <type>String</type>
         </field>
@@ -820,11 +791,9 @@
           <name>finalName</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             The filename (excluding the extension, and with no path information) that
             the produced artifact will be called.
             The default value is {@code ${artifactId}-${version}}.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -860,21 +829,19 @@
       <version>3.0.0+</version>
       <superClass>BuildBase</superClass>
       <description>
-        <![CDATA[
-        The {@code <build>} element contains informations required to build the project.
+        The {@code &lt;build>} element contains information required to build the project.
         Default values are defined in Super POM.
-        ]]>
       </description>
       <fields>
         <field>
           <name>sourceDirectory</name>
           <version>3.0.0+</version>
           <required>true</required>
-          <description><![CDATA[
+          <description>
             This element specifies a directory containing the source of the project. The
             generated build system will compile the sources from this directory when the project is
             built. The path given is relative to the project descriptor.
-            The default value is {@code src/main/java}.]]>
+            The default value is {@code src/main/java}.
           </description>
           <type>String</type>
         </field>
@@ -882,12 +849,12 @@
           <name>scriptSourceDirectory</name>
           <version>4.0.0+</version>
           <required>true</required>
-          <description><![CDATA[
+          <description>
             This element specifies a directory containing the script sources of the
             project. This directory is meant to be different from the sourceDirectory, in that its
             contents will be copied to the output directory in most cases (since scripts are
             interpreted rather than compiled).
-            The default value is {@code src/main/scripts}.]]>
+            The default value is {@code src/main/scripts}.
           </description>
           <type>String</type>
         </field>
@@ -895,29 +862,29 @@
           <name>testSourceDirectory</name>
           <version>4.0.0+</version>
           <required>true</required>
-          <description><![CDATA[
+          <description>
             This element specifies a directory containing the unit test source of the
             project. The generated build system will compile these directories when the project is
             being tested. The path given is relative to the project descriptor.
-            The default value is {@code src/test/java}.]]>
+            The default value is {@code src/test/java}.
           </description>
           <type>String</type>
         </field>
         <field>
           <name>outputDirectory</name>
           <version>4.0.0+</version>
-          <description><![CDATA[
+          <description>
             The directory where compiled application classes are placed.
-            The default value is {@code target/classes}.]]>
+            The default value is {@code target/classes}.
           </description>
           <type>String</type>
         </field>
         <field>
           <name>testOutputDirectory</name>
           <version>4.0.0+</version>
-          <description><![CDATA[
+          <description>
             The directory where compiled test classes are placed.
-            The default value is {@code target/test-classes}.]]>
+            The default value is {@code target/test-classes}.
           </description>
           <type>String</type>
         </field>
@@ -953,7 +920,7 @@
       <version>4.0.0+</version>
       <description>
         <![CDATA[
-        The {@code <ciManagement>} element contains informations required to the
+        The {@code <ciManagement>} element contains information required to the
         continuous integration system of the project.
         ]]>
       </description>
@@ -962,17 +929,16 @@
           <name>system</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             The name of the continuous integration system, e.g. {@code continuum}.
-            ]]>
           </description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
           <version>4.0.0+</version>
-          <description>URL for the continuous integration system used by the project if it has a web
-            interface.</description>
+          <description>
+            URL for the continuous integration system used by the project if it has a web interface.
+          </description>
           <type>String</type>
         </field>
         <field>
@@ -1033,9 +999,7 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            <![CDATA[
-            <b>Deprecated</b>. Where to send the notification to - eg email address.
-            ]]>
+            @deprecated Where to send the notification to - eg email address.
           </description>
         </field>
         <field>
@@ -1092,11 +1056,9 @@
           <name>roles</name>
           <version>3.0.0+</version>
           <description>
-            <![CDATA[
             The roles the contributor plays in the project. Each role is described by a
             {@code role} element, the body of which is a role name. This can also be used to
             describe the contribution.
-            ]]>
           </description>
           <association>
             <type>String</type>
@@ -1170,10 +1132,8 @@
           <version>3.0.0+</version>
           <required>true</required>
           <description>
-            <![CDATA[
             The unique id for an artifact produced by the project group, e.g.
             {@code maven-artifact}.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -1181,10 +1141,8 @@
           <name>version</name>
           <version>3.0.0+</version>
           <description>
-            <![CDATA[
-            The version of the dependency, e.g. {@code 3.2.1}. In Maven 2, this can also be
+            The version of the dependency, e.g. {@code 3.2.1}. Since Maven 2, this can also be
             specified as a range of versions.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -1271,13 +1229,11 @@
           <name>optional</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             Indicates the dependency is optional for use of this library. While the
             version of the dependency will be taken into account for dependency calculation if the
             library is used elsewhere, it will not be passed on transitively. Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}. Default value is {@code false}.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -1287,9 +1243,8 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-    public boolean isOptional()
-    {
-        return ( getOptional() != null ) ? Boolean.parseBoolean( getOptional() ) : false;
+    public boolean isOptional() {
+        return (getOptional() != null) ? Boolean.parseBoolean(getOptional()) : false;
     }
 
             ]]>
@@ -1299,9 +1254,8 @@
           <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
-    public void setOptional( boolean optional )
-    {
-        setOptional( String.valueOf( optional ) );
+    public void setOptional(boolean optional) {
+        setOptional(String.valueOf(optional));
     }
 
             ]]>
@@ -1314,8 +1268,7 @@
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString()
-    {
+    public String toString() {
         return "Dependency {groupId=" + getGroupId() + ", artifactId=" + getArtifactId() + ", version=" + getVersion() + ", type=" + getType() + "}";
     }
             ]]>
@@ -1330,11 +1283,9 @@
     /**
      * @return the management key as {@code groupId:artifactId:type}
      */
-    public String getManagementKey()
-    {
-        if ( managementKey == null )
-        {
-            managementKey = getGroupId() + ":" + getArtifactId() + ":" + getType() + ( getClassifier() != null ? ":" + getClassifier() : "" );
+    public String getManagementKey() {
+        if (managementKey == null) {
+            managementKey = getGroupId() + ":" + getArtifactId() + ":" + getType() + (getClassifier() != null ? ":" + getClassifier() : "");
         }
         return managementKey;
     }
@@ -1364,8 +1315,7 @@
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString()
-    {
+    public String toString() {
         return "Developer {id=" + getId() + ", " + super.toString() + "}";
     }
             ]]>
@@ -1378,11 +1328,12 @@
       <version>4.0.0+</version>
       <description>
         <![CDATA[
-        The {@code <exclusion>} element contains informations required to exclude
+        The {@code <exclusion>} element contains information required to exclude
         an artifact to the project.
         <p>
-        The {@code groupId} and {@code artifactId} fields are interpreted as glob patterns,
-        see {@link java.nio.file.FileSystem#getPathMatcher}.
+        The {@code groupId} and {@code artifactId} fields are interpreted as glob patterns.
+
+        @see java.nio.file.FileSystem#getPathMatcher
         ]]>
       </description>
       <fields>
@@ -1457,10 +1408,8 @@
           <name>snapshotRepository</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             Where to deploy snapshots of artifacts to. If not given, it defaults to the
             {@code repository} element.
-            ]]>
           </description>
           <association>
             <type>DeploymentRepository</type>
@@ -1478,20 +1427,20 @@
           <name>downloadUrl</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             The URL of the project's download page. If not given users will be
             referred to the homepage given by {@code url}.
             This is given to assist in locating artifacts that are not in the repository due to
             licensing restrictions.
-            ]]>
           </description>
           <type>String</type>
         </field>
         <field>
           <name>relocation</name>
           <version>4.0.0+</version>
-          <description>Relocation information of the artifact if it has been moved to a new group ID
-            and/or artifact ID.</description>
+          <description>
+            Relocation information of the artifact if it has been moved to a new group ID
+            and/or artifact ID.
+          </description>
           <association>
             <type>Relocation</type>
           </association>
@@ -1500,15 +1449,13 @@
           <name>status</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             Gives the status of this artifact in the remote repository.
             This must not be set in your local project, as it is updated by
-            tools placing it in the reposiory. Valid values are: {@code none} (default),
+            tools placing it in the repository. Valid values are: {@code none} (default),
             {@code converted} (repository manager converted this from an Maven 1 POM),
             {@code partner}
             (directly synced from a partner Maven 2 repository), {@code deployed} (was deployed from a Maven 2
             instance), {@code verified} (has been hand verified as correct and final).
-            ]]>
           </description>
           <required>false</required>
           <type>String</type>
@@ -1518,7 +1465,7 @@
     <class>
       <name>License</name>
       <description>Describes the licenses for this project. This is used to generate the license
-        page of the project's web site, as well as being taken into consideration in other reporting
+        page of the project's website, as well as being taken into consideration in other reporting
         and validation. The licenses listed for the project are that of the project itself, and not
         of dependencies.</description>
       <version>3.0.0+</version>
@@ -1585,9 +1532,7 @@
           <name>name</name>
           <version>3.0.0+</version>
           <description>
-            <![CDATA[
             The name of the mailing list.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -1595,12 +1540,10 @@
           <name>subscribe</name>
           <version>3.0.0+</version>
           <description>
-            <![CDATA[
             The email address or link that can be used to subscribe to
             the mailing list.  If this is an email address, a
             {@code mailto:} link will automatically be created
             when the documentation is created.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -1608,12 +1551,10 @@
           <name>unsubscribe</name>
           <version>3.0.0+</version>
           <description>
-            <![CDATA[
             The email address or link that can be used to unsubscribe to
             the mailing list.  If this is an email address, a
             {@code mailto:} link will automatically be created
             when the documentation is created.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -1621,12 +1562,10 @@
           <name>post</name>
           <version>3.0.0+</version>
           <description>
-            <![CDATA[
             The email address or link that can be used to post to
             the mailing list.  If this is an email address, a
             {@code mailto:} link will automatically be created
             when the documentation is created.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -1710,9 +1649,7 @@
           <name>includes</name>
           <version>3.0.0+</version>
           <description>
-            <![CDATA[
-            A list of patterns to include, e.g. {@code **&#47;*.xml}.
-            ]]>
+            A list of patterns to include, e.g. {@code **&amp;#47;*.xml}.
           </description>
           <association>
             <type>String</type>
@@ -1723,9 +1660,7 @@
           <name>excludes</name>
           <version>3.0.0+</version>
           <description>
-            <![CDATA[
-            A list of patterns to exclude, e.g. {@code **&#47;*.xml}
-            ]]>
+            A list of patterns to exclude, e.g. {@code **&amp;#47;*.xml}
           </description>
           <association>
             <type>String</type>
@@ -1741,28 +1676,10 @@
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder( 128 );
-
-        sb.append("PatternSet [includes: {");
-        for (java.util.Iterator i = getIncludes().iterator(); i.hasNext(); )
-        {
-            String str = (String) i.next();
-            sb.append(str).append(", ");
-        }
-        if (sb.substring(sb.length() - 2).equals(", ")) sb.delete(sb.length() - 2, sb.length());
-
-        sb.append("}, excludes: {");
-        for (java.util.Iterator i = getExcludes().iterator(); i.hasNext(); )
-        {
-            String str = (String) i.next();
-            sb.append(str).append(", ");
-        }
-        if (sb.substring(sb.length() - 2).equals(", ")) sb.delete(sb.length() - 2, sb.length());
-
-        sb.append("}]");
-        return sb.toString();
+    public String toString() {
+        return "PatternSet [" +
+            "includes: {" + getIncludes().stream().collect(java.util.stream.Collectors.joining(", ")) + "}, " +
+            "excludes: {" + getExcludes().stream().collect(java.util.stream.Collectors.joining(", ")) + "}]";
     }
             ]]>
           </code>
@@ -1776,7 +1693,7 @@
         <![CDATA[
         The {@code <parent>} element contains information required to locate the parent project from which
         this project will inherit from.
-        <strong>Note:</strong> The children of this element are not interpolated and must be given as literal values.
+        <p><strong>Note:</strong> The children of this element are not interpolated and must be given as literal values.</p>
         ]]>
       </description>
       <fields>
@@ -1804,19 +1721,17 @@
           <name>relativePath</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
-            The relative path of the parent {@code pom.xml} file within the check out.
+            The relative path of the parent {@code pom.xml} file within the checkout.
             If not specified, it defaults to {@code ../pom.xml}.
             Maven looks for the parent POM first in this location on
             the filesystem, then the local repository, and lastly in the remote repo.
             {@code relativePath} allows you to select a different location,
             for example when your structure is flat, or deeper without an intermediate parent POM.
             However, the group ID, artifact ID and version are still required,
-            and must match the file in the location given or it will revert to the repository for the POM.
+            and must match the file in the location given, or it will revert to the repository for the POM.
             This feature is only for enhancing the development in a local checkout of that project.
             Set the value to an empty string in case you want to disable the feature and always resolve
             the parent POM from the repositories.
-            ]]>
           </description>
           <type>String</type>
           <defaultValue>..</defaultValue>
@@ -1830,24 +1745,12 @@
     /**
      * @return the id as {@code groupId:artifactId:version}
      */
-    public String getId()
-    {
-        StringBuilder id = new StringBuilder( 64 );
-
-        id.append( getGroupId() );
-        id.append( ":" );
-        id.append( getArtifactId() );
-        id.append( ":" );
-        id.append( "pom" );
-        id.append( ":" );
-        id.append( getVersion() );
-
-        return id.toString();
+    public String getId() {
+        return getGroupId() + ":" + getArtifactId() + ":pom:" + getVersion();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getId();
     }
             ]]>
@@ -1860,10 +1763,8 @@
       <name>Scm</name>
       <version>4.0.0+</version>
       <description>
-        <![CDATA[
-        The {@code <scm>} element contains informations required to the SCM
+        The {@code &lt;scm>} element contains information required to the SCM
         (Source Control Management) of the project.
-        ]]>
       </description>
       <fields>
         <field>
@@ -1873,12 +1774,12 @@
             <![CDATA[
             The source control management system URL
             that describes the repository and how to connect to the
-            repository. For more information, see the
-            <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
-            and <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
+            repository.
             This connection is read-only.
             <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             scm's {@code child.scm.connection.inherit.append.path="false"}
+            @see <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
+            @see <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>
             ]]>
           </description>
           <type>String</type>
@@ -1890,8 +1791,8 @@
             <![CDATA[
             Just like {@code connection}, but for developers, i.e. this scm connection
             will not be read only.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
-            scm's {@code child.scm.developerConnection.inherit.append.path="false"}
+            <p><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            scm's {@code child.scm.developerConnection.inherit.append.path="false"}.</p>
             ]]>
           </description>
           <type>String</type>
@@ -1909,8 +1810,8 @@
           <description>
             <![CDATA[
             The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
-            scm's {@code child.scm.url.inherit.append.path="false"}
+            <p><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            scm's {@code child.scm.url.inherit.append.path="false"}</p>
             ]]>
           </description>
           <type>String</type>
@@ -1923,8 +1824,8 @@
             When children inherit from scm connection, append path or not? Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}
-            <br><b>Default value is</b>: {@code true}
-            <br><b>Since</b>: Maven 3.6.1
+            <p><b>Default value is</b>: {@code true}</p>
+            @since Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -1937,8 +1838,8 @@
             When children inherit from scm developer connection, append path or not? Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}
-            <br><b>Default value is</b>: {@code true}
-            <br><b>Since</b>: Maven 3.6.1
+            <p><b>Default value is</b>: {@code true}</p>
+            @since Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -1952,7 +1853,7 @@
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}
             <br><b>Default value is</b>: {@code true}
-            <br><b>Since</b>: Maven 3.6.1
+            @since Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -1964,19 +1865,16 @@
           <code>
             <![CDATA[
 
-    public boolean isChildScmConnectionInheritAppendPath()
-    {
-        return ( getChildScmConnectionInheritAppendPath() != null ) ? Boolean.parseBoolean( getChildScmConnectionInheritAppendPath() ) : true;
+    public boolean isChildScmConnectionInheritAppendPath() {
+        return (getChildScmConnectionInheritAppendPath() != null) ? Boolean.parseBoolean(getChildScmConnectionInheritAppendPath()) : true;
     }
 
-    public boolean isChildScmDeveloperConnectionInheritAppendPath()
-    {
-        return ( getChildScmDeveloperConnectionInheritAppendPath() != null ) ? Boolean.parseBoolean( getChildScmDeveloperConnectionInheritAppendPath() ) : true;
+    public boolean isChildScmDeveloperConnectionInheritAppendPath() {
+        return (getChildScmDeveloperConnectionInheritAppendPath() != null) ? Boolean.parseBoolean(getChildScmDeveloperConnectionInheritAppendPath()) : true;
     }
 
-    public boolean isChildScmUrlInheritAppendPath()
-    {
-        return ( getChildScmUrlInheritAppendPath() != null ) ? Boolean.parseBoolean( getChildScmUrlInheritAppendPath() ) : true;
+    public boolean isChildScmUrlInheritAppendPath() {
+        return (getChildScmUrlInheritAppendPath() != null) ? Boolean.parseBoolean(getChildScmUrlInheritAppendPath()) : true;
     }
 
             ]]>
@@ -1989,8 +1887,7 @@
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString()
-    {
+    public String toString() {
         return "Scm {connection=" + getConnection() + "}";
     }
             ]]>
@@ -2020,8 +1917,7 @@
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString()
-    {
+    public String toString() {
         return "FileSet {directory: " + getDirectory() + ", " + super.toString() + "}";
     }
             ]]>
@@ -2040,7 +1936,6 @@
           <name>targetPath</name>
           <version>3.0.0+</version>
           <description>
-            <![CDATA[
             Describe the resource target path. The path is relative to the target/classes
             directory (i.e. {@code ${project.build.outputDirectory}}).
             For example, if you want that resource to appear in a specific package
@@ -2048,7 +1943,6 @@
             element with this value: {@code org/apache/maven/messages}.
             This is not required if you simply put the resources in that directory
             structure at the source, however.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -2056,13 +1950,11 @@
           <name>filtering</name>
           <version>3.0.0+</version>
           <description>
-            <![CDATA[
             Whether resources are filtered to replace tokens with parameterised values or not.
             The values are taken from the {@code properties} element and from the
             properties in the files listed in the {@code filters} element. Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}. Default value is {@code false}.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -2070,13 +1962,11 @@
           <name>mergeId</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             FOR INTERNAL USE ONLY. This is a unique identifier assigned to each
             resource to allow Maven to merge changes to this resource that take
             place during the execution of a plugin. This field must be managed
             by the generated parser and formatter classes in order to allow it
             to survive model interpolation.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -2086,9 +1976,8 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-    public boolean isFiltering()
-    {
-        return ( getFiltering() != null ) ? Boolean.parseBoolean( getFiltering() ) : false;
+    public boolean isFiltering() {
+        return (getFiltering() != null) ? Boolean.parseBoolean(getFiltering()) : false;
     }
             ]]>
           </code>
@@ -2097,9 +1986,8 @@
           <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
-    public void setFiltering( boolean filtering )
-    {
-        setFiltering( String.valueOf( filtering ) );
+    public void setFiltering(boolean filtering) {
+        setFiltering(String.valueOf(filtering));
     }
             ]]>
           </code>
@@ -2111,8 +1999,7 @@
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString()
-    {
+    public String toString() {
         return "Resource {targetPath: " + getTargetPath() + ", filtering: " + isFiltering() + ", " + super.toString() + "}";
     }
             ]]>
@@ -2132,11 +2019,9 @@
           <required>true</required>
           <identifier>true</identifier>
           <description>
-            <![CDATA[
             A unique identifier for a repository. This is used to match the repository
             to configuration in the {@code settings.xml} file, for example. Furthermore, the identifier is
             used during POM inheritance and profile injection to detect repositories that should be merged.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -2151,9 +2036,7 @@
           <version>4.0.0+</version>
           <required>true</required>
           <description>
-            <![CDATA[
             The url of the repository, in the form {@code protocol://hostname/path}.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -2161,10 +2044,8 @@
           <name>layout</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             The type of layout this repository uses for locating and storing artifacts -
             can be {@code legacy} or {@code default}.
-            ]]>
           </description>
           <type>String</type>
           <defaultValue>default</defaultValue>
@@ -2225,11 +2106,9 @@
           <name>enabled</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             Whether to use this repository for downloading this type of artifact. Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}. Default value is {@code true}.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -2237,16 +2116,11 @@
           <name>updatePolicy</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             The frequency for downloading updates - can be
-            {@code always,}
-            {@code daily}
-            (default),
-            {@code interval:XXX}
-            (in minutes) or
-            {@code never}
-            (only if it doesn't exist locally).
-            ]]>
+            {@code always},
+            {@code daily} (default),
+            {@code interval:XXX} (in minutes) or
+            {@code never} (only if it doesn't exist locally).
           </description>
           <type>String</type>
         </field>
@@ -2254,14 +2128,10 @@
           <name>checksumPolicy</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             What to do when verification of an artifact checksum fails. Valid values are
             {@code ignore},
-            {@code fail}
-            (default for Maven 4 and above) or
-            {@code warn}
-            (default for Maven 2 and 3)
-            ]]>
+            {@code fail} (default for Maven 4 and above) or
+            {@code warn} (default for Maven 2 and 3).
           </description>
           <type>String</type>
         </field>
@@ -2271,9 +2141,8 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-    public boolean isEnabled()
-    {
-        return ( getEnabled() != null ) ? Boolean.parseBoolean( getEnabled() ) : true;
+    public boolean isEnabled() {
+        return (getEnabled() != null) ? Boolean.parseBoolean(getEnabled()) : true;
     }
 
             ]]>
@@ -2283,9 +2152,8 @@
           <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
-    public void setEnabled( boolean enabled )
-    {
-        setEnabled( String.valueOf( enabled ) );
+    public void setEnabled(boolean enabled) {
+        setEnabled(String.valueOf(enabled));
     }
 
             ]]>
@@ -2304,10 +2172,8 @@
           <name>id</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             A unique identifier for a deployment location. This is used to match the
             site to configuration in the {@code settings.xml} file, for example.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -2323,8 +2189,8 @@
           <description>
             <![CDATA[
             The url of the location where website is deployed, in the form {@code protocol://hostname/path}.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
-            site's {@code child.site.url.inherit.append.path="false"}
+            <p><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            site's {@code child.site.url.inherit.append.path="false"}.</p>
             ]]>
           </description>
           <type>String</type>
@@ -2337,8 +2203,8 @@
             When children inherit from distribution management site url, append path or not? Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}
-            <br><b>Default value is</b>: {@code true}
-            <br><b>Since</b>: Maven 3.6.1
+            <p><b>Default value is</b>: {@code true}</p>
+            @since Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -2350,9 +2216,8 @@
           <code>
             <![CDATA[
 
-    public boolean isChildSiteUrlInheritAppendPath()
-    {
-        return ( getChildSiteUrlInheritAppendPath() != null ) ? Boolean.parseBoolean( getChildSiteUrlInheritAppendPath() ) : true;
+    public boolean isChildSiteUrlInheritAppendPath() {
+        return (getChildSiteUrlInheritAppendPath() != null) ? Boolean.parseBoolean(getChildSiteUrlInheritAppendPath()) : true;
     }
 
             ]]>
@@ -2370,11 +2235,9 @@
           <name>inherited</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             Whether any configuration should be propagated to child POMs. Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}. Default value is {@code true}.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -2390,9 +2253,9 @@
             <li>{@code combine.children}: available values are {@code merge} (default) and {@code append},</li>
             <li>{@code combine.self}: available values are {@code merge} (default) and {@code override}.</li>
             </ul>
-            <p>See <a href="https://maven.apache.org/pom.html#Plugins">POM Reference documentation</a> and
-            <a href="https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html">Xpp3DomUtils</a>
-            for more information.</p>
+
+            @see <a href="https://maven.apache.org/pom.html#Plugins">POM Reference documentation</a>
+            @see <a href="https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html">Xpp3DomUtils</a>
             ]]>
           </description>
           <name>configuration</name>
@@ -2404,8 +2267,7 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-    public boolean isInherited()
-    {
+    public boolean isInherited() {
         return ( getInherited() != null ) ? Boolean.parseBoolean( getInherited() ) : true;
     }
 
@@ -2419,9 +2281,7 @@
       <version>4.0.0+</version>
       <superClass>ConfigurationContainer</superClass>
       <description>
-        <![CDATA[
-        The {@code <plugin>} element contains informations required for a plugin.
-        ]]>
+        The {@code &lt;plugin>} element contains information required for a plugin.
       </description>
       <fields>
         <field>
@@ -2449,12 +2309,10 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            <![CDATA[
             Whether to load Maven extensions (such as packaging and type handlers) from
             this plugin. For performance reasons, this should only be enabled when necessary. Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}. Default value is {@code false}.
-            ]]>
           </description>
         </field>
         <field>
@@ -2471,9 +2329,7 @@
           <name>goals</name>
           <version>4.0.0</version>
           <description>
-            <![CDATA[
-             <b>Deprecated</b>. Unused by Maven.
-             ]]>
+            @deprecated Unused by Maven.
           </description>
           <type>DOM</type>
         </field>
@@ -2612,10 +2468,8 @@
       <version>4.0.0+</version>
       <superClass>ConfigurationContainer</superClass>
       <description>
-        <![CDATA[
-        The {@code <execution>} element contains informations required for the
+        The {@code @lt;execution>} element contains information required for the
         execution of a plugin.
-        ]]>
       </description>
       <fields>
         <field>
@@ -2640,9 +2494,9 @@
           <description>
             <![CDATA[
             The priority of this execution compared to other executions which are bound to the same phase.
-            <strong>Warning:</strong> This is an internal utility property that is only public for technical reasons,
+            <p><strong>Warning:</strong> This is an internal utility property that is only public for technical reasons,
             it is not part of the public API. In particular, this property can be changed or deleted without prior
-            notice.
+            notice.</p>
             ]]>
           </description>
         </field>
@@ -2651,12 +2505,10 @@
           <version>4.1.0+</version>
           <type>int</type>
           <description>
-            <![CDATA[
             The priority of this execution compared to other executions which are bound to the same phase.
             Executions derived from the default lifecycle have a negative priority by default so that they are executed
             before any custom plugin executions.
-            <br><b>Since</b>: Maven 4.0.0
-            ]]>
+            @since Maven 4.0.0
           </description>
         </field>
         <field>
@@ -2677,8 +2529,7 @@
     public static final String DEFAULT_EXECUTION_ID = "default";
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getId();
     }
             ]]>
@@ -2722,12 +2573,10 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            <![CDATA[
             If true, then the default reports are not included in the site generation.
             This includes the reports in the "Project Info" menu. Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}. Default value is {@code false}.
-            ]]>
           </description>
         </field>
         <field>
@@ -2735,10 +2584,8 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            <![CDATA[
-            Where to store all of the generated reports. The default is
+            Where to store all the generated reports. The default is
             {@code ${project.build.directory}/site}.
-            ]]>
           </description>
           <!-- TODO: why isn't default set here? -->
         </field>
@@ -2757,9 +2604,8 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-    public boolean isExcludeDefaults()
-    {
-        return ( getExcludeDefaults() != null ) ? Boolean.parseBoolean( getExcludeDefaults() ) : false;
+    public boolean isExcludeDefaults() {
+        return (getExcludeDefaults() != null) ? Boolean.parseBoolean(getExcludeDefaults()) : false;
     }
 
             ]]>
@@ -2769,9 +2615,8 @@
           <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
-    public void setExcludeDefaults( boolean excludeDefaults )
-    {
-        setExcludeDefaults( String.valueOf( excludeDefaults ) );
+    public void setExcludeDefaults(boolean excludeDefaults) {
+        setExcludeDefaults(String.valueOf(excludeDefaults));
     }
 
             ]]>
@@ -2825,21 +2670,18 @@
 
     public static final String SOURCE_SETTINGS = "settings.xml";
 
-    public void setSource( String source )
-    {
-        getDelegate().setSource( source );
+    public void setSource(String source) {
+        getDelegate().setSource(source);
     }
 
-    public String getSource()
-    {
+    public String getSource() {
         return getDelegate().getSource();
     }
 
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString()
-    {
+    public String toString() {
         return "Profile {id: " + getId() + ", source: " + getSource() + "}";
     }
             ]]>
@@ -2857,21 +2699,18 @@
     // default source for this profile is in the pom itself.
     private String source = SOURCE_POM;
 
-    public void setSource( String source )
-    {
+    public void setSource(String source) {
         this.source = source;
     }
 
-    public String getSource()
-    {
+    public String getSource() {
         return source;
     }
 
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString()
-    {
+    public String toString() {
         return "Profile {id: " + getId() + ", source: " + getSource() + "}";
     }
             ]]>
@@ -2900,12 +2739,10 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            <![CDATA[
             Specifies that this profile will be activated when a matching JDK is detected.
             For example, {@code 1.4} only activates on JDKs versioned 1.4,
             while {@code !1.4} matches any JDK that is not version 1.4. Ranges are supported too:
             {@code [1.5,)} activates when the JDK is 1.5 minimum.
-            ]]>
           </description>
         </field>
         <field>
@@ -2938,7 +2775,7 @@
         This could be included once we teach Maven to deal with multiple versions of the model
         <field>
           <name>custom</name>
-          <version>4.0.0+</version>
+          <version>4.1.0+</version>
           <description>Describes a custom profile activation trigger, brought in via build
             extension.</description>
           <association>
@@ -2981,10 +2818,8 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            <![CDATA[
             The name of the operating system to be used to activate the profile. This must be an exact match
             of the {@code ${os.name}} Java property, such as {@code Windows XP}.
-            ]]>
           </description>
         </field>
         <field>
@@ -2992,10 +2827,8 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            <![CDATA[
             The general family of the OS to be used to activate the profile, such as
             {@code windows} or {@code unix}.
-            ]]>
           </description>
         </field>
         <field>
@@ -3017,12 +2850,12 @@
     <class>
       <name>ActivationFile</name>
       <version>4.0.0+</version>
-      <description><![CDATA[This is the file specification used to activate the profile. The {@code missing} value
+      <description>This is the file specification used to activate the profile. The {@code missing} value
         is the location of a file that needs to exist, and if it doesn't, the profile will be
         activated. On the other hand, {@code exists} will test for the existence of the file and if it is
-        there, the profile will be activated.<br>
-        Variable interpolation for these file specifications is limited to {@code ${project.basedir}},
-        system properties and user properties.]]></description>
+        there, the profile will be activated.
+        &lt;p>Variable interpolation for these file specifications is limited to {@code ${project.basedir}},
+        system properties and user properties.&lt;/p></description>
       <fields>
         <field>
           <name>missing</name>
@@ -3043,19 +2876,19 @@
     This can be put back in when we figure out how to have multiple model versions
     <class>
       <name>ActivationCustom</name>
-      <version>4.0.0+</version>
+      <version>4.1.0+</version>
       <description>This activation allows users to specify their own custom trigger for a profile.</description>
       <fields>
         <field>
           <name>configuration</name>
-          <version>4.0.0+</version>
+          <version>4.1.0+</version>
           <type>DOM</type>
           <description>The specification for triggering the profile according to the rules of the
             custom activation type.</description>
         </field>
         <field>
           <name>type</name>
-          <version>4.0.0+</version>
+          <version>4.1.0+</version>
           <type>String</type>
           <description>The type (role-hint) of activation which is to be used to activate the
             profile.</description>
@@ -3070,7 +2903,7 @@
       <superClass>ConfigurationContainer</superClass>
       <description>
         <![CDATA[
-        The {@code <plugin>} element in {@code <reporting><plugins>} contains informations required for a report plugin.
+        The {@code <plugin>} element in {@code <reporting><plugins>} contains information required for a report plugin.
         ]]>
       </description>
       <fields>
@@ -3093,10 +2926,8 @@
           <name>version</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             The version of the reporting plugin to be used. Starting with Maven 3, if no version is defined explicitly,
             version is searched in {@code build/plugins} then in {@code build/pluginManagement}.
-            ]]>
           </description>
           <type>String</type>
         </field>
@@ -3104,10 +2935,8 @@
           <name>reportSets</name>
           <version>4.0.0+</version>
           <description>
-            <![CDATA[
             Multiple specifications of a set of reports, each having (possibly) different
             configuration. This is the reporting parallel to an {@code execution} in the build.
-            ]]>
           </description>
           <association>
             <type>ReportSet</type>
@@ -3125,8 +2954,7 @@
     /**
      * Reset the {@code reportSetMap} field to {@code null}
      */
-    public void flushReportSetMap()
-    {
+    public void flushReportSetMap() {
         this.reportSetMap = null;
     }
 
@@ -3134,17 +2962,13 @@
      * @return a Map of reportSets field with {@code ReportSet#getId()} as key
      * @see ReportSet#getId()
      */
-    public java.util.Map<String, ReportSet> getReportSetsAsMap()
-    {
-        if ( reportSetMap == null )
-        {
+    public java.util.Map<String, ReportSet> getReportSetsAsMap() {
+        if (reportSetMap == null) {
             reportSetMap = new java.util.LinkedHashMap<String, ReportSet>();
-            if ( getReportSets() != null )
-            {
-                for ( java.util.Iterator<ReportSet> i = getReportSets().iterator(); i.hasNext(); )
-                {
+            if (getReportSets() != null) {
+                for (java.util.Iterator<ReportSet> i = getReportSets().iterator(); i.hasNext(); ) {
                     ReportSet reportSet = (ReportSet) i.next();
-                    reportSetMap.put( reportSet.getId(), reportSet );
+                    reportSetMap.put(reportSet.getId(), reportSet);
                 }
             }
         }
@@ -3155,9 +2979,8 @@
     /**
      * @return the key of the report plugin, ie {@code groupId:artifactId}
      */
-    public String getKey()
-    {
-        return constructKey( getGroupId(), getArtifactId() );
+    public String getKey() {
+        return constructKey(getGroupId(), getArtifactId());
     }
 
     /**
@@ -3165,8 +2988,7 @@
      * @param artifactId The artifact ID of the reporting plugin in the repository
      * @return the key of the report plugin, ie {@code groupId:artifactId}
      */
-    public static String constructKey( String groupId, String artifactId )
-    {
+    public static String constructKey(String groupId, String artifactId) {
         return groupId + ":" + artifactId;
     }
             ]]>
@@ -3206,8 +3028,7 @@
           <code>
             <![CDATA[
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getId();
     }
             ]]>
@@ -3299,10 +3120,8 @@
           <name>configuration</name>
           <version>4.1.0+</version>
           <description>
-            <![CDATA[
             The configuration of the extension.
-            <br><b>Since</b>: Maven 4.0.0
-            ]]>
+            @since Maven 4.0.0
           </description>
           <type>DOM</type>
         </field>
@@ -3315,50 +3134,24 @@
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals( Object o )
-    {
-        if ( this == o )
-        {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
-        }
-
-        if ( !( o instanceof Extension ) )
-        {
+        } else if (!(o instanceof Extension)) {
             return false;
+        } else {
+            Extension e = (Extension) o;
+            return java.util.Objects.equals(e.getArtifactId(), getArtifactId())
+                && java.util.Objects.equals(e.getGroupId(), getGroupId())
+                && java.util.Objects.equals(e.getVersion(), getVersion());
         }
-
-        Extension e = (Extension) o;
-
-        if ( !equal( e.getArtifactId(), getArtifactId() ) )
-        {
-            return false;
-        }
-        else if ( !equal( e.getGroupId(), getGroupId() ) )
-        {
-            return false;
-        }
-        else if ( !equal( e.getVersion(), getVersion() ) )
-        {
-            return false;
-        }
-        return true;
-    }
-
-    private static <T> boolean equal( T obj1, T obj2 )
-    {
-        return ( obj1 != null ) ? obj1.equals( obj2 ) : obj2 == null;
     }
 
     /**
      * @see java.lang.Object#hashCode()
      */
-    public int hashCode()
-    {
-        int result = 17;
-        result = 37 * result + ( getArtifactId() != null ? getArtifactId().hashCode() : 0 );
-        result = 37 * result + ( getGroupId() != null ? getGroupId().hashCode() : 0 );
-        result = 37 * result + ( getVersion() != null ? getVersion().hashCode() : 0 );
-        return result;
+    public int hashCode() {
+        return java.util.Objects.hash(getArtifactId(), getGroupId(), getVersion());
     }
             ]]>
           </code>
@@ -3367,7 +3160,7 @@
     </class>
     <class locationTracker="locations">
       <name>InputLocation</name>
-      <version>4.0.0+</version>
+      <version>4.0.0/4.0.99</version>
       <fields>
         <!-- line, column and source fields are auto-generated by Modello -->
       </fields>
@@ -3378,8 +3171,7 @@
             <![CDATA[
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getLineNumber() + " : " + getColumnNumber() + ", " + getSource();
     }
             ]]>
@@ -3389,16 +3181,14 @@
     </class>
     <class sourceTracker="source">
       <name>InputSource</name>
-      <version>4.0.0+</version>
+      <version>4.0.0/4.0.99</version>
       <fields>
         <field>
           <name>modelId</name>
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            <![CDATA[
-            The identifier of the POM in the format {@code <groupId>:<artifactId>:<version>}.
-            ]]>
+            The identifier of the POM in the format {@code &lt;groupId>:&lt;artifactId>:&lt;version>}.
           </description>
         </field>
         <field>
@@ -3406,9 +3196,7 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            <![CDATA[
             The path/URL of the POM or {@code null} if unknown.
-            ]]>
           </description>
         </field>
       </fields>
@@ -3418,8 +3206,7 @@
           <code>
             <![CDATA[
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getModelId() + " " + getLocation();
     }
             ]]>

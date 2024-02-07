@@ -19,213 +19,186 @@
   under the License.
 
 -->
-<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.0.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.0.0.xsd"
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/2.0.0 https://codehaus-plexus.github.io/modello/xsd/modello-2.0.0.xsd"
   xml.namespace="http://maven.apache.org/TOOLCHAINS/${version}"
   xml.schemaLocation="http://maven.apache.org/xsd/toolchains-${version}.xsd">
-    <id>toolchains</id>
-    <name>MavenToolchains</name>
-    <description><![CDATA[
-    <p>This is a reference for the Maven Toolchains descriptor.</p>
-    <p>The default location for the toolchains file is <code>~/.m2/toolchains.xml</code></p>
-    <p>A Toolchain is a preconfigured object that Maven plugins can use for tool configuration retrieval (location and other information).</p>
+  <id>toolchains</id>
+  <name>MavenToolchains</name>
+  <description><![CDATA[
+    This is a reference for the Maven Toolchains descriptor.
+    <p>The default location for the toolchains file is {@code ~/.m2/toolchains.xml}
+    <p>A Toolchain is a preconfigured object that Maven plugins can use for tool configuration retrieval (location and other information).
     <p>The <a href="/plugins/maven-toolchains-plugin/">toolchains-plugin</a> can read available toolchains on the user's computer
-    and match them against the toolchain requirements of the project (as configured in <code>pom.xml</code>):
+    and match them against the toolchain requirements of the project (as configured in {@code pom.xml}):
     if match is found, the toolchain instance is made available to other Maven plugins.</p>
-    <p>With <code>jdk</code> toolchain, for example, instead of being stuck with the JDK used to run Maven, all plugins can use
-    the same other JDK instance without hardcoding absolute paths into the <code>pom.xml</code>
+    <p>With {@code jdk} toolchain, for example, instead of being stuck with the JDK used to run Maven, all plugins can use
+    the same other JDK instance without hardcoding absolute paths into the {@code pom.xml}
     and without configuring every plugin that require path to JDK tools.</p>
-    <p>See the <a href="/guides/mini/guide-using-toolchains.html">Guide to Using Toolchains</a> for
-    more information.</p>
+
+    @see <a href="/guides/mini/guide-using-toolchains.html">Guide to Using Toolchains</a>
     ]]></description>
 
-    <defaults>
-        <default>
-            <key>package</key>
-            <value>org.apache.maven.toolchain.model</value>
-        </default>
-    </defaults>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.toolchain.model</value>
+    </default>
+  </defaults>
 
-    <classes>
+  <classes>
     <class java.clone="deep">
-          <name>TrackableBase</name>
-          <version>1.1.0+</version>
-          <description>
-            common base class that contains code to track the source for
-            this instance (USER|GLOBAL)
-          </description>
-          <codeSegments>
-            <codeSegment>
-              <version>1.1.0+</version>
-              <code>
-                <![CDATA[
+      <name>TrackableBase</name>
+      <version>1.1.0+</version>
+      <description>
+        Common base class that contains code to track the source for this instance (USER|GLOBAL)
+      </description>
+      <codeSegments>
+        <codeSegment>
+          <version>1.1.0/1.1.0</version>
+          <code>
+            <![CDATA[
         public static final String USER_LEVEL = "user-level";
         public static final String GLOBAL_LEVEL = "global-level";
 
         private String sourceLevel = USER_LEVEL;
         private boolean sourceLevelSet = false;
 
-        public void setSourceLevel( String sourceLevel )
-        {
-            if ( sourceLevelSet )
-            {
-                throw new IllegalStateException( "Cannot reset sourceLevel attribute; it is already set to: " + sourceLevel );
-            }
-            else if ( !( USER_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel ) ) )
-            {
-                throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "}" );
-            }
-            else
-            {
+        public void setSourceLevel(String sourceLevel) {
+            if (sourceLevelSet) {
+                throw new IllegalStateException("Cannot reset sourceLevel attribute; it is already set to: " + sourceLevel);
+            } else if (!(USER_LEVEL.equals(sourceLevel) || GLOBAL_LEVEL.equals(sourceLevel))) {
+                throw new IllegalArgumentException("sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "}");
+            } else {
                 this.sourceLevel = sourceLevel;
                 this.sourceLevelSet = true;
             }
         }
 
-        public String getSourceLevel()
-        {
+        public String getSourceLevel() {
             return sourceLevel;
         }
                 ]]>
-              </code>
-            </codeSegment>
-          </codeSegments>
-        </class>
-        <class rootElement="true" xml.tagName="toolchains" xsd.compositor="sequence">
-            <name>PersistedToolchains</name>
-            <superClass>TrackableBase</superClass>
-            <description><![CDATA[
-         The <code>&lt;toolchains&gt;</code> element is the root of the descriptor.
-         The following table lists all of the possible child elements.
-            ]]></description>
-            <version>1.0.0+</version>
-            <fields>
-                <field>
-                    <name>toolchains</name>
-                    <version>1.0.0+</version>
-                    <description><![CDATA[The toolchain instance definition.]]></description>
-                    <association xml.itemsStyle="flat">
-                        <type>ToolchainModel</type>
-                        <multiplicity>*</multiplicity>
-                    </association>
-                </field>
-            </fields>
-        </class>
-        <class>
-            <name>ToolchainModel</name>
-            <superClass>TrackableBase</superClass>
-            <version>1.0.0+</version>
-            <description>Definition of a toolchain instance.</description>
-            <fields>
-                <field>
-                    <name>type</name>
-                    <version>1.0.0+</version>
-                    <!-- <identifier>true</identifier> -->
-                    <description>
-                    <![CDATA[Type of toolchain:<ul>
-                    <li><code>jdk</code> for
-                    <a href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/jdk.html">JDK Standard Toolchain</a>,</li>
-                    <li>other value for
-                    <a href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/custom.html">Custom Toolchain</a></li>
-                    </ul>
-                    ]]></description>
-                    <type>String</type>
-                </field>
-                <field>
-                    <name>provides</name>
-                    <version>1.0.0/1.0.99</version> <!-- fake upperbound, it's inclusive -->
-                    <type>DOM</type> <!-- DOM for Maven 2.0.9/2.3.3 -->
-                    <description>
-                    <![CDATA[
-                    <p>Toolchain identification information, which will be matched against project requirements.</p>
-                    <p>Actual content structure is completely open: each toolchain type will define its own format and semantics.</p>
-                    <p>In general, this is a properties format: <code>&lt;name&gt;value&lt;/name&gt;</code> with
-                    predefined properties names.</p>
-                    ]]></description>
-                </field>
-                <field>
-                    <name>provides</name>
-                    <version>1.1.0+</version>
-                    <type>Properties</type> <!-- Properties for Maven 2.3.4+ -->
-                    <association xml.mapStyle="inline">
-                      <type>String</type>
-                      <multiplicity>*</multiplicity>
-                    </association>
-                    <!-- <identifier>true</identifier> -->
-                    <description>
-                    <![CDATA[
-                    <p>Toolchain identification information, which will be matched against project requirements.</p>
-                    <p>For Maven 2.0.9 to 3.2.3, the actual content structure was completely open: each toolchain type would define its own format and semantics.
-                    In general, this was a properties format.</p>
-                    <p>Since Maven 3.2.4, the type for this field has been changed to Properties to match the de-facto format.</p>
-                    <p>Each toolchain defines its own properties names and semantics.</p>
-                    ]]></description>
-                </field>
-                <field>
-                    <name>configuration</name>
-                    <version>1.0.0+</version>
-                    <type>DOM</type>
-                    <description>
-                    <![CDATA[
-                    <p>Toolchain configuration information, like location or any information that is to be retrieved.</p>
-                    <p>Actual content structure is completely open: each toolchain type will define its own format and semantics.</p>
-                    <p>In general, this is a properties format: <code>&lt;name&gt;value&lt;/name&gt;</code> with
-                    per-toolchain defined properties names.</p>
-                    ]]></description>
-                </field>
-            </fields>
-            <codeSegments>
-            <codeSegment>
-              <version>1.2.0+</version>
-              <comment>Generated hashCode() and equals() based on identifier also calls its super, which breaks comparison</comment>
-              <code>
-                <![CDATA[
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class rootElement="true" xml.tagName="toolchains" xsd.compositor="sequence">
+      <name>PersistedToolchains</name>
+      <superClass>TrackableBase</superClass>
+      <description>
+        The {@code &lt;toolchains&gt;} element is the root of the descriptor.
+        The following table lists all the possible child elements.
+      </description>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>toolchains</name>
+          <version>1.0.0+</version>
+          <description>The toolchain instance definition.</description>
+          <association xml.itemsStyle="flat">
+            <type>ToolchainModel</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ToolchainModel</name>
+      <superClass>TrackableBase</superClass>
+      <version>1.0.0+</version>
+      <description>Definition of a toolchain instance.</description>
+      <fields>
+        <field>
+          <name>type</name>
+          <version>1.0.0+</version>
+          <!-- <identifier>true</identifier> -->
+          <description>
+            Type of toolchain:&lt;ul>
+            &lt;li>{@code jdk} for &lt;a
+            href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/jdk.html">JDK Standard Toolchain&lt;/a>,&lt;/li>
+            &lt;li>other value for &lt;a
+            href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/custom.html">Custom Toolchain&lt;/a>&lt;/li>
+            &lt;/ul>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>provides</name>
+          <version>1.0.0/1.0.99</version> <!-- fake upperbound, it's inclusive -->
+          <type>DOM</type> <!-- DOM for Maven 2.0.9/2.3.3 -->
+          <description>
+            Toolchain identification information, which will be matched against project requirements.
+            &lt;p>Actual content structure is completely open: each toolchain type will define its own format and
+            semantics.
+            &lt;p>This is generally a properties format: {@code &lt;name&gt;value&lt;/name&gt;} with predefined
+            properties names.
+          </description>
+        </field>
+        <field>
+          <name>provides</name>
+          <version>1.1.0+</version>
+          <type>Properties</type> <!-- Properties for Maven 2.3.4+ -->
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <!-- <identifier>true</identifier> -->
+          <description>
+            Toolchain identification information, which will be matched against project requirements.
+            &lt;p>For Maven 2.0.9 to 3.2.3, the actual content structure was completely open: each toolchain type would
+            define its own format and semantics. This was generally a properties format.
+            &lt;p>Since Maven 3.2.4, the type for this field has been changed to Properties to match the de-facto
+            format.
+            &lt;p>Each toolchain defines its own properties names and semantics.
+          </description>
+        </field>
+        <field>
+          <name>configuration</name>
+          <version>1.0.0+</version>
+          <type>DOM</type>
+          <description>
+            Toolchain configuration information, like location or any information that is to be retrieved.
+            &lt;p>Actual content structure is completely open: each toolchain type will define its own format and
+            semantics.
+            &lt;p>In general, this is a properties format: {@code &lt;name&gt;value&lt;/name&gt;} with per-toolchain
+            defined properties names.
+          </description>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.2.0+</version>
+          <comment>Generated hashCode() and equals() based on identifier also calls its super, which breaks comparison
+          </comment>
+          <code>
+            <![CDATA[
     /**
-     * Method hashCode.
-     *
-     * @return int
+     * Computes a hash value based on {@link #getType()} and {@link #getProvides()} values.
      */
-    public int hashCode()
-    {
-        int result = 17;
-
-        result = 37 * result + ( getType() != null ? getType().hashCode() : 0 );
-        result = 37 * result + ( getProvides() != null ? getProvides().hashCode() : 0 );
-
-        return result;
+    public int hashCode() {
+        return java.util.Objects.hash(getType(), getProvides());
     } //-- int hashCode()
 
     /**
-     * Method equals.
-     *
-     * @param other
-     * @return boolean
+     * Checks equality based on {@link #getType()} and {@link #getProvides()} values.
      */
-    public boolean equals( Object other )
-    {
-        if ( this == other )
-        {
+    public boolean equals(Object other) {
+        if (this == other) {
             return true;
-        }
-
-        if ( !( other instanceof ToolchainModel ) )
-        {
+        } else if (!(other instanceof ToolchainModel)) {
             return false;
+        } else {
+            ToolchainModel that = (ToolchainModel) other;
+            return java.util.Objects.equals(this.getType(), that.getType())
+                && java.util.Objects.equals(this.getProvides(), that.getProvides());
         }
-
-        ToolchainModel that = (ToolchainModel) other;
-        boolean result = true;
-
-        result = result && ( getType() == null ? that.getType() == null : getType().equals( that.getType() ) );
-        result = result && ( getProvides() == null ? that.getProvides() == null : getProvides().equals( that.getProvides() ) );
-
-        return result;
-    } //-- boolean equals( Object )
+    } //-- boolean equals(Object)
                 ]]>
-              </code>
-            </codeSegment>
-          </codeSegments>
-        </class>
-    </classes>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+  </classes>
 </model>
 

@@ -24,7 +24,7 @@ under the License.
   <id>plugin</id>
   <name>PluginDescriptor</name>
   <description><![CDATA[
-    Maven 4 Plugin descriptor, stored in <code>META-INF/maven/plugin.xml</code> in a plugin's jar artifact.
+    Maven 4 Plugin descriptor, stored in {@code META-INF/maven/plugin.xml} in a plugin's jar artifact.
     This descriptor is generally using the information contained in the annotations of the plugin api.
     <p>An XSD is available at <a href="https://maven.apache.org/xsd/plugin-2.0.0.xsd">https://maven.apache.org/xsd/plugin-2.0.0.xsd</a></p>
   ]]></description>
@@ -32,7 +32,7 @@ under the License.
     <class rootElement="true" xml.tagName="plugin" xdoc.anchorName="plugin">
       <name>PluginDescriptor</name>
       <version>1.0.0+</version>
-      <description><![CDATA[Root element of the <code>plugin.xml</code> file.]]></description>
+      <description>Root element of the {@code plugin.xml} file.</description>
       <fields>
         <field>
           <name>name</name>
@@ -140,9 +140,7 @@ under the License.
     <class xdoc.anchorName="mojo">
       <name>MojoDescriptor</name>
       <version>1.0.0+</version>
-      <description><![CDATA[
-        A Mojo description.
-      ]]></description>
+      <description>A Mojo description.</description>
       <fields>
         <field>
           <name>goal</name>
@@ -179,12 +177,12 @@ under the License.
           <name>phase</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description><![CDATA[
+          <description>
             Defines a default phase to bind a Mojo execution to if the user does not explicitly set a phase in the POM.
-            <i>Note:</i> This will not automagically make a Mojo run when the plugin declaration is added
-            to the POM. It merely enables the user to omit the <code>&lt;phase&gt;</code> element from the
-            surrounding <code>&lt;execution&gt;</code> element.
-          ]]></description>
+            &lt;p>&lt;b>Note:&lt;/b> This will not automagically make a Mojo run when the plugin declaration is added
+            to the POM. It merely enables the user to omit the {@code &lt;phase&gt;} element from the
+            surrounding {@code &lt;execution&gt;} element.&lt;/p>
+          </description>
         </field>
         <field>
           <name>executePhase</name>
@@ -209,48 +207,48 @@ under the License.
           <version>1.0.0/1.1.0</version>
           <type>String</type>
           <defaultValue>runtime</defaultValue>
-          <description><![CDATA[
+          <description>
             Flags this Mojo as requiring the dependencies in the specified class path to be resolved before it can
-            execute: <code>compile</code>, <code>runtime</code>, <code>test</code>,
-            <code>compile+runtime</code> (since Maven 3.0) or <code>runtime+system</code> (since Maven 3.0)
-          ]]></description>
+            execute: {@code compile}, {@code runtime}, {@code test},
+            {@code compile+runtime} (since Maven 3.0) or {@code runtime+system} (since Maven 3.0)
+          </description>
         </field>
         <field>
           <name>dependencyResolution</name>
           <version>2.0.0+</version>
           <type>String</type>
           <defaultValue>runtime</defaultValue>
-          <description><![CDATA[
+          <description>
             Flags this Mojo as requiring the dependencies in the specified class path to be resolved before it can
-            execute: <code>compile</code>, <code>runtime</code>, <code>test</code>,
-            <code>compile+runtime</code> (since Maven 3.0) or <code>runtime+system</code> (since Maven 3.0)
-          ]]></description>
+            execute: {@code compile}, {@code runtime}, {@code test},
+            {@code compile+runtime} (since Maven 3.0) or {@code runtime+system} (since Maven 3.0)
+          </description>
         </field>
         <field>
           <name>requiresDependencyCollection</name>
           <version>1.0.0/1.1.0</version>
           <type>String</type>
-          <description><![CDATA[
+          <description>
             Flags this Mojo as requiring information about the dependencies that would make up the specified class
             path. As the name suggests, this is similar to requiresDependencyResolution and supports the same values.
             The important difference is this will not resolve the files for the dependencies, i.e. the artifacts
             associated with a Maven project can lack a file. As such, this annotation is meant for Mojos that only
             want to analyze the set of transitive dependencies, in particular during early lifecycle phases where
             full dependency resolution might fail due to projects which haven't been built yet.
-          ]]></description>
+          </description>
         </field>
         <field>
           <name>dependencyCollection</name>
           <version>2.0.0+</version>
           <type>String</type>
-          <description><![CDATA[
+          <description>
             Flags this Mojo as requiring information about the dependencies that would make up the specified class
             path. As the name suggests, this is similar to requiresDependencyResolution and supports the same values.
             The important difference is this will not resolve the files for the dependencies, i.e. the artifacts
             associated with a Maven project can lack a file. As such, this annotation is meant for Mojos that only
             want to analyze the set of transitive dependencies, in particular during early lifecycle phases where
             full dependency resolution might fail due to projects which haven't been built yet.
-          ]]></description>
+          </description>
         </field>
         <field>
           <name>requiresDirectInvocation</name>
@@ -325,7 +323,8 @@ under the License.
           <description>
             Marks this Mojo as being thread-safe, i.e. the Mojo safely supports concurrent execution during parallel
             builds. Mojos without this annotation will make Maven output a warning when used during a parallel build
-            session. Since Maven 3.0.
+            session.
+            @since Maven 3.0.
           </description>
           <defaultValue>false</defaultValue>
         </field>
@@ -347,9 +346,9 @@ under the License.
           <name>executionStrategy</name>
           <version>1.0.0/1.1.0</version>
           <type>String</type>
-          <description><![CDATA[
-            Specify the execution strategy: <code>once-per-session</code>, <code>always</code>.
-          ]]></description>
+          <description>
+            Specify the execution strategy: {@code once-per-session}, {@code always}.
+          </description>
           <defaultValue>once-per-session</defaultValue>
         </field>
         <field>
@@ -362,10 +361,10 @@ under the License.
           <name>deprecated</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description><![CDATA[
-            Description with the reason of Mojo deprecation. Similar to Javadoc <code>@deprecated</code>
+          <description>
+            Description with the reason of Mojo deprecation. Similar to Javadoc {@code @deprecated}
             This will trigger a warning when a user tries to use a Mojo marked as deprecated.
-          ]]></description>
+          </description>
         </field>
         <field>
           <name>configurator</name>
@@ -466,15 +465,15 @@ under the License.
           <version>1.0.0+</version>
           <type>boolean</type>
           <defaultValue>true</defaultValue>
-          <description><![CDATA[
+          <description>
             Specifies that this parameter can be configured directly by the user (as in the case of POM-specified
             configuration). This is useful when you want to force the user to use common POM elements rather than
             plugin configurations, as in the case where you want to use the artifact's final name as a parameter. In
-            this case, you want the user to modify <code>&lt;build&gt;&lt;finalName/&gt;&lt;/build&gt;</code> rather
+            this case, you want the user to modify {@code &lt;build&gt;&lt;finalName/&gt;&lt;/build&gt;} rather
             than specifying a value for finalName directly in the plugin configuration section. It is also useful to
             ensure that - for example - a List-typed parameter which expects items of type Artifact doesn't get a List
             full of Strings.
-          ]]></description>
+          </description>
         </field>
         <field>
           <name>description</name>
@@ -492,10 +491,10 @@ under the License.
           <name>deprecated</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description><![CDATA[
-            Description with the reason of parameter deprecation. Similar to Javadoc <code>@deprecated</code>
+          <description>
+            Description with the reason of parameter deprecation. Similar to Javadoc {@code @deprecated}.
             This will trigger a warning when a user tries to configure a parameter marked as deprecated.
-          ]]></description>
+          </description>
         </field>
         <field>
           <name>expression</name>

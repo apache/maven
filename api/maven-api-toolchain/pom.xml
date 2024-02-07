@@ -59,6 +59,8 @@ under the License.
               </templates>
               <params>
                 <param>packageModelV4=org.apache.maven.api.toolchain</param>
+                <param>locationTracking=true</param>
+                <param>generateLocationClasses=true</param>
               </params>
             </configuration>
           </execution>
