@@ -20,6 +20,7 @@ package org.apache.maven.di.impl;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,7 +34,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("unused")
-public class DITest {
+public class InjectorImplTest {
 
     @Test
     void markerQualifierTest() {
@@ -273,5 +274,48 @@ public class DITest {
         static class Bean2 {
             int num = bean2.incrementAndGet();
         }
+    }
+
+    @Test
+    void testProvides() {
+        Injector injector = Injector.create().bindImplicit(ProvidesContainer.class);
+
+        assertNotNull(injector.getInstance(String.class));
+    }
+
+    static class ProvidesContainer {
+
+        @Provides
+        static ArrayList<String> newStringList() {
+            return new ArrayList<>(Arrays.asList("foo", "bar"));
+        }
+
+        @Provides
+        static String newStringOfList(List<String> list) {
+            return list.toString();
+        }
+    }
+
+    @Test
+    void testInjectConstructor() {
+        Injector injector = Injector.create().bindImplicit(InjectConstructorContainer.class);
+
+        assertNotNull(injector.getInstance(InjectConstructorContainer.Bean.class));
+    }
+
+    static class InjectConstructorContainer {
+        @Named
+        static class Bean {
+            @Inject
+            Bean(Another another, Third third) {}
+
+            Bean() {}
+        }
+
+        @Named
+        static class Another {}
+
+        @Named
+        static class Third {}
     }
 }

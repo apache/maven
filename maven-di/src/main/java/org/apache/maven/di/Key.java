@@ -24,7 +24,6 @@ import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.di.impl.ReflectionUtils;
-import org.apache.maven.di.impl.TypeUtils;
 import org.apache.maven.di.impl.Types;
 import org.apache.maven.di.impl.Utils;
 
@@ -54,12 +53,12 @@ public abstract class Key<T> {
     }
 
     protected Key(@Nullable Object qualifier) {
-        this.type = TypeUtils.simplifyType(getTypeParameter());
+        this.type = Types.simplifyType(getTypeParameter());
         this.qualifier = qualifier;
     }
 
     protected Key(Type type, @Nullable Object qualifier) {
-        this.type = TypeUtils.simplifyType(type);
+        this.type = Types.simplifyType(type);
         this.qualifier = qualifier;
     }
 

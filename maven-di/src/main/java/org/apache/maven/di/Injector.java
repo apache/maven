@@ -32,6 +32,8 @@ public interface Injector {
         return new InjectorImpl();
     }
 
+    Injector discover(ClassLoader classLoader);
+
     Injector bindScope(Class<? extends Annotation> scopeAnnotation, Scope scope);
 
     Injector bindImplicit(Class<?> cls);

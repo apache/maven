@@ -19,10 +19,7 @@
 package org.apache.maven.di.impl;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -54,16 +51,18 @@ public abstract class Binding<T> {
         return new BindingToInstance<>(instance);
     }
 
-    public static <R> Binding<R> to(TupleConstructorN<R> constructor, Class<?>[] types) {
-        return Binding.to(constructor, Stream.of(types).map(Key::of).toArray(Key<?>[]::new));
+    public static <R> Binding<R> to(Key<R> originalKey, TupleConstructorN<R> constructor, Class<?>[] types) {
+        return Binding.to(
+                originalKey, constructor, Stream.of(types).map(Key::of).toArray(Key<?>[]::new));
     }
 
-    public static <R> Binding<R> to(TupleConstructorN<R> constructor, Key<?>[] dependencies) {
-        return to(constructor, dependencies, 0);
+    public static <R> Binding<R> to(Key<R> originalKey, TupleConstructorN<R> constructor, Key<?>[] dependencies) {
+        return to(originalKey, constructor, dependencies, 0);
     }
 
-    public static <R> Binding<R> to(TupleConstructorN<R> constructor, Key<?>[] dependencies, int priority) {
-        return new BindingToConstructor<>(null, constructor, dependencies, priority);
+    public static <R> Binding<R> to(
+            Key<R> originalKey, TupleConstructorN<R> constructor, Key<?>[] dependencies, int priority) {
+        return new BindingToConstructor<>(originalKey, constructor, dependencies, priority);
     }
 
     // endregion
@@ -162,20 +161,20 @@ public abstract class Binding<T> {
 
     public static class BindingToConstructor<T> extends Binding<T> {
         final TupleConstructorN<T> constructor;
+        final Key<?>[] args;
 
         BindingToConstructor(
                 Key<? extends T> key, TupleConstructorN<T> constructor, Key<?>[] dependencies, int priority) {
             super(key, new HashSet<>(Arrays.asList(dependencies)), null, priority);
             this.constructor = constructor;
+            this.args = dependencies;
         }
 
         @Override
         public Supplier<T> compile(Function<Key<?>, Supplier<?>> compiler) {
             return () -> {
-                Object[] args = getDependencies().stream()
-                        .map(compiler)
-                        .map(Supplier::get)
-                        .toArray();
+                Object[] args =
+                        Stream.of(this.args).map(compiler).map(Supplier::get).toArray();
                 return constructor.create(args);
             };
         }
