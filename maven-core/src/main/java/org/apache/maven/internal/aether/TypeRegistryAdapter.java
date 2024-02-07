@@ -20,7 +20,7 @@ package org.apache.maven.internal.aether;
 
 import org.apache.maven.api.Type;
 import org.apache.maven.api.services.TypeRegistry;
-import org.apache.maven.internal.impl.DefaultType;
+import org.apache.maven.repository.internal.type.DefaultType;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.repository.internal.type;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,21 +24,25 @@ import java.util.Map;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
+import org.apache.maven.repository.internal.artifact.MavenArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
+import static java.util.Objects.requireNonNull;
 
+/**
+ * Default implementation of {@link Type} and Resolver {@link ArtifactType}.
+ *
+ * @since 4.0.0
+ */
 public class DefaultType implements Type, ArtifactType {
     private final String id;
-
     private final Language language;
-
     private final String extension;
-
     private final String classifier;
     private final boolean buildPathConstituent;
     private final boolean includesDependencies;
+    private final Map<String, String> properties;
 
     public DefaultType(
             String id,
@@ -47,12 +51,19 @@ public class DefaultType implements Type, ArtifactType {
             String classifier,
             boolean buildPathConstituent,
             boolean includesDependencies) {
-        this.id = nonNull(id, "id");
-        this.language = nonNull(language, "language");
-        this.extension = nonNull(extension, "extension");
+        this.id = requireNonNull(id, "id");
+        this.language = requireNonNull(language, "language");
+        this.extension = requireNonNull(extension, "extension");
         this.classifier = classifier;
         this.buildPathConstituent = buildPathConstituent;
         this.includesDependencies = includesDependencies;
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put(ArtifactProperties.TYPE, id);
+        properties.put(ArtifactProperties.LANGUAGE, language.id());
+        properties.put(MavenArtifactProperties.INCLUDES_DEPENDENCIES, Boolean.toString(includesDependencies));
+        properties.put(MavenArtifactProperties.CONSTITUTES_BUILD_PATH, Boolean.toString(buildPathConstituent));
+        this.properties = Collections.unmodifiableMap(properties);
     }
 
     @Override
@@ -92,11 +103,6 @@ public class DefaultType implements Type, ArtifactType {
 
     @Override
     public Map<String, String> getProperties() {
-        Map<String, String> properties = new HashMap<>();
-        properties.put(ArtifactProperties.TYPE, this.id);
-        properties.put(ArtifactProperties.LANGUAGE, this.language.id());
-        properties.put(ArtifactProperties.INCLUDES_DEPENDENCIES, String.valueOf(includesDependencies));
-        properties.put(ArtifactProperties.CONSTITUTES_BUILD_PATH, String.valueOf(buildPathConstituent));
-        return Collections.unmodifiableMap(properties);
+        return properties;
     }
 }

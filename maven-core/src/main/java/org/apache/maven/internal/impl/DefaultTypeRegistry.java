@@ -22,19 +22,24 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.LanguageRegistry;
 import org.apache.maven.api.services.TypeRegistry;
+import org.apache.maven.api.spi.TypeProvider;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.LegacyArtifactHandlerManager;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.repository.internal.type.DefaultType;
 
+import static java.util.function.Function.identity;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -46,17 +51,16 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
 
     private final ConcurrentHashMap<String, Type> usedTypes;
 
-    private final ConcurrentHashMap<String, Type> legacyTypes;
-
     private final LegacyArtifactHandlerManager manager;
 
     @Inject
     public DefaultTypeRegistry(
-            Map<String, Type> types, LanguageRegistry languageRegistry, LegacyArtifactHandlerManager manager) {
-        this.types = nonNull(types, "types");
+            List<TypeProvider> providers, LanguageRegistry languageRegistry, LegacyArtifactHandlerManager manager) {
+        this.types = nonNull(providers, "providers").stream()
+                .flatMap(p -> p.provides().stream())
+                .collect(Collectors.toMap(Type::id, identity()));
         this.languageRegistry = nonNull(languageRegistry, "languageRegistry");
         this.usedTypes = new ConcurrentHashMap<>();
-        this.legacyTypes = new ConcurrentHashMap<>();
         this.manager = nonNull(manager, "artifactHandlerManager");
     }
 
@@ -66,7 +70,6 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
             ExecutionEvent executionEvent = (ExecutionEvent) event;
             if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
                 usedTypes.clear();
-                legacyTypes.clear();
             }
         }
     }
@@ -83,18 +86,15 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
         return usedTypes.computeIfAbsent(id, i -> {
             Type type = types.get(id);
             if (type == null) {
-                // legacy types ALWAYS return type (AHM never returns null)
-                type = legacyTypes.computeIfAbsent(id, k -> {
-                    // Copy data as the ArtifactHandler is not immutable, but Type should be.
-                    ArtifactHandler handler = manager.getArtifactHandler(id);
-                    return new DefaultType(
-                            id,
-                            languageRegistry.require(handler.getLanguage()),
-                            handler.getExtension(),
-                            handler.getClassifier(),
-                            handler.isAddedToClasspath(),
-                            handler.isIncludesDependencies());
-                });
+                // Copy data as the ArtifactHandler is not immutable, but Type should be.
+                ArtifactHandler handler = manager.getArtifactHandler(id);
+                type = new DefaultType(
+                        id,
+                        languageRegistry.require(handler.getLanguage()),
+                        handler.getExtension(),
+                        handler.getClassifier(),
+                        handler.isAddedToClasspath(),
+                        handler.isIncludesDependencies());
             }
             return type;
         });

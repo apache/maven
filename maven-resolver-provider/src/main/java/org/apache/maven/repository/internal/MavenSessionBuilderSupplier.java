@@ -20,14 +20,15 @@ package org.apache.maven.repository.internal;
 
 import java.util.function.Supplier;
 
+import org.apache.maven.repository.internal.artifact.FatArtifactTraverser;
 import org.apache.maven.repository.internal.scopes.MavenDependencyContextRefiner;
 import org.apache.maven.repository.internal.scopes.MavenScopeDeriver;
 import org.apache.maven.repository.internal.scopes.MavenScopeSelector;
+import org.apache.maven.repository.internal.type.DefaultTypeProvider;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
-import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
@@ -43,7 +44,6 @@ import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransform
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
-import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 import static java.util.Objects.requireNonNull;
@@ -62,6 +62,14 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
 
     public MavenSessionBuilderSupplier(RepositorySystem repositorySystem) {
         this.repositorySystem = requireNonNull(repositorySystem);
+    }
+
+    /**
+     * Package protected constructor, only for use with {@link MavenRepositorySystemUtils}.
+     */
+    @Deprecated
+    MavenSessionBuilderSupplier() {
+        this.repositorySystem = null;
     }
 
     protected DependencyTraverser getDependencyTraverser() {
@@ -87,20 +95,18 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
                 new MavenDependencyContextRefiner());
     }
 
+    /**
+     * This method produces "surrogate" type registry that is static: it aims users that want to use
+     * Maven-Resolver without involving Maven Core and related things.
+     * <p>
+     * This type registry is NOT used by Maven Core: Maven replaces it during Session creation with a type registry
+     * that supports extending it (i.e. via Maven Extensions).
+     * <p>
+     * Important: this "static" list of types should be in-sync with core provided types.
+     */
     protected ArtifactTypeRegistry getArtifactTypeRegistry() {
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
-        stereotypes.add(new DefaultArtifactType("pom"));
-        stereotypes.add(new DefaultArtifactType("maven-plugin", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("jar", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("ejb", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("ejb-client", "jar", "client", "java"));
-        stereotypes.add(new DefaultArtifactType("test-jar", "jar", "tests", "java"));
-        stereotypes.add(new DefaultArtifactType("javadoc", "jar", "javadoc", "java"));
-        stereotypes.add(new DefaultArtifactType("java-source", "jar", "sources", "java", false, false));
-        stereotypes.add(new DefaultArtifactType("war", "war", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("ear", "ear", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("rar", "rar", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("par", "par", "", "java", false, true));
+        new DefaultTypeProvider().types().forEach(stereotypes::add);
         return stereotypes;
     }
 
