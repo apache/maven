@@ -280,11 +280,12 @@ public class DefaultSession extends AbstractSession {
         }
     }
 
-    public org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency) {
+    public org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency, boolean managed) {
+        org.eclipse.aether.graph.Dependency dep;
         if (dependency instanceof DefaultDependencyCoordinate) {
-            return ((DefaultDependencyCoordinate) dependency).getDependency();
+            dep = ((DefaultDependencyCoordinate) dependency).getDependency();
         } else {
-            return new org.eclipse.aether.graph.Dependency(
+            dep = new org.eclipse.aether.graph.Dependency(
                     new org.eclipse.aether.artifact.DefaultArtifact(
                             dependency.getGroupId(),
                             dependency.getArtifactId(),
@@ -294,5 +295,9 @@ public class DefaultSession extends AbstractSession {
                             null),
                     dependency.getScope().id());
         }
+        if (!managed && "".equals(dep.getScope())) {
+            dep = dep.setScope(DependencyScope.COMPILE.id());
+        }
+        return dep;
     }
 }
