@@ -324,9 +324,6 @@ public class MojoExecutor {
     }
 
     private void doExecute2(MavenSession session, MojoExecution mojoExecution) throws LifecycleExecutionException {
-        if (!session.getCurrentProject().isProjectNeedsBuild()) {
-            return;
-        }
         eventCatapult.fire(ExecutionEvent.Type.MojoStarted, session, mojoExecution);
         try {
             try {
