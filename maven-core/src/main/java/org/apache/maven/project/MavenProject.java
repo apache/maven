@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -181,6 +182,18 @@ public class MavenProject implements Cloneable {
     private DependencyFilter extensionDependencyFilter;
 
     private final Set<String> lifecyclePhases = Collections.synchronizedSet(new LinkedHashSet<>());
+
+    private final AtomicBoolean projectNeedsBuild = new AtomicBoolean(true);
+
+    public boolean isProjectNeedsBuild() {
+        return projectNeedsBuild.get();
+    }
+
+    public void skipProjectBuild() {
+        if (projectNeedsBuild.compareAndSet(false, true)) {
+            LOGGER.info("Project {} is skipped from build", getId());
+        }
+    }
 
     public MavenProject() {
         Model model = new Model();
