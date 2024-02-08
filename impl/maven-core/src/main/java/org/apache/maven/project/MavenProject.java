@@ -209,7 +209,7 @@ public class MavenProject implements Cloneable {
     }
 
     public void skipProjectBuild() {
-        if (projectNeedsBuild.compareAndSet(false, true)) {
+        if (projectNeedsBuild.compareAndSet(true, false)) {
             LOGGER.info("Project {} is skipped from build", getId());
         }
     }
@@ -1438,6 +1438,10 @@ public class MavenProject implements Cloneable {
         }
 
         lifecyclePhases.addAll(project.lifecyclePhases);
+
+        if (!project.isProjectNeedsBuild()) {
+            skipProjectBuild();
+        }
     }
 
     private static String getProjectReferenceId(String groupId, String artifactId, String version) {
