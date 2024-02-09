@@ -370,7 +370,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             File pomFile = pomArtifact.getFile();
 
-            if ("pom".equals(artifact.getType())) {
+            if (!artifact.isResolved() && "pom".equals(artifact.getType())) {
                 artifact.selectVersion(pomArtifact.getVersion());
                 artifact.setFile(pomFile);
                 artifact.setResolved(true);
