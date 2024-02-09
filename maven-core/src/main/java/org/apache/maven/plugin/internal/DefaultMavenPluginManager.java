@@ -37,6 +37,7 @@ import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.di.Injector;
+import org.apache.maven.di.Key;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
@@ -534,7 +535,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             injector.bindInstance(Project.class, project);
             injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
             injector.bindInstance(org.apache.maven.api.plugin.Log.class, log);
-            mojo = mojoInterface.cast(injector.getInstance(mojoDescriptor.getImplementationClass()));
+            mojo = mojoInterface.cast(injector.getInstance(
+                    Key.of(mojoDescriptor.getImplementationClass(), mojoDescriptor.getRoleHint())));
 
         } catch (Exception e) {
             throw new PluginContainerException(mojoDescriptor, pluginRealm, "Unable to lookup Mojo", e);
