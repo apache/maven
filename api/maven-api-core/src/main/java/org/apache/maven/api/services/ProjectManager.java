@@ -19,16 +19,9 @@
 package org.apache.maven.api.services;
 
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Project;
-import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Service;
-import org.apache.maven.api.Session;
+import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
@@ -86,21 +79,45 @@ public interface ProjectManager extends Service {
 
     void attachArtifact(Project project, Artifact artifact, Path path);
 
-    List<String> getCompileSourceRoots(Project project);
+    /**
+     * Obtain an immutable list of compile source roots for the given project and scope.
+     * Paths are absolute.
+     *
+     * @param project the project
+     * @param scope the scope, i.e. usually main or test
+     * @return the list of compile source roots
+     */
+    @Nonnull
+    List<Path> getCompileSourceRoots(@Nonnull Project project, @Nonnull ProjectScope scope);
 
-    void addCompileSourceRoot(Project project, String sourceRoot);
+    /**
+     * Add a compilation source root to the given project for the given scope.
+     * The path will be transformed into an absolute path and added to the list for the given scope,
+     * if not already present.
+     *
+     * @param project the project
+     * @param scope the scope, i.e. usually main or test
+     * @param sourceRoot the new source root
+     */
+    void addCompileSourceRoot(@Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Path sourceRoot);
 
-    List<String> getTestCompileSourceRoots(Project project);
+    /**
+     * Get the list of resources for the given project and scope
+     *
+     * @param project the project
+     * @param scope the scope, i.e. usually main or test
+     * @return the list of resources
+     */
+    List<Resource> getResources(@Nonnull Project project, @Nonnull ProjectScope scope);
 
-    void addTestCompileSourceRoot(Project project, String sourceRoot);
-
-    List<Resource> getResources(Project project);
-
-    void addResource(Project project, Resource resource);
-
-    List<Resource> getTestResources(Project project);
-
-    void addTestResource(Project project, Resource resource);
+    /**
+     * Add a resource set to the given project for the given scope.
+     *
+     * @param project the project
+     * @param scope the scope, i.e. usually main or test
+     * @param resource the resource set to add
+     */
+    void addResource(@Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Resource resource);
 
     /**
      * Returns an immutable list of project remote repositories (directly specified or inherited).
