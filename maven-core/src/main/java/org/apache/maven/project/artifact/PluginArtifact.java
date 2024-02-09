@@ -57,30 +57,37 @@ public class PluginArtifact extends DefaultArtifact implements ArtifactWithDepen
 
     // TODO: this is duplicate of MavenPluginArtifactHandlerProvider provided one
     static class PluginArtifactHandler implements ArtifactHandler {
+        @Override
         public String getClassifier() {
             return null;
         }
 
+        @Override
         public String getDirectory() {
             return null;
         }
 
+        @Override
         public String getExtension() {
             return "jar";
         }
 
+        @Override
         public String getLanguage() {
             return "none";
         }
 
+        @Override
         public String getPackaging() {
             return "maven-plugin";
         }
 
+        @Override
         public boolean isAddedToClasspath() {
             return true;
         }
 
+        @Override
         public boolean isIncludesDependencies() {
             return false;
         }

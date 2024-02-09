@@ -27,6 +27,7 @@ public class ArtifactHandlerMock implements ArtifactHandler {
         this.extension = extension;
     }
 
+    @Override
     public String getExtension() {
         return extension;
     }
@@ -35,6 +36,7 @@ public class ArtifactHandlerMock implements ArtifactHandler {
         this.directory = directory;
     }
 
+    @Override
     public String getDirectory() {
         return directory;
     }
@@ -43,6 +45,7 @@ public class ArtifactHandlerMock implements ArtifactHandler {
         this.classifier = classifier;
     }
 
+    @Override
     public String getClassifier() {
         return classifier;
     }
@@ -51,6 +54,7 @@ public class ArtifactHandlerMock implements ArtifactHandler {
         this.packaging = packaging;
     }
 
+    @Override
     public String getPackaging() {
         return packaging;
     }
@@ -59,6 +63,7 @@ public class ArtifactHandlerMock implements ArtifactHandler {
         this.includesDependencies = includesDependencies;
     }
 
+    @Override
     public boolean isIncludesDependencies() {
         return includesDependencies;
     }
@@ -67,6 +72,7 @@ public class ArtifactHandlerMock implements ArtifactHandler {
         this.language = language;
     }
 
+    @Override
     public String getLanguage() {
         return language;
     }
@@ -75,6 +81,7 @@ public class ArtifactHandlerMock implements ArtifactHandler {
         this.addedToClasspath = addedToClasspath;
     }
 
+    @Override
     public boolean isAddedToClasspath() {
         return addedToClasspath;
     }
