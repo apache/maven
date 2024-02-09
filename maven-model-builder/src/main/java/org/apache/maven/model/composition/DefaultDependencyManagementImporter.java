@@ -76,7 +76,7 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
                                         + "to the dependencyManagement section of the POM."));
                     }
 
-                    if (request.isLocationTracking()) {
+                    if (present == null && request.isLocationTracking()) {
                         Dependency updatedDependency = updateWithImportedFrom(dependency, source);
                         dependencies.put(key, updatedDependency);
                     }
@@ -179,6 +179,8 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
         // We modify the input location that is used for the whole file.
         // This is likely correct because the POM hierarchy applies to the whole POM, not just one dependency.
         // TODO What to do now?!
-        return Dependency.newBuilder(dependency, true).importedFrom(bomLocation).build();
+        return Dependency.newBuilder(dependency, true)
+                .importedFrom(new InputLocation(bomLocation, dependency.getImportedFrom()))
+                .build();
     }
 }

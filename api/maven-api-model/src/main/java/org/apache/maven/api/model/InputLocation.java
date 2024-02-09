@@ -32,13 +32,14 @@ public class InputLocation implements Serializable, InputLocationTracker {
     private final int columnNumber;
     private final InputSource source;
     private final Map<Object, InputLocation> locations;
-    private final InputLocation importedFrom = null;
+    private final InputLocation importedFrom;
 
     public InputLocation(InputSource source) {
         this.lineNumber = -1;
         this.columnNumber = -1;
         this.source = source;
         this.locations = Collections.singletonMap(0, this);
+        this.importedFrom = null;
     }
 
     public InputLocation(int lineNumber, int columnNumber) {
@@ -55,6 +56,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.source = source;
         this.locations =
                 selfLocationKey != null ? Collections.singletonMap(selfLocationKey, this) : Collections.emptyMap();
+        this.importedFrom = null;
     }
 
     public InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
@@ -62,6 +64,15 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.columnNumber = columnNumber;
         this.source = source;
         this.locations = ImmutableCollections.copy(locations);
+        this.importedFrom = null;
+    }
+
+    public InputLocation(InputLocation original, InputLocation importedFrom) {
+        this.lineNumber = original.lineNumber;
+        this.columnNumber = original.columnNumber;
+        this.source = original.source;
+        this.locations = original.locations;
+        this.importedFrom = importedFrom;
     }
 
     public int getLineNumber() {
