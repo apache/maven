@@ -77,11 +77,13 @@ public class ArtifactHandlerMock implements ArtifactHandler {
         return language;
     }
 
+    @Deprecated
     public void setAddedToClasspath(boolean addedToClasspath) {
         this.addedToClasspath = addedToClasspath;
     }
 
     @Override
+    @Deprecated
     public boolean isAddedToClasspath() {
         return addedToClasspath;
     }

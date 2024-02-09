@@ -62,6 +62,7 @@ class TransformedArtifactHandler implements ArtifactHandler {
     }
 
     @Override
+    @Deprecated
     public boolean isAddedToClasspath() {
         return false;
     }

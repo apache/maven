@@ -95,7 +95,7 @@ public class ArtifactDescriptorReaderDelegate {
         ArtifactType stereotype = stereotypes.get(dependency.getType());
         if (stereotype == null) {
             // TODO: this here is fishy
-            stereotype = new DefaultType(dependency.getType(), Language.NONE, "", null, false, false);
+            stereotype = new DefaultType(dependency.getType(), Language.NONE, "", null, false);
         }
 
         boolean system = dependency.getSystemPath() != null

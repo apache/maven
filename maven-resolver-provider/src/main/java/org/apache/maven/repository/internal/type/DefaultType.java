@@ -18,11 +18,12 @@
  */
 package org.apache.maven.repository.internal.type;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.Map;
 
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Language;
+import org.apache.maven.api.PathType;
 import org.apache.maven.api.Type;
 import org.apache.maven.repository.internal.artifact.MavenArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactProperties;
@@ -40,8 +41,8 @@ public class DefaultType implements Type, ArtifactType {
     private final Language language;
     private final String extension;
     private final String classifier;
-    private final boolean buildPathConstituent;
     private final boolean includesDependencies;
+    private final Set<PathType> pathTypes;
     private final Map<String, String> properties;
 
     public DefaultType(
@@ -49,20 +50,22 @@ public class DefaultType implements Type, ArtifactType {
             Language language,
             String extension,
             String classifier,
-            boolean buildPathConstituent,
-            boolean includesDependencies) {
+            boolean includesDependencies,
+            PathType... pathTypes) {
         this.id = requireNonNull(id, "id");
         this.language = requireNonNull(language, "language");
         this.extension = requireNonNull(extension, "extension");
         this.classifier = classifier;
-        this.buildPathConstituent = buildPathConstituent;
         this.includesDependencies = includesDependencies;
+        this.pathTypes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(pathTypes)));
 
         Map<String, String> properties = new HashMap<>();
         properties.put(ArtifactProperties.TYPE, id);
         properties.put(ArtifactProperties.LANGUAGE, language.id());
         properties.put(MavenArtifactProperties.INCLUDES_DEPENDENCIES, Boolean.toString(includesDependencies));
-        properties.put(MavenArtifactProperties.CONSTITUTES_BUILD_PATH, Boolean.toString(buildPathConstituent));
+        properties.put(
+                MavenArtifactProperties.CONSTITUTES_BUILD_PATH,
+                String.valueOf(this.pathTypes.contains(JavaPathType.CLASSES)));
         this.properties = Collections.unmodifiableMap(properties);
     }
 
@@ -92,13 +95,12 @@ public class DefaultType implements Type, ArtifactType {
     }
 
     @Override
-    public boolean isBuildPathConstituent() {
-        return this.buildPathConstituent;
-    }
-
-    @Override
     public boolean isIncludesDependencies() {
         return this.includesDependencies;
+    }
+
+    public Set<PathType> getPathTypes() {
+        return this.pathTypes;
     }
 
     @Override

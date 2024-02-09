@@ -37,6 +37,7 @@ public class DefaultArtifactHandler implements ArtifactHandler {
 
     private String language;
 
+    @Deprecated
     private boolean addedToClasspath;
 
     /**
@@ -146,10 +147,12 @@ public class DefaultArtifactHandler implements ArtifactHandler {
     }
 
     @Override
+    @Deprecated
     public boolean isAddedToClasspath() {
         return addedToClasspath;
     }
 
+    @Deprecated
     public void setAddedToClasspath(final boolean addedToClasspath) {
         this.addedToClasspath = addedToClasspath;
     }

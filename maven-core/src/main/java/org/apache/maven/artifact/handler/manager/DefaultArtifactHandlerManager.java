@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -72,7 +73,8 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
                     null,
                     type.isIncludesDependencies(),
                     type.getLanguage().id(),
-                    type.isBuildPathConstituent());
+                    type.getPathTypes().contains(JavaPathType.CLASSES));
+            // TODO: watch out for module path
         });
 
         // Note: here, type decides is artifact added to "build path" (for example during resolution)

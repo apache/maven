@@ -65,6 +65,7 @@ class TestArtifactHandler implements ArtifactHandler {
     }
 
     @Override
+    @Deprecated
     public boolean isAddedToClasspath() {
         return true;
     }

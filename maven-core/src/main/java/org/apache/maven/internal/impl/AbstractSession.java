@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
@@ -353,7 +354,8 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public Map<Artifact, Path> resolveArtifacts(Artifact... artifacts) {
         ArtifactCoordinateFactory acf = getService(ArtifactCoordinateFactory.class);
-        List<ArtifactCoordinate> coords = map(Arrays.asList(artifacts), a -> acf.create(this, a));
+        List<ArtifactCoordinate> coords =
+                Arrays.stream(artifacts).map(a -> acf.create(this, a)).collect(Collectors.toList());
         return resolveArtifacts(coords);
     }
 
@@ -500,6 +502,34 @@ public abstract class AbstractSession implements InternalSession {
         return getService(DependencyResolver.class)
                 .resolve(this, project, scope)
                 .getPaths();
+    }
+
+    @Override
+    public Map<PathType, List<Path>> resolveDependencies(
+            @Nonnull DependencyCoordinate dependency,
+            @Nonnull PathScope scope,
+            @Nonnull Collection<PathType> desiredTypes) {
+        return getService(DependencyResolver.class)
+                .resolve(DependencyResolverRequest.builder()
+                        .session(this)
+                        .dependency(dependency)
+                        .pathScope(scope)
+                        .pathTypeFilter(desiredTypes)
+                        .build())
+                .getDispatchedPaths();
+    }
+
+    @Override
+    public Map<PathType, List<Path>> resolveDependencies(
+            @Nonnull Project project, @Nonnull PathScope scope, @Nonnull Collection<PathType> desiredTypes) {
+        return getService(DependencyResolver.class)
+                .resolve(DependencyResolverRequest.builder()
+                        .session(this)
+                        .project(project)
+                        .pathScope(scope)
+                        .pathTypeFilter(desiredTypes)
+                        .build())
+                .getDispatchedPaths();
     }
 
     @Override
