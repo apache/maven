@@ -41,7 +41,10 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+<<<<<<< Upstream, based on master
 import java.util.stream.StreamSupport;
+=======
+>>>>>>> 4f3fe69 [MNG-8050] emit warn in case of repo id clashes between settings and POM
 
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
@@ -784,6 +787,36 @@ public class DefaultModelValidator implements ModelValidator {
                         distMgmt.getSnapshotRepository(),
                         "distributionManagement.snapshotRepository.",
                         request);
+            }
+        }
+    }
+
+    @Override
+    public void validateExternalProfiles(
+            List<org.apache.maven.model.Profile> activeExternalProfiles,
+            Model ma,
+            ModelBuildingRequest request,
+            ModelProblemCollector problems) {
+        org.apache.maven.api.model.Model m = ma.getDelegate();
+        // check for id clashes in repositories
+        for (Profile profile : activeExternalProfiles.stream()
+                .map(org.apache.maven.model.Profile::getDelegate)
+                .collect(Collectors.toList())) {
+            for (Repository repository : profile.getRepositories()) {
+                Optional<Repository> clashingPomRepository = m.getRepositories().stream()
+                        .filter(r -> r.getId().equals(repository.getId()))
+                        .findFirst();
+                if (clashingPomRepository.isPresent()) {
+                    addViolation(
+                            problems,
+                            Severity.WARNING,
+                            Version.V40, // ?
+                            "pom repository",
+                            "?",
+                            "is overwritten by the repository with same id from external profile with id "
+                                    + profile.getId(),
+                            clashingPomRepository.get());
+                }
             }
         }
     }
