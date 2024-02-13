@@ -41,10 +41,7 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-<<<<<<< Upstream, based on master
 import java.util.stream.StreamSupport;
-=======
->>>>>>> 4f3fe69 [MNG-8050] emit warn in case of repo id clashes between settings and POM
 
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
