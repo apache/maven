@@ -728,6 +728,16 @@
             <type>ActivationFile</type>
           </association>
         </field>
+        <field>
+          <name>packaging</name>
+          <version>1.2.0+</version>
+          <description>
+            Specifies that this profile will be activated based on the project's packaging.
+          </description>
+          <association>
+            <type>ActivationPackaging</type>
+          </association>
+        </field>
       </fields>
     </class>
 
@@ -968,6 +978,24 @@
           <type>String</type>
           <description>
             The name of the file that should exist to activate a profile.
+          </description>
+        </field>
+      </fields>
+    </class>
+    <class java.clone="deep">
+      <name>ActivationPackaging</name>
+      <version>1.2.0+</version>
+      <description>
+        This is the packaging specification used to activate a profile.
+      </description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>1.2.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>
+            The name of the packaging to be used to activate a profile.
           </description>
         </field>
       </fields>

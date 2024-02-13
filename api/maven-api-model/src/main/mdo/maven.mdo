@@ -2771,6 +2771,14 @@
             <type>ActivationFile</type>
           </association>
         </field>
+        <field>
+          <name>packaging</name>
+          <version>4.1.0+</version>
+          <description>Specifies that this profile will be activated based on the project's packaging.</description>
+          <association>
+            <type>ActivationPackaging</type>
+          </association>
+        </field>
         <!--
         This could be included once we teach Maven to deal with multiple versions of the model
         <field>
@@ -2869,6 +2877,20 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>The name of the file that must exist to activate the profile.</description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ActivationPackaging</name>
+      <version>4.1.0+</version>
+      <description>This is the packaging specification used to activate a profile.</description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>4.1.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The name of the packaging to be used to activate a profile.</description>
         </field>
       </fields>
     </class>
