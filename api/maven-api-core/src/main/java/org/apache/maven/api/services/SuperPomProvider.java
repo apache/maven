@@ -25,6 +25,8 @@ import org.apache.maven.api.model.Model;
 
 /**
  * Provides the super POM that all models implicitly inherit from.
+ *
+ * @since 4.0.0
  */
 @Experimental
 public interface SuperPomProvider extends Service {

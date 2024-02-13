@@ -20,6 +20,7 @@ package org.apache.maven.api.plugin;
 
 import java.util.function.Supplier;
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Provider;
 
 /**
@@ -32,6 +33,7 @@ import org.apache.maven.api.annotations.Provider;
  *
  * @since 4.0.0
  */
+@Experimental
 @Provider
 public interface Log {
     /**

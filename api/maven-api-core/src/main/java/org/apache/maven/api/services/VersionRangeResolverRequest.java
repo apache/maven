@@ -26,6 +26,10 @@ import org.apache.maven.api.annotations.NotThreadSafe;
 
 import static org.apache.maven.api.services.BaseRequest.nonNull;
 
+/**
+ *
+ * @since 4.0.0
+ */
 @Experimental
 public interface VersionRangeResolverRequest {
 

@@ -20,9 +20,15 @@ package org.apache.maven.api.services;
 
 import java.util.List;
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 
+/**
+ *
+ * @since 4.0.0
+ */
+@Experimental
 public interface ToolchainsBuilderResult {
     /**
      * Gets the assembled toolchains.

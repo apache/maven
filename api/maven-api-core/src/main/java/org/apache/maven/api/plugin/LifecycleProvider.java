@@ -30,6 +30,8 @@ import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
  * annotation.  If a {@code META-INF/maven/lifecycle.xml} file is packaged
  * in the plugin, Maven will provide a default implementation that will parse
  * the file and return the contained lifecycle definitions.
+ *
+ * @since 4.0.0
  */
 @Experimental
 @Consumer
