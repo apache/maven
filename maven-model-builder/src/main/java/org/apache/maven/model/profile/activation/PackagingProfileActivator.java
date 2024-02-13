@@ -18,16 +18,17 @@
  */
 package org.apache.maven.model.profile.activation;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.util.Optional;
+
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationPackaging;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.profile.ProfileActivationContext;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Optional;
 
 /**
  * Determines profile activation based on the project's packaging.
@@ -39,11 +40,11 @@ import java.util.Optional;
 public class PackagingProfileActivator implements ProfileActivator {
 
     @Inject
-    public PackagingProfileActivator() {
-    }
+    public PackagingProfileActivator() {}
 
     @Override
-    public boolean isActive(org.apache.maven.model.Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
+    public boolean isActive(
+            org.apache.maven.model.Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
         ActivationPackaging packaging = getActivationPackaging(profile).orElse(null);
         if (packaging == null) {
             return false;
@@ -54,7 +55,8 @@ public class PackagingProfileActivator implements ProfileActivator {
     }
 
     @Override
-    public boolean presentInConfig(org.apache.maven.model.Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
+    public boolean presentInConfig(
+            org.apache.maven.model.Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
         return getActivationPackaging(profile).isPresent();
     }
 
