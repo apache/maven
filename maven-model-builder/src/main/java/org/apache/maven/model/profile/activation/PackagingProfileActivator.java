@@ -31,8 +31,6 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 
 /**
  * Determines profile activation based on the project's packaging.
- *
- * @see org.apache.maven.model.ActivationPackaging
  */
 @Named("packaging")
 @Singleton
