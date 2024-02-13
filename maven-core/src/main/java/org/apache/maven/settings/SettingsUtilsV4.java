@@ -125,6 +125,8 @@ public final class SettingsUtilsV4 {
                 activation.file(file);
             }
 
+            activation.packaging(modelActivation.getPackaging());
+
             profile.activation(activation.build());
         }
 
@@ -207,6 +209,8 @@ public final class SettingsUtilsV4 {
                         .location("missing", toLocation(settingsFile.getLocation("missing")))
                         .build());
             }
+
+            activation.packaging(settingsActivation.getPackaging());
 
             profile.activation(activation.build());
         }

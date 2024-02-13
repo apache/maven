@@ -18,14 +18,13 @@
  */
 package org.apache.maven.model.profile.activation;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.maven.api.model.Activation;
-import org.apache.maven.api.model.ActivationPackaging;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.profile.ProfileActivationContext;
@@ -39,19 +38,10 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 @Singleton
 public class PackagingProfileActivator implements ProfileActivator {
 
-    @Inject
-    public PackagingProfileActivator() {}
-
     @Override
     public boolean isActive(
             org.apache.maven.model.Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
-        ActivationPackaging packaging = getActivationPackaging(profile).orElse(null);
-        if (packaging == null) {
-            return false;
-        }
-
-        String prop = context.getUserProperties().get(ProfileActivationContext.PROPERTY_NAME_PACKAGING);
-        return packaging.equals(prop);
+        return getActivationPackaging(profile).map(p -> isPackaging(context, p)).orElse(false);
     }
 
     @Override
@@ -60,7 +50,12 @@ public class PackagingProfileActivator implements ProfileActivator {
         return getActivationPackaging(profile).isPresent();
     }
 
-    private static Optional<ActivationPackaging> getActivationPackaging(org.apache.maven.model.Profile profile) {
+    private static boolean isPackaging(ProfileActivationContext context, String p) {
+        String packaging = context.getUserProperties().get(ProfileActivationContext.PROPERTY_NAME_PACKAGING);
+        return Objects.equals(p, packaging);
+    }
+
+    private static Optional<String> getActivationPackaging(org.apache.maven.model.Profile profile) {
         return Optional.ofNullable(profile)
                 .map(org.apache.maven.model.Profile::getDelegate)
                 .map(Profile::getActivation)
