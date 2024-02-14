@@ -31,13 +31,13 @@ import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.Repository;
+import org.apache.maven.repository.internal.type.DefaultType;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
@@ -92,7 +92,7 @@ public class ArtifactDescriptorReaderDelegate {
     private Dependency convert(org.apache.maven.model.Dependency dependency, ArtifactTypeRegistry stereotypes) {
         ArtifactType stereotype = stereotypes.get(dependency.getType());
         if (stereotype == null) {
-            stereotype = new DefaultArtifactType(dependency.getType());
+            stereotype = new DefaultType(dependency.getType());
         }
 
         boolean system = dependency.getSystemPath() != null

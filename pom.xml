@@ -177,7 +177,7 @@ under the License.
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusTestingVersion>1.0.0</plexusTestingVersion>
     <plexusXmlVersion>4.0.1</plexusXmlVersion>
-    <resolverVersion>2.0.0-alpha-7</resolverVersion>
+    <resolverVersion>2.0.0-alpha-8</resolverVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <sisuVersion>0.9.0.M2</sisuVersion>
     <slf4jVersion>2.0.11</slf4jVersion>
@@ -624,6 +624,20 @@ under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>maven-2066</id>
+      <url>https://repository.apache.org/content/repositories/maven-2066/</url>
+    </repository>
+  </repositories>
   <!--bootstrap-end-comment-->
 
   <build>

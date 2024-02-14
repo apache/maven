@@ -42,15 +42,27 @@ class FilterModelBuildingRequest implements ModelBuildingRequest {
         this.request = request;
     }
 
+    @Deprecated
     @Override
     public File getPomFile() {
         return request.getPomFile();
     }
 
     @Override
-    public FilterModelBuildingRequest setPomFile(File pomFile) {
-        request.setPomFile(pomFile);
+    public Path getPomPath() {
+        return request.getPomPath();
+    }
 
+    @Deprecated
+    @Override
+    public ModelBuildingRequest setPomFile(File pomFile) {
+        request.setPomFile(pomFile);
+        return this;
+    }
+
+    @Override
+    public FilterModelBuildingRequest setPomPath(Path pomPath) {
+        request.setPomPath(pomPath);
         return this;
     }
 

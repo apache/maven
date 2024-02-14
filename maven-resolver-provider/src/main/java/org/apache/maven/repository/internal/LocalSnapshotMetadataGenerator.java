@@ -38,7 +38,7 @@ import org.eclipse.aether.util.ConfigUtils;
  */
 class LocalSnapshotMetadataGenerator implements MetadataGenerator {
 
-    private Map<Object, LocalSnapshotMetadata> snapshots;
+    private final Map<Object, LocalSnapshotMetadata> snapshots;
 
     private final Date timestamp;
 

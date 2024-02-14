@@ -87,6 +87,6 @@ public class UrlSource implements Source {
         }
 
         UrlSource other = (UrlSource) obj;
-        return this.url.equals(other.url);
+        return Objects.equals(url.toExternalForm(), other.url.toExternalForm());
     }
 }
