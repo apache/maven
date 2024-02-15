@@ -728,6 +728,14 @@
             <type>ActivationFile</type>
           </association>
         </field>
+        <field>
+          <name>packaging</name>
+          <version>1.2.0+</version>
+          <type>String</type>
+          <description>
+            Specifies that this profile will be activated based on the project's packaging.
+          </description>
+        </field>
       </fields>
     </class>
 

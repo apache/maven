@@ -83,6 +83,7 @@ class SettingsUtilsTest {
                 .file(af)
                 .property(ap)
                 .os(ao)
+                .packaging("pom")
                 .build();
         Map<String, String> props = new HashMap<>();
         int count = entropy.nextInt(10);
@@ -145,6 +146,7 @@ class SettingsUtilsTest {
         assertEquals(
                 p.getActivation().getOs().getVersion(),
                 clone.getActivation().getOs().getVersion());
+        assertEquals(p.getActivation().getPackaging(), clone.getActivation().getPackaging());
         assertEquals(p.getProperties(), clone.getProperties());
         assertEquals(p.getRepositories().size(), clone.getRepositories().size());
         // TODO deep compare the lists
