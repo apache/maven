@@ -91,8 +91,6 @@ public class DefaultMaven implements Maven {
 
     private final Lookup lookup;
 
-    private final LifecycleStarter lifecycleStarter;
-
     private final ExecutionEventCatapult eventCatapult;
 
     private final LegacySupport legacySupport;
@@ -119,7 +117,6 @@ public class DefaultMaven implements Maven {
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultMaven(
             Lookup lookup,
-            LifecycleStarter lifecycleStarter,
             ExecutionEventCatapult eventCatapult,
             LegacySupport legacySupport,
             SessionScope sessionScope,
@@ -131,7 +128,6 @@ public class DefaultMaven implements Maven {
             DefaultSessionFactory defaultSessionFactory,
             @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader) {
         this.lookup = lookup;
-        this.lifecycleStarter = lifecycleStarter;
         this.eventCatapult = eventCatapult;
         this.legacySupport = legacySupport;
         this.sessionScope = sessionScope;
@@ -308,6 +304,9 @@ public class DefaultMaven implements Maven {
             }
 
             validateOptionalProfiles(session, request.getProfileActivation());
+
+            LifecycleStarter lifecycleStarter = lookup.lookupOptional(LifecycleStarter.class, request.getBuilderId())
+                    .orElseGet(() -> lookup.lookup(LifecycleStarter.class));
 
             lifecycleStarter.execute(session);
 
