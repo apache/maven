@@ -50,7 +50,14 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
         legacyFormat = ConfigUtils.getBoolean(session, false, "maven.metadata.legacy");
 
         timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
-        buildNumber = (Integer) ConfigUtils.getObject(session, null, "maven.buildNumber");
+        Object bn = ConfigUtils.getObject(session, null, "maven.buildNumber");
+        if (bn instanceof Integer) {
+            this.buildNumber = (Integer) bn;
+        } else if (bn instanceof String) {
+            this.buildNumber = Integer.valueOf((String) bn);
+        } else {
+            this.buildNumber = null;
+        }
 
         snapshots = new LinkedHashMap<>();
 

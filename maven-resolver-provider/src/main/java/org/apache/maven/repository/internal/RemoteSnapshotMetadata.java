@@ -51,7 +51,8 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
         this.buildNumber = buildNumber;
     }
 
-    private RemoteSnapshotMetadata(Metadata metadata, File file, boolean legacyFormat, Date timestamp, Integer buildNumber) {
+    private RemoteSnapshotMetadata(
+            Metadata metadata, File file, boolean legacyFormat, Date timestamp, Integer buildNumber) {
         super(metadata, file, legacyFormat, timestamp);
         this.buildNumber = buildNumber;
     }
