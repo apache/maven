@@ -653,7 +653,7 @@ public class MavenRepositorySystem {
 
     public ArtifactRepository createLocalRepository(File localRepository) throws InvalidRepositoryException {
         return createRepository(
-                localRepository.toURI().toASCIIString(),
+                localRepository.toPath().toUri().toASCIIString(),
                 MavenRepositorySystem.DEFAULT_LOCAL_REPO_ID,
                 true,
                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
