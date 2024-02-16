@@ -44,17 +44,22 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
 
     private final Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
 
-    RemoteSnapshotMetadata(Artifact artifact, boolean legacyFormat, Date timestamp) {
+    private final Integer buildNumber;
+
+    RemoteSnapshotMetadata(Artifact artifact, boolean legacyFormat, Date timestamp, Integer buildNumber) {
         super(createRepositoryMetadata(artifact, legacyFormat), null, legacyFormat, timestamp);
+        this.buildNumber = buildNumber;
     }
 
-    private RemoteSnapshotMetadata(Metadata metadata, File file, boolean legacyFormat, Date timestamp) {
+    private RemoteSnapshotMetadata(
+            Metadata metadata, File file, boolean legacyFormat, Date timestamp, Integer buildNumber) {
         super(metadata, file, legacyFormat, timestamp);
+        this.buildNumber = buildNumber;
     }
 
     @Override
     public MavenMetadata setFile(File file) {
-        return new RemoteSnapshotMetadata(metadata, file, legacyFormat, timestamp);
+        return new RemoteSnapshotMetadata(metadata, file, legacyFormat, timestamp, buildNumber);
     }
 
     public String getExpandedVersion(Artifact artifact) {
@@ -73,7 +78,7 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
             utcDateFormatter.setTimeZone(DEFAULT_SNAPSHOT_TIME_ZONE);
 
             snapshot = new Snapshot();
-            snapshot.setBuildNumber(getBuildNumber(recessive) + 1);
+            snapshot.setBuildNumber(buildNumber != null ? buildNumber : getBuildNumber(recessive) + 1);
             snapshot.setTimestamp(utcDateFormatter.format(timestamp));
 
             Versioning versioning = new Versioning();
