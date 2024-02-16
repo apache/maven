@@ -33,6 +33,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class RemoteSnapshotMetadataTest {
@@ -63,7 +64,7 @@ public class RemoteSnapshotMetadataTest {
         String dateBefore = gregorianDate();
 
         RemoteSnapshotMetadata metadata =
-                new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), false, new Date());
+                new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), false, new Date(), null);
         metadata.merge(new Metadata());
 
         String dateAfter = gregorianDate();
@@ -74,5 +75,25 @@ public class RemoteSnapshotMetadataTest {
         /* Allow for this test running across midnight */
         Set<String> expected = new HashSet<>(Arrays.asList(dateBefore, dateAfter));
         assertTrue("Expected " + datePart + " to be in " + expected, expected.contains(datePart));
+    }
+
+    @Test
+    public void buildNumberNotSet() {
+        RemoteSnapshotMetadata metadata =
+                new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), false, new Date(), null);
+        metadata.merge(new Metadata());
+
+        int buildNumber = metadata.metadata.getVersioning().getSnapshot().getBuildNumber();
+        assertEquals(1, buildNumber);
+    }
+
+    @Test
+    public void buildNumberSet() {
+        RemoteSnapshotMetadata metadata =
+                new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), false, new Date(), 42);
+        metadata.merge(new Metadata());
+
+        int buildNumber = metadata.metadata.getVersioning().getSnapshot().getBuildNumber();
+        assertEquals(42, buildNumber);
     }
 }
