@@ -688,7 +688,8 @@ under the License.
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
-          <version>2.3.0</version> <!-- need to be removed when upgrading to parent >= 42 -->
+          <!-- need to be removed when upgrading to parent >= 42 -->
+          <version>2.3.0</version>
           <executions>
             <execution>
               <id>modello-site-docs</id>
