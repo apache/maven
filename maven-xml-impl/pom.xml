@@ -26,7 +26,7 @@ under the License.
   </parent>
 
   <artifactId>maven-xml-impl</artifactId>
-  <name>Implementation of Maven API XML</name>
+  <name>Maven XML API Implementation</name>
   <description>Provides the implementation classes for the Maven API XML</description>
 
   <dependencies>

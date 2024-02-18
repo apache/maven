@@ -100,11 +100,11 @@ under the License.
   </contributors>
 
   <modules>
+    <module>api</module>
     <module>maven-plugin-api</module>
     <module>maven-builder-support</module>
     <module>maven-model</module>
     <module>maven-model-builder</module>
-    <module>api</module>
     <module>maven-di</module>
     <module>maven-xml-impl</module>
     <module>maven-core</module>
