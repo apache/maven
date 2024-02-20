@@ -19,15 +19,23 @@
 package org.apache.maven.repository.internal;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.repository.internal.reader.CoreArtifactDescriptorReaderSource;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
- * Populates Aether {@link ArtifactDescriptorResult} from Maven project {@link Model}.
- * <p>
- * <strong>Note:</strong> This class is part of work in progress and can be changed or removed without notice.
- * @since 3.2.4
- * @deprecated Use {@link ArtifactDescriptorReaderSource} components instead.
+ * Component populating Aether {@link ArtifactDescriptorResult} from Maven project {@link Model}.
+ *
+ * @since TBD
  */
-@Deprecated
-public class ArtifactDescriptorReaderDelegate extends CoreArtifactDescriptorReaderSource {}
+public interface ArtifactDescriptorReaderSource {
+    /**
+     * Method the populates {@link ArtifactDescriptorResult} out of passed in {@link Model}.
+     *
+     * @param session The session, never {@code null}.
+     * @param result  The {@link ArtifactDescriptorResult} instance, never {@code null}.
+     * @param model   The {@link Model} instance, never {@code null}.
+     */
+    void populateResult(RepositorySystemSession session, ArtifactDescriptorResult result, Model model)
+            throws ArtifactDescriptorException;
+}
