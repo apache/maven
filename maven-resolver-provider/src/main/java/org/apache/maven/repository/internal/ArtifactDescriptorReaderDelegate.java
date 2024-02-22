@@ -25,12 +25,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.Language;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.Repository;
+import org.apache.maven.repository.internal.artifact.MavenArtifactProperties;
 import org.apache.maven.repository.internal.type.DefaultType;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -92,7 +94,8 @@ public class ArtifactDescriptorReaderDelegate {
     private Dependency convert(org.apache.maven.model.Dependency dependency, ArtifactTypeRegistry stereotypes) {
         ArtifactType stereotype = stereotypes.get(dependency.getType());
         if (stereotype == null) {
-            stereotype = new DefaultType(dependency.getType());
+            // TODO: this here is fishy
+            stereotype = new DefaultType(dependency.getType(), Language.NONE, "", null, false, false);
         }
 
         boolean system = dependency.getSystemPath() != null
@@ -100,7 +103,7 @@ public class ArtifactDescriptorReaderDelegate {
 
         Map<String, String> props = null;
         if (system) {
-            props = Collections.singletonMap(ArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
+            props = Collections.singletonMap(MavenArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
         }
 
         Artifact artifact = new DefaultArtifact(

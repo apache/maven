@@ -24,6 +24,7 @@ import org.apache.maven.repository.internal.artifact.FatArtifactTraverser;
 import org.apache.maven.repository.internal.scopes.MavenDependencyContextRefiner;
 import org.apache.maven.repository.internal.scopes.MavenScopeDeriver;
 import org.apache.maven.repository.internal.scopes.MavenScopeSelector;
+import org.apache.maven.repository.internal.scopes.MavenSystemScopeHandler;
 import org.apache.maven.repository.internal.type.DefaultTypeProvider;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
@@ -77,8 +78,12 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
         return new FatArtifactTraverser();
     }
 
+    protected SystemScopeHandler getSystemScopeHandler() {
+        return new MavenSystemScopeHandler();
+    }
+
     protected DependencyManager getDependencyManager() {
-        return new ClassicDependencyManager(true, SystemScopeHandler.LEGACY); // same default as in Maven4
+        return new ClassicDependencyManager(true, getSystemScopeHandler()); // same default as in Maven4
     }
 
     protected DependencySelector getDependencySelector() {

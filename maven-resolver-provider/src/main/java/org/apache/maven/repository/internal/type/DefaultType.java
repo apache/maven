@@ -66,13 +66,6 @@ public class DefaultType implements Type, ArtifactType {
         this.properties = Collections.unmodifiableMap(properties);
     }
 
-    /**
-     * Copy constructor.
-     */
-    public DefaultType(String id) {
-        this(requireNonNull(id), Language.NONE, "", null, false, false);
-    }
-
     @Override
     public String id() {
         return id;
