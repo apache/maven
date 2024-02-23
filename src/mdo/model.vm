@@ -31,10 +31,18 @@
     #set ( $dummy = $allFields.addAll( $cl.getFields($version) ) )
   #end
   #set ( $className = "${class.name}" )
+  #if ( $locationTracking && $generateLocationClasses )
+#MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/InputLocation.java
+    #parse ( "java/InputLocation.java" )
+#MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/InputLocationTracker.java
+    #parse ( "java/InputLocationTracker.java" )
+#MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/InputSource.java
+    #parse ( "java/InputSource.java" )
+  #end
 #MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/ImmutableCollections.java
 #parse ( "java/ImmutableCollections.java" )
-#MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/${className}.java
   #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
+#MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/${className}.java
     #set ( $types = { } )
     #set ( $imports = $class.getClass().forName("java.util.TreeSet").newInstance() )
     #set ( $dummy = $imports.add( "java.io.Serializable" ) )

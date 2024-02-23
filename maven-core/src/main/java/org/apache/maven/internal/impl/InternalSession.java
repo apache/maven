@@ -70,9 +70,10 @@ public interface InternalSession extends Session {
 
     org.apache.maven.artifact.repository.ArtifactRepository toArtifactRepository(RemoteRepository repository);
 
-    List<org.eclipse.aether.graph.Dependency> toDependencies(Collection<DependencyCoordinate> dependencies);
+    List<org.eclipse.aether.graph.Dependency> toDependencies(
+            Collection<DependencyCoordinate> dependencies, boolean managed);
 
-    org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency);
+    org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency, boolean managed);
 
     List<org.eclipse.aether.artifact.Artifact> toArtifacts(Collection<Artifact> artifacts);
 

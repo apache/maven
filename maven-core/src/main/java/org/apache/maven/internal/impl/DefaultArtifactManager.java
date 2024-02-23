@@ -36,6 +36,8 @@ import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.sisu.Typed;
 
+import static org.apache.maven.internal.impl.Utils.nonNull;
+
 @Named
 @Typed
 @SessionScoped
@@ -54,7 +56,7 @@ public class DefaultArtifactManager implements ArtifactManager {
     @Nonnull
     @Override
     public Optional<Path> getPath(@Nonnull Artifact artifact) {
-        String id = id(artifact);
+        String id = id(nonNull(artifact, "artifact"));
         if (session.getMavenSession().getAllProjects() != null) {
             for (MavenProject project : session.getMavenSession().getAllProjects()) {
                 if (id.equals(id(project.getArtifact()))
@@ -75,7 +77,7 @@ public class DefaultArtifactManager implements ArtifactManager {
 
     @Override
     public void setPath(@Nonnull Artifact artifact, Path path) {
-        String id = id(artifact);
+        String id = id(nonNull(artifact, "artifact"));
         if (session.getMavenSession().getAllProjects() != null) {
             session.getMavenSession().getAllProjects().stream()
                     .flatMap(this::getProjectArtifacts)

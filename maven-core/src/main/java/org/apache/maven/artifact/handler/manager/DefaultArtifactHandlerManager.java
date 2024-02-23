@@ -60,9 +60,10 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
         }
     }
 
+    @Override
     public ArtifactHandler getArtifactHandler(String id) {
         return allHandlers.computeIfAbsent(id, k -> {
-            Type type = typeRegistry.getType(id);
+            Type type = typeRegistry.require(id);
             return new DefaultArtifactHandler(
                     id,
                     type.getExtension(),
@@ -70,11 +71,16 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
                     null,
                     null,
                     type.isIncludesDependencies(),
-                    type.getLanguage(),
-                    type.isAddedToClassPath()); // TODO: watch out for module path
+                    type.getLanguage().id(),
+                    type.isBuildPathConstituent());
         });
+
+        // Note: here, type decides is artifact added to "build path" (for example during resolution)
+        // and "build path" is intermediate data that is used to create actual Java classpath/modulepath
+        // but to create those, proper filtering should happen via Type properties.
     }
 
+    @Override
     public void addHandlers(Map<String, ArtifactHandler> handlers) {
         throw new UnsupportedOperationException("Adding handlers programmatically is not supported anymore");
     }

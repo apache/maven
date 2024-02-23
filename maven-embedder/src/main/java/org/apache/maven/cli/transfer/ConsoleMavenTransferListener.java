@@ -49,21 +49,21 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     }
 
     @Override
-    public synchronized void transferInitiated(TransferEvent event) {
+    public void transferInitiated(TransferEvent event) {
         overridePreviousTransfer(event);
 
         super.transferInitiated(event);
     }
 
     @Override
-    public synchronized void transferCorrupted(TransferEvent event) throws TransferCancelledException {
+    public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
         overridePreviousTransfer(event);
 
         super.transferCorrupted(event);
     }
 
     @Override
-    public synchronized void transferProgressed(TransferEvent event) throws TransferCancelledException {
+    public void transferProgressed(TransferEvent event) throws TransferCancelledException {
         TransferResource resource = event.getResource();
         transfers.put(resource, event.getTransferredBytes());
 
@@ -119,7 +119,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     }
 
     @Override
-    public synchronized void transferSucceeded(TransferEvent event) {
+    public void transferSucceeded(TransferEvent event) {
         transfers.remove(event.getResource());
         overridePreviousTransfer(event);
 
@@ -127,7 +127,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     }
 
     @Override
-    public synchronized void transferFailed(TransferEvent event) {
+    public void transferFailed(TransferEvent event) {
         transfers.remove(event.getResource());
         overridePreviousTransfer(event);
 

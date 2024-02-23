@@ -30,16 +30,8 @@ public interface Dependency extends Artifact {
     @Nonnull
     Type getType();
 
-    /**
-     * The dependency properties.
-     *
-     * @return the dependency properties, never {@code null}
-     */
     @Nonnull
-    DependencyProperties getDependencyProperties();
-
-    @Nonnull
-    Scope getScope();
+    DependencyScope getScope();
 
     boolean isOptional();
 
@@ -49,5 +41,6 @@ public interface Dependency extends Artifact {
      * @return a {@link DependencyCoordinate}
      */
     @Nonnull
+    @Override
     DependencyCoordinate toCoordinate();
 }

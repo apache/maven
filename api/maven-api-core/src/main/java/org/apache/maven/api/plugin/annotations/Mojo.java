@@ -38,7 +38,7 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Documented
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
 public @interface Mojo {

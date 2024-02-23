@@ -20,32 +20,33 @@ package org.apache.maven.internal.aether;
 
 import org.apache.maven.api.Type;
 import org.apache.maven.api.services.TypeRegistry;
-import org.apache.maven.internal.impl.DefaultType;
+import org.apache.maven.repository.internal.type.DefaultType;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 
 import static java.util.Objects.requireNonNull;
 
-public class TypeRegistryAdapter implements ArtifactTypeRegistry {
+class TypeRegistryAdapter implements ArtifactTypeRegistry {
     private final TypeRegistry typeRegistry;
 
-    public TypeRegistryAdapter(TypeRegistry typeRegistry) {
+    TypeRegistryAdapter(TypeRegistry typeRegistry) {
         this.typeRegistry = requireNonNull(typeRegistry, "typeRegistry");
     }
 
     @Override
     public ArtifactType get(String typeId) {
-        Type type = typeRegistry.getType(typeId);
+        Type type = typeRegistry.require(typeId);
         if (type instanceof ArtifactType) {
             return (ArtifactType) type;
         }
         if (type != null) {
             return new DefaultType(
-                    type.getId(),
+                    type.id(),
                     type.getLanguage(),
                     type.getExtension(),
                     type.getClassifier(),
-                    type.getDependencyProperties());
+                    type.isBuildPathConstituent(),
+                    type.isIncludesDependencies());
         }
         return null;
     }

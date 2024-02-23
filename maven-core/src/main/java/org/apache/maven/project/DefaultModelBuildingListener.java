@@ -40,9 +40,9 @@ public class DefaultModelBuildingListener extends AbstractModelBuildingListener 
 
     private final MavenProject project;
 
-    private ProjectBuildingHelper projectBuildingHelper;
+    private final ProjectBuildingHelper projectBuildingHelper;
 
-    private ProjectBuildingRequest projectBuildingRequest;
+    private final ProjectBuildingRequest projectBuildingRequest;
 
     private List<ArtifactRepository> remoteRepositories;
 

@@ -29,6 +29,7 @@ public class BuildThreadFactory implements ThreadFactory {
 
     private static final String PREFIX = "BuilderThread";
 
+    @Override
     public Thread newThread(Runnable r) {
         return new Thread(r, String.format("%s-%d", PREFIX, id.getAndIncrement()));
     }

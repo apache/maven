@@ -28,32 +28,115 @@ import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
 
 /**
- * Interface representing a Maven project.
- * Projects can be built using the {@link org.apache.maven.api.services.ProjectBuilder} service.
+ * Interface representing a Maven project which can be created using the
+ * {@link org.apache.maven.api.services.ProjectBuilder} service.
+ * Such objects are immutable and plugin that wish to modify such objects
+ * need to do so using the {@link org.apache.maven.api.services.ProjectManager}
+ * service.
+ * <p>
+ * Projects are created using the {@code ProjectBuilder} from a POM file
+ * (usually named {@code pom.xml}) on the file system.
+ * The {@link #getPomPath()} will point to the POM file and the
+ * {@link #getBasedir()} to the directory parent containing the
+ * POM file.
+ * </p>
  *
  * @since 4.0.0
+ * @see org.apache.maven.api.services.ProjectManager
+ * @see org.apache.maven.api.services.ProjectBuilder
  */
 @Experimental
 public interface Project {
 
+    /**
+     * Returns the project groupId.
+     */
     @Nonnull
     String getGroupId();
 
+    /**
+     * Returns the project artifactId.
+     */
     @Nonnull
     String getArtifactId();
 
+    /**
+     * Returns the project version.
+     */
     @Nonnull
     String getVersion();
 
+    /**
+     * Returns the project packaging.
+     * <p>
+     * Note: unlike in legacy code, logical checks against string representing packaging (returned by this method)
+     * are NOT recommended (code like {@code "pom".equals(project.getPackaging)} must be avoided). Use method
+     * {@link #getArtifacts()} to gain access to POM or build artifact.
+     *
+     * @see #getArtifacts()
+     */
     @Nonnull
-    String getPackaging();
+    Packaging getPackaging();
 
+    /**
+     * Returns the project language. It is by default determined by {@link #getPackaging()}.
+     *
+     * @see #getPackaging()
+     */
     @Nonnull
-    Artifact getArtifact();
+    default Language getLanguage() {
+        return getPackaging().language();
+    }
 
+    /**
+     * Returns the project POM artifact, which is the artifact of the POM of this project. Every project have a POM
+     * artifact, even if the existence of backing POM file is NOT a requirement (i.e. for some transient projects).
+     *
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     */
+    @Nonnull
+    default Artifact getPomArtifact() {
+        return getArtifacts().get(0);
+    }
+
+    /**
+     * Returns the project main artifact, which is the artifact produced by this project build, if applicable.
+     * This artifact MAY be absent if the project is actually not producing any main artifact (i.e. "pom" packaging).
+     *
+     * @see #getPackaging()
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     */
+    @Nonnull
+    default Optional<Artifact> getMainArtifact() {
+        List<Artifact> artifacts = getArtifacts();
+        return artifacts.size() == 2 ? Optional.of(artifacts.get(1)) : Optional.empty();
+    }
+
+    /**
+     * Returns the project artifacts as immutable list. Elements are the project POM artifact and the artifact
+     * produced by this project build, if applicable. Hence, the returned list may have one or two elements
+     * (never less than 1, never more than 2), depending on project packaging.
+     * <p>
+     * The list's first element is ALWAYS the project POM artifact. Presence of second element in the list depends
+     * solely on the project packaging.
+     *
+     * @see #getPackaging()
+     * @see #getPomArtifact()
+     * @see #getMainArtifact()
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     */
+    @Nonnull
+    List<Artifact> getArtifacts();
+
+    /**
+     * Returns the project model.
+     */
     @Nonnull
     Model getModel();
 
+    /**
+     * Shorthand method.
+     */
     @Nonnull
     default Build getBuild() {
         Build build = getModel().getBuild();
@@ -62,35 +145,49 @@ public interface Project {
 
     /**
      * Returns the path to the pom file for this project.
-     * A project is usually read from the file system and this will point to
-     * the file.  In some cases, a transient project can be created which
-     * will not point to an actual pom file.
+     * A project is usually read from a file named {@code pom.xml},
+     * which contains the {@linkplain #getModel() model} in an XML form.
+     * When a custom {@code org.apache.maven.api.spi.ModelParser} is used,
+     * the path may point to a non XML file.
+     * <p>
+     * The POM path is also used to define the {@linkplain #getBasedir() base directory}
+     * of the project.
+     *
      * @return the path of the pom
+     * @see #getBasedir()
      */
     @Nonnull
-    Optional<Path> getPomPath();
+    Path getPomPath();
 
+    /**
+     * Returns the project base directory, i.e. the directory containing the project.
+     * A project is usually read from the file system and this will point to
+     * the directory containing the POM file.
+     *
+     * @return the path of the directory containing the project
+     */
     @Nonnull
-    default Optional<Path> getBasedir() {
-        return getPomPath().map(Path::getParent);
-    }
+    Path getBasedir();
 
+    /**
+     * Returns the project direct dependencies (directly specified or inherited).
+     */
     @Nonnull
     List<DependencyCoordinate> getDependencies();
 
+    /**
+     * Returns the project managed dependencies (directly specified or inherited).
+     */
     @Nonnull
     List<DependencyCoordinate> getManagedDependencies();
 
+    /**
+     * Returns the project ID, usable as key.
+     */
     @Nonnull
     default String getId() {
         return getModel().getId();
     }
-
-    /**
-     * @deprecated use {@link #isTopProject()} instead
-     */
-    @Deprecated
-    boolean isExecutionRoot();
 
     /**
      * Returns a boolean indicating if the project is the top level project for
@@ -125,12 +222,9 @@ public interface Project {
     @Nonnull
     Path getRootDirectory();
 
+    /**
+     * Returns project parent project, if any.
+     */
     @Nonnull
     Optional<Project> getParent();
-
-    @Nonnull
-    List<RemoteRepository> getRemoteProjectRepositories();
-
-    @Nonnull
-    List<RemoteRepository> getRemotePluginRepositories();
 }

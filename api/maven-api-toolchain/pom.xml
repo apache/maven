@@ -22,7 +22,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-11-SNAPSHOT</version>
+    <version>4.0.0-alpha-13-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-toolchain</artifactId>
@@ -59,6 +59,8 @@ under the License.
               </templates>
               <params>
                 <param>packageModelV4=org.apache.maven.api.toolchain</param>
+                <param>locationTracking=true</param>
+                <param>generateLocationClasses=true</param>
               </params>
             </configuration>
           </execution>

@@ -23,7 +23,6 @@ import javax.xml.stream.XMLStreamException;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -87,10 +86,8 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         this.namespaceUri = namespaceUri == null ? "" : namespaceUri;
         this.name = Objects.requireNonNull(name);
         this.value = value;
-        this.attributes =
-                attributes != null ? Collections.unmodifiableMap(new HashMap<>(attributes)) : Collections.emptyMap();
-        this.children =
-                children != null ? Collections.unmodifiableList(new ArrayList<>(children)) : Collections.emptyList();
+        this.attributes = ImmutableCollections.copy(attributes);
+        this.children = ImmutableCollections.copy(children);
         this.location = location;
     }
 

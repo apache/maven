@@ -58,18 +58,26 @@ public class PluginContainerException extends PluginManagerException {
         this.pluginRealm = pluginRealm;
     }
 
+    /**
+     * Ctor left for binary compatibility.
+     *
+     * @deprecated Use {@link #PluginContainerException(Plugin, ClassRealm, String, Throwable)}
+     */
+    @Deprecated
     public PluginContainerException(
             Plugin plugin, ClassRealm pluginRealm, String message, PlexusConfigurationException e) {
-        super(plugin, message, e);
-
-        this.pluginRealm = pluginRealm;
+        this(plugin, pluginRealm, message, (Throwable) e);
     }
 
+    /**
+     * Ctor left for binary compatibility.
+     *
+     * @deprecated Use {@link #PluginContainerException(Plugin, ClassRealm, String, Throwable)}
+     */
+    @Deprecated
     public PluginContainerException(
             Plugin plugin, ClassRealm pluginRealm, String message, ComponentRepositoryException e) {
-        super(plugin, message, e);
-
-        this.pluginRealm = pluginRealm;
+        this(plugin, pluginRealm, message, (Throwable) e);
     }
 
     public ClassRealm getPluginRealm() {

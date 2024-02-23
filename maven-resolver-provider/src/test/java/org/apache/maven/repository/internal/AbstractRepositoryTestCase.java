@@ -20,6 +20,7 @@ package org.apache.maven.repository.internal;
 
 import javax.inject.Inject;
 
+import java.io.File;
 import java.net.MalformedURLException;
 
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
@@ -55,10 +56,8 @@ public abstract class AbstractRepositoryTestCase {
     }
 
     public static RepositorySystemSession newMavenRepositorySystemSession(RepositorySystem system) {
-        SessionBuilder session = MavenRepositorySystemUtils.newSession(
-                system.createSessionBuilder(), MavenRepositorySystemUtils.newArtifactTypeRegistry());
-
-        session.withLocalRepositories(new LocalRepository("target/local-repo"));
+        SessionBuilder session = new MavenSessionBuilderSupplier(system).get();
+        session.withLocalRepositories(new LocalRepository(new File("target/local-repo"), "simple"));
         session.setTransferListener(new ConsoleTransferListener());
         session.setRepositoryListener(new ConsoleRepositoryListener());
 

@@ -20,16 +20,77 @@ package org.apache.maven.api.services;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Nonnull;
 
 public interface Lookup extends Service {
-
+    /**
+     * Performs a lookup for given typed component.
+     *
+     * @param type The component type.
+     * @return The component.
+     * @param <T> The component type.
+     * @throws LookupException if no such component or there is some provisioning related issue.
+     */
+    @Nonnull
     <T> T lookup(Class<T> type);
 
+    /**
+     * Performs a lookup for given typed component.
+     *
+     * @param type The component type.
+     * @param name The component name.
+     * @return The component.
+     * @param <T> The component type.
+     * @throws LookupException if no such component or there is some provisioning related issue.
+     */
+    @Nonnull
     <T> T lookup(Class<T> type, String name);
 
+    /**
+     * Performs a lookup for optional typed component.
+     *
+     * @param type The component type.
+     * @return Optional carrying component or empty optional if no such component.
+     * @param <T> The component type.
+     * @throws LookupException if there is some provisioning related issue.
+     */
+    @Nonnull
+    <T> Optional<T> lookupOptional(Class<T> type);
+
+    /**
+     * Performs a lookup for optional typed component.
+     *
+     * @param type The component type.
+     * @param name The component name.
+     * @return Optional carrying component or empty optional if no such component.
+     * @param <T> The component type.
+     * @throws LookupException if there is some provisioning related issue.
+     */
+    @Nonnull
+    <T> Optional<T> lookupOptional(Class<T> type, String name);
+
+    /**
+     * Performs a collection lookup for given typed components.
+     *
+     * @param type The component type.
+     * @return The list of components. The list may be empty if no components found.
+     * @param <T> The component type.
+     * @throws LookupException if there is some provisioning related issue.
+     */
+    @Nonnull
     <T> List<T> lookupList(Class<T> type);
 
+    /**
+     * Performs a collection lookup for given typed components.
+     *
+     * @param type The component type.
+     * @return The map of components. The map may be empty if no components found.
+     * @param <T> The component type.
+     * @throws LookupException if there is some provisioning related issue.
+     */
+    @Nonnull
     <T> Map<String, T> lookupMap(Class<T> type);
 }

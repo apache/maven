@@ -89,7 +89,7 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
                 .version(dependency.getVersion().asString())
                 .classifier(dependency.getClassifier())
                 .extension(dependency.getExtension())
-                .type(dependency.getType().getId())
+                .type(dependency.getType().id())
                 .scope(dependency.getScope().id())
                 .optional(dependency.isOptional())
                 .build();

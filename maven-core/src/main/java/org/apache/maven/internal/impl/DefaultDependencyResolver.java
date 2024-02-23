@@ -33,14 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
-import org.apache.maven.api.Dependency;
-import org.apache.maven.api.Node;
-import org.apache.maven.api.Project;
-import org.apache.maven.api.ResolutionScope;
-import org.apache.maven.api.Scope;
-import org.apache.maven.api.Session;
+import org.apache.maven.api.*;
 import org.apache.maven.api.services.*;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
@@ -58,7 +51,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultDependencyResolver implements DependencyResolver {
 
     @Override
-    public List<Node> flatten(Session s, Node node, ResolutionScope scope) throws DependencyResolverException {
+    public List<Node> flatten(Session s, Node node, PathScope scope) throws DependencyResolverException {
         InternalSession session = InternalSession.from(s);
         DependencyNode root = cast(AbstractNode.class, node, "node").getDependencyNode();
         List<DependencyNode> dependencies = session.getRepositorySystem()
@@ -67,8 +60,9 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return map(dependencies, session::getNode);
     }
 
-    private static DependencyFilter getScopeDependencyFilter(ResolutionScope scope) {
-        Set<String> scopes = scope.scopes().stream().map(Scope::id).collect(Collectors.toSet());
+    private static DependencyFilter getScopeDependencyFilter(PathScope scope) {
+        Set<String> scopes =
+                scope.dependencyScopes().stream().map(DependencyScope::id).collect(Collectors.toSet());
         return (n, p) -> {
             org.eclipse.aether.graph.Dependency d = n.getDependency();
             return d == null || scopes.contains(d.getScope());
@@ -83,7 +77,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
 
         if (request.getProject().isPresent()) {
             DependencyResolutionResult result = resolveDependencies(
-                    request.getSession(), request.getProject().get(), request.getResolutionScope());
+                    request.getSession(), request.getProject().get(), request.getPathScope());
 
             Map<org.eclipse.aether.graph.Dependency, org.eclipse.aether.graph.DependencyNode> nodes = stream(
                             result.getDependencyGraph())
@@ -106,7 +100,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
 
         DependencyCollectorResult collectorResult =
                 session.getService(DependencyCollector.class).collect(request);
-        List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getResolutionScope());
+        List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getPathScope());
         List<Dependency> deps =
                 nodes.stream().map(Node::getDependency).filter(Objects::nonNull).collect(Collectors.toList());
         List<ArtifactCoordinate> coordinates =
@@ -130,7 +124,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return Stream.concat(Stream.of(node), node.getChildren().stream().flatMap(this::stream));
     }
 
-    private DependencyResolutionResult resolveDependencies(Session session, Project project, ResolutionScope scope) {
+    private DependencyResolutionResult resolveDependencies(Session session, Project project, PathScope scope) {
         Collection<String> toResolve = toScopes(scope);
         try {
             LifecycleDependencyResolver lifecycleDependencyResolver =
@@ -151,8 +145,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return ((DefaultProject) project).getProject();
     }
 
-    private Collection<String> toScopes(ResolutionScope scope) {
-        return map(scope.scopes(), Scope::id);
+    private Collection<String> toScopes(PathScope scope) {
+        return map(scope.dependencyScopes(), DependencyScope::id);
     }
 
     static class DefaultDependencyResolverResult implements DependencyResolverResult {

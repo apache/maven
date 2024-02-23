@@ -18,10 +18,7 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.apache.maven.project.MavenProject;
 
@@ -36,8 +33,6 @@ import org.apache.maven.project.MavenProject;
 // TODO From a concurrency perspective, this class is not good. The combination of mutable/immutable state is not nice
 public class DependencyContext {
 
-    private static final Collection<?> UNRESOLVED = Arrays.asList();
-
     private final MavenProject project;
 
     private final Collection<String> scopesToCollectForCurrentProject;
@@ -48,7 +43,7 @@ public class DependencyContext {
 
     private final Collection<String> scopesToResolveForAggregatedProjects;
 
-    private volatile Collection<?> lastDependencyArtifacts = UNRESOLVED;
+    private volatile Collection<?> lastDependencyArtifacts = Collections.emptyList();
 
     private volatile int lastDependencyArtifactCount = -1;
 

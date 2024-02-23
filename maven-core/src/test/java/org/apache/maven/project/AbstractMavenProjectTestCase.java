@@ -30,7 +30,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositoryCache;
@@ -145,7 +144,7 @@ public abstract class AbstractMavenProjectTestCase {
 
     protected void initRepoSession(ProjectBuildingRequest request) {
         File localRepo = new File(request.getLocalRepository().getBasedir());
-        DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
+        DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(h -> false);
         repoSession.setCache(new DefaultRepositoryCache());
         repoSession.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));
         request.setRepositorySession(repoSession);

@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-11-SNAPSHOT</version>
+    <version>4.0.0-alpha-13-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-core</artifactId>
@@ -52,8 +52,8 @@
       <artifactId>maven-api-plugin</artifactId>
     </dependency>
     <dependency>
-      <groupId>jakarta.inject</groupId>
-      <artifactId>jakarta.inject-api</artifactId>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-di</artifactId>
     </dependency>
   </dependencies>
 

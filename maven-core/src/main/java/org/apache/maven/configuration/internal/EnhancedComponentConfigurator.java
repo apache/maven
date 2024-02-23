@@ -52,16 +52,26 @@ public class EnhancedComponentConfigurator extends BasicComponentConfigurator {
         try {
             ClassRealmConverter.pushContextRealm(realm);
 
-            new EnhancedConfigurationConverter()
-                    .processConfiguration(
-                            converterLookup,
-                            component,
-                            realm, //
-                            configuration,
-                            evaluator,
-                            listener);
+            this.configureComponent(component, configuration, evaluator, (ClassLoader) realm, listener);
         } finally {
             ClassRealmConverter.popContextRealm();
         }
+    }
+
+    public void configureComponent(
+            Object component,
+            PlexusConfiguration configuration,
+            ExpressionEvaluator evaluator,
+            ClassLoader loader,
+            ConfigurationListener listener)
+            throws ComponentConfigurationException {
+        new EnhancedConfigurationConverter()
+                .processConfiguration(
+                        converterLookup,
+                        component,
+                        loader, //
+                        configuration,
+                        evaluator,
+                        listener);
     }
 }

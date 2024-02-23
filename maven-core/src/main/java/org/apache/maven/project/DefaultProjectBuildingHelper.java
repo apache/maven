@@ -49,7 +49,6 @@ import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -67,7 +66,6 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final PlexusContainer container; // TODO not used? Then remove
     private final ClassRealmManager classRealmManager;
     private final ProjectRealmCache projectRealmCache;
     private final MavenRepositorySystem repositorySystem;
@@ -75,12 +73,10 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
 
     @Inject
     public DefaultProjectBuildingHelper(
-            PlexusContainer container,
             ClassRealmManager classRealmManager,
             ProjectRealmCache projectRealmCache,
             MavenRepositorySystem repositorySystem,
             MavenPluginManager pluginManager) {
-        this.container = container;
         this.classRealmManager = classRealmManager;
         this.projectRealmCache = projectRealmCache;
         this.repositorySystem = repositorySystem;

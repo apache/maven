@@ -46,6 +46,8 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
 
     private final Map<String, Set<FileModelSource>> mappedSources = new ConcurrentHashMap<>(64);
 
+    private volatile boolean fullReactorLoaded;
+
     DefaultTransformerContextBuilder(DefaultModelBuilder defaultModelBuilder) {
         this.defaultModelBuilder = defaultModelBuilder;
         this.context = new DefaultTransformerContext(defaultModelBuilder.getModelProcessor());
@@ -59,8 +61,6 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
         // We must assume the TransformerContext was created using this.newTransformerContextBuilder()
         DefaultModelProblemCollector problems = (DefaultModelProblemCollector) collector;
         return new TransformerContext() {
-
-            private volatile boolean fullReactorLoaded;
 
             @Override
             public Path locate(Path path) {
@@ -119,7 +119,7 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
 
             private void loadFullReactor() {
                 if (!fullReactorLoaded) {
-                    synchronized (this) {
+                    synchronized (DefaultTransformerContextBuilder.this) {
                         if (!fullReactorLoaded) {
                             doLoadFullReactor();
                             fullReactorLoaded = true;
@@ -181,9 +181,7 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
 
     private boolean addEdge(Path from, Path p, DefaultModelProblemCollector problems) {
         try {
-            synchronized (dag) {
-                dag.addEdge(dag.addVertex(from.toString()), dag.addVertex(p.toString()));
-            }
+            dag.addEdge(from.toString(), p.toString());
             return true;
         } catch (Graph.CycleDetectedException e) {
             problems.add(new DefaultModelProblem(

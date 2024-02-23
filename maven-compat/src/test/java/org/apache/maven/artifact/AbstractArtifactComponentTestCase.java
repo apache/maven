@@ -39,8 +39,12 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultLookup;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.repository.internal.scopes.MavenDependencyContextRefiner;
+import org.apache.maven.repository.internal.scopes.MavenScopeDeriver;
+import org.apache.maven.repository.internal.scopes.MavenScopeSelector;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.PlexusContainer;
@@ -61,9 +65,6 @@ import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
-import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
-import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
-import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
@@ -107,7 +108,7 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
         new DefaultSessionFactory(
                         getContainer().lookup(RepositorySystem.class),
                         getContainer().lookup(MavenRepositorySystem.class),
-                        getContainer(),
+                        new DefaultLookup(getContainer()),
                         getContainer().lookup(RuntimeInformation.class))
                 .getSession(session);
 
@@ -313,9 +314,9 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
         session.setDependencySelector(depFilter);
 
         DependencyGraphTransformer transformer = new ConflictResolver(
-                new NearestVersionSelector(), new JavaScopeSelector(),
-                new SimpleOptionalitySelector(), new JavaScopeDeriver());
-        transformer = new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner());
+                new NearestVersionSelector(), new MavenScopeSelector(),
+                new SimpleOptionalitySelector(), new MavenScopeDeriver());
+        transformer = new ChainedDependencyGraphTransformer(transformer, new MavenDependencyContextRefiner());
         session.setDependencyGraphTransformer(transformer);
 
         LocalRepository localRepo = new LocalRepository(localRepository().getBasedir());

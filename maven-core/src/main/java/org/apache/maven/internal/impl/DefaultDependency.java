@@ -23,13 +23,11 @@ import java.util.Objects;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinate;
-import org.apache.maven.api.DependencyProperties;
-import org.apache.maven.api.Scope;
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.repository.internal.DefaultModelVersionParser;
 import org.eclipse.aether.artifact.ArtifactProperties;
 
@@ -38,15 +36,12 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultDependency implements Dependency {
     private final InternalSession session;
     private final org.eclipse.aether.graph.Dependency dependency;
-    private final DependencyProperties dependencyProperties;
     private final String key;
 
     public DefaultDependency(
             @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency) {
         this.session = nonNull(session, "session");
         this.dependency = nonNull(dependency, "dependency");
-        this.dependencyProperties =
-                new DefaultDependencyProperties(dependency.getArtifact().getProperties());
         this.key = getGroupId()
                 + ':'
                 + getArtifactId()
@@ -102,12 +97,7 @@ public class DefaultDependency implements Dependency {
         String type = dependency
                 .getArtifact()
                 .getProperty(ArtifactProperties.TYPE, dependency.getArtifact().getExtension());
-        return session.getService(TypeRegistry.class).getType(type);
-    }
-
-    @Override
-    public DependencyProperties getDependencyProperties() {
-        return dependencyProperties;
+        return session.requireType(type);
     }
 
     @Override
@@ -117,8 +107,8 @@ public class DefaultDependency implements Dependency {
 
     @Nonnull
     @Override
-    public Scope getScope() {
-        return Scope.get(dependency.getScope());
+    public DependencyScope getScope() {
+        return session.requireDependencyScope(dependency.getScope());
     }
 
     @Nullable

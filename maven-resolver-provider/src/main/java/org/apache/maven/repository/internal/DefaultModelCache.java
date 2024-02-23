@@ -18,84 +18,58 @@
  */
 package org.apache.maven.repository.internal;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 import org.apache.maven.building.Source;
 import org.apache.maven.model.building.ModelCache;
+import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositorySystemSession;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A model builder cache backed by the repository system cache.
  *
  */
 public class DefaultModelCache implements ModelCache {
-
     private static final String KEY = DefaultModelCache.class.getName();
 
-    private final Map<Object, Supplier<?>> cache;
-
+    @SuppressWarnings("unchecked")
     public static ModelCache newInstance(RepositorySystemSession session) {
-        Map<Object, Supplier<?>> cache;
-        if (session.getCache() == null) {
+        ConcurrentHashMap<Object, Supplier<?>> cache;
+        RepositoryCache repositoryCache = session.getCache();
+        if (repositoryCache == null) {
             cache = new ConcurrentHashMap<>();
         } else {
-            cache = (Map) session.getCache().get(session, KEY);
-            if (cache == null) {
-                cache = new ConcurrentHashMap<>();
-                session.getCache().put(session, KEY, cache);
-            }
+            cache = (ConcurrentHashMap<Object, Supplier<?>>)
+                    repositoryCache.computeIfAbsent(session, KEY, ConcurrentHashMap::new);
         }
         return new DefaultModelCache(cache);
     }
 
-    private DefaultModelCache(Map<Object, Supplier<?>> cache) {
-        this.cache = cache;
-    }
+    private final ConcurrentMap<Object, Supplier<?>> cache;
 
-    public Object get(Source path, String tag) {
-        return get(new SourceCacheKey(path, tag));
-    }
-
-    public void put(Source path, String tag, Object data) {
-        put(new SourceCacheKey(path, tag), data);
+    private DefaultModelCache(ConcurrentMap<Object, Supplier<?>> cache) {
+        this.cache = requireNonNull(cache);
     }
 
     @Override
-    public Object get(String groupId, String artifactId, String version, String tag) {
-        return get(new GavCacheKey(groupId, artifactId, version, tag));
+    @SuppressWarnings({"unchecked"})
+    public <T> T computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<T> data) {
+        return (T) computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), data);
     }
 
     @Override
-    public void put(String groupId, String artifactId, String version, String tag, Object data) {
-        put(new GavCacheKey(groupId, artifactId, version, tag), data);
+    @SuppressWarnings({"unchecked"})
+    public <T> T computeIfAbsent(Source path, String tag, Supplier<T> data) {
+        return (T) computeIfAbsent(new SourceCacheKey(path, tag), data);
     }
 
-    protected Object get(Object key) {
-        Supplier<?> s = cache.get(key);
-        return s != null ? s.get() : null;
-    }
-
-    protected void put(Object key, Object data) {
-        cache.put(key, () -> data);
-    }
-
-    @Override
-    public Object computeIfAbsent(
-            String groupId, String artifactId, String version, String tag, Supplier<Supplier<?>> data) {
-        return computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), data);
-    }
-
-    @Override
-    public Object computeIfAbsent(Source path, String tag, Supplier<Supplier<?>> data) {
-        return computeIfAbsent(new SourceCacheKey(path, tag), data);
-    }
-
-    protected Object computeIfAbsent(Object key, Supplier<Supplier<?>> data) {
-        Supplier<?> s = cache.computeIfAbsent(key, k -> data.get());
-        return s != null ? s.get() : null;
+    protected Object computeIfAbsent(Object key, Supplier<?> data) {
+        return cache.computeIfAbsent(key, k -> new CachingSupplier<>(data)).get();
     }
 
     static class GavCacheKey {
@@ -189,5 +163,48 @@ public class DefaultModelCache implements ModelCache {
         public int hashCode() {
             return hash;
         }
+    }
+
+    static class CachingSupplier<T> implements Supplier<T> {
+        final Supplier<T> supplier;
+        volatile Object value;
+
+        CachingSupplier(Supplier<T> supplier) {
+            this.supplier = supplier;
+        }
+
+        @Override
+        @SuppressWarnings({"unchecked", "checkstyle:InnerAssignment"})
+        public T get() {
+            Object v;
+            if ((v = value) == null) {
+                synchronized (this) {
+                    if ((v = value) == null) {
+                        try {
+                            v = value = supplier.get();
+                        } catch (Exception e) {
+                            v = value = new AltRes(e);
+                        }
+                    }
+                }
+            }
+            if (v instanceof AltRes) {
+                uncheckedThrow(((AltRes) v).t);
+            }
+            return (T) v;
+        }
+
+        static class AltRes {
+            final Throwable t;
+
+            AltRes(Throwable t) {
+                this.t = t;
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T extends Throwable> void uncheckedThrow(Throwable t) throws T {
+        throw (T) t; // rely on vacuous cast
     }
 }

@@ -22,10 +22,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -35,10 +33,11 @@ import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.*;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.sisu.Typed;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.maven.internal.impl.Utils.map;
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Typed
@@ -47,19 +46,21 @@ public class DefaultProjectManager implements ProjectManager {
 
     private final InternalSession session;
     private final ArtifactManager artifactManager;
-    private final PlexusContainer container;
 
     @Inject
-    public DefaultProjectManager(InternalSession session, ArtifactManager artifactManager, PlexusContainer container) {
+    public DefaultProjectManager(InternalSession session, ArtifactManager artifactManager) {
         this.session = session;
         this.artifactManager = artifactManager;
-        this.container = container;
     }
 
     @Nonnull
     @Override
     public Optional<Path> getPath(Project project) {
-        return artifactManager.getPath(project.getArtifact());
+        Optional<Artifact> mainArtifact = project.getMainArtifact();
+        if (mainArtifact.isPresent()) {
+            return artifactManager.getPath(mainArtifact.get());
+        }
+        return Optional.empty();
     }
 
     @Nonnull
@@ -73,6 +74,14 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
+    public Collection<Artifact> getAllArtifacts(Project project) {
+        ArrayList<Artifact> result = new ArrayList<>(2);
+        result.addAll(project.getArtifacts());
+        result.addAll(getAttachedArtifacts(project));
+        return Collections.unmodifiableCollection(result);
+    }
+
+    @Override
     public void attachArtifact(Project project, Artifact artifact, Path path) {
         getMavenProject(project)
                 .addAttachedArtifact(RepositoryUtils.toArtifact(
@@ -81,60 +90,87 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
-    public List<String> getCompileSourceRoots(Project project) {
-        List<String> roots = getMavenProject(project).getCompileSourceRoots();
-        return Collections.unmodifiableList(roots);
+    public List<Path> getCompileSourceRoots(Project project, ProjectScope scope) {
+        MavenProject prj = getMavenProject(nonNull(project, "project"));
+        List<String> roots;
+        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
+            roots = prj.getCompileSourceRoots();
+        } else if (scope == ProjectScope.TEST) {
+            roots = prj.getTestCompileSourceRoots();
+        } else {
+            throw new IllegalArgumentException("Unsupported scope " + scope);
+        }
+        return roots.stream()
+                .map(Paths::get)
+                .collect(Collectors.collectingAndThen(toList(), Collections::unmodifiableList));
     }
 
     @Override
-    public void addCompileSourceRoot(Project project, String sourceRoot) {
-        List<String> roots = getMavenProject(project).getCompileSourceRoots();
-        roots.add(sourceRoot);
+    public void addCompileSourceRoot(Project project, ProjectScope scope, Path sourceRoot) {
+        MavenProject prj = getMavenProject(nonNull(project, "project"));
+        String root = nonNull(sourceRoot, "sourceRoot").toAbsolutePath().toString();
+        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
+            prj.addCompileSourceRoot(root);
+        } else if (scope == ProjectScope.TEST) {
+            prj.addTestCompileSourceRoot(root);
+        } else {
+            throw new IllegalArgumentException("Unsupported scope " + scope);
+        }
     }
 
     @Override
-    public List<String> getTestCompileSourceRoots(Project project) {
-        List<String> roots = getMavenProject(project).getTestCompileSourceRoots();
-        return Collections.unmodifiableList(roots);
+    public List<Resource> getResources(@Nonnull Project project, @Nonnull ProjectScope scope) {
+        Project prj = nonNull(project, "project");
+        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
+            return prj.getBuild().getResources();
+        } else if (scope == ProjectScope.TEST) {
+            return prj.getBuild().getTestResources();
+        } else {
+            throw new IllegalArgumentException("Unsupported scope " + scope);
+        }
     }
 
     @Override
-    public void addTestCompileSourceRoot(Project project, String sourceRoot) {
-        List<String> roots = getMavenProject(project).getTestCompileSourceRoots();
-        roots.add(sourceRoot);
+    public void addResource(@Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Resource resource) {
+        // TODO: we should not modify the underlying model here, but resources should be stored
+        // TODO: in a separate field in the project, however, that could break v3 plugins
+        MavenProject prj = getMavenProject(nonNull(project, "project"));
+        org.apache.maven.model.Resource res = new org.apache.maven.model.Resource(nonNull(resource, "resource"));
+        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
+            prj.addResource(res);
+        } else if (scope == ProjectScope.TEST) {
+            prj.addTestResource(res);
+        } else {
+            throw new IllegalArgumentException("Unsupported scope " + scope);
+        }
     }
 
     @Override
-    public List<Resource> getResources(Project project) {
-        return getMavenProject(project).getBuild().getDelegate().getResources();
+    public List<RemoteRepository> getRemoteProjectRepositories(Project project) {
+        return Collections.unmodifiableList(new MappedList<>(
+                ((DefaultProject) project).getProject().getRemoteProjectRepositories(), session::getRemoteRepository));
     }
 
     @Override
-    public void addResource(Project project, Resource resource) {
-        getMavenProject(project).addResource(new org.apache.maven.model.Resource(resource));
-    }
-
-    @Override
-    public List<Resource> getTestResources(Project project) {
-        return getMavenProject(project).getBuild().getDelegate().getTestResources();
-    }
-
-    @Override
-    public void addTestResource(Project project, Resource resource) {
-        getMavenProject(project).addTestResource(new org.apache.maven.model.Resource(resource));
-    }
-
-    @Override
-    public List<RemoteRepository> getRepositories(Project project) {
-        return ((DefaultProject) project)
-                .getProject().getRemoteProjectRepositories().stream()
-                        .map(session::getRemoteRepository)
-                        .collect(Collectors.toList());
+    public List<RemoteRepository> getRemotePluginRepositories(Project project) {
+        return Collections.unmodifiableList(new MappedList<>(
+                ((DefaultProject) project).getProject().getRemotePluginRepositories(), session::getRemoteRepository));
     }
 
     @Override
     public void setProperty(Project project, String key, String value) {
-        getMavenProject(project).getProperties().setProperty(key, value);
+        Properties properties = getMavenProject(project).getProperties();
+        if (value == null) {
+            properties.remove(key);
+        } else {
+            properties.setProperty(key, value);
+        }
+    }
+
+    @Override
+    public Map<String, String> getProperties(Project project) {
+        return Collections.unmodifiableMap(
+                new PropertiesAsMap(((DefaultProject) project).getProject().getProperties()));
     }
 
     @Override
