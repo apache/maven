@@ -624,20 +624,6 @@ under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <repositories>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>maven-2066</id>
-      <url>https://repository.apache.org/content/repositories/maven-2066/</url>
-    </repository>
-  </repositories>
   <!--bootstrap-end-comment-->
 
   <build>
