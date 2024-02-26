@@ -19,6 +19,7 @@
 package org.apache.maven.repository.internal;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -51,12 +52,12 @@ final class PluginsMetadata extends MavenMetadata {
     private final PluginInfo pluginInfo;
 
     PluginsMetadata(PluginInfo pluginInfo, Date timestamp) {
-        super(createRepositoryMetadata(pluginInfo), null, timestamp);
+        super(createRepositoryMetadata(pluginInfo), (Path) null, timestamp);
         this.pluginInfo = pluginInfo;
     }
 
-    PluginsMetadata(PluginInfo pluginInfo, File file, Date timestamp) {
-        super(createRepositoryMetadata(pluginInfo), file, timestamp);
+    PluginsMetadata(PluginInfo pluginInfo, Path path, Date timestamp) {
+        super(createRepositoryMetadata(pluginInfo), path, timestamp);
         this.pluginInfo = pluginInfo;
     }
 
@@ -82,9 +83,15 @@ final class PluginsMetadata extends MavenMetadata {
         }
     }
 
+    @Deprecated
     @Override
     public MavenMetadata setFile(File file) {
-        return new PluginsMetadata(pluginInfo, file, timestamp);
+        return new PluginsMetadata(pluginInfo, file.toPath(), timestamp);
+    }
+
+    @Override
+    public MavenMetadata setPath(Path path) {
+        return new PluginsMetadata(pluginInfo, path, timestamp);
     }
 
     @Override

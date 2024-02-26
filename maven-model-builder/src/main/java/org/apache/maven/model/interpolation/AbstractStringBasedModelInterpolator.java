@@ -20,7 +20,6 @@ package org.apache.maven.model.interpolation;
 
 import javax.inject.Inject;
 
-import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -92,7 +91,17 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
     @Override
     public org.apache.maven.model.Model interpolateModel(
             org.apache.maven.model.Model model,
-            File projectDir,
+            java.io.File projectDir,
+            ModelBuildingRequest request,
+            ModelProblemCollector problems) {
+        return new org.apache.maven.model.Model(interpolateModel(
+                model.getDelegate(), projectDir != null ? projectDir.toPath() : null, request, problems));
+    }
+
+    @Override
+    public org.apache.maven.model.Model interpolateModel(
+            org.apache.maven.model.Model model,
+            Path projectDir,
             ModelBuildingRequest request,
             ModelProblemCollector problems) {
         return new org.apache.maven.model.Model(interpolateModel(model.getDelegate(), projectDir, request, problems));
@@ -106,7 +115,7 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
 
     protected List<ValueSource> createValueSources(
             final Model model,
-            final File projectDir,
+            final Path projectDir,
             final ModelBuildingRequest config,
             ModelProblemCollector problems) {
         Map<String, String> modelProperties = model.getProperties();
@@ -139,9 +148,9 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                         @Override
                         public Object getValue(String expression) {
                             if ("basedir".equals(expression)) {
-                                return projectDir.getAbsoluteFile().toPath().toString();
+                                return projectDir.toAbsolutePath().toString();
                             } else if (expression.startsWith("basedir.")) {
-                                Path basedir = projectDir.getAbsoluteFile().toPath();
+                                Path basedir = projectDir.toAbsolutePath();
                                 return new ObjectBasedValueSource(basedir)
                                         .getValue(expression.substring("basedir.".length()));
                             }
@@ -157,14 +166,9 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                         @Override
                         public Object getValue(String expression) {
                             if ("baseUri".equals(expression)) {
-                                return projectDir
-                                        .getAbsoluteFile()
-                                        .toPath()
-                                        .toUri()
-                                        .toASCIIString();
+                                return projectDir.toAbsolutePath().toUri().toASCIIString();
                             } else if (expression.startsWith("baseUri.")) {
-                                URI baseUri =
-                                        projectDir.getAbsoluteFile().toPath().toUri();
+                                URI baseUri = projectDir.toAbsolutePath().toUri();
                                 return new ObjectBasedValueSource(baseUri)
                                         .getValue(expression.substring("baseUri.".length()));
                             }
@@ -182,12 +186,10 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                     @Override
                     public Object getValue(String expression) {
                         if ("rootDirectory".equals(expression)) {
-                            Path base = projectDir != null ? projectDir.toPath() : null;
-                            Path root = rootLocator.findMandatoryRoot(base);
+                            Path root = rootLocator.findMandatoryRoot(projectDir);
                             return root.toFile().getPath();
                         } else if (expression.startsWith("rootDirectory.")) {
-                            Path base = projectDir != null ? projectDir.toPath() : null;
-                            Path root = rootLocator.findMandatoryRoot(base);
+                            Path root = rootLocator.findMandatoryRoot(projectDir);
                             return new ObjectBasedValueSource(root)
                                     .getValue(expression.substring("rootDirectory.".length()));
                         }
@@ -217,7 +219,7 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
     }
 
     protected List<? extends InterpolationPostProcessor> createPostProcessors(
-            final Model model, final File projectDir, final ModelBuildingRequest config) {
+            final Model model, final Path projectDir, final ModelBuildingRequest config) {
         List<InterpolationPostProcessor> processors = new ArrayList<>(2);
         if (projectDir != null) {
             processors.add(new PathTranslatingPostProcessor(

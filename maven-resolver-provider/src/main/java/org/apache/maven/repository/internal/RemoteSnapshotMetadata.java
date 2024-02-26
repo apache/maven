@@ -19,6 +19,7 @@
 package org.apache.maven.repository.internal;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,14 +52,20 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
         this.buildNumber = buildNumber;
     }
 
-    private RemoteSnapshotMetadata(Metadata metadata, File file, Date timestamp, Integer buildNumber) {
-        super(metadata, file, timestamp);
+    private RemoteSnapshotMetadata(Metadata metadata, Path path, Date timestamp, Integer buildNumber) {
+        super(metadata, path, timestamp);
         this.buildNumber = buildNumber;
     }
 
+    @Deprecated
     @Override
     public MavenMetadata setFile(File file) {
-        return new RemoteSnapshotMetadata(metadata, file, timestamp, buildNumber);
+        return new RemoteSnapshotMetadata(metadata, file.toPath(), timestamp, buildNumber);
+    }
+
+    @Override
+    public MavenMetadata setPath(Path path) {
+        return new RemoteSnapshotMetadata(metadata, path, timestamp, buildNumber);
     }
 
     public String getExpandedVersion(Artifact artifact) {

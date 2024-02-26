@@ -164,7 +164,7 @@ public abstract class AbstractModelInterpolatorTest {
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
+        interpolator.interpolateModel(model, (Path) null, createModelBuildingRequest(context), collector);
         assertCollectorState(0, 1, 0, collector);
     }
 
@@ -283,7 +283,7 @@ public abstract class AbstractModelInterpolatorTest {
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out = interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
+        Model out = interpolator.interpolateModel(model, (Path) null, createModelBuildingRequest(context), collector);
         assertProblemFree(collector);
 
         assertEquals(
@@ -303,7 +303,7 @@ public abstract class AbstractModelInterpolatorTest {
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out = interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
+        Model out = interpolator.interpolateModel(model, (Path) null, createModelBuildingRequest(context), collector);
         assertProblemFree(collector);
 
         assertEquals("myBaseUri/temp-repo", (out.getRepositories().get(0)).getUrl());
@@ -370,7 +370,8 @@ public abstract class AbstractModelInterpolatorTest {
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         IllegalStateException e = assertThrows(
                 IllegalStateException.class,
-                () -> interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector));
+                () -> interpolator.interpolateModel(
+                        model, (Path) null, createModelBuildingRequest(context), collector));
 
         assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
     }
@@ -440,7 +441,7 @@ public abstract class AbstractModelInterpolatorTest {
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out = interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
+        Model out = interpolator.interpolateModel(model, (Path) null, createModelBuildingRequest(context), collector);
         assertCollectorState(0, 0, 0, collector);
 
         List<Resource> outResources = out.getBuild().getResources();
@@ -483,7 +484,7 @@ public abstract class AbstractModelInterpolatorTest {
 
         SimpleProblemCollector collector = new SimpleProblemCollector();
         ModelInterpolator interpolator = createInterpolator();
-        interpolator.interpolateModel(model, null, request, collector);
+        interpolator.interpolateModel(model, (Path) null, request, collector);
 
         assertCollectorState(0, 2, 0, collector);
         assertTrue(collector.getErrors().get(0).contains("Detected the following recursive expression cycle"));
@@ -499,7 +500,7 @@ public abstract class AbstractModelInterpolatorTest {
 
         SimpleProblemCollector collector = new SimpleProblemCollector();
         ModelInterpolator interpolator = createInterpolator();
-        interpolator.interpolateModel(model, null, request, collector);
+        interpolator.interpolateModel(model, (Path) null, request, collector);
 
         assertCollectorState(0, 1, 0, collector);
         assertEquals(
@@ -522,7 +523,7 @@ public abstract class AbstractModelInterpolatorTest {
         SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel(
                 model,
-                null,
+                (Path) null,
                 createModelBuildingRequest(context).setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_4_0),
                 collector);
 
@@ -545,7 +546,7 @@ public abstract class AbstractModelInterpolatorTest {
         SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel(
                 model,
-                null,
+                (Path) null,
                 createModelBuildingRequest(context).setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1),
                 collector);
 

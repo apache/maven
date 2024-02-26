@@ -19,6 +19,7 @@
 package org.apache.maven.model.building;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Objects;
 
 import org.apache.maven.building.FileSource;
@@ -37,8 +38,17 @@ public class ArtifactModelSource extends FileSource implements ModelSource {
 
     private final int hashCode;
 
+    @Deprecated
     public ArtifactModelSource(File file, String groupId, String artifactId, String version) {
         super(file);
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
+        this.hashCode = Objects.hash(groupId, artifactId, version);
+    }
+
+    public ArtifactModelSource(Path path, String groupId, String artifactId, String version) {
+        super(path);
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;

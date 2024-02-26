@@ -18,7 +18,6 @@
  */
 package org.apache.maven.model.building;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -78,7 +77,7 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
                 Model model = findRawModel(from, gId, aId);
                 if (model != null) {
                     context.modelByGA.put(new GAKey(gId, aId), new Holder(model));
-                    context.modelByPath.put(model.getPomFile().toPath(), new Holder(model));
+                    context.modelByPath.put(model.getPomPath(), new Holder(model));
                 }
                 return model;
             }
@@ -103,7 +102,7 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
                     source = getSource(groupId, artifactId);
                 }
                 if (source != null) {
-                    if (!addEdge(from, source.getFile().toPath(), problems)) {
+                    if (!addEdge(from, source.getPath(), problems)) {
                         return null;
                     }
                     try {
@@ -133,19 +132,19 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
                 if (rootDirectory == null) {
                     return;
                 }
-                List<File> toLoad = new ArrayList<>();
-                File root = defaultModelBuilder.getModelProcessor().locateExistingPom(rootDirectory.toFile());
+                List<Path> toLoad = new ArrayList<>();
+                Path root = defaultModelBuilder.getModelProcessor().locateExistingPom(rootDirectory);
                 toLoad.add(root);
                 while (!toLoad.isEmpty()) {
-                    File pom = toLoad.remove(0);
+                    Path pom = toLoad.remove(0);
                     try {
                         ModelBuildingRequest gaBuildingRequest =
                                 new DefaultModelBuildingRequest(request).setModelSource(new FileModelSource(pom));
                         Model rawModel = defaultModelBuilder.readFileModel(gaBuildingRequest, problems);
                         for (String module : rawModel.getModules()) {
-                            File moduleFile = defaultModelBuilder
+                            Path moduleFile = defaultModelBuilder
                                     .getModelProcessor()
-                                    .locateExistingPom(new File(pom.getParent(), module));
+                                    .locateExistingPom(pom.getParent().resolve(module));
                             if (moduleFile != null) {
                                 toLoad.add(moduleFile);
                             }
@@ -165,9 +164,8 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
                     return null;
                 }
 
-                DefaultModelBuildingRequest req = new DefaultModelBuildingRequest(request)
-                        .setPomFile(p.toFile())
-                        .setModelSource(new FileModelSource(p.toFile()));
+                DefaultModelBuildingRequest req =
+                        new DefaultModelBuildingRequest(request).setPomPath(p).setModelSource(new FileModelSource(p));
 
                 try {
                     return defaultModelBuilder.readRawModel(req, problems);

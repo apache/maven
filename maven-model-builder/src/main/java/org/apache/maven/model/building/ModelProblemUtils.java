@@ -18,7 +18,7 @@
  */
 package org.apache.maven.model.building;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.maven.model.Model;
 
@@ -43,9 +43,9 @@ public class ModelProblemUtils {
 
         buffer.append(toId(model));
 
-        File pomFile = model.getPomFile();
-        if (pomFile != null) {
-            buffer.append(" (").append(pomFile).append(')');
+        Path pomPath = model.getPomPath();
+        if (pomPath != null) {
+            buffer.append(" (").append(pomPath).append(')');
         }
 
         return buffer.toString();
@@ -55,10 +55,10 @@ public class ModelProblemUtils {
         String path = "";
 
         if (model != null) {
-            File pomFile = model.getPomFile();
+            Path pomPath = model.getPomPath();
 
-            if (pomFile != null) {
-                path = pomFile.getAbsolutePath();
+            if (pomPath != null) {
+                path = pomPath.toAbsolutePath().toString();
             }
         }
 

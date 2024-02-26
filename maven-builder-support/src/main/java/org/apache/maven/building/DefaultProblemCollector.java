@@ -27,7 +27,7 @@ import java.util.List;
  */
 class DefaultProblemCollector implements ProblemCollector {
 
-    private List<Problem> problems;
+    private final List<Problem> problems;
 
     private String source;
 

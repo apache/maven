@@ -22,6 +22,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Locates a POM file within a project base directory.
@@ -31,20 +34,34 @@ import java.io.File;
 @Singleton
 public class DefaultModelLocator implements ModelLocator {
 
+    @Deprecated
     @Override
     public File locatePom(File projectDirectory) {
-        return projectDirectory != null ? projectDirectory : new File(".");
+        Path path = locatePom(projectDirectory != null ? projectDirectory.toPath() : null);
+        return path != null ? path.toFile() : null;
     }
 
     @Override
+    public Path locatePom(Path projectDirectory) {
+        return projectDirectory != null ? projectDirectory : Paths.get(System.getProperty("user.dir"));
+    }
+
+    @Deprecated
+    @Override
     public File locateExistingPom(File project) {
-        if (project == null || project.isDirectory()) {
+        Path path = locateExistingPom(project != null ? project.toPath() : null);
+        return path != null ? path.toFile() : null;
+    }
+
+    @Override
+    public Path locateExistingPom(Path project) {
+        if (project == null || Files.isDirectory(project)) {
             project = locatePom(project);
         }
-        if (project.isDirectory()) {
-            File pom = new File(project, "pom.xml");
-            return pom.isFile() ? pom : null;
-        } else if (project.isFile()) {
+        if (Files.isDirectory(project)) {
+            Path pom = project.resolve("pom.xml");
+            return Files.isRegularFile(pom) ? pom : null;
+        } else if (Files.isRegularFile(project)) {
             return project;
         } else {
             return null;

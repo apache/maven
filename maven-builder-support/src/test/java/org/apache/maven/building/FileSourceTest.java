@@ -32,7 +32,9 @@ class FileSourceTest {
     @Test
     void testFileSource() {
         NullPointerException e = assertThrows(
-                NullPointerException.class, () -> new FileSource(null), "Should fail, since you must specify a file");
+                NullPointerException.class,
+                () -> new FileSource((File) null),
+                "Should fail, since you must specify a file");
         assertEquals("file cannot be null", e.getMessage());
     }
 
