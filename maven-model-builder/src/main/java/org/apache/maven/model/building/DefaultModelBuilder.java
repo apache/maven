@@ -982,7 +982,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         problems.setRootModel(resultModel);
 
         // model path translation
-        modelPathTranslator.alignToBaseDirectory(resultModel, resultModel.getProjectDirectory(), request);
+        modelPathTranslator.alignToBaseDirectory(resultModel, resultModel.getProjectDirectoryPath(), request);
 
         // plugin management injection
         pluginManagementInjector.injectManagement(resultModel, request, problems);
@@ -1381,7 +1381,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         Map<String, Activation> originalActivations = getProfileActivations(model, true);
 
         Model interpolatedModel = new Model(modelInterpolator.interpolateModel(
-                model.getDelegate(), model.getProjectDirectory(), request, problems));
+                model.getDelegate(), model.getProjectDirectoryPath(), request, problems));
         if (interpolatedModel.getParent() != null) {
             StringSearchInterpolator ssi = new StringSearchInterpolator();
             ssi.addValueSource(new MapBasedValueSource(request.getUserProperties()));
@@ -1404,7 +1404,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 problems.add(mpcr);
             }
         }
-        interpolatedModel.setPomFile(model.getPomFile());
+        interpolatedModel.setPomPath(model.getPomPath());
 
         // restore profiles with file activation to their value before full interpolation
         injectProfileActivations(model, originalActivations);
@@ -1468,7 +1468,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (candidateModel == null) {
                 return null;
             }
-            candidateSource = new FileModelSource(candidateModel.getPomFile());
+            candidateSource = new FileModelSource(candidateModel.getPomPath());
         }
 
         //
@@ -1604,7 +1604,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 buffer.append(" for ").append(ModelProblemUtils.toId(childModel));
             }
             buffer.append(": ").append(e.getMessage());
-            if (childModel.getProjectDirectory() != null) {
+            if (childModel.getProjectDirectoryPath() != null) {
                 if (parent.getRelativePath() == null || parent.getRelativePath().isEmpty()) {
                     buffer.append(" and 'parent.relativePath' points at no local POM");
                 } else {

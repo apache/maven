@@ -103,7 +103,7 @@ class TestApi {
         // create session with any local repo, is redefined anyway below
         RepositorySystemSession rss = new MavenSessionBuilderSupplier(repositorySystem)
                 .get()
-                .withLocalRepositoryBaseDirectories(new File("target"))
+                .withLocalRepositoryBaseDirectories(new File("target").toPath())
                 .build();
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
         DefaultMavenExecutionResult meres = new DefaultMavenExecutionResult();

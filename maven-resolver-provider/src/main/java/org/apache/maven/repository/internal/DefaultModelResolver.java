@@ -159,7 +159,7 @@ class DefaultModelResolver implements ModelResolver {
             throw new UnresolvableModelException(e.getMessage(), groupId, artifactId, version, e);
         }
 
-        return new ArtifactModelSource(pomArtifact.getFile(), groupId, artifactId, version);
+        return new ArtifactModelSource(pomArtifact.getPath(), groupId, artifactId, version);
     }
 
     @Override

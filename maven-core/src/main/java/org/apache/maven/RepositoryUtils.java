@@ -34,6 +34,7 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.repository.internal.artifact.MavenArtifactProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -144,7 +145,7 @@ public class RepositoryUtils {
         Map<String, String> props = null;
         if (org.apache.maven.artifact.Artifact.SCOPE_SYSTEM.equals(artifact.getScope())) {
             String localPath = (artifact.getFile() != null) ? artifact.getFile().getPath() : "";
-            props = Collections.singletonMap(ArtifactProperties.LOCAL_PATH, localPath);
+            props = Collections.singletonMap(MavenArtifactProperties.LOCAL_PATH, localPath);
         }
 
         Artifact result = new DefaultArtifact(
@@ -252,9 +253,9 @@ public class RepositoryUtils {
                 null,
                 null,
                 null,
-                Boolean.parseBoolean(artifact.getProperty(ArtifactProperties.INCLUDES_DEPENDENCIES, "")),
+                Boolean.parseBoolean(artifact.getProperty(MavenArtifactProperties.INCLUDES_DEPENDENCIES, "")),
                 artifact.getProperty(ArtifactProperties.LANGUAGE, null),
-                Boolean.parseBoolean(artifact.getProperty(ArtifactProperties.CONSTITUTES_BUILD_PATH, "")));
+                Boolean.parseBoolean(artifact.getProperty(MavenArtifactProperties.CONSTITUTES_BUILD_PATH, "")));
     }
 
     public static ArtifactType newArtifactType(String id, ArtifactHandler handler) {
@@ -279,7 +280,7 @@ public class RepositoryUtils {
 
         Map<String, String> props = null;
         if (system) {
-            props = Collections.singletonMap(ArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
+            props = Collections.singletonMap(MavenArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
         }
 
         Artifact artifact = new DefaultArtifact(

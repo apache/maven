@@ -20,6 +20,7 @@ package org.apache.maven.model.building;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Path;
 
 import org.apache.maven.building.FileSource;
 import org.apache.maven.model.locator.ModelLocator;
@@ -34,9 +35,21 @@ public class FileModelSource extends FileSource implements ModelSource3 {
      * Creates a new model source backed by the specified file.
      *
      * @param pomFile The POM file, must not be {@code null}.
+     * @deprecated Use {@link #FileModelSource(Path)} instead.
      */
+    @Deprecated
     public FileModelSource(File pomFile) {
         super(pomFile);
+    }
+
+    /**
+     * Creates a new model source backed by the specified file.
+     *
+     * @param pomPath The POM file, must not be {@code null}.
+     * @since 4.0.0
+     */
+    public FileModelSource(Path pomPath) {
+        super(pomPath);
     }
 
     /**
@@ -54,12 +67,12 @@ public class FileModelSource extends FileSource implements ModelSource3 {
     public ModelSource3 getRelatedSource(ModelLocator locator, String relPath) {
         relPath = relPath.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-        File path = new File(getFile().getParentFile(), relPath);
+        Path path = getPath().getParent().resolve(relPath);
 
-        File relatedPom = locator.locateExistingPom(path);
+        Path relatedPom = locator.locateExistingPom(path);
 
         if (relatedPom != null) {
-            return new FileModelSource(relatedPom.toPath().normalize().toFile());
+            return new FileModelSource(relatedPom.normalize());
         }
 
         return null;
@@ -67,7 +80,7 @@ public class FileModelSource extends FileSource implements ModelSource3 {
 
     @Override
     public URI getLocationURI() {
-        return getFile().toURI();
+        return getPath().toUri();
     }
 
     @Override
@@ -84,11 +97,11 @@ public class FileModelSource extends FileSource implements ModelSource3 {
             return false;
         }
         FileModelSource other = (FileModelSource) obj;
-        return getFile().equals(other.getFile());
+        return getPath().equals(other.getPath());
     }
 
     @Override
     public int hashCode() {
-        return getFile().hashCode();
+        return getPath().hashCode();
     }
 }

@@ -388,12 +388,28 @@
      * @return The POM file from which this model originated or {@code null} if this model does not belong to a local
      *         project (e.g. describes the metadata of some artifact from the repository).
      */
+    @Deprecated
     public java.io.File getPomFile() {
         return (getDelegate().getPomFile() != null) ? getDelegate().getPomFile().toFile() : null;
     }
 
+    @Deprecated
     public void setPomFile(java.io.File pomFile) {
         update( getDelegate().withPomFile(pomFile != null ? pomFile.toPath() : null));
+    }
+
+    /**
+     * Gets the POM file for the corresponding project (if any).
+     *
+     * @return The POM file from which this model originated or {@code null} if this model does not belong to a local
+     *         project (e.g. describes the metadata of some artifact from the repository).
+     */
+    public java.nio.file.Path getPomPath() {
+        return (getDelegate().getPomFile() != null) ? getDelegate().getPomFile() : null;
+    }
+
+    public void setPomPath(java.nio.file.Path pomPath) {
+        update( getDelegate().withPomFile(pomPath));
     }
 
     public void setModelEncoding(String modelEncoding) {
@@ -406,8 +422,19 @@
      * @return The base directory for the corresponding project or {@code null} if this model does not belong to a local
      *         project (e.g. describes the metadata of some artifact from the repository).
      */
+    @Deprecated
     public java.io.File getProjectDirectory() {
         return (getDelegate().getProjectDirectory() != null) ? getDelegate().getProjectDirectory().toFile() : null;
+    }
+
+    /**
+     * Gets the base directory for the corresponding project (if any).
+     *
+     * @return The base directory for the corresponding project or {@code null} if this model does not belong to a local
+     *         project (e.g. describes the metadata of some artifact from the repository).
+     */
+    public java.nio.file.Path getProjectDirectoryPath() {
+        return getDelegate().getProjectDirectory();
     }
 
     /**
