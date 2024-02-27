@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.jline;
+package org.apache.maven.jline;
 
 import javax.annotation.Priority;
 import javax.inject.Named;
@@ -39,8 +39,6 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.StyleResolver;
-
-import static org.jline.utils.AttributedStyle.DEFAULT;
 
 @Experimental
 @Named
@@ -223,7 +221,7 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory, Prompt
 
         @Override
         public MessageBuilder resetStyle() {
-            builder.style(DEFAULT);
+            builder.style(AttributedStyle.DEFAULT);
             return this;
         }
 

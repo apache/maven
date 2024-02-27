@@ -19,11 +19,12 @@
 package org.apache.maven.slf4j;
 
 import java.io.PrintStream;
+import java.util.function.Consumer;
 
 import org.apache.maven.api.services.MessageBuilder;
-import org.slf4j.simple.SimpleLogger;
+import org.slf4j.simple.ExtSimpleLogger;
 
-import static org.apache.maven.cli.jline.MessageUtils.builder;
+import static org.apache.maven.jline.MessageUtils.builder;
 
 /**
  * Logger for Maven, that support colorization of levels and stacktraces. This class implements 2 methods introduced in
@@ -31,13 +32,19 @@ import static org.apache.maven.cli.jline.MessageUtils.builder;
  *
  * @since 3.5.0
  */
-public class MavenSimpleLogger extends SimpleLogger {
+public class MavenSimpleLogger extends ExtSimpleLogger {
 
     private final String traceRenderedLevel = builder().trace("TRACE").build();
     private final String debugRenderedLevel = builder().debug("DEBUG").build();
     private final String infoRenderedLevel = builder().info("INFO").build();
     private final String warnRenderedLevel = builder().warning("WARNING").build();
     private final String errorRenderedLevel = builder().error("ERROR").build();
+
+    static Consumer<String> logSink;
+
+    public static void setLogSink(Consumer<String> logSink) {
+        MavenSimpleLogger.logSink = logSink;
+    }
 
     MavenSimpleLogger(String name) {
         super(name);
@@ -57,6 +64,16 @@ public class MavenSimpleLogger extends SimpleLogger {
             case LOG_LEVEL_ERROR:
             default:
                 return errorRenderedLevel;
+        }
+    }
+
+    @Override
+    protected void doWrite(StringBuilder buf, Throwable t) {
+        Consumer<String> sink = logSink;
+        if (sink != null) {
+            sink.accept(buf.toString());
+        } else {
+            super.doWrite(buf, t);
         }
     }
 
