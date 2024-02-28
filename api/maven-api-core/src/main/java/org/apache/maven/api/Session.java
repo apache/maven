@@ -502,15 +502,63 @@ public interface Session {
     @Nonnull
     VersionConstraint parseVersionConstraint(@Nonnull String versionConstraint);
 
-    Type requireType(String id);
+    /**
+     * Obtain the {@link Type} from the specified {@code id}.
+     * <p>
+     * Shortcut for {@code getService(TypeRegistry.class).require(...)}.
+     *
+     * @see org.apache.maven.api.services.TypeRegistry#require(String)
+     */
+    @Nonnull
+    Type requireType(@Nonnull String id);
 
-    Language requireLanguage(String id);
+    /**
+     * Obtain the {@link Language} from the specified {@code id}.
+     * <p>
+     * Shortcut for {@code getService(LanguageRegistry.class).require(...)}.
+     *
+     * @see org.apache.maven.api.services.LanguageRegistry#require(String)
+     */
+    @Nonnull
+    Language requireLanguage(@Nonnull String id);
 
-    Packaging requirePackaging(String id);
+    /**
+     * Obtain the {@link Packaging} from the specified {@code id}.
+     * <p>
+     * Shortcut for {@code getService(PackagingRegistry.class).require(...)}.
+     *
+     * @see org.apache.maven.api.services.PackagingRegistry#require(String)
+     */
+    @Nonnull
+    Packaging requirePackaging(@Nonnull String id);
 
-    ProjectScope requireProjectScope(String id);
+    /**
+     * Obtain the {@link ProjectScope} from the specified {@code id}.
+     * <p>
+     * Shortcut for {@code getService(ProjectScopeRegistry.class).require(...)}.
+     *
+     * @see org.apache.maven.api.services.ProjectScopeRegistry#require(String)
+     */
+    @Nonnull
+    ProjectScope requireProjectScope(@Nonnull String id);
 
+    /**
+     * Obtain the {@link DependencyScope} from the specified {@code id}.
+     * <p>
+     * Shortcut for {@code DependencyScope.forId(...)}.
+     *
+     * @see org.apache.maven.api.DependencyScope#forId(String)
+     */
+    @Nonnull
     DependencyScope requireDependencyScope(@Nonnull String id);
 
-    PathScope requirePathScope(String id);
+    /**
+     * Obtain the {@link PathScope} from the specified {@code id}.
+     * <p>
+     * Shortcut for {@code getService(PathScopeRegistry.class).require(...)}.
+     *
+     * @see org.apache.maven.api.services.PathScopeRegistry#require(String)
+     */
+    @Nonnull
+    PathScope requirePathScope(@Nonnull String id);
 }

@@ -26,6 +26,10 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
+/**
+ *
+ * @since 4.0.0
+ */
 @Experimental
 public interface VersionResolverResult {
 

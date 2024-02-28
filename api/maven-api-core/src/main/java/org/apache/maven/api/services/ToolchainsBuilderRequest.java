@@ -22,12 +22,18 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
 import static org.apache.maven.api.services.BaseRequest.nonNull;
 
+/**
+ *
+ * @since 4.0.0
+ */
+@Experimental
 public interface ToolchainsBuilderRequest {
     @Nonnull
     Session getSession();

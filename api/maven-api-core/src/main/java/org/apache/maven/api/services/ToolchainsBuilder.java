@@ -25,6 +25,8 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Builds the effective toolchains from a user toolchains file and/or a global toolchains file.
+ *
+ * @since 4.0.0
  */
 @Experimental
 public interface ToolchainsBuilder extends Service {

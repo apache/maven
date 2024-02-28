@@ -18,12 +18,16 @@
  */
 package org.apache.maven.api;
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
  * can be used as keys.
+ *
+ * @since 4.0.0
  */
+@Experimental
 public interface ExtensibleEnum {
 
     /**

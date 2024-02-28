@@ -19,5 +19,12 @@
 package org.apache.maven.api.spi;
 
 import org.apache.maven.api.Language;
+import org.apache.maven.api.annotations.Consumer;
+import org.apache.maven.api.annotations.Experimental;
 
+/**
+ * @since 4.0.0
+ */
+@Experimental
+@Consumer
 public interface LanguageProvider extends ExtensibleEnumProvider<Language> {}

@@ -22,11 +22,15 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
+ *
+ * @since 4.0.0
  */
+@Experimental
 public interface SettingsBuilder extends Service {
 
     /**

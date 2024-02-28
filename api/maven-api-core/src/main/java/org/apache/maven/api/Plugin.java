@@ -29,6 +29,8 @@ import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 
 /**
  * Represents a maven plugin runtime
+ *
+ * @since 4.0.0
  */
 @Experimental
 public interface Plugin {
