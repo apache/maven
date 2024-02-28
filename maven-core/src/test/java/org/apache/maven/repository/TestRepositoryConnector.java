@@ -116,7 +116,7 @@ public class TestRepositoryConnector implements RepositoryConnector {
 
         path.append(artifact.getArtifactId()).append('-').append(artifact.getVersion());
 
-        if (artifact.getClassifier().length() > 0) {
+        if (!artifact.getClassifier().isEmpty()) {
             path.append('-').append(artifact.getClassifier());
         }
 

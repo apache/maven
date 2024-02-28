@@ -204,7 +204,7 @@ public class DefaultPathTranslator implements PathTranslator {
             path = chopLeadingFileSeparator(path.substring(base.length()));
         }
 
-        if (path.length() <= 0) {
+        if (path.isEmpty()) {
             path = ".";
         }
 

@@ -30,7 +30,6 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
-import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
@@ -67,14 +66,12 @@ public class MojoExecutorStub extends MojoExecutor { // This is being lazy inste
     }
 
     @Override
-    public void execute(MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex)
-            throws LifecycleExecutionException {
+    public void execute(MavenSession session, List<MojoExecution> mojoExecutions) throws LifecycleExecutionException {
         executions.addAll(mojoExecutions);
     }
 
     @Override
-    public List<MavenProject> executeForkedExecutions(
-            MojoExecution mojoExecution, MavenSession session, ProjectIndex projectIndex)
+    public List<MavenProject> executeForkedExecutions(MojoExecution mojoExecution, MavenSession session)
             throws LifecycleExecutionException {
         return null;
     }

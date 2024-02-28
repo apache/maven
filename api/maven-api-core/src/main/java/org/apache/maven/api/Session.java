@@ -550,7 +550,7 @@ public interface Session {
      * @see org.apache.maven.api.DependencyScope#forId(String)
      */
     @Nonnull
-    DependencyScope requireDependencyScope(String id);
+    DependencyScope requireDependencyScope(@Nonnull String id);
 
     /**
      * Obtain the {@link PathScope} from the specified {@code id}.

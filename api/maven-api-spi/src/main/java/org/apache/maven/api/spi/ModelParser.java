@@ -37,7 +37,7 @@ import org.apache.maven.api.services.Source;
  */
 @Experimental
 @Consumer
-public interface ModelParser {
+public interface ModelParser extends SpiService {
 
     /**
      * Locates the pom in the given directory.

@@ -18,24 +18,12 @@
  */
 package org.apache.maven.api.spi;
 
-import java.util.Map;
-
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * Component able to contribute to Maven session user properties. This SPI component is invoked
- * very early, while there is no session created yet.
- *
- * @since 4.0.0
+ * Marker interface to indicate services that can be provided by plugins and extensions.
  */
 @Experimental
 @Consumer
-public interface PropertyContributor extends SpiService {
-    /**
-     * Invoked just before session is created with a mutable map that carries collected user properties so far.
-     *
-     * @param userProperties The mutable user properties, never {@code null}.
-     */
-    void contribute(Map<String, String> userProperties);
-}
+public interface SpiService {}

@@ -39,7 +39,7 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
         String value = configuration.getValue();
         try {
             Object result = null;
-            if (null != value && value.length() > 0) {
+            if (null != value && !value.isEmpty()) {
                 if (evaluator instanceof TypeAwareExpressionEvaluator) {
                     result = ((TypeAwareExpressionEvaluator) evaluator).evaluate(value, type);
                 } else {
@@ -48,7 +48,7 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
             }
             if (null == result && configuration.getChildCount() == 0) {
                 value = configuration.getAttribute("default-value");
-                if (null != value && value.length() > 0) {
+                if (null != value && !value.isEmpty()) {
                     if (evaluator instanceof TypeAwareExpressionEvaluator) {
                         result = ((TypeAwareExpressionEvaluator) evaluator).evaluate(value, type);
                     } else {

@@ -32,7 +32,7 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Consumer
-public interface ExtensibleEnumProvider<T extends ExtensibleEnum> {
+public interface ExtensibleEnumProvider<T extends ExtensibleEnum> extends SpiService {
 
     /**
      * Registers new values for the T extensible enum.

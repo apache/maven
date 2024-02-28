@@ -179,11 +179,11 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         }
 
         public boolean storedInArtifactVersionDirectory() {
-            return metadata.getVersion().length() > 0;
+            return !metadata.getVersion().isEmpty();
         }
 
         public boolean storedInGroupDirectory() {
-            return metadata.getArtifactId().length() <= 0;
+            return metadata.getArtifactId().isEmpty();
         }
 
         public String getGroupId() {
@@ -199,7 +199,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         }
 
         private String nullify(String str) {
-            return (str == null || str.length() <= 0) ? null : str;
+            return (str == null || str.isEmpty()) ? null : str;
         }
 
         public Object getKey() {

@@ -16,26 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.spi;
-
-import java.util.Map;
-
-import org.apache.maven.api.annotations.Consumer;
-import org.apache.maven.api.annotations.Experimental;
+package org.slf4j.simple;
 
 /**
- * Component able to contribute to Maven session user properties. This SPI component is invoked
- * very early, while there is no session created yet.
- *
- * @since 4.0.0
+ * Class inheriting SimpleLogger to work around the fact that the {@link #write(StringBuilder, Throwable)}
+ * method is package private.
  */
-@Experimental
-@Consumer
-public interface PropertyContributor extends SpiService {
-    /**
-     * Invoked just before session is created with a mutable map that carries collected user properties so far.
-     *
-     * @param userProperties The mutable user properties, never {@code null}.
-     */
-    void contribute(Map<String, String> userProperties);
+public class ExtSimpleLogger extends SimpleLogger {
+
+    public ExtSimpleLogger(String name) {
+        super(name);
+    }
+
+    @Override
+    void write(StringBuilder buf, Throwable t) {
+        doWrite(buf, t);
+    }
+
+    protected void doWrite(StringBuilder buf, Throwable t) {
+        super.write(buf, t);
+    }
 }

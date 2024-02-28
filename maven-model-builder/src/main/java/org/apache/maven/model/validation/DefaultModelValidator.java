@@ -1355,7 +1355,7 @@ public class DefaultModelValidator implements ModelValidator {
             return false;
         }
 
-        if (string.length() > 0) {
+        if (!string.isEmpty()) {
             return true;
         }
 
@@ -1427,7 +1427,7 @@ public class DefaultModelValidator implements ModelValidator {
             String string,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1458,7 +1458,7 @@ public class DefaultModelValidator implements ModelValidator {
             String sourceHint,
             InputLocationTracker tracker,
             String... validValues) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1483,7 +1483,7 @@ public class DefaultModelValidator implements ModelValidator {
     @SuppressWarnings("checkstyle:parameternumber")
     private boolean validateModelVersion(
             ModelProblemCollector problems, String string, InputLocationTracker tracker, List<String> validVersions) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1598,7 +1598,7 @@ public class DefaultModelValidator implements ModelValidator {
             String string,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1626,7 +1626,7 @@ public class DefaultModelValidator implements ModelValidator {
             String string,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1663,7 +1663,7 @@ public class DefaultModelValidator implements ModelValidator {
             return false;
         }
 
-        if (string.length() <= 0 || "RELEASE".equals(string) || "LATEST".equals(string)) {
+        if (string.isEmpty() || "RELEASE".equals(string) || "LATEST".equals(string)) {
             addViolation(
                     problems,
                     errOn30,

@@ -177,25 +177,27 @@ public class DefaultSession extends AbstractSession {
         org.eclipse.aether.SessionData data = session.getData();
         return new SessionData() {
             @Override
-            public void set(@Nonnull Object key, @Nullable Object value) {
+            public <T> void set(@Nonnull Key<T> key, @Nullable T value) {
                 data.set(key, value);
             }
 
             @Override
-            public boolean set(@Nonnull Object key, @Nullable Object oldValue, @Nullable Object newValue) {
+            public <T> boolean replace(@Nonnull Key<T> key, @Nullable T oldValue, @Nullable T newValue) {
                 return data.set(key, oldValue, newValue);
             }
 
             @Nullable
             @Override
-            public Object get(@Nonnull Object key) {
-                return data.get(key);
+            @SuppressWarnings("unchecked")
+            public <T> T get(@Nonnull Key<T> key) {
+                return (T) data.get(key);
             }
 
             @Nullable
             @Override
-            public Object computeIfAbsent(@Nonnull Object key, @Nonnull Supplier<Object> supplier) {
-                return data.computeIfAbsent(key, supplier);
+            @SuppressWarnings("unchecked")
+            public <T> T computeIfAbsent(@Nonnull Key<T> key, @Nonnull Supplier<T> supplier) {
+                return (T) data.computeIfAbsent(key, (Supplier<Object>) supplier);
             }
         };
     }
