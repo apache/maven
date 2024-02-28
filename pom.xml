@@ -107,6 +107,7 @@ under the License.
     <module>maven-model-builder</module>
     <module>maven-di</module>
     <module>maven-xml-impl</module>
+    <module>maven-jline</module>
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
@@ -201,6 +202,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-builder-support</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-jline</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
