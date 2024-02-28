@@ -560,7 +560,7 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public DependencyScope requireDependencyScope(String id) {
-        return DependencyScope.forId(id);
+        return DependencyScope.forId(nonNull(id, "id"));
     }
 
     @Override

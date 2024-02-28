@@ -287,7 +287,7 @@ public class MavenProject implements Cloneable {
     private void addPath(List<String> paths, String path) {
         if (path != null) {
             path = path.trim();
-            if (path.length() > 0) {
+            if (!path.isEmpty()) {
                 File file = new File(path);
                 if (file.isAbsolute()) {
                     path = file.getAbsolutePath();

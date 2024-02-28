@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -44,15 +45,20 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
 
     protected Metadata metadata;
 
-    private final File file;
+    private final Path path;
 
     protected final Date timestamp;
 
     private boolean merged;
 
+    @Deprecated
     protected MavenMetadata(Metadata metadata, File file, Date timestamp) {
+        this(metadata, file != null ? file.toPath() : null, timestamp);
+    }
+
+    protected MavenMetadata(Metadata metadata, Path path, Date timestamp) {
         this.metadata = metadata;
-        this.file = file;
+        this.path = path;
         this.timestamp = timestamp;
     }
 
@@ -61,13 +67,23 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
         return MAVEN_METADATA_XML;
     }
 
+    @Deprecated
     @Override
     public File getFile() {
-        return file;
+        return path != null ? path.toFile() : null;
     }
 
     @Override
+    public Path getPath() {
+        return path;
+    }
+
     public void merge(File existing, File result) throws RepositoryException {
+        merge(existing != null ? existing.toPath() : null, result != null ? result.toPath() : null);
+    }
+
+    @Override
+    public void merge(Path existing, Path result) throws RepositoryException {
         Metadata recessive = read(existing);
 
         merge(recessive);
@@ -84,24 +100,26 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
 
     protected abstract void merge(Metadata recessive);
 
-    static Metadata read(File metadataFile) throws RepositoryException {
-        if (metadataFile.length() <= 0) {
+    static Metadata read(Path metadataPath) throws RepositoryException {
+        if (!Files.exists(metadataPath)) {
             return new Metadata();
         }
 
-        try (InputStream input = Files.newInputStream(metadataFile.toPath())) {
+        try (InputStream input = Files.newInputStream(metadataPath)) {
             return new Metadata(new MetadataStaxReader().read(input, false));
         } catch (IOException | XMLStreamException e) {
-            throw new RepositoryException("Could not parse metadata " + metadataFile + ": " + e.getMessage(), e);
+            throw new RepositoryException("Could not parse metadata " + metadataPath + ": " + e.getMessage(), e);
         }
     }
 
-    private void write(File metadataFile, Metadata metadata) throws RepositoryException {
-        metadataFile.getParentFile().mkdirs();
-        try (OutputStream output = Files.newOutputStream(metadataFile.toPath())) {
-            new MetadataStaxWriter().write(output, metadata.getDelegate());
+    private void write(Path metadataPath, Metadata metadata) throws RepositoryException {
+        try {
+            Files.createDirectories(metadataPath.getParent());
+            try (OutputStream output = Files.newOutputStream(metadataPath)) {
+                new MetadataStaxWriter().write(output, metadata.getDelegate());
+            }
         } catch (IOException | XMLStreamException e) {
-            throw new RepositoryException("Could not write metadata " + metadataFile + ": " + e.getMessage(), e);
+            throw new RepositoryException("Could not write metadata " + metadataPath + ": " + e.getMessage(), e);
         }
     }
 

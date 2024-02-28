@@ -104,7 +104,7 @@ public class LifecycleModuleBuilder {
 
             projectExecutionListener.beforeProjectLifecycleExecution(
                     new ProjectExecutionEvent(session, currentProject, mojoExecutions));
-            mojoExecutor.execute(session, mojoExecutions, reactorContext.getProjectIndex());
+            mojoExecutor.execute(session, mojoExecutions);
 
             long buildEndTime = System.currentTimeMillis();
 

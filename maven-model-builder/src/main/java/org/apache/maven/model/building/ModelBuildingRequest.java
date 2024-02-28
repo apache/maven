@@ -106,7 +106,7 @@ public interface ModelBuildingRequest {
 
     /**
      * Sets the source of the POM to process. Eventually, either {@link #setModelSource(ModelSource)} or
-     * {@link #setPomFile(File)} must be set.
+     * {@link #setPomPath(Path)} must be set.
      *
      * @param modelSource The source of the POM to process, may be {@code null}.
      * @return This request, never {@code null}.
@@ -118,8 +118,19 @@ public interface ModelBuildingRequest {
      *
      * @return The POM file of the project or {@code null} if not applicable (i.e. when processing a POM from the
      *         repository).
+     * @deprecated Use {@link #getPomPath()} instead.
      */
+    @Deprecated
     File getPomFile();
+
+    /**
+     * Gets the POM file of the project to build.
+     *
+     * @return The POM file of the project or {@code null} if not applicable (i.e. when processing a POM from the
+     *         repository).
+     * @since 4.0.0
+     */
+    Path getPomPath();
 
     /**
      * Sets the POM file of the project to build. Note that providing the path to a POM file via this method will make
@@ -131,8 +142,24 @@ public interface ModelBuildingRequest {
      * @param pomFile The POM file of the project to build the effective model for, may be {@code null} to build the
      *            model of some POM from the repository.
      * @return This request, never {@code null}.
+     * @deprecated Use {@link #setPomPath(Path)} instead.
      */
+    @Deprecated
     ModelBuildingRequest setPomFile(File pomFile);
+
+    /**
+     * Sets the POM file of the project to build. Note that providing the path to a POM file via this method will make
+     * the model builder operate in project mode. This mode is meant for effective models that are employed during the
+     * build process of a local project. Hence the effective model will support the notion of a project directory. To
+     * build the model for a POM from the repository, use {@link #setModelSource(ModelSource)} in combination with a
+     * {@link FileModelSource} instead.
+     *
+     * @param pomPath The POM file of the project to build the effective model for, may be {@code null} to build the
+     *            model of some POM from the repository.
+     * @return This request, never {@code null}.
+     * @since 4.0.0
+     */
+    ModelBuildingRequest setPomPath(Path pomPath);
 
     /**
      * Gets the level of validation to perform on processed models.

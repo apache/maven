@@ -27,7 +27,7 @@ import org.apache.maven.api.annotations.Experimental;
  * very early, while there is no session created yet.
  */
 @Experimental
-public interface PropertyContributor {
+public interface PropertyContributor extends SpiService {
     /**
      * Invoked just before session is created with a mutable map that carries collected user properties so far.
      *

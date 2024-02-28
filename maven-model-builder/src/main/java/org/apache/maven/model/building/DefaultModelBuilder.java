@@ -982,7 +982,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         problems.setRootModel(resultModel);
 
         // model path translation
-        modelPathTranslator.alignToBaseDirectory(resultModel, resultModel.getProjectDirectory(), request);
+        modelPathTranslator.alignToBaseDirectory(resultModel, resultModel.getProjectDirectoryPath(), request);
 
         // plugin management injection
         pluginManagementInjector.injectManagement(resultModel, request, problems);
@@ -1152,7 +1152,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             throw problems.newModelBuildingException();
         } catch (IOException e) {
             String msg = e.getMessage();
-            if (msg == null || msg.length() <= 0) {
+            if (msg == null || msg.isEmpty()) {
                 // NOTE: There's java.nio.charset.MalformedInputException and sun.io.MalformedInputException
                 if (e.getClass().getName().endsWith("MalformedInputException")) {
                     msg = "Some input bytes do not match the file encoding.";
@@ -1381,7 +1381,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         Map<String, Activation> originalActivations = getProfileActivations(model, true);
 
         Model interpolatedModel = new Model(modelInterpolator.interpolateModel(
-                model.getDelegate(), model.getProjectDirectory(), request, problems));
+                model.getDelegate(), model.getProjectDirectoryPath(), request, problems));
         if (interpolatedModel.getParent() != null) {
             StringSearchInterpolator ssi = new StringSearchInterpolator();
             ssi.addValueSource(new MapBasedValueSource(request.getUserProperties()));
@@ -1404,7 +1404,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 problems.add(mpcr);
             }
         }
-        interpolatedModel.setPomFile(model.getPomFile());
+        interpolatedModel.setPomPath(model.getPomPath());
 
         // restore profiles with file activation to their value before full interpolation
         injectProfileActivations(model, originalActivations);
@@ -1468,7 +1468,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (candidateModel == null) {
                 return null;
             }
-            candidateSource = new FileModelSource(candidateModel.getPomFile());
+            candidateSource = new FileModelSource(candidateModel.getPomPath());
         }
 
         //
@@ -1560,7 +1560,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         String parentPath = childModel.getParent().getRelativePath();
 
-        if (parentPath == null || parentPath.length() <= 0) {
+        if (parentPath == null || parentPath.isEmpty()) {
             return null;
         }
 
@@ -1604,8 +1604,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 buffer.append(" for ").append(ModelProblemUtils.toId(childModel));
             }
             buffer.append(": ").append(e.getMessage());
-            if (childModel.getProjectDirectory() != null) {
-                if (parent.getRelativePath() == null || parent.getRelativePath().length() <= 0) {
+            if (childModel.getProjectDirectoryPath() != null) {
+                if (parent.getRelativePath() == null || parent.getRelativePath().isEmpty()) {
                     buffer.append(" and 'parent.relativePath' points at no local POM");
                 } else {
                     buffer.append(" and 'parent.relativePath' points at wrong local POM");
@@ -1710,21 +1710,21 @@ public class DefaultModelBuilder implements ModelBuilder {
         String artifactId = dependency.getArtifactId();
         String version = dependency.getVersion();
 
-        if (groupId == null || groupId.length() <= 0) {
+        if (groupId == null || groupId.isEmpty()) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                     .setMessage("'dependencyManagement.dependencies.dependency.groupId' for "
                             + dependency.getManagementKey() + " is missing.")
                     .setLocation(dependency.getLocation("")));
             return null;
         }
-        if (artifactId == null || artifactId.length() <= 0) {
+        if (artifactId == null || artifactId.isEmpty()) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                     .setMessage("'dependencyManagement.dependencies.dependency.artifactId' for "
                             + dependency.getManagementKey() + " is missing.")
                     .setLocation(dependency.getLocation("")));
             return null;
         }
-        if (version == null || version.length() <= 0) {
+        if (version == null || version.isEmpty()) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                     .setMessage("'dependencyManagement.dependencies.dependency.version' for "
                             + dependency.getManagementKey() + " is missing.")

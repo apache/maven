@@ -22,8 +22,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.File;
-import java.util.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -47,10 +54,7 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.eclipse.aether.ConfigurationProperties;
-import org.eclipse.aether.RepositoryListener;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.*;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -431,16 +435,16 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
 
         String resolverDependencyManagerTransitivity =
                 mergedProps.getOrDefault(MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY, Boolean.TRUE.toString());
-        sessionBuilder.setDependencyManager(
-                new ClassicDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
+        sessionBuilder.setDependencyManager(new ClassicDependencyManager(
+                Boolean.parseBoolean(resolverDependencyManagerTransitivity), SystemScopeHandler.LEGACY));
 
-        ArrayList<File> paths = new ArrayList<>();
-        paths.add(new File(request.getLocalRepository().getBasedir()));
+        ArrayList<Path> paths = new ArrayList<>();
+        paths.add(Paths.get(request.getLocalRepository().getBasedir()));
         String localRepoTail = mergedProps.get(MAVEN_REPO_LOCAL_TAIL);
         if (localRepoTail != null) {
             Arrays.stream(localRepoTail.split(","))
                     .filter(p -> p != null && !p.trim().isEmpty())
-                    .map(File::new)
+                    .map(Paths::get)
                     .forEach(paths::add);
         }
         sessionBuilder.withLocalRepositoryBaseDirectories(paths);

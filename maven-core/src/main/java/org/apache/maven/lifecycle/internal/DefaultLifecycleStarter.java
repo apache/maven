@@ -33,7 +33,6 @@ import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.lifecycle.NoGoalSpecifiedException;
 import org.apache.maven.lifecycle.internal.builder.Builder;
 import org.apache.maven.lifecycle.internal.builder.BuilderNotFoundException;
-import org.apache.maven.session.scope.internal.SessionScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,8 +64,7 @@ public class DefaultLifecycleStarter implements LifecycleStarter {
             BuildListCalculator buildListCalculator,
             LifecycleDebugLogger lifecycleDebugLogger,
             LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator,
-            Map<String, Builder> builders,
-            SessionScope sessionScope) {
+            Map<String, Builder> builders) {
         this.eventCatapult = eventCatapult;
         this.defaultLifeCycles = defaultLifeCycles;
         this.buildListCalculator = buildListCalculator;
@@ -100,15 +98,13 @@ public class DefaultLifecycleStarter implements LifecycleStarter {
                         + " Available lifecycle phases are: " + defaultLifeCycles.getLifecyclePhaseList() + ".");
             }
 
-            ProjectIndex projectIndex = new ProjectIndex(session.getProjects());
-
             if (logger.isDebugEnabled()) {
                 lifecycleDebugLogger.debugReactorPlan(projectBuilds);
             }
 
             ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
             ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus(session.getProjectDependencyGraph());
-            reactorContext = new ReactorContext(result, projectIndex, oldContextClassLoader, reactorBuildStatus);
+            reactorContext = new ReactorContext(result, oldContextClassLoader, reactorBuildStatus);
 
             String builderId = session.getRequest().getBuilderId();
             Builder builder = builders.get(builderId);

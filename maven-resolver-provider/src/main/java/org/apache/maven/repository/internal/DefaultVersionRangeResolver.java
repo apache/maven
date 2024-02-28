@@ -200,9 +200,8 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                 try (SyncContext syncContext = syncContextFactory.newInstance(session, true)) {
                     syncContext.acquire(null, Collections.singleton(metadata));
 
-                    if (metadata.getFile() != null && metadata.getFile().exists()) {
-                        try (InputStream in =
-                                Files.newInputStream(metadata.getFile().toPath())) {
+                    if (metadata.getPath() != null && Files.exists(metadata.getPath())) {
+                        try (InputStream in = Files.newInputStream(metadata.getPath())) {
                             versioning = new Versioning(
                                     new MetadataStaxReader().read(in, false).getVersioning());
                         }

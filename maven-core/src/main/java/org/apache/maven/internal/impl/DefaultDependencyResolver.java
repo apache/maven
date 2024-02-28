@@ -72,31 +72,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
     @Override
     public DependencyResolverResult resolve(DependencyResolverRequest request)
             throws DependencyCollectorException, DependencyResolverException, ArtifactResolverException {
-        nonNull(request, "request can not be null");
-        InternalSession session = InternalSession.from(request.getSession());
-
-        if (request.getProject().isPresent()) {
-            DependencyResolutionResult result = resolveDependencies(
-                    request.getSession(), request.getProject().get(), request.getPathScope());
-
-            Map<org.eclipse.aether.graph.Dependency, org.eclipse.aether.graph.DependencyNode> nodes = stream(
-                            result.getDependencyGraph())
-                    .filter(n -> n.getDependency() != null)
-                    .collect(Collectors.toMap(DependencyNode::getDependency, n -> n));
-
-            Node root = session.getNode(result.getDependencyGraph());
-            List<Node> dependencies = new ArrayList<>();
-            Map<Dependency, Path> artifacts = new LinkedHashMap<>();
-            List<Path> paths = new ArrayList<>();
-            for (org.eclipse.aether.graph.Dependency dep : result.getResolvedDependencies()) {
-                dependencies.add(session.getNode(nodes.get(dep)));
-                Path path = dep.getArtifact().getFile().toPath();
-                artifacts.put(session.getDependency(dep), path);
-                paths.add(path);
-            }
-            return new DefaultDependencyResolverResult(
-                    result.getCollectionErrors(), root, dependencies, paths, artifacts);
-        }
+        nonNull(request, "request");
+        Session session = InternalSession.from(request.getSession());
 
         DependencyCollectorResult collectorResult =
                 session.getService(DependencyCollector.class).collect(request);

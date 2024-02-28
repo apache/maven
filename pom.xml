@@ -107,6 +107,7 @@ under the License.
     <module>maven-model-builder</module>
     <module>maven-di</module>
     <module>maven-xml-impl</module>
+    <module>maven-jline</module>
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
@@ -177,7 +178,7 @@ under the License.
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusTestingVersion>1.0.0</plexusTestingVersion>
     <plexusXmlVersion>4.0.1</plexusXmlVersion>
-    <resolverVersion>2.0.0-alpha-7</resolverVersion>
+    <resolverVersion>2.0.0-alpha-8</resolverVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <sisuVersion>0.9.0.M2</sisuVersion>
     <slf4jVersion>2.0.11</slf4jVersion>
@@ -201,6 +202,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-builder-support</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-jline</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

@@ -33,7 +33,7 @@ import org.apache.maven.api.services.Source;
  * This allows plugging in additional syntaxes for the main model read by Maven when building a project.
  */
 @Experimental
-public interface ModelParser {
+public interface ModelParser extends SpiService {
 
     /**
      * Locates the pom in the given directory.

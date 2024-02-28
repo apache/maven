@@ -142,8 +142,8 @@ public class VersionRange {
             }
         }
 
-        if (process.length() > 0) {
-            if (restrictions.size() > 0) {
+        if (!process.isEmpty()) {
+            if (!restrictions.isEmpty()) {
                 throw new InvalidVersionSpecificationException(
                         "Only fully-qualified sets allowed in multiple set scenario: " + spec);
             } else {
@@ -180,11 +180,11 @@ public class VersionRange {
             String upperBound = process.substring(index + 1).trim();
 
             ArtifactVersion lowerVersion = null;
-            if (lowerBound.length() > 0) {
+            if (!lowerBound.isEmpty()) {
                 lowerVersion = new DefaultArtifactVersion(lowerBound);
             }
             ArtifactVersion upperVersion = null;
-            if (upperBound.length() > 0) {
+            if (!upperBound.isEmpty()) {
                 upperVersion = new DefaultArtifactVersion(upperBound);
             }
 

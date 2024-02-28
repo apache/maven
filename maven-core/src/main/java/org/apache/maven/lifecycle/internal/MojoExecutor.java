@@ -36,6 +36,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -57,7 +58,6 @@ import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.SessionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +74,11 @@ import org.slf4j.LoggerFactory;
 public class MojoExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MojoExecutor.class);
+    private static final SessionData.Key<ProjectIndex> PROJECT_INDEX = SessionData.key(ProjectIndex.class);
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static final SessionData.Key<Map<MavenProject, OwnerReentrantLock>> PROJECT_LOCKS =
+            (SessionData.Key) SessionData.key(Map.class, ProjectLock.class);
 
     private final BuildPluginManager pluginManager;
     private final MavenPluginManager mavenPluginManager;
@@ -149,8 +154,7 @@ public class MojoExecutor {
         return Collections.unmodifiableCollection(scopes);
     }
 
-    public void execute(
-            final MavenSession session, final List<MojoExecution> mojoExecutions, final ProjectIndex projectIndex)
+    public void execute(final MavenSession session, final List<MojoExecution> mojoExecutions)
             throws LifecycleExecutionException {
 
         final DependencyContext dependencyContext = newDependencyContext(session, mojoExecutions);
@@ -160,7 +164,7 @@ public class MojoExecutor {
         mojosExecutionStrategy.get().execute(mojoExecutions, session, new MojoExecutionRunner() {
             @Override
             public void run(MojoExecution mojoExecution) throws LifecycleExecutionException {
-                MojoExecutor.this.execute(session, mojoExecution, projectIndex, dependencyContext, phaseRecorder);
+                MojoExecutor.this.execute(session, mojoExecution, dependencyContext, phaseRecorder);
             }
         });
     }
@@ -168,19 +172,14 @@ public class MojoExecutor {
     private void execute(
             MavenSession session,
             MojoExecution mojoExecution,
-            ProjectIndex projectIndex,
             DependencyContext dependencyContext,
             PhaseRecorder phaseRecorder)
             throws LifecycleExecutionException {
-        execute(session, mojoExecution, projectIndex, dependencyContext);
+        execute(session, mojoExecution, dependencyContext);
         phaseRecorder.observeExecution(mojoExecution);
     }
 
-    private void execute(
-            MavenSession session,
-            MojoExecution mojoExecution,
-            ProjectIndex projectIndex,
-            DependencyContext dependencyContext)
+    private void execute(MavenSession session, MojoExecution mojoExecution, DependencyContext dependencyContext)
             throws LifecycleExecutionException {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -211,7 +210,7 @@ public class MojoExecutor {
             }
         }
 
-        doExecute(session, mojoExecution, projectIndex, dependencyContext);
+        doExecute(session, mojoExecution, dependencyContext);
     }
 
     /**
@@ -273,11 +272,9 @@ public class MojoExecutor {
             mojos.remove(Thread.currentThread());
         }
 
-        @SuppressWarnings({"unchecked", "rawtypes"})
         private OwnerReentrantLock getProjectLock(MavenSession session) {
-            SessionData data = session.getRepositorySession().getData();
-            Map<MavenProject, OwnerReentrantLock> locks =
-                    (Map) data.computeIfAbsent(ProjectLock.class, ConcurrentHashMap::new);
+            SessionData data = session.getSession().getData();
+            Map<MavenProject, OwnerReentrantLock> locks = data.computeIfAbsent(PROJECT_LOCKS, ConcurrentHashMap::new);
             return locks.computeIfAbsent(session.getCurrentProject(), p -> new OwnerReentrantLock());
         }
     }
@@ -302,15 +299,11 @@ public class MojoExecutor {
         }
     }
 
-    private void doExecute(
-            MavenSession session,
-            MojoExecution mojoExecution,
-            ProjectIndex projectIndex,
-            DependencyContext dependencyContext)
+    private void doExecute(MavenSession session, MojoExecution mojoExecution, DependencyContext dependencyContext)
             throws LifecycleExecutionException {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        List<MavenProject> forkedProjects = executeForkedExecutions(mojoExecution, session, projectIndex);
+        List<MavenProject> forkedProjects = executeForkedExecutions(mojoExecution, session);
 
         ensureDependenciesAreResolved(mojoDescriptor, session, dependencyContext);
 
@@ -407,8 +400,7 @@ public class MojoExecutor {
         }
     }
 
-    public List<MavenProject> executeForkedExecutions(
-            MojoExecution mojoExecution, MavenSession session, ProjectIndex projectIndex)
+    public List<MavenProject> executeForkedExecutions(MojoExecution mojoExecution, MavenSession session)
             throws LifecycleExecutionException {
         List<MavenProject> forkedProjects = Collections.emptyList();
 
@@ -424,6 +416,10 @@ public class MojoExecutor {
             try {
                 for (Map.Entry<String, List<MojoExecution>> fork : forkedExecutions.entrySet()) {
                     String projectId = fork.getKey();
+
+                    ProjectIndex projectIndex = session.getSession()
+                            .getData()
+                            .computeIfAbsent(PROJECT_INDEX, () -> new ProjectIndex(session.getProjects()));
 
                     int index = projectIndex.getIndices().get(projectId);
 
@@ -448,7 +444,7 @@ public class MojoExecutor {
 
                         eventCatapult.fire(ExecutionEvent.Type.ForkedProjectStarted, session, mojoExecution);
 
-                        execute(session, mojoExecutions, projectIndex);
+                        execute(session, mojoExecutions);
 
                         eventCatapult.fire(ExecutionEvent.Type.ForkedProjectSucceeded, session, mojoExecution);
                     } catch (LifecycleExecutionException e) {

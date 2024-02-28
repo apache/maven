@@ -33,6 +33,7 @@ import java.util.zip.ZipEntry;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
@@ -523,6 +524,11 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
         InternalSession sessionV4 = InternalSession.from(session.getSession());
         Project project = sessionV4.getProject(session.getCurrentProject());
+
+        List<org.apache.maven.api.RemoteRepository> repos =
+                sessionV4.getService(ProjectManager.class).getRemoteProjectRepositories(project);
+        sessionV4 = InternalSession.from(sessionV4.withRemoteRepositories(repos));
+
         org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
         org.apache.maven.api.plugin.Log log = new DefaultLog(
                 LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getFullGoalName()));

@@ -182,7 +182,8 @@ public class DefaultProject implements Project {
             @Nonnull
             @Override
             public DependencyScope getScope() {
-                return session.requireDependencyScope(dependency.getScope());
+                String scope = dependency.getScope() != null ? dependency.getScope() : "";
+                return session.requireDependencyScope(scope);
             }
 
             @Override

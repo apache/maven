@@ -129,7 +129,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
         String localRepository = userSettings.getLocalRepository();
-        if (localRepository != null && localRepository.length() > 0) {
+        if (localRepository != null && !localRepository.isEmpty()) {
             File file = new File(localRepository);
             if (!file.isAbsolute() && file.getPath().startsWith(File.separator)) {
                 userSettings.setLocalRepository(file.getAbsolutePath());

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.repository.internal;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -33,8 +33,8 @@ abstract class MavenSnapshotMetadata extends MavenMetadata {
 
     protected final Collection<Artifact> artifacts = new ArrayList<>();
 
-    protected MavenSnapshotMetadata(Metadata metadata, File file, Date timestamp) {
-        super(metadata, file, timestamp);
+    protected MavenSnapshotMetadata(Metadata metadata, Path path, Date timestamp) {
+        super(metadata, path, timestamp);
     }
 
     protected static Metadata createRepositoryMetadata(Artifact artifact) {

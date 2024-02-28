@@ -42,6 +42,14 @@ public final class MavenArtifactProperties {
      */
     public static final String CONSTITUTES_BUILD_PATH = "constitutesBuildPath";
 
+    /**
+     * The (expected) path to the artifact on the local filesystem. An artifact which has this property set is assumed
+     * to be not present in any regular repository and likewise has no artifact descriptor. Artifact resolution will
+     * verify the path and resolve the artifact if the path actually denotes an existing file. If the path isn't valid,
+     * resolution will fail and no attempts to search local/remote repositories are made.
+     */
+    public static final String LOCAL_PATH = "localPath";
+
     private MavenArtifactProperties() {
         // hide constructor
     }
