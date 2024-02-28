@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -49,7 +50,7 @@ public interface SessionData {
      * @param key the key under which to store the session data, must not be {@code null}
      * @param value the data to associate with the key, may be {@code null} to remove the mapping
      */
-    void set(@Nonnull Object key, @Nullable Object value);
+    <T> void set(@Nonnull Key<T> key, @Nullable T value);
 
     /**
      * Associates the specified session data with the given key if the key is currently mapped to the given value. This
@@ -61,7 +62,7 @@ public interface SessionData {
      * @return {@code true} if the key mapping was successfully updated from the old value to the new value,
      *         {@code false} if the current key mapping didn't match the expected value and was not updated.
      */
-    boolean set(@Nonnull Object key, @Nullable Object oldValue, @Nullable Object newValue);
+    <T> boolean replace(@Nonnull Key<T> key, @Nullable T oldValue, @Nullable T newValue);
 
     /**
      * Gets the session data associated with the specified key.
@@ -70,7 +71,7 @@ public interface SessionData {
      * @return the session data associated with the key or {@code null} if none
      */
     @Nullable
-    Object get(@Nonnull Object key);
+    <T> T get(@Nonnull Key<T> key);
 
     /**
      * Retrieve of compute the data associated with the specified key.
@@ -80,5 +81,55 @@ public interface SessionData {
      * @return the session data associated with the key
      */
     @Nullable
-    Object computeIfAbsent(@Nonnull Object key, @Nonnull Supplier<Object> supplier);
+    <T> T computeIfAbsent(@Nonnull Key<T> key, @Nonnull Supplier<T> supplier);
+
+    /**
+     * Create a key using the given class as an identifier and as the type of the object.
+     */
+    static <T> Key<T> key(Class<T> clazz) {
+        return new Key<>(clazz, clazz);
+    }
+
+    /**
+     * Create a key using the given class and id.
+     */
+    static <T> Key<T> key(Class<T> clazz, Object id) {
+        return new Key<>(clazz, id);
+    }
+
+    /**
+     * Key used to query the session data
+     * @param <T> the type of the object associated to this key
+     */
+    final class Key<T> {
+
+        private final Class<T> type;
+        private final Object id;
+
+        private Key(Class<T> type, Object id) {
+            this.type = type;
+            this.id = id;
+        }
+
+        public Class<T> type() {
+            return type;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Key<?> key = (Key<?>) o;
+            return Objects.equals(id, key.id) && Objects.equals(type, key.type);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id, type);
+        }
+    }
 }
