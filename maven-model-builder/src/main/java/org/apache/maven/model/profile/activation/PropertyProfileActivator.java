@@ -61,7 +61,7 @@ public class PropertyProfileActivator implements ProfileActivator {
             name = name.substring(1);
         }
 
-        if (name == null || name.length() <= 0) {
+        if (name == null || name.isEmpty()) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
                     .setMessage("The property name is required to activate the profile " + profile.getId())
                     .setLocation(property.getLocation("")));

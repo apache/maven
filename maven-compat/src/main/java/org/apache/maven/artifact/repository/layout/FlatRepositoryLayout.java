@@ -54,7 +54,7 @@ public class FlatRepositoryLayout implements ArtifactRepositoryLayout {
         }
 
         if (artifactHandler.getExtension() != null
-                && artifactHandler.getExtension().length() > 0) {
+                && !artifactHandler.getExtension().isEmpty()) {
             path.append(GROUP_SEPARATOR).append(artifactHandler.getExtension());
         }
 

@@ -33,7 +33,7 @@ class MavenArtifact implements ArtifactTransferResource {
     MavenArtifact(String repositoryUrl, Resource resource) {
         if (repositoryUrl == null) {
             this.repositoryUrl = "";
-        } else if (!repositoryUrl.endsWith("/") && repositoryUrl.length() > 0) {
+        } else if (!repositoryUrl.endsWith("/") && !repositoryUrl.isEmpty()) {
             this.repositoryUrl = repositoryUrl + '/';
         } else {
             this.repositoryUrl = repositoryUrl;
