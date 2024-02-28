@@ -510,7 +510,7 @@ public interface Session {
 
     ProjectScope requireProjectScope(String id);
 
-    DependencyScope requireDependencyScope(String id);
+    DependencyScope requireDependencyScope(@Nonnull String id);
 
     PathScope requirePathScope(String id);
 }
