@@ -123,26 +123,29 @@ public class LifecycleDependencyResolver {
                 }
             }
 
-            Set<Artifact> resolvedArtifacts;
             ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey(
                     project, scopesToCollect, scopesToResolve, aggregating, session.getRepositorySession());
             ProjectArtifactsCache.CacheRecord recordArtifacts;
             recordArtifacts = projectArtifactsCache.get(cacheKey);
 
-            if (recordArtifacts != null) {
-                resolvedArtifacts = recordArtifacts.getArtifacts();
-            } else {
-                try {
-                    resolvedArtifacts = getDependencies(
-                            project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
-                    recordArtifacts = projectArtifactsCache.put(cacheKey, resolvedArtifacts);
-                } catch (LifecycleExecutionException e) {
-                    projectArtifactsCache.put(cacheKey, e);
-                    projectArtifactsCache.register(project, cacheKey, recordArtifacts);
-                    throw e;
+            if (recordArtifacts == null) {
+                synchronized (cacheKey) {
+                    recordArtifacts = projectArtifactsCache.get(cacheKey);
+                    if (recordArtifacts == null) {
+                        try {
+                            Set<Artifact> resolvedArtifacts = getDependencies(
+                                    project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
+                            recordArtifacts = projectArtifactsCache.put(cacheKey, resolvedArtifacts);
+                        } catch (LifecycleExecutionException e) {
+                            projectArtifactsCache.put(cacheKey, e);
+                            projectArtifactsCache.register(project, cacheKey, recordArtifacts);
+                            throw e;
+                        }
+                    }
                 }
             }
             projectArtifactsCache.register(project, cacheKey, recordArtifacts);
+            Set<Artifact> resolvedArtifacts = recordArtifacts.getArtifacts();
 
             Map<Artifact, File> reactorProjects =
                     new HashMap<>(session.getProjects().size());
