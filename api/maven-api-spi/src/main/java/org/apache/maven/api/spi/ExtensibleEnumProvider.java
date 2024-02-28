@@ -22,7 +22,7 @@ import java.util.Collection;
 
 import org.apache.maven.api.ExtensibleEnum;
 
-public interface ExtensibleEnumProvider<T extends ExtensibleEnum> {
+public interface ExtensibleEnumProvider<T extends ExtensibleEnum> extends SpiService {
 
     Collection<T> provides();
 }
