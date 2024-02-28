@@ -50,13 +50,14 @@ import org.eclipse.aether.repository.WorkspaceRepository;
 public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
 
     private Map<Key, PluginDescriptor> descriptors = new ConcurrentHashMap<>(128);
+    private Map<Key, Key> keys = new ConcurrentHashMap<>();
 
     public void flush() {
         descriptors.clear();
     }
 
     public Key createKey(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session) {
-        return new CacheKey(plugin, repositories, session);
+        return keys.computeIfAbsent(new CacheKey(plugin, repositories, session), k -> k);
     }
 
     public PluginDescriptor get(Key cacheKey) {
@@ -66,26 +67,20 @@ public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
     @Override
     public PluginDescriptor get(Key key, PluginDescriptorSupplier supplier)
             throws PluginDescriptorParsingException, PluginResolutionException, InvalidPluginDescriptorException {
+
         try {
-            return clone(descriptors.computeIfAbsent(key, k -> {
-                try {
-                    return clone(supplier.load());
-                } catch (PluginDescriptorParsingException
-                        | PluginResolutionException
-                        | InvalidPluginDescriptorException e) {
-                    throw new RuntimeException(e);
+            PluginDescriptor desc = descriptors.get(key);
+            if (desc == null) {
+                synchronized (key) {
+                    desc = descriptors.get(key);
+                    if (desc == null) {
+                        desc = supplier.load();
+                        descriptors.putIfAbsent(key, clone(desc));
+                    }
                 }
-            }));
-        } catch (RuntimeException e) {
-            if (e.getCause() instanceof PluginDescriptorParsingException) {
-                throw (PluginDescriptorParsingException) e.getCause();
             }
-            if (e.getCause() instanceof PluginResolutionException) {
-                throw (PluginResolutionException) e.getCause();
-            }
-            if (e.getCause() instanceof InvalidPluginDescriptorException) {
-                throw (InvalidPluginDescriptorException) e.getCause();
-            }
+            return clone(desc);
+        } catch (PluginDescriptorParsingException | PluginResolutionException | InvalidPluginDescriptorException e) {
             throw e;
         }
     }

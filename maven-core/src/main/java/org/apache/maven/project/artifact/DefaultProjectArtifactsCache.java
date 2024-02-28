@@ -161,6 +161,7 @@ public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
     }
 
     protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
+    protected final Map<Key, Key> keys = new ConcurrentHashMap<>();
 
     @Override
     public Key createKey(
@@ -169,13 +170,14 @@ public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
             Collection<String> scopesToResolve,
             boolean aggregating,
             RepositorySystemSession session) {
-        return new CacheKey(
+        Key key = new CacheKey(
                 project,
                 project.getRemoteProjectRepositories(),
                 scopesToCollect,
                 scopesToResolve,
                 aggregating,
                 session);
+        return keys.computeIfAbsent(key, k -> k);
     }
 
     @Override
