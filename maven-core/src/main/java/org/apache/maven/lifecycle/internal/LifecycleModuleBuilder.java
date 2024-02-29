@@ -85,7 +85,8 @@ public class LifecycleModuleBuilder {
 
         try {
 
-            if (reactorContext.getReactorBuildStatus().isHaltedOrBlacklisted(currentProject)) {
+            if (reactorContext.getReactorBuildStatus().isHaltedOrBlacklisted(currentProject)
+                    || !currentProject.isProjectNeedsBuild()) {
                 eventCatapult.fire(ExecutionEvent.Type.ProjectSkipped, session, null);
                 return;
             }

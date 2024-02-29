@@ -141,7 +141,11 @@ public class DefaultGraphBuilder implements GraphBuilder {
         activeProjects = trimExcludedProjects(activeProjects, projectDependencyGraph, session.getRequest());
 
         if (activeProjects.size() != projectDependencyGraph.getSortedProjects().size()) {
-            projectDependencyGraph = new FilteredProjectDependencyGraph(projectDependencyGraph, activeProjects);
+            for (MavenProject mavenProject : projectDependencyGraph.getSortedProjects()) {
+                if (!activeProjects.contains(mavenProject)) {
+                    mavenProject.skipProjectBuild();
+                }
+            }
         }
 
         return Result.success(projectDependencyGraph);

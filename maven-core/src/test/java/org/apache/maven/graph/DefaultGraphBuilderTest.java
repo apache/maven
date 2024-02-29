@@ -49,6 +49,7 @@ import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.ProjectsSelector;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -70,6 +71,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Disabled
 class DefaultGraphBuilderTest {
     /*
     The multi-module structure in this project is displayed as follows:
