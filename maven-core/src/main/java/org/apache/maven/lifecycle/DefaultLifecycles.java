@@ -156,7 +156,7 @@ public class DefaultLifecycles {
         // Lifecycles cannot be cached as extensions might add custom lifecycles later in the execution.
         try {
             return registry != null
-                    ? registry.stream().collect(Collectors.toMap(lf -> lf.id(), lf -> new Lifecycle(lf)))
+                    ? registry.stream().collect(Collectors.toMap(lf -> lf.id(), lf -> new Lifecycle(registry, lf)))
                     : Map.of();
         } catch (LookupException e) {
             throw new IllegalStateException("Unable to lookup lifecycles from the plexus container", e);
