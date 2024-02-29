@@ -551,6 +551,9 @@ public class ${className} {
   #foreach ( $field in $allFields )
     #if ( $Helper.xmlFieldMetadata( $field ).attribute )
       #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
+      #if ( ! $fieldTagName )
+        #set ( $fieldTagName = $field.name )
+      #end
       #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
             } else if ("$fieldTagName".equals(name)) {
       #if ( $locationTracking )
@@ -562,6 +565,8 @@ public class ${className} {
                 ${classLcapName}.${field.name}(interpolatedTrimmed(value, "$fieldTagName"));
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
                 ${classLcapName}.${field.name}(getBooleanValue(interpolatedTrimmed(value, "$fieldTagName"), "$fieldTagName", parser, ${field.defaultValue}));
+      #elseif ( $field.type == "int" || $field.type == "Integer" )
+                ${classLcapName}.${field.name}(getIntegerValue(interpolatedTrimmed(value, "$fieldTagName"), "$fieldTagName", parser, strict, ${field.defaultValue}));
       #else
                 // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end

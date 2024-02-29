@@ -24,6 +24,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -47,8 +48,26 @@ import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
+import static org.apache.maven.api.Lifecycle.Phase.BUILD;
+import static org.apache.maven.api.Lifecycle.Phase.COMPILE;
+import static org.apache.maven.api.Lifecycle.Phase.DEPLOY;
+import static org.apache.maven.api.Lifecycle.Phase.INITIALIZE;
+import static org.apache.maven.api.Lifecycle.Phase.INSTALL;
+import static org.apache.maven.api.Lifecycle.Phase.INTEGRATION_TEST;
+import static org.apache.maven.api.Lifecycle.Phase.PACKAGE;
+import static org.apache.maven.api.Lifecycle.Phase.READY;
+import static org.apache.maven.api.Lifecycle.Phase.RESOURCES;
+import static org.apache.maven.api.Lifecycle.Phase.SOURCES;
+import static org.apache.maven.api.Lifecycle.Phase.TEST;
+import static org.apache.maven.api.Lifecycle.Phase.TEST_COMPILE;
+import static org.apache.maven.api.Lifecycle.Phase.TEST_RESOURCES;
+import static org.apache.maven.api.Lifecycle.Phase.TEST_SOURCES;
+import static org.apache.maven.api.Lifecycle.Phase.UNIT_TEST;
+import static org.apache.maven.api.Lifecycle.Phase.VALIDATE;
+import static org.apache.maven.api.Lifecycle.Phase.VERIFY;
+import static org.apache.maven.internal.impl.Lifecycles.after;
+import static org.apache.maven.internal.impl.Lifecycles.alias;
+import static org.apache.maven.internal.impl.Lifecycles.dependencies;
 import static org.apache.maven.internal.impl.Lifecycles.phase;
 import static org.apache.maven.internal.impl.Lifecycles.plugin;
 
@@ -58,6 +77,8 @@ import static org.apache.maven.internal.impl.Lifecycles.plugin;
 @Named
 @Singleton
 public class DefaultLifecycleRegistry implements LifecycleRegistry {
+
+    private static final String MAVEN_PLUGINS = "org.apache.maven.plugins:";
 
     private final List<LifecycleProvider> providers;
 
@@ -73,7 +94,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         // validate lifecycle
         for (Lifecycle lifecycle : this) {
             Set<String> set = new HashSet<>();
-            lifecycle.phases().forEach(phase -> {
+            lifecycle.allPhases().forEach(phase -> {
                 if (!set.add(phase.name())) {
                     throw new IllegalArgumentException(
                             "Found duplicated phase '" + phase.name() + "' in '" + lifecycle.id() + "' lifecycle");
@@ -95,6 +116,57 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
     @Override
     public Optional<Lifecycle> lookup(String id) {
         return stream().filter(lf -> Objects.equals(id, lf.id())).findAny();
+    }
+
+    public List<String> computePhases(Lifecycle lifecycle) {
+        Graph graph = new Graph();
+        lifecycle.phases().forEach(phase -> addPhase(graph, null, null, phase));
+        List<String> allPhases = graph.visitAll();
+        Collections.reverse(allPhases);
+        List<String> computed =
+                allPhases.stream().filter(s -> !s.startsWith("$")).collect(Collectors.toList());
+        List<String> given = lifecycle.orderedPhases().orElse(null);
+        if (given != null) {
+            if (given.size() != computed.size()) {
+                Set<String> s1 =
+                        given.stream().filter(s -> !computed.contains(s)).collect(Collectors.toSet());
+                Set<String> s2 =
+                        computed.stream().filter(s -> !given.contains(s)).collect(Collectors.toSet());
+                throw new IllegalStateException(
+                        "List of phases differ in size: expected " + computed.size() + ", but received " + given.size()
+                                + (s1.isEmpty() ? "" : ", missing " + s1)
+                                + (s2.isEmpty() ? "" : ", unexpected " + s2));
+            }
+            return given;
+        }
+        return computed;
+    }
+
+    private static void addPhase(
+            Graph graph, Graph.Vertex before, Graph.Vertex after, org.apache.maven.api.Lifecycle.Phase phase) {
+        Graph.Vertex ep0 = graph.addVertex("$" + phase.name());
+        Graph.Vertex ep1 = graph.addVertex("$$" + phase.name());
+        Graph.Vertex ep2 = graph.addVertex(phase.name());
+        Graph.Vertex ep3 = graph.addVertex("$$$" + phase.name());
+        graph.addEdge(ep0, ep1);
+        graph.addEdge(ep1, ep2);
+        graph.addEdge(ep2, ep3);
+        if (before != null) {
+            graph.addEdge(before, ep0);
+        }
+        if (after != null) {
+            graph.addEdge(ep3, after);
+        }
+        phase.links().forEach(link -> {
+            if (link.pointer().type() == Lifecycle.Pointer.Type.PROJECT) {
+                if (link.kind() == Lifecycle.Link.Kind.AFTER) {
+                    graph.addEdge(graph.addVertex(link.pointer().phase()), ep0);
+                } else {
+                    graph.addEdge(ep3, graph.addVertex("$" + link.pointer().phase()));
+                }
+            }
+        });
+        phase.phases().forEach(child -> addPhase(graph, ep1, ep2, child));
     }
 
     @Named
@@ -141,6 +213,17 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                                 }
 
                                 @Override
+                                public List<Phase> phases() {
+                                    return List.of();
+                                }
+
+                                @Override
+                                public Stream<Phase> allPhases() {
+                                    return Stream.concat(
+                                            Stream.of(this), phases().stream().flatMap(Lifecycle.Phase::allPhases));
+                                }
+
+                                @Override
                                 public List<Plugin> plugins() {
                                     Map<String, LifecyclePhase> lfPhases = lifecycle.getDefaultLifecyclePhases();
                                     LifecyclePhase phase = lfPhases != null ? lfPhases.get(name) : null;
@@ -151,16 +234,26 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                                     }
                                     return List.of();
                                 }
+
+                                @Override
+                                public Collection<Link> links() {
+                                    return List.of();
+                                }
                             })
                             .toList();
+                }
+
+                @Override
+                public Collection<Alias> aliases() {
+                    return Collections.emptyList();
                 }
             };
         }
     }
 
     static class WrappedLifecycle extends org.apache.maven.lifecycle.Lifecycle {
-        WrappedLifecycle(Lifecycle lifecycle) {
-            super(lifecycle);
+        WrappedLifecycle(LifecycleRegistry registry, Lifecycle lifecycle) {
+            super(registry, lifecycle);
         }
     }
 
@@ -178,7 +271,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         public org.apache.maven.lifecycle.Lifecycle get() {
             try {
                 LifecycleRegistry registry = lookup.lookup(LifecycleRegistry.class);
-                return new WrappedLifecycle(registry.require(name));
+                return new WrappedLifecycle(registry, registry.require(name));
             } catch (ComponentLookupException e) {
                 throw new LookupException(e);
             }
@@ -187,6 +280,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     @Singleton
     @Named(Lifecycle.CLEAN)
+    @SuppressWarnings("unused")
     static class CleanLifecycleProvider extends BaseLifecycleProvider {
         CleanLifecycleProvider() {
             super(Lifecycle.CLEAN);
@@ -195,6 +289,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     @Singleton
     @Named(Lifecycle.DEFAULT)
+    @SuppressWarnings("unused")
     static class DefaultLifecycleProvider extends BaseLifecycleProvider {
         DefaultLifecycleProvider() {
             super(Lifecycle.DEFAULT);
@@ -203,6 +298,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     @Singleton
     @Named(Lifecycle.SITE)
+    @SuppressWarnings("unused")
     static class SiteLifecycleProvider extends BaseLifecycleProvider {
         SiteLifecycleProvider() {
             super(Lifecycle.SITE);
@@ -211,6 +307,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     @Singleton
     @Named(Lifecycle.WRAPPER)
+    @SuppressWarnings("unused")
     static class WrapperLifecycleProvider extends BaseLifecycleProvider {
         WrapperLifecycleProvider() {
             super(Lifecycle.WRAPPER);
@@ -228,15 +325,16 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
         @Override
         public Collection<Phase> phases() {
-            return asList(
-                    phase("pre-clean"),
-                    phase(
-                            "clean",
-                            plugin(
-                                    "org.apache.maven.plugins:maven-clean-plugin:" + MAVEN_CLEAN_PLUGIN_VERSION
-                                            + ":clean",
-                                    "clean")),
-                    phase("post-clean"));
+            return List.of(phase(
+                    Phase.CLEAN,
+                    plugin(
+                            MAVEN_PLUGINS + "maven-clean-plugin:" + MAVEN_CLEAN_PLUGIN_VERSION + ":clean",
+                            Phase.CLEAN)));
+        }
+
+        @Override
+        public Collection<Alias> aliases() {
+            return List.of(alias("pre-clean", BEFORE + Phase.CLEAN), alias("post-clean", AFTER + Phase.CLEAN));
         }
     }
 
@@ -248,36 +346,101 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
         @Override
         public Collection<Phase> phases() {
-            return asList(
-                    phase("validate"),
-                    phase("initialize"),
-                    phase("generate-sources"),
-                    phase("process-sources"),
-                    phase("generate-resources"),
-                    phase("process-resources"),
-                    phase("compile"),
-                    phase("process-classes"),
-                    phase("generate-test-sources"),
-                    phase("process-test-sources"),
-                    phase("generate-test-resources"),
-                    phase("process-test-resources"),
-                    phase("test-compile"),
-                    phase("process-test-classes"),
-                    phase("test"),
-                    phase("prepare-package"),
-                    phase("package"),
-                    phase("pre-integration-test"),
-                    phase("integration-test"),
-                    phase("post-integration-test"),
-                    phase("verify"),
-                    phase("install"),
-                    phase("deploy"));
+            return List.of(phase(
+                    "all",
+                    phase(INITIALIZE, phase(VALIDATE)),
+                    phase(
+                            BUILD,
+                            after(VALIDATE),
+                            phase(SOURCES),
+                            phase(RESOURCES),
+                            phase(COMPILE, after(SOURCES), dependencies(COMPILE, READY)),
+                            phase(READY, after(COMPILE), after(RESOURCES)),
+                            phase(PACKAGE, after(READY), dependencies("runtime", PACKAGE))),
+                    phase(
+                            VERIFY,
+                            after(VALIDATE),
+                            phase(
+                                    UNIT_TEST,
+                                    phase(TEST_SOURCES),
+                                    phase(TEST_RESOURCES),
+                                    phase(
+                                            TEST_COMPILE,
+                                            after(TEST_SOURCES),
+                                            after(READY),
+                                            dependencies("test-only", READY)),
+                                    phase(
+                                            TEST,
+                                            after(TEST_COMPILE),
+                                            after(TEST_RESOURCES),
+                                            dependencies("test", READY))),
+                            phase(INTEGRATION_TEST)),
+                    phase(INSTALL, after(PACKAGE)),
+                    phase(DEPLOY, after(PACKAGE))));
+        }
+
+        @Override
+        public Collection<Alias> aliases() {
+            return List.of(
+                    alias("generate-sources", SOURCES),
+                    alias("process-sources", AFTER + SOURCES),
+                    alias("generate-resources", RESOURCES),
+                    alias("process-resources", AFTER + RESOURCES),
+                    alias("process-classes", AFTER + COMPILE),
+                    alias("generate-test-sources", TEST_SOURCES),
+                    alias("process-test-sources", AFTER + TEST_SOURCES),
+                    alias("generate-test-resources", TEST_RESOURCES),
+                    alias("process-test-resources", AFTER + TEST_RESOURCES),
+                    alias("process-test-classes", AFTER + TEST_COMPILE),
+                    alias("prepare-package", BEFORE + PACKAGE),
+                    alias("pre-integration-test", BEFORE + INTEGRATION_TEST),
+                    alias("post-integration-test", AFTER + INTEGRATION_TEST));
+        }
+
+        @Override
+        public Optional<List<String>> orderedPhases() {
+            return Optional.of(Arrays.asList(
+                    VALIDATE,
+                    INITIALIZE,
+                    // "generate-sources",
+                    SOURCES,
+                    // "process-sources",
+                    // "generate-resources",
+                    RESOURCES,
+                    // "process-resources",
+                    COMPILE,
+                    // "process-classes",
+                    READY,
+                    // "generate-test-sources",
+                    TEST_SOURCES,
+                    // "process-test-sources",
+                    // "generate-test-resources",
+                    TEST_RESOURCES,
+                    // "process-test-resources",
+                    TEST_COMPILE,
+                    // "process-test-classes",
+                    TEST,
+                    UNIT_TEST,
+                    // "prepare-package",
+                    PACKAGE,
+                    BUILD,
+                    // "pre-integration-test",
+                    INTEGRATION_TEST,
+                    // "post-integration-test",
+                    VERIFY,
+                    INSTALL,
+                    DEPLOY,
+                    "all"));
         }
     }
 
     static class SiteLifecycle implements Lifecycle {
 
         private static final String MAVEN_SITE_PLUGIN_VERSION = "3.12.1";
+        private static final String MAVEN_SITE_PLUGIN =
+                MAVEN_PLUGINS + "maven-site-plugin:" + MAVEN_SITE_PLUGIN_VERSION + ":";
+        private static final String PHASE_SITE = "site";
+        private static final String PHASE_SITE_DEPLOY = "site-deploy";
 
         @Override
         public String id() {
@@ -286,26 +449,24 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
         @Override
         public Collection<Phase> phases() {
-            return asList(
-                    phase("pre-site"),
+            return List.of(
+                    phase(PHASE_SITE, plugin(MAVEN_SITE_PLUGIN + "site", PHASE_SITE)),
                     phase(
-                            "site",
-                            plugin(
-                                    "org.apache.maven.plugins:maven-site-plugin:" + MAVEN_SITE_PLUGIN_VERSION + ":site",
-                                    "site")),
-                    phase("post-site"),
-                    phase(
-                            "site-deploy",
-                            plugin(
-                                    "org.apache.maven.plugins:maven-site-plugin:" + MAVEN_SITE_PLUGIN_VERSION
-                                            + ":deploy",
-                                    "site-deploy")));
+                            PHASE_SITE_DEPLOY,
+                            after(PHASE_SITE),
+                            plugin(MAVEN_SITE_PLUGIN + "deploy", PHASE_SITE_DEPLOY)));
+        }
+
+        @Override
+        public Collection<Alias> aliases() {
+            return List.of(alias("pre-site", BEFORE + PHASE_SITE), alias("post-site", AFTER + PHASE_SITE));
         }
     }
 
     static class WrapperLifecycle implements Lifecycle {
 
         private static final String MAVEN_WRAPPER_PLUGIN_VERSION = "3.2.0";
+        private static final String PHASE_WRAPPER = "wrapper";
 
         @Override
         public String id() {
@@ -314,12 +475,16 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
         @Override
         public Collection<Phase> phases() {
-            return singleton(phase(
-                    "wrapper",
+            return List.of(phase(
+                    PHASE_WRAPPER,
                     plugin(
-                            "org.apache.maven.plugins:maven-wrapper-plugin:" + MAVEN_WRAPPER_PLUGIN_VERSION
-                                    + ":wrapper",
-                            "wrapper")));
+                            MAVEN_PLUGINS + "maven-wrapper-plugin:" + MAVEN_WRAPPER_PLUGIN_VERSION + ":wrapper",
+                            PHASE_WRAPPER)));
+        }
+
+        @Override
+        public Collection<Alias> aliases() {
+            return List.of();
         }
     }
 }

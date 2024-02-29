@@ -94,7 +94,7 @@ under the License.
             <phase>generate-sources</phase>
             <configuration>
               <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
-              <version>1.0.0</version>
+              <version>2.0.0</version>
               <models>
                 <model>src/main/mdo/lifecycle.mdo</model>
               </models>

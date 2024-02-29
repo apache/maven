@@ -21,9 +21,11 @@ package org.apache.maven.api;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Plugin;
 
 /**
@@ -41,13 +43,19 @@ import org.apache.maven.api.model.Plugin;
 @Immutable
 public interface Lifecycle extends ExtensibleEnum {
 
+    // =========================
+    // Maven defined lifecycles
+    // =========================
     String CLEAN = "clean";
-
     String DEFAULT = "default";
-
     String SITE = "site";
-
     String WRAPPER = "wrapper";
+
+    // ======================
+    // Phase qualifiers
+    // ======================
+    String BEFORE = "before:";
+    String AFTER = "after:";
 
     /**
      * Name or identifier of this lifecycle.
@@ -63,6 +71,18 @@ public interface Lifecycle extends ExtensibleEnum {
     Collection<Phase> phases();
 
     /**
+     * Stream of phases containing all child phases recursively.
+     */
+    default Stream<Phase> allPhases() {
+        return phases().stream().flatMap(Phase::allPhases);
+    }
+
+    /**
+     * Collection of aliases.
+     */
+    Collection<Alias> aliases();
+
+    /**
      * Pre-ordered list of phases.
      * If not provided, a default order will be computed.
      */
@@ -72,10 +92,108 @@ public interface Lifecycle extends ExtensibleEnum {
 
     /**
      * A phase in the lifecycle.
+     *
+     * A phase is identified by its name. It also contains a list of plugins bound to that phase,
+     * a list of {@link Link links}, and a list of sub-phases.  This forms a tree of phases.
      */
     interface Phase {
+
+        // ======================
+        // Maven defined phases
+        // ======================
+        String BUILD = "build";
+        String INITIALIZE = "initialize";
+        String VALIDATE = "validate";
+        String SOURCES = "sources";
+        String RESOURCES = "resources";
+        String COMPILE = "compile";
+        String READY = "ready";
+        String PACKAGE = "package";
+        String VERIFY = "verify";
+        String UNIT_TEST = "unit-test";
+        String TEST_SOURCES = "test-sources";
+        String TEST_RESOURCES = "test-resources";
+        String TEST_COMPILE = "test-compile";
+        String TEST = "test";
+        String INTEGRATION_TEST = "integration-test";
+        String INSTALL = "install";
+        String DEPLOY = "deploy";
+        String CLEAN = "clean";
+
+        @Nonnull
         String name();
 
+        @Nonnull
         List<Plugin> plugins();
+
+        @Nonnull
+        Collection<Link> links();
+
+        /**
+         * {@return the list of sub-phases}
+         */
+        @Nonnull
+        List<Phase> phases();
+
+        @Nonnull
+        Stream<Phase> allPhases();
+    }
+
+    /**
+     * A phase alias, mostly used to support the Maven 3 phases which are mapped
+     * to dynamic phases in Maven 4.
+     */
+    interface Alias {
+        String v3Phase();
+
+        String v4Phase();
+    }
+
+    /**
+     * A link from a phase to another phase, consisting of a type which can be
+     * {@link Kind#BEFORE} or {@link Kind#AFTER}, and a {@link Pointer} to
+     * another phase.
+     */
+    interface Link {
+        enum Kind {
+            BEFORE,
+            AFTER
+        }
+
+        Kind kind();
+
+        Pointer pointer();
+    }
+
+    interface Pointer {
+        enum Type {
+            PROJECT,
+            DEPENDENCIES,
+            CHILDREN
+        }
+
+        String phase();
+
+        Type type();
+    }
+
+    interface PhasePointer extends Pointer {
+        default Type type() {
+            return Type.PROJECT;
+        }
+    }
+
+    interface DependenciesPointer extends Pointer {
+        String scope(); // default: all
+
+        default Type type() {
+            return Type.DEPENDENCIES;
+        }
+    }
+
+    interface ChildrenPointer extends Pointer {
+        default Type type() {
+            return Type.CHILDREN;
+        }
     }
 }
