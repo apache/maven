@@ -33,6 +33,8 @@ import org.apache.maven.api.*;
 import org.apache.maven.api.services.*;
 import org.apache.maven.api.spi.*;
 
+import static org.apache.maven.internal.impl.Utils.nonNull;
+
 public class ExtensibleEnumRegistries {
 
     @Named
@@ -76,7 +78,7 @@ public class ExtensibleEnumRegistries {
     static class DefaultExtensibleEnumRegistry<T extends ExtensibleEnum, P extends ExtensibleEnumProvider<T>>
             implements ExtensibleEnumRegistry<T> {
 
-        private final Map<String, T> values;
+        protected final Map<String, T> values;
 
         DefaultExtensibleEnumRegistry(List<P> providers, T... builtinValues) {
             values = Stream.<T>concat(
@@ -86,7 +88,7 @@ public class ExtensibleEnumRegistries {
 
         @Override
         public Optional<T> lookup(String id) {
-            return Optional.ofNullable(values.get(id));
+            return Optional.ofNullable(values.get(nonNull(id, "id")));
         }
     }
 }
