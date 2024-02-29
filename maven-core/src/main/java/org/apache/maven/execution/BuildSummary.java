@@ -36,7 +36,12 @@ public abstract class BuildSummary {
     /**
      * The build time of the project in milliseconds.
      */
-    private final long time;
+    private final long wallTime;
+
+    /**
+     * The total amount of time spent for to run mojos in milliseconds.
+     */
+    private final long execTime;
 
     /**
      * Creates a new build summary for the specified project.
@@ -45,9 +50,21 @@ public abstract class BuildSummary {
      * @param time The build time of the project in milliseconds.
      */
     protected BuildSummary(MavenProject project, long time) {
+        this(project, time, time);
+    }
+
+    /**
+     * Creates a new build summary for the specified project.
+     *
+     * @param project The project being summarized, must not be {@code null}.
+     * @param execTime The exec time of the project in milliseconds.
+     * @param wallTime The wall time of the project in milliseconds.
+     */
+    protected BuildSummary(MavenProject project, long execTime, long wallTime) {
         this.project = Objects.requireNonNull(project, "project cannot be null");
         // TODO Validate for < 0?
-        this.time = time;
+        this.execTime = execTime;
+        this.wallTime = wallTime;
     }
 
     /**
@@ -60,11 +77,20 @@ public abstract class BuildSummary {
     }
 
     /**
-     * Gets the build time of the project in milliseconds.
+     * Gets the wall time of the project in milliseconds.
      *
-     * @return The build time of the project in milliseconds.
+     * @return The wall time of the project in milliseconds.
      */
     public long getTime() {
-        return time;
+        return execTime;
+    }
+
+    /**
+     * Gets the exec time of the project in milliseconds.
+     *
+     * @return The exec time of the project in milliseconds.
+     */
+    public long getWallTime() {
+        return wallTime;
     }
 }

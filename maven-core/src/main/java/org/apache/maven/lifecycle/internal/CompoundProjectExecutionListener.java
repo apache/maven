@@ -24,10 +24,10 @@ import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 
-class CompoundProjectExecutionListener implements ProjectExecutionListener {
+public class CompoundProjectExecutionListener implements ProjectExecutionListener {
     private final Collection<ProjectExecutionListener> listeners;
 
-    CompoundProjectExecutionListener(Collection<ProjectExecutionListener> listeners) {
+    public CompoundProjectExecutionListener(Collection<ProjectExecutionListener> listeners) {
         this.listeners = listeners; // NB this is live injected collection
     }
 

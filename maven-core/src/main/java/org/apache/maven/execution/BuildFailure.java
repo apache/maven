@@ -39,7 +39,19 @@ public class BuildFailure extends BuildSummary {
      * @param cause The cause of the build failure, may be {@code null}.
      */
     public BuildFailure(MavenProject project, long time, Throwable cause) {
-        super(project, time);
+        this(project, time, time, cause);
+    }
+
+    /**
+     * Creates a new build summary for the specified project.
+     *
+     * @param project The project being summarized, must not be {@code null}.
+     * @param execTime The exec time of the project in milliseconds.
+     * @param wallTime The wall time of the project in milliseconds.
+     * @param cause The cause of the build failure, may be {@code null}.
+     */
+    public BuildFailure(MavenProject project, long execTime, long wallTime, Throwable cause) {
+        super(project, execTime, wallTime);
         this.cause = cause;
     }
 

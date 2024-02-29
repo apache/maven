@@ -56,6 +56,7 @@ public interface Lifecycle extends ExtensibleEnum {
     // ======================
     String BEFORE = "before:";
     String AFTER = "after:";
+    String AT = "at:";
 
     /**
      * Name or identifier of this lifecycle.
