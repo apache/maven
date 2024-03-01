@@ -1846,7 +1846,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             if (importSource instanceof FileModelSource && request.getRootDirectory() != null) {
-                URI sourceUri = ((FileModelSource) importSource).getLocationURI();
+                URI sourceUri = ((FileModelSource) importSource).getPath().toUri();
                 // URI.relativize does the job for us, as if the scheme and authority components of the two URIs
                 // are not identical, or if the path of this URI is not a prefix of the path of the passed URI,
                 // then the passed in URI is returned. Hence, if relativize succeeds, we should report problem,
