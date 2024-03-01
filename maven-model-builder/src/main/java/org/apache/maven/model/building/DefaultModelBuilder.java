@@ -25,6 +25,8 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URI;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -1032,14 +1034,27 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
+    @Deprecated
     @Override
     public Result<? extends Model> buildRawModel(File pomFile, int validationLevel, boolean locationTracking) {
+        return buildRawModel(pomFile.toPath(), validationLevel, locationTracking, null);
+    }
+
+    @Override
+    public Result<? extends Model> buildRawModel(Path pomFile, int validationLevel, boolean locationTracking) {
         return buildRawModel(pomFile, validationLevel, locationTracking, null);
+    }
+
+    @Deprecated
+    @Override
+    public Result<? extends Model> buildRawModel(
+            File pomFile, int validationLevel, boolean locationTracking, TransformerContext context) {
+        return buildRawModel(pomFile.toPath(), validationLevel, locationTracking, context);
     }
 
     @Override
     public Result<? extends Model> buildRawModel(
-            File pomFile, int validationLevel, boolean locationTracking, TransformerContext context) {
+            Path pomFile, int validationLevel, boolean locationTracking, TransformerContext context) {
         final ModelBuildingRequest request = new DefaultModelBuildingRequest()
                 .setValidationLevel(validationLevel)
                 .setLocationTracking(locationTracking)
@@ -1050,7 +1065,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             try {
                 if (transformer != null && context != null) {
-                    transformer.transform(pomFile.toPath(), context, model);
+                    transformer.transform(pomFile, context, model);
                 }
             } catch (TransformerException e) {
                 problems.add(
@@ -1828,6 +1843,15 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .setLocation(dependency.getLocation(""))
                         .setException(e));
                 return null;
+            }
+
+            if (importSource instanceof FileModelSource && request.getRootDirectory() != null) {
+                URI sourceUri = ((FileModelSource) importSource).getLocationURI();
+                if (request.getRootDirectory().toUri().relativize(sourceUri) != sourceUri) {
+                    problems.add(new ModelProblemCollectorRequest(Severity.WARNING, ModelProblem.Version.BASE)
+                            .setMessage("BOM imports from within reactor should be avoided")
+                            .setLocation(dependency.getLocation("")));
+                }
             }
 
             final ModelBuildingResult importResult;
