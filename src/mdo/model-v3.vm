@@ -282,6 +282,16 @@ public class ${class.name}
                         .location(key, location.toApiLocation()).build());
     }
 
+    public InputLocation getImportedFrom() {
+        ${packageModelV4}.InputLocation loc = getDelegate().getImportedFrom();
+        return loc != null ? new InputLocation(loc) : null;
+    }
+
+    public void setImportedFrom(InputLocation location) {
+        update(${packageModelV4}.${class.name}.newBuilder(getDelegate(), true)
+                        .importedFrom(location.toApiLocation()).build());
+    }
+
     #end
     protected boolean replace(Object oldDelegate, Object newDelegate) {
         if (super.replace(oldDelegate, newDelegate)) {

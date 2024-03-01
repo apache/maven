@@ -1705,8 +1705,10 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         importIds.remove(importing);
 
-        model.update(
-                dependencyManagementImporter.importManagement(model.getDelegate(), importMgmts, request, problems));
+        org.apache.maven.api.model.Model updatedModel =
+                dependencyManagementImporter.importManagement(model.getDelegate(), importMgmts, request, problems);
+        model.update(updatedModel);
+        model.setDependencyManagement(new DependencyManagement(updatedModel.getDependencyManagement()));
     }
 
     private DependencyManagement loadDependencyManagement(

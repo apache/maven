@@ -59,6 +59,11 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
      */
     private InputLocation location;
 
+    /**
+     * Field importedFrom.
+     */
+    private InputLocation importedFrom;
+
     // ----------------/
     // - Constructors -/
     // ----------------/
@@ -73,6 +78,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
                         .collect(Collectors.toMap(
                                 e -> e.getKey(),
                                 e -> e.getValue() == location ? this : new InputLocation(e.getValue())));
+        this.importedFrom = location.getImportedFrom() != null ? new InputLocation(location.getImportedFrom()) : null;
     }
 
     public InputLocation(int lineNumber, int columnNumber) {
@@ -216,6 +222,24 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
     public InputSource getSource() {
         return this.source;
     } // -- InputSource getSource()
+
+    /**
+     * Get the imported from location.
+     *
+     * @return InputLocation
+     */
+    public InputLocation getImportedFrom() {
+        return importedFrom;
+    }
+
+    /**
+     * Set the imported from location.
+     *
+     * @param importedFrom
+     */
+    public void setImportedFrom(InputLocation importedFrom) {
+        this.importedFrom = importedFrom;
+    }
 
     /**
      * Method merge.
