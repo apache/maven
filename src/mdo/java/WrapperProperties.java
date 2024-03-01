@@ -330,4 +330,11 @@ class WrapperProperties extends Properties {
         props.putAll(getter.get());
         props.storeToXML(os, comment, encoding);
     }
+
+
+    private Object writeReplace() throws java.io.ObjectStreamException {
+        Properties props = new Properties();
+        props.putAll(getter.get());
+        return props;
+    }
 }
