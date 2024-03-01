@@ -22,6 +22,8 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
+ * Interface that defines some kind of enums that can be extended by Maven plugins or extensions.
+ *
  * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
  * can be used as keys.
  *

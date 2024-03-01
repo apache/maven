@@ -83,6 +83,7 @@ public class PluginArtifact extends DefaultArtifact implements ArtifactWithDepen
         }
 
         @Override
+        @Deprecated
         public boolean isAddedToClasspath() {
             return true;
         }

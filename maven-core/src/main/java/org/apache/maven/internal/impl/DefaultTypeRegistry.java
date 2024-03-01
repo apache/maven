@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.LanguageRegistry;
@@ -93,8 +94,9 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                         languageRegistry.require(handler.getLanguage()),
                         handler.getExtension(),
                         handler.getClassifier(),
-                        handler.isAddedToClasspath(),
-                        handler.isIncludesDependencies());
+                        handler.isIncludesDependencies(),
+                        JavaPathType.CLASSES,
+                        JavaPathType.MODULES);
             }
             return type;
         });
