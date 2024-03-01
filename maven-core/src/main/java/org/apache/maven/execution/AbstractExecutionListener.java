@@ -36,6 +36,10 @@ public class AbstractExecutionListener implements ExecutionListener {
         // default does nothing
     }
 
+    public void afterSessionEnded(ExecutionEvent event) {
+        // default does nothing
+    }
+
     public void projectSkipped(ExecutionEvent event) {
         // default does nothing
     }

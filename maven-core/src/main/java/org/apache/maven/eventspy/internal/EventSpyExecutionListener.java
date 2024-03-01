@@ -56,6 +56,12 @@ class EventSpyExecutionListener extends AbstractExecutionListener {
     }
 
     @Override
+    public void afterSessionEnded(ExecutionEvent event) {
+        dispatcher.onEvent(event);
+        delegate.afterSessionEnded(event);
+    }
+
+    @Override
     public void projectSkipped(ExecutionEvent event) {
         dispatcher.onEvent(event);
         delegate.projectSkipped(event);

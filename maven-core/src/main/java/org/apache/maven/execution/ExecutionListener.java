@@ -32,6 +32,8 @@ public interface ExecutionListener {
 
     void sessionEnded(ExecutionEvent event);
 
+    void afterSessionEnded(ExecutionEvent event);
+
     void projectSkipped(ExecutionEvent event);
 
     void projectStarted(ExecutionEvent event);

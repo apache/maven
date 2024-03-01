@@ -60,6 +60,9 @@ public class DefaultExecutionEventCatapult implements ExecutionEventCatapult {
                 case SessionEnded:
                     listener.sessionEnded(event);
                     break;
+                case AfterSessionEnded:
+                    listener.afterSessionEnded(event);
+                    break;
 
                 case ProjectSkipped:
                     listener.projectSkipped(event);

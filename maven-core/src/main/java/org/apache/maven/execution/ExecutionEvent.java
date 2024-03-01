@@ -34,6 +34,7 @@ public interface ExecutionEvent {
         ProjectDiscoveryStarted,
         SessionStarted,
         SessionEnded,
+        AfterSessionEnded,
         ProjectSkipped,
         ProjectStarted,
         ProjectSucceeded,

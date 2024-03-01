@@ -222,7 +222,16 @@ public class DefaultMaven implements Maven {
 
             legacySupport.setSession(session);
 
-            return doExecute(request, session, result, chainedWorkspaceReader);
+            result = doExecute(request, session, result, chainedWorkspaceReader);
+
+            try {
+                closeableSession.close();
+            } catch (Exception e) {
+                addExceptionToResult(result, e);
+            }
+            eventCatapult.fire(ExecutionEvent.Type.AfterSessionEnded, session, null);
+
+            return result;
         } finally {
             sessionScope.exit();
         }

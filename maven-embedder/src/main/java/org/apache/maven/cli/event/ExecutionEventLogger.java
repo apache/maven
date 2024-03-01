@@ -154,6 +154,13 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                                                 + "Fix the logged issues or remove flag --fail-on-severity (-fos).")));
             }
 
+            infoLine('-');
+        }
+    }
+
+    @Override
+    public void afterSessionEnded(ExecutionEvent event) {
+        if (logger.isInfoEnabled()) {
             logResult(event.getSession());
 
             logStats(event.getSession());
