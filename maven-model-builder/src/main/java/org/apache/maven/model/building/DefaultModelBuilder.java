@@ -25,9 +25,17 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.URI;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -1846,12 +1854,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             if (importSource instanceof FileModelSource && request.getRootDirectory() != null) {
-                URI sourceUri = ((FileModelSource) importSource).getPath().toUri();
-                // URI.relativize does the job for us, as if the scheme and authority components of the two URIs
-                // are not identical, or if the path of this URI is not a prefix of the path of the passed URI,
-                // then the passed in URI is returned. Hence, if relativize succeeds, we should report problem,
-                // as the POM originates from within the reactor.
-                if (request.getRootDirectory().toUri().relativize(sourceUri) != sourceUri) {
+                Path sourcePath = ((FileModelSource) importSource).getPath();
+                if (sourcePath.startsWith(request.getRootDirectory())) {
                     problems.add(new ModelProblemCollectorRequest(Severity.WARNING, ModelProblem.Version.BASE)
                             .setMessage("BOM imports from within reactor should be avoided")
                             .setLocation(dependency.getLocation("")));
