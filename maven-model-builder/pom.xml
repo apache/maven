@@ -34,10 +34,6 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interpolation</artifactId>
     </dependency>
     <dependency>
