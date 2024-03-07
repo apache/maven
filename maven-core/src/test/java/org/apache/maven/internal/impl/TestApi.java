@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.*;
 import org.apache.maven.api.services.DependencyResolver;
@@ -227,7 +226,7 @@ class TestApi {
         List<Dependency> deps2 = result.getNodes().stream()
                 .map(Node::getDependency)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
         assertEquals(deps, deps2);
         for (Dependency dep : deps2) {
             dep.getVersion();

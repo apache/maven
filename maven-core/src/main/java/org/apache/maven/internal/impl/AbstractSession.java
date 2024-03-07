@@ -29,7 +29,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
@@ -355,7 +354,7 @@ public abstract class AbstractSession implements InternalSession {
     public Map<Artifact, Path> resolveArtifacts(Artifact... artifacts) {
         ArtifactCoordinateFactory acf = getService(ArtifactCoordinateFactory.class);
         List<ArtifactCoordinate> coords =
-                Arrays.stream(artifacts).map(a -> acf.create(this, a)).collect(Collectors.toList());
+                Arrays.stream(artifacts).map(a -> acf.create(this, a)).toList();
         return resolveArtifacts(coords);
     }
 

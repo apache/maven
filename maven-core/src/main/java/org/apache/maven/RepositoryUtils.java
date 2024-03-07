@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
@@ -171,14 +170,14 @@ public class RepositoryUtils {
 
         List<Exclusion> excl = Optional.ofNullable(exclusions).orElse(Collections.emptyList()).stream()
                 .map(RepositoryUtils::toExclusion)
-                .collect(Collectors.toList());
+                .toList();
         return new Dependency(result, artifact.getScope(), artifact.isOptional(), excl);
     }
 
     public static List<RemoteRepository> toRepos(List<ArtifactRepository> repos) {
         return Optional.ofNullable(repos).orElse(Collections.emptyList()).stream()
                 .map(RepositoryUtils::toRepo)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static RemoteRepository toRepo(ArtifactRepository repo) {
@@ -294,7 +293,7 @@ public class RepositoryUtils {
 
         List<Exclusion> exclusions = dependency.getExclusions().stream()
                 .map(RepositoryUtils::toExclusion)
-                .collect(Collectors.toList());
+                .toList();
 
         return new Dependency(
                 artifact,
@@ -326,7 +325,7 @@ public class RepositoryUtils {
     }
 
     public static Collection<Artifact> toArtifacts(Collection<org.apache.maven.artifact.Artifact> artifactsToConvert) {
-        return artifactsToConvert.stream().map(RepositoryUtils::toArtifact).collect(Collectors.toList());
+        return artifactsToConvert.stream().map(RepositoryUtils::toArtifact).toList();
     }
 
     public static WorkspaceRepository getWorkspace(RepositorySystemSession session) {

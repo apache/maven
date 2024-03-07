@@ -88,7 +88,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 .map(Node::getDependency)
                 .filter(Objects::nonNull)
                 .map(Artifact::toCoordinate)
-                .collect(Collectors.toList());
+                .toList();
         Map<Artifact, Path> artifacts = session.resolveArtifacts(coordinates);
         DefaultDependencyResolverResult result = new DefaultDependencyResolverResult(
                 collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());

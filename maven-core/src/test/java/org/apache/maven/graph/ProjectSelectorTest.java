@@ -20,6 +20,7 @@ package org.apache.maven.graph;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -60,7 +61,7 @@ class ProjectSelectorTest {
 
     @Test
     void getBaseDirectoryFromRequestWhenDirectoryIsValidReturnFile() {
-        when(mavenExecutionRequest.getBaseDirectory()).thenReturn("path/to/file");
+        when(mavenExecutionRequest.getTopDirectory()).thenReturn(Path.of("path/to/file"));
 
         final File baseDirectoryFromRequest = sut.getBaseDirectoryFromRequest(mavenExecutionRequest);
 

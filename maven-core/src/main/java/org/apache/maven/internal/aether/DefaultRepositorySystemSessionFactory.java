@@ -312,7 +312,7 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
                 XmlNode dom = server.getDelegate().getConfiguration();
                 List<XmlNode> children = dom.getChildren().stream()
                         .filter(c -> !"wagonProvider".equals(c.getName()))
-                        .collect(Collectors.toList());
+                        .toList();
                 dom = new XmlNodeImpl(dom.getName(), null, null, children, null);
                 PlexusConfiguration config = XmlPlexusConfiguration.toPlexusConfiguration(dom);
                 configProps.put("aether.transport.wagon.config." + server.getId(), config);

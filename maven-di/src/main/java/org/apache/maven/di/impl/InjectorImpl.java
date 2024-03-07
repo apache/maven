@@ -72,7 +72,7 @@ public class InjectorImpl implements Injector {
                 try (InputStream is = enumeration.nextElement().openStream();
                         BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
                     for (String line :
-                            reader.lines().filter(l -> !l.startsWith("#")).collect(Collectors.toList())) {
+                            reader.lines().filter(l -> !l.startsWith("#")).toList()) {
                         Class<?> clazz = classLoader.loadClass(line);
                         bindImplicit(clazz);
                     }
@@ -147,7 +147,7 @@ public class InjectorImpl implements Injector {
             Set<Binding<Object>> res2 = getBindings(key.getTypeParameter(0));
             if (res2 != null) {
                 List<Supplier<Object>> bindingList =
-                        res2.stream().map(this::compile).collect(Collectors.toList());
+                        res2.stream().map(this::compile).toList();
                 //noinspection unchecked
                 return () -> (Q) new WrappingList<>(bindingList, Supplier::get);
             }

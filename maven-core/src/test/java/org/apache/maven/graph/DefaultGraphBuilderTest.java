@@ -466,7 +466,7 @@ class DefaultGraphBuilderTest {
                     when(result.getProject()).thenReturn(project);
                     return result;
                 })
-                .collect(toList());
+                .toList();
     }
 
     static class ScenarioBuilder {
@@ -553,7 +553,7 @@ class DefaultGraphBuilderTest {
         }
 
         private List<String> prependWithColonIfNeeded(String[] selectors) {
-            return Arrays.stream(selectors).map(this::prependWithColonIfNeeded).collect(toList());
+            return Arrays.stream(selectors).map(this::prependWithColonIfNeeded).toList();
         }
 
         private String prependWithColonIfNeeded(String selector) {

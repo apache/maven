@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.inject.Key;
@@ -130,7 +129,7 @@ public class SessionScope implements Scope {
                             value = superType.getInterfaces();
                         }
                         List<Class<?>> nonInterfaces =
-                                Stream.of(value).filter(c -> !c.isInterface()).collect(Collectors.toList());
+                                Stream.of(value).filter(c -> !c.isInterface()).toList();
                         if (!nonInterfaces.isEmpty()) {
                             throw new IllegalArgumentException(
                                     "The Typed annotation must contain only interfaces but the following types are not: "

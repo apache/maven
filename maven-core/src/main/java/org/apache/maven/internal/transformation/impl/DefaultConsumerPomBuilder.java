@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
@@ -256,7 +255,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
             builder.packaging(POM_PACKAGING);
             builder.profiles(model.getProfiles().stream()
                     .map(p -> prune(Profile.newBuilder(p, true), p).build())
-                    .collect(Collectors.toList()));
+                    .toList());
 
             model = builder.build();
             String modelVersion = new MavenModelVersion().getModelVersion(model);
@@ -271,7 +270,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                     model);
             builder.profiles(model.getProfiles().stream()
                     .map(p -> prune(Profile.newBuilder(p, true), p).build())
-                    .collect(Collectors.toList()));
+                    .toList());
             model = builder.build();
             String modelVersion = new MavenModelVersion().getModelVersion(model);
             model = model.withModelVersion(modelVersion);
@@ -297,6 +296,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private static List<Repository> pruneRepositories(List<Repository> repositories) {
         return repositories.stream()
                 .filter(r -> !org.apache.maven.api.Repository.CENTRAL_ID.equals(r.getId()))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

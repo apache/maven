@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Exclusion;
@@ -40,7 +39,7 @@ public class ExclusionArtifactFilter implements ArtifactFilter {
     public ExclusionArtifactFilter(List<Exclusion> exclusions) {
         this.exclusions = exclusions;
         this.predicates =
-                exclusions.stream().map(ExclusionArtifactFilter::toPredicate).collect(Collectors.toList());
+                exclusions.stream().map(ExclusionArtifactFilter::toPredicate).toList();
     }
 
     @Override

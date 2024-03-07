@@ -29,7 +29,7 @@ import static org.apache.maven.di.impl.Types.simplifyType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TypeUtilsTest {
+class TypeUtilsTest {
 
     TreeSet<String> aField;
 
@@ -42,7 +42,7 @@ public class TypeUtilsTest {
         typesStr.remove("java.util.SequencedSet<java.lang.String>");
         typesStr.remove("java.util.SequencedCollection<java.lang.String>");
         assertEquals(
-                Arrays.asList(
+                List.of(
                         "class java.lang.Object",
                         "interface java.io.Serializable",
                         "interface java.lang.Cloneable",
@@ -58,7 +58,7 @@ public class TypeUtilsTest {
     }
 
     @Test
-    public void testSimplifyType() {
+    void testSimplifyType() {
         {
             Type type = Integer.class;
             assertEquals(type, simplifyType(type));

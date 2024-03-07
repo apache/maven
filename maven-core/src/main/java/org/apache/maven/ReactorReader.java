@@ -31,7 +31,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.services.Lookup;
@@ -115,7 +114,7 @@ class ReactorReader implements MavenWorkspaceReader {
                 .values()
                 .stream()
                 .map(MavenProject::getVersion)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+                .toList();
         if (!versions.isEmpty()) {
             return versions;
         }
@@ -126,7 +125,7 @@ class ReactorReader implements MavenWorkspaceReader {
                 .stream()
                 .filter(p -> Objects.nonNull(findArtifact(p, artifact)))
                 .map(MavenProject::getVersion)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+                .toList();
     }
 
     @Override

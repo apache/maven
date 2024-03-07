@@ -441,7 +441,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             List<Callable<InterimResult>> tasks = pomFiles.stream()
                     .map(pomFile -> ((Callable<InterimResult>)
                             () -> build(projectIndex, pomFile, concat(aggregatorFiles, pomFile), root, recursive)))
-                    .collect(Collectors.toList());
+                    .toList();
             try {
                 List<Future<InterimResult>> futures = executor.invokeAll(tasks);
                 List<InterimResult> list = new ArrayList<>();

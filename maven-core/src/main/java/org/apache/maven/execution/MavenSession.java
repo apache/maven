@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -418,13 +417,13 @@ public class MavenSession implements Cloneable {
                 .localRepository(localRepo != null ? localRepo.getAbsolutePath() : null)
                 .interactiveMode(request.isInteractiveMode())
                 .offline(request.isOffline())
-                .proxies(request.getProxies().stream().map(Proxy::getDelegate).collect(Collectors.toList()))
-                .servers(request.getServers().stream().map(Server::getDelegate).collect(Collectors.toList()))
-                .mirrors(request.getMirrors().stream().map(Mirror::getDelegate).collect(Collectors.toList()))
+                .proxies(request.getProxies().stream().map(Proxy::getDelegate).toList())
+                .servers(request.getServers().stream().map(Server::getDelegate).toList())
+                .mirrors(request.getMirrors().stream().map(Mirror::getDelegate).toList())
                 .profiles(request.getProfiles().stream()
                         .map(Profile::getDelegate)
                         .map(SettingsUtilsV4::convertToSettingsProfile)
-                        .collect(Collectors.toList()))
+                        .toList())
                 .activeProfiles(request.getActiveProfiles())
                 .pluginGroups(request.getPluginGroups())
                 .build());

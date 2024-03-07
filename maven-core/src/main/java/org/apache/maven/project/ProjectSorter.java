@@ -19,11 +19,9 @@
 package org.apache.maven.project;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
@@ -175,9 +173,8 @@ public class ProjectSorter {
 
         List<String> sortedProjectLabels = graph.visitAll();
 
-        this.sortedProjects = sortedProjectLabels.stream()
-                .map(id -> projectMap.get(id))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        this.sortedProjects =
+                sortedProjectLabels.stream().map(id -> projectMap.get(id)).toList();
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
@@ -262,11 +259,11 @@ public class ProjectSorter {
     }
 
     public List<String> getDependents(String id) {
-        return graph.getVertex(id).getParents().stream().map(Vertex::getLabel).collect(Collectors.toList());
+        return graph.getVertex(id).getParents().stream().map(Vertex::getLabel).toList();
     }
 
     public List<String> getDependencies(String id) {
-        return graph.getVertex(id).getChildren().stream().map(Vertex::getLabel).collect(Collectors.toList());
+        return graph.getVertex(id).getChildren().stream().map(Vertex::getLabel).toList();
     }
 
     public static String getId(MavenProject project) {

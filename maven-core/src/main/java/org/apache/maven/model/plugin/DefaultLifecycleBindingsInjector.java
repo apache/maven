@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
@@ -75,7 +74,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
         } else if (!defaultPlugins.isEmpty()) {
             List<Plugin> plugins = defaultPlugins.stream()
                     .map(org.apache.maven.model.Plugin::getDelegate)
-                    .collect(Collectors.toList());
+                    .toList();
             Model lifecycleModel = Model.newBuilder()
                     .build(Build.newBuilder().plugins(plugins).build())
                     .build();
