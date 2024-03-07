@@ -34,7 +34,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("unused")
-public class InjectorImplTest {
+class InjectorImplTest {
 
     @Test
     void markerQualifierTest() {
@@ -143,10 +143,9 @@ public class InjectorImplTest {
     }
 
     @Test
-    public void bindInterfacesTest() {
+    void bindInterfacesTest() {
         Injector injector = Injector.create().bindImplicit(BindInterfaces.class);
-        BindInterfaces.TestInterface<String> inst =
-                injector.getInstance(new Key<BindInterfaces.TestInterface<String>>() {});
+        BindInterfaces.TestInterface<String> inst = injector.getInstance(new Key<>() {});
         assertNotNull(inst);
     }
 
@@ -177,7 +176,7 @@ public class InjectorImplTest {
     @Test
     void injectListTest() {
         Injector injector = Injector.create().bindImplicit(InjectList.class);
-        List<InjectList.MyService> services = injector.getInstance(new Key<List<InjectList.MyService>>() {});
+        List<InjectList.MyService> services = injector.getInstance(new Key<>() {});
         assertNotNull(services);
         assertEquals(2, services.size());
 
@@ -202,8 +201,7 @@ public class InjectorImplTest {
     @Test
     void injectMapTest() {
         Injector injector = Injector.create().bindImplicit(InjectMap.class);
-        Map<String, InjectMap.MyService> services =
-                injector.getInstance(new Key<Map<String, InjectMap.MyService>>() {});
+        Map<String, InjectMap.MyService> services = injector.getInstance(new Key<>() {});
         assertNotNull(services);
         assertEquals(2, services.size());
 

@@ -33,22 +33,11 @@ import static java.util.stream.Collectors.toSet;
  * build if those projects do not exist.
  */
 public class ProjectActivation {
-    private static class ProjectActivationSettings {
-        /**
-         * The selector of a project. This can be the project directory, [groupId]:[artifactId] or :[artifactId].
-         */
-        final String selector;
-
-        /**
-         * This describes how/when to active or deactivate the project.
-         */
-        final ActivationSettings activationSettings;
-
-        ProjectActivationSettings(String selector, ActivationSettings activationSettings) {
-            this.selector = selector;
-            this.activationSettings = activationSettings;
-        }
-    }
+    /**
+     * @param selector The selector of a project. This can be the project directory, [groupId]:[artifactId] or :[artifactId].
+     * @param activationSettings This describes how/when to active or deactivate the project.
+     */
+    private record ProjectActivationSettings(String selector, ActivationSettings activationSettings) {}
 
     /**
      * List of activated and deactivated projects.

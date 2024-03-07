@@ -64,8 +64,8 @@ class LoggingRepositoryListener extends AbstractRepositoryListener {
         Exception exception = event.getException();
 
         Object metadata;
-        if (event.getMetadata().getFile() != null) {
-            metadata = event.getMetadata().getFile();
+        if (event.getMetadata().getPath() != null) {
+            metadata = event.getMetadata().getPath();
         } else {
             metadata = event.getMetadata();
         }

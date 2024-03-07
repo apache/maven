@@ -62,11 +62,9 @@ public class ExclusionSetFilter implements ArtifactFilter {
             return true;
         }
 
-        if (!(obj instanceof ExclusionSetFilter)) {
+        if (!(obj instanceof ExclusionSetFilter other)) {
             return false;
         }
-
-        ExclusionSetFilter other = (ExclusionSetFilter) obj;
 
         return excludes.equals(other.excludes);
     }

@@ -209,8 +209,8 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
     static CollectStepData lookupCollectStepData(RequestTrace trace) {
         CollectStepData collectStepTrace = null;
         while (trace != null) {
-            if (trace.getData() instanceof CollectStepData) {
-                collectStepTrace = (CollectStepData) trace.getData();
+            if (trace.getData() instanceof CollectStepData collectStepData) {
+                collectStepTrace = collectStepData;
                 break;
             }
             trace = trace.getParent();

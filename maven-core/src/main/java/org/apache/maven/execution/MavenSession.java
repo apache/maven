@@ -96,7 +96,7 @@ public class MavenSession implements Cloneable {
             MavenProject first = projects.get(0);
             this.currentProject = ThreadLocal.withInitial(() -> first);
             this.topLevelProject = projects.stream()
-                    .filter(project -> project.isExecutionRoot())
+                    .filter(MavenProject::isExecutionRoot)
                     .findFirst()
                     .orElse(first);
         } else {

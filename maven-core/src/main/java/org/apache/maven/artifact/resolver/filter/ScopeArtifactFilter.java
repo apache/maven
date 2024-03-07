@@ -53,11 +53,9 @@ public class ScopeArtifactFilter extends AbstractScopeArtifactFilter {
             return true;
         }
 
-        if (!(obj instanceof ScopeArtifactFilter)) {
+        if (!(obj instanceof ScopeArtifactFilter other)) {
             return false;
         }
-
-        ScopeArtifactFilter other = (ScopeArtifactFilter) obj;
 
         return Objects.equals(scope, other.scope);
     }

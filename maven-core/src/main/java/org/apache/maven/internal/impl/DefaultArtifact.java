@@ -106,7 +106,7 @@ public class DefaultArtifact implements Artifact {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Artifact && Objects.equals(key(), ((Artifact) o).key());
+        return o instanceof Artifact artifact && Objects.equals(key(), artifact.key());
     }
 
     @Override

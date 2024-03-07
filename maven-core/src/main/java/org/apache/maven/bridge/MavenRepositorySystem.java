@@ -410,9 +410,8 @@ public class MavenRepositorySystem {
         }
 
         ArtifactRepository repository;
-        if (repositoryLayout instanceof ArtifactRepositoryLayout2) {
-            repository = ((ArtifactRepositoryLayout2) repositoryLayout)
-                    .newMavenArtifactRepository(id, url, snapshots, releases);
+        if (repositoryLayout instanceof ArtifactRepositoryLayout2 repositoryLayout2) {
+            repository = repositoryLayout2.newMavenArtifactRepository(id, url, snapshots, releases);
         } else {
             repository = new MavenArtifactRepository(id, url, repositoryLayout, snapshots, releases);
         }

@@ -66,8 +66,8 @@ public class DefaultArtifactManager implements ArtifactManager {
             }
         }
         Path path = paths.get(id);
-        if (path == null && artifact instanceof DefaultArtifact) {
-            File file = ((DefaultArtifact) artifact).getArtifact().getFile();
+        if (path == null && artifact instanceof DefaultArtifact defaultArtifact) {
+            File file = defaultArtifact.getArtifact().getFile();
             if (file != null) {
                 path = file.toPath();
             }

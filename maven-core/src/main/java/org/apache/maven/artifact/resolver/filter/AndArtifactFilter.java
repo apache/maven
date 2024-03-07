@@ -73,11 +73,9 @@ public class AndArtifactFilter implements ArtifactFilter {
             return true;
         }
 
-        if (!(obj instanceof AndArtifactFilter)) {
+        if (!(obj instanceof AndArtifactFilter other)) {
             return false;
         }
-
-        AndArtifactFilter other = (AndArtifactFilter) obj;
 
         return filters.equals(other.filters);
     }

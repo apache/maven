@@ -48,8 +48,8 @@ public abstract class AbstractNode implements Node {
     @Override
     public Node filter(Predicate<Node> filter) {
         List<Node> children =
-                getChildren().stream().filter(filter).map(n -> n.filter(filter)).collect(Collectors.toList());
-        return new WrapperNode(this, Collections.unmodifiableList(children));
+                getChildren().stream().filter(filter).map(n -> n.filter(filter)).toList();
+        return new WrapperNode(this, children);
     }
 
     @Override

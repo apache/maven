@@ -66,7 +66,7 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     private Properties convertToProperties(final BuildResumptionData buildResumptionData) {
         Properties properties = new Properties();
 
-        String value = String.join(PROPERTY_DELIMITER, buildResumptionData.getRemainingProjects());
+        String value = String.join(PROPERTY_DELIMITER, buildResumptionData.remainingProjects());
         properties.setProperty(REMAINING_PROJECTS, value);
 
         return properties;

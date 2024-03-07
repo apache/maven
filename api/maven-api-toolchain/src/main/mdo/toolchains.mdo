@@ -186,10 +186,9 @@
     public boolean equals(Object other) {
         if (this == other) {
             return true;
-        } else if (!(other instanceof ToolchainModel)) {
+        } else if (!(other instanceof ToolchainModel that)) {
             return false;
         } else {
-            ToolchainModel that = (ToolchainModel) other;
             return java.util.Objects.equals(this.getType(), that.getType())
                 && java.util.Objects.equals(this.getProvides(), that.getProvides());
         }

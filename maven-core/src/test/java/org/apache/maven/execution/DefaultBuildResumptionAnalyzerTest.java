@@ -50,7 +50,7 @@ class DefaultBuildResumptionAnalyzerTest {
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData(executionResult);
 
         assertThat(result.isPresent(), is(true));
-        assertThat(result.get().getRemainingProjects(), is(asList("test:B")));
+        assertThat(result.get().remainingProjects(), is(asList("test:B")));
     }
 
     @Test
@@ -74,7 +74,7 @@ class DefaultBuildResumptionAnalyzerTest {
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData(executionResult);
 
         assertThat(result.isPresent(), is(true));
-        assertThat(result.get().getRemainingProjects(), is(asList("test:B")));
+        assertThat(result.get().remainingProjects(), is(asList("test:B")));
     }
 
     @Test
@@ -88,7 +88,7 @@ class DefaultBuildResumptionAnalyzerTest {
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData(executionResult);
 
         assertThat(result.isPresent(), is(true));
-        assertThat(result.get().getRemainingProjects(), is(asList("test:B", "test:C")));
+        assertThat(result.get().remainingProjects(), is(asList("test:B", "test:C")));
     }
 
     @Test
@@ -102,7 +102,7 @@ class DefaultBuildResumptionAnalyzerTest {
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData(executionResult);
 
         assertThat(result.isPresent(), is(true));
-        assertThat(result.get().getRemainingProjects(), is(asList("test:B", "test:D")));
+        assertThat(result.get().remainingProjects(), is(asList("test:B", "test:D")));
     }
 
     private MavenProject createMavenProject(String artifactId) {

@@ -330,8 +330,8 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     }
 
     private static Object getId(ClassLoader classLoader) {
-        if (classLoader instanceof ClassRealm) {
-            return ((ClassRealm) classLoader).getId();
+        if (classLoader instanceof ClassRealm classRealm) {
+            return classRealm.getId();
         }
         return classLoader;
     }

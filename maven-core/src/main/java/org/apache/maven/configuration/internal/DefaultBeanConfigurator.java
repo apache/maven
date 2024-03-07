@@ -73,10 +73,10 @@ public class DefaultBeanConfigurator implements BeanConfigurator {
         }
 
         PlexusConfiguration plexusConfig;
-        if (configuration instanceof PlexusConfiguration) {
-            plexusConfig = (PlexusConfiguration) configuration;
-        } else if (configuration instanceof Xpp3Dom) {
-            plexusConfig = new XmlPlexusConfiguration((Xpp3Dom) configuration);
+        if (configuration instanceof PlexusConfiguration config) {
+            plexusConfig = config;
+        } else if (configuration instanceof Xpp3Dom config) {
+            plexusConfig = new XmlPlexusConfiguration(config);
         } else {
             throw new BeanConfigurationException("unsupported bean configuration source ("
                     + configuration.getClass().getName() + ")");
@@ -196,8 +196,8 @@ public class DefaultBeanConfigurator implements BeanConfigurator {
             final Object result =
                     super.fromConfiguration(lookup, configuration, type, enclosingType, loader, evaluator, listener);
 
-            return result instanceof Path
-                    ? evaluator.alignToBaseDirectory(((Path) result).toFile()).toPath()
+            return result instanceof Path newpath
+                    ? evaluator.alignToBaseDirectory((newpath).toFile()).toPath()
                     : result;
         }
     }

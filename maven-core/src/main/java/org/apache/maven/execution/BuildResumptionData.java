@@ -22,22 +22,7 @@ import java.util.List;
 
 /**
  * This class holds the information required to enable resuming a Maven build with {@code --resume}.
+ *
+ * @param remainingProjects The list of projects that remain to be built.
  */
-public class BuildResumptionData {
-    /**
-     * The list of projects that remain to be built.
-     */
-    private final List<String> remainingProjects;
-
-    public BuildResumptionData(final List<String> remainingProjects) {
-        this.remainingProjects = remainingProjects;
-    }
-
-    /**
-     * Returns the projects that still need to be built when resuming.
-     * @return A list containing the group and artifact id of the projects.
-     */
-    public List<String> getRemainingProjects() {
-        return this.remainingProjects;
-    }
-}
+public record BuildResumptionData(List<String> remainingProjects) {}

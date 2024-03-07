@@ -47,7 +47,7 @@ public final class ProjectSelector {
         for (String selector : projectSelectors) {
             Optional<MavenProject> optSelectedProject =
                     findOptionalProjectBySelector(projects, baseDirectory, selector);
-            if (!optSelectedProject.isPresent()) {
+            if (optSelectedProject.isEmpty()) {
                 String message = "Could not find the selected project in the reactor: " + selector;
                 throw new MavenExecutionException(message, request.getPom());
             }
@@ -101,7 +101,9 @@ public final class ProjectSelector {
     }
 
     File getBaseDirectoryFromRequest(MavenExecutionRequest request) {
-        return request.getBaseDirectory() != null ? new File(request.getBaseDirectory()) : null;
+        return request.getTopDirectory() != null
+                ? new File(request.getTopDirectory().toString())
+                : null;
     }
 
     boolean isMatchingProject(MavenProject project, String selector, File reactorDirectory) {

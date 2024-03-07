@@ -471,7 +471,7 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         if (filterExpression != null) {
             List<String> expressions = Arrays.stream(filterExpression.split(";"))
                     .filter(s -> s != null && !s.trim().isEmpty())
-                    .collect(Collectors.toList());
+                    .toList();
             for (String expression : expressions) {
                 if ("h".equals(expression)) {
                     filters.add(new HighestVersionFilter());

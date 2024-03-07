@@ -48,8 +48,7 @@ public class LegacyArtifactHandlerManager extends AbstractEventSpy {
 
     @Override
     public void onEvent(Object event) {
-        if (event instanceof ExecutionEvent) {
-            ExecutionEvent executionEvent = (ExecutionEvent) event;
+        if (event instanceof ExecutionEvent executionEvent) {
             if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
                 allHandlers.clear();
             }
@@ -58,7 +57,7 @@ public class LegacyArtifactHandlerManager extends AbstractEventSpy {
 
     public ArtifactHandler getArtifactHandler(String type) {
         requireNonNull(type, "null type");
-        ArtifactHandler handler = allHandlers.get(type);
+        var handler = allHandlers.get(type);
         if (handler == null) {
             handler = artifactHandlers.get(type);
             if (handler == null) {

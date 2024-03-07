@@ -33,19 +33,20 @@ import org.apache.maven.artifact.versioning.VersionRange;
 public final class ArtifactUtils {
 
     public static boolean isSnapshot(String version) {
-        if (version != null) {
-            if (version.regionMatches(
-                    true,
-                    version.length() - Artifact.SNAPSHOT_VERSION.length(),
-                    Artifact.SNAPSHOT_VERSION,
-                    0,
-                    Artifact.SNAPSHOT_VERSION.length())) {
-                return true;
-            } else {
-                return Artifact.VERSION_FILE_PATTERN.matcher(version).matches();
-            }
+        if (version == null) {
+            return false;
         }
-        return false;
+
+        if (version.regionMatches(
+                true,
+                version.length() - Artifact.SNAPSHOT_VERSION.length(),
+                Artifact.SNAPSHOT_VERSION,
+                0,
+                Artifact.SNAPSHOT_VERSION.length())) {
+            return true;
+        } else {
+            return Artifact.VERSION_FILE_PATTERN.matcher(version).matches();
+        }
     }
 
     public static String toSnapshotVersion(String version) {
