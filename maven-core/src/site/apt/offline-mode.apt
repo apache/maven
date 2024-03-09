@@ -258,7 +258,7 @@ Offline Mode Design
     <<online>> status, or else doesn't care.
 
   * Otherwise, don't bind the mojo. Log a debug message to indicate that it is
-    sensitive the the online state of the application, and that this state is
+    sensitive the online state of the application, and that this state is
     currently wrong for execution.
 
     <<NOTE:>> Do we want to fail when we cannot bind a mojo to the lifecycle
