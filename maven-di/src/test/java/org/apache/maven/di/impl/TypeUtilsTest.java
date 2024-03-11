@@ -20,7 +20,6 @@ package org.apache.maven.di.impl;
 
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.maven.di.Key;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,7 @@ class TypeUtilsTest {
         Type type = new Key<TreeSet<String>>() {}.getType();
         Set<Type> types = Types.getAllSuperTypes(type);
         assertNotNull(types);
-        List<String> typesStr = types.stream().map(Type::toString).sorted().collect(Collectors.toList());
+        List<String> typesStr = types.stream().map(Type::toString).sorted().toList();
         typesStr.remove("java.util.SequencedSet<java.lang.String>");
         typesStr.remove("java.util.SequencedCollection<java.lang.String>");
         assertEquals(

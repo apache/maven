@@ -264,7 +264,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                 for (String name : names) {
                     List<XmlNode> dominantChildren = dominant.getChildren().stream()
                             .filter(n -> n.getName().equals(name))
-                            .collect(Collectors.toList());
+                            .toList();
                     if (!dominantChildren.isEmpty()) {
                         commonChildren.put(name, dominantChildren.iterator());
                     }
@@ -310,7 +310,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                         Iterator<XmlNode> it =
                                 commonChildren.computeIfAbsent(name, n1 -> Stream.of(dominant.getChildren().stream()
                                                 .filter(n2 -> n2.getName().equals(n1))
-                                                .collect(Collectors.toList()))
+                                                .toList())
                                         .filter(l -> !l.isEmpty())
                                         .map(List::iterator)
                                         .findFirst()

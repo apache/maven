@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.model.Plugin;
@@ -192,7 +191,7 @@ public class BootstrapCoreExtensionManager {
             return result.getArtifactResults().stream()
                     .filter(ArtifactResult::isResolved)
                     .map(ArtifactResult::getArtifact)
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (PluginResolutionException e) {
             throw new ExtensionResolutionException(extension, e.getCause());
         } catch (InterpolationException e) {

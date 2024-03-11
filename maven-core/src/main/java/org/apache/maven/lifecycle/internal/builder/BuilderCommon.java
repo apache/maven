@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildFailure;
@@ -149,7 +148,7 @@ public class BuilderCommon {
                                 p.getLocation("version").getSource().getModelId()))
                 .distinct()
                 .map(Plugin::getArtifactId) // managed by us, groupId is always o.a.m.plugins
-                .collect(Collectors.toList());
+                .toList();
 
         if (!unversionedPlugins.isEmpty()) {
             logger.warn("Version not locked for default bindings plugins " + unversionedPlugins

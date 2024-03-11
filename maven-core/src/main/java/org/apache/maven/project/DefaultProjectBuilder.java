@@ -28,7 +28,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.RepositoryUtils;
@@ -602,7 +601,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             List<Callable<List<ProjectBuildingResult>>> callables = interimResults.stream()
                     .map(interimResult ->
                             (Callable<List<ProjectBuildingResult>>) () -> doBuild(projectIndex, interimResult))
-                    .collect(Collectors.toList());
+                    .toList();
 
             try {
                 List<Future<List<ProjectBuildingResult>>> futures = executor.invokeAll(callables);
@@ -619,7 +618,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             }
                         })
                         .flatMap(List::stream)
-                        .collect(Collectors.toList());
+                        .toList();
             } catch (InterruptedException e) {
                 uncheckedThrow(e);
                 return null;
@@ -653,7 +652,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
                 project.setExecutionRoot(interimResult.root);
                 project.setCollectedProjects(
-                        results.stream().map(ProjectBuildingResult::getProject).collect(Collectors.toList()));
+                        results.stream().map(ProjectBuildingResult::getProject).toList());
                 DependencyResolutionResult resolutionResult = null;
                 if (request.isResolveDependencies()) {
                     resolutionResult = resolveDependencies(project);
@@ -957,7 +956,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     }
 
     private List<String> getProfileIds(List<org.apache.maven.model.Profile> profiles) {
-        return profiles.stream().map(org.apache.maven.model.Profile::getId).collect(Collectors.toList());
+        return profiles.stream().map(org.apache.maven.model.Profile::getId).toList();
     }
 
     private static ModelSource createStubModelSource(Artifact artifact) {

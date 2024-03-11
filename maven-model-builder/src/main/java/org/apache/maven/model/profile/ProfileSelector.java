@@ -20,7 +20,6 @@ package org.apache.maven.model.profile;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
@@ -58,9 +57,8 @@ public interface ProfileSelector {
             Collection<org.apache.maven.api.model.Profile> profiles,
             ProfileActivationContext context,
             ModelProblemCollector problems) {
-        return getActiveProfiles(profiles.stream().map(Profile::new).collect(Collectors.toList()), context, problems)
-                .stream()
+        return getActiveProfiles(profiles.stream().map(Profile::new).toList(), context, problems).stream()
                 .map(Profile::getDelegate)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

@@ -222,14 +222,14 @@ public final class SettingsUtilsV4 {
         if (repos != null) {
             profile.repositories(repos.stream()
                     .map(SettingsUtilsV4::convertFromSettingsRepository)
-                    .collect(Collectors.toList()));
+                    .toList());
         }
 
         List<Repository> pluginRepos = settingsProfile.getPluginRepositories();
         if (pluginRepos != null) {
             profile.pluginRepositories(pluginRepos.stream()
                     .map(SettingsUtilsV4::convertFromSettingsRepository)
-                    .collect(Collectors.toList()));
+                    .toList());
         }
 
         org.apache.maven.api.model.Profile value = profile.build();

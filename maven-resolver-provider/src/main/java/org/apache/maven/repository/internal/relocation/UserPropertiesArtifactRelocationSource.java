@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.model.Model;
@@ -188,7 +187,7 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
                         }
                         return new Relocation(global, s, t);
                     })
-                    .collect(Collectors.toList());
+                    .toList();
             LOGGER.info("Parsed {} user relocations", relocationList.size());
             return new Relocations(relocationList);
         }

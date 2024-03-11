@@ -476,7 +476,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
                             .requiredMavenVersion(requiredMavenVersion)
                             .mojos(getMojos().stream()
                                     .map(MojoDescriptor::getMojoDescriptorV4)
-                                    .collect(Collectors.toList()))
+                                    .toList())
                             .build();
                 }
             }

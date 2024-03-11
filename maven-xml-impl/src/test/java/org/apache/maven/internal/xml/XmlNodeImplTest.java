@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -627,7 +626,7 @@ class XmlNodeImplTest {
     }
 
     private static List<XmlNode> getChildren(XmlNode node, String name) {
-        return node.getChildren().stream().filter(n -> n.getName().equals(name)).collect(Collectors.toList());
+        return node.getChildren().stream().filter(n -> n.getName().equals(name)).toList();
     }
 
     private static XmlNode getNthChild(XmlNode node, String name, int nth) {

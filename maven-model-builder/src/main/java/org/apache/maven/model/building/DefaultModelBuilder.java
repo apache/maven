@@ -38,7 +38,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.feature.Features;
@@ -815,7 +814,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             List<org.apache.maven.api.model.Profile> activePomProfiles =
                     profileSelector.getActiveProfilesV4(interpolatedProfiles, profileActivationContext, problems);
             result.setActivePomProfiles(
-                    modelId, activePomProfiles.stream().map(Profile::new).collect(Collectors.toList()));
+                    modelId, activePomProfiles.stream().map(Profile::new).toList());
             modelv4 = profileInjector.injectProfiles(modelv4, activePomProfiles, request, problems);
             if (currentData == resultData) {
                 for (Profile activeProfile : activeExternalProfiles) {
@@ -865,7 +864,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         // inject external profile into current model
         tmpModel.update(profileInjector.injectProfiles(
                 tmpModel.getDelegate(),
-                activeExternalProfiles.stream().map(Profile::getDelegate).collect(Collectors.toList()),
+                activeExternalProfiles.stream().map(Profile::getDelegate).toList(),
                 request,
                 problems));
 
@@ -1786,7 +1785,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             List<org.apache.maven.api.model.Dependency> dependencies = importMgmt.getDependencies().stream()
                     .filter(candidate -> exclusions.stream().noneMatch(exclusion -> match(exclusion, candidate)))
                     .map(candidate -> candidate.withExclusions(exclusions))
-                    .collect(Collectors.toList());
+                    .toList();
             importMgmt = importMgmt.withDependencies(dependencies);
         }
 
