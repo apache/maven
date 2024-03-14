@@ -125,7 +125,7 @@ class TestApi {
                 .withRemoteRepositories(Collections.singletonList(remoteRepository));
 
         sessionScope.enter();
-        sessionScope.seed(InternalSession.class, InternalSession.from(this.session));
+        sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(this.session));
     }
 
     private Project project(Artifact artifact) {

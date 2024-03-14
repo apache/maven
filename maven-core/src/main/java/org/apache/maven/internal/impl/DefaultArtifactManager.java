@@ -44,12 +44,12 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultArtifactManager implements ArtifactManager {
 
     @Nonnull
-    private final InternalSession session;
+    private final InternalMavenSession session;
 
     private final Map<String, Path> paths = new ConcurrentHashMap<>();
 
     @Inject
-    public DefaultArtifactManager(@Nonnull InternalSession session) {
+    public DefaultArtifactManager(@Nonnull InternalMavenSession session) {
         this.session = session;
     }
 

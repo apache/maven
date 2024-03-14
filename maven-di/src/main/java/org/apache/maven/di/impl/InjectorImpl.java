@@ -130,7 +130,7 @@ public class InjectorImpl implements Injector {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private <T> Set<Binding<T>> getBindings(Key<T> key) {
+    protected <T> Set<Binding<T>> getBindings(Key<T> key) {
         return (Set) bindings.get(key);
     }
 

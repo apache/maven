@@ -44,7 +44,7 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
-import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.ContextEnabled;
@@ -522,12 +522,12 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             throws PluginContainerException, PluginConfigurationException {
         T mojo;
 
-        InternalSession sessionV4 = InternalSession.from(session.getSession());
+        InternalMavenSession sessionV4 = InternalMavenSession.from(session.getSession());
         Project project = sessionV4.getProject(session.getCurrentProject());
 
         List<org.apache.maven.api.RemoteRepository> repos =
                 sessionV4.getService(ProjectManager.class).getRemoteProjectRepositories(project);
-        sessionV4 = InternalSession.from(sessionV4.withRemoteRepositories(repos));
+        sessionV4 = InternalMavenSession.from(sessionV4.withRemoteRepositories(repos));
 
         org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
         org.apache.maven.api.plugin.Log log = new DefaultLog(
@@ -665,7 +665,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             pomConfiguration = XmlPlexusConfiguration.toPlexusConfiguration(dom);
         }
 
-        InternalSession sessionV4 = InternalSession.from(session.getSession());
+        InternalMavenSession sessionV4 = InternalMavenSession.from(session.getSession());
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(session, mojoExecution);
 
         for (MavenPluginConfigurationValidator validator : configurationValidators) {

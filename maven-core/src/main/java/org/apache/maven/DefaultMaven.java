@@ -60,7 +60,7 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.graph.ProjectSelector;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
-import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
@@ -218,7 +218,7 @@ public class DefaultMaven implements Maven {
 
             sessionScope.seed(MavenSession.class, session);
             sessionScope.seed(Session.class, session.getSession());
-            sessionScope.seed(InternalSession.class, InternalSession.from(session.getSession()));
+            sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(session.getSession()));
 
             legacySupport.setSession(session);
 

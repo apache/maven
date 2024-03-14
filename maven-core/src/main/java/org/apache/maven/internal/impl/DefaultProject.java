@@ -35,17 +35,17 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultProject implements Project {
 
-    private final InternalSession session;
+    private final InternalMavenSession session;
     private final MavenProject project;
     private final Packaging packaging;
 
-    public DefaultProject(InternalSession session, MavenProject project) {
+    public DefaultProject(InternalMavenSession session, MavenProject project) {
         this.session = session;
         this.project = project;
         this.packaging = session.requirePackaging(project.getPackaging());
     }
 
-    public InternalSession getSession() {
+    public InternalMavenSession getSession() {
         return session;
     }
 

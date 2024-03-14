@@ -44,11 +44,11 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 @SessionScoped
 public class DefaultProjectManager implements ProjectManager {
 
-    private final InternalSession session;
+    private final InternalMavenSession session;
     private final ArtifactManager artifactManager;
 
     @Inject
-    public DefaultProjectManager(InternalSession session, ArtifactManager artifactManager) {
+    public DefaultProjectManager(InternalMavenSession session, ArtifactManager artifactManager) {
         this.session = session;
         this.artifactManager = artifactManager;
     }
@@ -66,7 +66,7 @@ public class DefaultProjectManager implements ProjectManager {
     @Nonnull
     @Override
     public Collection<Artifact> getAttachedArtifacts(Project project) {
-        InternalSession session = ((DefaultProject) project).getSession();
+        InternalMavenSession session = ((DefaultProject) project).getSession();
         Collection<Artifact> attached = map(
                 getMavenProject(project).getAttachedArtifacts(),
                 a -> session.getArtifact(RepositoryUtils.toArtifact(a)));

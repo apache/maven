@@ -65,7 +65,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     @Override
     public ProjectBuilderResult build(ProjectBuilderRequest request)
             throws ProjectBuilderException, IllegalArgumentException {
-        InternalSession session = InternalSession.from(request.getSession());
+        InternalMavenSession session = InternalMavenSession.from(request.getSession());
         try {
             List<ArtifactRepository> repositories = session.toArtifactRepositories(session.getRemoteRepositories());
             ProjectBuildingRequest req = new DefaultProjectBuildingRequest()
