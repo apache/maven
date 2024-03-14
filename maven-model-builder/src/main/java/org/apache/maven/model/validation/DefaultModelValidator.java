@@ -982,10 +982,12 @@ public class DefaultModelValidator implements ModelValidator {
                     repository.getUrl(),
                     null,
                     repository)) {
-                // only allow ${basedir} and ${project.basedir}
+                // only allow ${basedir}, ${project.basedir} or ${project.baseUri}
                 Matcher m = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
                 while (m.find()) {
-                    if (!("basedir".equals(m.group(1)) || "project.basedir".equals(m.group(1)))) {
+                    if (!("basedir".equals(m.group(1))
+                            || "project.basedir".equals(m.group(1))
+                            || "project.baseUri".equals(m.group(1)))) {
                         validateStringNoExpression(
                                 prefix + prefix2 + "[" + repository.getId() + "].url",
                                 problems,

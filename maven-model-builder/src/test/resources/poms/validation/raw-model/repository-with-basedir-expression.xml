@@ -37,6 +37,14 @@ under the License.
       <id>repo</id>
       <url>file://${basedir}/target/remote-repo</url>
     </repository>
+    <repository>
+      <id>repo-project-basedir</id>
+      <url>file://${project.basedir}/sdk/maven/repo</url>
+    </repository>
+    <repository>
+      <id>repo-project-baseUri</id>
+      <url>${project.baseUri}/sdk/maven/repo</url>
+    </repository>
   </repositories>
 
 </project>
