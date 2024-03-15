@@ -67,12 +67,12 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.importedFrom = null;
     }
 
-    public InputLocation(InputLocation original, InputLocation importedFrom) {
+    public InputLocation(InputLocation original) {
         this.lineNumber = original.lineNumber;
         this.columnNumber = original.columnNumber;
         this.source = original.source;
         this.locations = original.locations;
-        this.importedFrom = importedFrom;
+        this.importedFrom = original.importedFrom;
     }
 
     public int getLineNumber() {

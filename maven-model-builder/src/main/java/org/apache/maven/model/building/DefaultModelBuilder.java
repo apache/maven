@@ -1660,18 +1660,18 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model model,
             ModelBuildingRequest request,
             DefaultModelProblemCollector problems,
-            Collection<String> importIds) { // a chain of model ID's that caused this depMgt to be loaded?!
+            Collection<String> importIds) {
         DependencyManagement depMgmt = model.getDependencyManagement();
 
         if (depMgmt == null) {
             return;
         }
 
-        // the one that's causing the import to happen?
         String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
 
         importIds.add(importing);
 
+        // Model v4
         List<org.apache.maven.api.model.DependencyManagement> importMgmts = null;
 
         for (Iterator<Dependency> it = depMgmt.getDependencies().iterator(); it.hasNext(); ) {
@@ -1684,6 +1684,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             it.remove();
 
+            // Model v3
             DependencyManagement importMgmt = loadDependencyManagement(model, request, problems, dependency, importIds);
 
             if (importMgmt != null) {
@@ -1693,6 +1694,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                 if (request.isLocationTracking()) {
                     // Keep track of why this DependencyManagement was imported.
+                    // And map model v3 to model v4 -> importMgmt(v3).getDelegate() returns a v4 object
                     importMgmts.add(
                             org.apache.maven.api.model.DependencyManagement.newBuilder(importMgmt.getDelegate(), true)
                                     .importedFrom(dependency.getDelegate().getLocation(""))
@@ -1705,10 +1707,8 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         importIds.remove(importing);
 
-        org.apache.maven.api.model.Model updatedModel =
-                dependencyManagementImporter.importManagement(model.getDelegate(), importMgmts, request, problems);
-        model.update(updatedModel);
-        model.setDependencyManagement(new DependencyManagement(updatedModel.getDependencyManagement()));
+        model.update(
+                dependencyManagementImporter.importManagement(model.getDelegate(), importMgmts, request, problems));
     }
 
     private DependencyManagement loadDependencyManagement(
