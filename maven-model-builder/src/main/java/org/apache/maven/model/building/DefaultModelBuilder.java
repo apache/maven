@@ -1672,7 +1672,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         importIds.add(importing);
 
         // Model v4
-        List<org.apache.maven.api.model.DependencyManagement> importMgmts = null;
+        List<org.apache.maven.api.model.DependencyManagement> importMgmts = new ArrayList<>();
 
         for (Iterator<Dependency> it = depMgmt.getDependencies().iterator(); it.hasNext(); ) {
             Dependency dependency = it.next();
@@ -1686,22 +1686,19 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // Model v3
             DependencyManagement importMgmt = loadDependencyManagement(model, request, problems, dependency, importIds);
+            if (importMgmt == null) {
+                continue;
+            }
 
-            if (importMgmt != null) {
-                if (importMgmts == null) {
-                    importMgmts = new ArrayList<>();
-                }
-
-                if (request.isLocationTracking()) {
-                    // Keep track of why this DependencyManagement was imported.
-                    // And map model v3 to model v4 -> importMgmt(v3).getDelegate() returns a v4 object
-                    importMgmts.add(
-                            org.apache.maven.api.model.DependencyManagement.newBuilder(importMgmt.getDelegate(), true)
-                                    .importedFrom(dependency.getDelegate().getLocation(""))
-                                    .build());
-                } else {
-                    importMgmts.add(importMgmt.getDelegate());
-                }
+            if (request.isLocationTracking()) {
+                // Keep track of why this DependencyManagement was imported.
+                // And map model v3 to model v4 -> importMgmt(v3).getDelegate() returns a v4 object
+                importMgmts.add(
+                        org.apache.maven.api.model.DependencyManagement.newBuilder(importMgmt.getDelegate(), true)
+                                .importedFrom(dependency.getDelegate().getLocation(""))
+                                .build());
+            } else {
+                importMgmts.add(importMgmt.getDelegate());
             }
         }
 
