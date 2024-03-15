@@ -89,13 +89,10 @@ public enum DependencyScope {
     /**
      * Test runtime.
      */
-    TEST_RUNTIME("test-runtime", true),
+    TEST_RUNTIME("test-runtime", false),
 
     /**
      * System scope.
-     * <p>
-     * Important: this scope {@code id} MUST BE KEPT in sync with label in
-     * {@code org.eclipse.aether.util.artifact.DependencyScopes#SYSTEM}.
      */
     SYSTEM("system", false);
 

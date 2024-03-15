@@ -20,6 +20,7 @@ package org.apache.maven.repository.internal.scopes;
 
 import java.util.Map;
 
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.repository.internal.artifact.MavenArtifactProperties;
 import org.eclipse.aether.SystemScopeHandler;
 import org.eclipse.aether.artifact.Artifact;
@@ -32,7 +33,7 @@ import org.eclipse.aether.artifact.Artifact;
 public final class MavenSystemScopeHandler implements SystemScopeHandler {
     @Override
     public boolean isSystemScope(String scope) {
-        return MavenDependencyScopes.SYSTEM.equals(scope);
+        return DependencyScope.SYSTEM.is(scope);
     }
 
     @Override
