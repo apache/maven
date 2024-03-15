@@ -165,8 +165,8 @@ class XmlNodeImplTest {
                 + "<property combine.id='TOOVERWRITE'><name>TOOVERWRITE</name><value>RHS</value></property>"
                 + "</props>";
 
-        XmlNodeImpl leftDom = XmlNodeBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
         XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
         assertEquals(3, getChildren(mergeResult, "property").size());
@@ -211,8 +211,8 @@ class XmlNodeImplTest {
                 + "<property key=\"RHS-ONLY\"><name>RHS-ONLY</name><value>RHS</value></property>"
                 + "<property combine.keys='name'><name>TOOVERWRITE</name><value>RHS</value></property>" + "</props>";
 
-        XmlNodeImpl leftDom = XmlNodeBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
         XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
         assertEquals(3, getChildren(mergeResult, "property").size());
@@ -248,8 +248,8 @@ class XmlNodeImplTest {
 
         String rhs = "<parameter>recessive</parameter>";
 
-        XmlNodeImpl leftDom = XmlNodeBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
         XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
         assertEquals(" ", mergeResult.getValue());
@@ -261,8 +261,8 @@ class XmlNodeImplTest {
 
         String rhs = "<parameter>recessive</parameter>";
 
-        XmlNodeImpl leftDom = XmlNodeBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
         XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
         assertEquals("", mergeResult.getValue());
@@ -274,8 +274,8 @@ class XmlNodeImplTest {
 
         String rhs = "<parameter>recessive</parameter>";
 
-        XmlNodeImpl leftDom = XmlNodeBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
         XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
         assertNull(mergeResult.getValue());
@@ -642,7 +642,7 @@ class XmlNodeImplTest {
         return toXmlNode(xml, null);
     }
 
-    private static XmlNode toXmlNode(String xml, XmlNodeBuilder.InputLocationBuilderStax locationBuilder)
+    private static XmlNode toXmlNode(String xml, XmlNodeStaxBuilder.InputLocationBuilderStax locationBuilder)
             throws XMLStreamException, IOException {
         return toXmlNode(new StringReader(xml), locationBuilder);
     }
@@ -651,12 +651,12 @@ class XmlNodeImplTest {
         return toXmlNode(reader, null);
     }
 
-    private static XmlNode toXmlNode(Reader reader, XmlNodeBuilder.InputLocationBuilderStax locationBuilder)
+    private static XmlNode toXmlNode(Reader reader, XmlNodeStaxBuilder.InputLocationBuilderStax locationBuilder)
             throws XMLStreamException, IOException {
-        return XmlNodeBuilder.build(reader, locationBuilder);
+        return XmlNodeStaxBuilder.build(reader, locationBuilder);
     }
 
-    private static class FixedInputLocationBuilder implements XmlNodeBuilder.InputLocationBuilderStax {
+    private static class FixedInputLocationBuilder implements XmlNodeStaxBuilder.InputLocationBuilderStax {
         private final Object location;
 
         public FixedInputLocationBuilder(Object location) {

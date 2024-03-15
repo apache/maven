@@ -32,6 +32,7 @@ import org.apache.maven.api.settings.ActivationProperty;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.internal.impl.SettingsUtilsV4;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

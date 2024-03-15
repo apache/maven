@@ -61,12 +61,54 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-settings-builder</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
       <artifactId>maven-toolchain-builder</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>velocity-settings</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <version>2.0.0</version>
+              <basedir>${project.basedir}/../api/maven-api-settings</basedir>
+              <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>
+              <models>
+                <model>src/main/mdo/settings.mdo</model>
+              </models>
+              <templates>
+                <template>merger.vm</template>
+                <template>transformer.vm</template>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
+              </templates>
+              <params>
+                <param>forcedIOModelVersion=1.2.0</param>
+                <param>packageModelV3=org.apache.maven.settings</param>
+                <param>packageModelV4=org.apache.maven.api.settings</param>
+                <param>packageToolV4=org.apache.maven.settings.v4</param>
+                <param>locationTracking=true</param>
+                <param>generateLocationClasses=true</param>
+              </params>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

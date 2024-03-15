@@ -48,7 +48,7 @@ import org.apache.maven.api.xml.XmlNode;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.apache.maven.internal.xml.XmlNodeImpl;
 
 @Generated
 public class ${className} {
@@ -144,35 +144,16 @@ public class ${className} {
     }
 
     protected XmlNode transform(XmlNode node) {
-        if (node != null) {
-            Xpp3Dom xpp = new Xpp3Dom(node);
-            transform(xpp);
-            return xpp.getDom();
-        }
-        return node;
-    }
-
-    protected void transform(Xpp3Dom dom) {
-        if (dom != null) {
-            String org, val;
-            // Content
-            org = dom.getValue();
-            val = transform(org);
-            if (org != val) {
-                dom.setValue(val);
-            }
-            // Attributes
-            for (String attr : dom.getAttributeNames()) {
-                org = dom.getAttribute(attr);
-                val = transform(org);
-                if (org != val) {
-                    dom.setAttribute(attr, val);
-                }
-            }
-            // Children
-            for (int i = 0, l = dom.getChildCount(); i < l; i++) {
-                transform(dom.getChild(i));
-            }
-        }
+        return node != null ? new XmlNodeImpl(
+                node.getPrefix(),
+                node.getNamespaceUri(),
+                node.getName(),
+                transform(node.getValue()),
+                node.getAttributes().entrySet()
+                        .stream().collect(Collectors.toMap(e -> e.getKey(), e -> transform(e.getValue()))),
+                node.getChildren().stream()
+                        .map(this::transform).collect(Collectors.toList()),
+                node.getInputLocation()
+        ) : null;
     }
 }

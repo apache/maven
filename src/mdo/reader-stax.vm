@@ -71,7 +71,7 @@ import ${packageModelV4}.InputLocation;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
-import org.apache.maven.internal.xml.XmlNodeBuilder;
+import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
 import org.apache.maven.api.xml.XmlNode;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -897,14 +897,14 @@ public class ${className} {
 
 #if ( $locationTracking )
     private XmlNode buildXmlNode(XMLStreamReader parser, InputSource source) throws XMLStreamException {
-        return XmlNodeBuilder.build(parser,
+        return XmlNodeStaxBuilder.build(parser,
                 addLocationInformation
                         ? p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source)
                         : null);
     }
 #else
     private XmlNode buildXmlNode(XMLStreamReader parser) throws XMLStreamException {
-        return XmlNodeBuilder.build(parser);
+        return XmlNodeStaxBuilder.build(parser);
     }
 #end
 

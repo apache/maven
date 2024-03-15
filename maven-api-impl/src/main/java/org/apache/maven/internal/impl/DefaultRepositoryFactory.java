@@ -18,13 +18,12 @@
  */
 package org.apache.maven.internal.impl;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import java.nio.file.Path;
 
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.eclipse.aether.repository.RepositoryPolicy;

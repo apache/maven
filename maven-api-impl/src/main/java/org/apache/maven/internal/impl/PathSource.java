@@ -18,41 +18,38 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.maven.api.LocalRepository;
-import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.services.Source;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
+public class PathSource implements Source {
 
-public class DefaultLocalRepository implements LocalRepository {
+    private final Path path;
 
-    private final @Nonnull org.eclipse.aether.repository.LocalRepository repository;
-
-    public DefaultLocalRepository(@Nonnull org.eclipse.aether.repository.LocalRepository repository) {
-        this.repository = nonNull(repository, "repository");
+    public PathSource(Path path) {
+        this.path = path;
     }
 
-    @Nonnull
-    public org.eclipse.aether.repository.LocalRepository getRepository() {
-        return repository;
-    }
-
-    @Nonnull
-    @Override
-    public String getId() {
-        return repository.getId();
-    }
-
-    @Nonnull
-    @Override
-    public String getType() {
-        return repository.getContentType();
-    }
-
-    @Nonnull
     @Override
     public Path getPath() {
-        return repository.getBasedir().toPath();
+        return path;
+    }
+
+    @Override
+    public InputStream openStream() throws IOException {
+        return Files.newInputStream(path);
+    }
+
+    @Override
+    public String getLocation() {
+        return path.toString();
+    }
+
+    @Override
+    public Source resolve(String relative) {
+        return new PathSource(path.resolve(relative));
     }
 }

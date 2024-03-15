@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.Artifact;
@@ -39,6 +38,7 @@ import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
@@ -53,13 +53,6 @@ import org.apache.maven.model.profile.activation.OperatingSystemProfileActivator
 import org.apache.maven.model.profile.activation.PropertyProfileActivator;
 import org.apache.maven.model.root.DefaultRootLocator;
 import org.apache.maven.repository.internal.DefaultModelVersionParser;
-import org.apache.maven.settings.building.DefaultSettingsBuilder;
-import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
-import org.apache.maven.settings.building.SettingsBuilder;
-import org.apache.maven.settings.building.SettingsBuildingException;
-import org.apache.maven.settings.io.DefaultSettingsReader;
-import org.apache.maven.settings.io.DefaultSettingsWriter;
-import org.apache.maven.settings.validation.DefaultSettingsValidator;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -220,7 +213,7 @@ public class ApiRunner {
     }
 
     @Provides
-    static Session newSession(Lookup lookup) throws SettingsBuildingException {
+    static Session newSession(Lookup lookup) {
         Map<String, String> properties = new HashMap<>();
         // Env variables prefixed with "env."
         System.getenv().forEach((k, v) -> properties.put("env." + k, v));
@@ -229,8 +222,6 @@ public class ApiRunner {
 
         RepositorySystem system = new RepositorySystemSupplier().get();
 
-        SettingsBuilder settingsBuilder = new DefaultSettingsBuilder(
-                new DefaultSettingsReader(), new DefaultSettingsWriter(), new DefaultSettingsValidator());
         // SettingsDecrypter settingsDecrypter =
         // (SettingsDecrypter)Objects.requireNonNull(this.createSettingsDecrypter(preBoot));
         new DefaultProfileSelector(List.of(
@@ -246,36 +237,39 @@ public class ApiRunner {
                 ? Paths.get(properties.get("maven.home"))
                 : properties.containsKey("env.MAVEN_HOME") ? Paths.get(properties.get("env.MAVEN_HOME")) : null;
 
-        DefaultSettingsBuildingRequest settingsBuilderRequest = new DefaultSettingsBuildingRequest();
-        Properties systemProperties = new Properties();
-        systemProperties.putAll(properties);
-        settingsBuilderRequest.setSystemProperties(systemProperties);
-        settingsBuilderRequest.setUserProperties(new Properties());
-        if (mavenSystemHome != null) {
-            settingsBuilderRequest.setGlobalSettingsFile(
-                    mavenSystemHome.resolve("settings.xml").toFile());
-        }
-        settingsBuilderRequest.setUserSettingsFile(
-                mavenUserHome.resolve("settings.xml").toFile());
-        org.apache.maven.settings.Settings settings =
-                settingsBuilder.build(settingsBuilderRequest).getEffectiveSettings();
+        DefaultRepositorySystemSession rsession = new DefaultRepositorySystemSession(h -> false);
+        rsession.setSystemProperties(properties);
+        rsession.setConfigProperties(properties);
 
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false);
-        // properties
-        session.setSystemProperties(properties);
-        session.setConfigProperties(properties);
+        DefaultSession session = new DefaultSession(
+                rsession,
+                system,
+                List.of(lookup.lookup(RepositoryFactory.class)
+                        .createRemote("central", "https://repo.maven.apache.org/maven2")),
+                null,
+                lookup);
+
+        Settings settings = session.getService(SettingsBuilder.class)
+                .build(
+                        session,
+                        mavenSystemHome != null ? mavenSystemHome.resolve("settings.xml") : null,
+                        mavenUserHome.resolve("settings.xml"))
+                .getEffectiveSettings();
+
+        settings.getProfiles();
+
         // local repository
         String localRepository = settings.getLocalRepository() != null
                 ? settings.getLocalRepository()
                 : mavenUserHome.resolve("repository").toString();
-        LocalRepositoryManager llm = system.newLocalRepositoryManager(session, new LocalRepository(localRepository));
-        session.setLocalRepositoryManager(llm);
+        LocalRepositoryManager llm = system.newLocalRepositoryManager(rsession, new LocalRepository(localRepository));
+        rsession.setLocalRepositoryManager(llm);
         // active proxies
         // TODO
         // active profiles
 
         DefaultSession defaultSession = new DefaultSession(
-                session,
+                rsession,
                 system,
                 List.of(lookup.lookup(RepositoryFactory.class)
                         .createRemote("central", "https://repo.maven.apache.org/maven2")),

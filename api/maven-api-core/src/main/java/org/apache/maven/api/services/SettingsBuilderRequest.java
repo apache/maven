@@ -108,9 +108,9 @@ public interface SettingsBuilderRequest {
             @Nonnull Source userSettingsSource) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
-                .globalSettingsSource(nonNull(globalSettingsSource, "globalSettingsSource cannot be null"))
-                .projectSettingsSource(nonNull(projectSettingsSource, "projectSettingsSource cannot be null"))
-                .userSettingsSource(nonNull(userSettingsSource, "userSettingsSource cannot be null"))
+                .globalSettingsSource(globalSettingsSource)
+                .projectSettingsSource(projectSettingsSource)
+                .userSettingsSource(userSettingsSource)
                 .build();
     }
 
@@ -122,9 +122,9 @@ public interface SettingsBuilderRequest {
             @Nonnull Path userSettingsPath) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
-                .globalSettingsPath(nonNull(globalSettingsPath, "globalSettingsPath cannot be null"))
-                .projectSettingsPath(nonNull(projectSettingsPath, "projectSettingsPath cannot be null"))
-                .userSettingsPath(nonNull(userSettingsPath, "userSettingsPath cannot be null"))
+                .globalSettingsPath(globalSettingsPath)
+                .projectSettingsPath(projectSettingsPath)
+                .userSettingsPath(userSettingsPath)
                 .build();
     }
 

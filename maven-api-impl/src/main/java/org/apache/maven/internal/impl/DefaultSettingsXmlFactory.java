@@ -36,8 +36,6 @@ import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.v4.SettingsStaxReader;
 import org.apache.maven.settings.v4.SettingsStaxWriter;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
 @Named
 @Singleton
 public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
@@ -84,5 +82,12 @@ public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
         } catch (Exception e) {
             throw new XmlWriterException("Unable to write settings", e);
         }
+    }
+
+    static <T> T nonNull(T t, String name) {
+        if (t == null) {
+            throw new IllegalArgumentException(name + " cannot be null");
+        }
+        return t;
     }
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.settings;
+package org.apache.maven.internal.impl;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -309,17 +309,6 @@ public final class SettingsUtilsV4 {
                 .checksumPolicy(modelPolicy.getChecksumPolicy())
                 .build();
         return policy;
-    }
-
-    /**
-     * @param settings could be null
-     * @return a new instance of settings or null if settings was null.
-     */
-    public static org.apache.maven.settings.Settings copySettings(org.apache.maven.settings.Settings settings) {
-        if (settings == null) {
-            return null;
-        }
-        return new org.apache.maven.settings.Settings(settings.getDelegate());
     }
 
     private static org.apache.maven.api.model.InputLocation toLocation(
