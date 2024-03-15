@@ -49,6 +49,7 @@
     #set ( $dummy = $imports.add( "java.util.Collections" ) )
     #set ( $dummy = $imports.add( "java.util.HashMap" ) )
     #set ( $dummy = $imports.add( "java.util.Map" ) )
+    #set ( $dummy = $imports.add( "java.util.Set" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Experimental" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Generated" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Immutable" ) )
@@ -255,6 +256,13 @@ public class ${class.name}
      */
     public InputLocation getLocation(Object key) {
         return locations != null ? locations.get(key) : null;
+    }
+
+    /**
+    * Gets the keys of the locations of the input source.
+    */
+    public Set<Object> getLocationKeys() {
+        return locations != null ? locations.keySet() : null;
     }
 
     /**
