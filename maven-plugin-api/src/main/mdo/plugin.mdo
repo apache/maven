@@ -92,6 +92,15 @@ under the License.
           <type>boolean</type>
           <defaultValue>true</defaultValue>
         </field>
+        <field>
+          <name>requiredMavenVersion</name>
+          <version>1.0.0</version>
+          <description>
+            Minimum Maven version required to use the plugin.
+            @since Maven 3.0.2
+          </description>
+          <type>String</type>
+        </field>
         <field xdoc.separator="blank">
           <name>mojos</name>
           <version>1.0.0</version>
