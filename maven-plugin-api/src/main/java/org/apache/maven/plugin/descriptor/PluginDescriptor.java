@@ -81,6 +81,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
 
     private String description;
 
+    // MNG-4840
     private String requiredMavenVersion;
 
     private String requiredJavaVersion;
@@ -367,10 +368,22 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         return description;
     }
 
+    /**
+     * Set required Maven version.
+     *
+     * @param requiredMavenVersion Maven version required by the plugin
+     * @since 3.0.2
+     */
     public void setRequiredMavenVersion(String requiredMavenVersion) {
         this.requiredMavenVersion = requiredMavenVersion;
     }
 
+    /**
+     * Get required Maven version.
+     *
+     * @return the Maven version required by the plugin
+     * @since 3.0.2
+     */
     public String getRequiredMavenVersion() {
         return requiredMavenVersion;
     }
