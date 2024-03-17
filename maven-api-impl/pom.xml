@@ -128,6 +128,10 @@ under the License.
               </params>
             </configuration>
           </execution>
+          <execution>
+            <id>modello-site-docs</id>
+            <phase>none</phase>
+          </execution>
         </executions>
       </plugin>
     </plugins>
