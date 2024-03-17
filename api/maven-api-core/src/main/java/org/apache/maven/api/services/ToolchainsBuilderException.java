@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.services;
 
+import java.util.List;
+
 import org.apache.maven.api.annotations.Experimental;
 
 /**
@@ -27,13 +29,24 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 public class ToolchainsBuilderException extends MavenException {
+
+    private final List<BuilderProblem> problems;
+
     /**
      * @param message the message to give
      * @param e the {@link Exception}
      */
     public ToolchainsBuilderException(String message, Exception e) {
         super(message, e);
+        this.problems = List.of();
     }
 
-    // TODO: add ToolchainsBuilderResult
+    public ToolchainsBuilderException(String message, List<BuilderProblem> problems) {
+        super(message, null);
+        this.problems = List.copyOf(problems);
+    }
+
+    public List<BuilderProblem> getProblems() {
+        return problems;
+    }
 }

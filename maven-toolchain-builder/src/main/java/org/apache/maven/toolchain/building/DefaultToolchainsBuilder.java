@@ -23,25 +23,28 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Collections;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import org.apache.maven.api.Session;
+import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.Source;
+import org.apache.maven.api.services.ToolchainsBuilderException;
+import org.apache.maven.api.services.ToolchainsBuilderRequest;
+import org.apache.maven.api.services.ToolchainsBuilderResult;
+import org.apache.maven.api.services.xml.ToolchainsXmlFactory;
+import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.ProblemCollector;
 import org.apache.maven.building.ProblemCollectorFactory;
-import org.apache.maven.building.Source;
-import org.apache.maven.toolchain.io.ToolchainsParseException;
-import org.apache.maven.toolchain.io.ToolchainsReader;
-import org.apache.maven.toolchain.io.ToolchainsWriter;
-import org.apache.maven.toolchain.merge.MavenToolchainMerger;
+import org.apache.maven.internal.impl.PathSource;
 import org.apache.maven.toolchain.model.PersistedToolchains;
-import org.apache.maven.toolchain.model.TrackableBase;
-import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+import org.codehaus.plexus.interpolation.os.OperatingSystemUtils;
 
 /**
  *
@@ -50,143 +53,88 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 @Named
 @Singleton
 public class DefaultToolchainsBuilder implements ToolchainsBuilder {
-    private final MavenToolchainMerger toolchainsMerger = new MavenToolchainMerger();
-    private final ToolchainsWriter toolchainsWriter;
-    private final ToolchainsReader toolchainsReader;
+    private final org.apache.maven.api.services.ToolchainsBuilder builder;
+    private final ToolchainsXmlFactory toolchainsXmlFactory;
 
     @Inject
-    public DefaultToolchainsBuilder(ToolchainsWriter toolchainsWriter, ToolchainsReader toolchainsReader) {
-        this.toolchainsWriter = toolchainsWriter;
-        this.toolchainsReader = toolchainsReader;
+    public DefaultToolchainsBuilder(
+            org.apache.maven.api.services.ToolchainsBuilder builder, ToolchainsXmlFactory toolchainsXmlFactory) {
+        this.builder = builder;
+        this.toolchainsXmlFactory = toolchainsXmlFactory;
     }
 
     @Override
     public ToolchainsBuildingResult build(ToolchainsBuildingRequest request) throws ToolchainsBuildingException {
-        ProblemCollector problems = ProblemCollectorFactory.newInstance(null);
+        try {
+            ToolchainsBuilderResult result = builder.build(ToolchainsBuilderRequest.builder()
+                    .session((Session) java.lang.reflect.Proxy.newProxyInstance(
+                            Session.class.getClassLoader(),
+                            new Class[] {Session.class},
+                            (Object proxy, Method method, Object[] args) -> {
+                                if ("getSystemProperties".equals(method.getName())) {
+                                    Map<String, String> properties = new HashMap<>();
+                                    Properties env = OperatingSystemUtils.getSystemEnvVars();
+                                    env.stringPropertyNames()
+                                            .forEach(k -> properties.put("env." + k, env.getProperty(k)));
+                                    return properties;
+                                } else if ("getUserProperties".equals(method.getName())) {
+                                    return Map.of();
+                                } else if ("getService".equals(method.getName())) {
+                                    if (args[0] == ToolchainsXmlFactory.class) {
+                                        return toolchainsXmlFactory;
+                                    }
+                                }
+                                return null;
+                            }))
+                    .globalToolchainsSource(convert(request.getGlobalToolchainsSource()))
+                    .userToolchainsSource(convert(request.getUserToolchainsSource()))
+                    .build());
 
-        PersistedToolchains globalToolchains = readToolchains(request.getGlobalToolchainsSource(), request, problems);
-
-        PersistedToolchains userToolchains = readToolchains(request.getUserToolchainsSource(), request, problems);
-
-        toolchainsMerger.merge(userToolchains, globalToolchains, TrackableBase.GLOBAL_LEVEL);
-
-        problems.setSource("");
-
-        userToolchains = interpolate(userToolchains, problems);
-
-        if (hasErrors(problems.getProblems())) {
-            throw new ToolchainsBuildingException(problems.getProblems());
+            return new DefaultToolchainsBuildingResult(
+                    new PersistedToolchains(result.getEffectiveToolchains()), convert(result.getProblems()));
+        } catch (ToolchainsBuilderException e) {
+            throw new ToolchainsBuildingException(convert(e.getProblems()));
         }
-
-        return new DefaultToolchainsBuildingResult(userToolchains, problems.getProblems());
     }
 
-    private PersistedToolchains interpolate(PersistedToolchains toolchains, ProblemCollector problems) {
-
-        StringWriter stringWriter = new StringWriter(1024 * 4);
-        try {
-            toolchainsWriter.write(stringWriter, null, toolchains);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to serialize toolchains to memory", e);
-        }
-
-        String serializedToolchains = stringWriter.toString();
-
-        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
-
-        try {
-            interpolator.addValueSource(new EnvarBasedValueSource());
-        } catch (IOException e) {
-            problems.add(
-                    Problem.Severity.WARNING,
-                    "Failed to use environment variables for interpolation: " + e.getMessage(),
-                    -1,
-                    -1,
-                    e);
-        }
-
-        interpolator.addPostProcessor((expression, value) -> {
-            if (value != null) {
-                // we're going to parse this back in as XML so we need to escape XML markup
-                value = value.toString()
-                        .replace("&", "&amp;")
-                        .replace("<", "&lt;")
-                        .replace(">", "&gt;");
-                return value;
-            }
-            return null;
-        });
-
-        try {
-            serializedToolchains = interpolator.interpolate(serializedToolchains);
-        } catch (InterpolationException e) {
-            problems.add(Problem.Severity.ERROR, "Failed to interpolate toolchains: " + e.getMessage(), -1, -1, e);
-            return toolchains;
-        }
-
-        PersistedToolchains result;
-        try {
-            Map<String, ?> options = Collections.singletonMap(ToolchainsReader.IS_STRICT, Boolean.FALSE);
-
-            result = toolchainsReader.read(new StringReader(serializedToolchains), options);
-        } catch (IOException e) {
-            problems.add(Problem.Severity.ERROR, "Failed to interpolate toolchains: " + e.getMessage(), -1, -1, e);
-            return toolchains;
-        }
-
-        return result;
-    }
-
-    private PersistedToolchains readToolchains(
-            Source toolchainsSource, ToolchainsBuildingRequest request, ProblemCollector problems) {
-        if (toolchainsSource == null) {
-            return new PersistedToolchains();
-        }
-
-        PersistedToolchains toolchains;
-
-        try {
-            Map<String, ?> options = Collections.singletonMap(ToolchainsReader.IS_STRICT, Boolean.TRUE);
-
-            try {
-                toolchains = toolchainsReader.read(toolchainsSource.getInputStream(), options);
-            } catch (ToolchainsParseException e) {
-                options = Collections.singletonMap(ToolchainsReader.IS_STRICT, Boolean.FALSE);
-
-                toolchains = toolchainsReader.read(toolchainsSource.getInputStream(), options);
-
-                problems.add(Problem.Severity.WARNING, e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
-            }
-        } catch (ToolchainsParseException e) {
-            problems.add(
-                    Problem.Severity.FATAL,
-                    "Non-parseable toolchains " + toolchainsSource.getLocation() + ": " + e.getMessage(),
-                    e.getLineNumber(),
-                    e.getColumnNumber(),
-                    e);
-            return new PersistedToolchains();
-        } catch (IOException e) {
-            problems.add(
-                    Problem.Severity.FATAL,
-                    "Non-readable toolchains " + toolchainsSource.getLocation() + ": " + e.getMessage(),
-                    -1,
-                    -1,
-                    e);
-            return new PersistedToolchains();
-        }
-
-        return toolchains;
-    }
-
-    private boolean hasErrors(List<Problem> problems) {
-        if (problems != null) {
-            for (Problem problem : problems) {
-                if (Problem.Severity.ERROR.compareTo(problem.getSeverity()) >= 0) {
-                    return true;
+    private Source convert(org.apache.maven.building.Source source) {
+        if (source instanceof FileSource fs) {
+            return new PathSource(fs.getPath());
+        } else if (source != null) {
+            return new Source() {
+                @Override
+                public Path getPath() {
+                    return null;
                 }
-            }
-        }
 
-        return false;
+                @Override
+                public InputStream openStream() throws IOException {
+                    return source.getInputStream();
+                }
+
+                @Override
+                public String getLocation() {
+                    return source.getLocation();
+                }
+
+                @Override
+                public Source resolve(String relative) {
+                    return null;
+                }
+            };
+        } else {
+            return null;
+        }
+    }
+
+    private List<Problem> convert(List<BuilderProblem> problems) {
+        ProblemCollector collector = ProblemCollectorFactory.newInstance(null);
+        problems.forEach(p -> collector.add(
+                Problem.Severity.valueOf(p.getSeverity().name()),
+                p.getMessage(),
+                p.getLineNumber(),
+                p.getColumnNumber(),
+                p.getException()));
+        return collector.getProblems();
     }
 }

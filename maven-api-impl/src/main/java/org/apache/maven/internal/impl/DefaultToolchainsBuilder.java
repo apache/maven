@@ -18,131 +18,216 @@
  */
 package org.apache.maven.internal.impl;
 
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLStreamException;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
-import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderException;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
 import org.apache.maven.api.services.ToolchainsBuilderResult;
+import org.apache.maven.api.services.xml.ToolchainsXmlFactory;
+import org.apache.maven.api.services.xml.XmlReaderException;
+import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.toolchain.PersistedToolchains;
-import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
-import org.apache.maven.toolchain.building.ToolchainsBuildingException;
-import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
+import org.apache.maven.toolchain.v4.MavenToolchainsMerger;
+import org.apache.maven.toolchain.v4.MavenToolchainsTransformer;
+import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
+/**
+ * Builds the effective settings from a user settings file and/or a global settings file.
+ *
+ */
 @Named
-@Singleton
 public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
-    private final org.apache.maven.toolchain.building.ToolchainsBuilder builder;
+    private final MavenToolchainsMerger toolchainsMerger = new MavenToolchainsMerger();
 
-    @Inject
-    public DefaultToolchainsBuilder(org.apache.maven.toolchain.building.ToolchainsBuilder builder) {
-        this.builder = builder;
-    }
-
-    @Nonnull
     @Override
-    public ToolchainsBuilderResult build(ToolchainsBuilderRequest request)
-            throws ToolchainsBuilderException, IllegalArgumentException {
+    public ToolchainsBuilderResult build(ToolchainsBuilderRequest request) throws ToolchainsBuilderException {
+        List<BuilderProblem> problems = new ArrayList<>();
+
+        Source globalSettingsSource = getSettingsSource(
+                request.getGlobalToolchainsPath().orElse(null),
+                request.getGlobalToolchainsSource().orElse(null));
+        PersistedToolchains globalSettings = readToolchains(globalSettingsSource, request, problems);
+
+        Source userSettingsSource = getSettingsSource(
+                request.getUserToolchainsPath().orElse(null),
+                request.getUserToolchainsSource().orElse(null));
+        PersistedToolchains userSettings = readToolchains(userSettingsSource, request, problems);
+
+        userSettings = toolchainsMerger.merge(userSettings, globalSettings, false, null);
+
+        if (hasErrors(problems)) {
+            throw new ToolchainsBuilderException("Error building settings", problems);
+        }
+
+        return new DefaultToolchainsBuilderResult(userSettings, problems);
+    }
+
+    private boolean hasErrors(List<BuilderProblem> problems) {
+        if (problems != null) {
+            for (BuilderProblem problem : problems) {
+                if (BuilderProblem.Severity.ERROR.compareTo(problem.getSeverity()) >= 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private Source getSettingsSource(Path settingsPath, Source settingsSource) {
+        if (settingsSource != null) {
+            return settingsSource;
+        } else if (settingsPath != null && Files.exists(settingsPath)) {
+            return new PathSource(settingsPath);
+        }
+        return null;
+    }
+
+    private PersistedToolchains readToolchains(
+            Source toolchainsSource, ToolchainsBuilderRequest request, List<BuilderProblem> problems) {
+        if (toolchainsSource == null) {
+            return PersistedToolchains.newInstance();
+        }
+
+        PersistedToolchains toolchains;
+
         try {
-            DefaultToolchainsBuildingRequest req = new DefaultToolchainsBuildingRequest();
-            if (request.getGlobalToolchainsSource().isPresent()) {
-                req.setGlobalToolchainsSource(new MappedToolchainsSource(
-                        request.getGlobalToolchainsSource().get()));
-            } else if (request.getGlobalToolchainsPath().isPresent()) {
-                req.setGlobalToolchainsSource(new org.apache.maven.building.FileSource(
-                        request.getGlobalToolchainsPath().get().toFile()));
-            }
-            if (request.getUserToolchainsSource().isPresent()) {
-                req.setUserToolchainsSource(new MappedToolchainsSource(
-                        request.getUserToolchainsSource().get()));
-            } else if (request.getUserToolchainsPath().isPresent()) {
-                req.setUserToolchainsSource(new org.apache.maven.building.FileSource(
-                        request.getUserToolchainsPath().get().toFile()));
-            }
-            ToolchainsBuildingResult result = builder.build(req);
-            return new ToolchainsBuilderResult() {
-                @Override
-                public PersistedToolchains getEffectiveToolchains() {
-                    return result.getEffectiveToolchains().getDelegate();
+            try {
+                InputStream is = toolchainsSource.openStream();
+                if (is == null) {
+                    return PersistedToolchains.newInstance();
                 }
-
-                @Override
-                public List<BuilderProblem> getProblems() {
-                    return new MappedList<>(result.getProblems(), MappedBuilderProblem::new);
+                toolchains = request.getSession()
+                        .getService(ToolchainsXmlFactory.class)
+                        .read(XmlReaderRequest.builder()
+                                .inputStream(is)
+                                .location(toolchainsSource.getLocation())
+                                .strict(true)
+                                .build());
+            } catch (XmlReaderException e) {
+                InputStream is = toolchainsSource.openStream();
+                if (is == null) {
+                    return PersistedToolchains.newInstance();
                 }
-            };
-        } catch (ToolchainsBuildingException e) {
-            throw new ToolchainsBuilderException("Unable to build Toolchains", e);
+                toolchains = request.getSession()
+                        .getService(ToolchainsXmlFactory.class)
+                        .read(XmlReaderRequest.builder()
+                                .inputStream(is)
+                                .location(toolchainsSource.getLocation())
+                                .strict(false)
+                                .build());
+                Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
+                problems.add(new DefaultBuilderProblem(
+                        toolchainsSource.getLocation(),
+                        loc != null ? loc.getLineNumber() : -1,
+                        loc != null ? loc.getColumnNumber() : -1,
+                        e,
+                        e.getMessage(),
+                        BuilderProblem.Severity.WARNING));
+            }
+        } catch (XmlReaderException e) {
+            Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
+            problems.add(new DefaultBuilderProblem(
+                    toolchainsSource.getLocation(),
+                    loc != null ? loc.getLineNumber() : -1,
+                    loc != null ? loc.getColumnNumber() : -1,
+                    e,
+                    "Non-parseable toolchains " + toolchainsSource.getLocation() + ": " + e.getMessage(),
+                    BuilderProblem.Severity.FATAL));
+            return PersistedToolchains.newInstance();
+        } catch (IOException e) {
+            problems.add(new DefaultBuilderProblem(
+                    toolchainsSource.getLocation(),
+                    -1,
+                    -1,
+                    e,
+                    "Non-readable toolchains " + toolchainsSource.getLocation() + ": " + e.getMessage(),
+                    BuilderProblem.Severity.FATAL));
+            return PersistedToolchains.newInstance();
         }
+
+        toolchains = interpolate(toolchains, request, problems);
+
+        return toolchains;
     }
 
-    private static class MappedToolchainsSource implements org.apache.maven.building.Source {
-        private final Source source;
+    private PersistedToolchains interpolate(
+            PersistedToolchains toolchains, ToolchainsBuilderRequest request, List<BuilderProblem> problems) {
 
-        MappedToolchainsSource(Source source) {
-            this.source = source;
+        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+
+        interpolator.addValueSource(new MapBasedValueSource(request.getSession().getUserProperties()));
+
+        interpolator.addValueSource(new MapBasedValueSource(request.getSession().getSystemProperties()));
+
+        try {
+            interpolator.addValueSource(new EnvarBasedValueSource());
+        } catch (IOException e) {
+            problems.add(new DefaultBuilderProblem(
+                    null,
+                    -1,
+                    -1,
+                    e,
+                    "Failed to use environment variables for interpolation: " + e.getMessage(),
+                    BuilderProblem.Severity.WARNING));
         }
 
-        @Override
-        public InputStream getInputStream() throws IOException {
-            return source.openStream();
-        }
-
-        @Override
-        public String getLocation() {
-            return source.getLocation();
-        }
+        return new MavenToolchainsTransformer(value -> {
+                    try {
+                        return value != null ? interpolator.interpolate(value) : null;
+                    } catch (InterpolationException e) {
+                        problems.add(new DefaultBuilderProblem(
+                                null,
+                                -1,
+                                -1,
+                                e,
+                                "Failed to interpolate settings: " + e.getMessage(),
+                                BuilderProblem.Severity.WARNING));
+                        return value;
+                    }
+                })
+                .visit(toolchains);
     }
 
-    private static class MappedBuilderProblem implements BuilderProblem {
-        private final org.apache.maven.building.Problem problem;
+    /**
+     * Collects the output of the settings builder.
+     *
+     */
+    static class DefaultToolchainsBuilderResult implements ToolchainsBuilderResult {
 
-        MappedBuilderProblem(org.apache.maven.building.Problem problem) {
-            this.problem = problem;
+        private final PersistedToolchains effectiveToolchains;
+
+        private final List<BuilderProblem> problems;
+
+        DefaultToolchainsBuilderResult(PersistedToolchains effectiveToolchains, List<BuilderProblem> problems) {
+            this.effectiveToolchains = effectiveToolchains;
+            this.problems = (problems != null) ? problems : new ArrayList<>();
         }
 
         @Override
-        public String getSource() {
-            return problem.getSource();
+        public PersistedToolchains getEffectiveToolchains() {
+            return effectiveToolchains;
         }
 
         @Override
-        public int getLineNumber() {
-            return problem.getLineNumber();
-        }
-
-        @Override
-        public int getColumnNumber() {
-            return problem.getColumnNumber();
-        }
-
-        @Override
-        public String getLocation() {
-            return problem.getLocation();
-        }
-
-        @Override
-        public Exception getException() {
-            return problem.getException();
-        }
-
-        @Override
-        public String getMessage() {
-            return problem.getMessage();
-        }
-
-        @Override
-        public Severity getSeverity() {
-            return Severity.valueOf(problem.getSeverity().name());
+        public List<BuilderProblem> getProblems() {
+            return problems;
         }
     }
 }
