@@ -100,7 +100,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     }
 
     private org.apache.maven.api.services.Source toSource(File file, Source source) {
-        if (file != null) {
+        if (file != null && file.exists()) {
             return new PathSource(file.toPath());
         } else if (source instanceof FileSource fs) {
             return new PathSource(fs.getPath());
