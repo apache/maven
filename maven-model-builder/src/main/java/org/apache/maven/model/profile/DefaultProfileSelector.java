@@ -22,17 +22,27 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.apache.maven.model.Activation;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.DefaultModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
+import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.profile.activation.ProfileActivator;
 
 /**
@@ -44,8 +54,23 @@ import org.apache.maven.model.profile.activation.ProfileActivator;
 @Singleton
 public class DefaultProfileSelector implements ProfileSelector {
 
+    private static Properties asProperties(Map<String, String> m) {
+        return m.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (l, r) -> r, Properties::new));
+    }
+
     @Inject
     private List<ProfileActivator> activators = new ArrayList<>();
+
+    @Inject
+    private ModelInterpolator interpolator = new ModelInterpolator() {
+
+        @Override
+        public Model interpolateModel(
+                Model model, File projectDir, ModelBuildingRequest request, ModelProblemCollector problems) {
+            return model;
+        }
+    };
 
     public DefaultProfileSelector addProfileActivator(ProfileActivator profileActivator) {
         if (profileActivator != null) {
@@ -54,9 +79,18 @@ public class DefaultProfileSelector implements ProfileSelector {
         return this;
     }
 
+    public void setInterpolator(ModelInterpolator interpolator) {
+        this.interpolator = interpolator;
+    }
+
     @Override
     public List<Profile> getActiveProfiles(
             Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems) {
+
+        if (profiles.stream().map(Profile::getId).distinct().count() < profiles.size()) {
+            // invalid profile specification
+            return Collections.emptyList();
+        }
         Collection<String> activatedIds = new HashSet<>(context.getActiveProfileIds());
         Collection<String> deactivatedIds = new HashSet<>(context.getInactiveProfileIds());
 
@@ -64,9 +98,12 @@ public class DefaultProfileSelector implements ProfileSelector {
         List<Profile> activePomProfilesByDefault = new ArrayList<>();
         boolean activatedPomProfileNotByDefault = false;
 
+        Map<String, Profile> activation = earlyInterpolateProfileActivations(profiles, context);
+
         for (Profile profile : profiles) {
             if (!deactivatedIds.contains(profile.getId())) {
-                if (activatedIds.contains(profile.getId()) || isActive(profile, context, problems)) {
+                if (activatedIds.contains(profile.getId())
+                        || isActive(activation.get(profile.getId()), context, problems)) {
                     activeProfiles.add(profile);
 
                     if (Profile.SOURCE_POM.equals(profile.getSource())) {
@@ -87,6 +124,35 @@ public class DefaultProfileSelector implements ProfileSelector {
         }
 
         return activeProfiles;
+    }
+
+    private Map<String, Profile> earlyInterpolateProfileActivations(
+            Collection<Profile> original, ProfileActivationContext context) {
+
+        Model model = new Model();
+
+        UnaryOperator<Profile> activatableProfile = p -> {
+            Profile result = new Profile();
+            result.setId(p.getId());
+            result.setActivation(p.getActivation());
+            return result;
+        };
+        model.setProfiles(original.stream().map(activatableProfile).collect(Collectors.toList()));
+
+        ModelBuildingRequest mbr = new DefaultModelBuildingRequest()
+                .setActiveProfileIds(context.getActiveProfileIds())
+                .setInactiveProfileIds(context.getInactiveProfileIds())
+                .setRawModel(model)
+                .setSystemProperties(asProperties(context.getSystemProperties()))
+                .setUserProperties(asProperties(context.getUserProperties()))
+                .setTwoPhaseBuilding(true)
+                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+
+        interpolator
+                .interpolateModel(model, context.getProjectDirectory(), mbr, problem -> {})
+                .getProfiles();
+
+        return model.getProfiles().stream().collect(Collectors.toMap(Profile::getId, UnaryOperator.identity()));
     }
 
     private boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
