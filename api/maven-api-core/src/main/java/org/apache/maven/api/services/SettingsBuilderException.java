@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.annotations.Experimental;
 
@@ -42,7 +43,7 @@ public class SettingsBuilderException extends MavenException {
     }
 
     public SettingsBuilderException(String message, List<BuilderProblem> problems) {
-        super(message, null);
+        super(message + ": " + problems.stream().map(BuilderProblem::toString).collect(Collectors.joining(", ")), null);
         this.problems = List.copyOf(problems);
     }
 

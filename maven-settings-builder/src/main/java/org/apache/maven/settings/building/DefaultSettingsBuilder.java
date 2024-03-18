@@ -38,7 +38,6 @@ import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
-import org.apache.maven.internal.impl.PathSource;
 import org.apache.maven.settings.Settings;
 
 /**
@@ -101,9 +100,9 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private org.apache.maven.api.services.Source toSource(File file, Source source) {
         if (file != null && file.exists()) {
-            return new PathSource(file.toPath());
+            return org.apache.maven.api.services.Source.fromPath(file.toPath());
         } else if (source instanceof FileSource fs) {
-            return new PathSource(fs.getPath());
+            return org.apache.maven.api.services.Source.fromPath(fs.getPath());
         } else if (source != null) {
             return new org.apache.maven.api.services.Source() {
                 @Override

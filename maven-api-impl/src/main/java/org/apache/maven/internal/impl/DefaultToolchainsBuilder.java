@@ -23,8 +23,6 @@ import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,14 +57,10 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     public ToolchainsBuilderResult build(ToolchainsBuilderRequest request) throws ToolchainsBuilderException {
         List<BuilderProblem> problems = new ArrayList<>();
 
-        Source globalSource = getSource(
-                request.getGlobalToolchainsPath().orElse(null),
-                request.getGlobalToolchainsSource().orElse(null));
+        Source globalSource = request.getGlobalToolchainsSource().orElse(null);
         PersistedToolchains global = readToolchains(globalSource, request, problems);
 
-        Source userSource = getSource(
-                request.getUserToolchainsPath().orElse(null),
-                request.getUserToolchainsSource().orElse(null));
+        Source userSource = request.getUserToolchainsSource().orElse(null);
         PersistedToolchains user = readToolchains(userSource, request, problems);
 
         PersistedToolchains effective = toolchainsMerger.merge(user, global, false, null);
@@ -88,15 +82,6 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
         }
 
         return false;
-    }
-
-    private Source getSource(Path path, Source source) {
-        if (source != null) {
-            return source;
-        } else if (path != null && Files.exists(path)) {
-            return new PathSource(path);
-        }
-        return null;
     }
 
     private PersistedToolchains readToolchains(

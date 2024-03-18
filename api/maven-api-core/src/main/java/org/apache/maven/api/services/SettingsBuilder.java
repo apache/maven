@@ -121,7 +121,15 @@ public interface SettingsBuilder extends Service {
     @Nonnull
     List<BuilderProblem> validate(@Nonnull Settings settings, boolean isProjectSettings);
 
-    org.apache.maven.api.settings.Profile convert(org.apache.maven.api.model.Profile profile);
+    /**
+     * Convert a model profile to a settings profile.
+     */
+    @Nonnull
+    org.apache.maven.api.settings.Profile convert(@Nonnull org.apache.maven.api.model.Profile profile);
 
-    org.apache.maven.api.model.Profile convert(org.apache.maven.api.settings.Profile profile);
+    /**
+     * Convert a settings profile to a model profile.
+     */
+    @Nonnull
+    org.apache.maven.api.model.Profile convert(@Nonnull org.apache.maven.api.settings.Profile profile);
 }

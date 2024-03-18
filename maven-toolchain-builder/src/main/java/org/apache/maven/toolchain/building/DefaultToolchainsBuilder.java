@@ -42,7 +42,6 @@ import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.ProblemCollector;
 import org.apache.maven.building.ProblemCollectorFactory;
-import org.apache.maven.internal.impl.PathSource;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.codehaus.plexus.interpolation.os.OperatingSystemUtils;
 
@@ -99,7 +98,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
     private Source convert(org.apache.maven.building.Source source) {
         if (source instanceof FileSource fs) {
-            return new PathSource(fs.getPath());
+            return Source.fromPath(fs.getPath());
         } else if (source != null) {
             return new Source() {
                 @Override

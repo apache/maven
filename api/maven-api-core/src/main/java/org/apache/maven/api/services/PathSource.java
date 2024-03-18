@@ -16,20 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.api.services;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.maven.api.services.Source;
-
-public class PathSource implements Source {
+class PathSource implements Source {
 
     private final Path path;
 
-    public PathSource(Path path) {
+    PathSource(Path path) {
         this.path = path;
     }
 

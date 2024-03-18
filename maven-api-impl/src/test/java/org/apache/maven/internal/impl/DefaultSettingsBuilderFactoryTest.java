@@ -27,6 +27,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
+import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,7 +66,7 @@ class DefaultSettingsBuilderFactoryTest {
 
         SettingsBuilderRequest request = SettingsBuilderRequest.builder()
                 .session(session)
-                .userSettingsPath(getSettings("settings-simple"))
+                .userSettingsSource(Source.fromPath(getSettings("settings-simple")))
                 .build();
 
         SettingsBuilderResult result = builder.build(request);

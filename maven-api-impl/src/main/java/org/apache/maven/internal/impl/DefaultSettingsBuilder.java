@@ -24,7 +24,6 @@ import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -67,19 +66,13 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     public SettingsBuilderResult build(SettingsBuilderRequest request) throws SettingsBuilderException {
         List<BuilderProblem> problems = new ArrayList<>();
 
-        Source globalSource = getSource(
-                request.getGlobalSettingsPath().orElse(null),
-                request.getGlobalSettingsSource().orElse(null));
+        Source globalSource = request.getGlobalSettingsSource().orElse(null);
         Settings global = readSettings(globalSource, false, request, problems);
 
-        Source projectSource = getSource(
-                request.getProjectSettingsPath().orElse(null),
-                request.getProjectSettingsSource().orElse(null));
+        Source projectSource = request.getProjectSettingsSource().orElse(null);
         Settings project = readSettings(projectSource, true, request, problems);
 
-        Source userSource = getSource(
-                request.getUserSettingsPath().orElse(null),
-                request.getUserSettingsSource().orElse(null));
+        Source userSource = request.getUserSettingsSource().orElse(null);
         Settings user = readSettings(userSource, false, request, problems);
 
         Settings effective =
@@ -130,15 +123,6 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
 
         return false;
-    }
-
-    private Source getSource(Path path, Source source) {
-        if (source != null) {
-            return source;
-        } else if (path != null && Files.exists(path)) {
-            return new PathSource(path);
-        }
-        return null;
     }
 
     private Settings readSettings(
