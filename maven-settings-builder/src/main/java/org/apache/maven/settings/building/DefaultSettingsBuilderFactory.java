@@ -52,6 +52,8 @@ public class DefaultSettingsBuilderFactory {
      * @return The new settings builder instance, never {@code null}.
      */
     public DefaultSettingsBuilder newInstance() {
-        return new DefaultSettingsBuilder(new org.apache.maven.internal.impl.DefaultSettingsBuilder());
+        return new DefaultSettingsBuilder(
+                new org.apache.maven.internal.impl.DefaultSettingsBuilder(),
+                new org.apache.maven.internal.impl.DefaultSettingsXmlFactory());
     }
 }

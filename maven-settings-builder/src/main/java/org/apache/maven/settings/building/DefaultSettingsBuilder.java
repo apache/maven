@@ -22,7 +22,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +35,10 @@ import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.SettingsBuilderException;
 import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
+import org.apache.maven.api.services.xml.SettingsXmlFactory;
+import org.apache.maven.building.FileSource;
+import org.apache.maven.building.Source;
+import org.apache.maven.internal.impl.PathSource;
 import org.apache.maven.settings.Settings;
 
 /**
@@ -42,10 +50,14 @@ import org.apache.maven.settings.Settings;
 public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final org.apache.maven.internal.impl.DefaultSettingsBuilder builder;
+    private final org.apache.maven.internal.impl.DefaultSettingsXmlFactory settingsXmlFactory;
 
     @Inject
-    public DefaultSettingsBuilder(org.apache.maven.internal.impl.DefaultSettingsBuilder builder) {
+    public DefaultSettingsBuilder(
+            org.apache.maven.internal.impl.DefaultSettingsBuilder builder,
+            org.apache.maven.internal.impl.DefaultSettingsXmlFactory settingsXmlFactory) {
         this.builder = builder;
+        this.settingsXmlFactory = settingsXmlFactory;
     }
 
     @Override
@@ -67,15 +79,55 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                                             .collect(Collectors.toMap(
                                                     e -> e.getKey().toString(),
                                                     e -> e.getValue().toString()));
+                                } else if ("getService".equals(method.getName())) {
+                                    if (args[0] == SettingsXmlFactory.class) {
+                                        return settingsXmlFactory;
+                                    }
                                 }
                                 return null;
                             }))
+                    .globalSettingsSource(toSource(request.getGlobalSettingsFile(), request.getGlobalSettingsSource()))
+                    .projectSettingsSource(
+                            toSource(request.getProjectSettingsFile(), request.getProjectSettingsSource()))
+                    .userSettingsSource(toSource(request.getUserSettingsFile(), request.getUserSettingsSource()))
                     .build());
 
             return new DefaultSettingsBuildingResult(
                     new Settings(result.getEffectiveSettings()), convert(result.getProblems()));
         } catch (SettingsBuilderException e) {
             throw new SettingsBuildingException(convert(e.getProblems()));
+        }
+    }
+
+    private org.apache.maven.api.services.Source toSource(File file, Source source) {
+        if (file != null) {
+            return new PathSource(file.toPath());
+        } else if (source instanceof FileSource fs) {
+            return new PathSource(fs.getPath());
+        } else if (source != null) {
+            return new org.apache.maven.api.services.Source() {
+                @Override
+                public Path getPath() {
+                    return null;
+                }
+
+                @Override
+                public InputStream openStream() throws IOException {
+                    return source.getInputStream();
+                }
+
+                @Override
+                public String getLocation() {
+                    return source.getLocation();
+                }
+
+                @Override
+                public org.apache.maven.api.services.Source resolve(String relative) {
+                    return null;
+                }
+            };
+        } else {
+            return null;
         }
     }
 

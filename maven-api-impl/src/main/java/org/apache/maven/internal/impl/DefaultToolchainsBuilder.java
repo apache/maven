@@ -47,7 +47,7 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
 /**
- * Builds the effective settings from a user settings file and/or a global settings file.
+ * Builds the effective toolchains from a user toolchains file and/or a global toolchains file.
  *
  */
 @Named
@@ -59,23 +59,23 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     public ToolchainsBuilderResult build(ToolchainsBuilderRequest request) throws ToolchainsBuilderException {
         List<BuilderProblem> problems = new ArrayList<>();
 
-        Source globalSettingsSource = getSettingsSource(
+        Source globalSource = getSource(
                 request.getGlobalToolchainsPath().orElse(null),
                 request.getGlobalToolchainsSource().orElse(null));
-        PersistedToolchains globalSettings = readToolchains(globalSettingsSource, request, problems);
+        PersistedToolchains global = readToolchains(globalSource, request, problems);
 
-        Source userSettingsSource = getSettingsSource(
+        Source userSource = getSource(
                 request.getUserToolchainsPath().orElse(null),
                 request.getUserToolchainsSource().orElse(null));
-        PersistedToolchains userSettings = readToolchains(userSettingsSource, request, problems);
+        PersistedToolchains user = readToolchains(userSource, request, problems);
 
-        userSettings = toolchainsMerger.merge(userSettings, globalSettings, false, null);
+        PersistedToolchains effective = toolchainsMerger.merge(user, global, false, null);
 
         if (hasErrors(problems)) {
-            throw new ToolchainsBuilderException("Error building settings", problems);
+            throw new ToolchainsBuilderException("Error building toolchains", problems);
         }
 
-        return new DefaultToolchainsBuilderResult(userSettings, problems);
+        return new DefaultToolchainsBuilderResult(effective, problems);
     }
 
     private boolean hasErrors(List<BuilderProblem> problems) {
@@ -90,11 +90,11 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
         return false;
     }
 
-    private Source getSettingsSource(Path settingsPath, Source settingsSource) {
-        if (settingsSource != null) {
-            return settingsSource;
-        } else if (settingsPath != null && Files.exists(settingsPath)) {
-            return new PathSource(settingsPath);
+    private Source getSource(Path path, Source source) {
+        if (source != null) {
+            return source;
+        } else if (path != null && Files.exists(path)) {
+            return new PathSource(path);
         }
         return null;
     }
@@ -197,7 +197,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
                                 -1,
                                 -1,
                                 e,
-                                "Failed to interpolate settings: " + e.getMessage(),
+                                "Failed to interpolate toolchains: " + e.getMessage(),
                                 BuilderProblem.Severity.WARNING));
                         return value;
                     }
@@ -206,7 +206,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     }
 
     /**
-     * Collects the output of the settings builder.
+     * Collects the output of the toolchains builder.
      *
      */
     static class DefaultToolchainsBuilderResult implements ToolchainsBuilderResult {

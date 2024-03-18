@@ -67,29 +67,29 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     public SettingsBuilderResult build(SettingsBuilderRequest request) throws SettingsBuilderException {
         List<BuilderProblem> problems = new ArrayList<>();
 
-        Source globalSettingsSource = getSettingsSource(
+        Source globalSource = getSource(
                 request.getGlobalSettingsPath().orElse(null),
                 request.getGlobalSettingsSource().orElse(null));
-        Settings globalSettings = readSettings(globalSettingsSource, false, request, problems);
+        Settings global = readSettings(globalSource, false, request, problems);
 
-        Source projectSettingsSource = getSettingsSource(
+        Source projectSource = getSource(
                 request.getProjectSettingsPath().orElse(null),
                 request.getProjectSettingsSource().orElse(null));
-        Settings projectSettings = readSettings(projectSettingsSource, true, request, problems);
+        Settings project = readSettings(projectSource, true, request, problems);
 
-        Source userSettingsSource = getSettingsSource(
+        Source userSource = getSource(
                 request.getUserSettingsPath().orElse(null),
                 request.getUserSettingsSource().orElse(null));
-        Settings userSettings = readSettings(userSettingsSource, false, request, problems);
+        Settings user = readSettings(userSource, false, request, problems);
 
-        projectSettings = settingsMerger.merge(projectSettings, globalSettings, false, null);
-        userSettings = settingsMerger.merge(userSettings, projectSettings, false, null);
+        Settings effective =
+                settingsMerger.merge(user, settingsMerger.merge(project, global, false, null), false, null);
 
         // If no repository is defined in the user/global settings,
         // it means that we have "old" settings (as those are new in 4.0)
         // so add central to the computed settings for backward compatibility.
-        if (userSettings.getRepositories().isEmpty()
-                && userSettings.getPluginRepositories().isEmpty()) {
+        if (effective.getRepositories().isEmpty()
+                && effective.getPluginRepositories().isEmpty()) {
             Repository central = Repository.newBuilder()
                     .id("central")
                     .name("Central Repository")
@@ -98,19 +98,18 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     .build();
             Repository centralWithNoUpdate = central.withReleases(
                     RepositoryPolicy.newBuilder().updatePolicy("never").build());
-            userSettings = Settings.newBuilder(userSettings)
+            effective = Settings.newBuilder(effective)
                     .repositories(List.of(central))
                     .pluginRepositories(List.of(centralWithNoUpdate))
                     .build();
         }
 
         // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
-        String localRepository = userSettings.getLocalRepository();
+        String localRepository = effective.getLocalRepository();
         if (localRepository != null && !localRepository.isEmpty()) {
             Path file = Paths.get(localRepository);
             if (!file.isAbsolute() && file.toString().startsWith(File.separator)) {
-                userSettings =
-                        userSettings.withLocalRepository(file.toAbsolutePath().toString());
+                effective = effective.withLocalRepository(file.toAbsolutePath().toString());
             }
         }
 
@@ -118,7 +117,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             throw new SettingsBuilderException("Error building settings", problems);
         }
 
-        return new DefaultSettingsBuilderResult(userSettings, problems);
+        return new DefaultSettingsBuilderResult(effective, problems);
     }
 
     private boolean hasErrors(List<BuilderProblem> problems) {
@@ -133,11 +132,11 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         return false;
     }
 
-    private Source getSettingsSource(Path settingsPath, Source settingsSource) {
-        if (settingsSource != null) {
-            return settingsSource;
-        } else if (settingsPath != null && Files.exists(settingsPath)) {
-            return new PathSource(settingsPath);
+    private Source getSource(Path path, Source source) {
+        if (source != null) {
+            return source;
+        } else if (path != null && Files.exists(path)) {
+            return new PathSource(path);
         }
         return null;
     }
