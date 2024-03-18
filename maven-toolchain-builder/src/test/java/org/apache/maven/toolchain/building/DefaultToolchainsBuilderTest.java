@@ -43,6 +43,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.apache.maven.internal.impl.StaxLocation.getLocation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -198,7 +199,7 @@ class DefaultToolchainsBuilderTest {
         when(loc.getLineNumber()).thenReturn(4);
         when(loc.getColumnNumber()).thenReturn(2);
         XMLStreamException parseException = new XMLStreamException("MESSAGE", loc);
-        doThrow(new XmlReaderException("MESSAGE", parseException))
+        doThrow(new XmlReaderException("MESSAGE", getLocation(parseException), parseException))
                 .when(toolchainsXmlFactory)
                 .read(any(XmlReaderRequest.class));
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();

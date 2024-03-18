@@ -39,6 +39,8 @@ import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.model.v4.MavenStaxWriter;
 
+import static org.apache.maven.internal.impl.StaxLocation.getLocation;
+import static org.apache.maven.internal.impl.StaxLocation.getMessage;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -75,7 +77,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                 }
             }
         } catch (Exception e) {
-            throw new XmlReaderException("Unable to read model", e);
+            throw new XmlReaderException("Unable to read model: " + getMessage(e), getLocation(e), e);
         }
     }
 
@@ -100,7 +102,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                 }
             }
         } catch (Exception e) {
-            throw new XmlWriterException("Unable to write model", e);
+            throw new XmlWriterException("Unable to write model: " + getMessage(e), getLocation(e), e);
         }
     }
 

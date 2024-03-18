@@ -37,6 +37,8 @@ import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
 import org.apache.maven.toolchain.v4.MavenToolchainsStaxWriter;
 
+import static org.apache.maven.internal.impl.StaxLocation.getLocation;
+import static org.apache.maven.internal.impl.StaxLocation.getMessage;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -63,7 +65,7 @@ public class DefaultToolchainsXmlFactory implements ToolchainsXmlFactory {
                 return xml.read(inputStream, request.isStrict());
             }
         } catch (Exception e) {
-            throw new XmlReaderException("Unable to read toolchains", e);
+            throw new XmlReaderException("Unable to read toolchains: " + getMessage(e), getLocation(e), e);
         }
     }
 
@@ -83,7 +85,7 @@ public class DefaultToolchainsXmlFactory implements ToolchainsXmlFactory {
                 new MavenToolchainsStaxWriter().write(outputStream, content);
             }
         } catch (Exception e) {
-            throw new XmlWriterException("Unable to write toolchains", e);
+            throw new XmlWriterException("Unable to write toolchains: " + getMessage(e), getLocation(e), e);
         }
     }
 }

@@ -36,6 +36,9 @@ import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.v4.SettingsStaxReader;
 import org.apache.maven.settings.v4.SettingsStaxWriter;
 
+import static org.apache.maven.internal.impl.StaxLocation.getLocation;
+import static org.apache.maven.internal.impl.StaxLocation.getMessage;
+
 @Named
 @Singleton
 public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
@@ -60,7 +63,7 @@ public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
                 return xml.read(inputStream, request.isStrict(), source);
             }
         } catch (Exception e) {
-            throw new XmlReaderException("Unable to read settings", e);
+            throw new XmlReaderException("Unable to read settings: " + getMessage(e), getLocation(e), e);
         }
     }
 
@@ -80,7 +83,7 @@ public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
                 new SettingsStaxWriter().write(outputStream, content);
             }
         } catch (Exception e) {
-            throw new XmlWriterException("Unable to write settings", e);
+            throw new XmlWriterException("Unable to write settings: " + getMessage(e), getLocation(e), e);
         }
     }
 
