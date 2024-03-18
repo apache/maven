@@ -18,16 +18,6 @@
  */
 package org.apache.maven.internal.impl.standalone;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
@@ -44,6 +34,26 @@ import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.internal.impl.AbstractSession;
+import org.apache.maven.internal.impl.DefaultArtifactCoordinateFactory;
+import org.apache.maven.internal.impl.DefaultArtifactDeployer;
+import org.apache.maven.internal.impl.DefaultArtifactFactory;
+import org.apache.maven.internal.impl.DefaultArtifactInstaller;
+import org.apache.maven.internal.impl.DefaultArtifactResolver;
+import org.apache.maven.internal.impl.DefaultChecksumAlgorithmService;
+import org.apache.maven.internal.impl.DefaultDependencyCollector;
+import org.apache.maven.internal.impl.DefaultDependencyCoordinateFactory;
+import org.apache.maven.internal.impl.DefaultLocalRepositoryManager;
+import org.apache.maven.internal.impl.DefaultMessageBuilderFactory;
+import org.apache.maven.internal.impl.DefaultModelXmlFactory;
+import org.apache.maven.internal.impl.DefaultRepositoryFactory;
+import org.apache.maven.internal.impl.DefaultSettingsBuilder;
+import org.apache.maven.internal.impl.DefaultSettingsXmlFactory;
+import org.apache.maven.internal.impl.DefaultToolchainsBuilder;
+import org.apache.maven.internal.impl.DefaultToolchainsXmlFactory;
+import org.apache.maven.internal.impl.DefaultTransportProvider;
+import org.apache.maven.internal.impl.DefaultVersionParser;
+import org.apache.maven.internal.impl.DefaultVersionRangeResolver;
+import org.apache.maven.internal.impl.DefaultVersionResolver;
 import org.apache.maven.model.path.DefaultPathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileSelector;
@@ -61,7 +71,48 @@ import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.supplier.RepositorySystemSupplier;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class ApiRunner {
+
+    /**
+     * Create a new session.
+     */
+    public static Session createSession() {
+        Injector injector = Injector.create();
+        injector.bindInstance(Injector.class, injector);
+        injector.bindImplicit(ApiRunner.class);
+        injector.bindImplicit(DefaultArtifactCoordinateFactory.class);
+        injector.bindImplicit(DefaultArtifactDeployer.class);
+        injector.bindImplicit(DefaultArtifactFactory.class);
+        injector.bindImplicit(DefaultArtifactInstaller.class);
+        injector.bindImplicit(DefaultArtifactResolver.class);
+        injector.bindImplicit(DefaultChecksumAlgorithmService.class);
+        injector.bindImplicit(DefaultDependencyCollector.class);
+        injector.bindImplicit(DefaultDependencyCoordinateFactory.class);
+        injector.bindImplicit(DefaultLocalRepositoryManager.class);
+        injector.bindImplicit(DefaultMessageBuilderFactory.class);
+        injector.bindImplicit(DefaultModelXmlFactory.class);
+        injector.bindImplicit(DefaultRepositoryFactory.class);
+        injector.bindImplicit(DefaultSettingsBuilder.class);
+        injector.bindImplicit(DefaultSettingsXmlFactory.class);
+        injector.bindImplicit(DefaultToolchainsBuilder.class);
+        injector.bindImplicit(DefaultToolchainsXmlFactory.class);
+        injector.bindImplicit(DefaultTransportProvider.class);
+        injector.bindImplicit(DefaultVersionParser.class);
+        injector.bindImplicit(DefaultVersionRangeResolver.class);
+        injector.bindImplicit(DefaultVersionResolver.class);
+
+        return injector.getInstance(Session.class);
+    }
 
     static class DefaultSession extends AbstractSession {
 
