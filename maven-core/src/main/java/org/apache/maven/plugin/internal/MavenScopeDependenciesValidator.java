@@ -22,14 +22,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.PluginValidationManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.util.artifact.JavaScopes;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Detects Maven3 dependencies scope.
@@ -38,19 +42,31 @@ import org.eclipse.aether.util.artifact.JavaScopes;
  */
 @Singleton
 @Named
-class MavenScopeDependenciesValidator extends AbstractMavenPluginDependenciesValidator {
+class MavenScopeDependenciesValidator implements MavenPluginDependenciesValidator {
+
+    private final PluginValidationManager pluginValidationManager;
 
     @Inject
     MavenScopeDependenciesValidator(PluginValidationManager pluginValidationManager) {
-        super(pluginValidationManager);
+        this.pluginValidationManager = requireNonNull(pluginValidationManager);
     }
 
     @Override
-    protected void doValidate(
+    public void validate(
             RepositorySystemSession session,
             Artifact pluginArtifact,
             ArtifactDescriptorResult artifactDescriptorResult) {
-        Set<String> mavenArtifacts = artifactDescriptorResult.getDependencies().stream()
+        doValidate(session, pluginArtifact, artifactDescriptorResult.getDependencies(), true);
+    }
+
+    @Override
+    public void validate(RepositorySystemSession session, Artifact pluginArtifact, List<Dependency> dependencies) {
+        doValidate(session, pluginArtifact, dependencies, false);
+    }
+
+    private void doValidate(
+            RepositorySystemSession session, Artifact pluginArtifact, List<Dependency> dependencies, boolean direct) {
+        Set<String> mavenArtifacts = dependencies.stream()
                 .filter(d -> !JavaScopes.PROVIDED.equals(d.getScope()) && !JavaScopes.TEST.equals(d.getScope()))
                 .map(org.eclipse.aether.graph.Dependency::getArtifact)
                 .filter(a -> "org.apache.maven".equals(a.getGroupId()))
@@ -65,7 +81,8 @@ class MavenScopeDependenciesValidator extends AbstractMavenPluginDependenciesVal
                     PluginValidationManager.IssueLocality.EXTERNAL,
                     session,
                     pluginArtifact,
-                    "Plugin should declare Maven artifacts in `provided` scope. If the plugin already declares them in `provided` scope, update the maven-plugin-plugin to latest version. Artifacts found with wrong scope: "
+                    (direct ? "Direct" : "Transitive")
+                            + " dependencies of Maven artifacts are not in `provided` scope. If the plugin already declares them in `provided` scope, update the maven-plugin-plugin to latest version. Artifacts found with wrong scope: "
                             + mavenArtifacts);
         }
     }
