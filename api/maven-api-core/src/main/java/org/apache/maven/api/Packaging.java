@@ -21,6 +21,7 @@ package org.apache.maven.api;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.model.PluginContainer;
 
 /**
  * Interface representing a Maven project packaging.
@@ -44,12 +45,19 @@ public interface Packaging extends ExtensibleEnum {
      */
     @Nonnull
     default Language language() {
-        return getType().getLanguage();
+        return type().getLanguage();
     }
 
     /**
      * The type of main artifact produced by this packaging.
      */
     @Nonnull
-    Type getType();
+    Type type();
+
+    /**
+     * Returns the binding to use specifically for this packaging.
+     * This will be merged to the default packaging definition.
+     */
+    @Nonnull
+    PluginContainer plugins();
 }
