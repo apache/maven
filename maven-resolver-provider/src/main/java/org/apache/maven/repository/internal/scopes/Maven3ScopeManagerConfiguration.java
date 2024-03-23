@@ -24,14 +24,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.DependencyScope;
-import org.apache.maven.repository.internal.artifact.MavenArtifactProperties;
+import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.impl.scope.BuildScopeMatrixSource;
 import org.eclipse.aether.impl.scope.BuildScopeSource;
 import org.eclipse.aether.impl.scope.CommonBuilds;
 import org.eclipse.aether.impl.scope.InternalScopeManager;
 import org.eclipse.aether.impl.scope.ScopeManagerConfiguration;
 import org.eclipse.aether.internal.impl.scope.ScopeManagerDump;
+import org.eclipse.aether.scope.DependencyScope;
+import org.eclipse.aether.scope.ResolutionScope;
 
 import static org.eclipse.aether.impl.scope.BuildScopeQuery.all;
 import static org.eclipse.aether.impl.scope.BuildScopeQuery.byBuildPath;
@@ -41,15 +42,19 @@ import static org.eclipse.aether.impl.scope.BuildScopeQuery.singleton;
 import static org.eclipse.aether.impl.scope.BuildScopeQuery.union;
 
 /**
- * Maven4 scope configurations. Configures scope manager to support Maven4 scopes.
+ * Maven3 scope configurations. Configures scope manager to support Maven3 scopes.
  * <p>
- * This manager supports all the new Maven 4 dependency scopes defined in {@link DependencyScope}.
+ * This manager supports the old Maven 3 dependency scopes.
  *
  * @since 2.0.0
  */
-public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfiguration {
-    public static final Maven4ScopeManagerConfiguration INSTANCE = new Maven4ScopeManagerConfiguration();
-
+public final class Maven3ScopeManagerConfiguration implements ScopeManagerConfiguration {
+    public static final Maven3ScopeManagerConfiguration INSTANCE = new Maven3ScopeManagerConfiguration();
+    public static final String DS_COMPILE = "compile";
+    public static final String DS_RUNTIME = "runtime";
+    public static final String DS_PROVIDED = "provided";
+    public static final String DS_SYSTEM = "system";
+    public static final String DS_TEST = "test";
     public static final String RS_NONE = "none";
     public static final String RS_MAIN_COMPILE = "main-compile";
     public static final String RS_MAIN_COMPILE_PLUS_RUNTIME = "main-compilePlusRuntime";
@@ -58,11 +63,11 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
     public static final String RS_TEST_COMPILE = "test-compile";
     public static final String RS_TEST_RUNTIME = "test-runtime";
 
-    private Maven4ScopeManagerConfiguration() {}
+    private Maven3ScopeManagerConfiguration() {}
 
     @Override
     public String getId() {
-        return "Maven4";
+        return "Maven3";
     }
 
     @Override
@@ -78,72 +83,39 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
     @Override
     public BuildScopeSource getBuildScopeSource() {
         return new BuildScopeMatrixSource(
-                Arrays.asList(CommonBuilds.PROJECT_PATH_MAIN, CommonBuilds.PROJECT_PATH_TEST),
-                Arrays.asList(CommonBuilds.BUILD_PATH_COMPILE, CommonBuilds.BUILD_PATH_RUNTIME));
+                Collections.singletonList(CommonBuilds.PROJECT_PATH_MAIN),
+                Arrays.asList(CommonBuilds.BUILD_PATH_COMPILE, CommonBuilds.BUILD_PATH_RUNTIME),
+                CommonBuilds.MAVEN_TEST_BUILD_SCOPE);
     }
 
     @Override
-    public Collection<org.eclipse.aether.scope.DependencyScope> buildDependencyScopes(
-            InternalScopeManager internalScopeManager) {
-        ArrayList<org.eclipse.aether.scope.DependencyScope> result = new ArrayList<>();
+    public Collection<DependencyScope> buildDependencyScopes(InternalScopeManager internalScopeManager) {
+        ArrayList<DependencyScope> result = new ArrayList<>();
+        result.add(internalScopeManager.createDependencyScope(DS_COMPILE, true, all()));
         result.add(internalScopeManager.createDependencyScope(
-                DependencyScope.COMPILE.id(), DependencyScope.COMPILE.isTransitive(), all()));
+                DS_RUNTIME, true, byBuildPath(CommonBuilds.BUILD_PATH_RUNTIME)));
         result.add(internalScopeManager.createDependencyScope(
-                DependencyScope.RUNTIME.id(),
-                DependencyScope.RUNTIME.isTransitive(),
-                byBuildPath(CommonBuilds.BUILD_PATH_RUNTIME)));
-        result.add(internalScopeManager.createDependencyScope(
-                DependencyScope.PROVIDED.id(),
-                DependencyScope.PROVIDED.isTransitive(),
+                DS_PROVIDED,
+                false,
                 union(
                         byBuildPath(CommonBuilds.BUILD_PATH_COMPILE),
                         select(CommonBuilds.PROJECT_PATH_TEST, CommonBuilds.BUILD_PATH_RUNTIME))));
         result.add(internalScopeManager.createDependencyScope(
-                DependencyScope.TEST.id(),
-                DependencyScope.TEST.isTransitive(),
-                byProjectPath(CommonBuilds.PROJECT_PATH_TEST)));
-        result.add(internalScopeManager.createDependencyScope(
-                DependencyScope.NONE.id(), DependencyScope.NONE.isTransitive(), Collections.emptySet()));
-        result.add(internalScopeManager.createDependencyScope(
-                DependencyScope.COMPILE_ONLY.id(),
-                DependencyScope.COMPILE_ONLY.isTransitive(),
-                singleton(CommonBuilds.PROJECT_PATH_MAIN, CommonBuilds.BUILD_PATH_COMPILE)));
-        result.add(internalScopeManager.createDependencyScope(
-                DependencyScope.TEST_RUNTIME.id(),
-                DependencyScope.TEST_RUNTIME.isTransitive(),
-                singleton(CommonBuilds.PROJECT_PATH_TEST, CommonBuilds.BUILD_PATH_RUNTIME)));
-        result.add(internalScopeManager.createDependencyScope(
-                DependencyScope.TEST_ONLY.id(),
-                DependencyScope.TEST_ONLY.isTransitive(),
-                singleton(CommonBuilds.PROJECT_PATH_TEST, CommonBuilds.BUILD_PATH_COMPILE)));
-
-        // system
+                DS_TEST, false, byProjectPath(CommonBuilds.PROJECT_PATH_TEST)));
         result.add(internalScopeManager.createSystemDependencyScope(
-                DependencyScope.SYSTEM.id(),
-                DependencyScope.SYSTEM.isTransitive(),
-                all(),
-                MavenArtifactProperties.LOCAL_PATH));
-
-        // == sanity check
-        if (result.size() != org.apache.maven.api.DependencyScope.values().length - 1) { // sans "undefined"
-            throw new IllegalStateException("Maven4 API dependency scope mismatch");
-        }
-
+                DS_SYSTEM, false, all(), ArtifactProperties.LOCAL_PATH));
         return result;
     }
 
     @Override
-    public Collection<org.eclipse.aether.scope.ResolutionScope> buildResolutionScopes(
-            InternalScopeManager internalScopeManager) {
-        Collection<org.eclipse.aether.scope.DependencyScope> allDependencyScopes =
-                internalScopeManager.getDependencyScopeUniverse();
-        Collection<org.eclipse.aether.scope.DependencyScope> nonTransitiveDependencyScopes =
+    public Collection<ResolutionScope> buildResolutionScopes(InternalScopeManager internalScopeManager) {
+        Collection<DependencyScope> allDependencyScopes = internalScopeManager.getDependencyScopeUniverse();
+        Collection<DependencyScope> nonTransitiveDependencyScopes =
                 allDependencyScopes.stream().filter(s -> !s.isTransitive()).collect(Collectors.toSet());
-        org.eclipse.aether.scope.DependencyScope system = internalScopeManager
-                .getDependencyScope(DependencyScope.SYSTEM.id())
-                .orElse(null);
+        DependencyScope system =
+                internalScopeManager.getDependencyScope(DS_SYSTEM).orElse(null);
 
-        ArrayList<org.eclipse.aether.scope.ResolutionScope> result = new ArrayList<>();
+        ArrayList<ResolutionScope> result = new ArrayList<>();
         result.add(internalScopeManager.createResolutionScope(
                 RS_NONE,
                 InternalScopeManager.Mode.REMOVE,
@@ -164,13 +136,13 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
                 nonTransitiveDependencyScopes));
         result.add(internalScopeManager.createResolutionScope(
                 RS_MAIN_RUNTIME,
-                InternalScopeManager.Mode.REMOVE,
+                InternalScopeManager.Mode.ELIMINATE,
                 singleton(CommonBuilds.PROJECT_PATH_MAIN, CommonBuilds.BUILD_PATH_RUNTIME),
                 Collections.emptySet(),
                 nonTransitiveDependencyScopes));
         result.add(internalScopeManager.createResolutionScope(
                 RS_MAIN_RUNTIME_PLUS_SYSTEM,
-                InternalScopeManager.Mode.REMOVE,
+                InternalScopeManager.Mode.ELIMINATE,
                 singleton(CommonBuilds.PROJECT_PATH_MAIN, CommonBuilds.BUILD_PATH_RUNTIME),
                 Collections.singletonList(system),
                 nonTransitiveDependencyScopes));
@@ -192,6 +164,6 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
     // ===
 
     public static void main(String... args) {
-        ScopeManagerDump.dump(Maven4ScopeManagerConfiguration.INSTANCE);
+        ScopeManagerDump.dump(Maven3ScopeManagerConfiguration.INSTANCE);
     }
 }
