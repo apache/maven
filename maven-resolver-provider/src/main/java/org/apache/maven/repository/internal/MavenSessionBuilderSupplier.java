@@ -24,12 +24,10 @@ import java.util.function.Supplier;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.repository.internal.artifact.FatArtifactTraverser;
 import org.apache.maven.repository.internal.scopes.Maven4ScopeManagerConfiguration;
-import org.apache.maven.repository.internal.scopes.MavenSystemScopeHandler;
 import org.apache.maven.repository.internal.type.DefaultTypeProvider;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
-import org.eclipse.aether.SystemScopeHandler;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
@@ -67,12 +65,10 @@ import static java.util.Objects.requireNonNull;
 public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     protected final RepositorySystem repositorySystem;
     protected final InternalScopeManager scopeManager;
-    protected final SystemScopeHandler systemScopeHandler;
 
     public MavenSessionBuilderSupplier(RepositorySystem repositorySystem) {
         this.repositorySystem = requireNonNull(repositorySystem);
         this.scopeManager = new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE);
-        this.systemScopeHandler = new MavenSystemScopeHandler();
     }
 
     /**
@@ -82,15 +78,10 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     MavenSessionBuilderSupplier() {
         this.repositorySystem = null;
         this.scopeManager = new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE);
-        this.systemScopeHandler = new MavenSystemScopeHandler();
     }
 
     protected InternalScopeManager getScopeManager() {
         return scopeManager;
-    }
-
-    protected SystemScopeHandler getSystemScopeHandler() {
-        return systemScopeHandler;
     }
 
     protected DependencyTraverser getDependencyTraverser() {
@@ -102,7 +93,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     }
 
     public DependencyManager getDependencyManager(boolean transitive) {
-        return new ClassicDependencyManager(transitive, getSystemScopeHandler());
+        return new ClassicDependencyManager(transitive, getScopeManager());
     }
 
     protected DependencySelector getDependencySelector() {
@@ -147,7 +138,6 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
         session.setDependencyGraphTransformer(getDependencyGraphTransformer());
         session.setArtifactTypeRegistry(getArtifactTypeRegistry());
         session.setArtifactDescriptorPolicy(getArtifactDescriptorPolicy());
-        session.setSystemScopeHandler(getSystemScopeHandler());
         session.setScopeManager(getScopeManager());
     }
 

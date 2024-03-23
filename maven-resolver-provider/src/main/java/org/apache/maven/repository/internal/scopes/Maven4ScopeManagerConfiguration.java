@@ -22,10 +22,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.repository.internal.artifact.MavenArtifactProperties;
 import org.eclipse.aether.impl.scope.BuildScopeMatrixSource;
 import org.eclipse.aether.impl.scope.BuildScopeSource;
 import org.eclipse.aether.impl.scope.CommonBuilds;
@@ -74,11 +74,6 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
     }
 
     @Override
-    public Optional<String> getSystemDependencyScopeLabel() {
-        return Optional.of(DependencyScope.SYSTEM.id());
-    }
-
-    @Override
     public BuildScopeSource getBuildScopeSource() {
         return new BuildScopeMatrixSource(
                 Arrays.asList(CommonBuilds.PROJECT_PATH_MAIN, CommonBuilds.PROJECT_PATH_TEST),
@@ -106,8 +101,6 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
                 DependencyScope.TEST.isTransitive(),
                 byProjectPath(CommonBuilds.PROJECT_PATH_TEST)));
         result.add(internalScopeManager.createDependencyScope(
-                DependencyScope.SYSTEM.id(), DependencyScope.SYSTEM.isTransitive(), all()));
-        result.add(internalScopeManager.createDependencyScope(
                 DependencyScope.NONE.id(), DependencyScope.NONE.isTransitive(), Collections.emptySet()));
         result.add(internalScopeManager.createDependencyScope(
                 DependencyScope.COMPILE_ONLY.id(),
@@ -121,6 +114,13 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
                 DependencyScope.TEST_ONLY.id(),
                 DependencyScope.TEST_ONLY.isTransitive(),
                 singleton(CommonBuilds.PROJECT_PATH_TEST, CommonBuilds.BUILD_PATH_COMPILE)));
+
+        // system
+        result.add(internalScopeManager.createSystemDependencyScope(
+                DependencyScope.SYSTEM.id(),
+                DependencyScope.SYSTEM.isTransitive(),
+                all(),
+                MavenArtifactProperties.LOCAL_PATH));
 
         // == sanity check
         if (result.size() != org.apache.maven.api.DependencyScope.values().length - 1) { // sans "undefined"
