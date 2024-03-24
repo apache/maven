@@ -876,6 +876,44 @@ under the License.
                   <head>Provisional:</head>
                 </tag>
               </tags>
+              <groups>
+                <group>
+                  <title>Maven 4 API - Core</title>
+                  <packages>org.apache.maven.api*</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - Plugin</title>
+                  <packages>org.apache.maven.api.plugin.descriptor*</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - Model</title>
+                  <packages>org.apache.maven.api.model</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - Settings</title>
+                  <packages>org.apache.maven.api.settings</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - Toolchain</title>
+                  <packages>org.apache.maven.api.toolchain</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - Meta</title>
+                  <packages>org.apache.maven.api.annotations</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - DI</title>
+                  <packages>org.apache.maven.api.di</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - SPI</title>
+                  <packages>org.apache.maven.api.spi</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - XML</title>
+                  <packages>org.apache.maven.api.xml</packages>
+                </group>
+              </groups>
             </configuration>
             <reportSets>
               <reportSet>

@@ -639,11 +639,11 @@
    <path d="m23193 15967-28 28 435-95-397-202 19 33 13 38 7 40-1 43-8 42-18 39z"/>
   </g>
   <g>
-   <path fill="none" d="M22399 7891h2203v811h-2203z"/>
+   <path fill="none" d="M22599 7891h2203v811h-2203z"/>
    <a target="_parent" xlink:href="../maven-xml-impl/">
-    <path fill="#9CF" d="M23500 8700h-1100v-808h2200v808z"/>
-    <path fill="none" stroke="#000" d="M23500 8700h-1100v-808h2200v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="22579" y="8468" class="TextPosition"><tspan style="white-space:pre">xml-impl</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M23700 8700h-1100v-808h2200v808z"/>
+    <path fill="none" stroke="#000" d="M23700 8700h-1100v-808h2200v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="22779" y="8468" class="TextPosition"><tspan style="white-space:pre">xml-impl</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
@@ -655,9 +655,9 @@
    </a>
   </g>
   <g>
-   <path fill="none" d="M21800 8699h1702v807h-1702z"/>
-   <path fill="none" stroke="#000" d="m23500 8700-1339 633"/>
-   <path d="m22107 9228 8-39-315 315 443-44-33-17-32-25-28-30-22-37-15-40-7-42z"/>
+   <path fill="none" d="M21800 8699h1902v807h-1902z"/>
+   <path fill="none" stroke="#000" d="m23700 8700-1532 648"/>
+   <path d="m22118 9241 10-38-328 301 444-25-32-19-31-26-26-32-21-37-14-41-4-42z"/>
   </g>
   <g>
    <path fill="none" d="M23455 8699h302v7203h-302z"/>
@@ -718,6 +718,19 @@
     <path fill="none" stroke="#000" d="M2150 4599h-750v-808h1500v808z"/>
     <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1710" y="4367" class="TextPosition"><tspan style="white-space:pre">jline</tspan></tspan></tspan></text>
    </a>
+  </g>
+  <g>
+   <path fill="none" d="M23999 9089h2403v812h-2403z"/>
+   <a target="_parent" xlink:href="https://github.com/FasterXML/woodstox">
+    <path fill="#FF9" d="M25200 9899h-1200v-809h2400v809z"/>
+    <path fill="none" stroke="#000" d="M25200 9899h-1200v-809h2400v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="24152" y="9666" class="TextPosition"><tspan style="white-space:pre">woodstox</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M23700 8699h1502v433h-1502z"/>
+   <path fill="none" stroke="#000" d="m23701 8700 1113 290"/>
+   <path d="m24787 9106-30 24 443-39-368-251 15 35 8 39 2 42-7 42-14 40-22 37z"/>
   </g>
  </g>
 </svg>
