@@ -1,0 +1,477 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" width="865.625" height="521.991" fill-rule="evenodd" stroke-linejoin="round" stroke-width="28.222" preserveAspectRatio="xMidYMid" version="1.2" viewBox="999 999 22903 13811">
+ <g>
+  <g>
+   <path fill="none" d="M14599 4899h5503v2003h-5503z"/>
+   <a target="_parent" xlink:href="https://projects.eclipse.org/projects/technology.sisu">
+    <path fill="#FFC" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M17350 6900h-2750V4900h5500v2000z"/>
+    <path fill="none" stroke="#000" d="M17350 6900h-2750V4900h5500v2000z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="14850" y="6669" class="TextPosition"><tspan style="white-space:pre">sisu</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M14910 5198h2053v812h-2053z"/>
+   <a target="_parent" xlink:href="https://github.com/eclipse/sisu.plexus">
+    <path fill="#FF9" d="M15936 6008h-1025v-809h2050v809z"/>
+    <path fill="none" stroke="#000" d="M15936 6008h-1025v-809h2050v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="15219" y="5775" class="TextPosition"><tspan style="white-space:pre">plexus</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M18077 5189h1718v812h-1718z"/>
+   <a target="_parent" xlink:href="https://github.com/eclipse/sisu.inject">
+    <path fill="#FF9" d="M18936 5999h-858v-809h1715v809z"/>
+    <path fill="none" stroke="#000" d="M18936 5999h-858v-809h1715v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="18356" y="5766" class="TextPosition"><tspan style="white-space:pre">inject</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M21504 5189h1803v812h-1803z"/>
+   <a target="_parent" xlink:href="https://github.com/google/guice">
+    <path fill="#FF9" d="M22405 5999h-900v-809h1800v809z"/>
+    <path fill="none" stroke="#000" d="M22405 5999h-900v-809h1800v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="21813" y="5766" class="TextPosition"><tspan style="white-space:pre">guice</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M16960 5448h1120v302h-1120z"/>
+   <path fill="none" stroke="#000" d="m16961 5604 719-6"/>
+   <path d="m17684 5717-23 31 418-153-420-147 22 30 19 36 12 40 5 42-3 43-12 41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M19793 5445h1713v301h-1713z"/>
+   <path fill="none" stroke="#000" d="M19794 5595h1312"/>
+   <path d="m21110 5714-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M14599 7599h9303v4803h-9303z"/>
+   <a target="_parent" xlink:href="https://codehaus-plexus.github.io/">
+    <path fill="#FFC" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M19250 12400h-4650V7600h9300v4800z"/>
+    <path fill="none" stroke="#000" d="M19250 12400h-4650V7600h9300v4800z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="14850" y="12169" class="TextPosition"><tspan style="white-space:pre">plexus</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M6632 5190h3236v811H6632z"/>
+   <a target="_parent" xlink:href="../maven-core/">
+    <path fill="#9CF" d="M8250 5999H6633v-808h3233v808z"/>
+    <path fill="none" stroke="#000" d="M8250 5999H6633v-808h3233v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7767" y="5767" class="TextPosition"><tspan style="white-space:pre">core</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M6633 3790h3235v811H6633z"/>
+   <a target="_parent" xlink:href="../maven-compat/">
+    <path fill="#9CF" d="M8250 4599H6634v-808h3232v808z"/>
+    <path fill="none" stroke="#000" d="M8250 4599H6634v-808h3232v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7437" y="4367" class="TextPosition"><tspan style="white-space:pre">compat</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M9866 5445h1836v302H9866z"/>
+   <path fill="none" stroke="#000" d="m9867 5595 1434 1"/>
+   <path d="m11304 5714-23 32 419-150-419-150 23 30 18 36 12 39 4 43-3 43-12 40z"/>
+  </g>
+  <g>
+   <path fill="none" d="M6634 999h3233v813H6634z"/>
+   <a target="_parent" xlink:href="../apache-maven/">
+    <path fill="#9CF" d="M8250 1810H6635v-810h3230v810z"/>
+    <path fill="none" stroke="#000" d="M8250 1810H6635v-810h3230v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7050" y="1577" class="TextPosition"><tspan style="white-space:pre">distribution</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M8100 1809h301v583h-301z"/>
+   <path fill="none" stroke="#000" d="M8250 1810v182"/>
+   <path d="m8131 1996-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+  </g>
+  <g>
+   <path fill="none" d="M8100 4598h301v594h-301z"/>
+   <path fill="none" stroke="#000" d="M8250 4599v193"/>
+   <path d="m8131 4796-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+  </g>
+  <g>
+   <path fill="none" d="M14799 9089h3403v812h-3403z"/>
+   <a target="_parent" xlink:href="https://github.com/codehaus-plexus/plexus-sec-dispatcher">
+    <path fill="#FF9" d="M16500 9899h-1700v-809h3400v809z"/>
+    <path fill="none" stroke="#000" d="M16500 9899h-1700v-809h3400v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="14885" y="9666" class="TextPosition"><tspan style="white-space:pre">sec-dispatcher</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M12082 6995h2720v2501h-2720z"/>
+   <path fill="none" stroke="#000" d="m12083 6996 2423 2229"/>
+   <path d="m14429 9315-39 7 410 173-207-394-4 37-11 39-18 37-25 35-32 29-36 22z"/>
+  </g>
+  <g>
+   <path fill="none" d="M14599 2390h3803v813h-3803z"/>
+   <a target="_parent" xlink:href="https://commons.apache.org/proper/commons-cli/">
+    <path fill="#FF9" d="M16500 3201h-1900v-810h3800v810z"/>
+    <path fill="none" stroke="#000" d="M16500 3201h-1900v-810h3800v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="15110" y="2968" class="TextPosition"><tspan style="white-space:pre">commons-cli</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M6634 2646h7967v301H6634z"/>
+   <path fill="none" stroke="#000" d="M6635 2796h7566"/>
+   <path d="m14205 2915-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M21199 10698h2203v812h-2203z"/>
+   <a target="_parent" xlink:href="https://codehaus-plexus.github.io/plexus-utils/">
+    <path fill="#FF9" d="M22300 11508h-1100v-809h2200v809z"/>
+    <path fill="none" stroke="#000" d="M22300 11508h-1100v-809h2200v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="21858" y="11275" class="TextPosition"><tspan style="white-space:pre">utils</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M11699 5191h2369v811h-2369z"/>
+   <a target="_parent" xlink:href="../maven-plugin-api/">
+    <path fill="#9CF" d="M12883 6000h-1183v-808h2366v808z"/>
+    <path fill="none" stroke="#000" d="M12883 6000h-1183v-808h2366v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="11810" y="5768" class="TextPosition"><tspan style="white-space:pre">plugin-api</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M13199 13999h2003v811h-2003z"/>
+   <a target="_parent" xlink:href="../maven-artifact/">
+    <path fill="#9CF" d="M14200 14808h-1000v-808h2000v808z"/>
+    <path fill="none" stroke="#000" d="M14200 14808h-1000v-808h2000v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="13453" y="14576" class="TextPosition"><tspan style="white-space:pre">artifact</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M6634 2390h3233v813H6634z"/>
+   <a target="_parent" xlink:href="../maven-embedder/">
+    <path fill="#9CF" d="M8250 3201H6635v-810h3230v810z"/>
+    <path fill="none" stroke="#000" d="M8250 3201H6635v-810h3230v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7137" y="2968" class="TextPosition"><tspan style="white-space:pre">embedder</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M12882 5999h1399v8002h-1399z"/>
+   <path fill="none" stroke="#000" d="m12883 6000 1252 7606"/>
+   <path d="m14019 13629-35-18 216 389 80-438-26 27-33 24-37 18-41 12-43 3-42-5z"/>
+  </g>
+  <g>
+   <path fill="none" d="M8100 3200h301v592h-301z"/>
+   <path fill="none" stroke="#000" d="M8250 3201v191"/>
+   <path d="m8131 3396-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+  </g>
+  <g>
+   <path fill="none" d="M8516 6591h3569v811H8516z"/>
+   <a target="_parent" xlink:href="../maven-settings-builder/">
+    <path fill="#9CF" d="M10300 7400H8517v-808h3566v808z"/>
+    <path fill="none" stroke="#000" d="M10300 7400H8517v-808h3566v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="8617" y="7168" class="TextPosition"><tspan style="white-space:pre">settings-builder</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M8249 5998h2053v623H8249z"/>
+   <path fill="none" stroke="#000" d="m8250 5999 1667 482"/>
+   <path d="m9887 6596-31 24 444-28-361-261 13 36 8 39v42l-7 42-15 40-23 35z"/>
+  </g>
+  <g>
+   <path fill="none" d="M7783 12291h3235v811H7783z"/>
+   <a target="_parent" xlink:href="../maven-model-builder/">
+    <path fill="#9CF" d="M9400 13100H7784v-808h3232v808z"/>
+    <path fill="none" stroke="#000" d="M9400 13100H7784v-808h3232v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7901" y="12868" class="TextPosition"><tspan style="white-space:pre">model-builder</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M10799 13989h2203v813h-2203z"/>
+   <a target="_parent" xlink:href="../maven-model/">
+    <path fill="#9CF" d="M11900 14800h-1100v-810h2200v810z"/>
+    <path fill="none" stroke="#000" d="M11900 14800h-1100v-810h2200v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="11227" y="14567" class="TextPosition"><tspan style="white-space:pre">model</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M11015 12695h887v1296h-887z"/>
+   <path fill="none" stroke="#000" d="m11016 12696 659 964"/>
+   <path d="m11579 13730-39-1 360 261-113-431-12 36-19 35-26 32-33 28-37 22-40 12z"/>
+  </g>
+  <g>
+   <path fill="none" d="M11802 5999h1083v7993h-1083z"/>
+   <path fill="none" stroke="#000" d="m12883 6000-934 7594"/>
+   <path d="m11830 13583-28-27 98 434 200-398-33 19-38 14-40 7-43-1-42-9-39-17z"/>
+  </g>
+  <g>
+   <path fill="none" d="M18849 9098h1903v812h-1903z"/>
+   <a target="_parent" xlink:href="https://github.com/codehaus-plexus/plexus-cipher">
+    <path fill="#FF9" d="M19800 9908h-950v-809h1900v809z"/>
+    <path fill="none" stroke="#000" d="M19800 9908h-950v-809h1900v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="19125" y="9675" class="TextPosition"><tspan style="white-space:pre">cipher</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M18199 9348h653v302h-653z"/>
+   <path fill="none" stroke="#000" d="m18200 9495 251 3"/>
+   <path d="m18453 9617-24 31 421-144-417-156 22 31 18 36 11 40 4 42-4 43-13 40z"/>
+  </g>
+  <g>
+   <path fill="none" d="M14899 10699h3103v813h-3103z"/>
+   <a target="_parent" xlink:href="https://codehaus-plexus.github.io/plexus-interpolation/">
+    <path fill="#FF9" d="M16450 11510h-1550v-810h3100v810z"/>
+    <path fill="none" stroke="#000" d="M16450 11510h-1550v-810h3100v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="15099" y="11277" class="TextPosition"><tspan style="white-space:pre">interpolation</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M11015 11104h3886v1594h-3886z"/>
+   <path fill="none" stroke="#000" d="m11016 12696 3515-1440"/>
+   <path d="m14579 11365-10 38 331-298-445 20 33 19 30 27 26 32 21 38 13 40 4 43z"/>
+  </g>
+  <g>
+   <path fill="none" d="M14799 7889h5503v812h-5503z"/>
+   <a target="_parent" xlink:href="https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/">
+    <path fill="#FF9" d="M17550 8699h-2750v-809h5500v809z"/>
+    <path fill="none" stroke="#000" d="M17550 8699h-2750v-809h5500v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="14959" y="8466" class="TextPosition"><tspan style="white-space:pre">component-annotations</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M14599 3789h4603v812h-4603z"/>
+   <a target="_parent" xlink:href="https://maven.apache.org/wagon/wagon-provider-api/">
+    <path fill="#FF9" d="M16900 4599h-2300v-809h4600v809z"/>
+    <path fill="none" stroke="#000" d="M16900 4599h-2300v-809h4600v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="14781" y="4366" class="TextPosition"><tspan style="white-space:pre">wagon-provider-api</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M9865 4045h4736v301H9865z"/>
+   <path fill="none" stroke="#000" d="M9866 4195h4335"/>
+   <path d="m14205 4314-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M20699 7898h2903v812h-2903z"/>
+   <a target="_parent" xlink:href="https://codehaus-plexus.github.io/plexus-classworlds/">
+    <path fill="#FF9" d="M22150 8708h-1450v-809h2900v809z"/>
+    <path fill="none" stroke="#000" d="M22150 8708h-1450v-809h2900v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="20867" y="8475" class="TextPosition"><tspan style="white-space:pre">classworlds</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M15935 6008h6217v1915h-6217z"/>
+   <path fill="none" stroke="#000" d="m15936 6009 5832 1775"/>
+   <path d="m21737 7898-32 23 445-21-357-266 12 36 7 40v41l-8 42-15 40-24 35z"/>
+  </g>
+  <g>
+   <path fill="none" d="M14065 5450h848v302h-848z"/>
+   <path fill="none" stroke="#000" d="m14066 5596 446 4"/>
+   <path d="m14514 5719-23 31 420-146-418-154 23 30 17 37 12 39 4 43-4 43-12 40z"/>
+  </g>
+  <g>
+   <path fill="none" d="M5499 13999h4703v811H5499z"/>
+   <a target="_parent" xlink:href="../maven-repository-metadata/">
+    <path fill="#9CF" d="M7850 14808H5500v-808h4700v808z"/>
+    <path fill="none" stroke="#000" d="M7850 14808H5500v-808h4700v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="5644" y="14576" class="TextPosition"><tspan style="white-space:pre">repository-metadata</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M6250 5998h2002v3696H6250z"/>
+   <path fill="none" stroke="#000" d="M8250 5999 6440 9341"/>
+   <path d="m6334 9288-16-36-68 440 331-297-37 5-40-1-40-8-40-16-36-24-30-30z"/>
+  </g>
+  <g>
+   <path fill="none" d="M7999 7991h2003v811H7999z"/>
+   <a target="_parent" xlink:href="../maven-settings/">
+    <path fill="#9CF" d="M9000 8800H8000v-808h2000v808z"/>
+    <path fill="none" stroke="#000" d="M9000 8800H8000v-808h2000v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="8142" y="8568" class="TextPosition"><tspan style="white-space:pre">settings</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M9000 7399h1302v595H9000z"/>
+   <path fill="none" stroke="#000" d="m10300 7400-937 427"/>
+   <path d="m9311 7720 8-38-319 310 444-37-33-18-32-26-27-30-22-37-15-41-5-42z"/>
+  </g>
+  <g>
+   <path fill="none" d="M999 11399h4203v3403H999z"/>
+   <a target="_parent" xlink:href="https://maven.apache.org/resolver/">
+    <path fill="#C0E3FC" fill-opacity=".251" stroke="#FFF" stroke-opacity=".251" d="M3100 14800H1000v-3400h4200v3400z"/>
+    <path fill="none" stroke="#000" d="M3100 14800H1000v-3400h4200v3400z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1250" y="14569" class="TextPosition"><tspan style="white-space:pre">resolver</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M1275 12989h1490v812H1275z"/>
+   <a target="_parent" xlink:href="https://maven.apache.org/resolver/maven-resolver-api/">
+    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M2020 13799h-744v-809h1487v809z"/>
+    <path fill="none" stroke="#000" d="M2020 13799h-744v-809h1487v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1690" y="13566" class="TextPosition"><tspan style="white-space:pre">api</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M1275 11589h1490v812H1275z"/>
+   <a target="_parent" xlink:href="https://maven.apache.org/resolver/maven-resolver-spi/">
+    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M2020 12399h-744v-809h1487v809z"/>
+    <path fill="none" stroke="#000" d="M2020 12399h-744v-809h1487v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1702" y="12166" class="TextPosition"><tspan style="white-space:pre">spi</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M3405 11589h1490v812H3405z"/>
+   <a target="_parent" xlink:href="https://maven.apache.org/resolver/maven-resolver-impl/">
+    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M4150 12399h-744v-809h1487v809z"/>
+    <path fill="none" stroke="#000" d="M4150 12399h-744v-809h1487v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3697" y="12166" class="TextPosition"><tspan style="white-space:pre">impl</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M3405 12989h1490v812H3405z"/>
+   <a target="_parent" xlink:href="https://maven.apache.org/resolver/maven-resolver-util/">
+    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M4150 13799h-744v-809h1487v809z"/>
+    <path fill="none" stroke="#000" d="M4150 13799h-744v-809h1487v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3832" y="13566" class="TextPosition"><tspan style="white-space:pre">util</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M1870 12399h301v593h-301z"/>
+   <path fill="none" stroke="#000" d="M2020 12400v192"/>
+   <path d="m1901 12596-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+  </g>
+  <g>
+   <path fill="none" d="M2764 11845h645v301h-645z"/>
+   <path fill="none" stroke="#000" d="M3407 11995h-244"/>
+   <path d="m3159 11876 24-31-419 150 419 150-22-30-18-36-13-40-4-42 3-43 12-41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M4000 12399h301v593h-301z"/>
+   <path fill="none" stroke="#000" d="M4150 12400v192"/>
+   <path d="m4031 12596-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+  </g>
+  <g>
+   <path fill="none" d="M2764 13245h645v301h-645z"/>
+   <path fill="none" stroke="#000" d="M3407 13395h-244"/>
+   <path d="m3159 13276 24-31-419 150 419 150-22-30-18-36-13-40-4-42 3-43 12-41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M4334 9691h3833v813H4334z"/>
+   <a target="_parent" xlink:href="../maven-resolver-provider/">
+    <path fill="#9CF" d="M6250 10502H4335v-810h3830v810z"/>
+    <path fill="none" stroke="#000" d="M6250 10502H4335v-810h3830v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="4389" y="10269" class="TextPosition"><tspan style="white-space:pre">resolver-provider</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M4150 10501h2102v1092H4150z"/>
+   <path fill="none" stroke="#000" d="m6250 10502-1746 905"/>
+   <path d="m4446 11304 7-39-303 326 441-60-34-16-32-24-29-29-24-36-17-40-7-41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M6249 10501h1603v3500H6249z"/>
+   <path fill="none" stroke="#000" d="m6250 10502 1434 3135"/>
+   <path d="m7578 13690-39-9 311 319-38-444-18 34-25 31-31 27-37 22-40 15-42 6z"/>
+  </g>
+  <g>
+   <path fill="none" d="M6249 10501h1537v2196H6249z"/>
+   <path fill="none" stroke="#000" d="m6250 10502 1305 1867"/>
+   <path d="m7460 12440-39-2 363 258-117-429-12 35-19 36-25 32-33 28-37 22-40 13z"/>
+  </g>
+  <g>
+   <path fill="none" d="M12082 6995h2820v4111h-2820z"/>
+   <path fill="none" stroke="#000" d="m12083 6996 2591 3780"/>
+   <path d="m14578 10846-39-2 361 261-113-430-12 35-20 35-25 33-33 28-37 21-41 13z"/>
+  </g>
+  <g>
+   <path fill="none" d="M15935 6008h1617v1884h-1617z"/>
+   <path fill="none" stroke="#000" d="m15936 6009 1354 1579"/>
+   <path d="m17202 7668-39 3 387 220-159-416-8 37-16 37-22 35-29 31-35 25-39 18z"/>
+  </g>
+  <g>
+   <path fill="none" d="M8516 10899h3569v811H8516z"/>
+   <a target="_parent" xlink:href="../maven-builder-support/">
+    <path fill="#9CF" d="M10300 11708H8517v-808h3566v808z"/>
+    <path fill="none" stroke="#000" d="M10300 11708H8517v-808h3566v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="8647" y="11476" class="TextPosition"><tspan style="white-space:pre">builder-support</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M10150 7399h301v3502h-301z"/>
+   <path fill="none" stroke="#000" d="M10300 7400v3101"/>
+   <path d="m10181 10505-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+  </g>
+  <g>
+   <path fill="none" d="M9399 11707h902v587h-902z"/>
+   <path fill="none" stroke="#000" d="m9400 12292 565-367"/>
+   <path d="m10033 12023-3 39 270-354-433 102 35 13 35 21 32 26 27 33 20 38 12 41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M20909 6489h2993v812h-2993z"/>
+   <a target="_parent" xlink:href="https://docs.oracle.com/javaee/6/api/javax/inject/package-summary.html">
+    <path fill="#FF9" d="M22405 7299h-1495v-809h2990v809z"/>
+    <path fill="none" stroke="#000" d="M22405 7299h-1495v-809h2990v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="21175" y="7066" class="TextPosition"><tspan style="white-space:pre">javax.inject</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M22255 5999h301v493h-301z"/>
+   <path fill="none" stroke="#000" d="M22405 6000v92"/>
+   <path d="m22286 6096-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+  </g>
+  <g>
+   <path fill="none" d="M3399 6589h1603v813H3399z"/>
+   <a target="_parent" xlink:href="https://fusesource.github.io/jansi/">
+    <path fill="#FF9" d="M4200 7400h-800v-810h1600v810z"/>
+    <path fill="none" stroke="#000" d="M4200 7400h-800v-810h1600v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3690" y="7167" class="TextPosition"><tspan style="white-space:pre">jansi</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M4050 5999h301v592h-301z"/>
+   <path fill="none" stroke="#000" d="M4200 6000v191"/>
+   <path d="m4081 6195-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+  </g>
+  <g>
+   <path fill="none" d="M2734 2399h2503v813H2734z"/>
+   <a target="_parent" xlink:href="https://www.slf4j.org/manual.html">
+    <path fill="#FF9" d="M3985 3210H2735v-810h2500v810z"/>
+    <path fill="none" stroke="#000" d="M3985 3210H2735v-810h2500v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3130" y="2977" class="TextPosition"><tspan style="white-space:pre">slf4j-api</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M5235 2652h1402v302H5235z"/>
+   <path fill="none" stroke="#000" d="m6635 2796-1001 6"/>
+   <path d="m5630 2684 23-32-418 153 420 147-23-30-18-36-12-39-5-43 3-42 12-41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M2699 5189h3003v813H2699z"/>
+   <a target="_parent" xlink:href="https://maven.apache.org/shared/maven-shared-utils/">
+    <path fill="#FF9" d="M4200 6000H2700v-810h3000v810z"/>
+    <path fill="none" stroke="#000" d="M4200 6000H2700v-810h3000v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="2917" y="5767" class="TextPosition"><tspan style="white-space:pre">shared-utils</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M5700 5445h936v301h-936z"/>
+   <path fill="none" stroke="#000" d="M6634 5595h-535"/>
+   <path d="m6095 5476 24-31-419 150 419 150-22-30-18-36-13-40-4-42 3-43 12-41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M2069 999h3833v813H2069z"/>
+   <a target="_parent" xlink:href="../maven-slf4j-provider/">
+    <path fill="#9CF" d="M3985 1810H2070v-810h3830v810z"/>
+    <path fill="none" stroke="#000" d="M3985 1810H2070v-810h3830v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="2565" y="1577" class="TextPosition"><tspan style="white-space:pre">slf4j-provider</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M3835 1809h301v592h-301z"/>
+   <path fill="none" stroke="#000" d="M3985 1810v191"/>
+   <path d="m3866 2005-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+  </g>
+  <g>
+   <path fill="none" d="M5900 1255h737v301h-737z"/>
+   <path fill="none" stroke="#000" d="M6635 1405h-336"/>
+   <path d="m6295 1286 24-31-419 150 419 150-22-30-18-36-13-40-4-42 3-43 12-41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M11015 12695h3187v1306h-3187z"/>
+   <path fill="none" stroke="#000" d="m11016 12696 2815 1153"/>
+   <path d="m13789 13960-34 20 445 20-331-298 9 37 3 40-3 41-12 41-20 38-26 33z"/>
+  </g>
+ </g>
+</svg>
