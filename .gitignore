@@ -15,3 +15,4 @@
 .checkstyle
 .vscode/
 repo/
+/*.svg
