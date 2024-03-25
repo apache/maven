@@ -19,11 +19,13 @@
 package org.apache.maven.api.services;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.settings.Settings;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
@@ -97,4 +99,37 @@ public interface SettingsBuilder extends Service {
             @Nonnull Path userSettingsPath) {
         return build(SettingsBuilderRequest.build(session, globalSettingsPath, projectSettingsPath, userSettingsPath));
     }
+
+    /**
+     * Validate the specified settings.
+     *
+     * @param settings The settings to validate, must not be {@code null}.
+     * @return The list of problems that were encountered, must not be {@code null}.
+     */
+    @Nonnull
+    default List<BuilderProblem> validate(@Nonnull Settings settings) {
+        return validate(settings, false);
+    }
+
+    /**
+     * Validate the specified settings.
+     *
+     * @param settings The settings to validate, must not be {@code null}.
+     * @param isProjectSettings Boolean indicating if the validation is for project settings or user / global settings.
+     * @return The list of problems that were encountered, must not be {@code null}.
+     */
+    @Nonnull
+    List<BuilderProblem> validate(@Nonnull Settings settings, boolean isProjectSettings);
+
+    /**
+     * Convert a model profile to a settings profile.
+     */
+    @Nonnull
+    org.apache.maven.api.settings.Profile convert(@Nonnull org.apache.maven.api.model.Profile profile);
+
+    /**
+     * Convert a settings profile to a model profile.
+     */
+    @Nonnull
+    org.apache.maven.api.model.Profile convert(@Nonnull org.apache.maven.api.settings.Profile profile);
 }

@@ -143,7 +143,7 @@ public abstract class Binding<T> {
     public static class BindingToInstance<T> extends Binding<T> {
         final T instance;
 
-        BindingToInstance(T instance) {
+        public BindingToInstance(T instance) {
             super(null, Collections.emptySet());
             this.instance = instance;
         }

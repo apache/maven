@@ -413,7 +413,8 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
 
         pd.addComponentDescriptor(md);
 
-        return new DefaultMojoExecution((AbstractSession) session, new org.apache.maven.plugin.MojoExecution(md));
+        return new DefaultMojoExecution(
+                InternalMavenSession.from(session), new org.apache.maven.plugin.MojoExecution(md));
     }
 
     private DefaultSession newSession() throws Exception {

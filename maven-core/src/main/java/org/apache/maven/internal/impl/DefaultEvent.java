@@ -28,10 +28,10 @@ import org.apache.maven.api.Session;
 import org.apache.maven.execution.ExecutionEvent;
 
 public class DefaultEvent implements Event {
-    private final InternalSession session;
+    private final InternalMavenSession session;
     private final ExecutionEvent delegate;
 
-    public DefaultEvent(InternalSession session, ExecutionEvent delegate) {
+    public DefaultEvent(InternalMavenSession session, ExecutionEvent delegate) {
         this.session = session;
         this.delegate = delegate;
     }

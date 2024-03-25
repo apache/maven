@@ -35,6 +35,8 @@ import org.apache.maven.api.services.xml.*;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxWriter;
 
+import static org.apache.maven.internal.impl.StaxLocation.getLocation;
+import static org.apache.maven.internal.impl.StaxLocation.getMessage;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
@@ -67,7 +69,7 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
                 }
             }
         } catch (Exception e) {
-            throw new XmlReaderException("Unable to read model", e);
+            throw new XmlReaderException("Unable to read plugin: " + getMessage(e), getLocation(e), e);
         }
     }
 
@@ -92,7 +94,7 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
                 }
             }
         } catch (Exception e) {
-            throw new XmlWriterException("Unable to write model", e);
+            throw new XmlWriterException("Unable to write plugin: " + getMessage(e), getLocation(e), e);
         }
     }
 

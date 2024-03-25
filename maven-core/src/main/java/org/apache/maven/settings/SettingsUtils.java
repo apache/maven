@@ -18,6 +18,8 @@
  */
 package org.apache.maven.settings;
 
+import org.apache.maven.internal.impl.SettingsUtilsV4;
+
 /**
  * Several convenience methods to handle settings
  *

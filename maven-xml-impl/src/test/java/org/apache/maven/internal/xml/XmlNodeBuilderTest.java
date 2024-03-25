@@ -50,7 +50,7 @@ class XmlNodeBuilderTest {
         String doc = "<?xml version='1.0'?><doc xmlns='foo:bar'/>";
         StringReader r = new StringReader(doc);
         XMLStreamReader xsr = WstxInputFactory.newFactory().createXMLStreamReader(r);
-        XmlNode node = XmlNodeBuilder.build(xsr);
+        XmlNode node = XmlNodeStaxBuilder.build(xsr);
         assertEquals("doc", node.getName());
         assertEquals(1, node.getAttributes().size());
         assertEquals("foo:bar", node.getAttribute("xmlns"));
