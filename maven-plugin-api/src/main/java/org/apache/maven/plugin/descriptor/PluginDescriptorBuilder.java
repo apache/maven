@@ -32,6 +32,8 @@ import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
+ * Build plugin descriptor object from {@code plugin.xml}.
+ *
  * @author Jason van Zyl
  */
 public class PluginDescriptorBuilder {
