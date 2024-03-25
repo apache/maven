@@ -18,10 +18,6 @@
  */
 package org.apache.maven.model.interpolation;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -49,13 +45,13 @@ import org.codehaus.plexus.interpolation.ValueSource;
  *
  * @since 3.6.2
  */
-@Named
-@Singleton
 public class StringVisitorModelInterpolator extends AbstractStringBasedModelInterpolator {
-    @Inject
     public StringVisitorModelInterpolator(
-            PathTranslator pathTranslator, UrlNormalizer urlNormalizer, RootLocator rootLocator) {
-        super(pathTranslator, urlNormalizer, rootLocator);
+            PathTranslator pathTranslator,
+            UrlNormalizer urlNormalizer,
+            RootLocator rootLocator,
+            List<ValueSource> valueSources) {
+        super(pathTranslator, urlNormalizer, rootLocator, valueSources);
     }
 
     interface InnerInterpolator {
@@ -77,7 +73,17 @@ public class StringVisitorModelInterpolator extends AbstractStringBasedModelInte
 
         InnerInterpolator innerInterpolator = createInterpolator(valueSources, postProcessors, problems, config);
 
-        return new MavenTransformer(innerInterpolator::interpolate).visit(model);
+        return new MavenTransformer(innerInterpolator::interpolate) {
+            @Override
+            protected void transformModel_ModelVersion(final Model.Builder builder, final Model target) {
+                beforeTransform(builder, target);
+                super.transformModel_ModelVersion(builder, target);
+            }
+        }.visit(model);
+    }
+
+    protected void beforeTransform(final Model.Builder builder, final Model target) {
+        // no-op
     }
 
     private InnerInterpolator createInterpolator(

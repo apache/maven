@@ -16,12 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.model.interpolation;
+package org.apache.maven.repository.internal.bean;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.maven.model.interpolation.StringVisitorModelInterpolator;
+import org.apache.maven.model.path.PathTranslator;
+import org.apache.maven.model.path.UrlNormalizer;
+import org.apache.maven.model.root.RootLocator;
 
 import static java.util.Collections.emptyList;
 
-public class StringVisitorModelInterpolatorTest extends AbstractModelInterpolatorTest {
-    protected ModelInterpolator createInterpolator() {
-        return new StringVisitorModelInterpolator(null, null, bd -> true, emptyList());
+/**
+ * just to provide an impl for tests.
+ */
+@Named
+@Singleton
+public class SimpleInterpolator extends StringVisitorModelInterpolator {
+    @Inject
+    public SimpleInterpolator(
+            final PathTranslator pathTranslator, final UrlNormalizer urlNormalizer, final RootLocator rootLocator) {
+        super(pathTranslator, urlNormalizer, rootLocator, emptyList());
     }
 }
