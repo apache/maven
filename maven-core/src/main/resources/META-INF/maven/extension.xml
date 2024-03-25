@@ -147,7 +147,9 @@ under the License.
     <exportedArtifact>org.apache.maven:maven-api-core</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-api-meta</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-api-model</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-plugin</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-api-settings</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-spi</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-api-toolchain</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-api-xml</exportedArtifact>
 
@@ -191,6 +193,7 @@ under the License.
     <exportedArtifact>org.apache.maven.resolver:maven-resolver-util</exportedArtifact>
     <exportedArtifact>org.apache.maven.resolver:maven-resolver-connector-basic</exportedArtifact>
 
+    <exportedArtifact>jakarta.inject:jakarta.inject-api</exportedArtifact>
     <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
     <exportedArtifact>javax.annotation:javax.annotation-api</exportedArtifact>
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
