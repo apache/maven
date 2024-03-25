@@ -693,8 +693,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         request.setFileModel(fileModel);
         result.setFileModel(fileModel.clone());
 
-        activateFileModel(request, result, problems);
-
         if (!request.isTwoPhaseBuilding()) {
             return build(request, result, importIds);
         } else if (hasModelErrors(problems)) {
@@ -705,11 +703,11 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private void activateFileModel(
+            Model inputModel,
             final ModelBuildingRequest request,
             final DefaultModelBuildingResult result,
             DefaultModelProblemCollector problems)
             throws ModelBuildingException {
-        Model inputModel = request.getFileModel();
         problems.setRootModel(inputModel);
 
         // profile activation
@@ -762,6 +760,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         if (problems.hasFatalErrors()) {
             throw problems.newModelBuildingException();
         }
+
+        activateFileModel(inputModel, request, result, problems);
 
         problems.setRootModel(inputModel);
 
