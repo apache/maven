@@ -20,6 +20,7 @@ package org.apache.maven.model.validation;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
@@ -50,31 +51,39 @@ class DefaultModelValidatorTest {
     }
 
     private SimpleProblemCollector validate(String pom) throws Exception {
-        return validateEffective(pom, ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
+        return validateEffective(pom, UnaryOperator.identity());
     }
 
     private SimpleProblemCollector validateRaw(String pom) throws Exception {
-        return validateRaw(pom, ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
+        return validateRaw(pom, UnaryOperator.identity());
     }
 
     private SimpleProblemCollector validateEffective(String pom, int level) throws Exception {
-        ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel(level);
+        return validateEffective(pom, mbr -> mbr.setValidationLevel(level));
+    }
 
+    private SimpleProblemCollector validateEffective(String pom, UnaryOperator<ModelBuildingRequest> requestConfigurer)
+            throws Exception {
         Model model = read(pom);
 
         SimpleProblemCollector problems = new SimpleProblemCollector(model);
 
-        validator.validateEffectiveModel(model, request, problems);
+        validator.validateEffectiveModel(model, requestConfigurer.apply(new DefaultModelBuildingRequest()), problems);
 
         return problems;
     }
 
     private SimpleProblemCollector validateRaw(String pom, int level) throws Exception {
-        ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel(level);
+        return validateRaw(pom, mbr -> mbr.setValidationLevel(level));
+    }
 
+    private SimpleProblemCollector validateRaw(String pom, UnaryOperator<ModelBuildingRequest> requestConfigurer)
+            throws Exception {
         Model model = read(pom);
 
         SimpleProblemCollector problems = new SimpleProblemCollector(model);
+
+        ModelBuildingRequest request = requestConfigurer.apply(new DefaultModelBuildingRequest());
 
         validator.validateFileModel(model, request, problems);
 
