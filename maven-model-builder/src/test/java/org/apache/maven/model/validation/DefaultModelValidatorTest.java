@@ -20,6 +20,7 @@ package org.apache.maven.model.validation;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 import java.util.function.UnaryOperator;
 
 import junit.framework.TestCase;
@@ -761,24 +762,64 @@ public class DefaultModelValidatorTest extends TestCase {
                 result.getWarnings().get(0));
     }
 
-    public void testProfileActivationWithAllowedExpression() throws Exception {
-        SimpleProblemCollector result = validateRaw("raw-model/profile-activation-file-with-allowed-expressions.xml");
+    public void repositoryWithExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/repository-with-expression.xml");
+        assertViolations(result, 0, 1, 0);
+        assertEquals(
+                "'repositories.repository.[repo].url' contains an expression but should be a constant.",
+                result.getErrors().get(0));
+    }
+
+    public void repositoryWithBasedirExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/repository-with-basedir-expression.xml");
         assertViolations(result, 0, 0, 0);
     }
 
-    public void testProfileActivationWithProjectExpression() throws Exception {
+    public void profileActivationWithAllowedExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw(
+                "raw-model/profile-activation-file-with-allowed-expressions.xml",
+                mbr -> mbr.setUserProperties(new Properties() {
+                    private static final long serialVersionUID = 1L;
+
+                    {
+                        setProperty("foo", "foo");
+                        setProperty("bar", "foo");
+                    }
+                }));
+        assertViolations(result, 0, 0, 0);
+    }
+
+    public void profileActivationFileWithProjectExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/profile-activation-file-with-project-expressions.xml");
         assertViolations(result, 0, 0, 2);
 
         assertEquals(
                 "'profiles.profile[exists-project-version].activation.file.exists' "
-                        + "Failed to interpolate file location ${project.version}/test.txt: "
+                        + "Failed to interpolate profile activation property ${project.version}/test.txt: "
                         + "${project.version} expressions are not supported during profile activation.",
                 result.getWarnings().get(0));
 
         assertEquals(
                 "'profiles.profile[missing-project-version].activation.file.missing' "
-                        + "Failed to interpolate file location ${project.version}/test.txt: "
+                        + "Failed to interpolate profile activation property ${project.version}/test.txt: "
+                        + "${project.version} expressions are not supported during profile activation.",
+                result.getWarnings().get(1));
+    }
+
+    public void profileActivationPropertyWithProjectExpression() throws Exception {
+        SimpleProblemCollector result =
+                validateRaw("raw-model/profile-activation-property-with-project-expressions.xml");
+        assertViolations(result, 0, 0, 2);
+
+        assertEquals(
+                "'profiles.profile[property-name-project-version].activation.property.name' "
+                        + "Failed to interpolate profile activation property ${project.version}: "
+                        + "${project.version} expressions are not supported during profile activation.",
+                result.getWarnings().get(0));
+
+        assertEquals(
+                "'profiles.profile[property-value-project-version].activation.property.value' "
+                        + "Failed to interpolate profile activation property ${project.version}: "
                         + "${project.version} expressions are not supported during profile activation.",
                 result.getWarnings().get(1));
     }

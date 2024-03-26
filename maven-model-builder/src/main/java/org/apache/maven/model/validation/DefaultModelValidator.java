@@ -24,17 +24,24 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
@@ -236,42 +243,97 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validate30RawProfileActivation(ModelProblemCollector problems, Activation activation, String prefix) {
-        if (activation == null || activation.getFile() == null) {
+        if (activation == null) {
             return;
         }
+        class ActivationFrame {
+            String location;
+            Optional<? extends InputLocationTracker> parent;
 
-        ActivationFile file = activation.getFile();
-
-        String path;
-        String location;
-
-        if (file.getExists() != null && !file.getExists().isEmpty()) {
-            path = file.getExists();
-            location = "exists";
-        } else if (file.getMissing() != null && !file.getMissing().isEmpty()) {
-            path = file.getMissing();
-            location = "missing";
-        } else {
-            return;
+            ActivationFrame(String location, Optional<? extends InputLocationTracker> parent) {
+                this.location = location;
+                this.parent = parent;
+            }
         }
+        final Deque<ActivationFrame> stk = new LinkedList<>();
 
-        if (hasProjectExpression(path)) {
-            Matcher matcher = EXPRESSION_PROJECT_NAME_PATTERN.matcher(path);
-            while (matcher.find()) {
-                String propertyName = matcher.group(0);
-                if (!"${project.basedir}".equals(propertyName)) {
+        final Supplier<String> pathSupplier = () -> {
+            final boolean parallel = false;
+            return StreamSupport.stream(((Iterable<ActivationFrame>) stk::descendingIterator).spliterator(), parallel)
+                    .map(f -> f.location)
+                    .collect(Collectors.joining("."));
+        };
+        final Supplier<InputLocation> locationSupplier = () -> {
+            if (stk.size() < 2) {
+                return null;
+            }
+            Iterator<ActivationFrame> f = stk.iterator();
+
+            String location = f.next().location;
+            ActivationFrame parent = f.next();
+
+            return parent.parent.map(p -> p.getLocation(location)).orElse(null);
+        };
+        final Consumer<String> validator = s -> {
+            if (hasProjectExpression(s)) {
+                String path = pathSupplier.get();
+                Matcher matcher = EXPRESSION_PROJECT_NAME_PATTERN.matcher(s);
+                while (matcher.find()) {
+                    String propertyName = matcher.group(0);
+
+                    if (path.startsWith("activation.file.") && "${project.basedir}".equals(propertyName)) {
+                        continue;
+                    }
                     addViolation(
                             problems,
                             Severity.WARNING,
                             Version.V30,
-                            prefix + "activation.file." + location,
+                            prefix + path,
                             null,
-                            "Failed to interpolate file location " + path + ": " + propertyName
+                            "Failed to interpolate profile activation property " + s + ": " + propertyName
                                     + " expressions are not supported during profile activation.",
-                            file.getLocation(location));
+                            locationSupplier.get());
                 }
             }
-        }
+        };
+        Optional<Activation> root = Optional.of(activation);
+        stk.push(new ActivationFrame("activation", root));
+        root.map(Activation::getFile).ifPresent(fa -> {
+            stk.push(new ActivationFrame("file", Optional.of(fa)));
+            stk.push(new ActivationFrame("exists", Optional.empty()));
+            validator.accept(fa.getExists());
+            stk.peek().location = "missing";
+            validator.accept(fa.getMissing());
+            stk.pop();
+            stk.pop();
+        });
+        root.map(Activation::getOs).ifPresent(oa -> {
+            stk.push(new ActivationFrame("os", Optional.of(oa)));
+            stk.push(new ActivationFrame("arch", Optional.empty()));
+            validator.accept(oa.getArch());
+            stk.peek().location = "family";
+            validator.accept(oa.getFamily());
+            stk.peek().location = "name";
+            validator.accept(oa.getName());
+            stk.peek().location = "version";
+            validator.accept(oa.getVersion());
+            stk.pop();
+            stk.pop();
+        });
+        root.map(Activation::getProperty).ifPresent(pa -> {
+            stk.push(new ActivationFrame("property", Optional.of(pa)));
+            stk.push(new ActivationFrame("name", Optional.empty()));
+            validator.accept(pa.getName());
+            stk.peek().location = "value";
+            validator.accept(pa.getValue());
+            stk.pop();
+            stk.pop();
+        });
+        root.map(Activation::getJdk).ifPresent(jdk -> {
+            stk.push(new ActivationFrame("jdk", Optional.empty()));
+            validator.accept(jdk);
+            stk.pop();
+        });
     }
 
     private void validate20RawPlugins(
