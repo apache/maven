@@ -25,7 +25,7 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.VersionParser;
-import org.apache.maven.model.version.ModelVersionParser;
+import org.apache.maven.api.services.model.ModelVersionParser;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 

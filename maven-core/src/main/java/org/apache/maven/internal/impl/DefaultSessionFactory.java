@@ -28,7 +28,6 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.SessionData;
 
 @Singleton
 @Named
@@ -52,11 +51,10 @@ public class DefaultSessionFactory {
     }
 
     public Session getSession(MavenSession mavenSession) {
-        SessionData data = mavenSession.getRepositorySession().getData();
-        return (Session) data.computeIfAbsent(InternalMavenSession.class, () -> newSession(mavenSession));
+        return InternalSession.from(mavenSession.getRepositorySession(), () -> newSession(mavenSession));
     }
 
-    private Session newSession(MavenSession mavenSession) {
+    private InternalSession newSession(MavenSession mavenSession) {
         return new DefaultSession(
                 mavenSession, repositorySystem, null, mavenRepositorySystem, lookup, runtimeInformation);
     }

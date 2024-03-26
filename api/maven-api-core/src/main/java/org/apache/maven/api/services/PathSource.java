@@ -26,9 +26,15 @@ import java.nio.file.Path;
 class PathSource implements Source {
 
     private final Path path;
+    private final String location;
 
     PathSource(Path path) {
+        this(path, null);
+    }
+
+    PathSource(Path path, String location) {
         this.path = path;
+        this.location = location != null ? location : path.toString();
     }
 
     @Override
@@ -43,7 +49,7 @@ class PathSource implements Source {
 
     @Override
     public String getLocation() {
-        return path.toString();
+        return location;
     }
 
     @Override

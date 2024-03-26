@@ -178,7 +178,7 @@ public class Types {
             TypeVariable<?> typeVariable = (TypeVariable<?>) type;
             Type actualType = bindings.apply(typeVariable);
             if (actualType == null) {
-                throw new IllegalArgumentException("Type variable not found: " + typeVariable + " ( "
+                throw new TypeNotBoundException("Type variable not found: " + typeVariable + " ( "
                         + typeVariable.getGenericDeclaration() + " ) ");
             }
             return actualType;
@@ -264,11 +264,19 @@ public class Types {
                 }
                 Type[] interfaces = cls.getGenericInterfaces();
                 for (Type itf : interfaces) {
-                    todo.add(bind(itf, bindings));
+                    try {
+                        todo.add(bind(itf, bindings));
+                    } catch (TypeNotBoundException e) {
+                        // ignore
+                    }
                 }
                 Type supercls = cls.getGenericSuperclass();
                 if (supercls != null) {
-                    todo.add(bind(supercls, bindings));
+                    try {
+                        todo.add(bind(supercls, bindings));
+                    } catch (TypeNotBoundException e) {
+                        // ignore
+                    }
                 }
             }
         }
@@ -702,5 +710,11 @@ public class Types {
         }
 
         return type.getTypeName();
+    }
+
+    public static class TypeNotBoundException extends IllegalArgumentException {
+        public TypeNotBoundException(String s) {
+            super(s);
+        }
     }
 }

@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
@@ -39,6 +40,21 @@ public interface InternalSession extends Session {
 
     static InternalSession from(Session session) {
         return cast(InternalSession.class, session, "session should be an " + InternalSession.class);
+    }
+
+    static InternalSession from(org.eclipse.aether.RepositorySystemSession session) {
+        return cast(
+                InternalSession.class,
+                session.getData().get(InternalSession.class),
+                "session should be an " + InternalSession.class);
+    }
+
+    static InternalSession from(
+            org.eclipse.aether.RepositorySystemSession session, Supplier<InternalSession> supplier) {
+        return cast(
+                InternalSession.class,
+                session.getData().computeIfAbsent(InternalSession.class, (Supplier) supplier),
+                "session should be an " + InternalSession.class);
     }
 
     RemoteRepository getRemoteRepository(org.eclipse.aether.repository.RemoteRepository repository);
