@@ -25,17 +25,29 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.Activation.Builder;
 import org.apache.maven.api.model.ActivationFile;
+import org.apache.maven.api.model.ActivationOS;
+import org.apache.maven.api.model.ActivationProperty;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.BuildBase;
 import org.apache.maven.api.model.Dependency;
@@ -61,6 +73,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.interpolation.ModelVersionProcessor;
 import org.apache.maven.model.v4.MavenModelVersion;
+import org.apache.maven.model.v4.MavenTransformer;
 
 /**
  */
@@ -81,6 +94,180 @@ public class DefaultModelValidator implements ModelValidator {
     private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
 
     private static final String EMPTY = "";
+
+    private record ActivationFrame(String location, Optional<? extends InputLocationTracker> parent) {}
+
+    private static class ActivationWalker extends MavenTransformer {
+
+        private final Deque<ActivationFrame> stk;
+
+        ActivationWalker(Deque<ActivationFrame> stk, UnaryOperator<String> transformer) {
+            super(transformer);
+            this.stk = stk;
+        }
+
+        private ActivationFrame nextFrame(String property) {
+            return new ActivationFrame(property, Optional.empty());
+        }
+
+        private <P> ActivationFrame nextFrame(String property, Function<P, InputLocationTracker> child) {
+            @SuppressWarnings("unchecked")
+            final Optional<P> parent = (Optional<P>) stk.peek().parent;
+            return new ActivationFrame(property, parent.map(child));
+        }
+
+        @Override
+        public Activation transformActivation(Activation target) {
+            stk.push(new ActivationFrame("activation", Optional.of(target)));
+            try {
+                return super.transformActivation(target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivation_ActiveByDefault(Builder builder, Activation target) {}
+
+        @Override
+        protected void transformActivation_File(Builder builder, Activation target) {
+            stk.push(nextFrame("file", Activation::getFile));
+            Optional.ofNullable(target.getFile());
+            try {
+                super.transformActivation_File(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivationFile_Exists(
+                org.apache.maven.api.model.ActivationFile.Builder builder, ActivationFile target) {
+            stk.push(nextFrame("exists"));
+            try {
+                super.transformActivationFile_Exists(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivationFile_Missing(
+                org.apache.maven.api.model.ActivationFile.Builder builder, ActivationFile target) {
+            stk.push(nextFrame("missing"));
+            try {
+                super.transformActivationFile_Missing(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivation_Jdk(Builder builder, Activation target) {
+            stk.push(nextFrame("jdk"));
+            try {
+                super.transformActivation_Jdk(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivation_Os(Builder builder, Activation target) {
+            stk.push(nextFrame("os", Activation::getOs));
+            try {
+                super.transformActivation_Os(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivationOS_Arch(
+                org.apache.maven.api.model.ActivationOS.Builder builder, ActivationOS target) {
+            stk.push(nextFrame("arch"));
+            try {
+                super.transformActivationOS_Arch(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivationOS_Family(
+                org.apache.maven.api.model.ActivationOS.Builder builder, ActivationOS target) {
+            stk.push(nextFrame("family"));
+            try {
+                super.transformActivationOS_Family(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivationOS_Name(
+                org.apache.maven.api.model.ActivationOS.Builder builder, ActivationOS target) {
+            stk.push(nextFrame("name"));
+            try {
+                super.transformActivationOS_Name(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivationOS_Version(
+                org.apache.maven.api.model.ActivationOS.Builder builder, ActivationOS target) {
+            stk.push(nextFrame("version"));
+            try {
+                super.transformActivationOS_Version(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivation_Packaging(Builder builder, Activation target) {
+            stk.push(nextFrame("packaging"));
+            try {
+                super.transformActivation_Packaging(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivation_Property(Builder builder, Activation target) {
+            stk.push(nextFrame("property", Activation::getProperty));
+            try {
+                super.transformActivation_Property(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivationProperty_Name(
+                org.apache.maven.api.model.ActivationProperty.Builder builder, ActivationProperty target) {
+            stk.push(nextFrame("name"));
+            try {
+                super.transformActivationProperty_Name(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected void transformActivationProperty_Value(
+                org.apache.maven.api.model.ActivationProperty.Builder builder, ActivationProperty target) {
+            stk.push(nextFrame("value"));
+            try {
+                super.transformActivationProperty_Value(builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+    }
 
     private final Set<String> validCoordinateIds = new HashSet<>();
 
@@ -288,42 +475,52 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validate30RawProfileActivation(ModelProblemCollector problems, Activation activation, String prefix) {
-        if (activation == null || activation.getFile() == null) {
+        if (activation == null) {
             return;
         }
+        final Deque<ActivationFrame> stk = new LinkedList<>();
 
-        ActivationFile file = activation.getFile();
+        final Supplier<String> pathSupplier = () -> {
+            final boolean parallel = false;
+            return StreamSupport.stream(((Iterable<ActivationFrame>) stk::descendingIterator).spliterator(), parallel)
+                    .map(ActivationFrame::location)
+                    .collect(Collectors.joining("."));
+        };
+        final Supplier<InputLocation> locationSupplier = () -> {
+            if (stk.size() < 2) {
+                return null;
+            }
+            Iterator<ActivationFrame> f = stk.iterator();
 
-        String path;
-        String location;
+            String location = f.next().location;
+            ActivationFrame parent = f.next();
 
-        if (file.getExists() != null && !file.getExists().isEmpty()) {
-            path = file.getExists();
-            location = "exists";
-        } else if (file.getMissing() != null && !file.getMissing().isEmpty()) {
-            path = file.getMissing();
-            location = "missing";
-        } else {
-            return;
-        }
+            return parent.parent.map(p -> p.getLocation(location)).orElse(null);
+        };
+        final UnaryOperator<String> transformer = s -> {
+            if (hasProjectExpression(s)) {
+                String path = pathSupplier.get();
+                Matcher matcher = EXPRESSION_PROJECT_NAME_PATTERN.matcher(s);
+                while (matcher.find()) {
+                    String propertyName = matcher.group(0);
 
-        if (hasProjectExpression(path)) {
-            Matcher matcher = EXPRESSION_PROJECT_NAME_PATTERN.matcher(path);
-            while (matcher.find()) {
-                String propertyName = matcher.group(0);
-                if (!"${project.basedir}".equals(propertyName)) {
+                    if (path.startsWith("activation.file.") && "${project.basedir}".equals(propertyName)) {
+                        continue;
+                    }
                     addViolation(
                             problems,
                             Severity.WARNING,
                             Version.V30,
-                            prefix + "activation.file." + location,
+                            prefix + path,
                             null,
-                            "Failed to interpolate file location " + path + ": " + propertyName
+                            "Failed to interpolate profile activation property " + s + ": " + propertyName
                                     + " expressions are not supported during profile activation.",
-                            file.getLocation(location));
+                            locationSupplier.get());
                 }
             }
-        }
+            return s;
+        };
+        new ActivationWalker(stk, transformer).transformActivation(activation);
     }
 
     private void validate20RawPlugins(
