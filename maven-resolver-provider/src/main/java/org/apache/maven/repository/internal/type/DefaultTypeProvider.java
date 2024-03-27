@@ -58,7 +58,13 @@ public class DefaultTypeProvider implements TypeProvider {
                 new DefaultType(Type.MODULAR_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.MODULES),
                 new DefaultType(Type.CLASSPATH_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES),
                 new DefaultType(
-                        Type.FATJAR, Language.JAVA_FAMILY, "jar", null, true, JavaPathType.CLASSES, JavaPathType.MODULES),
+                        Type.FATJAR,
+                        Language.JAVA_FAMILY,
+                        "jar",
+                        null,
+                        true,
+                        JavaPathType.CLASSES,
+                        JavaPathType.MODULES),
                 new DefaultType(Type.MODULAR_FATJAR, Language.JAVA_FAMILY, "jar", null, true, JavaPathType.MODULES),
                 new DefaultType(Type.CLASSPATH_FATJAR, Language.JAVA_FAMILY, "jar", null, true, JavaPathType.CLASSES),
                 // j2ee types
