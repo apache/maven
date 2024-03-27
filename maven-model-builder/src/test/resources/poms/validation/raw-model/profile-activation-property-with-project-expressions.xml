@@ -26,57 +26,24 @@ under the License.
   <packaging>pom</packaging>
 
   <profiles>
-    <profile>
-      <id>exists-basedir</id>
-      <activation>
-        <file>
-          <exists>${basedir}/test.txt</exists>
-        </file>
-      </activation>
-    </profile>
-    <profile>
-      <id>missing-basedir</id>
-      <activation>
-        <file>
-          <missing>${basedir}/test.txt</missing>
-        </file>
-      </activation>
-    </profile>
 
     <profile>
-      <id>exists-project-basedir</id>
-      <activation>
-        <file>
-          <exists>${project.basedir}/test.txt</exists>
-        </file>
-      </activation>
-    </profile>
-    <profile>
-      <id>missing-project-basedir</id>
-      <activation>
-        <file>
-          <missing>${project.basedir}/test.txt</missing>
-        </file>
-      </activation>
-    </profile>
-
-    <profile>
-      <id>dynamic-property-available</id>
+      <id>property-name-project-version</id>
       <activation>
         <property>
-          <name>${activationProperty}</name>
+          <name>${project.version}</name>
+        </property>
+      </activation>
+    </profile>
+    <profile>
+      <id>property-value-project-version</id>
+      <activation>
+        <property>
+          <name>project.version</name>
+          <value>${project.version}</value>
         </property>
       </activation>
     </profile>
 
-    <profile>
-      <id>matches-another-property</id>
-      <activation>
-        <property>
-          <name>foo</name>
-          <value>${bar}</value>
-        </property>
-      </activation>
-    </profile>
   </profiles>
 </project>
