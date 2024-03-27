@@ -16,33 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.api.services.model;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.nio.file.Path;
 
 import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.SuperPomProvider;
-import org.apache.maven.api.services.SuperPomProviderException;
 
-@Named
-@Singleton
-public class DefaultSuperPomProvider implements SuperPomProvider {
-
-    private final org.apache.maven.model.superpom.SuperPomProvider provider;
-
-    @Inject
-    public DefaultSuperPomProvider(org.apache.maven.model.superpom.SuperPomProvider provider) {
-        this.provider = provider;
-    }
-
-    @Override
-    public Model getSuperPom(String version) {
-        try {
-            return provider.getSuperModel(version).getDelegate();
-        } catch (IllegalStateException e) {
-            throw new SuperPomProviderException("Could not retrieve super pom " + version, e);
-        }
-    }
+/**
+ * The ModelSourceTransformer is a way to transform the local pom while streaming the input.
+ *
+ * The {@link #transform(Path, TransformerContext, Model)} method uses a Path on purpose, to ensure the
+ * local pom is the original source.
+ *
+ * @since 4.0.0
+ */
+public interface ModelSourceTransformer {
+    /**
+     *
+     * @param pomFile the pom file, cannot be null
+     * @param context the context, cannot be null
+     * @param  model the model to transform
+     * @throws TransformerException if the transformation fails
+     */
+    Model transform(Path pomFile, TransformerContext context, Model model) throws TransformerException;
 }

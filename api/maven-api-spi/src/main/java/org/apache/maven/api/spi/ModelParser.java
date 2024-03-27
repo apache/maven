@@ -40,6 +40,11 @@ import org.apache.maven.api.services.Source;
 public interface ModelParser extends SpiService {
 
     /**
+     * Option that can be specified in the options map.  The value should be a Boolean.
+     */
+    String STRICT = "strict";
+
+    /**
      * Locates the pom in the given directory.
      *
      * @param dir the directory to locate the pom for, never {@code null}

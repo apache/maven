@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.*;
@@ -101,8 +102,13 @@ public class InjectorImpl implements Injector {
     @Override
     public Injector bindImplicit(Class<?> clazz) {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
-        Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
-        return doBind(key, binding);
+        if (clazz.isInterface()) {
+            bindings.computeIfAbsent(key, $ -> new HashSet<>());
+        } else if (!Modifier.isAbstract(clazz.getModifiers())) {
+            Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
+            doBind(key, binding);
+        }
+        return this;
     }
 
     private LinkedHashSet<Key<?>> current = new LinkedHashSet<>();
@@ -158,17 +164,27 @@ public class InjectorImpl implements Injector {
             Set<Binding<Object>> res2 = getBindings(v);
             if (k.getRawType() == String.class && res2 != null) {
                 Map<String, Supplier<Object>> map = res2.stream()
-                        .filter(b -> b.getOriginalKey().getQualifier() == null
+                        .filter(b -> b.getOriginalKey() == null
+                                || b.getOriginalKey().getQualifier() == null
                                 || b.getOriginalKey().getQualifier() instanceof String)
                         .collect(Collectors.toMap(
-                                b -> (String) b.getOriginalKey().getQualifier(), this::compile));
+                                b -> (String)
+                                        (b.getOriginalKey() != null
+                                                ? b.getOriginalKey().getQualifier()
+                                                : null),
+                                this::compile));
                 //noinspection unchecked
                 return (() -> (Q) new WrappingMap<>(map, Supplier::get));
             }
         }
         throw new DIException("No binding to construct an instance for key "
                 + key.getDisplayString() + ".  Existing bindings:\n"
-                + bindings.keySet().stream().map(Key::toString).collect(Collectors.joining("\n - ", " - ", "")));
+                + bindings.keySet().stream()
+                        .map(Key::toString)
+                        .map(String::trim)
+                        .sorted()
+                        .distinct()
+                        .collect(Collectors.joining("\n - ", " - ", "")));
     }
 
     @SuppressWarnings("unchecked")

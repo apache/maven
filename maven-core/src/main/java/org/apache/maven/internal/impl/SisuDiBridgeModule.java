@@ -27,11 +27,15 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.google.inject.AbstractModule;
+import org.apache.maven.api.spi.LanguageProvider;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.Binding;
 import org.apache.maven.di.impl.InjectorImpl;
+import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.internal.impl.resolver.DefaultVersionSchemeProvider;
 import org.codehaus.plexus.PlexusContainer;
+import org.eclipse.aether.version.VersionScheme;
 
 @Named
 class SisuDiBridgeModule extends AbstractModule {
@@ -58,7 +62,7 @@ class SisuDiBridgeModule extends AbstractModule {
         };
         injector.bindInstance(Injector.class, injector);
         bind(Injector.class).toInstance(injector);
-
+        injector.bindImplicit(LanguageProvider.class);
         Stream.of(
                         DefaultArtifactCoordinateFactory.class,
                         DefaultArtifactDeployer.class,
@@ -79,11 +83,21 @@ class SisuDiBridgeModule extends AbstractModule {
                         DefaultTransportProvider.class,
                         DefaultVersionParser.class,
                         DefaultVersionRangeResolver.class,
-                        DefaultVersionResolver.class)
+                        DefaultVersionResolver.class,
+                        DefaultVersionSchemeProvider.class,
+                        VersionScheme.class,
+                        DefaultModelVersionParser.class,
+                        DefaultRepositorySystemSessionFactory.class,
+                        ExtensibleEnumRegistries.DefaultLanguageRegistry.class)
                 .forEach((Class<?> clazz) -> {
                     injector.bindImplicit(clazz);
-                    Class<Object> itf = (Class) clazz.getInterfaces()[0];
-                    bind(itf).toProvider(() -> injector.getInstance(clazz));
+                    Class<Object> itf = (Class)
+                            (clazz.isInterface()
+                                    ? clazz
+                                    : clazz.getInterfaces().length > 0 ? clazz.getInterfaces()[0] : null);
+                    if (itf != null) {
+                        bind(itf).toProvider(() -> injector.getInstance(clazz));
+                    }
                 });
     }
 }

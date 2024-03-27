@@ -18,18 +18,14 @@
  */
 package org.apache.maven.internal.impl;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.SessionScoped;
 import org.apache.maven.api.*;
+import org.apache.maven.api.di.*;
 import org.apache.maven.api.services.*;
 import org.apache.maven.api.spi.*;
 
@@ -73,7 +69,19 @@ public class ExtensibleEnumRegistries {
         }
     }
 
-    static class DefaultExtensibleEnumRegistry<T extends ExtensibleEnum, P extends ExtensibleEnumProvider<T>>
+    @Named
+    @Singleton
+    public static class DefaultTypeRegistry extends DefaultExtensibleEnumRegistry<Type, TypeProvider>
+            implements TypeRegistry {
+
+        @Inject
+        public DefaultTypeRegistry(List<TypeProvider> providers) {
+            super(providers);
+        }
+    }
+
+    public abstract static class DefaultExtensibleEnumRegistry<
+                    T extends ExtensibleEnum, P extends ExtensibleEnumProvider<T>>
             implements ExtensibleEnumRegistry<T> {
 
         private final Map<String, T> values;
