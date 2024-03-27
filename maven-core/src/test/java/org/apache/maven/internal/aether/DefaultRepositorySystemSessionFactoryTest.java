@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -69,9 +68,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
     protected org.eclipse.aether.RepositorySystem aetherRepositorySystem;
 
     @Inject
-    protected ArtifactHandlerManager artifactHandlerManager;
-
-    @Inject
     protected RuntimeInformation information;
 
     @Inject
@@ -83,7 +79,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
     @Test
     void isNoSnapshotUpdatesTest() throws InvalidRepositoryException {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
-                artifactHandlerManager,
                 aetherRepositorySystem,
                 settingsDecrypter,
                 eventSpyDispatcher,
@@ -108,7 +103,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
     @Test
     void isSnapshotUpdatesTest() throws InvalidRepositoryException {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
-                artifactHandlerManager,
                 aetherRepositorySystem,
                 settingsDecrypter,
                 eventSpyDispatcher,
@@ -145,7 +139,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         request.setServers(servers);
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
-                artifactHandlerManager,
                 aetherRepositorySystem,
                 settingsDecrypter,
                 eventSpyDispatcher,
@@ -190,7 +183,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         request.setServers(servers);
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
-                artifactHandlerManager,
                 aetherRepositorySystem,
                 settingsDecrypter,
                 eventSpyDispatcher,
@@ -229,7 +221,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         request.setServers(servers);
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
-                artifactHandlerManager,
                 aetherRepositorySystem,
                 settingsDecrypter,
                 eventSpyDispatcher,
@@ -272,7 +263,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         request.setServers(servers);
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
-                artifactHandlerManager,
                 aetherRepositorySystem,
                 settingsDecrypter,
                 eventSpyDispatcher,
@@ -309,7 +299,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         request.setServers(servers);
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
-                artifactHandlerManager,
                 aetherRepositorySystem,
                 settingsDecrypter,
                 eventSpyDispatcher,
@@ -352,7 +341,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
         request.setServers(servers);
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
-                artifactHandlerManager,
                 aetherRepositorySystem,
                 settingsDecrypter,
                 eventSpyDispatcher,
@@ -372,7 +360,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
     @Test
     void transportConfigurationTest() throws InvalidRepositoryException {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
-                artifactHandlerManager,
                 aetherRepositorySystem,
                 settingsDecrypter,
                 eventSpyDispatcher,
@@ -420,7 +407,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
     @Test
     void versionFilteringTest() throws InvalidRepositoryException {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
-                artifactHandlerManager,
                 aetherRepositorySystem,
                 settingsDecrypter,
                 eventSpyDispatcher,
