@@ -84,7 +84,7 @@ public class Lifecycles {
         return new Lifecycle.Link() {
             @Override
             public Kind kind() {
-                return Kind.After;
+                return Kind.AFTER;
             }
 
             @Override
@@ -104,7 +104,7 @@ public class Lifecycles {
         return new Lifecycle.Link() {
             @Override
             public Kind kind() {
-                return Kind.After;
+                return Kind.AFTER;
             }
 
             @Override

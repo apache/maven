@@ -145,8 +145,8 @@ public class DefaultLifecycleRegistry
             graph.addEdge(ep3, after);
         }
         phase.links().forEach(link -> {
-            if (link.pointer().type() == org.apache.maven.api.Lifecycle.Pointer.Type.Project) {
-                if (link.kind() == org.apache.maven.api.Lifecycle.Link.Kind.After) {
+            if (link.pointer().type() == org.apache.maven.api.Lifecycle.Pointer.Type.PROJECT) {
+                if (link.kind() == org.apache.maven.api.Lifecycle.Link.Kind.AFTER) {
                     graph.addEdge(graph.addVertex(link.pointer().phase()), ep0);
                 } else {
                     graph.addEdge(ep3, graph.addVertex("$" + link.pointer().phase()));

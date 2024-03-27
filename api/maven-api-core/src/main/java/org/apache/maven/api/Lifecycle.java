@@ -109,13 +109,13 @@ public interface Lifecycle extends ExtensibleEnum {
 
     /**
      * A link from a phase to another phase, consisting of a type which can be
-     * {@link Kind#Before} or {@link Kind#After}, and a {@link Pointer} to
+     * {@link Kind#BEFORE} or {@link Kind#AFTER}, and a {@link Pointer} to
      * another phase.
      */
     interface Link {
         enum Kind {
-            Before,
-            After
+            BEFORE,
+            AFTER
         }
 
         Kind kind();
@@ -125,9 +125,9 @@ public interface Lifecycle extends ExtensibleEnum {
 
     interface Pointer {
         enum Type {
-            Project,
-            Dependencies,
-            Children
+            PROJECT,
+            DEPENDENCIES,
+            CHILDREN
         }
 
         String phase();
@@ -137,7 +137,7 @@ public interface Lifecycle extends ExtensibleEnum {
 
     interface PhasePointer extends Pointer {
         default Type type() {
-            return Type.Project;
+            return Type.PROJECT;
         }
     }
 
@@ -145,13 +145,13 @@ public interface Lifecycle extends ExtensibleEnum {
         String scope(); // default: all
 
         default Type type() {
-            return Type.Dependencies;
+            return Type.DEPENDENCIES;
         }
     }
 
     interface ChildrenPointer extends Pointer {
         default Type type() {
-            return Type.Children;
+            return Type.CHILDREN;
         }
     }
 }

@@ -44,9 +44,9 @@ public @interface After {
      * @see org.apache.maven.api.Lifecycle.Pointer.Type
      */
     enum Type {
-        Project,
-        Dependencies,
-        Children
+        PROJECT,
+        DEPENDENCIES,
+        CHILDREN
     }
 
     /**
