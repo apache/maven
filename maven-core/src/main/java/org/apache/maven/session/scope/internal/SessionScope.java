@@ -107,7 +107,11 @@ public class SessionScope implements Scope {
     private <T> T createProxy(Key<T> key, Provider<T> unscoped) {
         InvocationHandler dispatcher = (proxy, method, args) -> {
             method.setAccessible(true);
-            return method.invoke(getScopeState().scope(key, unscoped).get(), args);
+            try {
+                return method.invoke(getScopeState().scope(key, unscoped).get(), args);
+            } catch (InvocationTargetException e) {
+                throw e.getCause();
+            }
         };
         Class<T> superType = (Class<T>) key.getTypeLiteral().getRawType();
         Class<?>[] interfaces = getInterfaces(superType);

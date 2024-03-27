@@ -74,6 +74,7 @@ public class SessionScopeProxyTest {
         assertNotNull(bean.myBean.getSession());
         assertNotNull(bean.myBean.getAnotherBean());
         assertSame(bean.myBean.getAnotherBean().getClass(), AnotherBean.class);
+        assertThrows(TestException.class, () -> bean.myBean.throwException());
     }
 
     @Named
@@ -102,6 +103,8 @@ public class SessionScopeProxyTest {
         Session getSession();
 
         BeanItf2 getAnotherBean();
+
+        void throwException() throws TestException;
     }
 
     interface BeanItf2 {}
@@ -127,5 +130,11 @@ public class SessionScopeProxyTest {
         public BeanItf2 getAnotherBean() {
             return anotherBean;
         }
+
+        public void throwException() throws TestException {
+            throw new TestException();
+        }
     }
+
+    static class TestException extends Exception {}
 }
