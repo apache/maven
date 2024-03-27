@@ -39,6 +39,7 @@
     <module>maven-api-plugin</module>
     <module>maven-api-settings</module>
     <module>maven-api-toolchain</module>
+    <module>maven-api-metadata</module>
     <module>maven-api-core</module>
     <module>maven-api-spi</module>
   </modules>
