@@ -41,6 +41,9 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 /**
+ * Build plugin descriptor object from {@code plugin.xml}.
+ *
+ * @author Jason van Zyl
  */
 public class PluginDescriptorBuilder {
 
