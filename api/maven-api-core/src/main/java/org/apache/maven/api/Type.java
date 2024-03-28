@@ -61,10 +61,9 @@ public interface Type extends ExtensibleEnum {
     String JAR = "jar";
 
     /**
-     * Artifact type name for a fat-JAR file that can be placed either on the class-path or on the module-path.
+     * Artifact type name for a fat-JAR file that can be only on the class-path.
      * The fat-JAR is a self-contained JAR and its transitive dependencies will not be resolved, if any.
-     * The path (classes or modules) is chosen by the plugin, possibly using heuristic rules.
-     * This is the behavior of Maven 3.
+     * This type is new in Maven 4.
      */
     String FATJAR = "fatjar";
 
@@ -76,27 +75,11 @@ public interface Type extends ExtensibleEnum {
     String CLASSPATH_JAR = "classpath-jar";
 
     /**
-     * Artifact type name for a fat-JAR file to unconditionally place on the class-path.
-     * The fat-JAR is a self-contained JAR and its transitive dependencies will not be resolved, if any.
-     * If the fat-JAR is modular, its module information are ignored.
-     * This type is new in Maven 4.
-     */
-    String CLASSPATH_FATJAR = "classpath-fatjar";
-
-    /**
      * Artifact type name for a JAR file to unconditionally place on the module-path.
      * If the JAR is not modular, then it is loaded by Java as an unnamed module.
      * This type is new in Maven 4.
      */
     String MODULAR_JAR = "modular-jar";
-
-    /**
-     * Artifact type name for a JAR file to unconditionally place on the module-path.
-     * The fat-JAR is a self-contained JAR and its transitive dependencies will not be resolved, if any.
-     * If the fat-JAR is not modular, then it is loaded by Java as an unnamed module.
-     * This type is new in Maven 4.
-     */
-    String MODULAR_FATJAR = "modular-fatjar";
 
     /**
      * Artifact type name for source code packaged in a JAR file.
