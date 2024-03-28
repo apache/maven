@@ -61,6 +61,13 @@ public interface Type extends ExtensibleEnum {
     String JAR = "jar";
 
     /**
+     * Artifact type name for a fat-JAR file that can be only on the class-path.
+     * The fat-JAR is a self-contained JAR and its transitive dependencies will not be resolved, if any.
+     * This type is new in Maven 4.
+     */
+    String FATJAR = "fatjar";
+
+    /**
      * Artifact type name for a JAR file to unconditionally place on the class-path.
      * If the JAR is modular, its module information are ignored.
      * This type is new in Maven 4.
