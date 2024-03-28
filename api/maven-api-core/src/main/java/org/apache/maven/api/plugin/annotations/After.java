@@ -26,13 +26,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * This annotation will mark your class as a Mojo (ie. goal in a Maven plugin).
- * The mojo can be annotated with {@code jakarta.inject.*} annotations.
- * The {@link Parameter} annotation can be added on fields to inject data
- * from the plugin configuration or from other components.
+ * Specifies that the mojo should be run after the specific phase.
  *
  * @since 4.0.0
  */
@@ -41,44 +37,30 @@ import org.apache.maven.api.annotations.Nonnull;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
-public @interface Mojo {
-    /**
-     * goal name (required).
-     * @return the goal name
-     */
-    @Nonnull
-    String name();
+public @interface After {
 
     /**
-     * default phase to bind your mojo.
-     * @return the default phase
+     * Type of pointer.
+     * @see org.apache.maven.api.Lifecycle.Pointer.Type
      */
-    @Nonnull
-    String defaultPhase() default "";
+    enum Type {
+        PROJECT,
+        DEPENDENCIES,
+        CHILDREN
+    }
 
     /**
-     * does your mojo requires a project to be executed?
-     * @return requires a project
+     * The phase name.
      */
-    boolean projectRequired() default true;
+    String phase();
 
     /**
-     * if the Mojo uses the Maven project and its child modules.
-     * @return uses the Maven project and its child modules
+     * The type of this pointer.
      */
-    boolean aggregator() default false;
+    Type type();
 
     /**
-     * does this Mojo need to be online to be executed?
-     * @return need to be online
+     * The scope for dependencies, only if {@code type() == Type.Dependencies}.
      */
-    boolean onlineRequired() default false;
-
-    /**
-     * TODO: v4: add a SPI for the configurator
-     * configurator bean name.
-     * @return the configurator bean name
-     */
-    @Nonnull
-    String configurator() default "";
+    String scope() default "";
 }

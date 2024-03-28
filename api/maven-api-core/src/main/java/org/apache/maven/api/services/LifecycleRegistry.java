@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api;
+package org.apache.maven.api.services;
 
-import org.apache.maven.api.annotations.Experimental;
+import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-/**
- * Storage location for metadata
- *
- * @since 4.0.0
- */
-@Experimental
-public enum MetadataStorage {
-    GROUP,
-    ARTIFACT,
-    VERSION
+import org.apache.maven.api.Lifecycle;
+
+public interface LifecycleRegistry extends ExtensibleEnumRegistry<Lifecycle>, Iterable<Lifecycle> {
+    default Stream<Lifecycle> stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
+
+    List<String> computePhases(Lifecycle lifecycle);
 }
