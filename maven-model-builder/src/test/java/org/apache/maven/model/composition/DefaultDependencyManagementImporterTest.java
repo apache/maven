@@ -37,7 +37,7 @@ class DefaultDependencyManagementImporterTest {
     }
 
     @Test
-    void testUpdateWithImportedFrom_bomAndDependencyHaveSameSource_dependencyRootFound() {
+    void testUpdateWithImportedFrom_dependencyManagementAndDependencyHaveSameSource_dependencyImportedFromSameSource() {
         final InputSource source = new InputSource("SINGLE_SOURCE", "");
         final Dependency dependency = Dependency.newBuilder()
                 .location("", new InputLocation(1, 1, source))
@@ -49,7 +49,8 @@ class DefaultDependencyManagementImporterTest {
         final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, bom);
 
         assertThat(result).isNotNull();
-        assertThat(result.getImportedFrom()).isEqualTo(bom.getLocation(""));
+        assertThat(result.getImportedFrom().toString())
+                .isEqualTo(bom.getLocation("").toString());
     }
 
     @Test
