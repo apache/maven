@@ -18,87 +18,106 @@
  */
 package org.apache.maven.model.composition;
 
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.InputSource;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 class DefaultDependencyManagementImporterTest {
-    // TODO Need to rewrite tests as soon as the SUT is a bit more stable
-    /*
     @Test
-    public void testUpdateDependencyHierarchy_SameSource() {
-        InputSource source = new InputSource();
-        source.setModelId("SINGLE_SOURCE");
-        Dependency dependency = new Dependency();
-        dependency.setLocation("", new InputLocation(1, 1, source));
-        DependencyManagement bom = new DependencyManagement();
-        bom.setLocation("", new InputLocation(2, 2, source));
+    void testUpdateWithImportedFrom_dependencyLocationAndBomLocationAreNull_dependencyReturned() {
+        final Dependency dependency = Dependency.newBuilder().build();
+        final DependencyManagement depMgmt = DependencyManagement.newBuilder().build();
+        final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, depMgmt);
 
-        DefaultDependencyManagementImporter.updateDependencyImports(dependency, bom);
-
-        assertSame(source, dependency.getLocation("").getSource());
-        assertSame(source, bom.getLocation("").getSource());
-        assertNull(source.getImportedBy());
+        assertThat(dependency).isEqualTo(result);
     }
 
     @Test
-    public void testUpdateDependencyHierarchy_SingleLevel() {
-        InputSource dependencySource = new InputSource();
-        dependencySource.setModelId("DEPENDENCY");
-        InputSource bomSource = new InputSource();
-        bomSource.setModelId("BOM");
-        Dependency dependency = new Dependency();
-        dependency.setLocation("", new InputLocation(1, 1, dependencySource));
-        DependencyManagement bom = new DependencyManagement();
-        bom.setLocation("", new InputLocation(2, 2, bomSource));
+    void testUpdateWithImportedFrom_bomAndDependencyHaveSameSource_dependencyRootFound() {
+        final InputSource source = new InputSource("SINGLE_SOURCE", "");
+        final Dependency dependency = Dependency.newBuilder()
+                .location("", new InputLocation(1, 1, source))
+                .build();
+        final DependencyManagement bom = DependencyManagement.newBuilder()
+                .location("", new InputLocation(1, 1, source))
+                .build();
 
-        DefaultDependencyManagementImporter.updateDependencyImports(dependency, bom);
+        final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, bom);
 
-        assertSame(dependencySource, dependency.getLocation("").getSource());
-        assertSame(bomSource, bom.getLocation("").getSource());
-        assertEquals(bomSource, dependencySource.getImportedBy());
+        assertThat(result).isNotNull();
+        assertThat(result.getImportedFrom()).isEqualTo(bom.getLocation(""));
     }
 
     @Test
-    public void testUpdateDependencyHierarchy_MultiLevel() {
-        InputSource intermediateSource = new InputSource();
-        intermediateSource.setModelId("INTERMEDIATE");
-        InputSource dependencySource = new InputSource();
-        dependencySource.setModelId("DEPENDENCY");
-        dependencySource.setImportedBy(intermediateSource);
-        InputSource bomSource = new InputSource();
-        bomSource.setModelId("BOM");
-        Dependency dependency = new Dependency();
-        dependency.setLocation("", new InputLocation(1, 1, dependencySource));
-        DependencyManagement bom = new DependencyManagement();
-        bom.setLocation("", new InputLocation(2, 2, bomSource));
+    public void testUpdateWithImportedFrom_singleLevel_importedFromSet() {
+        // Arrange
+        final InputSource dependencySource = new InputSource("DEPENDENCY", "DEPENDENCY");
+        final InputSource bomSource = new InputSource("BOM", "BOM");
+        final Dependency dependency = Dependency.newBuilder()
+                .location("", new InputLocation(1, 1, dependencySource))
+                .build();
+        final DependencyManagement bom = DependencyManagement.newBuilder()
+                .location("", new InputLocation(2, 2, bomSource))
+                .build();
 
-        DefaultDependencyManagementImporter.updateDependencyImports(dependency, bom);
+        // Act
+        final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, bom);
 
-        assertSame(dependencySource, dependency.getLocation("").getSource());
-        assertSame(bomSource, bom.getLocation("").getSource());
-        assertEquals(intermediateSource, dependencySource.getImportedBy());
-        assertEquals(bomSource, intermediateSource.getImportedBy());
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.getImportedFrom().toString())
+                .isEqualTo(bom.getLocation("").toString());
     }
 
     @Test
-    public void testUpdateDependencyHierarchy_PresentSource() {
-        InputSource bomSource = new InputSource();
-        bomSource.setModelId("BOM");
-        InputSource intermediateSource = new InputSource();
-        intermediateSource.setModelId("INTERMEDIATE");
-        intermediateSource.setImportedBy(bomSource);
-        InputSource dependencySource = new InputSource();
-        dependencySource.setModelId("DEPENDENCY");
-        dependencySource.setImportedBy(intermediateSource);
-        Dependency dependency = new Dependency();
-        dependency.setLocation("", new InputLocation(1, 1, dependencySource));
-        DependencyManagement bom = new DependencyManagement();
-        bom.setLocation("", new InputLocation(2, 2, bomSource));
+    public void testUpdateWithImportedFrom_multiLevel_importedFromSetChanged() {
+        // Arrange
+        final InputSource bomSource = new InputSource("BOM", "BOM");
+        final InputSource intermediateSource =
+                new InputSource("INTERMEDIATE", "INTERMEDIATE").importedFrom(new InputLocation(bomSource));
+        final InputSource dependencySource =
+                new InputSource("DEPENDENCY", "DEPENDENCY").importedFrom(new InputLocation(intermediateSource));
+        final InputLocation bomLocation = new InputLocation(2, 2, bomSource);
+        final Dependency dependency = Dependency.newBuilder()
+                .location("", new InputLocation(1, 1, dependencySource))
+                .importedFrom(bomLocation)
+                .build();
+        final DependencyManagement bom =
+                DependencyManagement.newBuilder().location("", bomLocation).build();
 
-        DefaultDependencyManagementImporter.updateDependencyImports(dependency, bom);
+        // Act
+        final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, bom);
 
-        assertSame(dependencySource, dependency.getLocation("").getSource());
-        assertSame(bomSource, bom.getLocation("").getSource());
-        assertEquals(intermediateSource, dependencySource.getImportedBy());
-        assertEquals(bomSource, intermediateSource.getImportedBy());
-        assertNull(bomSource.getImportedBy());
+        // Assert
+        assertThat(result.getImportedFrom().toString())
+                .isEqualTo(bom.getLocation("").toString());
     }
-    */
+
+    @Test
+    public void testUpdateWithImportedFrom_multiLevelAlreadyFoundInDifferentSource_importedFromSetMaintained() {
+        // Arrange
+        final InputSource bomSource = new InputSource("BOM", "BOM");
+        final InputSource intermediateSource =
+                new InputSource("INTERMEDIATE", "INTERMEDIATE").importedFrom(new InputLocation(bomSource));
+        final InputSource dependencySource =
+                new InputSource("DEPENDENCY", "DEPENDENCY").importedFrom(new InputLocation(intermediateSource));
+        final Dependency dependency = Dependency.newBuilder()
+                .location("", new InputLocation(1, 1, dependencySource))
+                .build();
+        final DependencyManagement differentSource = DependencyManagement.newBuilder()
+                .location("", new InputLocation(2, 2, new InputSource("BOM2", "BOM2")))
+                .build();
+
+        // Act
+        final Dependency result =
+                DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, differentSource);
+
+        // Assert
+        assertThat(result.getImportedFrom().toString())
+                .isEqualTo(differentSource.getLocation("").toString());
+    }
 }
