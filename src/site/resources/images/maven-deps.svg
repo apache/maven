@@ -1,736 +1,812 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" width="960.113" height="601.361" fill-rule="evenodd" stroke-linejoin="round" stroke-width="28.222" preserveAspectRatio="xMidYMid" version="1.2" viewBox="999 991 25403 15911">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" width="967.672" height="605.14" fill-rule="evenodd" stroke-linejoin="round" stroke-width="28.222" preserveAspectRatio="xMidYMid" version="1.2" viewBox="999 991 25603 16011">
  <g>
   <g>
-   <path fill="none" d="M16599 12199h9803v4703h-9803z"/>
+   <path fill="none" d="M7716 11307h11436v3411H7716z"/>
+   <path fill="none" stroke="#000" d="m7717 11308 11050 3271"/>
+   <path d="m18737 14694-31 23 444-25-359-263 13 36 7 39v41l-7 43-16 40-23 35z"/>
+  </g>
+  <g>
+   <path fill="none" d="M11757 8899h9545v5794h-9545z"/>
+   <path fill="none" stroke="#000" d="m11758 8900 9201 5585"/>
+   <path d="m20900 14588-36 15 436 89-280-346 3 38-3 40-10 40-18 39-25 35-32 28z"/>
+  </g>
+  <g>
+   <path fill="none" d="M10200 14507h3102v1387h-3102z"/>
+   <path fill="none" stroke="#000" d="m13300 14508-2736 1221"/>
+   <path d="m10513 15622 9-38-322 308 444-34-33-18-31-26-27-31-22-37-14-40-6-42z"/>
+  </g>
+  <g>
+   <path fill="none" d="M11299 12595h10202v3703H11299z"/>
+   <path fill="none" stroke="#000" d="m11300 16296 9825-3564"/>
+   <path d="m21169 12842-12 38 343-284-445 2 31 21 30 27 24 33 19 39 12 41 2 42z"/>
+  </g>
+  <g>
+   <path fill="none" d="M9499 9503h806v6390h-806z"/>
+   <path fill="none" stroke="#000" d="m9500 9504 657 5991"/>
+   <path d="m10039 15512-34-20 195 400 103-433-27 26-34 22-38 16-42 9-43 1-41-7z"/>
+  </g>
+  <g>
+   <path fill="none" d="M10128 7399h1632v8495h-1632z"/>
+   <path fill="none" stroke="#000" d="m11758 7400-1486 8099"/>
+   <path d="m10155 15482-27-29 72 439 223-385-34 17-38 11-41 5-43-4-41-11-38-19z"/>
+  </g>
+  <g>
+   <path fill="none" d="M14999 13099h11303v3803H14999z"/>
    <a target="_parent" xlink:href="../api/">
-    <path fill="#C0E3FC" fill-opacity=".251" stroke="#FFF" stroke-opacity=".251" d="M21500 16900h-4900v-4700h9800v4700z"/>
-    <path fill="none" stroke="#000" d="M21500 16900h-4900v-4700h9800v4700z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16851" y="12774" class="TextPosition"><tspan style="white-space:pre">                       </tspan><tspan style="white-space:pre">Maven 4 API</tspan></tspan></tspan></text>
+    <path fill="#C0E3FC" fill-opacity=".251" stroke="#FFF" stroke-opacity=".251" d="M20650 16900h-5650v-3800h11300v3800z"/>
+    <path fill="none" stroke="#000" d="M20650 16900h-5650v-3800h11300v3800z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="20251" y="13674" class="TextPosition"><tspan style="white-space:pre">                      </tspan><tspan style="white-space:pre">Maven 4 API</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M15899 4899h5003v2003h-5003z"/>
+   <path fill="none" d="M16699 4899h5003v2003h-5003z"/>
    <a target="_parent" xlink:href="https://projects.eclipse.org/projects/technology.sisu">
-    <path fill="#FFC" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M18400 6900h-2500V4900h5000v2000z"/>
-    <path fill="none" stroke="#000" d="M18400 6900h-2500V4900h5000v2000z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16150" y="6669" class="TextPosition"><tspan style="white-space:pre">sisu</tspan></tspan></tspan></text>
+    <path fill="#FFC" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M19200 6900h-2500V4900h5000v2000z"/>
+    <path fill="none" stroke="#000" d="M19200 6900h-2500V4900h5000v2000z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16950" y="6669" class="TextPosition"><tspan style="white-space:pre">sisu</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M16210 5198h2053v812h-2053z"/>
+   <path fill="none" d="M17010 5198h2053v812h-2053z"/>
    <a target="_parent" xlink:href="https://github.com/eclipse/sisu.plexus">
-    <path fill="#FF9" d="M17236 6008h-1025v-809h2050v809z"/>
-    <path fill="none" stroke="#000" d="M17236 6008h-1025v-809h2050v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16519" y="5775" class="TextPosition"><tspan style="white-space:pre">plexus</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M18036 6008h-1025v-809h2050v809z"/>
+    <path fill="none" stroke="#000" d="M18036 6008h-1025v-809h2050v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="17319" y="5775" class="TextPosition"><tspan style="white-space:pre">plexus</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M18877 5189h1718v812h-1718z"/>
+   <path fill="none" d="M19677 5189h1718v812h-1718z"/>
    <a target="_parent" xlink:href="https://github.com/eclipse/sisu.inject">
-    <path fill="#FF9" d="M19736 5999h-858v-809h1715v809z"/>
-    <path fill="none" stroke="#000" d="M19736 5999h-858v-809h1715v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="19156" y="5766" class="TextPosition"><tspan style="white-space:pre">inject</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M20536 5999h-858v-809h1715v809z"/>
+    <path fill="none" stroke="#000" d="M20536 5999h-858v-809h1715v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="19956" y="5766" class="TextPosition"><tspan style="white-space:pre">inject</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M21204 5189h1803v812h-1803z"/>
+   <path fill="none" d="M22004 5189h1803v812h-1803z"/>
    <a target="_parent" xlink:href="https://github.com/google/guice">
-    <path fill="#FF9" d="M22105 5999h-900v-809h1800v809z"/>
-    <path fill="none" stroke="#000" d="M22105 5999h-900v-809h1800v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="21513" y="5766" class="TextPosition"><tspan style="white-space:pre">guice</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M22905 5999h-900v-809h1800v809z"/>
+    <path fill="none" stroke="#000" d="M22905 5999h-900v-809h1800v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="22313" y="5766" class="TextPosition"><tspan style="white-space:pre">guice</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M18260 5451h620v302h-620z"/>
-   <path fill="none" stroke="#000" d="m18261 5604 219-3"/>
-   <path d="m18485 5719-23 32 417-156-421-144 23 30 18 36 13 39 5 43-3 42-11 41z"/>
+   <path fill="none" d="M19060 5451h620v302h-620z"/>
+   <path fill="none" stroke="#000" d="m19061 5604 219-3"/>
+   <path d="m19285 5719-23 32 417-156-421-144 23 30 18 36 13 39 5 43-3 42-11 41z"/>
   </g>
   <g>
-   <path fill="none" d="M20593 5445h613v301h-613z"/>
-   <path fill="none" stroke="#000" d="M20594 5595h212"/>
-   <path d="m20810 5714-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
+   <path fill="none" d="M21393 5445h613v301h-613z"/>
+   <path fill="none" stroke="#000" d="M21394 5595h212"/>
+   <path d="m21610 5714-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
   </g>
   <g>
-   <path fill="none" d="M15499 7599h6603v4403h-6603z"/>
+   <path fill="none" d="M16299 7599h7103v4403h-7103z"/>
    <a target="_parent" xlink:href="https://codehaus-plexus.github.io/">
-    <path fill="#FFC" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M18800 12000h-3300V7600h6600v4400z"/>
-    <path fill="none" stroke="#000" d="M18800 12000h-3300V7600h6600v4400z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="15750" y="11769" class="TextPosition"><tspan style="white-space:pre">plexus</tspan></tspan></tspan></text>
+    <path fill="#FFC" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M19850 12000h-3550V7600h7100v4400z"/>
+    <path fill="none" stroke="#000" d="M19850 12000h-3550V7600h7100v4400z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16550" y="11769" class="TextPosition"><tspan style="white-space:pre">plexus</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M6466 5190h3303v811H6466z"/>
+   <path fill="none" d="M6066 5190h3303v811H6066z"/>
    <a target="_parent" xlink:href="../maven-core/">
-    <path fill="#9CF" d="M8117 5999H6467v-808h3300v808z"/>
-    <path fill="none" stroke="#000" d="M8117 5999H6467v-808h3300v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7635" y="5767" class="TextPosition"><tspan style="white-space:pre">core</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M7717 5999H6067v-808h3300v808z"/>
+    <path fill="none" stroke="#000" d="M7717 5999H6067v-808h3300v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7235" y="5767" class="TextPosition"><tspan style="white-space:pre">core</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M9766 5445h2836v302H9766z"/>
-   <path fill="none" stroke="#000" d="m9767 5595 2434 1"/>
-   <path d="m12204 5715-23 31 419-150-419-150 22 30 19 36 12 39 4 43-3 43-12 40z"/>
+   <path fill="none" d="M9366 5445h4536v302H9366z"/>
+   <path fill="none" stroke="#000" d="m9367 5595 4134 1"/>
+   <path d="m13504 5715-23 31 419-150-419-150 22 30 19 36 12 39 4 43-3 43-12 40z"/>
   </g>
   <g>
-   <path fill="none" d="M6501 999h3233v813H6501z"/>
+   <path fill="none" d="M6101 999h3233v813H6101z"/>
    <a target="_parent" xlink:href="../apache-maven/">
-    <path fill="#9CF" d="M8117 1810H6502v-810h3230v810z"/>
-    <path fill="none" stroke="#000" d="M8117 1810H6502v-810h3230v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="6917" y="1577" class="TextPosition"><tspan style="white-space:pre">distribution</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M7717 1810H6102v-810h3230v810z"/>
+    <path fill="none" stroke="#000" d="M7717 1810H6102v-810h3230v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="6517" y="1577" class="TextPosition"><tspan style="white-space:pre">distribution</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M7967 1809h301v583h-301z"/>
-   <path fill="none" stroke="#000" d="M8117 1810v182"/>
-   <path d="m7998 1996-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+   <path fill="none" d="M7567 1809h301v583h-301z"/>
+   <path fill="none" stroke="#000" d="M7717 1810v182"/>
+   <path d="m7598 1996-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M7967 4598h301v594h-301z"/>
-   <path fill="none" stroke="#000" d="M8117 4599v193"/>
-   <path d="m7998 4796-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+   <path fill="none" d="M7717 4194h2286v999H7717z"/>
+   <path fill="none" stroke="#000" d="m10001 4195-1918 836"/>
+   <path d="m8032 4924 9-38-324 305 444-30-33-19-31-26-26-31-22-37-14-41-5-42z"/>
   </g>
   <g>
-   <path fill="none" d="M15799 10289h3403v812h-3403z"/>
+   <path fill="none" d="M16599 10289h3403v812h-3403z"/>
    <a target="_parent" xlink:href="https://github.com/codehaus-plexus/plexus-sec-dispatcher">
-    <path fill="#FF9" d="M17500 11099h-1700v-809h3400v809z"/>
-    <path fill="none" stroke="#000" d="M17500 11099h-1700v-809h3400v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="15885" y="10866" class="TextPosition"><tspan style="white-space:pre">sec-dispatcher</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M18300 11099h-1700v-809h3400v809z"/>
+    <path fill="none" stroke="#000" d="M18300 11099h-1700v-809h3400v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16685" y="10866" class="TextPosition"><tspan style="white-space:pre">sec-dispatcher</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M9899 9503h5903v1258H9899z"/>
-   <path fill="none" stroke="#000" d="m9900 9504 5509 1112"/>
-   <path d="m15389 10733-29 26 440-64-381-230 16 34 11 39 4 41-4 43-12 41-20 37z"/>
+   <path fill="none" d="M9499 9503h7103v1272H9499z"/>
+   <path fill="none" stroke="#000" d="m9500 9504 6706 1125"/>
+   <path d="m16190 10747-28 27 438-79-389-217 18 33 12 39 5 41-3 42-10 42-19 38z"/>
   </g>
   <g>
-   <path fill="none" d="M15899 2390h3203v813h-3203z"/>
+   <path fill="none" d="M16699 2390h3203v813h-3203z"/>
    <a target="_parent" xlink:href="https://commons.apache.org/proper/commons-cli/">
-    <path fill="#FF9" d="M17500 3201h-1600v-810h3200v810z"/>
-    <path fill="none" stroke="#000" d="M17500 3201h-1600v-810h3200v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16109" y="2968" class="TextPosition"><tspan style="white-space:pre">commons-cli</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M18300 3201h-1600v-810h3200v810z"/>
+    <path fill="none" stroke="#000" d="M18300 3201h-1600v-810h3200v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16909" y="2968" class="TextPosition"><tspan style="white-space:pre">commons-cli</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M6501 2646h9400v301H6501z"/>
-   <path fill="none" stroke="#000" d="M6502 2796h8999"/>
-   <path d="m15505 2915-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
+   <path fill="none" d="M6101 2646h10600v301H6101z"/>
+   <path fill="none" stroke="#000" d="M6102 2796h10199"/>
+   <path d="m16305 2915-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
   </g>
   <g>
-   <path fill="none" d="M20099 7898h1703v812h-1703z"/>
+   <path fill="none" d="M21499 7898h1703v812h-1703z"/>
    <a target="_parent" xlink:href="https://codehaus-plexus.github.io/plexus-utils/">
-    <path fill="#FF9" d="M20950 8708h-850v-809h1700v809z"/>
-    <path fill="none" stroke="#000" d="M20950 8708h-850v-809h1700v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="20508" y="8475" class="TextPosition"><tspan style="white-space:pre">utils</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M22350 8708h-850v-809h1700v809z"/>
+    <path fill="none" stroke="#000" d="M22350 8708h-850v-809h1700v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="21908" y="8475" class="TextPosition"><tspan style="white-space:pre">utils</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M12599 5191h2369v811h-2369z"/>
+   <path fill="none" d="M13899 5191h2369v811h-2369z"/>
    <a target="_parent" xlink:href="../maven-plugin-api/">
-    <path fill="#9CF" d="M13783 6000h-1183v-808h2366v808z"/>
-    <path fill="none" stroke="#000" d="M13783 6000h-1183v-808h2366v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="12710" y="5768" class="TextPosition"><tspan style="white-space:pre">plugin-api</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M15083 6000h-1183v-808h2366v808z"/>
+    <path fill="none" stroke="#000" d="M15083 6000h-1183v-808h2366v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="14010" y="5768" class="TextPosition"><tspan style="white-space:pre">plugin-api</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M14199 13297h2003v811h-2003z"/>
+   <path fill="none" d="M14299 11897h1803v811h-1803z"/>
    <a target="_parent" xlink:href="../maven-artifact/">
-    <path fill="#9CF" d="M15200 14106h-1000v-808h2000v808z"/>
-    <path fill="none" stroke="#000" d="M15200 14106h-1000v-808h2000v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="14453" y="13874" class="TextPosition"><tspan style="white-space:pre">artifact</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M15200 12706h-900v-808h1800v808z"/>
+    <path fill="none" stroke="#000" d="M15200 12706h-900v-808h1800v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="14453" y="12474" class="TextPosition"><tspan style="white-space:pre">artifact</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M6501 2390h3233v813H6501z"/>
+   <path fill="none" d="M6101 2390h3233v813H6101z"/>
    <a target="_parent" xlink:href="../maven-embedder/">
-    <path fill="#9CF" d="M8117 3201H6502v-810h3230v810z"/>
-    <path fill="none" stroke="#000" d="M8117 3201H6502v-810h3230v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7004" y="2968" class="TextPosition"><tspan style="white-space:pre">embedder</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M7717 3201H6102v-810h3230v810z"/>
+    <path fill="none" stroke="#000" d="M7717 3201H6102v-810h3230v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="6604" y="2968" class="TextPosition"><tspan style="white-space:pre">embedder</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M13782 5999h1487v7300h-1487z"/>
-   <path fill="none" stroke="#000" d="m13783 6000 1341 6906"/>
-   <path d="m15008 12932-35-17 227 383 67-440-25 28-32 24-36 20-41 13-43 4-42-4z"/>
+   <path fill="none" d="M15041 5999h302v5900h-302z"/>
+   <path fill="none" stroke="#000" d="m15083 6000 109 5499"/>
+   <path d="m15073 11505-31-23 158 416 142-422-30 23-36 19-39 13-42 5-43-2-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M7967 3200h301v592h-301z"/>
-   <path fill="none" stroke="#000" d="M8117 3201v191"/>
-   <path d="m7998 3396-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+   <path fill="none" d="M7567 3200h301v1992h-301z"/>
+   <path fill="none" stroke="#000" d="M7717 3201v1591"/>
+   <path d="m7598 4796-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M6333 9099h3569v811H6333z"/>
+   <path fill="none" d="M5933 9099h3569v811H5933z"/>
    <a target="_parent" xlink:href="../maven-settings-builder/">
-    <path fill="#9CF" d="M8117 9908H6334v-808h3566v808z"/>
-    <path fill="none" stroke="#000" d="M8117 9908H6334v-808h3566v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="6434" y="9676" class="TextPosition"><tspan style="white-space:pre">settings-builder</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M7717 9908H5934v-808h3566v808z"/>
+    <path fill="none" stroke="#000" d="M7717 9908H5934v-808h3566v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="6034" y="9676" class="TextPosition"><tspan style="white-space:pre">settings-builder</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M7967 5998h301v3103h-301z"/>
-   <path fill="none" stroke="#000" d="M8117 5999v2702"/>
-   <path d="m7998 8705-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+   <path fill="none" d="M7567 5998h301v3103h-301z"/>
+   <path fill="none" stroke="#000" d="M7717 5999v2702"/>
+   <path d="m7598 8705-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M9499 11899h3319v811H9499z"/>
+   <path fill="none" d="M10099 11899h3319v811h-3319z"/>
    <a target="_parent" xlink:href="../maven-model-builder/">
-    <path fill="#9CF" d="M11158 12708H9500v-808h3316v808z"/>
-    <path fill="none" stroke="#000" d="M11158 12708H9500v-808h3316v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="9659" y="12476" class="TextPosition"><tspan style="white-space:pre">model-builder</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M11758 12708h-1658v-808h3316v808z"/>
+    <path fill="none" stroke="#000" d="M11758 12708h-1658v-808h3316v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="10259" y="12476" class="TextPosition"><tspan style="white-space:pre">model-builder</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M11799 13297h2203v813h-2203z"/>
+   <path fill="none" d="M12399 13697h1803v813h-1803z"/>
    <a target="_parent" xlink:href="../maven-model/">
-    <path fill="#9CF" d="M12900 14108h-1100v-810h2200v810z"/>
-    <path fill="none" stroke="#000" d="M12900 14108h-1100v-810h2200v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="12227" y="13875" class="TextPosition"><tspan style="white-space:pre">model</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M13300 14508h-900v-810h1800v810z"/>
+    <path fill="none" stroke="#000" d="M13300 14508h-900v-810h1800v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="12627" y="14275" class="TextPosition"><tspan style="white-space:pre">model</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M11157 12707h1745v600h-1745z"/>
-   <path fill="none" stroke="#000" d="m11158 12708 1364 462"/>
-   <path d="m12487 13284-32 22 445-8-349-277 12 36 5 40-1 41-9 42-17 40-25 34z"/>
+   <path fill="none" d="M11757 12707h1545v992h-1545z"/>
+   <path fill="none" stroke="#000" d="m11758 12708 1206 774"/>
+   <path d="m12903 13584-37 14 434 100-272-353 3 38-4 40-11 40-20 38-25 34-33 28z"/>
   </g>
   <g>
-   <path fill="none" d="M12801 5999h984v7301h-984z"/>
-   <path fill="none" stroke="#000" d="m13783 6000-835 6902"/>
-   <path d="m12830 12891-29-27 99 434 199-398-32 19-38 13-41 8-43-1-42-9-39-17z"/>
+   <path fill="none" d="M13248 5999h1837v7701h-1837z"/>
+   <path fill="none" stroke="#000" d="m15083 6000-1693 7309"/>
+   <path d="m13274 13286-26-30 52 442 241-374-35 15-39 9-41 3-43-5-41-13-36-21z"/>
   </g>
   <g>
-   <path fill="none" d="M19849 10298h1903v812h-1903z"/>
+   <path fill="none" d="M20649 10298h1753v812h-1753z"/>
    <a target="_parent" xlink:href="https://github.com/codehaus-plexus/plexus-cipher">
-    <path fill="#FF9" d="M20800 11108h-950v-809h1900v809z"/>
-    <path fill="none" stroke="#000" d="M20800 11108h-950v-809h1900v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="20125" y="10875" class="TextPosition"><tspan style="white-space:pre">cipher</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M21525 11108h-875v-809h1750v809z"/>
+    <path fill="none" stroke="#000" d="M21525 11108h-875v-809h1750v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="20850" y="10875" class="TextPosition"><tspan style="white-space:pre">cipher</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M19199 10548h653v302h-653z"/>
-   <path fill="none" stroke="#000" d="m19200 10695 251 3"/>
-   <path d="m19453 10817-24 31 421-144-417-156 22 31 18 36 11 40 4 42-4 43-13 40z"/>
+   <path fill="none" d="M19999 10548h653v302h-653z"/>
+   <path fill="none" stroke="#000" d="m20000 10695 251 3"/>
+   <path d="m20253 10817-24 31 421-144-417-156 22 31 18 36 11 40 4 42-4 43-13 40z"/>
   </g>
   <g>
-   <path fill="none" d="M15799 9099h3103v813h-3103z"/>
+   <path fill="none" d="M16599 9099h3103v813h-3103z"/>
    <a target="_parent" xlink:href="https://codehaus-plexus.github.io/plexus-interpolation/">
-    <path fill="#FF9" d="M17350 9910h-1550v-810h3100v810z"/>
-    <path fill="none" stroke="#000" d="M17350 9910h-1550v-810h3100v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="15999" y="9677" class="TextPosition"><tspan style="white-space:pre">interpolation</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M18150 9910h-1550v-810h3100v810z"/>
+    <path fill="none" stroke="#000" d="M18150 9910h-1550v-810h3100v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16799" y="9677" class="TextPosition"><tspan style="white-space:pre">interpolation</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M12815 9504h2986v2802h-2986z"/>
-   <path fill="none" stroke="#000" d="m12816 12304 2693-2526"/>
-   <path d="m15593 9862 4 39 203-396-408 177 37 7 38 14 35 20 33 28 27 34 19 38z"/>
+   <path fill="none" d="M13415 9504h3186v2802h-3186z"/>
+   <path fill="none" stroke="#000" d="m13416 12304 2884-2535"/>
+   <path d="m16381 9855 3 39 216-389-414 164 37 8 37 15 36 21 31 30 26 34 17 38z"/>
   </g>
   <g>
-   <path fill="none" d="M15899 3789h4603v812h-4603z"/>
+   <path fill="none" d="M16699 3789h4603v812h-4603z"/>
    <a target="_parent" xlink:href="https://maven.apache.org/wagon/wagon-provider-api/">
-    <path fill="#FF9" d="M18200 4599h-2300v-809h4600v809z"/>
-    <path fill="none" stroke="#000" d="M18200 4599h-2300v-809h4600v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16081" y="4366" class="TextPosition"><tspan style="white-space:pre">wagon-provider-api</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M19000 4599h-2300v-809h4600v809z"/>
+    <path fill="none" stroke="#000" d="M19000 4599h-2300v-809h4600v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16881" y="4366" class="TextPosition"><tspan style="white-space:pre">wagon-provider-api</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M9732 4045h6169v301H9732z"/>
-   <path fill="none" stroke="#000" d="M9733 4195h5768"/>
-   <path d="m15505 4314-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
+   <path fill="none" d="M13232 4045h3469v301h-3469z"/>
+   <path fill="none" stroke="#000" d="M13233 4195h3068"/>
+   <path d="m16305 4314-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
   </g>
   <g>
-   <path fill="none" d="M15799 7898h2903v812h-2903z"/>
+   <path fill="none" d="M16599 7898h2903v812h-2903z"/>
    <a target="_parent" xlink:href="https://codehaus-plexus.github.io/plexus-classworlds/">
-    <path fill="#FF9" d="M17250 8708h-1450v-809h2900v809z"/>
-    <path fill="none" stroke="#000" d="M17250 8708h-1450v-809h2900v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="15967" y="8475" class="TextPosition"><tspan style="white-space:pre">classworlds</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M18050 8708h-1450v-809h2900v809z"/>
+    <path fill="none" stroke="#000" d="M18050 8708h-1450v-809h2900v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="16767" y="8475" class="TextPosition"><tspan style="white-space:pre">classworlds</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M17096 6008h302v1893h-302z"/>
-   <path fill="none" stroke="#000" d="m17236 6009 11 1492"/>
-   <path d="m17128 7505-31-23 153 418 147-420-30 23-36 18-39 12-43 5-43-3-40-12z"/>
+   <path fill="none" d="M17896 6008h302v1893h-302z"/>
+   <path fill="none" stroke="#000" d="m18036 6009 11 1492"/>
+   <path d="m17928 7505-31-23 153 418 147-420-30 23-36 18-39 12-43 5-43-3-40-12z"/>
   </g>
   <g>
-   <path fill="none" d="M14965 5451h1248v302h-1248z"/>
-   <path fill="none" stroke="#000" d="m14966 5596 846 5"/>
-   <path d="m15815 5720-24 31 420-147-418-153 22 31 18 36 12 39 4 43-4 43-12 40z"/>
+   <path fill="none" d="M16265 5449h748v302h-748z"/>
+   <path fill="none" stroke="#000" d="m16266 5596 346 4"/>
+   <path d="m16614 5718-24 31 421-145-417-154 22 30 17 36 12 40 4 42-4 43-12 41z"/>
   </g>
   <g>
-   <path fill="none" d="M5499 14607h4703v811H5499z"/>
+   <path fill="none" d="M6999 13707h4703v811H6999z"/>
    <a target="_parent" xlink:href="../maven-repository-metadata/">
-    <path fill="#9CF" d="M7850 15416H5500v-808h4700v808z"/>
-    <path fill="none" stroke="#000" d="M7850 15416H5500v-808h4700v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="5644" y="15184" class="TextPosition"><tspan style="white-space:pre">repository-metadata</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M9350 14516H7000v-808h4700v808z"/>
+    <path fill="none" stroke="#000" d="M9350 14516H7000v-808h4700v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7144" y="14284" class="TextPosition"><tspan style="white-space:pre">repository-metadata</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M4950 5998h3169v4504H4950z"/>
-   <path fill="none" stroke="#000" d="m8117 5999-2937 4175"/>
-   <path d="m5081 10108-13-37-118 429 364-256-38 1-40-6-39-13-37-21-33-27-27-34z"/>
+   <path fill="none" d="M3850 5998h3869v5904H3850z"/>
+   <path fill="none" stroke="#000" d="m7717 5999-3648 5567"/>
+   <path d="m3967 11504-13-37-104 433 355-268-37 2-41-5-39-11-38-20-34-26-27-32z"/>
   </g>
   <g>
-   <path fill="none" d="M7116 10499h2003v811H7116z"/>
+   <path fill="none" d="M6716 10499h2003v811H6716z"/>
    <a target="_parent" xlink:href="../maven-settings/">
-    <path fill="#9CF" d="M8117 11308H7117v-808h2000v808z"/>
-    <path fill="none" stroke="#000" d="M8117 11308H7117v-808h2000v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7259" y="11076" class="TextPosition"><tspan style="white-space:pre">settings</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M7717 11308H6717v-808h2000v808z"/>
+    <path fill="none" stroke="#000" d="M7717 11308H6717v-808h2000v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="6859" y="11076" class="TextPosition"><tspan style="white-space:pre">settings</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M7967 9907h301v594h-301z"/>
-   <path fill="none" stroke="#000" d="M8117 9908v193"/>
-   <path d="m7998 10105-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+   <path fill="none" d="M7567 9907h301v594h-301z"/>
+   <path fill="none" stroke="#000" d="M7717 9908v193"/>
+   <path d="m7598 10105-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M999 12007h4203v3403H999z"/>
+   <path fill="none" d="M2799 13799h3903v3203H2799z"/>
    <a target="_parent" xlink:href="https://maven.apache.org/resolver/">
-    <path fill="#C0E3FC" fill-opacity=".251" stroke="#FFF" stroke-opacity=".251" d="M3100 15408H1000v-3400h4200v3400z"/>
-    <path fill="none" stroke="#000" d="M3100 15408H1000v-3400h4200v3400z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1250" y="15177" class="TextPosition"><tspan style="white-space:pre">resolver</tspan></tspan></tspan></text>
+    <path fill="#C0E3FC" fill-opacity=".251" stroke="#FFF" stroke-opacity=".251" d="M4750 17000H2800v-3200h3900v3200z"/>
+    <path fill="none" stroke="#000" d="M4750 17000H2800v-3200h3900v3200z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3050" y="16769" class="TextPosition"><tspan style="white-space:pre">resolver</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M1275 13697h1490v812H1275z"/>
+   <path fill="none" d="M5099 15397h1267v812H5099z"/>
    <a target="_parent" xlink:href="https://maven.apache.org/resolver/maven-resolver-api/">
-    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M2020 14507h-744v-809h1487v809z"/>
-    <path fill="none" stroke="#000" d="M2020 14507h-744v-809h1487v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1690" y="14274" class="TextPosition"><tspan style="white-space:pre">api</tspan></tspan></tspan></text>
+    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M5732 16207h-632v-809h1264v809z"/>
+    <path fill="none" stroke="#000" d="M5732 16207h-632v-809h1264v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="5402" y="15974" class="TextPosition"><tspan style="white-space:pre">api</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M1275 12289h1490v812H1275z"/>
+   <path fill="none" d="M5099 13989h1267v812H5099z"/>
    <a target="_parent" xlink:href="https://maven.apache.org/resolver/maven-resolver-spi/">
-    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M2020 13099h-744v-809h1487v809z"/>
-    <path fill="none" stroke="#000" d="M2020 13099h-744v-809h1487v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1702" y="12866" class="TextPosition"><tspan style="white-space:pre">spi</tspan></tspan></tspan></text>
+    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M5732 14799h-632v-809h1264v809z"/>
+    <path fill="none" stroke="#000" d="M5732 14799h-632v-809h1264v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="5415" y="14566" class="TextPosition"><tspan style="white-space:pre">spi</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M3405 12289h1490v812H3405z"/>
+   <path fill="none" d="M3205 13989h1296v812H3205z"/>
    <a target="_parent" xlink:href="https://maven.apache.org/resolver/maven-resolver-impl/">
-    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M4150 13099h-744v-809h1487v809z"/>
-    <path fill="none" stroke="#000" d="M4150 13099h-744v-809h1487v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3697" y="12866" class="TextPosition"><tspan style="white-space:pre">impl</tspan></tspan></tspan></text>
+    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M3853 14799h-647v-809h1293v809z"/>
+    <path fill="none" stroke="#000" d="M3853 14799h-647v-809h1293v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3399" y="14566" class="TextPosition"><tspan style="white-space:pre">impl</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M3405 13697h1490v812H3405z"/>
+   <path fill="none" d="M3205 15397h1296v812H3205z"/>
    <a target="_parent" xlink:href="https://maven.apache.org/resolver/maven-resolver-util/">
-    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M4150 14507h-744v-809h1487v809z"/>
-    <path fill="none" stroke="#000" d="M4150 14507h-744v-809h1487v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3832" y="14274" class="TextPosition"><tspan style="white-space:pre">util</tspan></tspan></tspan></text>
+    <path fill="#9CF" fill-opacity=".502" stroke="#FFF" stroke-opacity=".502" d="M3853 16207h-647v-809h1293v809z"/>
+    <path fill="none" stroke="#000" d="M3853 16207h-647v-809h1293v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3535" y="15974" class="TextPosition"><tspan style="white-space:pre">util</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M1870 13099h301v601h-301z"/>
-   <path fill="none" stroke="#000" d="M2020 13100v200"/>
-   <path d="m1901 13304-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+   <path fill="none" d="M5582 14799h301v601h-301z"/>
+   <path fill="none" stroke="#000" d="M5732 14800v200"/>
+   <path d="m5613 15004-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M2764 12545h645v301h-645z"/>
-   <path fill="none" stroke="#000" d="M3407 12695h-244"/>
-   <path d="m3159 12576 24-31-419 150 419 150-22-30-18-36-13-40-4-42 3-43 12-41z"/>
+   <path fill="none" d="M4499 14245h602v301h-602z"/>
+   <path fill="none" stroke="#000" d="M4500 14395h201"/>
+   <path d="m4705 14514-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
   </g>
   <g>
-   <path fill="none" d="M4000 13099h301v601h-301z"/>
-   <path fill="none" stroke="#000" d="M4150 13100v200"/>
-   <path d="m4031 13304-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+   <path fill="none" d="M3703 14799h301v601h-301z"/>
+   <path fill="none" stroke="#000" d="M3853 14800v200"/>
+   <path d="m3734 15004-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M2764 13953h645v301h-645z"/>
-   <path fill="none" stroke="#000" d="M3407 14103h-244"/>
-   <path d="m3159 13984 24-31-419 150 419 150-22-30-18-36-13-40-4-42 3-43 12-41z"/>
+   <path fill="none" d="M4499 15653h602v301h-602z"/>
+   <path fill="none" stroke="#000" d="M4500 15803h201"/>
+   <path d="m4705 15922-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
   </g>
   <g>
-   <path fill="none" d="M3034 10499h3833v813H3034z"/>
+   <path fill="none" d="M1934 11899h3833v813H1934z"/>
    <a target="_parent" xlink:href="../maven-resolver-provider/">
-    <path fill="#9CF" d="M4950 11310H3035v-810h3830v810z"/>
-    <path fill="none" stroke="#000" d="M4950 11310H3035v-810h3830v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3089" y="11077" class="TextPosition"><tspan style="white-space:pre">resolver-provider</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M3850 12710H1935v-810h3830v810z"/>
+    <path fill="none" stroke="#000" d="M3850 12710H1935v-810h3830v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1989" y="12477" class="TextPosition"><tspan style="white-space:pre">resolver-provider</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M4150 11309h802v984h-802z"/>
-   <path fill="none" stroke="#000" d="m4950 11310-548 672"/>
-   <path d="m4308 11909-9-38-149 420 381-230-38-2-39-8-38-16-36-23-31-30-24-35z"/>
+   <path fill="none" d="M3702 12709h302v1283h-302z"/>
+   <path fill="none" stroke="#000" d="m3850 12710 2 882"/>
+   <path d="m3733 13596-31-24 151 419 149-419-30 22-36 18-39 13-43 4-43-3-40-12z"/>
   </g>
   <g>
-   <path fill="none" d="M4949 11309h2903v3300H4949z"/>
-   <path fill="none" stroke="#000" d="m4950 11310 2636 2998"/>
-   <path d="m7500 14389-39 3 389 216-164-414-8 37-15 37-22 36-29 31-34 26-39 17z"/>
+   <path fill="none" d="M5764 12304h3588v1405H5764z"/>
+   <path fill="none" stroke="#000" d="m5765 12305 3213 1258"/>
+   <path d="m8938 13674-33 21 445 13-336-292 10 36 4 40-3 41-11 42-19 38-26 33z"/>
   </g>
   <g>
-   <path fill="none" d="M4949 11309h4553v1054H4949z"/>
-   <path fill="none" stroke="#000" d="m4950 11310 4160 909"/>
-   <path d="m9088 12336-29 25 441-57-377-236 15 34 10 39 4 41-5 43-13 41-20 37z"/>
+   <path fill="none" d="M5764 12154h4337v302H5764z"/>
+   <path fill="none" stroke="#000" d="m5765 12305 3936-1"/>
+   <path d="m9705 12423-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
   </g>
   <g>
-   <path fill="none" d="M9899 9354h5903v302H9899z"/>
-   <path fill="none" stroke="#000" d="m9900 9504 5501 1"/>
-   <path d="m15404 9624-23 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
+   <path fill="none" d="M9499 9354h7103v302H9499z"/>
+   <path fill="none" stroke="#000" d="m9500 9504 6701 1"/>
+   <path d="m16204 9624-23 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
   </g>
   <g>
-   <path fill="none" d="M12815 12303h2387v996h-2387z"/>
-   <path fill="none" stroke="#000" d="m12816 12304 2016 840"/>
-   <path d="m14789 13255-34 20 445 23-329-300 9 37 3 40-4 41-12 41-20 38-27 33z"/>
+   <path fill="none" d="M13415 12152h886v302h-886z"/>
+   <path fill="none" stroke="#000" d="m13416 12304 485-1"/>
+   <path d="m13905 12422-24 31 419-151-419-149 22 30 18 36 13 39 4 43-3 43-12 40z"/>
   </g>
   <g>
-   <path fill="none" d="M9374 10491h3569v811H9374z"/>
+   <path fill="none" d="M9974 10491h3569v811H9974z"/>
    <a target="_parent" xlink:href="../maven-builder-support/">
-    <path fill="#9CF" d="M11158 11300H9375v-808h3566v808z"/>
-    <path fill="none" stroke="#000" d="M11158 11300H9375v-808h3566v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="9505" y="11068" class="TextPosition"><tspan style="white-space:pre">builder-support</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M11758 11300H9975v-808h3566v808z"/>
+    <path fill="none" stroke="#000" d="M11758 11300H9975v-808h3566v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="10105" y="11068" class="TextPosition"><tspan style="white-space:pre">builder-support</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M9899 9503h1261v990H9899z"/>
-   <path fill="none" stroke="#000" d="m9900 9504 944 741"/>
-   <path d="m10774 10341-38 10 422 141-237-377-1 38-8 39-15 39-22 36-30 32-34 24z"/>
+   <path fill="none" d="M9499 9503h2261v990H9499z"/>
+   <path fill="none" stroke="#000" d="m9500 9504 1892 828"/>
+   <path d="m11348 10442-34 19 444 31-324-305 9 36 2 41-5 40-13 41-20 38-27 32z"/>
   </g>
   <g>
-   <path fill="none" d="M11008 11300h301v602h-301z"/>
-   <path fill="none" stroke="#000" d="M11158 11900v-201"/>
-   <path d="m11277 11695 31 24-150-419-150 419 30-22 36-18 40-13 42-4 43 3 41 12z"/>
+   <path fill="none" d="M11608 11300h301v602h-301z"/>
+   <path fill="none" stroke="#000" d="M11758 11900v-201"/>
+   <path d="m11877 11695 31 24-150-419-150 419 30-22 36-18 40-13 42-4 43 3 41 12z"/>
   </g>
   <g>
-   <path fill="none" d="M3399 7889h1703v813H3399z"/>
+   <path fill="none" d="M3399 7989h1703v813H3399z"/>
    <a target="_parent" xlink:href="https://fusesource.github.io/jansi/">
-    <path fill="#FF9" d="M4250 8700h-850v-810h1700v810z"/>
-    <path fill="none" stroke="#000" d="M4250 8700h-850v-810h1700v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3740" y="8467" class="TextPosition"><tspan style="white-space:pre">jansi</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M4250 8800h-850v-810h1700v810z"/>
+    <path fill="none" stroke="#000" d="M4250 8800h-850v-810h1700v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3740" y="8567" class="TextPosition"><tspan style="white-space:pre">jansi</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M4102 7299h302v593h-302z"/>
-   <path fill="none" stroke="#000" d="m4254 7300-1 191"/>
-   <path d="m4134 7494-31-24 147 420 153-418-31 22-36 18-39 12-43 4-43-4-40-12z"/>
+   <path fill="none" d="M4102 7399h302v593h-302z"/>
+   <path fill="none" stroke="#000" d="m4254 7400-1 191"/>
+   <path d="m4134 7594-31-24 147 420 153-418-31 22-36 18-39 12-43 4-43-4-40-12z"/>
   </g>
   <g>
-   <path fill="none" d="M3449 5199h2503v813H3449z"/>
+   <path fill="none" d="M3049 5199h2503v813H3049z"/>
    <a target="_parent" xlink:href="https://www.slf4j.org/manual.html">
-    <path fill="#FF9" d="M4700 6010H3450v-810h2500v810z"/>
-    <path fill="none" stroke="#000" d="M4700 6010H3450v-810h2500v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3845" y="5777" class="TextPosition"><tspan style="white-space:pre">slf4j-api</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M4300 6010H3050v-810h2500v810z"/>
+    <path fill="none" stroke="#000" d="M4300 6010H3050v-810h2500v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3445" y="5777" class="TextPosition"><tspan style="white-space:pre">slf4j-api</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M4700 3200h3419v669H4700z"/>
-   <path fill="none" stroke="#000" d="m8117 3201-3024 522"/>
-   <path d="m5070 3607 17-35-387 219 439 77-28-26-24-33-18-37-12-41-4-43 5-42z"/>
+   <path fill="none" d="M4300 3200h3419v669H4300z"/>
+   <path fill="none" stroke="#000" d="m7717 3201-3024 522"/>
+   <path d="m4670 3607 17-35-387 219 439 77-28-26-24-33-18-37-12-41-4-43 5-42z"/>
   </g>
   <g>
-   <path fill="none" d="M2799 6489h2911v813H2799z"/>
+   <path fill="none" d="M2799 6589h2911v813H2799z"/>
    <a target="_parent" xlink:href="https://maven.apache.org/shared/maven-shared-utils/">
-    <path fill="#FF9" d="M4254 7300H2800v-810h2908v810z"/>
-    <path fill="none" stroke="#000" d="M4254 7300H2800v-810h2908v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="2971" y="7067" class="TextPosition"><tspan style="white-space:pre">shared-utils</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M4254 7400H2800v-810h2908v810z"/>
+    <path fill="none" stroke="#000" d="M4254 7400H2800v-810h2908v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="2971" y="7167" class="TextPosition"><tspan style="white-space:pre">shared-utils</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M5708 5998h2411v899H5708z"/>
-   <path fill="none" stroke="#000" d="m8117 5999-2035 757"/>
-   <path d="m6037 6646 12-38-341 287 445-6-32-20-29-28-25-32-19-39-12-41-3-42z"/>
+   <path fill="none" d="M5708 5998h2011v999H5708z"/>
+   <path fill="none" stroke="#000" d="m7717 5999-1651 819"/>
+   <path d="m6010 6713 7-39-309 321 442-52-34-17-32-24-28-30-23-36-16-40-7-42z"/>
   </g>
   <g>
-   <path fill="none" d="M3099 2399h3203v813H3099z"/>
+   <path fill="none" d="M2699 2399h3203v813H2699z"/>
    <a target="_parent" xlink:href="../maven-slf4j-provider/">
-    <path fill="#9CF" d="M4700 3210H3100v-810h3200v810z"/>
-    <path fill="none" stroke="#000" d="M4700 3210H3100v-810h3200v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3279" y="2977" class="TextPosition"><tspan style="white-space:pre">slf4j-provider</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M4300 3210H2700v-810h3200v810z"/>
+    <path fill="none" stroke="#000" d="M4300 3210H2700v-810h3200v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="2879" y="2977" class="TextPosition"><tspan style="white-space:pre">slf4j-provider</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M4550 3791h301v812h-301z"/>
-   <path fill="none" stroke="#000" d="M4700 4601v-411"/>
-   <path d="m4819 4186 31 24-150-419-150 419 30-22 36-18 40-13 42-4 43 3 41 12z"/>
+   <path fill="none" d="M4150 3791h301v812h-301z"/>
+   <path fill="none" stroke="#000" d="M4300 4601v-411"/>
+   <path d="m4419 4186 31 24-150-419-150 419 30-22 36-18 40-13 42-4 43 3 41 12z"/>
   </g>
   <g>
-   <path fill="none" d="M4700 1809h3419v669H4700z"/>
-   <path fill="none" stroke="#000" d="m8117 1810-3024 522"/>
-   <path d="m5070 2216 17-35-387 219 439 77-28-26-24-33-18-37-12-41-4-43 5-42z"/>
+   <path fill="none" d="M4300 1809h3419v669H4300z"/>
+   <path fill="none" stroke="#000" d="m7717 1810-3024 522"/>
+   <path d="m4670 2216 17-35-387 219 439 77-28-26-24-33-18-37-12-41-4-43 5-42z"/>
   </g>
   <g>
-   <path fill="none" d="M11499 991h1903v811h-1903z"/>
+   <path fill="none" d="M11099 991h1903v811h-1903z"/>
    <a target="_parent" xlink:href="../maven-bom/">
-    <path fill="#9CF" d="M12450 1800h-950V992h1900v808z"/>
-    <path fill="none" stroke="#000" d="M12450 1800h-950V992h1900v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="11970" y="1568" class="TextPosition"><tspan style="white-space:pre">bom</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M12050 1800h-950V992h1900v808z"/>
+    <path fill="none" stroke="#000" d="M12050 1800h-950V992h1900v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="11570" y="1568" class="TextPosition"><tspan style="white-space:pre">bom</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M7699 13297h3903v811H7699z"/>
-   <a target="_parent" xlink:href="../maven-model-transform/">
-    <path fill="#9CF" d="M9650 14106H7700v-808h3900v808z"/>
-    <path fill="none" stroke="#000" d="M9650 14106H7700v-808h3900v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7846" y="13874" class="TextPosition"><tspan style="white-space:pre">model-transform</tspan></tspan></tspan></text>
-   </a>
+   <path fill="none" d="M4150 4600h301v601h-301z"/>
+   <path fill="none" stroke="#000" d="M4300 4601v200"/>
+   <path d="m4181 4805-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M9650 12707h1510v593H9650z"/>
-   <path fill="none" stroke="#000" d="m11158 12708-1136 445"/>
-   <path d="m9975 13043 11-37-336 292 445-13-32-20-30-27-26-32-19-38-13-41-3-42z"/>
+   <path fill="none" d="M4150 3209h301v583h-301z"/>
+   <path fill="none" stroke="#000" d="M4300 3210v182"/>
+   <path d="m4181 3396-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M4550 4600h301v601h-301z"/>
-   <path fill="none" stroke="#000" d="M4700 4601v200"/>
-   <path d="m4581 4805-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
-  </g>
-  <g>
-   <path fill="none" d="M4550 3209h301v583h-301z"/>
-   <path fill="none" stroke="#000" d="M4700 3210v182"/>
-   <path d="m4581 3396-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
-  </g>
-  <g>
-   <path fill="none" d="M9215 6491h3887v811H9215z"/>
+   <path fill="none" d="M9815 6591h3887v811H9815z"/>
    <a target="_parent" xlink:href="../maven-toolchain-builder/">
-    <path fill="#9CF" d="M11158 7300H9216v-808h3884v808z"/>
-    <path fill="none" stroke="#000" d="M11158 7300H9216v-808h3884v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="9340" y="7068" class="TextPosition"><tspan style="white-space:pre">toolchain-builder</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M11758 7400H9816v-808h3884v808z"/>
+    <path fill="none" stroke="#000" d="M11758 7400H9816v-808h3884v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="9940" y="7168" class="TextPosition"><tspan style="white-space:pre">toolchain-builder</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M9257 7891h3803v811H9257z"/>
+   <path fill="none" d="M9857 8091h3803v811H9857z"/>
    <a target="_parent" xlink:href="../maven-toolchain-model/">
-    <path fill="#9CF" d="M11158 8700H9258v-808h3800v808z"/>
-    <path fill="none" stroke="#000" d="M11158 8700H9258v-808h3800v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="9409" y="8468" class="TextPosition"><tspan style="white-space:pre">toolchain-model</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M11758 8900H9858v-808h3800v808z"/>
+    <path fill="none" stroke="#000" d="M11758 8900H9858v-808h3800v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="10009" y="8668" class="TextPosition"><tspan style="white-space:pre">toolchain-model</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M8116 5998h1102v899H8116z"/>
-   <path fill="none" stroke="#000" d="m8117 5999 790 645"/>
-   <path d="m8835 6738-39 9 420 149-230-381-1 37-9 40-16 38-23 36-30 31-35 24z"/>
+   <path fill="none" d="M7716 5998h2102v999H7716z"/>
+   <path fill="none" stroke="#000" d="m7717 5999 1739 826"/>
+   <path d="m9408 6934-35 18 443 44-314-315 7 37 1 40-6 41-14 40-22 37-28 32z"/>
   </g>
   <g>
-   <path fill="none" d="M11008 7299h301v594h-301z"/>
-   <path fill="none" stroke="#000" d="M11158 7300v193"/>
-   <path d="m11039 7497-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+   <path fill="none" d="M11608 7399h301v694h-301z"/>
+   <path fill="none" stroke="#000" d="M11758 7400v293"/>
+   <path d="m11639 7697-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M13099 6895h2703v2611h-2703z"/>
-   <path fill="none" stroke="#000" d="m13100 6896 2413 2332"/>
-   <path d="m15433 9316-39 6 406 183-197-399-5 37-12 39-19 37-26 33-32 29-37 20z"/>
+   <path fill="none" d="M13699 6995h2903v2511h-2903z"/>
+   <path fill="none" stroke="#000" d="m13700 6996 2598 2248"/>
+   <path d="m16223 9336-38 8 415 161-219-388-3 38-9 39-17 38-24 35-31 30-36 23z"/>
   </g>
   <g>
-   <path fill="none" d="M11008 8699h301v1794h-301z"/>
-   <path fill="none" stroke="#000" d="M11158 8700v1393"/>
-   <path d="m11039 10097-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+   <path fill="none" d="M11608 8899h301v1594h-301z"/>
+   <path fill="none" stroke="#000" d="M11758 8900v1193"/>
+   <path d="m11639 10097-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M19699 15891h1603v811h-1603z"/>
+   <path fill="none" d="M19399 15891h1603v811h-1603z"/>
    <a target="_parent" xlink:href="../api/maven-api-meta/">
-    <path fill="#9CF" d="M20500 16700h-800v-808h1600v808z"/>
-    <path fill="none" stroke="#000" d="M20500 16700h-800v-808h1600v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="19949" y="16468" class="TextPosition"><tspan style="white-space:pre">meta</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M20200 16700h-800v-808h1600v808z"/>
+    <path fill="none" stroke="#000" d="M20200 16700h-800v-808h1600v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="19649" y="16468" class="TextPosition"><tspan style="white-space:pre">meta</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M17199 15891h803v811h-803z"/>
+   <path fill="none" d="M17599 15891h803v811h-803z"/>
    <a target="_parent" xlink:href="../api/maven-api-di/">
-    <path fill="#9CF" d="M17600 16700h-400v-808h800v808z"/>
-    <path fill="none" stroke="#000" d="M17600 16700h-400v-808h800v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="17407" y="16468" class="TextPosition"><tspan style="white-space:pre">di</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M18000 16700h-400v-808h800v808z"/>
+    <path fill="none" stroke="#000" d="M18000 16700h-400v-808h800v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="17807" y="16468" class="TextPosition"><tspan style="white-space:pre">di</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M22899 15899h1403v811h-1403z"/>
+   <path fill="none" d="M21899 15899h1403v811h-1403z"/>
    <a target="_parent" xlink:href="../api/maven-api-xml/">
-    <path fill="#9CF" d="M23600 16708h-700v-808h1400v808z"/>
-    <path fill="none" stroke="#000" d="M23600 16708h-700v-808h1400v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="23215" y="16476" class="TextPosition"><tspan style="white-space:pre">xml</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M22600 16708h-700v-808h1400v808z"/>
+    <path fill="none" stroke="#000" d="M22600 16708h-700v-808h1400v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="22215" y="16476" class="TextPosition"><tspan style="white-space:pre">xml</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M17799 14699h1703v811h-1703z"/>
+   <path fill="none" d="M22799 14699h1603v811h-1603z"/>
    <a target="_parent" xlink:href="../api/maven-api-model/">
-    <path fill="#9CF" d="M18650 15508h-850v-808h1700v808z"/>
-    <path fill="none" stroke="#000" d="M18650 15508h-850v-808h1700v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="17977" y="15276" class="TextPosition"><tspan style="white-space:pre">model</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M23600 15508h-800v-808h1600v808z"/>
+    <path fill="none" stroke="#000" d="M23600 15508h-800v-808h1600v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="22927" y="15276" class="TextPosition"><tspan style="white-space:pre">model</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M19699 14699h1703v811h-1703z"/>
+   <path fill="none" d="M24499 14699h1603v811h-1603z"/>
    <a target="_parent" xlink:href="../api/maven-api-plugin/">
-    <path fill="#9CF" d="M20550 15508h-850v-808h1700v808z"/>
-    <path fill="none" stroke="#000" d="M20550 15508h-850v-808h1700v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="19889" y="15276" class="TextPosition"><tspan style="white-space:pre">plugin</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M25300 15508h-800v-808h1600v808z"/>
+    <path fill="none" stroke="#000" d="M25300 15508h-800v-808h1600v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="24639" y="15276" class="TextPosition"><tspan style="white-space:pre">plugin</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M23699 14691h2203v811h-2203z"/>
+   <path fill="none" d="M20199 14691h2203v811h-2203z"/>
    <a target="_parent" xlink:href="../api/maven-api-toolchain/">
-    <path fill="#9CF" d="M24800 15500h-1100v-808h2200v808z"/>
-    <path fill="none" stroke="#000" d="M24800 15500h-1100v-808h2200v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="23807" y="15268" class="TextPosition"><tspan style="white-space:pre">toolchain</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M21300 15500h-1100v-808h2200v808z"/>
+    <path fill="none" stroke="#000" d="M21300 15500h-1100v-808h2200v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="20307" y="15268" class="TextPosition"><tspan style="white-space:pre">toolchain</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M16799 13699h1503v811h-1503z"/>
+   <path fill="none" d="M17399 13399h1203v811h-1203z"/>
    <a target="_parent" xlink:href="../api/maven-api-core/">
-    <path fill="#9CF" d="M17550 14508h-750v-808h1500v808z"/>
-    <path fill="none" stroke="#000" d="M17550 14508h-750v-808h1500v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="17068" y="14276" class="TextPosition"><tspan style="white-space:pre">core</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M18000 14208h-600v-808h1200v808z"/>
+    <path fill="none" stroke="#000" d="M18000 14208h-600v-808h1200v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="17517" y="13976" class="TextPosition"><tspan style="white-space:pre">core</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M16999 12399h1103v811h-1103z"/>
+   <path fill="none" d="M15599 13399h1103v811h-1103z"/>
    <a target="_parent" xlink:href="../api/maven-api-spi/">
-    <path fill="#9CF" d="M17550 13208h-550v-808h1100v808z"/>
-    <path fill="none" stroke="#000" d="M17550 13208h-550v-808h1100v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="17232" y="12976" class="TextPosition"><tspan style="white-space:pre">spi</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M16150 14208h-550v-808h1100v808z"/>
+    <path fill="none" stroke="#000" d="M16150 14208h-550v-808h1100v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="15832" y="13976" class="TextPosition"><tspan style="white-space:pre">spi</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M18649 15507h4953v511h-4953z"/>
-   <path fill="none" stroke="#000" d="m18650 15508 4552 360"/>
-   <path d="m23196 15987-26 29 430-116-406-183 20 32 15 38 9 40 1 43-6 42-16 40z"/>
+   <path fill="none" d="M17399 15595h5203v432h-5203z"/>
+   <path fill="none" stroke="#000" d="m17400 15596 4802 281"/>
+   <path d="m22198 15995-25 30 427-125-410-174 21 31 16 37 10 40 2 43-6 43-15 39z"/>
   </g>
   <g>
-   <path fill="none" d="M23600 15499h1202v412h-1202z"/>
-   <path fill="none" stroke="#000" d="m24800 15500-821 274"/>
-   <path d="m23938 15662 12-37-350 275 445 10-31-22-28-28-24-34-18-39-10-41-2-43z"/>
+   <path fill="none" d="M21299 15499h1303v423h-1303z"/>
+   <path fill="none" stroke="#000" d="m21300 15500 919 283"/>
+   <path d="m22187 15897-32 23 445-20-356-267 12 36 7 40v41l-8 42-16 40-24 35z"/>
   </g>
   <g>
-   <path fill="none" d="M17434 14507h302v1386h-302z"/>
-   <path fill="none" stroke="#000" d="m17550 14508 36 985"/>
-   <path d="m17467 15501-32-22 165 413 135-424-30 23-35 20-39 13-42 6-43-2-41-10z"/>
+   <path fill="none" d="M17850 14207h301v1686h-301z"/>
+   <path fill="none" stroke="#000" d="M18000 14208v1285"/>
+   <path d="m17881 15497-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M18299 14103h4253v682h-4253z"/>
-   <path fill="none" stroke="#000" d="m18300 14104 3855 533"/>
-   <path d="m22142 14755-28 28 436-91-395-206 19 33 13 38 6 41-1 43-9 42-18 38z"/>
+   <path fill="none" d="M18599 13803h6703v992h-6703z"/>
+   <path fill="none" stroke="#000" d="m18600 13804 6304 843"/>
+   <path d="m24892 14765-27 28 435-93-396-204 19 33 13 38 7 40-1 43-9 42-18 39z"/>
   </g>
   <g>
-   <path fill="none" d="M18299 14103h2253v636h-2253z"/>
-   <path fill="none" stroke="#000" d="m18300 14104 1864 494"/>
-   <path d="m20137 14713-31 25 444-38-367-252 14 35 9 39 1 41-6 43-15 40-22 36z"/>
+   <path fill="none" d="M18599 13803h5003v972h-5003z"/>
+   <path fill="none" stroke="#000" d="m18600 13804 4607 826"/>
+   <path d="m23190 14747-29 27 439-74-386-222 17 34 11 39 5 41-3 42-11 42-19 38z"/>
   </g>
   <g>
-   <path fill="none" d="M18299 14103h353v598h-353z"/>
-   <path fill="none" stroke="#000" d="m18300 14104 148 252"/>
-   <path d="m18347 14419-39-4 342 285-83-437-15 34-22 34-27 31-35 25-38 19-41 10z"/>
+   <path fill="none" d="M18599 13803h2703v902h-2703z"/>
+   <path fill="none" stroke="#000" d="m18600 13804 2321 763"/>
+   <path d="m20887 14681-32 23 445-12-351-273 12 35 6 40-1 41-9 42-17 40-24 35z"/>
   </g>
   <g>
-   <path fill="none" d="M18299 14103h6503v702h-6503z"/>
-   <path fill="none" stroke="#000" d="m18300 14104 6103 552"/>
-   <path d="m24395 14775-26 29 431-112-404-187 20 32 15 38 8 40 1 43-7 42-16 39z"/>
+   <path fill="none" d="M16699 13654h702v301h-702z"/>
+   <path fill="none" stroke="#000" d="M16700 13804h301"/>
+   <path d="m17005 13923-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
   </g>
   <g>
-   <path fill="none" d="M17400 13207h301v494h-301z"/>
-   <path fill="none" stroke="#000" d="M17550 13208v93"/>
-   <path d="m17431 13305-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+   <path fill="none" d="M18399 16146h1002v301h-1002z"/>
+   <path fill="none" stroke="#000" d="M18400 16296h601"/>
+   <path d="m19005 16415-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
   </g>
   <g>
-   <path fill="none" d="M17999 16146h1702v301h-1702z"/>
-   <path fill="none" stroke="#000" d="M18000 16296h1301"/>
-   <path d="m19305 16415-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
+   <path fill="none" d="M20999 16149h903v302h-903z"/>
+   <path fill="none" stroke="#000" d="m21900 16304-501-4"/>
+   <path d="m21397 16181 23-31-420 146 418 154-23-31-17-36-12-39-4-43 4-43 12-40z"/>
   </g>
   <g>
-   <path fill="none" d="M21299 16148h1603v302h-1603z"/>
-   <path fill="none" stroke="#000" d="m22900 16304-1201-6"/>
-   <path d="m21696 16179 24-31-420 148 418 152-22-30-18-36-12-40-4-42 3-43 13-41z"/>
+   <path fill="none" d="M19149 15499h3453v503h-3453z"/>
+   <path fill="none" stroke="#000" d="m19150 15500 3054 354"/>
+   <path d="m22193 15972-27 29 434-101-399-197 19 32 14 38 7 41v43l-9 42-16 39z"/>
   </g>
   <g>
-   <path fill="none" d="M22549 15499h1053v402h-1053z"/>
-   <path fill="none" stroke="#000" d="m22550 15500 677 258"/>
-   <path d="m23188 15870-33 21 445 9-338-289 10 36 4 40-2 41-11 42-19 38-26 34z"/>
+   <path fill="none" d="M22600 15507h2702v483h-2702z"/>
+   <path fill="none" stroke="#000" d="m25300 15508-2305 335"/>
+   <path d="m22974 15726 19-35-393 209 436 88-26-26-23-34-18-37-11-41-2-43 6-42z"/>
   </g>
   <g>
-   <path fill="none" d="M20549 15507h3053v490h-3053z"/>
-   <path fill="none" stroke="#000" d="m20550 15508 2654 341"/>
-   <path d="m23193 15967-28 28 435-95-397-202 19 33 13 38 7 40-1 43-8 42-18 39z"/>
-  </g>
-  <g>
-   <path fill="none" d="M22599 7891h2203v811h-2203z"/>
+   <path fill="none" d="M21499 12191h2203v811h-2203z"/>
    <a target="_parent" xlink:href="../maven-xml-impl/">
-    <path fill="#9CF" d="M23700 8700h-1100v-808h2200v808z"/>
-    <path fill="none" stroke="#000" d="M23700 8700h-1100v-808h2200v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="22779" y="8468" class="TextPosition"><tspan style="white-space:pre">xml-impl</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M22600 13000h-1100v-808h2200v808z"/>
+    <path fill="none" stroke="#000" d="M22600 13000h-1100v-808h2200v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="21679" y="12768" class="TextPosition"><tspan style="white-space:pre">xml-impl</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M20499 9098h1303v812h-1303z"/>
+   <path fill="none" d="M21899 9098h1303v812h-1303z"/>
    <a target="_parent" xlink:href="https://codehaus-plexus.github.io/plexus-xml/">
-    <path fill="#FF9" d="M21150 9908h-650v-809h1300v809z"/>
-    <path fill="none" stroke="#000" d="M21150 9908h-650v-809h1300v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="20765" y="9675" class="TextPosition"><tspan style="white-space:pre">xml</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M22550 9908h-650v-809h1300v809z"/>
+    <path fill="none" stroke="#000" d="M22550 9908h-650v-809h1300v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="22165" y="9675" class="TextPosition"><tspan style="white-space:pre">xml</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M21800 8699h1902v807h-1902z"/>
-   <path fill="none" stroke="#000" d="m23700 8700-1532 648"/>
-   <path d="m22118 9241 10-38-328 301 444-25-32-19-31-26-26-32-21-37-14-41-4-42z"/>
+   <path fill="none" d="M22440 9908h302v2285h-302z"/>
+   <path fill="none" stroke="#000" d="m22550 9909 41 1884"/>
+   <path d="m22473 11799-32-23 159 416 141-422-30 23-36 19-39 13-42 5-43-2-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M23455 8699h302v7203h-302z"/>
-   <path fill="none" stroke="#000" d="m23701 8700-95 6801"/>
-   <path d="m23487 15503-31-24 144 421 156-417-31 22-36 18-39 11-43 4-43-4-40-13z"/>
+   <path fill="none" d="M22450 12999h301v2902h-301z"/>
+   <path fill="none" stroke="#000" d="M22600 13000v2501"/>
+   <path d="m22481 15505-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M21599 14691h1903v811h-1903z"/>
+   <path fill="none" d="M18199 14691h1903v811h-1903z"/>
    <a target="_parent" xlink:href="../api/maven-api-settings/">
-    <path fill="#9CF" d="M22550 15500h-950v-808h1900v808z"/>
-    <path fill="none" stroke="#000" d="M22550 15500h-950v-808h1900v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="21692" y="15268" class="TextPosition"><tspan style="white-space:pre">settings</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M19150 15500h-950v-808h1900v808z"/>
+    <path fill="none" stroke="#000" d="M19150 15500h-950v-808h1900v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="18292" y="15268" class="TextPosition"><tspan style="white-space:pre">settings</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M1399 5198h1503v812H1399z"/>
+   <path fill="none" d="M999 5198h1503v812H999z"/>
    <a target="_parent" xlink:href="https://github.com/jline/jline3">
-    <path fill="#FF9" d="M2150 6008h-750v-809h1500v809z"/>
-    <path fill="none" stroke="#000" d="M2150 6008h-750v-809h1500v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1572" y="5775" class="TextPosition"><tspan style="white-space:pre">jline3</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M1750 6008h-750v-809h1500v809z"/>
+    <path fill="none" stroke="#000" d="M1750 6008h-750v-809h1500v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1172" y="5775" class="TextPosition"><tspan style="white-space:pre">jline3</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M2000 4598h301v603h-301z"/>
-   <path fill="none" stroke="#000" d="M2150 4599v202"/>
-   <path d="m2031 4805-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
+   <path fill="none" d="M1600 4598h301v603h-301z"/>
+   <path fill="none" stroke="#000" d="M1750 4599v202"/>
+   <path d="m1631 4805-31-24 150 419 150-419-30 22-36 18-40 13-42 4-43-3-41-12z"/>
   </g>
   <g>
-   <path fill="none" d="M2150 3209h2552v637H2150z"/>
-   <path fill="none" stroke="#000" d="m4700 3210-2161 492"/>
-   <path d="m2509 3587 16-35-375 239 442 53-29-24-25-31-21-36-14-41-6-42 3-42z"/>
+   <path fill="none" d="M1750 3209h2552v637H1750z"/>
+   <path fill="none" stroke="#000" d="m4300 3210-2161 492"/>
+   <path d="m2109 3587 16-35-375 239 442 53-29-24-25-31-21-36-14-41-6-42 3-42z"/>
   </g>
   <g>
-   <path fill="none" d="M2150 3200h5969v701H2150z"/>
-   <path fill="none" stroke="#000" d="m8117 3201-5570 551"/>
-   <path d="m2532 3634 20-34-402 191 432 108-26-28-21-34-16-38-9-42-1-43 9-41z"/>
+   <path fill="none" d="M1750 3200h5969v701H1750z"/>
+   <path fill="none" stroke="#000" d="m7717 3201-5570 551"/>
+   <path d="m2132 3634 20-34-402 191 432 108-26-28-21-34-16-38-9-42-1-43 9-41z"/>
   </g>
   <g>
-   <path fill="none" d="M6500 3790h3235v811H6500z"/>
+   <path fill="none" d="M10000 3790h3235v811h-3235z"/>
    <a target="_parent" xlink:href="../maven-compat/">
-    <path fill="#9CF" d="M8117 4599H6501v-808h3232v808z"/>
-    <path fill="none" stroke="#000" d="M8117 4599H6501v-808h3232v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="7304" y="4367" class="TextPosition"><tspan style="white-space:pre">compat</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M11617 4599h-1616v-808h3232v808z"/>
+    <path fill="none" stroke="#000" d="M11617 4599h-1616v-808h3232v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="10804" y="4367" class="TextPosition"><tspan style="white-space:pre">compat</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M3134 3790h3133v813H3134z"/>
+   <path fill="none" d="M2734 3790h3133v813H2734z"/>
    <a target="_parent" xlink:href="../maven-slf4j-wrapper/">
-    <path fill="#9CF" d="M4700 4601H3135v-810h3130v810z"/>
-    <path fill="none" stroke="#000" d="M4700 4601H3135v-810h3130v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3282" y="4368" class="TextPosition"><tspan style="white-space:pre">slf4j-wrapper</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M4300 4601H2735v-810h3130v810z"/>
+    <path fill="none" stroke="#000" d="M4300 4601H2735v-810h3130v810z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="2882" y="4368" class="TextPosition"><tspan style="white-space:pre">slf4j-wrapper</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M1399 3790h1503v811H1399z"/>
+   <path fill="none" d="M999 3790h1503v811H999z"/>
    <a target="_parent" xlink:href="../maven-jline/">
-    <path fill="#9CF" d="M2150 4599h-750v-808h1500v808z"/>
-    <path fill="none" stroke="#000" d="M2150 4599h-750v-808h1500v808z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1710" y="4367" class="TextPosition"><tspan style="white-space:pre">jline</tspan></tspan></tspan></text>
+    <path fill="#9CF" d="M1750 4599h-750v-808h1500v808z"/>
+    <path fill="none" stroke="#000" d="M1750 4599h-750v-808h1500v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="1310" y="4367" class="TextPosition"><tspan style="white-space:pre">jline</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M23999 9089h2403v812h-2403z"/>
+   <path fill="none" d="M24199 12189h2403v812h-2403z"/>
    <a target="_parent" xlink:href="https://github.com/FasterXML/woodstox">
-    <path fill="#FF9" d="M25200 9899h-1200v-809h2400v809z"/>
-    <path fill="none" stroke="#000" d="M25200 9899h-1200v-809h2400v809z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="24152" y="9666" class="TextPosition"><tspan style="white-space:pre">woodstox</tspan></tspan></tspan></text>
+    <path fill="#FF9" d="M25400 12999h-1200v-809h2400v809z"/>
+    <path fill="none" stroke="#000" d="M25400 12999h-1200v-809h2400v809z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="24352" y="12766" class="TextPosition"><tspan style="white-space:pre">woodstox</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
-   <path fill="none" d="M23700 8699h1502v433h-1502z"/>
-   <path fill="none" stroke="#000" d="m23701 8700 1113 290"/>
-   <path d="m24787 9106-30 24 443-39-368-251 15 35 8 39 2 42-7 42-14 40-22 37z"/>
+   <path fill="none" d="M23699 12445h502v302h-502z"/>
+   <path fill="none" stroke="#000" d="M23700 12596h101"/>
+   <path d="m23805 12714-24 32 419-151-419-149 22 30 18 36 13 39 4 43-3 43-12 40z"/>
+  </g>
+  <g>
+   <path fill="none" d="M9099 15891h2203v811H9099z"/>
+   <a target="_parent" xlink:href="../maven-api-impl/">
+    <path fill="#9CF" d="M10200 16700H9100v-808h2200v808z"/>
+    <path fill="none" stroke="#000" d="M10200 16700H9100v-808h2200v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="9334" y="16468" class="TextPosition"><tspan style="white-space:pre">api-impl</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M11299 13803h4302v2495h-4302z"/>
+   <path fill="none" stroke="#000" d="m11300 16296 3955-2292"/>
+   <path d="m15317 14105-4 39 287-340-438 80 35 15 34 22 30 28 25 35 19 39 9 41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M6363 14395h2739v1903H6363z"/>
+   <path fill="none" stroke="#000" d="m9100 16296-2408-1673"/>
+   <path d="m6757 14523 37-12-430-116 259 362-2-37 6-40 12-39 21-38 27-33 34-27z"/>
+  </g>
+  <g>
+   <path fill="none" d="M18599 13803h553v890h-553z"/>
+   <path fill="none" stroke="#000" d="m18600 13804 340 549"/>
+   <path d="m18841 14418-39-3 348 277-93-435-14 35-21 34-27 31-34 27-38 19-41 11z"/>
+  </g>
+  <g>
+   <path fill="none" d="M13899 15891h803v811h-803z"/>
+   <a target="_parent" xlink:href="../maven-di/">
+    <path fill="#9CF" d="M14300 16700h-400v-808h800v808z"/>
+    <path fill="none" stroke="#000" d="M14300 16700h-400v-808h800v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="14107" y="16468" class="TextPosition"><tspan style="white-space:pre">di</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M11299 16146h2602v301h-2602z"/>
+   <path fill="none" stroke="#000" d="M11300 16296h2201"/>
+   <path d="m13505 16415-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M14699 16146h2902v301h-2902z"/>
+   <path fill="none" stroke="#000" d="M14700 16296h2501"/>
+   <path d="m17205 16415-24 31 419-150-419-150 22 30 18 36 13 40 4 42-3 43-12 41z"/>
+  </g>
+  <g>
+   <path fill="none" d="M15199 15191h2203v811h-2203z"/>
+   <a target="_parent" xlink:href="../api/maven-api-metadata/">
+    <path fill="#9CF" d="M16300 16000h-1100v-808h2200v808z"/>
+    <path fill="none" stroke="#000" d="M16300 16000h-1100v-808h2200v808z"/>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="15267" y="15768" class="TextPosition"><tspan style="white-space:pre">metadata</tspan></tspan></tspan></text>
+   </a>
+  </g>
+  <g>
+   <path fill="none" d="M11299 15522h3902v776h-3902z"/>
+   <path fill="none" stroke="#000" d="m11300 16296 3507-629"/>
+   <path d="m14832 15783-18 35 386-222-439-74 28 26 24 32 19 37 12 41 4 43-5 42z"/>
+  </g>
+  <g>
+   <path fill="none" d="M22600 15507h1002v395h-1002z"/>
+   <path fill="none" stroke="#000" d="m23600 15508-628 246"/>
+   <path d="m22925 15645 10-38-335 293 445-13-32-20-30-27-26-32-20-38-12-41-3-43z"/>
+  </g>
+  <g>
+   <path fill="none" d="M9349 14515h853v1378h-853z"/>
+   <path fill="none" stroke="#000" d="m9350 14516 640 1036"/>
+   <path d="m9891 15618-39-4 348 278-93-435-14 35-21 34-27 31-34 26-38 20-41 11z"/>
   </g>
  </g>
 </svg>
