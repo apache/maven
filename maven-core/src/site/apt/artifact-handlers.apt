@@ -16,21 +16,23 @@
 ~~ under the License.
 
  ---
- Default Artifact Handlers Reference
+ Legacy Artifact Handlers Reference
  ---
  Hervé Boutemy
  ---
  2013-08-02
  ---
 
-Default Artifact Handlers Reference
+Legacy Artifact Handlers Reference
 
-  Artifact handlers (see {{{../maven-artifact/apidocs/org/apache/maven/artifact/handler/ArtifactHandler.html} API}})
+  Maven 3 artifact handlers (see {{{../maven-artifact/apidocs/org/apache/maven/artifact/handler/ArtifactHandler.html} API}})
   define for each {{{../maven-model/maven.html#class_dependency}dependency type}} information on the artifact
   (classifier, extension, language) and how to manage it as dependency (add to classpath, include dependencies).
 
-  Some artifact handlers
-  are configured by default in {{{./apidocs/org/apache/maven/artifact/handler/providers/package-summary.html}<<<org.apache.maven.artifact.handler.providers>>>}} package:
+  They are replaced in Maven 4 with Maven 4 API Core's {{{../api/maven-api-core/apidocs/org/apache/maven/api/Type.html}Dependency Types}},
+  with default values defined in {{{../maven-resolver-provider/apidocs/org/apache/maven/repository/internal/type/DefaultTypeProvider.html}DefaultTypeProvider}}.
+
+  For compatibility, legacy Maven 3 artifact handlers are still provided:
 
 *--------------------+---------------+------------+------------+-----------+---------------------+-----------------------+
 || type              || classifier   || extension || packaging || language || added to classpath || includesDependencies ||
