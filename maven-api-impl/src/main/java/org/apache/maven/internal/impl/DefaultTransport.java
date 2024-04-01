@@ -26,8 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.apache.maven.api.di.Named;
-import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.Transport;
 import org.eclipse.aether.spi.connector.transport.GetTask;
 import org.eclipse.aether.spi.connector.transport.PutTask;
@@ -35,8 +33,6 @@ import org.eclipse.aether.spi.connector.transport.Transporter;
 
 import static java.util.Objects.requireNonNull;
 
-@Named
-@Singleton
 public class DefaultTransport implements Transport {
     private final URI baseURI;
     private final Transporter transporter;
