@@ -34,11 +34,11 @@ import static org.apache.maven.jline.MessageUtils.builder;
  */
 public class MavenSimpleLogger extends ExtSimpleLogger {
 
-    private final String traceRenderedLevel = builder().trace("TRACE").build();
-    private final String debugRenderedLevel = builder().debug("DEBUG").build();
-    private final String infoRenderedLevel = builder().info("INFO").build();
-    private final String warnRenderedLevel = builder().warning("WARNING").build();
-    private final String errorRenderedLevel = builder().error("ERROR").build();
+    private String traceRenderedLevel;
+    private String debugRenderedLevel;
+    private String infoRenderedLevel;
+    private String warnRenderedLevel;
+    private String errorRenderedLevel;
 
     static Consumer<String> logSink;
 
@@ -52,6 +52,13 @@ public class MavenSimpleLogger extends ExtSimpleLogger {
 
     @Override
     protected String renderLevel(int level) {
+        if (traceRenderedLevel == null) {
+            traceRenderedLevel = builder().trace("TRACE").build();
+            debugRenderedLevel = builder().debug("DEBUG").build();
+            infoRenderedLevel = builder().info("INFO").build();
+            warnRenderedLevel = builder().warning("WARNING").build();
+            errorRenderedLevel = builder().error("ERROR").build();
+        }
         switch (level) {
             case LOG_LEVEL_TRACE:
                 return traceRenderedLevel;

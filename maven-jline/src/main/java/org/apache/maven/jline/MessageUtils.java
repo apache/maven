@@ -18,8 +18,6 @@
  */
 package org.apache.maven.jline;
 
-import java.io.IOError;
-import java.io.IOException;
 import java.io.PrintStream;
 
 import org.apache.maven.api.services.MessageBuilder;
@@ -43,14 +41,12 @@ public class MessageUtils {
     static PrintStream prevErr;
 
     public static void systemInstall() {
-        try {
-            terminal = TerminalBuilder.builder().name("Maven").dumb(true).build();
-            reader = LineReaderBuilder.builder().terminal(terminal).build();
-            AnsiConsole.setTerminal(terminal);
-            AnsiConsole.systemInstall();
-        } catch (IOException e) {
-            throw new IOError(e);
-        }
+        terminal = new FastTerminal(
+                () -> TerminalBuilder.builder().name("Maven").dumb(true).build(), t -> {
+                    reader = LineReaderBuilder.builder().terminal(t).build();
+                    AnsiConsole.setTerminal(t);
+                    AnsiConsole.systemInstall();
+                });
     }
 
     public static void registerShutdownHook() {
