@@ -652,7 +652,8 @@ under the License.
         <enabled>false</enabled>
       </snapshots>
       <id>maven-2080</id>
-      <url>https://repository.apache.org/content/repositories/maven-2080/</url>
+      <!-- Maven Central sync is busted: is released but not published yet -->
+      <url>https://repository.apache.org/content/repositories/releases/</url>
     </repository>
   </repositories>
 
