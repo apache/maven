@@ -23,7 +23,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.model.Dependency;
@@ -57,6 +61,8 @@ import org.eclipse.aether.resolution.VersionRangeResult;
  */
 public class ProjectModelResolver implements ModelResolver {
 
+    private static final int MAX_CAP = 0x7fff;
+
     private final RepositorySystemSession session;
 
     private final RequestTrace trace;
@@ -79,6 +85,8 @@ public class ProjectModelResolver implements ModelResolver {
 
     private final ProjectBuildingRequest.RepositoryMerging repositoryMerging;
 
+    private final Map<String, ForkJoinTask<Result>> parentCache;
+
     public ProjectModelResolver(
             RepositorySystemSession session,
             RequestTrace trace,
@@ -86,7 +94,8 @@ public class ProjectModelResolver implements ModelResolver {
             RemoteRepositoryManager remoteRepositoryManager,
             List<RemoteRepository> repositories,
             ProjectBuildingRequest.RepositoryMerging repositoryMerging,
-            ReactorModelPool modelPool) {
+            ReactorModelPool modelPool,
+            Map<String, Object> parentCache) {
         this.session = session;
         this.trace = trace;
         this.resolver = resolver;
@@ -98,6 +107,7 @@ public class ProjectModelResolver implements ModelResolver {
         this.repositoryMerging = repositoryMerging;
         this.repositoryIds = new HashSet<>();
         this.modelPool = modelPool;
+        this.parentCache = parentCache != null ? (Map) parentCache : new ConcurrentHashMap<>();
     }
 
     private ProjectModelResolver(ProjectModelResolver original) {
@@ -111,6 +121,7 @@ public class ProjectModelResolver implements ModelResolver {
         this.repositoryMerging = original.repositoryMerging;
         this.repositoryIds = new HashSet<>(original.repositoryIds);
         this.modelPool = original.modelPool;
+        this.parentCache = original.parentCache;
     }
 
     public void addRepository(Repository repository) throws InvalidRepositoryException {
@@ -171,8 +182,61 @@ public class ProjectModelResolver implements ModelResolver {
         return new ArtifactModelSource(pomArtifact.getFile(), groupId, artifactId, version);
     }
 
+    record Result(ModelSource source, Parent parent, Exception e) {}
+
+    private ForkJoinPool pool = new ForkJoinPool(MAX_CAP);
+
     @Override
     public ModelSource resolveModel(final Parent parent, AtomicReference<Parent> modified)
+            throws UnresolvableModelException {
+        Result result;
+        try {
+            ForkJoinTask<Result> future = parentCache.computeIfAbsent(parent.getId(), id -> new ForkJoinTask<>() {
+                Result result;
+
+                @Override
+                public Result getRawResult() {
+                    return result;
+                }
+
+                @Override
+                protected void setRawResult(Result result) {
+                    this.result = result;
+                }
+
+                @Override
+                protected boolean exec() {
+                    try {
+                        AtomicReference<Parent> modified = new AtomicReference<>();
+                        ModelSource source = doResolveModel(parent, modified);
+                        result = new Result(source, modified.get(), null);
+                    } catch (Exception e) {
+                        result = new Result(null, null, e);
+                    }
+                    return true;
+                }
+            });
+            pool.execute(future);
+            result = future.get();
+        } catch (Exception e) {
+            throw new UnresolvableModelException(e, parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
+        }
+        if (result.e != null) {
+            uncheckedThrow(result.e);
+            return null;
+        } else {
+            if (result.parent != null && modified != null) {
+                modified.set(result.parent);
+            }
+            return result.source;
+        }
+    }
+
+    static <T extends Throwable> void uncheckedThrow(Throwable t) throws T {
+        throw (T) t; // rely on vacuous cast
+    }
+
+    private ModelSource doResolveModel(Parent parent, AtomicReference<Parent> modified)
             throws UnresolvableModelException {
         try {
             final Artifact artifact =
