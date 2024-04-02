@@ -206,6 +206,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private final RepositorySystemSession session;
         private final List<RemoteRepository> repositories;
         private final ReactorModelPool modelPool;
+        private final ConcurrentMap<String, Object> parentCache;
         private final TransformerContextBuilder transformerContextBuilder;
         private final ExecutorService executor;
 
@@ -222,6 +223,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 this.modelPool = null;
                 this.transformerContextBuilder = null;
             }
+            this.parentCache = new ConcurrentHashMap<>();
         }
 
         ExecutorService createExecutor(int parallelism) {
@@ -893,7 +895,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     repositoryManager,
                     repositories,
                     request.getRepositoryMerging(),
-                    modelPool);
+                    modelPool,
+                    parentCache);
 
             modelBuildingRequest.setValidationLevel(request.getValidationLevel());
             modelBuildingRequest.setProcessPlugins(request.isProcessPlugins());

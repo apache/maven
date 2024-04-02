@@ -208,6 +208,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 remoteRepositoryManager,
                 project.getRemoteProjectRepositories(),
                 ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
+                null,
                 null));
         request.setTransformerContextBuilder(modelBuilder.newTransformerContextBuilder());
         request.setSystemProperties(toProperties(session.getSystemProperties()));
