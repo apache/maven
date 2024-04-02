@@ -357,8 +357,15 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                 if (children == null) {
                     children = dominant.getChildren();
                 }
-                return new XmlNodeImpl(
-                        dominant.getName(), value != null ? value : dominant.getValue(), attrs, children, location);
+                if (!Objects.equals(value, dominant.getValue())
+                        || !Objects.equals(attrs, dominant.getAttributes())
+                        || !Objects.equals(children, dominant.getChildren())
+                        || !Objects.equals(location, dominant.getInputLocation())) {
+                    return new XmlNodeImpl(
+                            dominant.getName(), value != null ? value : dominant.getValue(), attrs, children, location);
+                } else {
+                    return dominant;
+                }
             }
         }
         return dominant;
