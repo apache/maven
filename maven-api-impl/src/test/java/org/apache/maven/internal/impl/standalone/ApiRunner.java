@@ -73,12 +73,12 @@ import org.apache.maven.model.profile.activation.OperatingSystemProfileActivator
 import org.apache.maven.model.profile.activation.PropertyProfileActivator;
 import org.apache.maven.model.root.DefaultRootLocator;
 import org.apache.maven.repository.internal.DefaultModelVersionParser;
+import org.apache.maven.repository.internal.MavenRepositorySystemSupplier;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
-import org.eclipse.aether.supplier.RepositorySystemSupplier;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 
 public class ApiRunner {
@@ -271,7 +271,7 @@ public class ApiRunner {
         // Java System properties
         System.getProperties().forEach((k, v) -> properties.put(k.toString(), v.toString()));
 
-        RepositorySystem system = new RepositorySystemSupplier().get();
+        RepositorySystem system = new MavenRepositorySystemSupplier().get();
 
         // SettingsDecrypter settingsDecrypter =
         // (SettingsDecrypter)Objects.requireNonNull(this.createSettingsDecrypter(preBoot));
