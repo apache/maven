@@ -57,3 +57,5 @@ Default Artifact Handlers Reference
 *--------------------+---------------+------------+------------+-----------+---------------------+-----------------------+
 | <<<javadoc>>>      | <<<javadoc>>> | <<<jar>>>  | <= type>   | java      | <<<true>>>          |                       |
 *--------------------+---------------+------------+------------+-----------+---------------------+-----------------------+
+
+  Additional ones can be contributed by {{{/guides/mini/guide-using-extensions.html}extensions}}.

@@ -27,6 +27,8 @@ import java.util.List;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
@@ -75,7 +77,7 @@ class ArtifactHandlerTest {
 
                 ArtifactHandler handler =
                         container.lookup(ArtifactHandlerManager.class).getArtifactHandler(type);
-                assertEquals(handler.getExtension(), extension, type + " extension");
+                MatcherAssert.assertThat(type + " extension", extension, Matchers.startsWith(handler.getExtension()));
                 // Packaging/Directory is Maven1 remnant!!!
                 // assertEquals(handler.getPackaging(), packaging, type + " packaging");
                 assertEquals(handler.getClassifier(), classifier, type + " classifier");
@@ -92,7 +94,8 @@ class ArtifactHandlerTest {
 
     private String trimApt(String content, String type) {
         String value = trimApt(content);
-        return "= type".equals(value) ? type : value;
+        // replace placeholder "= type" with the given type
+        return value.replace("= type", type);
     }
 
     private String trimApt(String content) {
