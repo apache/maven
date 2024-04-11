@@ -33,6 +33,10 @@ under the License.
 
   <dependencies>
     <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-metadata</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
     </dependency>
@@ -56,12 +60,12 @@ under the License.
         <configuration>
           <version>1.2.0</version>
           <models>
-            <model>src/main/mdo/metadata.mdo</model>
+            <model>../api/maven-api-metadata/src/main/mdo/metadata.mdo</model>
           </models>
           <params>
             <param>forcedIOModelVersion=1.1.0</param>
             <param>packageModelV3=org.apache.maven.artifact.repository.metadata</param>
-            <param>packageModelV4=org.apache.maven.artifact.repository.metadata.v4</param>
+            <param>packageModelV4=org.apache.maven.api.metadata</param>
             <param>packageToolV4=org.apache.maven.artifact.repository.metadata.io</param>
           </params>
           <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>
@@ -75,10 +79,9 @@ under the License.
             <configuration>
               <version>1.2.0</version>
               <models>
-                <model>src/main/mdo/metadata.mdo</model>
+                <model>../api/maven-api-metadata/src/main/mdo/metadata.mdo</model>
               </models>
               <templates>
-                <template>model.vm</template>
                 <template>reader-stax.vm</template>
                 <template>writer-stax.vm</template>
               </templates>
@@ -92,7 +95,7 @@ under the License.
             <configuration>
               <version>1.1.0</version>
               <models>
-                <model>src/main/mdo/metadata.mdo</model>
+                <model>../api/maven-api-metadata/src/main/mdo/metadata.mdo</model>
               </models>
               <templates>
                 <template>model-v3.vm</template>

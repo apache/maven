@@ -224,7 +224,7 @@ class MetadataTest {
         System.setProperty(XMLInputFactory.class.getName(), WstxInputFactory.class.getName());
         System.setProperty(XMLOutputFactory.class.getName(), WstxOutputFactory.class.getName());
 
-        Metadata source = new Metadata(org.apache.maven.artifact.repository.metadata.v4.Metadata.newBuilder(
+        Metadata source = new Metadata(org.apache.maven.api.metadata.Metadata.newBuilder(
                         createMetadataFromArtifact(artifact).getDelegate(), true)
                 .modelEncoding("UTF-16")
                 .build());
