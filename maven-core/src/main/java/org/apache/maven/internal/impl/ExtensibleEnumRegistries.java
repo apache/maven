@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,6 +33,8 @@ import org.apache.maven.SessionScoped;
 import org.apache.maven.api.*;
 import org.apache.maven.api.services.*;
 import org.apache.maven.api.spi.*;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class ExtensibleEnumRegistries {
 
@@ -76,17 +79,17 @@ public class ExtensibleEnumRegistries {
     static class DefaultExtensibleEnumRegistry<T extends ExtensibleEnum, P extends ExtensibleEnumProvider<T>>
             implements ExtensibleEnumRegistry<T> {
 
-        private final Map<String, T> values;
+        protected final Map<String, T> values;
 
         DefaultExtensibleEnumRegistry(List<P> providers, T... builtinValues) {
             values = Stream.<T>concat(
                             Stream.of(builtinValues), providers.stream().flatMap(p -> p.provides().stream()))
-                    .collect(Collectors.toMap(t -> t.id(), t -> t));
+                    .collect(Collectors.toUnmodifiableMap(ExtensibleEnum::id, Function.identity()));
         }
 
         @Override
         public Optional<T> lookup(String id) {
-            return Optional.ofNullable(values.get(id));
+            return Optional.ofNullable(values.get(nonNull(id, "id")));
         }
     }
 }
