@@ -22,6 +22,10 @@ import javax.inject.Inject;
 
 import java.net.MalformedURLException;
 
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -56,15 +60,19 @@ public abstract class AbstractRepositoryTestCase {
     }
 
     public static RepositorySystemSession newMavenRepositorySystemSession(RepositorySystem system) {
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false);
+        DefaultRepositorySystemSession rsession = new DefaultRepositorySystemSession(h -> false);
 
         LocalRepository localRepo = new LocalRepository("target/local-repo");
-        session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
+        rsession.setLocalRepositoryManager(system.newLocalRepositoryManager(rsession, localRepo));
 
-        session.setTransferListener(Mockito.mock(TransferListener.class));
-        session.setRepositoryListener(Mockito.mock(RepositoryListener.class));
+        rsession.setTransferListener(Mockito.mock(TransferListener.class));
+        rsession.setRepositoryListener(Mockito.mock(RepositoryListener.class));
 
-        return session;
+        DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenSession mavenSession = new MavenSession(rsession, request, new DefaultMavenExecutionResult());
+        DefaultSession session = new DefaultSession(mavenSession, null, null, null, null, null);
+
+        return rsession;
     }
 
     public static RemoteRepository newTestRepository() throws MalformedURLException {

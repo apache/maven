@@ -78,6 +78,19 @@ public interface ProjectBuilder {
             throws ProjectBuildingException;
 
     /**
+     * Builds a project descriptor for the specified model source.
+     *
+     * @param modelSource The source of the model to build the project descriptor from, must not be {@code null}.
+     * @param request The project building request that holds further parameters, must not be {@code null}.
+     * @return The result of the project building, never {@code null}.
+     * @throws ProjectBuildingException If the project descriptor could not be successfully built.
+     *
+     * @see org.apache.maven.model.building.ModelSource2
+     */
+    ProjectBuildingResult build(org.apache.maven.api.services.ModelSource modelSource, ProjectBuildingRequest request)
+            throws ProjectBuildingException;
+
+    /**
      * Builds the projects for the specified POM files and optionally their children.
      *
      * @param pomFiles The POM files to build, must not be {@code null}.

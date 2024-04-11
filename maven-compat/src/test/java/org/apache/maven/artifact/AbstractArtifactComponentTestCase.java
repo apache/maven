@@ -109,12 +109,12 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
         RepositorySystemSession repoSession = initRepoSession();
         MavenSession session = new MavenSession(
                 getContainer(), repoSession, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult());
-        new DefaultSessionFactory(
+        session.setSession(new DefaultSessionFactory(
                         getContainer().lookup(RepositorySystem.class),
                         getContainer().lookup(MavenRepositorySystem.class),
                         new DefaultLookup(getContainer()),
                         getContainer().lookup(RuntimeInformation.class))
-                .getSession(session);
+                .newSession(session));
 
         legacySupport.setSession(session);
     }

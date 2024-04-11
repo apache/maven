@@ -60,7 +60,10 @@ public interface ModelLocator {
      * @deprecated Use {@link #locateExistingPom(Path)} instead.
      */
     @Deprecated
-    File locateExistingPom(File project);
+    default File locateExistingPom(File project) {
+        Path path = locateExistingPom(project != null ? project.toPath() : null);
+        return path != null ? path.toFile() : null;
+    }
 
     /**
      * Returns the file containing the pom or null if a pom can not be found at the given file or in the given directory.

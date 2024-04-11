@@ -123,7 +123,6 @@ class TestApi {
                 new RemoteRepository.Builder("mirror", "default", "file:target/test-classes/repo").build());
         this.session = session.withLocalRepository(localRepository)
                 .withRemoteRepositories(Collections.singletonList(remoteRepository));
-
         sessionScope.enter();
         sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(this.session));
     }

@@ -21,13 +21,12 @@ package org.apache.maven.project;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.api.services.model.ModelBuildingEvent;
+import org.apache.maven.api.services.model.ModelBuildingListener;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.AbstractModelBuildingListener;
-import org.apache.maven.model.building.ModelBuildingEvent;
-import org.apache.maven.model.building.ModelProblem.Severity;
-import org.apache.maven.model.building.ModelProblem.Version;
-import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -36,7 +35,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
  * Processes events from the model builder while building the effective model for a {@link MavenProject} instance.
  *
  */
-public class DefaultModelBuildingListener extends AbstractModelBuildingListener {
+public class DefaultModelBuildingListener implements ModelBuildingListener {
 
     private final MavenProject project;
 
@@ -72,20 +71,22 @@ public class DefaultModelBuildingListener extends AbstractModelBuildingListener 
 
     @Override
     public void buildExtensionsAssembled(ModelBuildingEvent event) {
-        Model model = event.getModel();
+        Model model = new Model(event.model());
 
         try {
             pluginRepositories = projectBuildingHelper.createArtifactRepositories(
                     model.getPluginRepositories(), pluginRepositories, projectBuildingRequest);
         } catch (Exception e) {
-            event.getProblems()
-                    .add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
-                            .setMessage("Invalid plugin repository: " + e.getMessage())
-                            .setException(e));
+            event.problems()
+                    .add(
+                            BuilderProblem.Severity.ERROR,
+                            ModelProblem.Version.BASE,
+                            "Invalid plugin repository: " + e.getMessage(),
+                            e);
         }
         project.setPluginArtifactRepositories(pluginRepositories);
 
-        if (event.getRequest().isProcessPlugins()) {
+        if (event.request().isProcessPlugins()) {
             try {
                 ProjectRealmCache.CacheRecord record =
                         projectBuildingHelper.createProjectRealm(project, model, projectBuildingRequest);
@@ -93,10 +94,12 @@ public class DefaultModelBuildingListener extends AbstractModelBuildingListener 
                 project.setClassRealm(record.getRealm());
                 project.setExtensionDependencyFilter(record.getExtensionArtifactFilter());
             } catch (PluginResolutionException | PluginManagerException | PluginVersionResolutionException e) {
-                event.getProblems()
-                        .add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
-                                .setMessage("Unresolvable build extension: " + e.getMessage())
-                                .setException(e));
+                event.problems()
+                        .add(
+                                BuilderProblem.Severity.ERROR,
+                                ModelProblem.Version.BASE,
+                                "Unresolvable build extension: " + e.getMessage(),
+                                e);
             }
 
             projectBuildingHelper.selectProjectRealm(project);
@@ -107,11 +110,17 @@ public class DefaultModelBuildingListener extends AbstractModelBuildingListener 
             remoteRepositories = projectBuildingHelper.createArtifactRepositories(
                     model.getRepositories(), remoteRepositories, projectBuildingRequest);
         } catch (Exception e) {
-            event.getProblems()
-                    .add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
-                            .setMessage("Invalid artifact repository: " + e.getMessage())
-                            .setException(e));
+            event.problems()
+                    .add(
+                            BuilderProblem.Severity.ERROR,
+                            ModelProblem.Version.BASE,
+                            "Invalid artifact repository: " + e.getMessage(),
+                            e);
         }
         project.setRemoteArtifactRepositories(remoteRepositories);
+
+        if (model.getDelegate() != event.model()) {
+            event.update().accept(model.getDelegate());
+        }
     }
 }

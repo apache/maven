@@ -135,7 +135,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private Properties userProperties;
 
-    private Date startTime;
+    private Date startTime = new Date();
 
     private boolean showErrors = false;
 
@@ -214,6 +214,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setExecutionListener(original.getExecutionListener());
         copy.setUseLegacyLocalRepository(original.isUseLegacyLocalRepository());
         copy.setBuilderId(original.getBuilderId());
+        copy.setStartTime(original.getStartTime());
         return copy;
     }
 

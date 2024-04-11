@@ -87,7 +87,8 @@ public interface Source {
      * @param relative is the path of the requested source relative to this source
      * @return related source or <code>null</code> if no such source
      */
-    Source resolve(String relative);
+    @Nullable
+    Source resolve(@Nonnull String relative);
 
     /**
      * Creates a Source for the following Path

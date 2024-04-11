@@ -214,7 +214,7 @@ public class DefaultMaven implements Maven {
                 new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
         try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
             MavenSession session = new MavenSession(closeableSession, request, result);
-            session.setSession(defaultSessionFactory.getSession(session));
+            session.setSession(defaultSessionFactory.newSession(session));
 
             sessionScope.seed(MavenSession.class, session);
             sessionScope.seed(Session.class, session.getSession());

@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api;
 
+import java.util.Map;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
@@ -55,9 +57,9 @@ public interface Packaging extends ExtensibleEnum {
     Type type();
 
     /**
-     * Returns the binding to use specifically for this packaging.
-     * This will be merged to the default packaging definition.
+     * Returns the binding to use specifically for this packaging keyed by lifecycle id.
+     * This will be used instead of the default packaging definition.
      */
     @Nonnull
-    PluginContainer plugins();
+    Map<String, PluginContainer> plugins();
 }

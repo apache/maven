@@ -33,6 +33,8 @@ import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
@@ -115,8 +117,11 @@ class LegacyRepositorySystemTest {
                 new LocalRepository(request.getLocalRepository().getBasedir());
         session.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory().newInstance(session, localRepo));
         LegacySupport legacySupport = container.lookup(LegacySupport.class);
-        legacySupport.setSession(new MavenSession(
-                container, session, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult()));
+        DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
+        MavenSession mavenSession =
+                new MavenSession(container, session, mavenExecutionRequest, new DefaultMavenExecutionResult());
+        legacySupport.setSession(mavenSession);
+        InternalSession iSession = new DefaultSession(mavenSession, null, null, null, null, null);
 
         ArtifactResolutionResult result = repositorySystem.resolve(request);
         resolutionErrorHandler.throwErrors(request, result);

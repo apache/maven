@@ -28,13 +28,22 @@ import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultLookup;
+import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
 import org.junit.jupiter.api.BeforeEach;
+
+import static org.mockito.Mockito.mock;
 
 /**
  */
@@ -145,6 +154,16 @@ public abstract class AbstractMavenProjectTestCase {
     protected void initRepoSession(ProjectBuildingRequest request) {
         File localRepo = new File(request.getLocalRepository().getBasedir());
         DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(h -> false);
+
+        DefaultSessionFactory defaultSessionFactory =
+                new DefaultSessionFactory(mock(RepositorySystem.class), null, new DefaultLookup(container), null);
+
+        MavenSession session = new MavenSession(
+                getContainer(), repoSession, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult());
+        session.setSession(defaultSessionFactory.newSession(session));
+
+        new DefaultSession(session, null, null, null, null, null);
+
         repoSession.setCache(new DefaultRepositoryCache());
         repoSession.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));
         request.setRepositorySession(repoSession);

@@ -90,10 +90,11 @@ public abstract class AbstractSession implements InternalSession {
             List<RemoteRepository> repositories,
             List<org.eclipse.aether.repository.RemoteRepository> resolverRepositories,
             Lookup lookup) {
-        this.session = session;
+        this.session = nonNull(session, "session");
         this.repositorySystem = repositorySystem;
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
+        this.session.getData().set(InternalSession.class, this);
     }
 
     @Override

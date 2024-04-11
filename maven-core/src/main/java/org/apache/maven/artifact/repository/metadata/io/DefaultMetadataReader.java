@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.metadata.v4.MetadataStaxReader;
 
 /**
  * Handles deserialization of metadata from some kind of textual format like XML.

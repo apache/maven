@@ -29,6 +29,8 @@ import java.util.Collections;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.transformation.AbstractRepositoryTestCase;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.project.MavenProject;
@@ -75,6 +77,10 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                     "central", "http://repo.maven.apache.org/", new DefaultRepositoryLayout(), null, null)));
             project.setOriginalModel(model);
         }
+        InternalMavenSession.from(InternalSession.from(session))
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(Paths.get("src/test/resources/consumer/simple"));
         Model model = builder.build(session, project, file);
 
         assertNotNull(model);

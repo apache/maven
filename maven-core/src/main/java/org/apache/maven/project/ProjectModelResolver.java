@@ -31,9 +31,9 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Repository;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
@@ -184,8 +184,6 @@ public class ProjectModelResolver implements ModelResolver {
 
     record Result(ModelSource source, Parent parent, Exception e) {}
 
-    private ForkJoinPool pool = new ForkJoinPool(MAX_CAP);
-
     @Override
     public ModelSource resolveModel(final Parent parent, AtomicReference<Parent> modified)
             throws UnresolvableModelException {
@@ -216,8 +214,13 @@ public class ProjectModelResolver implements ModelResolver {
                     return true;
                 }
             });
-            pool.execute(future);
-            result = future.get();
+            ForkJoinPool pool = new ForkJoinPool(MAX_CAP);
+            try {
+                pool.execute(future);
+                result = future.get();
+            } finally {
+                pool.shutdownNow();
+            }
         } catch (Exception e) {
             throw new UnresolvableModelException(e, parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
         }

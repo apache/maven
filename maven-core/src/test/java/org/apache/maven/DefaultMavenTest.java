@@ -31,9 +31,9 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.resolver.MavenWorkspaceReader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
-import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
@@ -93,9 +93,9 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
         mavenProject.setArtifact(new DefaultArtifact("g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null));
         File artifactFile = Files.createTempFile("foo", "tmp").toFile();
         try {
-            mavenProjectHelper.attachArtifact(mavenProject, "sources", artifactFile);
+            mavenProjectHelper.attachArtifact(mavenProject, "java-source", artifactFile);
             assertEquals(1, mavenProject.getAttachedArtifacts().size());
-            mavenProjectHelper.attachArtifact(mavenProject, "sources", artifactFile);
+            mavenProjectHelper.attachArtifact(mavenProject, "java-source", artifactFile);
             assertEquals(1, mavenProject.getAttachedArtifacts().size());
         } finally {
             Files.deleteIfExists(artifactFile.toPath());
