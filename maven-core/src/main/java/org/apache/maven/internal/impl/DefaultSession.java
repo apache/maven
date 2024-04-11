@@ -60,14 +60,14 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
             @Nonnull Lookup lookup,
             @Nonnull RuntimeInformation runtimeInformation) {
         super(
-                session.getRepositorySession(),
+                nonNull(session).getRepositorySession(),
                 repositorySystem,
                 remoteRepositories,
                 remoteRepositories == null
                         ? map(session.getRequest().getRemoteRepositories(), RepositoryUtils::toRepo)
                         : null,
                 lookup);
-        this.mavenSession = nonNull(session);
+        this.mavenSession = session;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.runtimeInformation = runtimeInformation;
     }
@@ -112,12 +112,11 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     @Nonnull
     @Override
     public Map<String, String> getEffectiveProperties(@Nullable Project project) {
-        HashMap<String, String> result = new HashMap<>(new PropertiesAsMap(mavenSession.getSystemProperties()));
+        HashMap<String, String> result = new HashMap<>(getSystemProperties());
         if (project != null) {
-            result.putAll(
-                    new PropertiesAsMap(((DefaultProject) project).getProject().getProperties()));
+            result.putAll(project.getModel().getProperties());
         }
-        result.putAll(new PropertiesAsMap(mavenSession.getUserProperties()));
+        result.putAll(getUserProperties());
         return result;
     }
 
@@ -135,7 +134,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     @Nonnull
     @Override
     public Instant getStartTime() {
-        return mavenSession.getStartTime().toInstant();
+        return mavenSession.getRequest().getStartTime().toInstant();
     }
 
     @Override
@@ -169,12 +168,24 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     }
 
     protected Session newSession(RepositorySystemSession repoSession, List<RemoteRepository> repositories) {
-        MavenSession ms = this.mavenSession;
-        if (repoSession != this.getSession()) {
-            ms = new MavenSession(repoSession, ms.getRequest(), ms.getResult());
+        final MavenSession ms = nonNull(mavenSession);
+        final MavenSession mss;
+        if (repoSession != ms.getRepositorySession()) {
+            mss = new MavenSession(repoSession, ms.getRequest(), ms.getResult());
+        } else {
+            mss = ms;
         }
+        return newSession(mss, repositories);
+    }
+
+    protected Session newSession(MavenSession mavenSession, List<RemoteRepository> repositories) {
         return new DefaultSession(
-                ms, getRepositorySystem(), repositories, mavenRepositorySystem, lookup, runtimeInformation);
+                nonNull(mavenSession),
+                getRepositorySystem(),
+                repositories,
+                mavenRepositorySystem,
+                lookup,
+                runtimeInformation);
     }
 
     public ArtifactRepository toArtifactRepository(RemoteRepository repository) {

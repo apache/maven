@@ -20,12 +20,16 @@ package org.apache.maven.internal.impl.standalone;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.services.ModelBuilder;
+import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelBuilderResult;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,6 +41,11 @@ class TestApiStandalone {
     @Test
     void testStandalone() {
         Session session = ApiRunner.createSession();
+
+        ModelBuilder builder = session.getService(ModelBuilder.class);
+        ModelBuilderResult result = builder.build(
+                ModelBuilderRequest.build(session, Paths.get("pom.xml").toAbsolutePath()));
+        assertNotNull(result.getEffectiveModel());
 
         ArtifactCoordinate coord = session.createArtifactCoordinate("org.apache.maven:maven-api-core:4.0.0-alpha-13");
         Map.Entry<Artifact, Path> res = session.resolveArtifact(coord);

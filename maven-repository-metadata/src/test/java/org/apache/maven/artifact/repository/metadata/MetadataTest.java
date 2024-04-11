@@ -31,8 +31,8 @@ import java.util.TimeZone;
 
 import com.ctc.wstx.stax.WstxInputFactory;
 import com.ctc.wstx.stax.WstxOutputFactory;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxWriter;
+import org.apache.maven.metadata.v4.MetadataStaxReader;
+import org.apache.maven.metadata.v4.MetadataStaxWriter;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.junit.jupiter.api.BeforeEach;

@@ -22,7 +22,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
+import org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.junit.jupiter.api.BeforeEach;

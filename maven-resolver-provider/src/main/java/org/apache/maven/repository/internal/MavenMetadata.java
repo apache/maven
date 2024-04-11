@@ -31,8 +31,8 @@ import java.util.Date;
 import java.util.Map;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxWriter;
+import org.apache.maven.metadata.v4.MetadataStaxReader;
+import org.apache.maven.metadata.v4.MetadataStaxWriter;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.metadata.AbstractMetadata;
 import org.eclipse.aether.metadata.MergeableMetadata;

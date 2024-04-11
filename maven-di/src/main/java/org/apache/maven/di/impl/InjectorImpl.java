@@ -23,9 +23,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -101,8 +103,13 @@ public class InjectorImpl implements Injector {
     @Override
     public Injector bindImplicit(Class<?> clazz) {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
-        Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
-        return doBind(key, binding);
+        if (clazz.isInterface()) {
+            bindings.computeIfAbsent(key, $ -> new HashSet<>());
+        } else if (!Modifier.isAbstract(clazz.getModifiers())) {
+            Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
+            doBind(key, binding);
+        }
+        return this;
     }
 
     private LinkedHashSet<Key<?>> current = new LinkedHashSet<>();
@@ -134,9 +141,13 @@ public class InjectorImpl implements Injector {
         return (Set) bindings.get(key);
     }
 
+    protected Set<Key<?>> getBoundKeys() {
+        return bindings.keySet();
+    }
+
     public <Q> Supplier<Q> getCompiledBinding(Key<Q> key) {
         Set<Binding<Q>> res = getBindings(key);
-        if (res != null) {
+        if (res != null && !res.isEmpty()) {
             List<Binding<Q>> bindingList = new ArrayList<>(res);
             Comparator<Binding<Q>> comparing = Comparator.comparing(Binding::getPriority);
             bindingList.sort(comparing.reversed());
@@ -146,10 +157,9 @@ public class InjectorImpl implements Injector {
         if (key.getRawType() == List.class) {
             Set<Binding<Object>> res2 = getBindings(key.getTypeParameter(0));
             if (res2 != null) {
-                List<Supplier<Object>> bindingList =
-                        res2.stream().map(this::compile).collect(Collectors.toList());
+                List<Supplier<Object>> list = res2.stream().map(this::compile).collect(Collectors.toList());
                 //noinspection unchecked
-                return () -> (Q) new WrappingList<>(bindingList, Supplier::get);
+                return () -> (Q) list(list);
             }
         }
         if (key.getRawType() == Map.class) {
@@ -158,21 +168,31 @@ public class InjectorImpl implements Injector {
             Set<Binding<Object>> res2 = getBindings(v);
             if (k.getRawType() == String.class && res2 != null) {
                 Map<String, Supplier<Object>> map = res2.stream()
-                        .filter(b -> b.getOriginalKey().getQualifier() == null
+                        .filter(b -> b.getOriginalKey() == null
+                                || b.getOriginalKey().getQualifier() == null
                                 || b.getOriginalKey().getQualifier() instanceof String)
                         .collect(Collectors.toMap(
-                                b -> (String) b.getOriginalKey().getQualifier(), this::compile));
+                                b -> (String)
+                                        (b.getOriginalKey() != null
+                                                ? b.getOriginalKey().getQualifier()
+                                                : null),
+                                this::compile));
                 //noinspection unchecked
-                return (() -> (Q) new WrappingMap<>(map, Supplier::get));
+                return () -> (Q) map(map);
             }
         }
         throw new DIException("No binding to construct an instance for key "
                 + key.getDisplayString() + ".  Existing bindings:\n"
-                + bindings.keySet().stream().map(Key::toString).collect(Collectors.joining("\n - ", " - ", "")));
+                + getBoundKeys().stream()
+                        .map(Key::toString)
+                        .map(String::trim)
+                        .sorted()
+                        .distinct()
+                        .collect(Collectors.joining("\n - ", " - ", "")));
     }
 
     @SuppressWarnings("unchecked")
-    private <Q> Supplier<Q> compile(Binding<Q> binding) {
+    protected <Q> Supplier<Q> compile(Binding<Q> binding) {
         Supplier<Q> compiled = binding.compile(this::getCompiledBinding);
         if (binding.getScope() != null) {
             Scope scope = scopes.entrySet().stream()
@@ -247,6 +267,10 @@ public class InjectorImpl implements Injector {
         }
     }
 
+    protected <K, V> Map<K, V> map(Map<K, Supplier<V>> map) {
+        return new WrappingMap<>(map, Supplier::get);
+    }
+
     private static class WrappingMap<K, V, T> extends AbstractMap<K, V> {
 
         private final Map<K, T> delegate;
@@ -286,6 +310,10 @@ public class InjectorImpl implements Injector {
         }
     }
 
+    protected <T> List<T> list(List<Supplier<T>> bindingList) {
+        return new WrappingList<>(bindingList, Supplier::get);
+    }
+
     private static class WrappingList<Q, T> extends AbstractList<Q> {
 
         private final List<T> delegate;
@@ -308,7 +336,7 @@ public class InjectorImpl implements Injector {
     }
 
     private static class SingletonScope implements Scope {
-        Map<Key<?>, java.util.function.Supplier<?>> cache = new HashMap<>();
+        Map<Key<?>, java.util.function.Supplier<?>> cache = new ConcurrentHashMap<>();
 
         @SuppressWarnings("unchecked")
         @Override

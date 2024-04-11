@@ -41,6 +41,10 @@ public interface InternalSession extends Session {
         return cast(InternalSession.class, session, "session should be an " + InternalSession.class);
     }
 
+    static InternalSession from(org.eclipse.aether.RepositorySystemSession session) {
+        return cast(InternalSession.class, session.getData().get(InternalSession.class), "session");
+    }
+
     RemoteRepository getRemoteRepository(org.eclipse.aether.repository.RemoteRepository repository);
 
     Node getNode(org.eclipse.aether.graph.DependencyNode node);

@@ -39,5 +39,8 @@ public interface TypeRegistry extends ExtensibleEnumRegistry<Type> {
      * @return the type
      */
     @Nonnull
-    Type require(@Nonnull String id);
+    @Override
+    default Type require(@Nonnull String id) {
+        return lookup(id).orElseThrow(() -> new IllegalArgumentException("Unknown extensible enum value '" + id + "'"));
+    }
 }

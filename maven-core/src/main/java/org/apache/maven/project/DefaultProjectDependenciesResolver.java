@@ -168,12 +168,13 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         if (logger.isWarnEnabled()) {
             for (DependencyNode child : node.getChildren()) {
                 if (!child.getRelocations().isEmpty()) {
-                    org.eclipse.aether.artifact.Artifact relocated =
+                    org.eclipse.aether.artifact.Artifact artifact =
                             child.getDependency().getArtifact();
-                    String message = relocated instanceof org.apache.maven.repository.internal.RelocatedArtifact
-                            ? ((org.apache.maven.repository.internal.RelocatedArtifact) relocated).getMessage()
-                            : null;
-                    logger.warn("The artifact " + child.getRelocations().get(0) + " has been relocated to " + relocated
+                    String message =
+                            artifact instanceof org.apache.maven.internal.impl.resolver.RelocatedArtifact relocated
+                                    ? relocated.getMessage()
+                                    : null;
+                    logger.warn("The artifact " + child.getRelocations().get(0) + " has been relocated to " + artifact
                             + (message != null ? ": " + message : ""));
                 }
             }

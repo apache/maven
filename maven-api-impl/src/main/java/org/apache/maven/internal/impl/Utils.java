@@ -40,6 +40,9 @@ class Utils {
 
     static <T> T cast(Class<T> clazz, Object o, String name) {
         if (!clazz.isInstance(o)) {
+            if (o == null) {
+                throw new IllegalArgumentException(name + " is null");
+            }
             throw new IllegalArgumentException(name + " is not an instance of " + clazz.getName());
         }
         return clazz.cast(o);

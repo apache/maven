@@ -18,14 +18,13 @@
  */
 package org.apache.maven.internal.aether;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -44,7 +43,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  */
 @Named
 @Singleton
-class LegacyRepositorySystemSessionExtender implements RepositorySystemSessionExtender {
+public class LegacyRepositorySystemSessionExtender implements RepositorySystemSessionExtender {
     @Override
     public void extend(
             MavenExecutionRequest mavenExecutionRequest,
