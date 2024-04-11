@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.slf4j.Logger;
@@ -51,24 +52,29 @@ public class DefaultLifecycles {
 
     private final Lookup lookup;
 
+    private final LifecycleRegistry registry;
+
     private Map<String, Lifecycle> customLifecycles;
 
     public DefaultLifecycles() {
         this.lookup = null;
+        this.registry = null;
     }
 
     /**
-     * @deprecated Rely on {@link #DefaultLifecycles(Lookup)} instead
+     * @deprecated Use {@link #DefaultLifecycles(LifecycleRegistry,Lookup)} instead
      */
     @Deprecated
     public DefaultLifecycles(Map<String, Lifecycle> lifecycles, org.codehaus.plexus.logging.Logger logger) {
         this.customLifecycles = lifecycles;
         this.lookup = null;
+        this.registry = null;
     }
 
     @Inject
-    public DefaultLifecycles(Lookup lookup) {
+    public DefaultLifecycles(LifecycleRegistry registry, Lookup lookup) {
         this.lookup = lookup;
+        this.registry = registry;
     }
 
     /**
@@ -149,7 +155,11 @@ public class DefaultLifecycles {
 
         // Lifecycles cannot be cached as extensions might add custom lifecycles later in the execution.
         try {
-            return lookup.lookupMap(Lifecycle.class);
+            Map<String, Lifecycle> lifecycles = new HashMap<>(lookup.lookupMap(Lifecycle.class));
+            for (org.apache.maven.api.Lifecycle lf : registry) {
+                lifecycles.put(lf.id(), new Lifecycle(registry, lf));
+            }
+            return lifecycles;
         } catch (LookupException e) {
             throw new IllegalStateException("Unable to lookup lifecycles from the plexus container", e);
         }

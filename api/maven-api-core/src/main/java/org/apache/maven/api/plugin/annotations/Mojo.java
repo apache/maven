@@ -54,7 +54,7 @@ public @interface Mojo {
      * @return the default phase
      */
     @Nonnull
-    LifecyclePhase defaultPhase() default LifecyclePhase.NONE;
+    String defaultPhase() default "";
 
     /**
      * does your mojo requires a project to be executed?
