@@ -1695,7 +1695,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 // And map model v3 to model v4 -> importMgmt(v3).getDelegate() returns a v4 object
                 importMgmts.add(
                         org.apache.maven.api.model.DependencyManagement.newBuilder(importMgmt.getDelegate(), true)
-                                .importedFrom(dependency.getDelegate().getLocation(""))
                                 .build());
             } else {
                 importMgmts.add(importMgmt.getDelegate());
