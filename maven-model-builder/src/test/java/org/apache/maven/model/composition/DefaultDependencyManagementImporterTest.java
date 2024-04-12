@@ -79,9 +79,9 @@ class DefaultDependencyManagementImporterTest {
         // Arrange
         final InputSource bomSource = new InputSource("BOM", "BOM");
         final InputSource intermediateSource =
-                new InputSource("INTERMEDIATE", "INTERMEDIATE").importedFrom(new InputLocation(bomSource));
+                new InputSource("INTERMEDIATE", "INTERMEDIATE", new InputLocation(bomSource));
         final InputSource dependencySource =
-                new InputSource("DEPENDENCY", "DEPENDENCY").importedFrom(new InputLocation(intermediateSource));
+                new InputSource("DEPENDENCY", "DEPENDENCY", new InputLocation(intermediateSource));
         final InputLocation bomLocation = new InputLocation(2, 2, bomSource);
         final Dependency dependency = Dependency.newBuilder()
                 .location("", new InputLocation(1, 1, dependencySource))
@@ -103,9 +103,9 @@ class DefaultDependencyManagementImporterTest {
         // Arrange
         final InputSource bomSource = new InputSource("BOM", "BOM");
         final InputSource intermediateSource =
-                new InputSource("INTERMEDIATE", "INTERMEDIATE").importedFrom(new InputLocation(bomSource));
+                new InputSource("INTERMEDIATE", "INTERMEDIATE", new InputLocation(bomSource));
         final InputSource dependencySource =
-                new InputSource("DEPENDENCY", "DEPENDENCY").importedFrom(new InputLocation(intermediateSource));
+                new InputSource("DEPENDENCY", "DEPENDENCY", new InputLocation(intermediateSource));
         final Dependency dependency = Dependency.newBuilder()
                 .location("", new InputLocation(1, 1, dependencySource))
                 .build();
