@@ -96,7 +96,9 @@ public class InputLocation implements Serializable, InputLocationTracker {
     }
 
     /**
-     * Gets the input location that caused this model to be read.
+     * Gets the parent InputLocation where this InputLocation may have been imported from.
+     * Can return {@code null}.
+     * @since 4.0.0
      */
     public InputLocation getImportedFrom() {
         return importedFrom;
