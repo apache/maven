@@ -98,6 +98,8 @@ public class InputLocation implements Serializable, InputLocationTracker {
     /**
      * Gets the parent InputLocation where this InputLocation may have been imported from.
      * Can return {@code null}.
+     *
+     * @return InputLocation
      * @since 4.0.0
      */
     public InputLocation getImportedFrom() {
