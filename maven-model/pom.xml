@@ -136,7 +136,6 @@ under the License.
               <exclude>org.apache.maven.model.*#setOtherLocation(java.lang.Object,org.apache.maven.model.InputLocation):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.ConfigurationContainer#isInheritanceApplied():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.ConfigurationContainer#setInherited(boolean):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.model.ConfigurationContainer#unsetInheritanceApplied():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Contributor#addProperty(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Dependency#clearManagementKey():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.ModelBase#addProperty(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
@@ -145,8 +144,6 @@ under the License.
               <exclude>org.apache.maven.model.Notifier#addConfiguration(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Plugin#getGoals():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Plugin#setGoals(java.lang.Object):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.model.Reporting#flushReportPluginMap():METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.model.Reporting#getReportPluginsAsMap():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Resource#initMergeId():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Scm#setChildScmConnectionInheritAppendPath(boolean):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Scm#setChildScmDeveloperConnectionInheritAppendPath(boolean):METHOD_REMOVED</exclude>

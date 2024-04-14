@@ -163,6 +163,10 @@ public class Ansi implements Appendable {
         return org.apache.maven.jline.MessageUtils.isColorEnabled() && org.jline.jansi.Ansi.isEnabled();
     }
 
+    public static void setEnabled(final boolean flag) {
+        org.jline.jansi.Ansi.setEnabled(flag);
+    }
+
     public static Ansi ansi() {
         if (isEnabled()) {
             return new Ansi();
