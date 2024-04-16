@@ -25,7 +25,7 @@ Environment Variable Prerequisites
 JAVA_HOME           (Optional) Points to a Java installation.
 MAVEN_OPTS          (Optional) Java runtime options used when Maven is executed.
 MAVEN_SKIP_RC       (Optional) Flag to disable loading of mavenrc files.
-MAVEN_DEBUG_ADDRESS (Optional) Set the debug address. Default value is 8000
+MAVEN_DEBUG_ADDRESS (Optional) Set the debug address. Default value is localhost:8000
 -----------------------------------------------------------------------------
 #>
 
@@ -33,7 +33,7 @@ MAVEN_DEBUG_ADDRESS (Optional) Set the debug address. Default value is 8000
 $Host.UI.RawUI.WindowTitle = $MyInvocation.MyCommand
 
 if (-not $env:MAVEN_DEBUG_ADDRESS ) {
-  $env:MAVEN_DEBUG_ADDRESS = "8000"
+  $env:MAVEN_DEBUG_ADDRESS = "localhost:8000"
 }
 
 $env:MAVEN_DEBUG_OPTS = "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=$env:MAVEN_DEBUG_ADDRESS"
