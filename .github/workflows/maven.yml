@@ -36,11 +36,11 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           java-version: 8
           distribution: 'temurin'
@@ -50,7 +50,7 @@ jobs:
         run: mvn verify -e -B -V -DdistributionFileName=apache-maven
 
       - name: Upload built Maven
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
           name: built-maven
@@ -99,7 +99,7 @@ jobs:
           echo "REPO_USER=$target_user" >> $GITHUB_ENV
 
       - name: Checkout maven-integration-testing
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO_USER }}/maven-integration-testing
           path: maven-integration-testing/
@@ -108,7 +108,7 @@ jobs:
 
 
       - name: Set up cache for ~/.m2/repository
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: it-m2-repo-${{ matrix.os }}-${{ hashFiles('maven-integration-testing/**/pom.xml') }}
@@ -116,13 +116,13 @@ jobs:
             it-m2-repo-${{ matrix.os }}-
 
       - name: Download built Maven
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: built-maven
           path: built-maven/
 
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
