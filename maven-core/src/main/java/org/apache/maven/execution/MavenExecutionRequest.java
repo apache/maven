@@ -252,6 +252,16 @@ public interface MavenExecutionRequest {
 
     MavenExecutionRequest setCacheNotFound(boolean cacheNotFound);
 
+    /**
+     * @since 3.9.7
+     */
+    boolean isIgnoreTransitiveRepositories();
+
+    /**
+     * @since 3.9.7
+     */
+    MavenExecutionRequest setIgnoreTransitiveRepositories(boolean ignoreTransitiveRepositories);
+
     // Profiles
     List<Profile> getProfiles();
 

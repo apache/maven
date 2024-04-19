@@ -65,6 +65,8 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private boolean cacheNotFound;
 
+    private boolean ignoreTransitiveRepositories;
+
     private List<Proxy> proxies;
 
     private List<Server> servers;
@@ -169,6 +171,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setOffline(original.isOffline());
         copy.setInteractiveMode(original.isInteractiveMode());
         copy.setCacheNotFound(original.isCacheNotFound());
+        copy.setIgnoreTransitiveRepositories(original.isIgnoreTransitiveRepositories());
         copy.setCacheTransferError(original.isCacheTransferError());
         copy.setProxies(original.getProxies());
         copy.setServers(original.getServers());
@@ -1015,6 +1018,17 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     @Override
     public MavenExecutionRequest setCacheNotFound(boolean cacheNotFound) {
         this.cacheNotFound = cacheNotFound;
+        return this;
+    }
+
+    @Override
+    public boolean isIgnoreTransitiveRepositories() {
+        return ignoreTransitiveRepositories;
+    }
+
+    @Override
+    public MavenExecutionRequest setIgnoreTransitiveRepositories(boolean ignoreTransitiveRepositories) {
+        this.ignoreTransitiveRepositories = ignoreTransitiveRepositories;
         return this;
     }
 

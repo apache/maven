@@ -1409,6 +1409,7 @@ public class MavenCli {
 
         request.setCacheNotFound(true);
         request.setCacheTransferError(false);
+        request.setIgnoreTransitiveRepositories(commandLine.hasOption(CLIManager.IGNORE_TRANSITIVE_REPOSITORIES));
 
         //
         // Builder, concurrency and parallelism
