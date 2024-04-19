@@ -24,7 +24,7 @@ under the License.
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
     <!-- when upgrading parent, also upgrade maven-bom's parent -->
-    <version>41</version>
+    <version>42</version>
     <relativePath />
   </parent>
 
@@ -128,7 +128,7 @@ under the License.
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>maven-4.0.0-alpha-10</tag>
+    <tag>HEAD</tag>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
@@ -649,67 +649,16 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
-        <!-- Remove when Parent 41 used -->
-        <plugin>
-          <groupId>com.diffplug.spotless</groupId>
-          <artifactId>spotless-maven-plugin</artifactId>
-          <version>2.40.0</version>
-          <configuration>
-            <java>
-              <!-- orders of used formatters are important MPOM-376 -->
-              <!-- eg. palantir override importOrder, so should be first -->
-              <palantirJavaFormat>
-                <version>2.38.0</version>
-              </palantirJavaFormat>
-              <removeUnusedImports />
-              <importOrder>
-                <file>config/maven-eclipse-importorder.txt</file>
-              </importOrder>
-              <licenseHeader>
-                <file>config/maven-header-plain.txt</file>
-              </licenseHeader>
-            </java>
-            <pom>
-              <sortPom>
-                <expandEmptyElements>false</expandEmptyElements>
-                <!-- https://issues.apache.org/jira/browse/MRELEASE-1111 -->
-                <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
-              </sortPom>
-            </pom>
-            <upToDateChecking>
-              <enabled>true</enabled>
-            </upToDateChecking>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <proc>none</proc>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <autoVersionSubmodules>true</autoVersionSubmodules>
-          </configuration>
-        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <argLine>-Xmx256m</argLine>
-            <environmentVariables>
-              <JENKINS_MAVEN_AGENT_DISABLED>true</JENKINS_MAVEN_AGENT_DISABLED>
-            </environmentVariables>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
-          <!-- need to be removed when upgrading to parent >= 42 -->
-          <version>2.3.0</version>
           <executions>
             <execution>
               <id>modello-site-docs</id>
