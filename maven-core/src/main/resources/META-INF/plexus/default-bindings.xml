@@ -70,19 +70,19 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-resources-plugin:3.3.1:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile
+                org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:3.3.1:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:3.2.2:test
+                org.apache.maven.plugins:maven-surefire-plugin:3.2.5:test
               </test>
               <package>
-                org.apache.maven.plugins:maven-jar-plugin:3.3.0:jar
+                org.apache.maven.plugins:maven-jar-plugin:3.4.1:jar
               </package>
               <install>
                 org.apache.maven.plugins:maven-install-plugin:3.1.1:install
@@ -114,16 +114,16 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-resources-plugin:3.3.1:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile
+                org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:3.3.1:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:3.2.2:test
+                org.apache.maven.plugins:maven-surefire-plugin:3.2.5:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-ejb-plugin:3.2.1:ejb
@@ -158,23 +158,23 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-resources-plugin:3.3.1:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile
+                org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile
               </compile>
               <process-classes>
-                org.apache.maven.plugins:maven-plugin-plugin:3.9.0:descriptor
+                org.apache.maven.plugins:maven-plugin-plugin:3.12.0:descriptor
               </process-classes>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:3.3.1:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:3.2.2:test
+                org.apache.maven.plugins:maven-surefire-plugin:3.2.5:test
               </test>
               <package>
-                org.apache.maven.plugins:maven-jar-plugin:3.3.0:jar,
-                org.apache.maven.plugins:maven-plugin-plugin:3.9.0:addPluginArtifactMetadata
+                org.apache.maven.plugins:maven-jar-plugin:3.4.1:jar,
+                org.apache.maven.plugins:maven-plugin-plugin:3.12.0:addPluginArtifactMetadata
               </package>
               <install>
                 org.apache.maven.plugins:maven-install-plugin:3.1.1:install
@@ -206,16 +206,16 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-resources-plugin:3.3.1:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile
+                org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:3.3.1:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:3.2.2:test
+                org.apache.maven.plugins:maven-surefire-plugin:3.2.5:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-war-plugin:3.4.0:war
@@ -285,16 +285,16 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-resources-plugin:3.3.1:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile
+                org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:3.3.1:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:3.2.2:test
+                org.apache.maven.plugins:maven-surefire-plugin:3.2.5:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-rar-plugin:3.0.0:rar
