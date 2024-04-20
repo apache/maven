@@ -41,7 +41,7 @@ import static java.util.Objects.requireNonNull;
  * output to perform possible cleanup. It spawns a daemon thread to consume queued events that may fall in even
  * concurrently.
  *
- * @since 4.0.0
+ * @since 3.9.7
  */
 public final class SimplexTransferListener extends AbstractTransferListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplexTransferListener.class);
