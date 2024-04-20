@@ -107,6 +107,8 @@ public class CLIManager {
 
     public static final String COLOR = "color";
 
+    public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
+
     protected Options options;
 
     @SuppressWarnings({"checkstyle:linelength", "checkstyle:MethodLength"})
@@ -260,6 +262,10 @@ public class CLIManager {
         options.addOption(Option.builder(NO_TRANSFER_PROGRESS)
                 .longOpt("no-transfer-progress")
                 .desc("Do not display transfer progress when downloading or uploading")
+                .build());
+        options.addOption(Option.builder(IGNORE_TRANSITIVE_REPOSITORIES)
+                .longOpt("ignore-transitive-repositories")
+                .desc("If set, Maven will ignore remote repositories introduced by transitive dependencies.")
                 .build());
 
         // Adding this back in for compatibility with the verifier that hard codes this option.

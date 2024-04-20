@@ -341,6 +341,8 @@ public class DefaultRepositorySystemSessionFactory {
 
         session.setRepositoryListener(eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger)));
 
+        session.setIgnoreArtifactDescriptorRepositories(request.isIgnoreTransitiveRepositories());
+
         boolean recordReverseTree = ConfigUtils.getBoolean(session, false, MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE);
         if (recordReverseTree) {
             session.setRepositoryListener(new ChainedRepositoryListener(
