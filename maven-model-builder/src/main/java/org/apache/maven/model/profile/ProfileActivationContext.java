@@ -79,4 +79,11 @@ public interface ProfileActivationContext {
      * @return The project properties, never {@code null}.
      */
     Map<String, String> getProjectProperties();
+
+    /**
+     * Interpolates value from this context.
+     *
+     * @since 3.9.7
+     */
+    String interpolate(String value);
 }

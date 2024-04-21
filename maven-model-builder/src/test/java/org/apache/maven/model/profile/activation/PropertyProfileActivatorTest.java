@@ -155,4 +155,52 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
 
         assertActivation(false, profile, newContext(props2, props1));
     }
+
+    public void testWithValueInterpolation() throws Exception {
+        Profile profile = newProfile("prop", "${value}");
+        // prop => key
+        // ${value} => key
+
+        Properties userProperties = newProperties("prop", "key");
+        Properties systemProperties = newProperties("value", "key");
+
+        assertActivation(true, profile, newContext(userProperties, systemProperties));
+        assertActivation(false, profile, newContext(new Properties(), systemProperties));
+        assertActivation(false, profile, newContext(userProperties, new Properties()));
+    }
+
+    public void testWithValueInterpolationNegation() throws Exception {
+        Profile profile = newProfile("prop", "!${value}");
+        // prop => key
+        // ${value} => key
+
+        Properties userProperties = newProperties("prop", "key");
+        Properties systemProperties = newProperties("value", "key");
+
+        assertActivation(false, profile, newContext(userProperties, systemProperties));
+        assertActivation(true, profile, newContext(new Properties(), systemProperties));
+        assertActivation(true, profile, newContext(userProperties, new Properties()));
+    }
+
+    public void testWithValueInterpolationMismatch() throws Exception {
+        Profile profile = newProfile("prop", "${value}");
+        // prop => key
+        // ${value} => key
+
+        Properties userProperties = newProperties("prop", "key");
+        Properties systemProperties = newProperties("value", "anotherKey");
+
+        assertActivation(false, profile, newContext(userProperties, systemProperties));
+    }
+
+    public void testWithValueInterpolationMismatchNegation() throws Exception {
+        Profile profile = newProfile("prop", "!${value}");
+        // prop => key
+        // ${value} => key
+
+        Properties userProperties = newProperties("prop", "key");
+        Properties systemProperties = newProperties("value", "anotherKey");
+
+        assertActivation(true, profile, newContext(userProperties, systemProperties));
+    }
 }

@@ -82,6 +82,7 @@ public class PropertyProfileActivator implements ProfileActivator {
                 reverseValue = true;
                 propValue = propValue.substring(1);
             }
+            propValue = context.interpolate(propValue);
 
             // we have a value, so it has to match the system value...
             boolean result = propValue.equals(sysValue);

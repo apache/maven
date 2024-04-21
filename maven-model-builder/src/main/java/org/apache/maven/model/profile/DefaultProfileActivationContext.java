@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toMap;
 
@@ -204,5 +208,18 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         }
 
         return this;
+    }
+
+    @Override
+    public String interpolate(String value) {
+        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+        interpolator.addValueSource(new MapBasedValueSource(userProperties));
+        interpolator.addValueSource(new MapBasedValueSource(projectProperties));
+        interpolator.addValueSource(new MapBasedValueSource(systemProperties));
+        try {
+            return interpolator.interpolate(value);
+        } catch (InterpolationException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }
