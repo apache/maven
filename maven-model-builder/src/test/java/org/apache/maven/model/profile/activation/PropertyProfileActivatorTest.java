@@ -185,7 +185,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     public void testWithValueInterpolationMismatch() throws Exception {
         Profile profile = newProfile("prop", "${value}");
         // prop => key
-        // ${value} => key
+        // ${value} => anotherKey
 
         Properties userProperties = newProperties("prop", "key");
         Properties systemProperties = newProperties("value", "anotherKey");
@@ -196,7 +196,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     public void testWithValueInterpolationMismatchNegation() throws Exception {
         Profile profile = newProfile("prop", "!${value}");
         // prop => key
-        // ${value} => key
+        // ${value} => anotherKey
 
         Properties userProperties = newProperties("prop", "key");
         Properties systemProperties = newProperties("value", "anotherKey");
