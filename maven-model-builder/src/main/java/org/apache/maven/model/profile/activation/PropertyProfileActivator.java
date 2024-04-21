@@ -84,6 +84,9 @@ public class PropertyProfileActivator implements ProfileActivator {
                 propValue = propValue.substring(1);
             }
             propValue = interpolate(profile, property, propValue, context, problems);
+            if (propValue == null) {
+                return false;
+            }
 
             // we have a value, so it has to match the system value...
             boolean result = propValue.equals(sysValue);
@@ -124,6 +127,7 @@ public class PropertyProfileActivator implements ProfileActivator {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
                     .setMessage("The property value could not be interpolated in the profile " + profile.getId())
                     .setLocation(property.getLocation("")));
+            return null;
         }
     }
 }
