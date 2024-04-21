@@ -22,6 +22,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.interpolation.InterpolationException;
+
 /**
  * Describes the environmental context used to determine the activation status of profiles.
  *
@@ -85,5 +87,5 @@ public interface ProfileActivationContext {
      *
      * @since 3.9.7
      */
-    String interpolate(String value);
+    String interpolate(String value) throws InterpolationException;
 }

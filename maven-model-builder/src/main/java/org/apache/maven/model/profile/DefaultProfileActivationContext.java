@@ -211,15 +211,11 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     }
 
     @Override
-    public String interpolate(String value) {
+    public String interpolate(String value) throws InterpolationException {
         RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
         interpolator.addValueSource(new MapBasedValueSource(userProperties));
         interpolator.addValueSource(new MapBasedValueSource(projectProperties));
         interpolator.addValueSource(new MapBasedValueSource(systemProperties));
-        try {
-            return interpolator.interpolate(value);
-        } catch (InterpolationException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return interpolator.interpolate(value);
     }
 }
