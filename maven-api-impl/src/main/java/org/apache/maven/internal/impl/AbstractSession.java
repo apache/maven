@@ -94,7 +94,6 @@ public abstract class AbstractSession implements InternalSession {
         this.repositorySystem = repositorySystem;
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
-        this.session.getData().set(InternalSession.class, this);
     }
 
     @Override
@@ -155,13 +154,13 @@ public abstract class AbstractSession implements InternalSession {
         return dependencies == null ? null : map(dependencies, d -> toDependency(d, managed));
     }
 
-    protected List<RemoteRepository> getRepositories(
+    static List<RemoteRepository> getRepositories(
             List<RemoteRepository> repositories,
             List<org.eclipse.aether.repository.RemoteRepository> resolverRepositories) {
         if (repositories != null) {
             return repositories;
         } else if (resolverRepositories != null) {
-            return map(resolverRepositories, this::getRemoteRepository);
+            return map(resolverRepositories, DefaultRemoteRepository::new);
         } else {
             throw new IllegalArgumentException("no remote repositories provided");
         }

@@ -46,6 +46,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultSession extends AbstractSession implements InternalMavenSession {
 
+    private final Throwable creationStack = new Throwable();
     private final MavenSession mavenSession;
     private final MavenRepositorySystem mavenRepositorySystem;
     private final RuntimeInformation runtimeInformation;
@@ -73,6 +74,10 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     }
 
     public MavenSession getMavenSession() {
+        if (mavenSession == null) {
+            throw new IllegalArgumentException(
+                    "Found null mavenSession on object " + this + " (stack = " + creationStack + ")", creationStack);
+        }
         return mavenSession;
     }
 
@@ -94,19 +99,19 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     @Nonnull
     @Override
     public Settings getSettings() {
-        return mavenSession.getSettings().getDelegate();
+        return getMavenSession().getSettings().getDelegate();
     }
 
     @Nonnull
     @Override
     public Map<String, String> getUserProperties() {
-        return Collections.unmodifiableMap(new PropertiesAsMap(mavenSession.getUserProperties()));
+        return Collections.unmodifiableMap(new PropertiesAsMap(getMavenSession().getUserProperties()));
     }
 
     @Nonnull
     @Override
     public Map<String, String> getSystemProperties() {
-        return Collections.unmodifiableMap(new PropertiesAsMap(mavenSession.getSystemProperties()));
+        return Collections.unmodifiableMap(new PropertiesAsMap(getMavenSession().getSystemProperties()));
     }
 
     @Nonnull
@@ -128,29 +133,29 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
 
     @Override
     public int getDegreeOfConcurrency() {
-        return mavenSession.getRequest().getDegreeOfConcurrency();
+        return getMavenSession().getRequest().getDegreeOfConcurrency();
     }
 
     @Nonnull
     @Override
     public Instant getStartTime() {
-        return mavenSession.getRequest().getStartTime().toInstant();
+        return getMavenSession().getRequest().getStartTime().toInstant();
     }
 
     @Override
     public Path getRootDirectory() {
-        return mavenSession.getRequest().getRootDirectory();
+        return getMavenSession().getRequest().getRootDirectory();
     }
 
     @Override
     public Path getTopDirectory() {
-        return mavenSession.getRequest().getTopDirectory();
+        return getMavenSession().getRequest().getTopDirectory();
     }
 
     @Nonnull
     @Override
     public List<Project> getProjects() {
-        return getProjects(mavenSession.getProjects());
+        return getProjects(getMavenSession().getProjects());
     }
 
     @Nonnull
@@ -161,14 +166,14 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
             MojoExecution mojoExecution = lookup.lookup(MojoExecution.class);
             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
             PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-            return mavenSession.getPluginContext(pluginDescriptor, ((DefaultProject) project).getProject());
+            return getMavenSession().getPluginContext(pluginDescriptor, ((DefaultProject) project).getProject());
         } catch (LookupException e) {
             throw new MavenException("The PluginContext is only available during a mojo execution", e);
         }
     }
 
     protected Session newSession(RepositorySystemSession repoSession, List<RemoteRepository> repositories) {
-        final MavenSession ms = nonNull(mavenSession);
+        final MavenSession ms = nonNull(getMavenSession());
         final MavenSession mss;
         if (repoSession != ms.getRepositorySession()) {
             mss = new MavenSession(repoSession, ms.getRequest(), ms.getResult());

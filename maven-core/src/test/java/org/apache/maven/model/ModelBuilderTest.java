@@ -70,6 +70,7 @@ public class ModelBuilderTest {
         MavenSession msession = new MavenSession(rsession, mavenRequest, new DefaultMavenExecutionResult());
         InternalSession session =
                 new DefaultSession(msession, repositorySystem, null, mavenRepositorySystem, null, null);
+        InternalSession.associate(rsession, session);
 
         List<ProjectBuildingResult> results = projectBuilder.build(
                 Collections.singletonList(new File("src/test/resources/projects/tree/pom.xml")), true, request);

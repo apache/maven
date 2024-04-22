@@ -122,6 +122,7 @@ class LegacyRepositorySystemTest {
                 new MavenSession(container, session, mavenExecutionRequest, new DefaultMavenExecutionResult());
         legacySupport.setSession(mavenSession);
         InternalSession iSession = new DefaultSession(mavenSession, null, null, null, null, null);
+        InternalSession.associate(session, iSession);
 
         ArtifactResolutionResult result = repositorySystem.resolve(request);
         resolutionErrorHandler.throwErrors(request, result);

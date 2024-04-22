@@ -26,6 +26,7 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -71,6 +72,7 @@ public abstract class AbstractRepositoryTestCase {
         DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
         MavenSession mavenSession = new MavenSession(rsession, request, new DefaultMavenExecutionResult());
         DefaultSession session = new DefaultSession(mavenSession, null, null, null, null, null);
+        InternalSession.associate(rsession, session);
 
         return rsession;
     }
