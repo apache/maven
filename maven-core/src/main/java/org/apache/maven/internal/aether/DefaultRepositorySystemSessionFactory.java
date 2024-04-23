@@ -18,10 +18,6 @@
  */
 package org.apache.maven.internal.aether;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -34,6 +30,9 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -82,7 +81,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Named
 @Singleton
-class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFactory {
+public class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFactory {
     /**
      * User property for version filters expression, a semicolon separated list of filters to apply. By default, no version
      * filter is applied (like in Maven 3).

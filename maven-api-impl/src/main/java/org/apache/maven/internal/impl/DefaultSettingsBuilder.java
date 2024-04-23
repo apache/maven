@@ -137,11 +137,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         Settings settings;
 
         try {
-            try {
-                InputStream is = settingsSource.openStream();
-                if (is == null) {
-                    return Settings.newInstance();
-                }
+            try (InputStream is = settingsSource.openStream()) {
                 settings = request.getSession()
                         .getService(SettingsXmlFactory.class)
                         .read(XmlReaderRequest.builder()
@@ -150,25 +146,23 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                                 .strict(true)
                                 .build());
             } catch (XmlReaderException e) {
-                InputStream is = settingsSource.openStream();
-                if (is == null) {
-                    return Settings.newInstance();
+                try (InputStream is = settingsSource.openStream()) {
+                    settings = request.getSession()
+                            .getService(SettingsXmlFactory.class)
+                            .read(XmlReaderRequest.builder()
+                                    .inputStream(is)
+                                    .location(settingsSource.getLocation())
+                                    .strict(false)
+                                    .build());
+                    Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
+                    problems.add(new DefaultBuilderProblem(
+                            settingsSource.getLocation(),
+                            loc != null ? loc.getLineNumber() : -1,
+                            loc != null ? loc.getColumnNumber() : -1,
+                            e,
+                            e.getMessage(),
+                            BuilderProblem.Severity.WARNING));
                 }
-                settings = request.getSession()
-                        .getService(SettingsXmlFactory.class)
-                        .read(XmlReaderRequest.builder()
-                                .inputStream(is)
-                                .location(settingsSource.getLocation())
-                                .strict(false)
-                                .build());
-                Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
-                problems.add(new DefaultBuilderProblem(
-                        settingsSource.getLocation(),
-                        loc != null ? loc.getLineNumber() : -1,
-                        loc != null ? loc.getColumnNumber() : -1,
-                        e,
-                        e.getMessage(),
-                        BuilderProblem.Severity.WARNING));
             }
         } catch (XmlReaderException e) {
             Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;

@@ -22,7 +22,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,8 +38,9 @@ import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.spi.LifecycleProvider;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.*;
-import static org.apache.maven.internal.impl.Lifecycles.*;
+import static java.util.Collections.singleton;
+import static org.apache.maven.internal.impl.Lifecycles.phase;
+import static org.apache.maven.internal.impl.Lifecycles.plugin;
 
 /**
  * TODO: this is session scoped as SPI can contribute.

@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
+import org.apache.maven.metadata.v4.MetadataStaxReader;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositorySystemSession;

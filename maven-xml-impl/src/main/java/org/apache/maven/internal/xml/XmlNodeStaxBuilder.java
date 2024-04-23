@@ -21,6 +21,7 @@ package org.apache.maven.internal.xml;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,12 @@ import org.apache.maven.api.xml.XmlNode;
  */
 public class XmlNodeStaxBuilder {
     private static final boolean DEFAULT_TRIM = true;
+
+    public static XmlNodeImpl build(InputStream stream, InputLocationBuilderStax locationBuilder)
+            throws XMLStreamException {
+        XMLStreamReader parser = WstxInputFactory.newFactory().createXMLStreamReader(stream);
+        return build(parser, DEFAULT_TRIM, locationBuilder);
+    }
 
     public static XmlNodeImpl build(Reader reader, InputLocationBuilderStax locationBuilder) throws XMLStreamException {
         XMLStreamReader parser = WstxInputFactory.newFactory().createXMLStreamReader(reader);

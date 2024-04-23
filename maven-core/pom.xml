@@ -304,6 +304,7 @@ under the License.
               <!-- END default constructor on Plexus/JSR 330 components -->
               <!-- system property with that name no longer evaluated -->
               <exclude>org.apache.maven.project.DefaultProjectBuilder#DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY</exclude>
+              <exclude>org.apache.maven.project.DefaultModelBuildingListener</exclude>
               <exclude>org.apache.maven.project.ProjectModelResolver#ProjectModelResolver(org.eclipse.aether.RepositorySystemSession,org.eclipse.aether.RequestTrace,org.eclipse.aether.RepositorySystem,org.eclipse.aether.impl.RemoteRepositoryManager,java.util.List,org.apache.maven.project.ProjectBuildingRequest$RepositoryMerging,org.apache.maven.project.ReactorModelPool):CONSTRUCTOR_REMOVED</exclude>
               <!-- was only a workaround for Plexus Container, hopefully never used by anyone else -->
               <exclude>org.apache.maven.plugin.DefaultBuildPluginManager#setMojoExecutionListeners(java.util.List)</exclude>

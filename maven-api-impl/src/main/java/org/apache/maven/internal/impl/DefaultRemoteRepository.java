@@ -55,4 +55,9 @@ public class DefaultRemoteRepository implements RemoteRepository {
     public String getProtocol() {
         return repository.getProtocol();
     }
+
+    @Override
+    public String toString() {
+        return repository.toString();
+    }
 }

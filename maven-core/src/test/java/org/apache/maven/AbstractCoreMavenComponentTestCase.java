@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -36,6 +37,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.impl.DefaultLookup;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
+import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -47,6 +49,7 @@ import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.internal.MavenSessionBuilderSupplier;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
@@ -55,7 +58,6 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-import static org.mockito.Mockito.mock;
 
 @PlexusTest
 public abstract class AbstractCoreMavenComponentTestCase {
@@ -117,8 +119,10 @@ public abstract class AbstractCoreMavenComponentTestCase {
     protected MavenSession createMavenSession(File pom, Properties executionProperties, boolean includeModules)
             throws Exception {
         MavenExecutionRequest request = createMavenExecutionRequest(pom);
+        RepositorySystemSession rsession = MavenTestHelper.createSession(mavenRepositorySystem);
 
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest()
+                .setRepositorySession(rsession)
                 .setLocalRepository(request.getLocalRepository())
                 .setRemoteRepositories(request.getRemoteRepositories())
                 .setPluginArtifactRepositories(request.getPluginArtifactRepositories())
@@ -150,13 +154,19 @@ public abstract class AbstractCoreMavenComponentTestCase {
         initRepoSession(configuration);
 
         DefaultSessionFactory defaultSessionFactory =
-                new DefaultSessionFactory(mock(RepositorySystem.class), null, new DefaultLookup(container), null);
+                new DefaultSessionFactory(repositorySystem, null, new DefaultLookup(container), null);
 
         MavenSession session = new MavenSession(
                 getContainer(), configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());
         session.setProjects(projects);
         session.setAllProjects(session.getProjects());
-        session.setSession(defaultSessionFactory.getSession(session));
+        session.setSession(defaultSessionFactory.newSession(session));
+
+        SessionScope sessionScope = getContainer().lookup(SessionScope.class);
+        sessionScope.enter();
+        sessionScope.seed(MavenSession.class, session);
+        sessionScope.seed(Session.class, session.getSession());
+        sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(session.getSession()));
 
         return session;
     }

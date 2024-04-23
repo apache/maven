@@ -28,12 +28,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Repository;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
@@ -85,7 +86,7 @@ public class ProjectModelResolver implements ModelResolver {
 
     private final ProjectBuildingRequest.RepositoryMerging repositoryMerging;
 
-    private final Map<String, ForkJoinTask<Result>> parentCache;
+    private final Map<String, Future<Result>> parentCache;
 
     public ProjectModelResolver(
             RepositorySystemSession session,
@@ -184,39 +185,43 @@ public class ProjectModelResolver implements ModelResolver {
 
     record Result(ModelSource source, Parent parent, Exception e) {}
 
-    private ForkJoinPool pool = new ForkJoinPool(MAX_CAP);
-
     @Override
     public ModelSource resolveModel(final Parent parent, AtomicReference<Parent> modified)
             throws UnresolvableModelException {
         Result result;
         try {
-            ForkJoinTask<Result> future = parentCache.computeIfAbsent(parent.getId(), id -> new ForkJoinTask<>() {
-                Result result;
+            Future<Result> future = parentCache.computeIfAbsent(parent.getId(), id -> {
+                ForkJoinPool pool = new ForkJoinPool(MAX_CAP);
+                ForkJoinTask<Result> task = new ForkJoinTask<>() {
+                    Result result;
 
-                @Override
-                public Result getRawResult() {
-                    return result;
-                }
-
-                @Override
-                protected void setRawResult(Result result) {
-                    this.result = result;
-                }
-
-                @Override
-                protected boolean exec() {
-                    try {
-                        AtomicReference<Parent> modified = new AtomicReference<>();
-                        ModelSource source = doResolveModel(parent, modified);
-                        result = new Result(source, modified.get(), null);
-                    } catch (Exception e) {
-                        result = new Result(null, null, e);
+                    @Override
+                    public Result getRawResult() {
+                        return result;
                     }
-                    return true;
-                }
+
+                    @Override
+                    protected void setRawResult(Result result) {
+                        this.result = result;
+                    }
+
+                    @Override
+                    protected boolean exec() {
+                        try {
+                            AtomicReference<Parent> modified = new AtomicReference<>();
+                            ModelSource source = doResolveModel(parent, modified);
+                            result = new Result(source, modified.get(), null);
+                        } catch (Exception e) {
+                            result = new Result(null, null, e);
+                        } finally {
+                            pool.shutdown();
+                        }
+                        return true;
+                    }
+                };
+                pool.submit(task);
+                return task;
             });
-            pool.execute(future);
             result = future.get();
         } catch (Exception e) {
             throw new UnresolvableModelException(e, parent.getGroupId(), parent.getArtifactId(), parent.getVersion());

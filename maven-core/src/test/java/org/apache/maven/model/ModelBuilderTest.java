@@ -26,12 +26,18 @@ import java.util.List;
 
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.codehaus.plexus.testing.PlexusTest;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,20 +49,29 @@ public class ModelBuilderTest {
     ProjectBuilder projectBuilder;
 
     @Inject
-    MavenRepositorySystem repositorySystem;
+    MavenRepositorySystem mavenRepositorySystem;
 
     @Inject
     RepositorySystemSessionFactory repositorySessionFactory;
 
+    @Inject
+    RepositorySystem repositorySystem;
+
     @Test
     void testModelBuilder() throws Exception {
         MavenExecutionRequest mavenRequest = new DefaultMavenExecutionRequest();
-        mavenRequest.setLocalRepository(repositorySystem.createLocalRepository(new File("target/test-repo/")));
+        mavenRequest.setLocalRepository(mavenRepositorySystem.createLocalRepository(new File("target/test-repo/")));
 
         DefaultProjectBuildingRequest request = new DefaultProjectBuildingRequest();
-        request.setRepositorySession(repositorySessionFactory
+        RepositorySystemSession.CloseableSession rsession = repositorySessionFactory
                 .newRepositorySessionBuilder(mavenRequest)
-                .build());
+                .build();
+        request.setRepositorySession(rsession);
+        MavenSession msession = new MavenSession(rsession, mavenRequest, new DefaultMavenExecutionResult());
+        InternalSession session =
+                new DefaultSession(msession, repositorySystem, null, mavenRepositorySystem, null, null);
+        InternalSession.associate(rsession, session);
+
         List<ProjectBuildingResult> results = projectBuilder.build(
                 Collections.singletonList(new File("src/test/resources/projects/tree/pom.xml")), true, request);
 

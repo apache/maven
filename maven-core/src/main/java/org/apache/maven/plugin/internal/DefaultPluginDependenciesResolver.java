@@ -114,9 +114,10 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             pluginArtifact = result.getArtifact();
 
             if (logger.isWarnEnabled() && !result.getRelocations().isEmpty()) {
-                String message = pluginArtifact instanceof org.apache.maven.repository.internal.RelocatedArtifact
-                        ? ": " + ((org.apache.maven.repository.internal.RelocatedArtifact) pluginArtifact).getMessage()
-                        : "";
+                String message =
+                        pluginArtifact instanceof org.apache.maven.internal.impl.resolver.RelocatedArtifact relocated
+                                ? ": " + relocated.getMessage()
+                                : "";
                 logger.warn(
                         "The artifact {} has been relocated to {}{}",
                         result.getRelocations().get(0),

@@ -36,7 +36,7 @@ import java.util.Objects;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
+import org.apache.maven.metadata.v4.MetadataStaxReader;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;

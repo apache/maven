@@ -35,6 +35,7 @@ import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -122,6 +123,15 @@ public abstract class AbstractCoreMavenComponentTestCase {
                 .setSystemProperties(executionProperties)
                 .setUserProperties(new Properties());
 
+        initRepoSession(configuration);
+
+        MavenSession session = new MavenSession(
+                getContainer(), configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());
+        DefaultSession iSession =
+                new DefaultSession(session, mock(org.eclipse.aether.RepositorySystem.class), null, null, null, null);
+        InternalSession.associate(session.getRepositorySession(), iSession);
+        session.setSession(iSession);
+
         List<MavenProject> projects = new ArrayList<>();
 
         if (pom != null) {
@@ -144,14 +154,8 @@ public abstract class AbstractCoreMavenComponentTestCase {
             projects.add(project);
         }
 
-        initRepoSession(configuration);
-
-        MavenSession session = new MavenSession(
-                getContainer(), configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());
         session.setProjects(projects);
         session.setAllProjects(session.getProjects());
-        session.setSession(
-                new DefaultSession(session, mock(org.eclipse.aether.RepositorySystem.class), null, null, null, null));
 
         return session;
     }

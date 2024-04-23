@@ -78,8 +78,7 @@ public class DefaultModelProcessor implements ModelProcessor {
     private final ModelReader modelReader;
 
     @Inject
-    public DefaultModelProcessor(
-            Collection<ModelParser> modelParsers, ModelLocator modelLocator, ModelReader modelReader) {
+    public DefaultModelProcessor(List<ModelParser> modelParsers, ModelLocator modelLocator, ModelReader modelReader) {
         this.modelParsers = modelParsers;
         this.modelLocator = modelLocator;
         this.modelReader = modelReader;

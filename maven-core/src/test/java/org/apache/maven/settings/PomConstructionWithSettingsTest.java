@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
+import org.apache.maven.MavenTestHelper;
 import org.apache.maven.api.settings.InputSource;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -110,7 +111,7 @@ class PomConstructionWithSettingsTest {
                 "local", localRepoUrl, new DefaultRepositoryLayout(), null, null));
         config.setActiveProfileIds(settings.getActiveProfiles());
 
-        DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(h -> false);
+        DefaultRepositorySystemSession repoSession = MavenTestHelper.createSession(repositorySystem);
         LocalRepository localRepo =
                 new LocalRepository(config.getLocalRepository().getBasedir());
         repoSession.setLocalRepositoryManager(

@@ -23,63 +23,52 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.Packaging;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.di.Provides;
+import org.apache.maven.api.model.PluginContainer;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.ArtifactManager;
+import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
+import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.SettingsBuilder;
+import org.apache.maven.api.services.TypeRegistry;
+import org.apache.maven.api.services.model.*;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.spi.ModelParser;
+import org.apache.maven.api.spi.TypeProvider;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
-import org.apache.maven.internal.impl.AbstractSession;
-import org.apache.maven.internal.impl.DefaultArtifactCoordinateFactory;
-import org.apache.maven.internal.impl.DefaultArtifactDeployer;
-import org.apache.maven.internal.impl.DefaultArtifactFactory;
-import org.apache.maven.internal.impl.DefaultArtifactInstaller;
-import org.apache.maven.internal.impl.DefaultArtifactResolver;
-import org.apache.maven.internal.impl.DefaultChecksumAlgorithmService;
-import org.apache.maven.internal.impl.DefaultDependencyCollector;
-import org.apache.maven.internal.impl.DefaultDependencyCoordinateFactory;
-import org.apache.maven.internal.impl.DefaultLocalRepositoryManager;
-import org.apache.maven.internal.impl.DefaultMessageBuilderFactory;
-import org.apache.maven.internal.impl.DefaultModelXmlFactory;
-import org.apache.maven.internal.impl.DefaultRepositoryFactory;
-import org.apache.maven.internal.impl.DefaultSettingsBuilder;
-import org.apache.maven.internal.impl.DefaultSettingsXmlFactory;
-import org.apache.maven.internal.impl.DefaultToolchainsBuilder;
-import org.apache.maven.internal.impl.DefaultToolchainsXmlFactory;
-import org.apache.maven.internal.impl.DefaultTransportProvider;
-import org.apache.maven.internal.impl.DefaultVersionParser;
-import org.apache.maven.internal.impl.DefaultVersionRangeResolver;
-import org.apache.maven.internal.impl.DefaultVersionResolver;
-import org.apache.maven.model.path.DefaultPathTranslator;
-import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
-import org.apache.maven.model.profile.DefaultProfileSelector;
-import org.apache.maven.model.profile.activation.FileProfileActivator;
-import org.apache.maven.model.profile.activation.JdkVersionProfileActivator;
-import org.apache.maven.model.profile.activation.OperatingSystemProfileActivator;
-import org.apache.maven.model.profile.activation.PropertyProfileActivator;
-import org.apache.maven.model.root.DefaultRootLocator;
-import org.apache.maven.repository.internal.DefaultModelVersionParser;
-import org.apache.maven.repository.internal.MavenRepositorySystemSupplier;
+import org.apache.maven.internal.impl.*;
+import org.apache.maven.internal.impl.model.*;
+import org.apache.maven.internal.impl.resolver.DefaultVersionRangeResolver;
+import org.apache.maven.internal.impl.resolver.DefaultVersionResolver;
+import org.apache.maven.internal.impl.resolver.DefaultVersionSchemeProvider;
+import org.apache.maven.internal.impl.resolver.type.DefaultTypeProvider;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
-import org.eclipse.aether.util.version.GenericVersionScheme;
 
 public class ApiRunner {
 
@@ -109,12 +98,47 @@ public class ApiRunner {
         injector.bindImplicit(DefaultTransportProvider.class);
         injector.bindImplicit(DefaultVersionParser.class);
         injector.bindImplicit(DefaultVersionRangeResolver.class);
+        injector.bindImplicit(org.apache.maven.internal.impl.DefaultVersionParser.class);
+        injector.bindImplicit(org.apache.maven.internal.impl.DefaultVersionRangeResolver.class);
         injector.bindImplicit(DefaultVersionResolver.class);
+        injector.bindImplicit(ExtensibleEnumRegistries.class);
+        injector.bindImplicit(DefaultTypeProvider.class);
+
+        injector.bindImplicit(DefaultVersionSchemeProvider.class);
+        injector.bindImplicit(BuildModelTransformer.class);
+        injector.bindImplicit(DefaultDependencyManagementImporter.class);
+        injector.bindImplicit(DefaultDependencyManagementInjector.class);
+        injector.bindImplicit(DefaultModelBuilder.class);
+        injector.bindImplicit(DefaultModelProcessor.class);
+        injector.bindImplicit(DefaultModelValidator.class);
+        injector.bindImplicit(DefaultModelVersionProcessor.class);
+        injector.bindImplicit(DefaultModelNormalizer.class);
+        injector.bindImplicit(DefaultModelInterpolator.class);
+        injector.bindImplicit(DefaultPathTranslator.class);
+        injector.bindImplicit(DefaultRootLocator.class);
+        injector.bindImplicit(DefaultModelPathTranslator.class);
+        injector.bindImplicit(DefaultUrlNormalizer.class);
+        injector.bindImplicit(DefaultModelUrlNormalizer.class);
+        injector.bindImplicit(DefaultSuperPomProvider.class);
+        injector.bindImplicit(DefaultInheritanceAssembler.class);
+        injector.bindImplicit(DefaultProfileInjector.class);
+        injector.bindImplicit(DefaultProfileSelector.class);
+        injector.bindImplicit(DefaultPluginManagementInjector.class);
+        injector.bindImplicit(DefaultLifecycleBindingsInjector.class);
+        injector.bindImplicit(DefaultPluginConfigurationExpander.class);
+        injector.bindImplicit(ProfileActivationFilePathInterpolator.class);
+        injector.bindImplicit(DefaultModelVersionParser.class);
+
+        injector.bindImplicit(ProfileActivator.class);
+        injector.bindImplicit(ModelParser.class);
 
         return injector.getInstance(Session.class);
     }
 
     static class DefaultSession extends AbstractSession {
+
+        private final Map<String, String> systemProperties;
+        private Instant startTime = Instant.now();
 
         DefaultSession(RepositorySystemSession session, RepositorySystem repositorySystem, Lookup lookup) {
             this(session, repositorySystem, Collections.emptyList(), null, lookup);
@@ -127,6 +151,8 @@ public class ApiRunner {
                 List<org.eclipse.aether.repository.RemoteRepository> resolverRepositories,
                 Lookup lookup) {
             super(session, repositorySystem, repositories, resolverRepositories, lookup);
+            systemProperties = System.getenv().entrySet().stream()
+                    .collect(Collectors.toMap(e -> "env." + e.getKey(), e -> e.getValue()));
         }
 
         @Override
@@ -136,22 +162,27 @@ public class ApiRunner {
 
         @Override
         public Settings getSettings() {
-            return null;
+            return Settings.newInstance();
         }
 
         @Override
         public Map<String, String> getUserProperties() {
-            return null;
+            return Map.of();
         }
 
         @Override
         public Map<String, String> getSystemProperties() {
-            return null;
+            return systemProperties;
         }
 
         @Override
         public Map<String, String> getEffectiveProperties(Project project) {
-            return null;
+            HashMap<String, String> result = new HashMap<>(getSystemProperties());
+            if (project != null) {
+                result.putAll(project.getModel().getProperties());
+            }
+            result.putAll(getUserProperties());
+            return result;
         }
 
         @Override
@@ -166,7 +197,7 @@ public class ApiRunner {
 
         @Override
         public Instant getStartTime() {
-            return null;
+            return startTime;
         }
 
         @Override
@@ -259,28 +290,74 @@ public class ApiRunner {
     }
 
     @Provides
-    static DefaultModelVersionParser newModelVersionParser() {
-        return new DefaultModelVersionParser(new GenericVersionScheme());
+    static PackagingRegistry newPackagingRegistry(TypeRegistry typeRegistry) {
+        return id -> Optional.of(new DumbPackaging(id, typeRegistry.require(id), Map.of()));
     }
 
     @Provides
-    static Session newSession(Lookup lookup) {
+    static TypeRegistry newTypeRegistry(List<TypeProvider> providers) {
+        return new TypeRegistry() {
+            @Override
+            public Optional<Type> lookup(String id) {
+                return providers.stream()
+                        .flatMap(p -> p.provides().stream())
+                        .filter(t -> Objects.equals(id, t.id()))
+                        .findAny();
+            }
+        };
+    }
+
+    @Provides
+    static LifecycleRegistry newLifecycleRegistry() {
+        return new LifecycleRegistry() {
+            @Override
+            public List<String> computePhases(Lifecycle lifecycle) {
+                return List.of();
+            }
+
+            @Override
+            public Iterator<Lifecycle> iterator() {
+                return Collections.emptyIterator();
+            }
+
+            @Override
+            public Optional<Lifecycle> lookup(String id) {
+                return Optional.empty();
+            }
+        };
+    }
+
+    @Provides
+    static RepositorySystemSupplier newRepositorySystemSupplier() {
+        return new RepositorySystemSupplier();
+    }
+
+    @Provides
+    static RepositorySystem newRepositorySystem(RepositorySystemSupplier repositorySystemSupplier) {
+        return repositorySystemSupplier.getRepositorySystem();
+    }
+
+    @Provides
+    static RemoteRepositoryManager newRemoteRepositoryManager(RepositorySystemSupplier repositorySystemSupplier) {
+        return repositorySystemSupplier.getRemoteRepositoryManager();
+    }
+
+    @Provides
+    static Session newSession(RepositorySystem system, Lookup lookup) {
         Map<String, String> properties = new HashMap<>();
         // Env variables prefixed with "env."
         System.getenv().forEach((k, v) -> properties.put("env." + k, v));
         // Java System properties
         System.getProperties().forEach((k, v) -> properties.put(k.toString(), v.toString()));
 
-        RepositorySystem system = new MavenRepositorySystemSupplier().get();
-
         // SettingsDecrypter settingsDecrypter =
         // (SettingsDecrypter)Objects.requireNonNull(this.createSettingsDecrypter(preBoot));
-        new DefaultProfileSelector(List.of(
-                new JdkVersionProfileActivator(),
-                new PropertyProfileActivator(),
-                new OperatingSystemProfileActivator(),
-                new FileProfileActivator(new ProfileActivationFilePathInterpolator(
-                        new DefaultPathTranslator(), new DefaultRootLocator()))));
+        //        new DefaultProfileSelector(List.of(
+        //                new JdkVersionProfileActivator(),
+        //                new PropertyProfileActivator(),
+        //                new OperatingSystemProfileActivator(),
+        //                new FileProfileActivator(new ProfileActivationFilePathInterpolator(
+        //                        new DefaultPathTranslator(), new DefaultRootLocator()))));
 
         Path userHome = Paths.get(properties.get("user.home"));
         Path mavenUserHome = userHome.resolve(".m2");
@@ -326,11 +403,31 @@ public class ApiRunner {
                         .createRemote("central", "https://repo.maven.apache.org/maven2")),
                 null,
                 lookup);
+
+        Profile profile = session.getService(SettingsBuilder.class)
+                .convert(org.apache.maven.api.settings.Profile.newBuilder()
+                        .repositories(settings.getRepositories())
+                        .pluginRepositories(settings.getPluginRepositories())
+                        .build());
+        RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
+        List<RemoteRepository> repositories = profile.getRepositories().stream()
+                .map(repositoryFactory::createRemote)
+                .toList();
+        InternalSession s = (InternalSession) session.withRemoteRepositories(repositories);
+        InternalSession.associate(rsession, s);
+        return s;
+
+        // List<RemoteRepository> repositories = repositoryFactory.createRemote();
+
+        //        session.getService(SettingsBuilder.class).convert()
+
         //        settings.getDelegate().getRepositories().stream()
         //                        .map(r -> SettingsUtilsV4.)
         //        defaultSession.getService(RepositoryFactory.class).createRemote()
-        return defaultSession;
+        //        return defaultSession;
     }
 
     static class UnsupportedInStandaloneModeException extends MavenException {}
+
+    record DumbPackaging(String id, Type type, Map<String, PluginContainer> plugins) implements Packaging {}
 }

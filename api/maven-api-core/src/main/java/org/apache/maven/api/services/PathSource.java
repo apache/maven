@@ -18,17 +18,25 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
-class PathSource implements Source {
+class PathSource implements ModelSource {
 
     private final Path path;
+    private final String location;
 
     PathSource(Path path) {
+        this(path, null);
+    }
+
+    PathSource(Path path, String location) {
         this.path = path;
+        this.location = location != null ? location : path.toString();
     }
 
     @Override
@@ -43,11 +51,32 @@ class PathSource implements Source {
 
     @Override
     public String getLocation() {
-        return path.toString();
+        return location;
     }
 
     @Override
     public Source resolve(String relative) {
         return new PathSource(path.resolve(relative));
+    }
+
+    @Override
+    public ModelSource resolve(ModelLocator locator, String relative) {
+        String norm = relative.replace('\\', File.separatorChar).replace('/', File.separatorChar);
+        Path path = getPath().getParent().resolve(norm);
+        Path relatedPom = locator.locateExistingPom(path);
+        if (relatedPom != null) {
+            return new PathSource(relatedPom.normalize(), null);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this == o || o instanceof PathSource ps && Objects.equals(path, ps.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
     }
 }

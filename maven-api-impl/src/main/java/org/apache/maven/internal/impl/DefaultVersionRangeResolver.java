@@ -66,8 +66,9 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                             session.toRepositories(session.getRemoteRepositories()),
                             null));
 
-            Map<String, ArtifactRepository> repos =
-                    res.getVersions().stream().collect(Collectors.toMap(v -> v.toString(), res::getRepository));
+            Map<String, ArtifactRepository> repos = res.getVersions().stream()
+                    .filter(v -> res.getRepository(v) != null)
+                    .collect(Collectors.toMap(v -> v.toString(), res::getRepository));
 
             return new VersionRangeResolverResult() {
                 @Override

@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -38,6 +39,7 @@ import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.spi.PackagingProvider;
@@ -59,23 +61,27 @@ public class DefaultPackagingRegistry
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPackagingRegistry.class);
 
-    private final Map<String, LifecycleMapping> lifecycleMappings;
+    private final Lookup lookup;
 
     private final TypeRegistry typeRegistry;
 
     @Inject
-    public DefaultPackagingRegistry(
-            Map<String, LifecycleMapping> lifecycleMappings,
-            TypeRegistry typeRegistry,
-            List<PackagingProvider> providers) {
+    public DefaultPackagingRegistry(Lookup lookup, TypeRegistry typeRegistry, List<PackagingProvider> providers) {
         super(providers);
-        this.lifecycleMappings = lifecycleMappings;
+        this.lookup = lookup;
         this.typeRegistry = typeRegistry;
     }
 
     @Override
     public Optional<Packaging> lookup(String id) {
-        LifecycleMapping lifecycleMapping = lifecycleMappings.get(id);
+        id = id.toLowerCase(Locale.ROOT);
+        // TODO: we should be able to inject a Map<String, LifecycleMapping> directly,
+        // however, SISU visibility filtering can only happen when an explicit
+        // lookup is performed. The whole problem here is caused by "project extensions"
+        // which are bound to a project's classloader, without any clear definition
+        // of a "project scope"
+        LifecycleMapping lifecycleMapping =
+                lookup.lookupOptional(LifecycleMapping.class, id).orElse(null);
         if (lifecycleMapping == null) {
             return Optional.empty();
         }
@@ -86,12 +92,16 @@ public class DefaultPackagingRegistry
         return Optional.of(new DefaultPackaging(id, type, getPlugins(lifecycleMapping)));
     }
 
-    private PluginContainer getPlugins(LifecycleMapping lifecycleMapping) {
-        Map<String, Plugin> plugins = new HashMap<>();
-        lifecycleMapping.getLifecycles().forEach((id, lifecycle) -> lifecycle
-                .getLifecyclePhases()
-                .forEach((phase, lifecyclePhase) -> parseLifecyclePhaseDefinitions(plugins, phase, lifecyclePhase)));
-        return PluginContainer.newBuilder().plugins(plugins.values()).build();
+    private Map<String, PluginContainer> getPlugins(LifecycleMapping lifecycleMapping) {
+        Map<String, PluginContainer> lfs = new HashMap<>();
+        lifecycleMapping.getLifecycles().forEach((id, lifecycle) -> {
+            Map<String, Plugin> plugins = new HashMap<>();
+            lifecycle
+                    .getLifecyclePhases()
+                    .forEach((phase, lifecyclePhase) -> parseLifecyclePhaseDefinitions(plugins, phase, lifecyclePhase));
+            lfs.put(id, PluginContainer.newBuilder().plugins(plugins.values()).build());
+        });
+        return lfs;
     }
 
     private void parseLifecyclePhaseDefinitions(Map<String, Plugin> plugins, String phase, LifecyclePhase goals) {
@@ -189,5 +199,5 @@ public class DefaultPackagingRegistry
         return id;
     }
 
-    private record DefaultPackaging(String id, Type type, PluginContainer plugins) implements Packaging {}
+    private record DefaultPackaging(String id, Type type, Map<String, PluginContainer> plugins) implements Packaging {}
 }
