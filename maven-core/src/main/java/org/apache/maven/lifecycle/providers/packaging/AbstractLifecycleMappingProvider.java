@@ -37,9 +37,9 @@ public abstract class AbstractLifecycleMappingProvider implements Provider<Lifec
     // START SNIPPET: versions
     protected static final String RESOURCES_PLUGIN_VERSION = "3.3.1";
 
-    protected static final String COMPILER_PLUGIN_VERSION = "3.11.0";
+    protected static final String COMPILER_PLUGIN_VERSION = "3.13.0";
 
-    protected static final String SUREFIRE_PLUGIN_VERSION = "3.1.2";
+    protected static final String SUREFIRE_PLUGIN_VERSION = "3.2.5";
 
     protected static final String INSTALL_PLUGIN_VERSION = "3.1.1";
 
@@ -47,13 +47,13 @@ public abstract class AbstractLifecycleMappingProvider implements Provider<Lifec
 
     // packaging
 
-    protected static final String JAR_PLUGIN_VERSION = "3.3.0";
+    protected static final String JAR_PLUGIN_VERSION = "3.4.1";
 
     protected static final String EAR_PLUGIN_VERSION = "3.3.0";
 
     protected static final String EJB_PLUGIN_VERSION = "3.2.1";
 
-    protected static final String PLUGIN_PLUGIN_VERSION = "3.9.0";
+    protected static final String PLUGIN_PLUGIN_VERSION = "3.12.0";
 
     protected static final String RAR_PLUGIN_VERSION = "3.0.0";
 
