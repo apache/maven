@@ -940,21 +940,23 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             @Override
-            protected void transformActivationFile_Missing(ActivationFile.Builder builder, ActivationFile target) {
+            protected ActivationFile.Builder transformActivationFile_Missing(
+                    Supplier<? extends ActivationFile.Builder> creator,
+                    ActivationFile.Builder builder,
+                    ActivationFile target) {
                 final String path = target.getMissing();
                 final String xformed = transformPath(path, target, "missing");
-                if (xformed != path) {
-                    builder.missing(xformed);
-                }
+                return xformed != path ? (builder != null ? builder : creator.get()).missing(xformed) : builder;
             }
 
             @Override
-            protected void transformActivationFile_Exists(ActivationFile.Builder builder, ActivationFile target) {
+            protected ActivationFile.Builder transformActivationFile_Exists(
+                    Supplier<? extends ActivationFile.Builder> creator,
+                    ActivationFile.Builder builder,
+                    ActivationFile target) {
                 final String path = target.getExists();
                 final String xformed = transformPath(path, target, "exists");
-                if (xformed != path) {
-                    builder.exists(xformed);
-                }
+                return xformed != path ? (builder != null ? builder : creator.get()).exists(xformed) : builder;
             }
 
             private String transformPath(String path, ActivationFile target, String locationKey) {

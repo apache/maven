@@ -44,7 +44,6 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.maven.api.model.Activation;
-import org.apache.maven.api.model.Activation.Builder;
 import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.ActivationOS;
 import org.apache.maven.api.model.ActivationProperty;
@@ -127,142 +126,158 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         @Override
-        protected void transformActivation_ActiveByDefault(Builder builder, Activation target) {}
+        protected Activation.Builder transformActivation_ActiveByDefault(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
+            return builder;
+        }
 
         @Override
-        protected void transformActivation_File(Builder builder, Activation target) {
+        protected Activation.Builder transformActivation_File(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
             stk.push(nextFrame("file", Activation::getFile));
             Optional.ofNullable(target.getFile());
             try {
-                super.transformActivation_File(builder, target);
+                return super.transformActivation_File(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivationFile_Exists(
-                org.apache.maven.api.model.ActivationFile.Builder builder, ActivationFile target) {
+        protected ActivationFile.Builder transformActivationFile_Exists(
+                Supplier<? extends ActivationFile.Builder> creator,
+                ActivationFile.Builder builder,
+                ActivationFile target) {
             stk.push(nextFrame("exists"));
             try {
-                super.transformActivationFile_Exists(builder, target);
+                return super.transformActivationFile_Exists(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivationFile_Missing(
-                org.apache.maven.api.model.ActivationFile.Builder builder, ActivationFile target) {
+        protected ActivationFile.Builder transformActivationFile_Missing(
+                Supplier<? extends ActivationFile.Builder> creator,
+                ActivationFile.Builder builder,
+                ActivationFile target) {
             stk.push(nextFrame("missing"));
             try {
-                super.transformActivationFile_Missing(builder, target);
+                return super.transformActivationFile_Missing(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivation_Jdk(Builder builder, Activation target) {
+        protected Activation.Builder transformActivation_Jdk(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
             stk.push(nextFrame("jdk"));
             try {
-                super.transformActivation_Jdk(builder, target);
+                return super.transformActivation_Jdk(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivation_Os(Builder builder, Activation target) {
+        protected Activation.Builder transformActivation_Os(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
             stk.push(nextFrame("os", Activation::getOs));
             try {
-                super.transformActivation_Os(builder, target);
+                return super.transformActivation_Os(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivationOS_Arch(
-                org.apache.maven.api.model.ActivationOS.Builder builder, ActivationOS target) {
+        protected ActivationOS.Builder transformActivationOS_Arch(
+                Supplier<? extends ActivationOS.Builder> creator, ActivationOS.Builder builder, ActivationOS target) {
             stk.push(nextFrame("arch"));
             try {
-                super.transformActivationOS_Arch(builder, target);
+                return super.transformActivationOS_Arch(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivationOS_Family(
-                org.apache.maven.api.model.ActivationOS.Builder builder, ActivationOS target) {
+        protected ActivationOS.Builder transformActivationOS_Family(
+                Supplier<? extends ActivationOS.Builder> creator, ActivationOS.Builder builder, ActivationOS target) {
             stk.push(nextFrame("family"));
             try {
-                super.transformActivationOS_Family(builder, target);
+                return super.transformActivationOS_Family(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivationOS_Name(
-                org.apache.maven.api.model.ActivationOS.Builder builder, ActivationOS target) {
+        protected ActivationOS.Builder transformActivationOS_Name(
+                Supplier<? extends ActivationOS.Builder> creator, ActivationOS.Builder builder, ActivationOS target) {
             stk.push(nextFrame("name"));
             try {
-                super.transformActivationOS_Name(builder, target);
+                return super.transformActivationOS_Name(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivationOS_Version(
-                org.apache.maven.api.model.ActivationOS.Builder builder, ActivationOS target) {
+        protected ActivationOS.Builder transformActivationOS_Version(
+                Supplier<? extends ActivationOS.Builder> creator, ActivationOS.Builder builder, ActivationOS target) {
             stk.push(nextFrame("version"));
             try {
-                super.transformActivationOS_Version(builder, target);
+                return super.transformActivationOS_Version(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivation_Packaging(Builder builder, Activation target) {
+        protected Activation.Builder transformActivation_Packaging(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
             stk.push(nextFrame("packaging"));
             try {
-                super.transformActivation_Packaging(builder, target);
+                return super.transformActivation_Packaging(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivation_Property(Builder builder, Activation target) {
+        protected Activation.Builder transformActivation_Property(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
             stk.push(nextFrame("property", Activation::getProperty));
             try {
-                super.transformActivation_Property(builder, target);
+                return super.transformActivation_Property(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivationProperty_Name(
-                org.apache.maven.api.model.ActivationProperty.Builder builder, ActivationProperty target) {
+        protected ActivationProperty.Builder transformActivationProperty_Name(
+                Supplier<? extends ActivationProperty.Builder> creator,
+                ActivationProperty.Builder builder,
+                ActivationProperty target) {
             stk.push(nextFrame("name"));
             try {
-                super.transformActivationProperty_Name(builder, target);
+                return super.transformActivationProperty_Name(creator, builder, target);
             } finally {
                 stk.pop();
             }
         }
 
         @Override
-        protected void transformActivationProperty_Value(
-                org.apache.maven.api.model.ActivationProperty.Builder builder, ActivationProperty target) {
+        protected ActivationProperty.Builder transformActivationProperty_Value(
+                Supplier<? extends ActivationProperty.Builder> creator,
+                ActivationProperty.Builder builder,
+                ActivationProperty target) {
             stk.push(nextFrame("value"));
             try {
-                super.transformActivationProperty_Value(builder, target);
+                return super.transformActivationProperty_Value(creator, builder, target);
             } finally {
                 stk.pop();
             }
