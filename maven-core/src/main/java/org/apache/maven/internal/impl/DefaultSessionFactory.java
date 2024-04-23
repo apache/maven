@@ -50,7 +50,9 @@ public class DefaultSessionFactory {
     }
 
     public InternalSession newSession(MavenSession mavenSession) {
-        return new DefaultSession(
+        InternalSession session = new DefaultSession(
                 mavenSession, repositorySystem, null, mavenRepositorySystem, lookup, runtimeInformation);
+        InternalSession.associate(mavenSession.getRepositorySession(), session);
+        return session;
     }
 }

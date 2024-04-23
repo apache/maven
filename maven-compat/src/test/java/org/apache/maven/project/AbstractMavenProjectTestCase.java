@@ -33,6 +33,7 @@ import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.impl.DefaultLookup;
 import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
@@ -153,12 +154,13 @@ public abstract class AbstractMavenProjectTestCase {
         DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         MavenSession msession =
                 new MavenSession(getContainer(), session, mavenExecutionRequest, new DefaultMavenExecutionResult());
-        new DefaultSession(
+        DefaultSession iSession = new DefaultSession(
                 msession,
                 mock(org.eclipse.aether.RepositorySystem.class),
                 null,
                 null,
                 new DefaultLookup(container),
                 null);
+        InternalSession.associate(session, iSession);
     }
 }
