@@ -652,36 +652,18 @@
           <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
-    Map<String, Plugin> pluginMap;
-
     /**
      * Reset the {@code pluginsMap} field to {@code null}
      */
-    public synchronized void flushPluginMap()
-    {
-        this.pluginMap = null;
+    public void flushPluginMap() {
     }
 
     /**
      * @return a Map of plugins field with {@code Plugins#getKey()} as key
      * @see Plugin#getKey()
      */
-    public synchronized Map<String, Plugin> getPluginsAsMap()
-    {
-        if ( pluginMap == null )
-        {
-            pluginMap = new java.util.LinkedHashMap<String, Plugin>();
-            if ( getPlugins() != null )
-            {
-                for ( java.util.Iterator<Plugin> it = getPlugins().iterator(); it.hasNext(); )
-                {
-                    Plugin plugin = (Plugin) it.next();
-                    pluginMap.put( plugin.getKey(), plugin );
-                }
-            }
-        }
-
-        return pluginMap;
+    public Map<String, Plugin> getPluginsAsMap() {
+        return getPlugins().stream().collect(Collectors.toMap(plugin -> plugin.getKey(), plugin -> plugin));
     }
             ]]>
           </code>
@@ -2301,6 +2283,17 @@
             ]]>
           </code>
         </codeSegment>
+        <codeSegment>
+          <version>4.0.0/4.0.99</version>
+          <code>
+            <![CDATA[
+    @Deprecated
+    public void unsetInheritanceApplied() {
+    }
+
+            ]]>
+          </code>
+        </codeSegment>
       </codeSegments>
     </class>
     <class>
@@ -2389,20 +2382,12 @@
     public void setExtensions(boolean extensions) {
         setExtensions(String.valueOf(extensions));
     }
-            ]]>
-          </code>
-        </codeSegment>
-        <codeSegment>
-          <version>4.0.0+</version>
-          <code>
-            <![CDATA[
-    private Map<String, PluginExecution> executionMap = null;
 
     /**
      * Reset the {@code executionMap} field to {@code null}
      */
+     @Deprecated
     public void flushExecutionMap() {
-        this.executionMap = null;
     }
 
     /**
@@ -2410,19 +2395,15 @@
      * @see PluginExecution#getId()
      */
     public Map<String, PluginExecution> getExecutionsAsMap() {
-        if (executionMap == null) {
-            executionMap = new java.util.LinkedHashMap<String, PluginExecution>();
-            for (java.util.Iterator<PluginExecution> i = getExecutions().iterator(); i.hasNext();) {
-                PluginExecution exec = (PluginExecution) i.next();
-                if (executionMap.containsKey(exec.getId())) {
-                    throw new IllegalStateException("You cannot have two plugin executions with the same (or missing) <id/> elements.\nOffending execution\n\nId: \'" + exec.getId() + "\'\nPlugin:\'" + getKey() + "\'\n\n");
-                }
-                executionMap.put(exec.getId(), exec);
-            }
-        }
-        return executionMap;
+        return getExecutions().stream().collect(Collectors.toMap(exec -> exec.getId(), exec -> exec));
     }
-
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
     /**
      * Gets the identifier of the plugin.
      *
@@ -2646,6 +2627,20 @@
         setExcludeDefaults(String.valueOf(excludeDefaults));
     }
 
+    /**
+     * Reset the <code>reportPluginMap</code> field to <code>null</code>
+     */
+    @Deprecated
+    public void flushReportPluginMap() {
+    }
+
+    /**
+     * @return a Map of plugins field with <code>ReportPlugin#getKey()</code> as key
+     * @see org.apache.maven.model.ReportPlugin#getKey()
+     */
+    public java.util.Map<String, ReportPlugin> getReportPluginsAsMap() {
+        return getPlugins().stream().collect(Collectors.toMap(report -> report.getKey(), report -> report));
+    }
             ]]>
           </code>
         </codeSegment>
