@@ -46,7 +46,6 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultSession extends AbstractSession implements InternalMavenSession {
 
-    private final Throwable creationStack = new Throwable();
     private final MavenSession mavenSession;
     private final MavenRepositorySystem mavenRepositorySystem;
     private final RuntimeInformation runtimeInformation;
@@ -75,8 +74,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
 
     public MavenSession getMavenSession() {
         if (mavenSession == null) {
-            throw new IllegalArgumentException(
-                    "Found null mavenSession on object " + this + " (stack = " + creationStack + ")", creationStack);
+            throw new IllegalArgumentException("Found null mavenSession on session " + this);
         }
         return mavenSession;
     }
