@@ -23,6 +23,7 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 
 public class MavenTestHelper {
@@ -31,6 +32,7 @@ public class MavenTestHelper {
         DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
         MavenSession mavenSession = new MavenSession(repoSession, request, new DefaultMavenExecutionResult());
         DefaultSession session = new DefaultSession(mavenSession, null, null, repositorySystem, null, null);
+        InternalSession.associate(repoSession, session);
         return repoSession;
     }
 }

@@ -414,6 +414,7 @@ public class ApiRunner {
                 .map(repositoryFactory::createRemote)
                 .toList();
         InternalSession s = (InternalSession) session.withRemoteRepositories(repositories);
+        InternalSession.associate(rsession, s);
         return s;
 
         // List<RemoteRepository> repositories = repositoryFactory.createRemote();

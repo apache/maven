@@ -53,6 +53,7 @@ import org.apache.maven.internal.impl.DefaultRepositoryFactory;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.internal.impl.DefaultVersionParser;
 import org.apache.maven.internal.impl.DefaultVersionRangeResolver;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
 import org.apache.maven.resolver.MavenChainedWorkspaceReader;
@@ -130,7 +131,8 @@ public class BootstrapCoreExtensionManager {
                 .setWorkspaceReader(new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader))
                 .build()) {
             MavenSession mSession = new MavenSession(repoSession, request, new DefaultMavenExecutionResult());
-            new SimpleSession(mSession, repoSystem, null);
+            InternalSession iSession = new SimpleSession(mSession, repoSystem, null);
+            InternalSession.associate(repoSession, iSession);
 
             List<RemoteRepository> repositories = RepositoryUtils.toRepos(request.getPluginArtifactRepositories());
             Interpolator interpolator = createInterpolator(request);
