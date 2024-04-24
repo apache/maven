@@ -135,7 +135,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private final ClassRealmManager classRealmManager;
     private final PluginDescriptorCache pluginDescriptorCache;
     private final PluginRealmCache pluginRealmCache;
-    private final DefaultPluginDependenciesResolver pluginDependenciesResolver;
+    private final PluginDependenciesResolver pluginDependenciesResolver;
     private final ExtensionRealmCache extensionRealmCache;
     private final PluginVersionResolver pluginVersionResolver;
     private final PluginArtifactsCache pluginArtifactsCache;
@@ -153,7 +153,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             ClassRealmManager classRealmManager,
             PluginDescriptorCache pluginDescriptorCache,
             PluginRealmCache pluginRealmCache,
-            DefaultPluginDependenciesResolver pluginDependenciesResolver,
+            PluginDependenciesResolver pluginDependenciesResolver,
             ExtensionRealmCache extensionRealmCache,
             PluginVersionResolver pluginVersionResolver,
             PluginArtifactsCache pluginArtifactsCache,

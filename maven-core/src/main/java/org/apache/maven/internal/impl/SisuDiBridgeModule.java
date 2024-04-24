@@ -21,9 +21,13 @@ package org.apache.maven.internal.impl;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -33,51 +37,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.binder.AnnotatedBindingBuilder;
+import com.google.inject.name.Names;
 import org.apache.maven.api.services.MavenException;
-import org.apache.maven.api.services.model.ProfileActivator;
-import org.apache.maven.api.spi.LanguageProvider;
-import org.apache.maven.api.spi.LifecycleProvider;
-import org.apache.maven.api.spi.ModelParser;
-import org.apache.maven.api.spi.PackagingProvider;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.Binding;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.di.impl.InjectorImpl;
-import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
-import org.apache.maven.internal.aether.LegacyRepositorySystemSessionExtender;
-import org.apache.maven.internal.impl.model.BuildModelTransformer;
-import org.apache.maven.internal.impl.model.DefaultDependencyManagementImporter;
-import org.apache.maven.internal.impl.model.DefaultDependencyManagementInjector;
-import org.apache.maven.internal.impl.model.DefaultInheritanceAssembler;
-import org.apache.maven.internal.impl.model.DefaultLifecycleBindingsInjector;
-import org.apache.maven.internal.impl.model.DefaultModelBuilder;
-import org.apache.maven.internal.impl.model.DefaultModelInterpolator;
-import org.apache.maven.internal.impl.model.DefaultModelNormalizer;
-import org.apache.maven.internal.impl.model.DefaultModelPathTranslator;
-import org.apache.maven.internal.impl.model.DefaultModelProcessor;
-import org.apache.maven.internal.impl.model.DefaultModelValidator;
-import org.apache.maven.internal.impl.model.DefaultModelVersionProcessor;
-import org.apache.maven.internal.impl.model.DefaultPathTranslator;
-import org.apache.maven.internal.impl.model.DefaultPluginManagementInjector;
-import org.apache.maven.internal.impl.model.DefaultProfileInjector;
-import org.apache.maven.internal.impl.model.DefaultProfileSelector;
-import org.apache.maven.internal.impl.model.DefaultRootLocator;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
-import org.apache.maven.internal.impl.model.profile.FileProfileActivator;
-import org.apache.maven.internal.impl.model.profile.JdkVersionProfileActivator;
-import org.apache.maven.internal.impl.model.profile.OperatingSystemProfileActivator;
-import org.apache.maven.internal.impl.model.profile.PackagingProfileActivator;
-import org.apache.maven.internal.impl.model.profile.PropertyProfileActivator;
-import org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader;
-import org.apache.maven.internal.impl.resolver.DefaultVersionSchemeProvider;
-import org.apache.maven.internal.impl.resolver.relocation.DistributionManagementArtifactRelocationSource;
-import org.apache.maven.internal.impl.resolver.relocation.UserPropertiesArtifactRelocationSource;
 import org.codehaus.plexus.PlexusContainer;
-import org.eclipse.aether.version.VersionScheme;
 
 @Named
 class SisuDiBridgeModule extends AbstractModule {
@@ -86,7 +56,7 @@ class SisuDiBridgeModule extends AbstractModule {
     protected void configure() {
         Provider<PlexusContainer> containerProvider = getProvider(PlexusContainer.class);
 
-        Injector injector = new InjectorImpl() {
+        InjectorImpl injector = new InjectorImpl() {
             @Override
             public <Q> Supplier<Q> getCompiledBinding(Key<Q> key) {
                 Set<Binding<Q>> res = getBindings(key);
@@ -163,23 +133,21 @@ class SisuDiBridgeModule extends AbstractModule {
                             .asIterator();
                     it.hasNext(); ) {
                 URL url = it.next();
-                try (InputStream is = url.openStream()) {
-                    String[] lines = new String(is.readAllBytes()).split("\n");
-                    for (String className : lines) {
-                        try {
-                            Class<?> clazz = classLoader.loadClass(className);
-                            injector.bindImplicit(clazz);
-                            Class<Object> itf = (Class)
-                                    (clazz.isInterface()
-                                            ? clazz
-                                            : clazz.getInterfaces().length > 0 ? clazz.getInterfaces()[0] : null);
-                            if (itf != null) {
-                                bind(itf).toProvider(() -> injector.getInstance(clazz));
-                            }
-                        } catch (ClassNotFoundException e) {
-                            // ignore
-                            e.printStackTrace();
-                        }
+                List<String> lines;
+                try (InputStream is = url.openStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                    lines = reader.lines()
+                            .map(String::trim)
+                            .filter(s -> !s.isEmpty() && !s.startsWith("#"))
+                            .toList();
+                }
+                for (String className : lines) {
+                    try {
+                        Class<?> clazz = classLoader.loadClass(className);
+                        injector.bindImplicit(clazz);
+                    } catch (ClassNotFoundException e) {
+                        // ignore
+                        e.printStackTrace();
                     }
                 }
             }
@@ -187,78 +155,23 @@ class SisuDiBridgeModule extends AbstractModule {
         } catch (IOException e) {
             throw new MavenException(e);
         }
-        Stream.of(
-                        LanguageProvider.class,
-                        LifecycleProvider.class,
-                        PackagingProvider.class,
-                        DefaultArtifactCoordinateFactory.class,
-                        DefaultArtifactDeployer.class,
-                        DefaultArtifactFactory.class,
-                        DefaultArtifactInstaller.class,
-                        DefaultArtifactResolver.class,
-                        DefaultChecksumAlgorithmService.class,
-                        DefaultDependencyCollector.class,
-                        DefaultDependencyCoordinateFactory.class,
-                        DefaultLocalRepositoryManager.class,
-                        DefaultMessageBuilderFactory.class,
-                        DefaultModelXmlFactory.class,
-                        DefaultRepositoryFactory.class,
-                        DefaultSettingsBuilder.class,
-                        DefaultSettingsXmlFactory.class,
-                        DefaultToolchainsBuilder.class,
-                        DefaultToolchainsXmlFactory.class,
-                        DefaultTransportProvider.class,
-                        DefaultVersionParser.class,
-                        DefaultVersionRangeResolver.class,
-                        DefaultVersionResolver.class,
-                        DefaultVersionSchemeProvider.class,
-                        VersionScheme.class,
-                        DefaultModelVersionParser.class,
-                        DefaultRepositorySystemSessionFactory.class,
-                        LegacyRepositorySystemSessionExtender.class,
-                        ExtensibleEnumRegistries.DefaultLanguageRegistry.class,
-                        ExtensibleEnumRegistries.DefaultPathScopeRegistry.class,
-                        ExtensibleEnumRegistries.DefaultProjectScopeRegistry.class,
-                        DefaultModelBuilder.class,
-                        DefaultModelProcessor.class,
-                        ModelParser.class,
-                        DefaultModelValidator.class,
-                        DefaultModelVersionProcessor.class,
-                        DefaultModelNormalizer.class,
-                        DefaultModelInterpolator.class,
-                        DefaultPathTranslator.class,
-                        DefaultUrlNormalizer.class,
-                        DefaultRootLocator.class,
-                        DefaultModelPathTranslator.class,
-                        DefaultModelUrlNormalizer.class,
-                        DefaultSuperPomProvider.class,
-                        DefaultInheritanceAssembler.class,
-                        DefaultProfileSelector.class,
-                        ProfileActivator.class,
-                        DefaultProfileInjector.class,
-                        DefaultPluginManagementInjector.class,
-                        DefaultDependencyManagementInjector.class,
-                        DefaultDependencyManagementImporter.class,
-                        DefaultLifecycleBindingsInjector.class,
-                        DefaultPluginConfigurationExpander.class,
-                        ProfileActivationFilePathInterpolator.class,
-                        BuildModelTransformer.class,
-                        DefaultArtifactDescriptorReader.class,
-                        DistributionManagementArtifactRelocationSource.class,
-                        UserPropertiesArtifactRelocationSource.class,
-                        FileProfileActivator.class,
-                        JdkVersionProfileActivator.class,
-                        OperatingSystemProfileActivator.class,
-                        PackagingProfileActivator.class,
-                        PropertyProfileActivator.class)
-                .forEach((Class<?> clazz) -> {
-                    injector.bindImplicit(clazz);
-                    Class<Object> itf = (Class)
-                            (clazz.isInterface()
-                                    ? null
-                                    : clazz.getInterfaces().length > 0 ? clazz.getInterfaces()[0] : null);
+        injector.getBindings().keySet().stream()
+                .filter(k -> k.getQualifier() != null)
+                .sorted(Comparator.comparing(k -> k.getRawType().getName()))
+                .distinct()
+                .forEach(key -> {
+                    Class<?> clazz = key.getRawType();
+                    Class<Object> itf = (clazz.isInterface()
+                            ? null
+                            : clazz.getInterfaces().length > 0 ? (Class<Object>) clazz.getInterfaces()[0] : null);
                     if (itf != null) {
-                        bind(itf).toProvider(() -> injector.getInstance(clazz));
+                        AnnotatedBindingBuilder<Object> binder = bind(itf);
+                        if (key.getQualifier() instanceof String s) {
+                            binder.annotatedWith(Names.named(s));
+                        } else if (key.getQualifier() instanceof Annotation a) {
+                            binder.annotatedWith(a);
+                        }
+                        binder.toProvider(() -> injector.getInstance(clazz));
                     }
                 });
     }

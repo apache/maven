@@ -145,6 +145,10 @@ public class InjectorImpl implements Injector {
         return bindings.keySet();
     }
 
+    public Map<Key<?>, Set<Binding<?>>> getBindings() {
+        return bindings;
+    }
+
     public <Q> Supplier<Q> getCompiledBinding(Key<Q> key) {
         Set<Binding<Q>> res = getBindings(key);
         if (res != null && !res.isEmpty()) {
