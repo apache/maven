@@ -49,6 +49,7 @@ import static org.mockito.Mockito.mock;
 /**
  */
 @PlexusTest
+@Deprecated
 public abstract class AbstractMavenProjectTestCase {
     protected ProjectBuilder projectBuilder;
 

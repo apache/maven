@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * transitive dependencies.
  *
  */
+@Deprecated
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //

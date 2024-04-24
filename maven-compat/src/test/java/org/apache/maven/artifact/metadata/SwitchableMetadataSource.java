@@ -33,6 +33,7 @@ import org.eclipse.sisu.Priority;
 @Singleton
 @Priority(10)
 @Named
+@Deprecated
 public class SwitchableMetadataSource implements ArtifactMetadataSource {
     private ArtifactMetadataSource delegate;
 

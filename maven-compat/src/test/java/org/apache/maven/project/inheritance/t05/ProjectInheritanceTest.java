@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * A test which demonstrates maven's dependency management
  *
  */
+@Deprecated
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //

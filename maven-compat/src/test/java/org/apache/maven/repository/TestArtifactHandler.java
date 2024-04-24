@@ -24,6 +24,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
  * Assists unit testing.
  *
  */
+@Deprecated
 class TestArtifactHandler implements ArtifactHandler {
 
     private String type;

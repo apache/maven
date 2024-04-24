@@ -61,6 +61,7 @@ import org.eclipse.sisu.Priority;
 @Named
 @Singleton
 @Priority(10)
+@Deprecated
 public class TestRepositorySystem implements RepositorySystem {
 
     private final ModelReader modelReader;

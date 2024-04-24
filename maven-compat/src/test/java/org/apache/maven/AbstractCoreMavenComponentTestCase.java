@@ -59,6 +59,7 @@ import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.mockito.Mockito.mock;
 
 @PlexusTest
+@Deprecated
 public abstract class AbstractCoreMavenComponentTestCase {
 
     @Inject

@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *    they do not explicitly state a scope.
  *
  */
+@Deprecated
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //

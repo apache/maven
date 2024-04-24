@@ -46,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * down in the lineage are bubbling up where they should.
  *
  */
+@Deprecated
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //

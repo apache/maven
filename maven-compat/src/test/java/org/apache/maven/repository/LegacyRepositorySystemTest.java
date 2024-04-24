@@ -60,6 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 @PlexusTest
+@Deprecated
 class LegacyRepositorySystemTest {
     @Inject
     private LegacyRepositorySystem repositorySystem;
