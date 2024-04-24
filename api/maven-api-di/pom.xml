@@ -30,11 +30,4 @@
   <name>Maven 4 API :: Dependency Injection</name>
   <description>Maven 4 API - Dependency Injection</description>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-api-meta</artifactId>
-    </dependency>
-  </dependencies>
-
 </project>
