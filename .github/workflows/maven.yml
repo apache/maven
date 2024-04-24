@@ -43,7 +43,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           java-version: 8
-          distribution: 'temurin'
+          distribution: 'zulu'
           cache: 'maven'
 
       - name: Build with Maven
@@ -125,7 +125,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'temurin'
+          distribution: 'zulu'
           cache: 'maven'
 
       - name: Running integration tests
