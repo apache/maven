@@ -85,8 +85,6 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
     @Override
     public void merge(Path existing, Path result) throws RepositoryException {
         Metadata recessive = read(existing);
-        recessive.merge(metadata);
-        metadata = recessive;
 
         merge(recessive);
 

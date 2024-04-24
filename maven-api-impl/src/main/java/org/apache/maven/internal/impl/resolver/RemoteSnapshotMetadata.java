@@ -22,6 +22,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
@@ -130,6 +131,11 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
         }
 
         metadata = metadata.withVersioning(metadata.getVersioning().withSnapshotVersions(versions.values()));
+
+        // just carry-on as-is
+        if (recessive.getPlugins() != null && !recessive.getPlugins().isEmpty()) {
+            metadata = metadata.withPlugins(new ArrayList<>(recessive.getPlugins()));
+        }
     }
 
     private static int getBuildNumber(Metadata metadata) {
