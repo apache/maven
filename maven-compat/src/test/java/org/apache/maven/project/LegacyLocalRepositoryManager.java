@@ -35,6 +35,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  */
+@Deprecated
 public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
     private final LocalRepository repository;

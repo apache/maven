@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests {@link OrArtifactFilter}.
  *
  */
+@Deprecated
 class OrArtifactFilterTest {
 
     private ArtifactFilter newSubFilter() {

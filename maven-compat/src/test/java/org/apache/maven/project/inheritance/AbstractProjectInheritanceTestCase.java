@@ -28,6 +28,7 @@ import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 
 /**
  */
+@Deprecated
 public abstract class AbstractProjectInheritanceTestCase extends AbstractMavenProjectTestCase {
     protected String getTestSeries() {
         String className = getClass().getPackage().getName();

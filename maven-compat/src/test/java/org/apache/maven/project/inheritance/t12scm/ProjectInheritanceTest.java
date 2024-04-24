@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Verifies SCM inheritance uses modules statement from parent.
  *
  */
+@Deprecated
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //

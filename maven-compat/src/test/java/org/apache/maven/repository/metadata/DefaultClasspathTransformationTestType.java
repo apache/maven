@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  */
 @PlexusTest
+@Deprecated
 class DefaultClasspathTransformationTestType {
     @Inject
     ClasspathTransformation transform;

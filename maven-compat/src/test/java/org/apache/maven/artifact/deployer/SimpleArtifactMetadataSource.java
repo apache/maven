@@ -34,6 +34,7 @@ import org.apache.maven.repository.legacy.metadata.ResolutionGroup;
 
 @Named("classpath")
 @Singleton
+@Deprecated
 public class SimpleArtifactMetadataSource implements ArtifactMetadataSource {
     public ResolutionGroup retrieve(
             Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories) {

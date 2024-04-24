@@ -45,6 +45,7 @@ import static org.apache.maven.api.Lifecycle.DEFAULT;
 @Singleton
 @Named
 @Priority(5)
+@Deprecated
 public class EmptyLifecycleBindingsInjector extends DefaultLifecycleBindingsInjector {
 
     private static LifecycleRegistry lifecycleRegistry;

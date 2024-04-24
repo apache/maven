@@ -59,6 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  */
 @PlexusTest
+@Deprecated
 class DefaultWagonManagerTest {
     @Inject
     private WagonManager wagonManager;

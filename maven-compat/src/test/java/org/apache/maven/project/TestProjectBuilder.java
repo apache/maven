@@ -36,6 +36,7 @@ import org.eclipse.aether.impl.RemoteRepositoryManager;
 
 @Named("classpath")
 @Singleton
+@Deprecated
 public class TestProjectBuilder extends DefaultProjectBuilder {
     @Inject
     public TestProjectBuilder(

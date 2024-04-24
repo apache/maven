@@ -27,6 +27,7 @@ import org.apache.maven.artifact.resolver.DefaultArtifactResolver;
 
 @Named("classpath")
 @Singleton
+@Deprecated
 public class TestArtifactResolver extends DefaultArtifactResolver {
     private ArtifactMetadataSource source;
 

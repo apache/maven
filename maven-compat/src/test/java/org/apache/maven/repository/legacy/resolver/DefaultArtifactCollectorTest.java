@@ -63,6 +63,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 @PlexusTest
+@Deprecated
 class DefaultArtifactCollectorTest {
     @Inject
     private LegacyArtifactCollector artifactCollector;

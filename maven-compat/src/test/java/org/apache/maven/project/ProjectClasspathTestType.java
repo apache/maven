@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+@Deprecated
 class ProjectClasspathTestType extends AbstractMavenProjectTestCase {
     static final String dir = "projects/scope/";
 

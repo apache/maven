@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * not clobbered by the same elements elsewhere in the lineage.
  *
  */
+@Deprecated
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //

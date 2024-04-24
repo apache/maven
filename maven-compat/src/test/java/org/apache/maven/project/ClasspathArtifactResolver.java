@@ -41,6 +41,7 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
  */
 @Named("classpath")
 @Singleton
+@Deprecated
 public class ClasspathArtifactResolver implements ArtifactResolver {
 
     public List<ArtifactResult> resolveArtifacts(

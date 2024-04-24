@@ -82,6 +82,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  */
 @PlexusTest
+@Deprecated
 public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCase
  {
     @Inject
