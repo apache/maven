@@ -513,6 +513,11 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-named-locks</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-connector-basic</artifactId>
         <version>${resolverVersion}</version>
       </dependency>
@@ -631,7 +636,7 @@ under the License.
     <!--bootstrap-start-comment-->
   </dependencyManagement>
   <!--bootstrap-end-comment-->
-  <!--bootstrap-start-comment-->
+  <!--
   <dependencies>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -644,7 +649,7 @@ under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <!--bootstrap-end-comment-->
+  -->
 
   <build>
     <pluginManagement>

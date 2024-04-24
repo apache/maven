@@ -53,7 +53,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-api-di</artifactId>
+      <artifactId>maven-api-xml</artifactId>
     </dependency>
   </dependencies>
 
