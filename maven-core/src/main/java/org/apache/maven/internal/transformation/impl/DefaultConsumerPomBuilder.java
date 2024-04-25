@@ -61,6 +61,7 @@ import org.apache.maven.api.services.model.ProfileSelector;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.model.DefaultModelBuilder;
 import org.apache.maven.internal.impl.model.DefaultProfileSelector;
+import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
@@ -129,6 +130,9 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     @Inject
     private RemoteRepositoryManager remoteRepositoryManager;
 
+    @Inject
+    private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
+
     @Override
     public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuilderException {
         Model model = project.getModel().getDelegate();
@@ -180,7 +184,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 dependencyManagementImporter,
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
-                null,
+                profileActivationFilePathInterpolator,
                 modelTransformer,
                 versionParser,
                 remoteRepositoryManager);
