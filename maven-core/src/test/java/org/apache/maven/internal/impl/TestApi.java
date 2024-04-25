@@ -49,9 +49,11 @@ import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -207,6 +209,14 @@ class TestApi {
         assertNull(modules);
         assertTrue(paths.containsAll(classes));
         assertEquals("plexus-1.0.11.pom", unresolved.get(0).getFileName().toString());
+    }
+
+    @Test
+    void testMetadataGeneratorFactory() throws ComponentLookupException {
+        List<MetadataGeneratorFactory> factories = plexusContainer.lookupList(MetadataGeneratorFactory.class);
+        assertNotNull(factories);
+        factories.forEach(f -> System.out.println(f.getClass().getName()));
+        assertEquals(3, factories.size());
     }
 
     @Test

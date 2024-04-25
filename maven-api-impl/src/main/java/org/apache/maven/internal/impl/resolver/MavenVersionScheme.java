@@ -19,9 +19,12 @@
 package org.apache.maven.internal.impl.resolver;
 
 import org.apache.maven.api.di.Named;
-import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
 import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.Version;
+import org.eclipse.aether.version.VersionConstraint;
+import org.eclipse.aether.version.VersionRange;
 import org.eclipse.aether.version.VersionScheme;
 
 /**
@@ -29,10 +32,22 @@ import org.eclipse.aether.version.VersionScheme;
  */
 @Singleton
 @Named
-public final class DefaultVersionSchemeProvider {
+public class MavenVersionScheme implements VersionScheme {
 
-    @Provides
-    static VersionScheme getVersionScheme() {
-        return new GenericVersionScheme();
+    private final VersionScheme delegate = new GenericVersionScheme();
+
+    @Override
+    public Version parseVersion(String version) throws InvalidVersionSpecificationException {
+        return delegate.parseVersion(version);
+    }
+
+    @Override
+    public VersionRange parseVersionRange(String range) throws InvalidVersionSpecificationException {
+        return delegate.parseVersionRange(range);
+    }
+
+    @Override
+    public VersionConstraint parseVersionConstraint(String constraint) throws InvalidVersionSpecificationException {
+        return delegate.parseVersionConstraint(constraint);
     }
 }

@@ -69,7 +69,6 @@ import org.apache.maven.model.building.ModelSource3;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
-import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.apache.maven.utils.Os;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -100,7 +99,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     private final org.eclipse.aether.RepositorySystem repoSystem;
     private final RemoteRepositoryManager repositoryManager;
     private final ProjectDependenciesResolver dependencyResolver;
-    private final ModelCacheFactory modelCacheFactory;
 
     private final RootLocator rootLocator;
 
@@ -114,7 +112,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             RepositorySystem repoSystem,
             RemoteRepositoryManager repositoryManager,
             ProjectDependenciesResolver dependencyResolver,
-            ModelCacheFactory modelCacheFactory,
             RootLocator rootLocator) {
         this.modelBuilder = modelBuilder;
         this.modelProcessor = modelProcessor;
@@ -123,7 +120,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         this.repoSystem = repoSystem;
         this.repositoryManager = repositoryManager;
         this.dependencyResolver = dependencyResolver;
-        this.modelCacheFactory = modelCacheFactory;
         this.rootLocator = rootLocator;
     }
     // ----------------------------------------------------------------------

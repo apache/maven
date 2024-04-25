@@ -35,13 +35,13 @@ import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.internal.impl.resolver.ArtifactDescriptorUtils;
 import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
-import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
@@ -141,8 +141,8 @@ public class ProjectModelResolver implements ModelResolver {
             removeMatchingRepository(pomRepositories, repository.getId());
         }
 
-        List<RemoteRepository> newRepositories = Collections.singletonList(
-                ArtifactDescriptorUtils.toRemoteRepository(new org.apache.maven.model.Repository(repository)));
+        List<RemoteRepository> newRepositories =
+                Collections.singletonList(ArtifactDescriptorUtils.toRemoteRepository(repository));
 
         if (ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT.equals(repositoryMerging)) {
             repositories = remoteRepositoryManager.aggregateRepositories(session, repositories, newRepositories, true);

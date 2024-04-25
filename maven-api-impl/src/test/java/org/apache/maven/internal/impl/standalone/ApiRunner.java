@@ -61,7 +61,7 @@ import org.apache.maven.internal.impl.*;
 import org.apache.maven.internal.impl.model.*;
 import org.apache.maven.internal.impl.resolver.DefaultVersionRangeResolver;
 import org.apache.maven.internal.impl.resolver.DefaultVersionResolver;
-import org.apache.maven.internal.impl.resolver.DefaultVersionSchemeProvider;
+import org.apache.maven.internal.impl.resolver.MavenVersionScheme;
 import org.apache.maven.internal.impl.resolver.type.DefaultTypeProvider;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -104,7 +104,7 @@ public class ApiRunner {
         injector.bindImplicit(ExtensibleEnumRegistries.class);
         injector.bindImplicit(DefaultTypeProvider.class);
 
-        injector.bindImplicit(DefaultVersionSchemeProvider.class);
+        injector.bindImplicit(MavenVersionScheme.class);
         injector.bindImplicit(BuildModelTransformer.class);
         injector.bindImplicit(DefaultDependencyManagementImporter.class);
         injector.bindImplicit(DefaultDependencyManagementInjector.class);
