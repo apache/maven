@@ -173,7 +173,7 @@ under the License.
     <hamcrestVersion>2.2</hamcrestVersion>
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
-    <jlineVersion>3.26.0</jlineVersion>
+    <jlineVersion>3.26.1</jlineVersion>
     <junitVersion>5.10.1</junitVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <logbackClassicVersion>1.2.13</logbackClassicVersion>
