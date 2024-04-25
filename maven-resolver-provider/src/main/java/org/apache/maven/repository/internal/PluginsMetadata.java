@@ -75,11 +75,16 @@ final class PluginsMetadata extends MavenMetadata {
     protected void merge(Metadata recessive) {
         List<Plugin> recessivePlugins = recessive.getPlugins();
         List<Plugin> plugins = metadata.getPlugins();
-        if (!plugins.isEmpty()) {
+        if (!recessivePlugins.isEmpty() || !plugins.isEmpty()) {
             LinkedHashMap<String, Plugin> mergedPlugins = new LinkedHashMap<>();
             recessivePlugins.forEach(p -> mergedPlugins.put(p.getPrefix(), p));
             plugins.forEach(p -> mergedPlugins.put(p.getPrefix(), p));
             metadata.setPlugins(new ArrayList<>(mergedPlugins.values()));
+        }
+
+        // just carry-on as-is
+        if (recessive.getVersioning() != null) {
+            metadata.setVersioning(recessive.getVersioning());
         }
     }
 

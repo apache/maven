@@ -90,6 +90,11 @@ final class VersionsMetadata extends MavenMetadata {
         }
 
         metadata = metadata.withVersioning(versioning.build());
+
+        // just carry-on as-is
+        if (recessive.getPlugins() != null && !recessive.getPlugins().isEmpty()) {
+            metadata = metadata.withPlugins(new ArrayList<>(recessive.getPlugins()));
+        }
     }
 
     public Object getKey() {

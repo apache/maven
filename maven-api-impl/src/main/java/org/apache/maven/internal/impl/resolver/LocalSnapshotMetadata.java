@@ -113,6 +113,11 @@ final class LocalSnapshotMetadata extends MavenMetadata {
 
         metadata = metadata.withVersioning(metadata.getVersioning().withSnapshotVersions(versions.values()));
 
+        // just carry-on as-is
+        if (recessive.getPlugins() != null && !recessive.getPlugins().isEmpty()) {
+            metadata = metadata.withPlugins(new ArrayList<>(recessive.getPlugins()));
+        }
+
         artifacts.clear();
     }
 
