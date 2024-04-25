@@ -124,6 +124,10 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
         if (!legacyFormat) {
             metadata.getVersioning().setSnapshotVersions(new ArrayList<>(versions.values()));
         }
+        // just carry-on as-is
+        if (!recessive.getPlugins().isEmpty()) {
+            metadata.setPlugins(new ArrayList<>(recessive.getPlugins()));
+        }
     }
 
     private static int getBuildNumber(Metadata metadata) {
