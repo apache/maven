@@ -18,8 +18,6 @@
  */
 package org.apache.maven.jline;
 
-import java.io.PrintStream;
-
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.jline.jansi.AnsiConsole;
@@ -37,16 +35,22 @@ public class MessageUtils {
     static Thread shutdownHook;
     static final Object STARTUP_SHUTDOWN_MONITOR = new Object();
 
-    static PrintStream prevOut;
-    static PrintStream prevErr;
+    public static void systemInstall(Terminal terminal) {
+        MessageUtils.terminal = terminal;
+        MessageUtils.reader = createReader(terminal);
+    }
 
     public static void systemInstall() {
-        terminal = new FastTerminal(
-                () -> TerminalBuilder.builder().name("Maven").dumb(true).build(), t -> {
-                    reader = LineReaderBuilder.builder().terminal(t).build();
-                    AnsiConsole.setTerminal(t);
+        MessageUtils.terminal = new FastTerminal(
+                () -> TerminalBuilder.builder().name("Maven").dumb(true).build(), terminal -> {
+                    MessageUtils.reader = createReader(terminal);
+                    AnsiConsole.setTerminal(terminal);
                     AnsiConsole.systemInstall();
                 });
+    }
+
+    private static LineReader createReader(Terminal terminal) {
+        return LineReaderBuilder.builder().terminal(terminal).build();
     }
 
     public static void registerShutdownHook() {
