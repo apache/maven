@@ -44,10 +44,10 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.internal.impl.DefaultArtifactCoordinate;
-import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
+import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -74,19 +74,17 @@ public class MavenStatusCommand {
     private final ArtifactResolver artifactResolver;
     private final RemoteRepositoryConnectionVerifier remoteRepositoryConnectionVerifier;
     private final DefaultSessionFactory defaultSessionFactory;
-    private final DefaultRepositorySystemSessionFactory repoSession;
+    private final RepositorySystemSessionFactory repoSession;
     private final MavenRepositorySystem repositorySystem;
-    private final PlexusContainer container;
     private final SessionScope sessionScope;
     private Path tempLocalRepository;
 
     public MavenStatusCommand(final PlexusContainer container) throws ComponentLookupException {
-        this.container = container;
         this.remoteRepositoryConnectionVerifier = new RemoteRepositoryConnectionVerifier(container);
         this.mavenExecutionRequestPopulator = container.lookup(MavenExecutionRequestPopulator.class);
         this.artifactResolver = container.lookup(ArtifactResolver.class);
         this.defaultSessionFactory = container.lookup(DefaultSessionFactory.class);
-        this.repoSession = container.lookup(DefaultRepositorySystemSessionFactory.class);
+        this.repoSession = container.lookup(RepositorySystemSessionFactory.class);
         this.sessionScope = container.lookup(SessionScope.class);
         this.repositorySystem = container.lookup(MavenRepositorySystem.class);
     }
@@ -142,31 +140,34 @@ public class MavenStatusCommand {
         final List<String> issues = new ArrayList<>();
 
         for (ArtifactRepository remoteRepository : remoteRepositories) {
-            final RepositorySystemSession repositorySession = repoSession.newRepositorySession(mavenExecutionRequest);
+            final RepositorySystemSession.CloseableSession repositorySession = repoSession
+                    .newRepositorySessionBuilder(mavenExecutionRequest)
+                    .build();
             remoteRepositoryConnectionVerifier
                     .verifyConnectionToRemoteRepository(repositorySession, remoteRepository)
                     .ifPresent(issues::add);
+            repositorySession.close();
         }
 
         return issues;
     }
 
     private List<String> verifyArtifactResolution(final MavenExecutionRequest mavenExecutionRequest) {
-        final Session session = this.defaultSessionFactory.newSession(new MavenSession(
-                container,
-                repoSession.newRepositorySession(mavenExecutionRequest),
-                mavenExecutionRequest,
-                new DefaultMavenExecutionResult()));
-
+        RepositorySystemSession.CloseableSession repoSession = this.repoSession
+                .newRepositorySessionBuilder(mavenExecutionRequest)
+                .build();
+        final Session session = this.defaultSessionFactory.newSession(
+                new MavenSession(repoSession, mavenExecutionRequest, new DefaultMavenExecutionResult()));
+        repoSession.close();
         sessionScope.enter();
         try {
-            sessionScope.seed(DefaultSession.class, (DefaultSession) session);
+            InternalMavenSession internalSession = InternalMavenSession.from(session);
+            sessionScope.seed(InternalMavenSession.class, internalSession);
 
             ArtifactCoordinate artifactCoordinate =
-                    new DefaultArtifactCoordinate((DefaultSession) session, APACHE_MAVEN_ARTIFACT);
+                    new DefaultArtifactCoordinate(internalSession, APACHE_MAVEN_ARTIFACT);
             ArtifactResolverResult resolverResult =
                     artifactResolver.resolve(session, Collections.singleton(artifactCoordinate));
-
             resolverResult
                     .getArtifacts()
                     .forEach((key, value) -> LOGGER.debug("Successfully resolved {} to {}", key, value));
