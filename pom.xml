@@ -182,7 +182,7 @@ under the License.
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusTestingVersion>1.0.0</plexusTestingVersion>
     <plexusXmlVersion>4.0.1</plexusXmlVersion>
-    <resolverVersion>2.0.0-alpha-10</resolverVersion>
+    <resolverVersion>2.0.0-alpha-11</resolverVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <sisuVersion>0.9.0.M2</sisuVersion>
     <slf4jVersion>2.0.11</slf4jVersion>
@@ -650,6 +650,21 @@ under the License.
     </dependency>
   </dependencies>
   -->
+
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>maven-2102</id>
+      <url>https://repository.apache.org/content/repositories/maven-2102/</url>
+    </repository>
+  </repositories>
 
   <build>
     <pluginManagement>
