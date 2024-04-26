@@ -18,6 +18,13 @@
  */
 package org.apache.maven.repository.internal;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
+
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.internal.impl.DefaultModelUrlNormalizer;
 import org.apache.maven.internal.impl.DefaultModelVersionParser;
@@ -154,13 +161,6 @@ import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.VersionScheme;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
 
 /**
  * A simple memorizing {@link Supplier} of {@link RepositorySystem} instance, that on first call
