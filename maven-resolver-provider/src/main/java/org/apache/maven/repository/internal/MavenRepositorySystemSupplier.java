@@ -16,14 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl.standalone;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
+package org.apache.maven.repository.internal;
 
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.internal.impl.DefaultModelUrlNormalizer;
@@ -79,8 +72,34 @@ import org.eclipse.aether.impl.UpdateCheckManager;
 import org.eclipse.aether.impl.UpdatePolicyAnalyzer;
 import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.impl.VersionResolver;
-import org.eclipse.aether.internal.impl.*;
+import org.eclipse.aether.internal.impl.DefaultArtifactPredicateFactory;
 import org.eclipse.aether.internal.impl.DefaultArtifactResolver;
+import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
+import org.eclipse.aether.internal.impl.DefaultChecksumProcessor;
+import org.eclipse.aether.internal.impl.DefaultDeployer;
+import org.eclipse.aether.internal.impl.DefaultInstaller;
+import org.eclipse.aether.internal.impl.DefaultLocalPathComposer;
+import org.eclipse.aether.internal.impl.DefaultLocalPathPrefixComposerFactory;
+import org.eclipse.aether.internal.impl.DefaultLocalRepositoryProvider;
+import org.eclipse.aether.internal.impl.DefaultMetadataResolver;
+import org.eclipse.aether.internal.impl.DefaultOfflineController;
+import org.eclipse.aether.internal.impl.DefaultPathProcessor;
+import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.internal.impl.DefaultRepositoryConnectorProvider;
+import org.eclipse.aether.internal.impl.DefaultRepositoryEventDispatcher;
+import org.eclipse.aether.internal.impl.DefaultRepositoryLayoutProvider;
+import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
+import org.eclipse.aether.internal.impl.DefaultRepositorySystemLifecycle;
+import org.eclipse.aether.internal.impl.DefaultTrackingFileManager;
+import org.eclipse.aether.internal.impl.DefaultTransporterProvider;
+import org.eclipse.aether.internal.impl.DefaultUpdateCheckManager;
+import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
+import org.eclipse.aether.internal.impl.EnhancedLocalRepositoryManagerFactory;
+import org.eclipse.aether.internal.impl.LocalPathComposer;
+import org.eclipse.aether.internal.impl.LocalPathPrefixComposerFactory;
+import org.eclipse.aether.internal.impl.Maven2RepositoryLayoutFactory;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.internal.impl.TrackingFileManager;
 import org.eclipse.aether.internal.impl.checksum.DefaultChecksumAlgorithmFactorySelector;
 import org.eclipse.aether.internal.impl.checksum.Md5ChecksumAlgorithmFactory;
 import org.eclipse.aether.internal.impl.checksum.Sha1ChecksumAlgorithmFactory;
@@ -136,6 +155,13 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.VersionScheme;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
+
 /**
  * A simple memorizing {@link Supplier} of {@link RepositorySystem} instance, that on first call
  * supplies lazily constructed instance, and on each subsequent call same instance. Hence, this instance should be
@@ -156,11 +182,13 @@ import org.eclipse.aether.version.VersionScheme;
  * Important: Given the instance of supplier memorizes the supplier {@link RepositorySystem} instance it supplies,
  * their lifecycle is shared as well: once supplied repository system is shut-down, this instance becomes closed as
  * well. Any subsequent {@code getXXX} method invocation attempt will fail with {@link IllegalStateException}.
+ *
+ * @since 4.0.0
  */
-public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
+public class MavenRepositorySystemSupplier implements Supplier<RepositorySystem> {
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    public RepositorySystemSupplier() {}
+    public MavenRepositorySystemSupplier() {}
 
     private void checkClosed() {
         if (closed.get()) {
