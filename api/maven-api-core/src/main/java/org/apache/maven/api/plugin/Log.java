@@ -20,6 +20,9 @@ package org.apache.maven.api.plugin;
 
 import java.util.function.Supplier;
 
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Provider;
+
 /**
  * This interface supplies the API for providing feedback to the user from the <code>Mojo</code>, using standard
  * <code>Maven</code> channels.<br>
@@ -28,8 +31,10 @@ import java.util.function.Supplier;
  * convenience, to enable developers to pass things like <code>java.lang.StringBuffer</code> directly into the logger,
  * rather than formatting first by calling <code>toString()</code>.
  *
- * @since 4.0
+ * @since 4.0.0
  */
+@Experimental
+@Provider
 public interface Log {
     /**
      * @return true if the <b>debug</b> error level is enabled

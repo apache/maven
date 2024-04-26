@@ -18,11 +18,17 @@
  */
 package org.apache.maven.artifact.repository.metadata;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.xml.stream.XMLStreamException;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,28 +39,24 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
+import org.apache.maven.metadata.v4.MetadataStaxReader;
+import org.apache.maven.metadata.v4.MetadataStaxWriter;
 import org.apache.maven.repository.legacy.UpdateCheckManager;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.WriterFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * @author Jason van Zyl
  */
-@Component(role = RepositoryMetadataManager.class)
+@Named
+@Singleton
+@Deprecated
 public class DefaultRepositoryMetadataManager extends AbstractLogEnabled implements RepositoryMetadataManager {
-    @Requirement
+    @Inject
     private WagonManager wagonManager;
 
-    @Requirement
+    @Inject
     private UpdateCheckManager updateCheckManager;
 
     public void resolve(
@@ -267,19 +269,15 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
      * TODO share with DefaultPluginMappingManager.
      */
     protected Metadata readMetadata(File mappingFile) throws RepositoryMetadataReadException {
-        Metadata result;
 
-        try (Reader reader = ReaderFactory.newXmlReader(mappingFile)) {
-            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
-            result = mappingReader.read(reader, false);
+        try (InputStream in = Files.newInputStream(mappingFile.toPath())) {
+            return new Metadata(new MetadataStaxReader().read(in, false));
         } catch (FileNotFoundException e) {
             throw new RepositoryMetadataReadException("Cannot read metadata from '" + mappingFile + "'", e);
-        } catch (IOException | XmlPullParserException e) {
+        } catch (IOException | XMLStreamException e) {
             throw new RepositoryMetadataReadException(
                     "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e);
         }
-        return result;
     }
 
     /**
@@ -310,9 +308,9 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
         if (changed) {
             getLogger().debug("Repairing metadata in " + metadataFile);
 
-            try (Writer writer = WriterFactory.newXmlWriter(metadataFile)) {
-                new MetadataXpp3Writer().write(writer, metadata);
-            } catch (IOException e) {
+            try (OutputStream out = Files.newOutputStream(metadataFile.toPath())) {
+                new MetadataStaxWriter().write(out, metadata.getDelegate());
+            } catch (IOException | XMLStreamException e) {
                 String msg = "Could not write fixed metadata to " + metadataFile + ": " + e.getMessage();
                 if (getLogger().isDebugEnabled()) {
                     getLogger().warn(msg, e);

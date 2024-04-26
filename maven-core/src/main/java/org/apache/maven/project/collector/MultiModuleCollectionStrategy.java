@@ -97,17 +97,19 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
     }
 
     private File getMultiModuleProjectPomFile(MavenExecutionRequest request) {
-        if (request.getPom().getParentFile().equals(request.getMultiModuleProjectDirectory())) {
+        File multiModuleProjectDirectory = request.getMultiModuleProjectDirectory();
+        if (request.getPom().getParentFile().equals(multiModuleProjectDirectory)) {
             return request.getPom();
         } else {
-            File multiModuleProjectPom = modelLocator.locatePom(request.getMultiModuleProjectDirectory());
-            if (!multiModuleProjectPom.exists()) {
+            File multiModuleProjectPom = modelLocator.locateExistingPom(multiModuleProjectDirectory);
+            if (multiModuleProjectPom == null) {
                 LOGGER.info(
                         "Maven detected that the requested POM file is part of a multi-module project, "
                                 + "but could not find a pom.xml file in the multi-module root directory '{}'.",
-                        request.getMultiModuleProjectDirectory());
-                LOGGER.info("The reactor is limited to all projects under: "
-                        + request.getPom().getParent());
+                        multiModuleProjectDirectory);
+                LOGGER.info(
+                        "The reactor is limited to all projects under: {}",
+                        request.getPom().getParent());
                 return request.getPom();
             }
 

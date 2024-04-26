@@ -24,9 +24,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class DefaultMirrorSelectorTest {
+@Deprecated
+class DefaultMirrorSelectorTest {
     @Test
-    public void testMirrorWithMirrorOfPatternContainingANegationIsNotSelected() {
+    void testMirrorWithMirrorOfPatternContainingANegationIsNotSelected() {
         ArtifactRepository repository = new DefaultArtifactRepository("snapshots.repo", "http://whatever", null);
         String pattern = "external:*, !snapshots.repo";
         assertFalse(DefaultMirrorSelector.matchPattern(repository, pattern));

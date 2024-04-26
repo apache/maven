@@ -30,8 +30,6 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 /**
  * Exception in the plugin manager.
- *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class PluginManagerException extends Exception {
 
@@ -97,20 +95,24 @@ public class PluginManagerException extends Exception {
         pluginVersion = plugin.getVersion();
     }
 
+    /**
+     * Constructor.
+     *
+     * @deprecated Left for binary compatibility.
+     */
+    @Deprecated
     public PluginManagerException(Plugin plugin, String message, PlexusConfigurationException cause) {
-        super(message, cause);
-
-        pluginGroupId = plugin.getGroupId();
-        pluginArtifactId = plugin.getArtifactId();
-        pluginVersion = plugin.getVersion();
+        this(plugin, message, (Throwable) cause);
     }
 
+    /**
+     * Constructor.
+     *
+     * @deprecated Left for binary compatibility.
+     */
+    @Deprecated
     public PluginManagerException(Plugin plugin, String message, ComponentRepositoryException cause) {
-        super(message, cause);
-
-        pluginGroupId = plugin.getGroupId();
-        pluginArtifactId = plugin.getArtifactId();
-        pluginVersion = plugin.getVersion();
+        this(plugin, message, (Throwable) cause);
     }
 
     public PluginManagerException(
@@ -138,12 +140,14 @@ public class PluginManagerException extends Exception {
         goal = mojoDescriptor.getGoal();
     }
 
+    /**
+     * Constructor.
+     *
+     * @deprecated Left for binary compatibility.
+     */
+    @Deprecated
     public PluginManagerException(Plugin plugin, String message, PlexusContainerException cause) {
-        super(message, cause);
-
-        pluginGroupId = plugin.getGroupId();
-        pluginArtifactId = plugin.getArtifactId();
-        pluginVersion = plugin.getVersion();
+        this(plugin, message, (Throwable) cause);
     }
 
     public PluginManagerException(Plugin plugin, String message, MavenProject project) {

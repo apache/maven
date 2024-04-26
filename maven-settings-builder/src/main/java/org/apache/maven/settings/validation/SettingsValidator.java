@@ -24,7 +24,6 @@ import org.apache.maven.settings.building.SettingsProblemCollector;
 /**
  * Validate a model settings
  *
- * @author Milos Kleint
  */
 public interface SettingsValidator {
 
@@ -35,4 +34,15 @@ public interface SettingsValidator {
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
     void validate(Settings settings, SettingsProblemCollector problems);
+
+    /**
+     * Validate the specified settings.
+     *
+     * @param settings The settings to validate, must not be {@code null}.
+     * @param isProjectSettings Boolean indicating if the validation is for project settings or user / global settings.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     */
+    default void validate(Settings settings, boolean isProjectSettings, SettingsProblemCollector problems) {
+        validate(settings, problems);
+    }
 }

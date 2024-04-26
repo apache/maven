@@ -21,8 +21,8 @@ package org.apache.maven.artifact.repository.metadata;
 /**
  * Assists in handling repository metadata.
  *
- * @author Benjamin Bentmann
  */
+@Deprecated
 class MetadataUtils {
 
     public static Metadata cloneMetadata(Metadata src) {

@@ -18,14 +18,14 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.MavenSession;
@@ -39,7 +39,6 @@ import org.apache.maven.project.MavenProject;
  * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice.
  *
  * @since 3.0
- * @author Kristian Rosenvold
  */
 public class ProjectBuildList implements Iterable<ProjectSegment> {
     private final List<ProjectSegment> items;
@@ -55,23 +54,14 @@ public class ProjectBuildList implements Iterable<ProjectSegment> {
      * @return a project build list for the supplied task segment
      */
     public ProjectBuildList getByTaskSegment(TaskSegment taskSegment) {
-        List<ProjectSegment> currentSegment = new ArrayList<>();
-        for (ProjectSegment projectBuild : items) {
-            if (taskSegment == projectBuild.getTaskSegment()) { // NOTE: There's no notion of taskSegment equality.
-                currentSegment.add(projectBuild);
-            }
-        }
-        return new ProjectBuildList(currentSegment);
+        return new ProjectBuildList(
+                items.stream().filter(pb -> taskSegment == pb.getTaskSegment()).collect(Collectors.toList()));
     }
 
     public Map<MavenProject, ProjectSegment> selectSegment(TaskSegment taskSegment) {
-        Map<MavenProject, ProjectSegment> result = new HashMap<>();
-        for (ProjectSegment projectBuild : items) {
-            if (taskSegment == projectBuild.getTaskSegment()) { // NOTE: There's no notion of taskSegment equality.
-                result.put(projectBuild.getProject(), projectBuild);
-            }
-        }
-        return result;
+        return items.stream()
+                .filter(pb -> taskSegment == pb.getTaskSegment())
+                .collect(Collectors.toMap(ProjectSegment::getProject, Function.identity()));
     }
 
     /**
@@ -80,14 +70,13 @@ public class ProjectBuildList implements Iterable<ProjectSegment> {
      * @return The projectSegment or null.
      */
     public ProjectSegment findByMavenProject(MavenProject mavenProject) {
-        for (ProjectSegment projectBuild : items) {
-            if (mavenProject.equals(projectBuild.getProject())) {
-                return projectBuild;
-            }
-        }
-        return null;
+        return items.stream()
+                .filter(pb -> mavenProject.equals(pb.getProject()))
+                .findFirst()
+                .orElse(null);
     }
 
+    @Override
     public Iterator<ProjectSegment> iterator() {
         return items.iterator();
     }
@@ -125,11 +114,6 @@ public class ProjectBuildList implements Iterable<ProjectSegment> {
      * @return a set of all the projects managed by the build
      */
     public Set<MavenProject> getProjects() {
-        Set<MavenProject> projects = new HashSet<>();
-
-        for (ProjectSegment s : items) {
-            projects.add(s.getProject());
-        }
-        return projects;
+        return items.stream().map(ProjectSegment::getProject).collect(Collectors.toSet());
     }
 }

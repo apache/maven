@@ -19,6 +19,7 @@
 package org.apache.maven.model.building;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,12 +33,11 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 /**
  * Collects settings that control building of effective models.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultModelBuildingRequest implements ModelBuildingRequest {
     private Model fileModel;
 
-    private File pomFile;
+    private Path pomPath;
 
     private ModelSource modelSource;
 
@@ -71,6 +71,8 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
 
     private TransformerContextBuilder contextBuilder;
 
+    private Path rootDirectory;
+
     /**
      * Creates an empty request.
      */
@@ -82,7 +84,7 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
      * @param request The request to copy, must not be {@code null}.
      */
     public DefaultModelBuildingRequest(ModelBuildingRequest request) {
-        setPomFile(request.getPomFile());
+        setPomPath(request.getPomPath());
         setModelSource(request.getModelSource());
         setValidationLevel(request.getValidationLevel());
         setProcessPlugins(request.isProcessPlugins());
@@ -99,24 +101,37 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
         setModelCache(request.getModelCache());
         setWorkspaceModelResolver(request.getWorkspaceModelResolver());
         setTransformerContextBuilder(request.getTransformerContextBuilder());
+        setRootDirectory(request.getRootDirectory());
     }
 
+    @Deprecated
     @Override
     public File getPomFile() {
-        return pomFile;
+        return pomPath != null ? pomPath.toFile() : null;
     }
 
     @Override
-    public DefaultModelBuildingRequest setPomFile(File pomFile) {
-        this.pomFile = (pomFile != null) ? pomFile.getAbsoluteFile() : null;
+    public Path getPomPath() {
+        return pomPath;
+    }
 
+    @Deprecated
+    @Override
+    public DefaultModelBuildingRequest setPomFile(File pomFile) {
+        this.pomPath = (pomFile != null) ? pomFile.toPath().toAbsolutePath() : null;
+        return this;
+    }
+
+    @Override
+    public DefaultModelBuildingRequest setPomPath(Path pomPath) {
+        this.pomPath = (pomPath != null) ? pomPath.toAbsolutePath() : null;
         return this;
     }
 
     @Override
     public synchronized ModelSource getModelSource() {
-        if (modelSource == null && pomFile != null) {
-            modelSource = new FileModelSource(pomFile);
+        if (modelSource == null && pomPath != null) {
+            modelSource = new FileModelSource(pomPath);
         }
         return modelSource;
     }
@@ -249,8 +264,8 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
     public DefaultModelBuildingRequest setSystemProperties(Properties systemProperties) {
         if (systemProperties != null) {
             this.systemProperties = new Properties();
-            synchronized (systemProperties) { // avoid concurrent modification if someone else sets/removes an unrelated
-                // system property
+            // avoid concurrent modification if someone else sets/removes an unrelated system property
+            synchronized (systemProperties) {
                 this.systemProperties.putAll(systemProperties);
             }
         } else {
@@ -369,6 +384,17 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
     @Override
     public ModelBuildingRequest setTransformerContextBuilder(TransformerContextBuilder contextBuilder) {
         this.contextBuilder = contextBuilder;
+        return this;
+    }
+
+    @Override
+    public Path getRootDirectory() {
+        return rootDirectory;
+    }
+
+    @Override
+    public ModelBuildingRequest setRootDirectory(Path rootDirectory) {
+        this.rootDirectory = rootDirectory;
         return this;
     }
 }

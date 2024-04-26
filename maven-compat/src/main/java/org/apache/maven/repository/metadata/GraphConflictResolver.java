@@ -24,8 +24,8 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  * Resolves conflicts in the supplied dependency graph.
  * Different implementations will implement different conflict resolution policies.
  *
- * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  */
+@Deprecated
 public interface GraphConflictResolver {
     String ROLE = GraphConflictResolver.class.getName();
 

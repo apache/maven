@@ -21,6 +21,7 @@ package org.apache.maven.settings.validation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.internal.impl.DefaultSettingsBuilder;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Proxy;
@@ -37,19 +38,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author mkleint
  */
-public class DefaultSettingsValidatorTest {
+class DefaultSettingsValidatorTest {
 
     private DefaultSettingsValidator validator;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        validator = new DefaultSettingsValidator();
+    void setUp() throws Exception {
+        validator = new DefaultSettingsValidator(new DefaultSettingsBuilder());
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    void tearDown() throws Exception {
         validator = null;
     }
 
@@ -58,7 +58,7 @@ public class DefaultSettingsValidatorTest {
     }
 
     @Test
-    public void testValidate() {
+    void testValidate() {
         Settings model = new Settings();
         Profile prof = new Profile();
         prof.setId("xxx");
@@ -67,7 +67,7 @@ public class DefaultSettingsValidatorTest {
         validator.validate(model, problems);
         assertEquals(0, problems.messages.size());
 
-        Repository repo = new Repository();
+        Repository repo = new Repository(org.apache.maven.api.settings.Repository.newInstance(false));
         prof.addRepository(repo);
         problems = new SimpleProblemCollector();
         validator.validate(model, problems);
@@ -85,7 +85,7 @@ public class DefaultSettingsValidatorTest {
     }
 
     @Test
-    public void testValidateMirror() throws Exception {
+    void testValidateMirror() throws Exception {
         Settings settings = new Settings();
         Mirror mirror = new Mirror();
         mirror.setId("local");
@@ -106,7 +106,7 @@ public class DefaultSettingsValidatorTest {
     }
 
     @Test
-    public void testValidateRepository() throws Exception {
+    void testValidateRepository() throws Exception {
         Profile profile = new Profile();
         Repository repo = new Repository();
         repo.setId("local");
@@ -132,7 +132,7 @@ public class DefaultSettingsValidatorTest {
     }
 
     @Test
-    public void testValidateUniqueServerId() throws Exception {
+    void testValidateUniqueServerId() throws Exception {
         Settings settings = new Settings();
         Server server1 = new Server();
         server1.setId("test");
@@ -149,7 +149,7 @@ public class DefaultSettingsValidatorTest {
     }
 
     @Test
-    public void testValidateUniqueProfileId() throws Exception {
+    void testValidateUniqueProfileId() throws Exception {
         Settings settings = new Settings();
         Profile profile1 = new Profile();
         profile1.setId("test");
@@ -167,7 +167,7 @@ public class DefaultSettingsValidatorTest {
     }
 
     @Test
-    public void testValidateUniqueRepositoryId() throws Exception {
+    void testValidateUniqueRepositoryId() throws Exception {
         Settings settings = new Settings();
         Profile profile = new Profile();
         profile.setId("pro");
@@ -191,7 +191,7 @@ public class DefaultSettingsValidatorTest {
     }
 
     @Test
-    public void testValidateUniqueProxyId() throws Exception {
+    void testValidateUniqueProxyId() throws Exception {
         Settings settings = new Settings();
         Proxy proxy = new Proxy();
         String id = "foo";
@@ -209,7 +209,7 @@ public class DefaultSettingsValidatorTest {
     }
 
     @Test
-    public void testValidateProxy() throws Exception {
+    void testValidateProxy() throws Exception {
         Settings settings = new Settings();
         Proxy proxy1 = new Proxy();
         settings.addProxy(proxy1);

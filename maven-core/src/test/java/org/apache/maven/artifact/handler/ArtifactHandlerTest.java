@@ -21,26 +21,27 @@ package org.apache.maven.artifact.handler;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.List;
 
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PlexusTest
-public class ArtifactHandlerTest {
+class ArtifactHandlerTest {
     @Inject
     PlexusContainer container;
 
     @Test
-    public void testAptConsistency() throws Exception {
+    void testAptConsistency() throws Exception {
         File apt = getTestFile("src/site/apt/artifact-handlers.apt");
 
-        List<String> lines = FileUtils.loadFile(apt);
+        List<String> lines = Files.readAllLines(apt.toPath());
 
         for (String line : lines) {
             if (line.startsWith("||")) {
@@ -72,9 +73,11 @@ public class ArtifactHandlerTest {
                 String addedToClasspath = trimApt(cols[6]);
                 String includesDependencies = trimApt(cols[7]);
 
-                ArtifactHandler handler = container.lookup(ArtifactHandler.class, type);
+                ArtifactHandler handler =
+                        container.lookup(ArtifactHandlerManager.class).getArtifactHandler(type);
                 assertEquals(handler.getExtension(), extension, type + " extension");
-                assertEquals(handler.getPackaging(), packaging, type + " packaging");
+                // Packaging/Directory is Maven1 remnant!!!
+                // assertEquals(handler.getPackaging(), packaging, type + " packaging");
                 assertEquals(handler.getClassifier(), classifier, type + " classifier");
                 assertEquals(handler.getLanguage(), language, type + " language");
                 assertEquals(

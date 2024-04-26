@@ -38,9 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Provides a basis for testing conflict resolvers.
  *
- * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  */
 @PlexusTest
+@Deprecated
 public abstract class AbstractConflictResolverTest {
     // constants --------------------------------------------------------------
 

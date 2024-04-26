@@ -52,7 +52,6 @@ import org.eclipse.aether.resolution.VersionRangeResult;
  * A model resolver to assist building of dependency POMs. This resolver gives priority to those repositories that have
  * been initially specified and repositories discovered in dependency POMs are recessively merged into the search chain.
  *
- * @author Benjamin Bentmann
  * @see DefaultArtifactDescriptorReader
  */
 class DefaultModelResolver implements ModelResolver {
@@ -160,7 +159,7 @@ class DefaultModelResolver implements ModelResolver {
             throw new UnresolvableModelException(e.getMessage(), groupId, artifactId, version, e);
         }
 
-        return new ArtifactModelSource(pomArtifact.getFile(), groupId, artifactId, version);
+        return new ArtifactModelSource(pomArtifact.getPath(), groupId, artifactId, version);
     }
 
     @Override

@@ -20,9 +20,9 @@ package org.apache.maven.repository.metadata;
 
 /**
  *
- * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
+@Deprecated
 public class GraphConflictResolutionException extends Exception {
     private static final long serialVersionUID = 2677613140287940255L;
 

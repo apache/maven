@@ -25,7 +25,6 @@ import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Server;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
@@ -36,22 +35,22 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Tests {@link LegacyRepositorySystem}.
  *
- * @author Benjamin Bentmann
  */
 @PlexusTest
-public class LegacyRepositorySystemTest {
+@Deprecated
+class LegacyRepositorySystemTest {
     @Inject
-    private RepositorySystem repositorySystem;
+    private LegacyRepositorySystem repositorySystem;
 
     @Test
-    public void testThatLocalRepositoryWithSpacesIsProperlyHandled() throws Exception {
+    void testThatLocalRepositoryWithSpacesIsProperlyHandled() throws Exception {
         File basedir = new File("target/spacy path").getAbsoluteFile();
         ArtifactRepository repo = repositorySystem.createLocalRepository(basedir);
         assertEquals(basedir, new File(repo.getBasedir()));
     }
 
     @Test
-    public void testAuthenticationHandling() {
+    void testAuthenticationHandling() {
         Server server = new Server();
         server.setId("repository");
         server.setUsername("jason");

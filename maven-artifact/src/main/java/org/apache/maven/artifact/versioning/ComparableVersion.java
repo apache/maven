@@ -26,18 +26,19 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
  * <p>
  * Generic implementation of version comparison.
  * </p>
- *
+ * <p>
  * Features:
  * <ul>
  * <li>mixing of '<code>-</code>' (hyphen) and '<code>.</code>' (dot) separators,</li>
  * <li>transition between characters and digits also constitutes a separator:
- *     <code>1.0alpha1 =&gt; [1, 0, alpha, 1]</code></li>
+ *     <code>1.0alpha1 =&gt; [1, [alpha, 1]]</code></li>
  * <li>unlimited number of version components,</li>
  * <li>version components in the text can be digits or strings,</li>
  * <li>strings are checked for well-known qualifiers and the qualifier ordering is used for version ordering.
@@ -58,9 +59,7 @@ import java.util.Properties;
  *   over {@code 1.0.0.X1}.</li>
  * </ul>
  *
- * @see <a href="https://cwiki.apache.org/confluence/display/MAVENOLD/Versioning">"Versioning" on Maven Wiki</a>
- * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
- * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
+ * @see <a href="https://maven.apache.org/pom.html#version-order-specification">"Versioning" in the POM reference</a>
  */
 public class ComparableVersion implements Comparable<ComparableVersion> {
     private static final int MAX_INTITEM_LENGTH = 9;
@@ -79,6 +78,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
         int BIGINTEGER_ITEM = 0;
         int STRING_ITEM = 1;
         int LIST_ITEM = 2;
+        int COMBINATION_ITEM = 5;
 
         int compareTo(Item item);
 
@@ -128,6 +128,8 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return -1;
 
                 case STRING_ITEM:
+                    return 1;
+                case COMBINATION_ITEM:
                     return 1; // 1.1 > 1-sp
 
                 case LIST_ITEM:
@@ -199,6 +201,8 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return -1;
 
                 case STRING_ITEM:
+                    return 1;
+                case COMBINATION_ITEM:
                     return 1; // 1.1 > 1-sp
 
                 case LIST_ITEM:
@@ -269,6 +273,8 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return value.compareTo(((BigIntegerItem) item).value);
 
                 case STRING_ITEM:
+                    return 1;
+                case COMBINATION_ITEM:
                     return 1; // 1.1 > 1-sp
 
                 case LIST_ITEM:
@@ -309,13 +315,11 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
     private static class StringItem implements Item {
         private static final List<String> QUALIFIERS =
                 Arrays.asList("alpha", "beta", "milestone", "rc", "snapshot", "", "sp");
+        private static final List<String> RELEASE_QUALIFIERS = Arrays.asList("ga", "final", "release");
 
         private static final Properties ALIASES = new Properties();
 
         static {
-            ALIASES.put("ga", "");
-            ALIASES.put("final", "");
-            ALIASES.put("release", "");
             ALIASES.put("cr", "rc");
         }
 
@@ -353,25 +357,31 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
         @Override
         public boolean isNull() {
-            return (comparableQualifier(value).compareTo(RELEASE_VERSION_INDEX) == 0);
+            return value == null || value.isEmpty();
         }
 
         /**
          * Returns a comparable value for a qualifier.
-         *
+         * <p>
          * This method takes into account the ordering of known qualifiers then unknown qualifiers with lexical
          * ordering.
-         *
-         * just returning an Integer with the index here is faster, but requires a lot of if/then/else to check for -1
-         * or QUALIFIERS.size and then resort to lexical ordering. Most comparisons are decided by the first character,
-         * so this is still fast. If more characters are needed then it requires a lexical sort anyway.
+         * <p>
          *
          * @param qualifier
          * @return an equivalent value that can be used with lexical comparison
          */
         public static String comparableQualifier(String qualifier) {
+            if (RELEASE_QUALIFIERS.contains(qualifier)) {
+                return String.valueOf(QUALIFIERS.indexOf(""));
+            }
+
             int i = QUALIFIERS.indexOf(qualifier);
 
+            // Just returning an Integer with the index here is faster, but requires a lot of if/then/else to check for
+            // -1
+            //  or QUALIFIERS.size and then resort to lexical ordering. Most comparisons are decided by the first
+            // character,
+            // so this is still fast. If more characters are needed then it requires a lexical sort anyway.
             return i == -1 ? (QUALIFIERS.size() + "-" + qualifier) : String.valueOf(i);
         }
 
@@ -389,6 +399,13 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
                 case STRING_ITEM:
                     return comparableQualifier(value).compareTo(comparableQualifier(((StringItem) item).value));
+
+                case COMBINATION_ITEM:
+                    int result = this.compareTo(((CombinationItem) item).getStringPart());
+                    if (result == 0) {
+                        return -1;
+                    }
+                    return result;
 
                 case LIST_ITEM:
                     return -1; // 1.any < 1-1
@@ -423,6 +440,106 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
     }
 
     /**
+     * Represents a combination in the version item list.
+     * It is usually a combination of a string and a number, with the string first and the number second.
+     */
+    private static class CombinationItem implements Item {
+
+        StringItem stringPart;
+
+        Item digitPart;
+
+        CombinationItem(String value) {
+            int index = 0;
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
+                if (Character.isDigit(c)) {
+                    index = i;
+                    break;
+                }
+            }
+
+            stringPart = new StringItem(value.substring(0, index), true);
+            digitPart = parseItem(true, value.substring(index));
+        }
+
+        @Override
+        public int compareTo(Item item) {
+            if (item == null) {
+                // 1-rc1 < 1, 1-ga1 > 1
+                return stringPart.compareTo(item);
+            }
+            int result = 0;
+            switch (item.getType()) {
+                case INT_ITEM:
+                case LONG_ITEM:
+                case BIGINTEGER_ITEM:
+                    return -1;
+
+                case STRING_ITEM:
+                    result = stringPart.compareTo(item);
+                    if (result == 0) {
+                        // X1 > X
+                        return 1;
+                    }
+                    return result;
+
+                case LIST_ITEM:
+                    return -1;
+
+                case COMBINATION_ITEM:
+                    result = stringPart.compareTo(((CombinationItem) item).getStringPart());
+                    if (result == 0) {
+                        return digitPart.compareTo(((CombinationItem) item).getDigitPart());
+                    }
+                    return result;
+                default:
+                    return 0;
+            }
+        }
+
+        public StringItem getStringPart() {
+            return stringPart;
+        }
+
+        public Item getDigitPart() {
+            return digitPart;
+        }
+
+        @Override
+        public int getType() {
+            return COMBINATION_ITEM;
+        }
+
+        @Override
+        public boolean isNull() {
+            return false;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            CombinationItem that = (CombinationItem) o;
+            return Objects.equals(stringPart, that.stringPart) && Objects.equals(digitPart, that.digitPart);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(stringPart, digitPart);
+        }
+
+        @Override
+        public String toString() {
+            return stringPart.toString() + digitPart.toString();
+        }
+    }
+
+    /**
      * Represents a version list item. This class is used both for the global item list and for sub-lists (which start
      * with '-(number)' in the version specification).
      */
@@ -442,10 +559,14 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 Item lastItem = get(i);
 
                 if (lastItem.isNull()) {
-                    // remove null trailing items: 0, "", empty list
-                    remove(i);
-                } else if (!(lastItem instanceof ListItem)) {
-                    break;
+                    if (i == size() - 1 || get(i + 1).getType() == STRING_ITEM) {
+                        remove(i);
+                    } else if (get(i + 1).getType() == LIST_ITEM) {
+                        Item item = ((ListItem) get(i + 1)).get(0);
+                        if (item.getType() == COMBINATION_ITEM || item.getType() == STRING_ITEM) {
+                            remove(i);
+                        }
+                    }
                 }
             }
         }
@@ -472,6 +593,8 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return -1; // 1-1 < 1.0.x
 
                 case STRING_ITEM:
+                    return 1;
+                case COMBINATION_ITEM:
                     return 1; // 1-1 > 1-sp
 
                 case LIST_ITEM:
@@ -549,6 +672,8 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
         boolean isDigit = false;
 
+        boolean isCombination = false;
+
         int startIndex = 0;
 
         for (int i = 0; i < version.length(); i++) {
@@ -558,43 +683,51 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 if (i == startIndex) {
                     list.add(IntItem.ZERO);
                 } else {
-                    list.add(parseItem(isDigit, version.substring(startIndex, i)));
+                    list.add(parseItem(isCombination, isDigit, version.substring(startIndex, i)));
                 }
+                isCombination = false;
                 startIndex = i + 1;
             } else if (c == '-') {
                 if (i == startIndex) {
                     list.add(IntItem.ZERO);
                 } else {
-                    list.add(parseItem(isDigit, version.substring(startIndex, i)));
+                    // X-1 is going to be treated as X1
+                    if (!isDigit && i != version.length() - 1) {
+                        char c1 = version.charAt(i + 1);
+                        if (Character.isDigit(c1)) {
+                            isCombination = true;
+                            continue;
+                        }
+                    }
+                    list.add(parseItem(isCombination, isDigit, version.substring(startIndex, i)));
                 }
                 startIndex = i + 1;
 
-                list.add(list = new ListItem());
-                stack.push(list);
+                if (!list.isEmpty()) {
+                    list.add(list = new ListItem());
+                    stack.push(list);
+                }
+                isCombination = false;
             } else if (Character.isDigit(c)) {
                 if (!isDigit && i > startIndex) {
-                    // 1.0.0.X1 < 1.0.0-X2
-                    // treat .X as -X for any string qualifier X
+                    // X1
+                    isCombination = true;
+
                     if (!list.isEmpty()) {
                         list.add(list = new ListItem());
                         stack.push(list);
                     }
-
-                    list.add(new StringItem(version.substring(startIndex, i), true));
-                    startIndex = i;
-
-                    list.add(list = new ListItem());
-                    stack.push(list);
                 }
 
                 isDigit = true;
             } else {
                 if (isDigit && i > startIndex) {
-                    list.add(parseItem(true, version.substring(startIndex, i)));
+                    list.add(parseItem(isCombination, true, version.substring(startIndex, i)));
                     startIndex = i;
 
                     list.add(list = new ListItem());
                     stack.push(list);
+                    isCombination = false;
                 }
 
                 isDigit = false;
@@ -609,7 +742,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 stack.push(list);
             }
 
-            list.add(parseItem(isDigit, version.substring(startIndex)));
+            list.add(parseItem(isCombination, isDigit, version.substring(startIndex)));
         }
 
         while (!stack.isEmpty()) {
@@ -619,7 +752,13 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
     }
 
     private static Item parseItem(boolean isDigit, String buf) {
-        if (isDigit) {
+        return parseItem(false, isDigit, buf);
+    }
+
+    private static Item parseItem(boolean isCombination, boolean isDigit, String buf) {
+        if (isCombination) {
+            return new CombinationItem(buf.replace("-", ""));
+        } else if (isDigit) {
             buf = stripLeadingZeroes(buf);
             if (buf.length() <= MAX_INTITEM_LENGTH) {
                 // lower than 2^31
@@ -674,6 +813,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
     }
 
     // CHECKSTYLE_OFF: LineLength
+
     /**
      * Main to test version parsing and comparison.
      * <p>
@@ -688,7 +828,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
      * </pre>
      *
      * @param args the version strings to parse and compare. You can pass arbitrary number of version strings and always
-     * two adjacent will be compared
+     *             two adjacent will be compared.
      */
     // CHECKSTYLE_ON: LineLength
     public static void main(String... args) {

@@ -32,12 +32,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PlexusTest
-public class DefaultMavenExecutionRequestPopulatorTest {
+class DefaultMavenExecutionRequestPopulatorTest {
     @Inject
     MavenExecutionRequestPopulator testee;
 
     @Test
-    public void testPluginRepositoryInjection() throws Exception {
+    void testPluginRepositoryInjection() throws Exception {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 
         Repository r = new Repository();

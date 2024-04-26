@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -60,9 +60,6 @@ import org.slf4j.LoggerFactory;
  * </p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Jason van Zyl
- * @author Kristian Rosenvold (extracted class)
  */
 @Named
 public class LifecycleDependencyResolver {
@@ -76,30 +73,33 @@ public class LifecycleDependencyResolver {
 
     private final ProjectArtifactsCache projectArtifactsCache;
 
+    private final MessageBuilderFactory messageBuilderFactory;
+
     @Inject
     public LifecycleDependencyResolver(
             ProjectDependenciesResolver dependenciesResolver,
             ProjectArtifactFactory artifactFactory,
             EventSpyDispatcher eventSpyDispatcher,
-            ProjectArtifactsCache projectArtifactsCache) {
+            ProjectArtifactsCache projectArtifactsCache,
+            MessageBuilderFactory messageBuilderFactory) {
         this.dependenciesResolver = dependenciesResolver;
         this.artifactFactory = artifactFactory;
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.projectArtifactsCache = projectArtifactsCache;
+        this.messageBuilderFactory = messageBuilderFactory;
     }
 
     public static List<MavenProject> getProjects(MavenProject project, MavenSession session, boolean aggregator) {
         if (aggregator && project.getCollectedProjects() != null) {
-            return getProjectAndSubModules(project).collect(Collectors.toList());
+            // get the unsorted list of wanted projects
+            Set<MavenProject> projectAndSubmodules = new HashSet<>(project.getCollectedProjects());
+            projectAndSubmodules.add(project);
+            return session.getProjects().stream() // sorted all
+                    .filter(projectAndSubmodules::contains)
+                    .collect(Collectors.toList()); // sorted and filtered to what we need
         } else {
             return Collections.singletonList(project);
         }
-    }
-
-    private static Stream<MavenProject> getProjectAndSubModules(MavenProject project) {
-        return Stream.concat(
-                Stream.of(project),
-                project.getCollectedProjects().stream().flatMap(LifecycleDependencyResolver::getProjectAndSubModules));
     }
 
     public void resolveProjectDependencies(
@@ -169,6 +169,24 @@ public class LifecycleDependencyResolver {
         }
     }
 
+    public DependencyResolutionResult getProjectDependencyResolutionResult(
+            MavenProject project,
+            Collection<String> scopesToCollect,
+            Collection<String> scopesToResolve,
+            MavenSession session,
+            boolean aggregating,
+            Set<Artifact> projectArtifacts)
+            throws LifecycleExecutionException {
+
+        Set<Artifact> resolvedArtifacts = resolveProjectArtifacts(
+                project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
+        if (resolvedArtifacts instanceof ProjectArtifactsCache.ArtifactsSetWithResult) {
+            return ((ProjectArtifactsCache.ArtifactsSetWithResult) resolvedArtifacts).getResult();
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
     public Set<Artifact> resolveProjectArtifacts(
             MavenProject project,
             Collection<String> scopesToCollect,
@@ -177,27 +195,30 @@ public class LifecycleDependencyResolver {
             boolean aggregating,
             Set<Artifact> projectArtifacts)
             throws LifecycleExecutionException {
-        Set<Artifact> resolvedArtifacts;
         ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey(
                 project, scopesToCollect, scopesToResolve, aggregating, session.getRepositorySession());
+
         ProjectArtifactsCache.CacheRecord recordArtifacts;
         recordArtifacts = projectArtifactsCache.get(cacheKey);
-
-        if (recordArtifacts != null) {
-            resolvedArtifacts = recordArtifacts.getArtifacts();
-        } else {
-            try {
-                resolvedArtifacts = getDependencies(
-                        project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
-                recordArtifacts = projectArtifactsCache.put(cacheKey, resolvedArtifacts);
-            } catch (LifecycleExecutionException e) {
-                projectArtifactsCache.put(cacheKey, e);
-                projectArtifactsCache.register(project, cacheKey, recordArtifacts);
-                throw e;
+        if (recordArtifacts == null) {
+            synchronized (cacheKey) {
+                recordArtifacts = projectArtifactsCache.get(cacheKey);
+                if (recordArtifacts == null) {
+                    try {
+                        Set<Artifact> resolvedArtifacts = getDependencies(
+                                project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
+                        recordArtifacts = projectArtifactsCache.put(cacheKey, resolvedArtifacts);
+                    } catch (LifecycleExecutionException e) {
+                        projectArtifactsCache.put(cacheKey, e);
+                        projectArtifactsCache.register(project, cacheKey, recordArtifacts);
+                        throw e;
+                    }
+                }
             }
         }
         projectArtifactsCache.register(project, cacheKey, recordArtifacts);
-        return resolvedArtifacts;
+
+        return recordArtifacts.getArtifacts();
     }
 
     private Set<Artifact> getDependencies(
@@ -216,7 +237,7 @@ public class LifecycleDependencyResolver {
         }
 
         if (scopesToCollect.isEmpty() && scopesToResolve.isEmpty()) {
-            return new LinkedHashSet<>();
+            return new SetWithResolutionResult(null, new LinkedHashSet<>());
         }
 
         scopesToCollect = new HashSet<>(scopesToCollect);
@@ -250,12 +271,12 @@ public class LifecycleDependencyResolver {
                         + " but seem to be part of the reactor:");
 
                 for (Dependency dependency : result.getUnresolvedDependencies()) {
-                    logger.warn("o " + dependency);
+                    logger.warn("o {}", dependency);
                 }
 
                 logger.warn("Try running the build up to the lifecycle phase \"package\"");
             } else {
-                throw new LifecycleExecutionException(null, project, e);
+                throw new LifecycleExecutionException(messageBuilderFactory, null, project, e);
             }
         }
 
@@ -270,7 +291,7 @@ public class LifecycleDependencyResolver {
                     Collections.singletonList(project.getArtifact().getId()),
                     collectionFilter);
         }
-        return artifacts;
+        return new SetWithResolutionResult(result, artifacts);
     }
 
     private boolean areAllDependenciesInReactor(
@@ -328,7 +349,7 @@ public class LifecycleDependencyResolver {
 
     private static class ReactorDependencyFilter implements DependencyFilter {
 
-        private Set<String> keys = new HashSet<>();
+        private final Set<String> keys = new HashSet<>();
 
         ReactorDependencyFilter(Collection<Artifact> artifacts) {
             for (Artifact artifact : artifacts) {

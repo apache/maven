@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,16 +60,19 @@ import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.interpolation.ModelVersionProcessor;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.maven.model.v4.MavenModelVersion;
 
 /**
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 @Named
 @Singleton
 public class DefaultModelValidator implements ModelValidator {
 
+    public static final List<String> VALID_MODEL_VERSIONS =
+            Collections.unmodifiableList(Arrays.asList("4.0.0", "4.1.0"));
+
     private static final Pattern EXPRESSION_NAME_PATTERN = Pattern.compile("\\$\\{(.+?)}");
+    private static final Pattern EXPRESSION_PROJECT_NAME_PATTERN = Pattern.compile("\\$\\{(project.+?)}");
 
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
@@ -144,15 +148,11 @@ public class DefaultModelValidator implements ModelValidator {
 
             Severity errOn30 = getSeverity(request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
-            // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an
-            // effective model.
-            //
-            // As of 3.4, the model version is mandatory even in raw models. The XML element still is optional in the
-            // XML schema and this will not change anytime soon. We do not want to build effective models based on
-            // models without a version starting with 3.4.
-            validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m);
-
-            validateModelVersion(problems, m.getModelVersion(), m, "4.0.0");
+            // The file pom may not contain the modelVersion yet, as it may be set later by the
+            // ModelVersionXMLFilter.
+            if (m.getModelVersion() != null && !m.getModelVersion().isEmpty()) {
+                validateModelVersion(problems, m.getModelVersion(), m, VALID_MODEL_VERSIONS);
+            }
 
             validateStringNoExpression("groupId", problems, Severity.WARNING, Version.V20, m.getGroupId(), m);
             if (parent == null) {
@@ -215,8 +215,7 @@ public class DefaultModelValidator implements ModelValidator {
                             profile);
                 }
 
-                validate30RawProfileActivation(
-                        problems, profile.getActivation(), profile.getId(), prefix, "activation", request);
+                validate30RawProfileActivation(problems, profile.getActivation(), prefix);
 
                 validate20RawDependencies(
                         problems, profile.getDependencies(), prefix, "dependencies.dependency.", request);
@@ -258,6 +257,28 @@ public class DefaultModelValidator implements ModelValidator {
     public void validateRawModel(Model ma, ModelBuildingRequest request, ModelProblemCollector problems) {
         org.apache.maven.api.model.Model m = ma.getDelegate();
 
+        // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an
+        // effective model.
+        //
+        // As of 3.4, the model version is mandatory even in raw models. The XML element still is optional in the
+        // XML schema and this will not change anytime soon. We do not want to build effective models based on
+        // models without a version starting with 3.4.
+        validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m);
+
+        validateModelVersion(problems, m.getModelVersion(), m, VALID_MODEL_VERSIONS);
+
+        String minVersion = new MavenModelVersion().getModelVersion(m);
+        if (m.getModelVersion() != null && compareModelVersions(minVersion, m.getModelVersion()) > 0) {
+            addViolation(
+                    problems,
+                    Severity.FATAL,
+                    Version.V40,
+                    "model",
+                    null,
+                    "the model contains elements that require a model version of " + minVersion,
+                    m);
+        }
+
         Parent parent = m.getParent();
 
         if (parent != null) {
@@ -266,54 +287,41 @@ public class DefaultModelValidator implements ModelValidator {
         }
     }
 
-    private void validate30RawProfileActivation(
-            ModelProblemCollector problems,
-            Activation activation,
-            String sourceHint,
-            String prefix,
-            String fieldName,
-            ModelBuildingRequest request) {
-        if (activation == null) {
+    private void validate30RawProfileActivation(ModelProblemCollector problems, Activation activation, String prefix) {
+        if (activation == null || activation.getFile() == null) {
             return;
         }
 
         ActivationFile file = activation.getFile();
 
-        if (file != null) {
-            String path;
-            boolean missing;
+        String path;
+        String location;
 
-            if (StringUtils.isNotEmpty(file.getExists())) {
-                path = file.getExists();
-                missing = false;
-            } else if (StringUtils.isNotEmpty(file.getMissing())) {
-                path = file.getMissing();
-                missing = true;
-            } else {
-                return;
-            }
+        if (file.getExists() != null && !file.getExists().isEmpty()) {
+            path = file.getExists();
+            location = "exists";
+        } else if (file.getMissing() != null && !file.getMissing().isEmpty()) {
+            path = file.getMissing();
+            location = "missing";
+        } else {
+            return;
+        }
 
-            if (path.contains("${project.basedir}")) {
-                addViolation(
-                        problems,
-                        Severity.WARNING,
-                        Version.V30,
-                        prefix + fieldName + (missing ? ".file.missing" : ".file.exists"),
-                        null,
-                        "Failed to interpolate file location " + path + " for profile " + sourceHint
-                                + ": ${project.basedir} expression not supported during profile activation, "
-                                + "use ${basedir} instead",
-                        file.getLocation(missing ? "missing" : "exists"));
-            } else if (hasProjectExpression(path)) {
-                addViolation(
-                        problems,
-                        Severity.WARNING,
-                        Version.V30,
-                        prefix + fieldName + (missing ? ".file.missing" : ".file.exists"),
-                        null,
-                        "Failed to interpolate file location " + path + " for profile " + sourceHint
-                                + ": ${project.*} expressions are not supported during profile activation",
-                        file.getLocation(missing ? "missing" : "exists"));
+        if (hasProjectExpression(path)) {
+            Matcher matcher = EXPRESSION_PROJECT_NAME_PATTERN.matcher(path);
+            while (matcher.find()) {
+                String propertyName = matcher.group(0);
+                if (!"${project.basedir}".equals(propertyName)) {
+                    addViolation(
+                            problems,
+                            Severity.WARNING,
+                            Version.V30,
+                            prefix + "activation.file." + location,
+                            null,
+                            "Failed to interpolate file location " + path + ": " + propertyName
+                                    + " expressions are not supported during profile activation.",
+                            file.getLocation(location));
+                }
             }
         }
     }
@@ -428,7 +436,17 @@ public class DefaultModelValidator implements ModelValidator {
 
             for (int i = 0, n = m.getModules().size(); i < n; i++) {
                 String module = m.getModules().get(i);
-                if (StringUtils.isBlank(module)) {
+
+                boolean isBlankModule = true;
+                if (module != null) {
+                    for (int j = 0; j < module.length(); j++) {
+                        if (!Character.isWhitespace(module.charAt(j))) {
+                            isBlankModule = false;
+                        }
+                    }
+                }
+
+                if (isBlankModule) {
                     addViolation(
                             problems,
                             Severity.ERROR,
@@ -582,7 +600,8 @@ public class DefaultModelValidator implements ModelValidator {
                             key,
                             "must be 'pom' to import the managed dependencies.",
                             dependency);
-                } else if (StringUtils.isNotEmpty(dependency.getClassifier())) {
+                } else if (dependency.getClassifier() != null
+                        && !dependency.getClassifier().isEmpty()) {
                     addViolation(
                             problems,
                             errOn30,
@@ -606,7 +625,7 @@ public class DefaultModelValidator implements ModelValidator {
                 }
 
                 String sysPath = dependency.getSystemPath();
-                if (StringUtils.isNotEmpty(sysPath)) {
+                if (sysPath != null && !sysPath.isEmpty()) {
                     if (!hasExpression(sysPath)) {
                         addViolation(
                                 problems,
@@ -837,7 +856,7 @@ public class DefaultModelValidator implements ModelValidator {
         if ("system".equals(d.getScope())) {
             String systemPath = d.getSystemPath();
 
-            if (StringUtils.isEmpty(systemPath)) {
+            if (systemPath == null || systemPath.isEmpty()) {
                 addViolation(
                         problems,
                         Severity.ERROR,
@@ -875,14 +894,14 @@ public class DefaultModelValidator implements ModelValidator {
                             d);
                 }
             }
-        } else if (StringUtils.isNotEmpty(d.getSystemPath())) {
+        } else if (d.getSystemPath() != null && !d.getSystemPath().isEmpty()) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.BASE,
                     prefix + "systemPath",
                     d.getManagementKey(),
-                    "must be omitted." + " This field may only be specified for a dependency with system scope.",
+                    "must be omitted. This field may only be specified for a dependency with system scope.",
                     d);
         }
 
@@ -963,10 +982,12 @@ public class DefaultModelValidator implements ModelValidator {
                     repository.getUrl(),
                     null,
                     repository)) {
-                // only allow ${basedir} and ${project.basedir}
+                // only allow ${basedir}, ${project.basedir} or ${project.baseUri}
                 Matcher m = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
                 while (m.find()) {
-                    if (!("basedir".equals(m.group(1)) || "project.basedir".equals(m.group(1)))) {
+                    if (!("basedir".equals(m.group(1))
+                            || "project.basedir".equals(m.group(1))
+                            || "project.baseUri".equals(m.group(1)))) {
                         validateStringNoExpression(
                                 prefix + prefix2 + "[" + repository.getId() + "].url",
                                 problems,
@@ -1336,7 +1357,7 @@ public class DefaultModelValidator implements ModelValidator {
             return false;
         }
 
-        if (string.length() > 0) {
+        if (!string.isEmpty()) {
             return true;
         }
 
@@ -1408,7 +1429,7 @@ public class DefaultModelValidator implements ModelValidator {
             String string,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1439,7 +1460,7 @@ public class DefaultModelValidator implements ModelValidator {
             String sourceHint,
             InputLocationTracker tracker,
             String... validValues) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1463,14 +1484,12 @@ public class DefaultModelValidator implements ModelValidator {
 
     @SuppressWarnings("checkstyle:parameternumber")
     private boolean validateModelVersion(
-            ModelProblemCollector problems, String string, InputLocationTracker tracker, String... validVersions) {
-        if (string == null || string.length() <= 0) {
+            ModelProblemCollector problems, String string, InputLocationTracker tracker, List<String> validVersions) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
-        List<String> values = Arrays.asList(validVersions);
-
-        if (values.contains(string)) {
+        if (validVersions.contains(string)) {
             return true;
         }
 
@@ -1489,8 +1508,8 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + string + "' is newer than the versions supported by this version of Maven: " + values
-                            + ". Building this project requires a newer version of Maven.",
+                    "of '" + string + "' is newer than the versions supported by this version of Maven: "
+                            + validVersions + ". Building this project requires a newer version of Maven.",
                     tracker);
 
         } else if (olderThanAll) {
@@ -1501,8 +1520,8 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + string + "' is older than the versions supported by this version of Maven: " + values
-                            + ". Building this project requires an older version of Maven.",
+                    "of '" + string + "' is older than the versions supported by this version of Maven: "
+                            + validVersions + ". Building this project requires an older version of Maven.",
                     tracker);
 
         } else {
@@ -1512,7 +1531,7 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "must be one of " + values + " but is '" + string + "'.",
+                    "must be one of " + validVersions + " but is '" + string + "'.",
                     tracker);
         }
 
@@ -1529,18 +1548,16 @@ public class DefaultModelValidator implements ModelValidator {
      */
     private static int compareModelVersions(String first, String second) {
         // we use a dedicated comparator because we control our model version scheme.
-        String[] firstSegments = StringUtils.split(first, ".");
-        String[] secondSegments = StringUtils.split(second, ".");
-        for (int i = 0; i < Math.min(firstSegments.length, secondSegments.length); i++) {
-            int result = Long.valueOf(firstSegments[i]).compareTo(Long.valueOf(secondSegments[i]));
+        String[] firstSegments = first.split("\\.");
+        String[] secondSegments = second.split("\\.");
+        for (int i = 0; i < Math.max(firstSegments.length, secondSegments.length); i++) {
+            int result = Long.valueOf(i < firstSegments.length ? firstSegments[i] : "0")
+                    .compareTo(Long.valueOf(i < secondSegments.length ? secondSegments[i] : "0"));
             if (result != 0) {
                 return result;
             }
         }
-        if (firstSegments.length == secondSegments.length) {
-            return 0;
-        }
-        return firstSegments.length > secondSegments.length ? -1 : 1;
+        return 0;
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
@@ -1583,7 +1600,7 @@ public class DefaultModelValidator implements ModelValidator {
             String string,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1611,7 +1628,7 @@ public class DefaultModelValidator implements ModelValidator {
             String string,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1648,7 +1665,7 @@ public class DefaultModelValidator implements ModelValidator {
             return false;
         }
 
-        if (string.length() <= 0 || "RELEASE".equals(string) || "LATEST".equals(string)) {
+        if (string.isEmpty() || "RELEASE".equals(string) || "LATEST".equals(string)) {
             addViolation(
                     problems,
                     errOn30,
@@ -1719,7 +1736,9 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private static boolean equals(String s1, String s2) {
-        return StringUtils.clean(s1).equals(StringUtils.clean(s2));
+        String c1 = s1 == null ? "" : s1.trim();
+        String c2 = s2 == null ? "" : s2.trim();
+        return c1.equals(c2);
     }
 
     private static Severity getSeverity(ModelBuildingRequest request, int errorThreshold) {

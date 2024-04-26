@@ -25,7 +25,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * A factory for {@link MessageBuilder}.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface MessageBuilderFactory extends Service {
@@ -49,20 +49,10 @@ public interface MessageBuilderFactory extends Service {
     MessageBuilder builder();
 
     /**
-     * Creates a new message builder backed by the given string builder.
-     * @param stringBuilder a string builder
-     * @return a new message builder
-     */
-    @Nonnull
-    MessageBuilder builder(@Nonnull StringBuilder stringBuilder);
-
-    /**
      * Creates a new message builder of the specified size.
      * @param size the initial size of the message builder buffer
      * @return a new message builder
      */
     @Nonnull
-    default MessageBuilder builder(int size) {
-        return builder(new StringBuilder(size));
-    }
+    MessageBuilder builder(int size);
 }

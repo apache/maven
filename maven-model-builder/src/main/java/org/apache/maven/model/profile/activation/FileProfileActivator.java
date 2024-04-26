@@ -34,17 +34,12 @@ import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Determines profile activation based on the existence/absence of some file.
- * File name interpolation support is limited to <code>${basedir}</code> (since Maven 3,
- * see <a href="https://issues.apache.org/jira/browse/MNG-2363">MNG-2363</a>),
+ * File name interpolation support is limited to <code>${project.basedir}</code>
  * system properties and user properties.
- * <code>${project.basedir}</code> is intentionally not supported as this form would suggest that other
- * <code>${project.*}</code> expressions can be used, which is however beyond the design.
  *
- * @author Benjamin Bentmann
  * @see ActivationFile
  * @see org.apache.maven.model.validation.DefaultModelValidator#validateRawModel
  */
@@ -76,10 +71,10 @@ public class FileProfileActivator implements ProfileActivator {
         String path;
         boolean missing;
 
-        if (StringUtils.isNotEmpty(file.getExists())) {
+        if (file.getExists() != null && !file.getExists().isEmpty()) {
             path = file.getExists();
             missing = false;
-        } else if (StringUtils.isNotEmpty(file.getMissing())) {
+        } else if (file.getMissing() != null && !file.getMissing().isEmpty()) {
             path = file.getMissing();
             missing = true;
         } else {

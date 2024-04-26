@@ -24,9 +24,9 @@ import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
@@ -39,7 +39,6 @@ import org.apache.maven.model.profile.activation.ProfileActivator;
 /**
  * Calculates the active profiles among a given collection of profiles.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
@@ -48,7 +47,7 @@ public class DefaultProfileSelector implements ProfileSelector {
     private final List<ProfileActivator> activators;
 
     public DefaultProfileSelector() {
-        this.activators = Collections.emptyList();
+        this.activators = new ArrayList<>();
     }
 
     @Inject
@@ -61,6 +60,17 @@ public class DefaultProfileSelector implements ProfileSelector {
             activators.add(profileActivator);
         }
         return this;
+    }
+
+    @Override
+    public List<org.apache.maven.api.model.Profile> getActiveProfilesV4(
+            Collection<org.apache.maven.api.model.Profile> profiles,
+            ProfileActivationContext context,
+            ModelProblemCollector problems) {
+        return getActiveProfiles(profiles.stream().map(Profile::new).collect(Collectors.toList()), context, problems)
+                .stream()
+                .map(Profile::getDelegate)
+                .collect(Collectors.toList());
     }
 
     @Override

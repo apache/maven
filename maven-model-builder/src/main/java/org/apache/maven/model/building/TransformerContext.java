@@ -26,7 +26,6 @@ import org.apache.maven.model.Model;
  * Context used to transform a pom file.
  *
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 public interface TransformerContext {
@@ -36,27 +35,32 @@ public interface TransformerContext {
     Object KEY = TransformerContext.class;
 
     /**
-     * Get the value of the commandline argument {@code -Dkey=value}
-     * @param key
-     * @return
+     * Get the value of the Maven user property.
      */
     String getUserProperty(String key);
 
     /**
-     * Get the model based on the path, will be used to resolve the parent based on relativePath
+     * Get the model based on the path when resolving the parent based on relativePath.
      *
+     * @param from    the requiring model
      * @param pomFile the path to the pomFile
      * @return the model, otherwise {@code null}
      */
-    Model getRawModel(Path pomFile);
+    Model getRawModel(Path from, Path pomFile);
 
     /**
-     * Get the model from the reactor based on the groupId and artifactId, will be used for reactor dependencies
+     * Get the model from the reactor based on the groupId and artifactId when resolving reactor dependencies.
      *
-     * @param groupId the groupId
+     * @param from    the requiring model
+     * @param groupId    the groupId
      * @param artifactId the artifactId
      * @return the model, otherwise {@code null}
      * @throws IllegalStateException if multiple versions of the same GA are part of the reactor
      */
-    Model getRawModel(String groupId, String artifactId);
+    Model getRawModel(Path from, String groupId, String artifactId);
+
+    /**
+     * Locate the POM file inside the given directory.
+     */
+    Path locate(Path path);
 }

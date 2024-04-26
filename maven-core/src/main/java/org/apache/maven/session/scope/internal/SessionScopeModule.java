@@ -25,9 +25,7 @@ import com.google.inject.AbstractModule;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Session;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.DefaultSession;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.apache.maven.internal.impl.InternalMavenSession;
 
 /**
  * SessionScopeModule
@@ -41,21 +39,24 @@ public class SessionScopeModule extends AbstractModule {
         this(new SessionScope());
     }
 
-    public SessionScopeModule(PlexusContainer container) throws ComponentLookupException {
-        this(container.lookup(SessionScope.class));
-    }
-
-    private SessionScopeModule(SessionScope scope) {
+    public SessionScopeModule(SessionScope scope) {
         this.scope = scope;
     }
 
     @Override
     protected void configure() {
         bindScope(SessionScoped.class, scope);
+        // bindScope(org.apache.maven.api.di.SessionScoped.class, scope);
         bind(SessionScope.class).toInstance(scope);
 
-        bind(MavenSession.class).toProvider(SessionScope.seededKeyProvider()).in(scope);
-        bind(Session.class).toProvider(SessionScope.seededKeyProvider()).in(scope);
-        bind(DefaultSession.class).toProvider(SessionScope.seededKeyProvider()).in(scope);
+        bind(MavenSession.class)
+                .toProvider(SessionScope.seededKeyProvider(MavenSession.class))
+                .in(scope);
+        bind(Session.class)
+                .toProvider(SessionScope.seededKeyProvider(Session.class))
+                .in(scope);
+        bind(InternalMavenSession.class)
+                .toProvider(SessionScope.seededKeyProvider(InternalMavenSession.class))
+                .in(scope);
     }
 }

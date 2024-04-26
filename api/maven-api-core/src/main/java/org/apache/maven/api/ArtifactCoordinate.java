@@ -26,7 +26,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * The {@code Coordinate} object is used to point to an {@link Artifact}
  * but the version may be specified as a range instead of an exact version.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable
@@ -62,7 +62,7 @@ public interface ArtifactCoordinate {
      * @return the version
      */
     @Nonnull
-    VersionRange getVersion();
+    VersionConstraint getVersion();
 
     /**
      * The extension of the artifact.
@@ -75,6 +75,7 @@ public interface ArtifactCoordinate {
     /**
      * Unique id identifying this artifact
      */
+    @Nonnull
     default String getId() {
         return getGroupId()
                 + ":" + getArtifactId()

@@ -26,7 +26,6 @@ import org.apache.maven.settings.io.SettingsParseException;
 /**
  * Collects problems that are encountered during settings building.
  *
- * @author Benjamin Bentmann
  */
 class DefaultSettingsProblemCollector implements SettingsProblemCollector {
 

@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
 
@@ -31,9 +32,6 @@ import org.eclipse.aether.RepositorySystemSession;
  * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
  * prior notice.
  *
- * @author Igor Fedorenko
- * @author Benjamin Bentmann
- * @author Anton Tanasenko
  */
 public interface ProjectArtifactsCache {
 
@@ -44,20 +42,16 @@ public interface ProjectArtifactsCache {
         // marker interface for cache keys
     }
 
+    interface ArtifactsSetWithResult extends Set<Artifact> {
+        DependencyResolutionResult getResult();
+    }
+
     /**
      * CacheRecord
      */
     class CacheRecord {
 
-        public Set<Artifact> getArtifacts() {
-            return artifacts;
-        }
-
         private final Set<Artifact> artifacts;
-
-        public LifecycleExecutionException getException() {
-            return exception;
-        }
 
         private final LifecycleExecutionException exception;
 
@@ -69,6 +63,14 @@ public interface ProjectArtifactsCache {
         CacheRecord(LifecycleExecutionException exception) {
             this.artifacts = null;
             this.exception = exception;
+        }
+
+        public Set<Artifact> getArtifacts() {
+            return artifacts;
+        }
+
+        public LifecycleExecutionException getException() {
+            return exception;
         }
     }
 

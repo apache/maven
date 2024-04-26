@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CLIReportingUtilsTest {
+class CLIReportingUtilsTest {
 
     @Test
-    public void testFormatDuration() {
+    void testFormatDuration() {
         assertEquals("0.001 s", CLIReportingUtils.formatDuration(1));
         assertEquals("0.999 s", CLIReportingUtils.formatDuration(1000 - 1));
         assertEquals("1.000 s", CLIReportingUtils.formatDuration(1000));

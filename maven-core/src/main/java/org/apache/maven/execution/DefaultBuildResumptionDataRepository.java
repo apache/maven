@@ -30,7 +30,6 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,10 +108,11 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
 
     // This method is made package-private for testing purposes
     void applyResumptionProperties(MavenExecutionRequest request, Properties properties) {
-        if (properties.containsKey(REMAINING_PROJECTS) && StringUtils.isEmpty(request.getResumeFrom())) {
+        String str1 = request.getResumeFrom();
+        if (properties.containsKey(REMAINING_PROJECTS) && !(str1 != null && !str1.isEmpty())) {
             String propertyValue = properties.getProperty(REMAINING_PROJECTS);
             Stream.of(propertyValue.split(PROPERTY_DELIMITER))
-                    .filter(StringUtils::isNotEmpty)
+                    .filter(str -> str != null && !str.isEmpty())
                     .forEach(request.getProjectActivation()::activateOptionalProject);
             LOGGER.info("Resuming from {} due to the --resume / -r feature.", propertyValue);
         }

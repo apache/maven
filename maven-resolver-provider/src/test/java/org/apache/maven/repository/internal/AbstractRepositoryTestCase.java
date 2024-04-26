@@ -20,15 +20,16 @@ package org.apache.maven.repository.internal;
 
 import javax.inject.Inject;
 
+import java.io.File;
 import java.net.MalformedURLException;
 
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
 import org.apache.maven.repository.internal.util.ConsoleTransferListener;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
-import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,15 +56,12 @@ public abstract class AbstractRepositoryTestCase {
     }
 
     public static RepositorySystemSession newMavenRepositorySystemSession(RepositorySystem system) {
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-
-        LocalRepository localRepo = new LocalRepository("target/local-repo");
-        session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
-
+        SessionBuilder session = new MavenSessionBuilderSupplier(system).get();
+        session.withLocalRepositories(new LocalRepository(new File("target/local-repo"), "simple"));
         session.setTransferListener(new ConsoleTransferListener());
         session.setRepositoryListener(new ConsoleRepositoryListener());
 
-        return session;
+        return session.build();
     }
 
     public static RemoteRepository newTestRepository() throws MalformedURLException {

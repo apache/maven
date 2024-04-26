@@ -33,21 +33,22 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RemoteSnapshotMetadataTest {
+class RemoteSnapshotMetadataTest {
     private Locale defaultLocale;
 
     private static final Pattern DATE_FILTER = Pattern.compile("\\..*");
 
     @BeforeEach
-    public void setLocaleToUseBuddhistCalendar() {
+    void setLocaleToUseBuddhistCalendar() {
         defaultLocale = Locale.getDefault();
         Locale.setDefault(new Locale("th", "TH"));
     }
 
     @AfterEach
-    public void restoreLocale() {
+    void restoreLocale() {
         Locale.setDefault(defaultLocale);
     }
 
@@ -59,11 +60,11 @@ public class RemoteSnapshotMetadataTest {
     }
 
     @Test
-    public void gregorianCalendarIsUsed() {
+    void gregorianCalendarIsUsed() {
         String dateBefore = gregorianDate();
 
         RemoteSnapshotMetadata metadata =
-                new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), false, new Date());
+                new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), new Date(), null);
         metadata.merge(new Metadata());
 
         String dateAfter = gregorianDate();
@@ -74,5 +75,25 @@ public class RemoteSnapshotMetadataTest {
         /* Allow for this test running across midnight */
         Set<String> expected = new HashSet<>(Arrays.asList(dateBefore, dateAfter));
         assertTrue(expected.contains(datePart), "Expected " + datePart + " to be in " + expected);
+    }
+
+    @Test
+    void buildNumberNotSet() {
+        RemoteSnapshotMetadata metadata =
+                new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), new Date(), null);
+        metadata.merge(new Metadata());
+
+        int buildNumber = metadata.metadata.getVersioning().getSnapshot().getBuildNumber();
+        assertEquals(1, buildNumber);
+    }
+
+    @Test
+    void buildNumberSet() {
+        RemoteSnapshotMetadata metadata =
+                new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), new Date(), 42);
+        metadata.merge(new Metadata());
+
+        int buildNumber = metadata.metadata.getVersioning().getSnapshot().getBuildNumber();
+        assertEquals(42, buildNumber);
     }
 }

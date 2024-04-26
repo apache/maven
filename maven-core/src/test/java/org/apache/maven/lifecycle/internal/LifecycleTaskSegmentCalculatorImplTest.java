@@ -29,11 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * @author Kristian Rosenvold
  */
-public class LifecycleTaskSegmentCalculatorImplTest {
+class LifecycleTaskSegmentCalculatorImplTest {
     @Test
-    public void testCalculateProjectBuilds() throws Exception {
+    void testCalculateProjectBuilds() throws Exception {
         LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator = getTaskSegmentCalculator();
         BuildListCalculator buildListCalculator = new BuildListCalculator();
         final MavenSession session = ProjectDependencyGraphStub.getMavenSession();

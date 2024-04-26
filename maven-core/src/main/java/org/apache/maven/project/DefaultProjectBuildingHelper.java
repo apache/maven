@@ -33,9 +33,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
@@ -47,9 +49,8 @@ import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 import org.slf4j.Logger;
@@ -60,26 +61,22 @@ import org.slf4j.LoggerFactory;
  * technical reasons, it is not part of the public API. In particular, this class can be changed or deleted without
  * prior notice.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
 public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final PlexusContainer container; // TODO not used? Then remove
     private final ClassRealmManager classRealmManager;
     private final ProjectRealmCache projectRealmCache;
-    private final RepositorySystem repositorySystem;
+    private final MavenRepositorySystem repositorySystem;
     private final MavenPluginManager pluginManager;
 
     @Inject
     public DefaultProjectBuildingHelper(
-            PlexusContainer container,
             ClassRealmManager classRealmManager,
             ProjectRealmCache projectRealmCache,
-            RepositorySystem repositorySystem,
+            MavenRepositorySystem repositorySystem,
             MavenPluginManager pluginManager) {
-        this.container = container;
         this.classRealmManager = classRealmManager;
         this.projectRealmCache = projectRealmCache;
         this.repositorySystem = repositorySystem;
@@ -94,7 +91,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
         List<ArtifactRepository> internalRepositories = new ArrayList<>();
 
         for (Repository repository : pomRepositories) {
-            internalRepositories.add(repositorySystem.buildArtifactRepository(repository));
+            internalRepositories.add(MavenRepositorySystem.buildArtifactRepository(repository));
         }
 
         repositorySystem.injectMirror(request.getRepositorySession(), internalRepositories);
@@ -152,6 +149,10 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
                 plugin.setGroupId(extension.getGroupId());
                 plugin.setArtifactId(extension.getArtifactId());
                 plugin.setVersion(extension.getVersion());
+                XmlNode configuration = extension.getDelegate().getConfiguration();
+                if (configuration != null) {
+                    plugin.setConfiguration(new Xpp3Dom(configuration));
+                }
                 extensionPlugins.add(plugin);
             }
 

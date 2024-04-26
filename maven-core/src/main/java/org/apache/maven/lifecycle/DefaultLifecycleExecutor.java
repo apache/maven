@@ -31,9 +31,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
-import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
-import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -49,12 +47,9 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * A facade that provides lifecycle services to components outside maven core.
- *
+ * <p>
  * Note that this component is not normally used from within core itself.
  *
- * @author Jason van Zyl
- * @author Benjamin Bentmann
- * @author Kristian Rosenvold
  */
 @Named
 @Singleton
@@ -66,7 +61,6 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
     private final LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator;
     private final MojoExecutor mojoExecutor;
     private final LifecycleStarter lifecycleStarter;
-    private final MojoDescriptorCreator mojoDescriptorCreator;
 
     @Inject
     public DefaultLifecycleExecutor(
@@ -75,15 +69,13 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
             LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator,
             LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator,
             MojoExecutor mojoExecutor,
-            LifecycleStarter lifecycleStarter,
-            MojoDescriptorCreator mojoDescriptorCreator) {
+            LifecycleStarter lifecycleStarter) {
         this.lifeCyclePluginAnalyzer = lifeCyclePluginAnalyzer;
         this.defaultLifeCycles = defaultLifeCycles;
         this.lifecycleTaskSegmentCalculator = lifecycleTaskSegmentCalculator;
         this.lifecycleExecutionPlanCalculator = lifecycleExecutionPlanCalculator;
         this.mojoExecutor = mojoExecutor;
         this.lifecycleStarter = lifecycleStarter;
-        this.mojoDescriptorCreator = mojoDescriptorCreator;
     }
 
     public void execute(MavenSession session) {
@@ -153,6 +145,6 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
     // Site 3.x
     public List<MavenProject> executeForkedExecutions(MojoExecution mojoExecution, MavenSession session)
             throws LifecycleExecutionException {
-        return mojoExecutor.executeForkedExecutions(mojoExecution, session, new ProjectIndex(session.getProjects()));
+        return mojoExecutor.executeForkedExecutions(mojoExecution, session);
     }
 }

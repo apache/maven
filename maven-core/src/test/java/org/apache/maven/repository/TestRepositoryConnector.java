@@ -22,9 +22,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -39,7 +40,6 @@ import org.eclipse.aether.transfer.MetadataNotFoundException;
 import org.eclipse.aether.transfer.MetadataTransferException;
 
 /**
- * @author Benjamin Bentmann
  */
 public class TestRepositoryConnector implements RepositoryConnector {
 
@@ -49,10 +49,20 @@ public class TestRepositoryConnector implements RepositoryConnector {
 
     public TestRepositoryConnector(RemoteRepository repository) {
         this.repository = repository;
-        try {
-            basedir = FileUtils.toFile(new URL(repository.getUrl()));
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException(e);
+        String repositoryUrl = repository.getUrl();
+        if (repositoryUrl.contains("${")) {
+            // the repository url contains unresolved properties and getting the basedir is not possible
+            // in JDK 20+ 'new URL(string)' will fail if the string contains a curly brace
+            this.basedir = null;
+        } else {
+            try {
+                URL url = new URL(repository.getUrl());
+                if ("file".equals(url.getProtocol())) {
+                    basedir = new File(url.getPath());
+                }
+            } catch (MalformedURLException e) {
+                throw new IllegalStateException(e);
+            }
         }
     }
 
@@ -65,7 +75,9 @@ public class TestRepositoryConnector implements RepositoryConnector {
             for (ArtifactDownload download : artifactDownloads) {
                 File remoteFile = new File(basedir, path(download.getArtifact()));
                 try {
-                    FileUtils.copyFile(remoteFile, download.getFile());
+                    Path dest = download.getFile().toPath();
+                    Files.createDirectories(dest.getParent());
+                    Files.copy(remoteFile.toPath(), dest);
                 } catch (IOException e) {
                     if (!remoteFile.exists()) {
                         download.setException(new ArtifactNotFoundException(download.getArtifact(), repository));
@@ -79,7 +91,9 @@ public class TestRepositoryConnector implements RepositoryConnector {
             for (final MetadataDownload download : metadataDownloads) {
                 File remoteFile = new File(basedir, path(download.getMetadata()));
                 try {
-                    FileUtils.copyFile(remoteFile, download.getFile());
+                    Path dest = download.getFile().toPath();
+                    Files.createDirectories(dest.getParent());
+                    Files.copy(remoteFile.toPath(), dest);
                 } catch (IOException e) {
                     if (!remoteFile.exists()) {
                         download.setException(new MetadataNotFoundException(download.getMetadata(), repository));
@@ -102,7 +116,7 @@ public class TestRepositoryConnector implements RepositoryConnector {
 
         path.append(artifact.getArtifactId()).append('-').append(artifact.getVersion());
 
-        if (artifact.getClassifier().length() > 0) {
+        if (!artifact.getClassifier().isEmpty()) {
             path.append('-').append(artifact.getClassifier());
         }
 

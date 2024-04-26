@@ -20,6 +20,7 @@ package org.apache.maven.model.profile;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
@@ -27,7 +28,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Calculates the active profiles among a given collection of profiles.
  *
- * @author Benjamin Bentmann
  */
 public interface ProfileSelector {
 
@@ -43,4 +43,24 @@ public interface ProfileSelector {
      */
     List<Profile> getActiveProfiles(
             Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems);
+
+    /**
+     * Determines the profiles which are active in the specified activation context. Active profiles will eventually be
+     * injected into the model.
+     *
+     * @param profiles The profiles whose activation status should be determined, must not be {@code null}.
+     * @param context The environmental context used to determine the activation status of a profile, must not be
+     *            {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     * @return The profiles that have been activated, never {@code null}.
+     */
+    default List<org.apache.maven.api.model.Profile> getActiveProfilesV4(
+            Collection<org.apache.maven.api.model.Profile> profiles,
+            ProfileActivationContext context,
+            ModelProblemCollector problems) {
+        return getActiveProfiles(profiles.stream().map(Profile::new).collect(Collectors.toList()), context, problems)
+                .stream()
+                .map(Profile::getDelegate)
+                .collect(Collectors.toList());
+    }
 }

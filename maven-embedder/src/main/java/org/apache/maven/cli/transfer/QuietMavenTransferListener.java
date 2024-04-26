@@ -21,6 +21,5 @@ package org.apache.maven.cli.transfer;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 
 /**
- * @author Benjamin Bentmann
  */
 public class QuietMavenTransferListener extends AbstractTransferListener {}

@@ -29,7 +29,6 @@ import org.apache.maven.settings.Settings;
 /**
  * Handles serialization of settings into some kind of textual format like XML.
  *
- * @author Benjamin Bentmann
  */
 public interface SettingsWriter {
 

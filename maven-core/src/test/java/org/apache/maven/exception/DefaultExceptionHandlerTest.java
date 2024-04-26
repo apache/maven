@@ -20,6 +20,7 @@ package org.apache.maven.exception;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
@@ -33,9 +34,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * @author <a href="mailto:baerrach@apache.org">Barrie Treloar</a>
  */
-public class DefaultExceptionHandlerTest {
+class DefaultExceptionHandlerTest {
     /**
      * Running Maven under JDK7 may cause connection issues because IPv6 is used by default.
      * <p>
@@ -47,7 +47,7 @@ public class DefaultExceptionHandlerTest {
      * </p>
      */
     @Test
-    public void testJdk7ipv6() {
+    void testJdk7ipv6() {
         ConnectException connEx = new ConnectException("Connection refused: connect");
         IOException ioEx = new IOException("Unable to establish loopback connection", connEx);
         MojoExecutionException mojoEx =
@@ -61,7 +61,7 @@ public class DefaultExceptionHandlerTest {
     }
 
     @Test
-    public void testHandleExceptionAetherClassNotFound() {
+    void testHandleExceptionAetherClassNotFound() {
         Throwable cause2 = new NoClassDefFoundError("org/sonatype/aether/RepositorySystem");
         Plugin plugin = new Plugin();
         Exception cause = new PluginContainerException(plugin, null, null, cause2);
@@ -79,10 +79,38 @@ public class DefaultExceptionHandlerTest {
     }
 
     @Test
-    public void testHandleExceptionNoClassDefFoundErrorNull() {
+    void testHandleExceptionNoClassDefFoundErrorNull() {
         Throwable cause2 = new NoClassDefFoundError();
         Plugin plugin = new Plugin();
         Exception cause = new PluginContainerException(plugin, null, null, cause2);
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setPluginDescriptor(pluginDescriptor);
+        MojoExecution mojoExecution = new MojoExecution(mojoDescriptor);
+        Throwable exception = new PluginExecutionException(mojoExecution, null, cause);
+
+        DefaultExceptionHandler handler = new DefaultExceptionHandler();
+        ExceptionSummary summary = handler.handleException(exception);
+
+        String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/PluginContainerException";
+        assertEquals(expectedReference, summary.getReference());
+    }
+
+    @Test
+    void testHandleExceptionLoopInCause() {
+        // Some broken exception that does return "this" as getCause
+        AtomicReference<Throwable> causeRef = new AtomicReference<>(null);
+        Exception cause2 = new RuntimeException("loop") {
+            @Override
+            public synchronized Throwable getCause() {
+                return causeRef.get();
+            }
+        };
+        causeRef.set(cause2);
+
+        Plugin plugin = new Plugin();
+        Exception cause = new PluginContainerException(plugin, null, null, cause2);
+        cause2.initCause(cause);
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setPluginDescriptor(pluginDescriptor);

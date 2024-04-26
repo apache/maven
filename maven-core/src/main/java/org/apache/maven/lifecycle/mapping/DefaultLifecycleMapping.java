@@ -59,7 +59,7 @@ public class DefaultLifecycleMapping implements LifecycleMapping {
     /**
      * Plexus: Populates the lifecycle map from the injected list of lifecycle mappings (if not already done).
      */
-    private void initLifecycleMap() {
+    private synchronized void initLifecycleMap() {
         if (lifecycleMap == null) {
             lifecycleMap = new HashMap<>();
 

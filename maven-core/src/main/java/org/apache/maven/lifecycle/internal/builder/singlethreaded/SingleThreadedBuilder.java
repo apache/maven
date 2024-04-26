@@ -36,7 +36,7 @@ import org.apache.maven.lifecycle.internal.builder.Builder;
 /**
  * <p>
  * A {@link Builder} encapsulates a strategy for building a set of Maven projects. The default strategy in Maven builds
- * the the projects serially, but a {@link Builder} can employ any type of concurrency model to build the projects.
+ * the projects serially, but a {@link Builder} can employ any type of concurrency model to build the projects.
  */
 @Named("singlethreaded")
 @Singleton

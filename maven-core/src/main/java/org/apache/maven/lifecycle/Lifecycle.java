@@ -18,8 +18,8 @@
  */
 package org.apache.maven.lifecycle;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
@@ -33,6 +33,14 @@ public class Lifecycle {
         this.id = id;
         this.phases = phases;
         this.defaultPhases = defaultPhases;
+    }
+
+    public Lifecycle(
+            org.apache.maven.api.services.LifecycleRegistry registry, org.apache.maven.api.Lifecycle lifecycle) {
+        this.lifecycle = lifecycle;
+        this.id = lifecycle.id();
+        this.phases = registry.computePhases(lifecycle);
+        this.defaultPhases = getDefaultPhases(lifecycle);
     }
 
     // <lifecycle>
@@ -53,12 +61,25 @@ public class Lifecycle {
 
     private Map<String, LifecyclePhase> defaultPhases;
 
+    private org.apache.maven.api.Lifecycle lifecycle;
+
     public String getId() {
-        return this.id;
+        return id;
     }
 
     public List<String> getPhases() {
-        return this.phases;
+        return phases;
+    }
+
+    static Map<String, LifecyclePhase> getDefaultPhases(org.apache.maven.api.Lifecycle lifecycle) {
+        Map<String, List<String>> goals = new HashMap<>();
+        lifecycle.phases().forEach(phase -> phase.plugins()
+                .forEach(plugin -> plugin.getExecutions().forEach(exec -> exec.getGoals()
+                        .forEach(goal -> goals.computeIfAbsent(phase.name(), n -> new ArrayList<>())
+                                .add(plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion()
+                                        + ":" + goal)))));
+        return goals.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new LifecyclePhase(String.join(",", e.getValue()))));
     }
 
     public Map<String, LifecyclePhase> getDefaultLifecyclePhases() {

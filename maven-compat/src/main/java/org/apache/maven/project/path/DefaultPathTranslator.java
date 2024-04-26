@@ -18,6 +18,9 @@
  */
 package org.apache.maven.project.path;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +29,13 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * DefaultPathTranslator
  */
 @Deprecated
-@Component(role = PathTranslator.class)
+@Named
+@Singleton
 public class DefaultPathTranslator implements PathTranslator {
     private static final String[] BASEDIR_EXPRESSIONS = {"${basedir}", "${pom.basedir}", "${project.basedir}"};
 
@@ -201,7 +204,7 @@ public class DefaultPathTranslator implements PathTranslator {
             path = chopLeadingFileSeparator(path.substring(base.length()));
         }
 
-        if (path.length() <= 0) {
+        if (path.isEmpty()) {
             path = ".";
         }
 

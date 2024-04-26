@@ -20,23 +20,36 @@ package org.apache.maven.model.building;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Path;
 
 import org.apache.maven.building.FileSource;
+import org.apache.maven.model.locator.ModelLocator;
 
 /**
  * Wraps an ordinary {@link File} as a model source.
  *
- * @author Benjamin Bentmann
  */
-public class FileModelSource extends FileSource implements ModelSource2 {
+public class FileModelSource extends FileSource implements ModelSource3 {
 
     /**
      * Creates a new model source backed by the specified file.
      *
      * @param pomFile The POM file, must not be {@code null}.
+     * @deprecated Use {@link #FileModelSource(Path)} instead.
      */
+    @Deprecated
     public FileModelSource(File pomFile) {
         super(pomFile);
+    }
+
+    /**
+     * Creates a new model source backed by the specified file.
+     *
+     * @param pomPath The POM file, must not be {@code null}.
+     * @since 4.0.0
+     */
+    public FileModelSource(Path pomPath) {
+        super(pomPath);
     }
 
     /**
@@ -51,18 +64,15 @@ public class FileModelSource extends FileSource implements ModelSource2 {
     }
 
     @Override
-    public ModelSource2 getRelatedSource(String relPath) {
+    public ModelSource3 getRelatedSource(ModelLocator locator, String relPath) {
         relPath = relPath.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-        File relatedPom = new File(getFile().getParentFile(), relPath);
+        Path path = getPath().getParent().resolve(relPath);
 
-        if (relatedPom.isDirectory()) {
-            // TODO figure out how to reuse ModelLocator.locatePom(File) here
-            relatedPom = new File(relatedPom, "pom.xml");
-        }
+        Path relatedPom = locator.locateExistingPom(path);
 
-        if (relatedPom.isFile() && relatedPom.canRead()) {
-            return new FileModelSource(new File(relatedPom.toURI().normalize()));
+        if (relatedPom != null) {
+            return new FileModelSource(relatedPom.normalize());
         }
 
         return null;
@@ -70,7 +80,7 @@ public class FileModelSource extends FileSource implements ModelSource2 {
 
     @Override
     public URI getLocationURI() {
-        return getFile().toURI();
+        return getPath().toUri();
     }
 
     @Override
@@ -87,11 +97,11 @@ public class FileModelSource extends FileSource implements ModelSource2 {
             return false;
         }
         FileModelSource other = (FileModelSource) obj;
-        return getFile().equals(other.getFile());
+        return getPath().equals(other.getPath());
     }
 
     @Override
     public int hashCode() {
-        return getFile().hashCode();
+        return getPath().hashCode();
     }
 }

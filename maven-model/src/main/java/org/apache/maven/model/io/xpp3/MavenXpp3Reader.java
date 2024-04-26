@@ -18,28 +18,36 @@
  */
 package org.apache.maven.model.io.xpp3;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
+import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
-import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.apache.maven.model.v4.MavenStaxReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+/**
+ * @deprecated Use MavenStaxReader instead
+ */
+@Deprecated
 public class MavenXpp3Reader {
-    private boolean addDefaultEntities = true;
-
-    private final ContentTransformer contentTransformer;
+    private MavenStaxReader delegate;
 
     public MavenXpp3Reader() {
-        this((source, fieldName) -> source);
+        this(null, false);
     }
 
     public MavenXpp3Reader(ContentTransformer contentTransformer) {
-        this.contentTransformer = contentTransformer;
+        this(contentTransformer, false);
+    }
+
+    protected MavenXpp3Reader(ContentTransformer contentTransformer, boolean addLocationInformation) {
+        delegate =
+                contentTransformer != null ? new MavenStaxReader(contentTransformer::transform) : new MavenStaxReader();
+        delegate.setAddLocationInformation(addLocationInformation);
     }
 
     /**
@@ -48,11 +56,29 @@ public class MavenXpp3Reader {
      * @return boolean
      */
     public boolean getAddDefaultEntities() {
-        return addDefaultEntities;
+        return delegate.getAddDefaultEntities();
     } // -- boolean getAddDefaultEntities()
 
     /**
-     * @see ReaderFactory#newXmlReader
+     * Sets the state of the "add default entities" flag.
+     *
+     * @param addDefaultEntities a addDefaultEntities object.
+     */
+    public void setAddDefaultEntities(boolean addDefaultEntities) {
+        delegate.setAddLocationInformation(addDefaultEntities);
+    } // -- void setAddDefaultEntities( boolean )
+
+    protected Model read(Reader reader, boolean strict, InputSource source) throws IOException, XmlPullParserException {
+        try {
+            org.apache.maven.api.model.Model model =
+                    delegate.read(reader, strict, source != null ? source.toApiSource() : null);
+            return new Model(model);
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
+
+    /**
      *
      * @param reader a reader object.
      * @param strict a strict object.
@@ -62,14 +88,10 @@ public class MavenXpp3Reader {
      * @return Model
      */
     public Model read(Reader reader, boolean strict) throws IOException, XmlPullParserException {
-        XmlPullParser parser =
-                addDefaultEntities ? new MXParser(EntityReplacementMap.defaultEntityReplacementMap) : new MXParser();
-        parser.setInput(reader);
-        return read(parser, strict);
+        return read(reader, strict, null);
     } // -- Model read( Reader, boolean )
 
     /**
-     * @see ReaderFactory#newXmlReader
      *
      * @param reader a reader object.
      * @throws IOException IOException if any.
@@ -80,6 +102,17 @@ public class MavenXpp3Reader {
     public Model read(Reader reader) throws IOException, XmlPullParserException {
         return read(reader, true);
     } // -- Model read( Reader )
+
+    protected Model read(InputStream is, boolean strict, InputSource source)
+            throws IOException, XmlPullParserException {
+        try {
+            org.apache.maven.api.model.Model model =
+                    delegate.read(is, strict, source != null ? source.toApiSource() : null);
+            return new Model(model);
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
 
     /**
      * Method read.
@@ -92,7 +125,7 @@ public class MavenXpp3Reader {
      * @return Model
      */
     public Model read(InputStream in, boolean strict) throws IOException, XmlPullParserException {
-        return read(ReaderFactory.newXmlReader(in), strict);
+        return read(in, strict, null);
     } // -- Model read( InputStream, boolean )
 
     /**
@@ -105,36 +138,8 @@ public class MavenXpp3Reader {
      * @return Model
      */
     public Model read(InputStream in) throws IOException, XmlPullParserException {
-        return read(ReaderFactory.newXmlReader(in));
+        return read(in, true);
     } // -- Model read( InputStream )
-
-    /**
-     * Method read.
-     *
-     * @param parser a parser object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Model
-     */
-    public Model read(XmlPullParser parser, boolean strict) throws IOException, XmlPullParserException {
-        org.apache.maven.model.v4.MavenXpp3Reader reader = contentTransformer != null
-                ? new org.apache.maven.model.v4.MavenXpp3Reader(contentTransformer::transform)
-                : new org.apache.maven.model.v4.MavenXpp3Reader();
-        reader.setAddDefaultEntities(addDefaultEntities);
-        org.apache.maven.api.model.Model model = reader.read(parser, strict);
-        return new Model(model);
-    } // -- Model read( XmlPullParser, boolean )
-
-    /**
-     * Sets the state of the "add default entities" flag.
-     *
-     * @param addDefaultEntities a addDefaultEntities object.
-     */
-    public void setAddDefaultEntities(boolean addDefaultEntities) {
-        this.addDefaultEntities = addDefaultEntities;
-    } // -- void setAddDefaultEntities( boolean )
 
     public interface ContentTransformer {
         /**

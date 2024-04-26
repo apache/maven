@@ -24,15 +24,12 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * A version usually parsed using the {@link org.apache.maven.api.services.VersionParser} service.
  *
- * @since 4.0
+ * @since 4.0.0
  * @see org.apache.maven.api.services.VersionParser#parseVersion(String)
  * @see org.apache.maven.api.Session#parseVersion(String)
  */
 @Experimental
 public interface Version extends Comparable<Version> {
-
-    // TODO: add access to the version information
-
     /**
      * Returns a string representation of this version.
      * @return the string representation of this version

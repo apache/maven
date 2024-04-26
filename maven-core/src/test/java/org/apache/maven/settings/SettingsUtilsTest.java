@@ -32,15 +32,16 @@ import org.apache.maven.api.settings.ActivationProperty;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.internal.impl.SettingsUtilsV4;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SettingsUtilsTest {
+class SettingsUtilsTest {
 
     @Test
-    public void testShouldAppendRecessivePluginGroupIds() {
+    void testShouldAppendRecessivePluginGroupIds() {
         Settings dominant = Settings.newBuilder()
                 .pluginGroups(Arrays.asList("org.apache.maven.plugins", "org.codehaus.modello"))
                 .build();
@@ -61,7 +62,7 @@ public class SettingsUtilsTest {
     }
 
     @Test
-    public void testRoundTripProfiles() {
+    void testRoundTripProfiles() {
         Random entropy = new Random();
         ActivationFile af = ActivationFile.newBuilder()
                 .exists("exists" + Long.toHexString(entropy.nextLong()))
@@ -83,6 +84,7 @@ public class SettingsUtilsTest {
                 .file(af)
                 .property(ap)
                 .os(ao)
+                .packaging("pom")
                 .build();
         Map<String, String> props = new HashMap<>();
         int count = entropy.nextInt(10);
@@ -145,6 +147,7 @@ public class SettingsUtilsTest {
         assertEquals(
                 p.getActivation().getOs().getVersion(),
                 clone.getActivation().getOs().getVersion());
+        assertEquals(p.getActivation().getPackaging(), clone.getActivation().getPackaging());
         assertEquals(p.getProperties(), clone.getProperties());
         assertEquals(p.getRepositories().size(), clone.getRepositories().size());
         // TODO deep compare the lists

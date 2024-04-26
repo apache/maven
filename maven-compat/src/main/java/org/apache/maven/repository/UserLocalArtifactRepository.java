@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  * UserLocalArtifactRepository
  */
+@Deprecated
 public class UserLocalArtifactRepository extends LocalArtifactRepository {
     private ArtifactRepository localRepository;
 

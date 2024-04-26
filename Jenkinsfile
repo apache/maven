@@ -20,10 +20,10 @@
 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='master'?'5':'1'))])
 
 def buildOs = 'linux'
-def buildJdk = '8'
+def buildJdk = '17'
 def buildMvn = '3.8.x'
 def runITsOses = ['linux']
-def runITsJdks = ['8', '11', '17']
+def runITsJdks = ['17', '21']
 def runITsMvn = '3.8.x'
 def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
@@ -58,9 +58,6 @@ node(jenkinsEnv.nodeSelection(osNode)) {
             } finally {
                 junit testResults: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml', allowEmptyResults: true
             }    
-            dir ('apache-maven/target') {
-                stash includes: 'apache-maven-bin.zip', name: 'maven-dist'
-            }
         }
     }
 }
@@ -84,39 +81,54 @@ for (String os in runITsOses) {
                     // will not trample each other plus workaround for JENKINS-52657
                     dir(isUnix() ? 'test' : "c:\\mvn-it-${EXECUTOR_NUMBER}.tmp") {
                         def WORK_DIR=pwd()
-                        checkout([$class: 'GitSCM',
-                                branches: [[name: "*/master"]],
-                                extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
-                                userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])                        
-                        if (isUnix()) {
-                            sh "rm -rvf $WORK_DIR/dists $WORK_DIR/it-local-repo"
-                        } else {
-                            bat "if exist it-local-repo rmdir /s /q it-local-repo"
-                            bat "if exist dists         rmdir /s /q dists"
-                        }
-                        dir('dists') {
-                          unstash 'maven-dist'
-                        }
                         try {
-                            withEnv(["JAVA_HOME=${ tool "$jdkName" }",
-                                        "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
-                                        "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {                                               
-                                String cmd = "${runITscommand} -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/dists/apache-maven-bin.zip -Dmaven.test.failure.ignore"
+                            dir ('maven') {
+                                checkout scm
+                                withEnv(["JAVA_HOME=${ tool "$jdkName" }",
+                                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
+                                         "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
+                                    sh "mvn clean install -B -U -e -DskipTests -V -PversionlessMavenDist -Dmaven.repo.local=${WORK_DIR}/.repository"
+                                }
+                            }
+                            dir ('its') {
+                                def ITS_BRANCH = env.CHANGE_BRANCH != null ? env.CHANGE_BRANCH :  env.BRANCH_NAME;
+                                try {
+                                  echo "Checkout ITs from branch: ${ITS_BRANCH}"
+                                  checkout([$class: 'GitSCM',
+                                          branches: [[name: ITS_BRANCH]],
+                                          extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
+                                          userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])
+                                } catch (Throwable e) {
+                                  echo "Failure checkout ITs branch: ${ITS_BRANCH} - fallback master branch"
+                                  checkout([$class: 'GitSCM',
+                                          branches: [[name: "*/master"]],
+                                          extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
+                                          userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])
+                                }
 
-                                if (isUnix()) {
-                                    sh 'df -hT'
-                                    sh "${cmd}"
-                                } else {
-                                    bat 'wmic logicaldisk get size,freespace,caption'
-                                    bat "${cmd}"
+                                try {
+                                    withEnv(["JAVA_HOME=${ tool "$jdkName" }",
+                                                "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
+                                                "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
+                                        String cmd = "${runITscommand} -Dmaven.repo.local=$WORK_DIR/.repository -DmavenDistro=$WORK_DIR/maven/apache-maven/target/apache-maven-bin.zip -Dmaven.test.failure.ignore"
+
+                                        if (isUnix()) {
+                                            sh 'df -hT'
+                                            sh "${cmd}"
+                                        } else {
+                                            bat 'wmic logicaldisk get size,freespace,caption'
+                                            bat "${cmd}"
+                                        }
+                                    }
+                                } finally {
+                                    // in ITs test we need only reports from test itself
+                                    // test projects can contain reports with tested failed builds
+                                    junit testResults: '**/core-it-suite/target/surefire-reports/*.xml,**/core-it-support/**/target/surefire-reports/*.xml', allowEmptyResults: true
+                                    archiveDirs(stageId, ['core-it-suite-logs':'core-it-suite/target/test-classes',
+                                                          'core-it-suite-reports':'core-it-suite/target/surefire-reports'])
                                 }
                             }
                         } finally {
-                            // in ITs test we need only reports from test itself
-                            // test projects can contain reports with tested failed builds
-                            junit testResults: '**/core-it-suite/target/surefire-reports/*.xml,**/core-it-support/**/target/surefire-reports/*.xml', allowEmptyResults: true
-                            archiveDirs(stageId, ['core-it-suite-logs':'core-it-suite/target/test-classes',
-                                                  'core-it-suite-reports':'core-it-suite/target/surefire-reports'])
                             deleteDir() // clean up after ourselves to reduce disk space
                         }
                     }

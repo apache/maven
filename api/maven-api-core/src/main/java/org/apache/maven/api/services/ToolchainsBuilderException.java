@@ -18,22 +18,36 @@
  */
 package org.apache.maven.api.services;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.maven.api.annotations.Experimental;
 
 /**
  * The Exception class throw by the {@link ToolchainsBuilder}.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class ToolchainsBuilderException extends MavenException {
+
+    private final List<BuilderProblem> problems;
+
     /**
      * @param message the message to give
      * @param e the {@link Exception}
      */
     public ToolchainsBuilderException(String message, Exception e) {
         super(message, e);
+        this.problems = List.of();
     }
 
-    // TODO: add ToolchainsBuilderResult
+    public ToolchainsBuilderException(String message, List<BuilderProblem> problems) {
+        super(message + ": " + problems.stream().map(BuilderProblem::toString).collect(Collectors.joining(", ")), null);
+        this.problems = List.copyOf(problems);
+    }
+
+    public List<BuilderProblem> getProblems() {
+        return problems;
+    }
 }

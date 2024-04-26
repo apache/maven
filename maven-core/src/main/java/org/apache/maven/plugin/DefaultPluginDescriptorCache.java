@@ -28,11 +28,8 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -46,20 +43,20 @@ import org.eclipse.aether.repository.WorkspaceRepository;
  * prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
 public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
 
     private Map<Key, PluginDescriptor> descriptors = new ConcurrentHashMap<>(128);
+    private Map<Key, Key> keys = new ConcurrentHashMap<>();
 
     public void flush() {
         descriptors.clear();
     }
 
     public Key createKey(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session) {
-        return new CacheKey(plugin, repositories, session);
+        return keys.computeIfAbsent(new CacheKey(plugin, repositories, session), k -> k);
     }
 
     public PluginDescriptor get(Key cacheKey) {
@@ -69,26 +66,20 @@ public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
     @Override
     public PluginDescriptor get(Key key, PluginDescriptorSupplier supplier)
             throws PluginDescriptorParsingException, PluginResolutionException, InvalidPluginDescriptorException {
+
         try {
-            return clone(descriptors.computeIfAbsent(key, k -> {
-                try {
-                    return clone(supplier.load());
-                } catch (PluginDescriptorParsingException
-                        | PluginResolutionException
-                        | InvalidPluginDescriptorException e) {
-                    throw new RuntimeException(e);
+            PluginDescriptor desc = descriptors.get(key);
+            if (desc == null) {
+                synchronized (key) {
+                    desc = descriptors.get(key);
+                    if (desc == null) {
+                        desc = supplier.load();
+                        descriptors.putIfAbsent(key, clone(desc));
+                    }
                 }
-            }));
-        } catch (RuntimeException e) {
-            if (e.getCause() instanceof PluginDescriptorParsingException) {
-                throw (PluginDescriptorParsingException) e.getCause();
             }
-            if (e.getCause() instanceof PluginResolutionException) {
-                throw (PluginResolutionException) e.getCause();
-            }
-            if (e.getCause() instanceof InvalidPluginDescriptorException) {
-                throw (InvalidPluginDescriptorException) e.getCause();
-            }
+            return clone(desc);
+        } catch (PluginDescriptorParsingException | PluginResolutionException | InvalidPluginDescriptorException e) {
             throw e;
         }
     }
@@ -98,49 +89,7 @@ public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
     }
 
     protected static PluginDescriptor clone(PluginDescriptor original) {
-        PluginDescriptor clone = null;
-
-        if (original != null) {
-            clone = new PluginDescriptor();
-
-            clone.setGroupId(original.getGroupId());
-            clone.setArtifactId(original.getArtifactId());
-            clone.setVersion(original.getVersion());
-            clone.setGoalPrefix(original.getGoalPrefix());
-            clone.setInheritedByDefault(original.isInheritedByDefault());
-
-            clone.setName(original.getName());
-            clone.setDescription(original.getDescription());
-            clone.setRequiredMavenVersion(original.getRequiredMavenVersion());
-            clone.setRequiredJavaVersion(original.getRequiredJavaVersion());
-
-            clone.setPluginArtifact(ArtifactUtils.copyArtifactSafe(original.getPluginArtifact()));
-
-            clone.setComponents(clone(original.getMojos(), clone));
-            clone.setId(original.getId());
-            clone.setIsolatedRealm(original.isIsolatedRealm());
-            clone.setSource(original.getSource());
-
-            clone.setDependencies(original.getDependencies());
-        }
-
-        return clone;
-    }
-
-    private static List<ComponentDescriptor<?>> clone(List<MojoDescriptor> mojos, PluginDescriptor pluginDescriptor) {
-        List<ComponentDescriptor<?>> clones = null;
-
-        if (mojos != null) {
-            clones = new ArrayList<>(mojos.size());
-
-            for (MojoDescriptor mojo : mojos) {
-                MojoDescriptor clone = mojo.clone();
-                clone.setPluginDescriptor(pluginDescriptor);
-                clones.add(clone);
-            }
-        }
-
-        return clones;
+        return new PluginDescriptor(original);
     }
 
     private static final class CacheKey implements Key {

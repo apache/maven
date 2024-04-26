@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Service used to create {@link ArtifactCoordinate} objects.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface ArtifactCoordinateFactory extends Service {
@@ -37,11 +37,25 @@ public interface ArtifactCoordinateFactory extends Service {
      * Creates a coordinate.
      *
      * @param request the request holding coordinate creation parameters
-     * @return an {@code Artifact}, never {@code null}
+     * @return an {@code ArtifactCoordinate}, never {@code null}
      * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
      */
     @Nonnull
     ArtifactCoordinate create(@Nonnull ArtifactCoordinateFactoryRequest request);
+
+    /**
+     * Creates a coordinate out of string that is formatted like:
+     * {@code <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>}
+     *
+     * @param session the session.
+     * @param coordinateString the string having "standard" coordinate.
+     * @return an {@code ArtifactCoordinate}, never {@code null}
+     * @throws IllegalArgumentException if {@code session} is null or invalid
+     */
+    @Nonnull
+    default ArtifactCoordinate create(@Nonnull Session session, @Nonnull String coordinateString) {
+        return create(ArtifactCoordinateFactoryRequest.build(session, coordinateString));
+    }
 
     @Nonnull
     default ArtifactCoordinate create(

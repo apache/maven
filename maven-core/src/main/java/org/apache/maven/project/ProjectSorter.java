@@ -31,17 +31,13 @@ import org.apache.maven.api.model.Extension;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
-import org.codehaus.plexus.util.dag.DAG;
-import org.codehaus.plexus.util.dag.TopologicalSorter;
-import org.codehaus.plexus.util.dag.Vertex;
+import org.apache.maven.project.Graph.Vertex;
 
 /**
  * ProjectSorter
  */
 public class ProjectSorter {
-    private DAG dag;
+    private Graph graph;
 
     private List<MavenProject> sortedProjects;
 
@@ -71,7 +67,7 @@ public class ProjectSorter {
     // in a different lifecycle. Though the compiler-plugin has a valid use case, although
     // that seems to work fine. We need to take versions and lifecycle into account.
     public ProjectSorter(Collection<MavenProject> projects) throws CycleDetectedException, DuplicateProjectException {
-        dag = new DAG();
+        graph = new Graph();
 
         // groupId:artifactId:version -> project
         projectMap = new HashMap<>(projects.size() * 2);
@@ -96,10 +92,10 @@ public class ProjectSorter {
 
             Map<String, Vertex> vertices = vertexMap.computeIfAbsent(projectKey, k -> new HashMap<>(2, 1));
 
-            vertices.put(project.getVersion(), dag.addVertex(projectId));
+            vertices.put(project.getVersion(), graph.addVertex(projectId));
         }
 
-        for (Vertex projectVertex : dag.getVertices()) {
+        for (Vertex projectVertex : graph.getVertices()) {
             String projectId = projectVertex.getLabel();
 
             MavenProject project = projectMap.get(projectId);
@@ -177,7 +173,7 @@ public class ProjectSorter {
             }
         }
 
-        List<String> sortedProjectLabels = TopologicalSorter.sort(dag);
+        List<String> sortedProjectLabels = graph.visitAll();
 
         this.sortedProjects = sortedProjectLabels.stream()
                 .map(id -> projectMap.get(id))
@@ -232,11 +228,11 @@ public class ProjectSorter {
         }
 
         if (force && toVertex.getChildren().contains(fromVertex)) {
-            dag.removeEdge(toVertex, fromVertex);
+            graph.removeEdge(toVertex, fromVertex);
         }
 
         try {
-            dag.addEdge(fromVertex, toVertex);
+            graph.addEdge(fromVertex, toVertex);
         } catch (CycleDetectedException e) {
             if (!safe) {
                 throw e;
@@ -245,7 +241,7 @@ public class ProjectSorter {
     }
 
     private boolean isSpecificVersion(String version) {
-        return !(StringUtils.isEmpty(version) || version.startsWith("[") || version.startsWith("("));
+        return !((version == null || version.isEmpty()) || version.startsWith("[") || version.startsWith("("));
     }
 
     // TODO !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in
@@ -266,19 +262,15 @@ public class ProjectSorter {
     }
 
     public List<String> getDependents(String id) {
-        return dag.getParentLabels(id);
+        return graph.getVertex(id).getParents().stream().map(Vertex::getLabel).collect(Collectors.toList());
     }
 
     public List<String> getDependencies(String id) {
-        return dag.getChildLabels(id);
+        return graph.getVertex(id).getChildren().stream().map(Vertex::getLabel).collect(Collectors.toList());
     }
 
     public static String getId(MavenProject project) {
         return ArtifactUtils.key(project.getGroupId(), project.getArtifactId(), project.getVersion());
-    }
-
-    public DAG getDAG() {
-        return dag;
     }
 
     public Map<String, MavenProject> getProjectMap() {

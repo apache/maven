@@ -18,58 +18,65 @@
  */
 package org.apache.maven.toolchain.building;
 
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLStreamException;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.api.services.xml.XmlReaderException;
+import org.apache.maven.api.services.xml.XmlReaderRequest;
+import org.apache.maven.building.Source;
 import org.apache.maven.building.StringSource;
-import org.apache.maven.toolchain.io.DefaultToolchainsReader;
-import org.apache.maven.toolchain.io.DefaultToolchainsWriter;
-import org.apache.maven.toolchain.io.ToolchainsParseException;
+import org.apache.maven.internal.impl.DefaultToolchainsXmlFactory;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.interpolation.os.OperatingSystemUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.apache.maven.internal.impl.StaxLocation.getLocation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-public class DefaultToolchainsBuilderTest {
+@ExtendWith(MockitoExtension.class)
+class DefaultToolchainsBuilderTest {
     private static final String LS = System.lineSeparator();
 
     @Spy
-    private DefaultToolchainsReader toolchainsReader;
-
-    @Spy
-    private DefaultToolchainsWriter toolchainsWriter;
+    private DefaultToolchainsXmlFactory toolchainsXmlFactory;
 
     @InjectMocks
     private DefaultToolchainsBuilder toolchainBuilder;
 
     @BeforeEach
-    public void onSetup() {
-        MockitoAnnotations.initMocks(this);
+    void onSetup() {
+        // MockitoAnnotations.openMocks(this);
 
         Map<String, String> envVarMap = new HashMap<>();
         envVarMap.put("testKey", "testValue");
         envVarMap.put("testSpecialCharactersKey", "<test&Value>");
         OperatingSystemUtils.setEnvVarSource(new TestEnvVarSource(envVarMap));
+
+        toolchainBuilder = new DefaultToolchainsBuilder(
+                new org.apache.maven.internal.impl.DefaultToolchainsBuilder(), toolchainsXmlFactory);
     }
 
     @Test
-    public void testBuildEmptyRequest() throws Exception {
+    void testBuildEmptyRequest() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
         assertNotNull(result.getEffectiveToolchains());
@@ -78,20 +85,18 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testBuildRequestWithUserToolchains() throws Exception {
-        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
-        request.setUserToolchainsSource(new StringSource(""));
-
+    void testBuildRequestWithUserToolchains() throws Exception {
         Properties props = new Properties();
         props.put("key", "user_value");
         ToolchainModel toolchain = new ToolchainModel();
         toolchain.setType("TYPE");
         toolchain.setProvides(props);
-        PersistedToolchains userResult = new PersistedToolchains();
-        userResult.setToolchains(Collections.singletonList(toolchain));
-        doReturn(userResult)
-                .when(toolchainsReader)
-                .read(any(InputStream.class), ArgumentMatchers.<String, Object>anyMap());
+        PersistedToolchains persistedToolchains = new PersistedToolchains();
+        persistedToolchains.setToolchains(Collections.singletonList(toolchain));
+
+        String xml = new DefaultToolchainsXmlFactory().toXmlString(persistedToolchains.getDelegate());
+        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
+        request.setUserToolchainsSource(new StringSource(xml));
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
         assertNotNull(result.getEffectiveToolchains());
@@ -110,20 +115,18 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testBuildRequestWithGlobalToolchains() throws Exception {
-        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
-        request.setGlobalToolchainsSource(new StringSource(""));
-
+    void testBuildRequestWithGlobalToolchains() throws Exception {
         Properties props = new Properties();
         props.put("key", "global_value");
         ToolchainModel toolchain = new ToolchainModel();
         toolchain.setType("TYPE");
         toolchain.setProvides(props);
-        PersistedToolchains globalResult = new PersistedToolchains();
-        globalResult.setToolchains(Collections.singletonList(toolchain));
-        doReturn(globalResult)
-                .when(toolchainsReader)
-                .read(any(InputStream.class), ArgumentMatchers.<String, Object>anyMap());
+        PersistedToolchains persistedToolchains = new PersistedToolchains();
+        persistedToolchains.setToolchains(Collections.singletonList(toolchain));
+
+        String xml = new DefaultToolchainsXmlFactory().toXmlString(persistedToolchains.getDelegate());
+        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
+        request.setGlobalToolchainsSource(new StringSource(xml));
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
         assertNotNull(result.getEffectiveToolchains());
@@ -142,11 +145,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testBuildRequestWithBothToolchains() throws Exception {
-        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
-        request.setGlobalToolchainsSource(new StringSource(""));
-        request.setUserToolchainsSource(new StringSource(""));
-
+    void testBuildRequestWithBothToolchains() throws Exception {
         Properties props = new Properties();
         props.put("key", "user_value");
         ToolchainModel toolchain = new ToolchainModel();
@@ -163,10 +162,11 @@ public class DefaultToolchainsBuilderTest {
         PersistedToolchains globalResult = new PersistedToolchains();
         globalResult.setToolchains(Collections.singletonList(toolchain));
 
-        doReturn(globalResult)
-                .doReturn(userResult)
-                .when(toolchainsReader)
-                .read(any(InputStream.class), ArgumentMatchers.<String, Object>anyMap());
+        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
+        request.setUserToolchainsSource(
+                new StringSource(new DefaultToolchainsXmlFactory().toXmlString(userResult.getDelegate())));
+        request.setGlobalToolchainsSource(
+                new StringSource(new DefaultToolchainsXmlFactory().toXmlString(globalResult.getDelegate())));
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
         assertNotNull(result.getEffectiveToolchains());
@@ -194,13 +194,16 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testStrictToolchainsParseException() throws Exception {
+    void testStrictToolchainsParseException() throws Exception {
+        Location loc = mock(Location.class);
+        when(loc.getLineNumber()).thenReturn(4);
+        when(loc.getColumnNumber()).thenReturn(2);
+        XMLStreamException parseException = new XMLStreamException("MESSAGE", loc);
+        doThrow(new XmlReaderException("MESSAGE", getLocation(parseException), parseException))
+                .when(toolchainsXmlFactory)
+                .read(any(XmlReaderRequest.class));
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource(new StringSource(""));
-        ToolchainsParseException parseException = new ToolchainsParseException("MESSAGE", 4, 2);
-        doThrow(parseException)
-                .when(toolchainsReader)
-                .read(any(InputStream.class), ArgumentMatchers.<String, Object>anyMap());
 
         try {
             toolchainBuilder.build(request);
@@ -213,13 +216,14 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testIOException() throws Exception {
-        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
-        request.setGlobalToolchainsSource(new StringSource("", "LOCATION"));
+    void testIOException() throws Exception {
+        Source src = mock(Source.class);
         IOException ioException = new IOException("MESSAGE");
-        doThrow(ioException)
-                .when(toolchainsReader)
-                .read(any(InputStream.class), ArgumentMatchers.<String, Object>anyMap());
+        doThrow(ioException).when(src).getInputStream();
+        doReturn("LOCATION").when(src).getLocation();
+
+        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
+        request.setGlobalToolchainsSource(src);
 
         try {
             toolchainBuilder.build(request);
@@ -232,10 +236,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testEnvironmentVariablesAreInterpolated() throws Exception {
-        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
-        request.setUserToolchainsSource(new StringSource(""));
-
+    void testEnvironmentVariablesAreInterpolated() throws Exception {
         Properties props = new Properties();
         props.put("key", "${env.testKey}");
         Xpp3Dom configurationChild = new Xpp3Dom("jdkHome");
@@ -249,9 +250,9 @@ public class DefaultToolchainsBuilderTest {
         PersistedToolchains persistedToolchains = new PersistedToolchains();
         persistedToolchains.setToolchains(Collections.singletonList(toolchain));
 
-        doReturn(persistedToolchains)
-                .when(toolchainsReader)
-                .read(any(InputStream.class), ArgumentMatchers.<String, Object>anyMap());
+        String xml = new DefaultToolchainsXmlFactory().toXmlString(persistedToolchains.getDelegate());
+        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
+        request.setUserToolchainsSource(new StringSource(xml));
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
         String interpolatedValue = "testValue";
@@ -271,10 +272,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testNonExistingEnvironmentVariablesAreNotInterpolated() throws Exception {
-        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
-        request.setUserToolchainsSource(new StringSource(""));
-
+    void testNonExistingEnvironmentVariablesAreNotInterpolated() throws Exception {
         Properties props = new Properties();
         props.put("key", "${env.testNonExistingKey}");
         ToolchainModel toolchain = new ToolchainModel();
@@ -283,9 +281,9 @@ public class DefaultToolchainsBuilderTest {
         PersistedToolchains persistedToolchains = new PersistedToolchains();
         persistedToolchains.setToolchains(Collections.singletonList(toolchain));
 
-        doReturn(persistedToolchains)
-                .when(toolchainsReader)
-                .read(any(InputStream.class), ArgumentMatchers.<String, Object>anyMap());
+        String xml = new DefaultToolchainsXmlFactory().toXmlString(persistedToolchains.getDelegate());
+        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
+        request.setUserToolchainsSource(new StringSource(xml));
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
         assertEquals(
@@ -300,10 +298,7 @@ public class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    public void testEnvironmentVariablesWithSpecialCharactersAreInterpolated() throws Exception {
-        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
-        request.setUserToolchainsSource(new StringSource(""));
-
+    void testEnvironmentVariablesWithSpecialCharactersAreInterpolated() throws Exception {
         Properties props = new Properties();
         props.put("key", "${env.testSpecialCharactersKey}");
         ToolchainModel toolchain = new ToolchainModel();
@@ -312,9 +307,9 @@ public class DefaultToolchainsBuilderTest {
         PersistedToolchains persistedToolchains = new PersistedToolchains();
         persistedToolchains.setToolchains(Collections.singletonList(toolchain));
 
-        doReturn(persistedToolchains)
-                .when(toolchainsReader)
-                .read(any(InputStream.class), ArgumentMatchers.<String, Object>anyMap());
+        String xml = new DefaultToolchainsXmlFactory().toXmlString(persistedToolchains.getDelegate());
+        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
+        request.setUserToolchainsSource(new StringSource(xml));
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
         String interpolatedValue = "<test&Value>";

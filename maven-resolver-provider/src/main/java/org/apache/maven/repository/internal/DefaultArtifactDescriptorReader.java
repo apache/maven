@@ -26,11 +26,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 
-import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Relocation;
 import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuilder;
@@ -64,17 +61,13 @@ import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResolutionException;
 import org.eclipse.aether.resolution.VersionResult;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * @author Benjamin Bentmann
+ * Default artifact descriptor reader.
  */
 @Named
 @Singleton
 public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultArtifactDescriptorReader.class);
-
     private final RemoteRepositoryManager remoteRepositoryManager;
     private final VersionResolver versionResolver;
     private final VersionRangeResolver versionRangeResolver;
@@ -82,6 +75,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
     private final RepositoryEventDispatcher repositoryEventDispatcher;
     private final ModelBuilder modelBuilder;
     private final ModelCacheFactory modelCacheFactory;
+    private final Map<String, MavenArtifactRelocationSource> artifactRelocationSources;
+    private final ArtifactDescriptorReaderDelegate delegate;
 
     @Inject
     public DefaultArtifactDescriptorReader(
@@ -91,7 +86,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             ArtifactResolver artifactResolver,
             ModelBuilder modelBuilder,
             RepositoryEventDispatcher repositoryEventDispatcher,
-            ModelCacheFactory modelCacheFactory) {
+            ModelCacheFactory modelCacheFactory,
+            Map<String, MavenArtifactRelocationSource> artifactRelocationSources) {
         this.remoteRepositoryManager =
                 Objects.requireNonNull(remoteRepositoryManager, "remoteRepositoryManager cannot be null");
         this.versionResolver = Objects.requireNonNull(versionResolver, "versionResolver cannot be null");
@@ -101,8 +97,12 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         this.repositoryEventDispatcher =
                 Objects.requireNonNull(repositoryEventDispatcher, "repositoryEventDispatcher cannot be null");
         this.modelCacheFactory = Objects.requireNonNull(modelCacheFactory, "modelCacheFactory cannot be null");
+        this.artifactRelocationSources =
+                Objects.requireNonNull(artifactRelocationSources, "artifactRelocationSources cannot be null");
+        this.delegate = new ArtifactDescriptorReaderDelegate();
     }
 
+    @Override
     public ArtifactDescriptorResult readArtifactDescriptor(
             RepositorySystemSession session, ArtifactDescriptorRequest request) throws ArtifactDescriptorException {
         ArtifactDescriptorResult result = new ArtifactDescriptorResult(request);
@@ -114,7 +114,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                     (ArtifactDescriptorReaderDelegate) config.get(ArtifactDescriptorReaderDelegate.class.getName());
 
             if (delegate == null) {
-                delegate = new ArtifactDescriptorReaderDelegate();
+                delegate = this.delegate;
             }
 
             delegate.populateResult(session, result, model);
@@ -128,9 +128,9 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             throws ArtifactDescriptorException {
         RequestTrace trace = RequestTrace.newChild(request.getTrace(), request);
 
-        Set<String> visited = new LinkedHashSet<>();
+        LinkedHashSet<String> visited = new LinkedHashSet<>();
         for (Artifact a = request.getArtifact(); ; ) {
-            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact(a);
+            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifactUnconditionally(a);
             try {
                 VersionRequest versionRequest =
                         new VersionRequest(a, request.getRepositories(), request.getRequestContext());
@@ -211,10 +211,10 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         remoteRepositoryManager,
                         request.getRepositories()));
                 if (resolveResult.getRepository() instanceof WorkspaceRepository) {
-                    modelRequest.setPomFile(pomArtifact.getFile());
+                    modelRequest.setPomPath(pomArtifact.getPath());
                 } else {
                     modelRequest.setModelSource(new ArtifactModelSource(
-                            pomArtifact.getFile(),
+                            pomArtifact.getPath(),
                             pomArtifact.getGroupId(),
                             pomArtifact.getArtifactId(),
                             pomArtifact.getVersion()));
@@ -236,21 +236,26 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 throw new ArtifactDescriptorException(result);
             }
 
-            Relocation relocation = getRelocation(model);
-
-            if (relocation != null) {
-                result.addRelocation(a);
-                a = new RelocatedArtifact(
-                        a,
-                        relocation.getGroupId(),
-                        relocation.getArtifactId(),
-                        relocation.getVersion(),
-                        relocation.getMessage());
-                result.setArtifact(a);
+            Artifact relocatedArtifact = getRelocation(session, result, model);
+            if (relocatedArtifact != null) {
+                if (withinSameGav(relocatedArtifact, a)) {
+                    result.setArtifact(relocatedArtifact);
+                    return model; // they share same model
+                } else {
+                    result.addRelocation(a);
+                    a = relocatedArtifact;
+                    result.setArtifact(a);
+                }
             } else {
                 return model;
             }
         }
+    }
+
+    private boolean withinSameGav(Artifact a1, Artifact a2) {
+        return Objects.equals(a1.getGroupId(), a2.getGroupId())
+                && Objects.equals(a1.getArtifactId(), a2.getArtifactId())
+                && Objects.equals(a1.getVersion(), a2.getVersion());
     }
 
     private Properties toProperties(Map<String, String> dominant, Map<String, String> recessive) {
@@ -264,13 +269,17 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         return props;
     }
 
-    private Relocation getRelocation(Model model) {
-        Relocation relocation = null;
-        DistributionManagement distMgmt = model.getDistributionManagement();
-        if (distMgmt != null) {
-            relocation = distMgmt.getRelocation();
+    private Artifact getRelocation(
+            RepositorySystemSession session, ArtifactDescriptorResult artifactDescriptorResult, Model model)
+            throws ArtifactDescriptorException {
+        Artifact result = null;
+        for (MavenArtifactRelocationSource source : artifactRelocationSources.values()) {
+            result = source.relocatedTarget(session, artifactDescriptorResult, model);
+            if (result != null) {
+                break;
+            }
         }
-        return relocation;
+        return result;
     }
 
     private void missingDescriptor(

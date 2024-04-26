@@ -58,7 +58,7 @@ under the License.
     <plexusInteractivityVersion>1.0-alpha-6</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.1</plexusInterpolationVersion>
     <plexusPluginManagerVersion>1.0-alpha-1</plexusPluginManagerVersion>
-    <plexusUtilsVersion>1.5.8</plexusUtilsVersion>
+    <plexusUtilsVersion>3.0.16</plexusUtilsVersion>
     <plexusJetty6Version>1.6</plexusJetty6Version>
     <plexusWebdavVersion>1.0</plexusWebdavVersion>
     <wagonVersion>1.0-beta-4</wagonVersion>

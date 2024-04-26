@@ -34,9 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * A test which demonstrates maven's dependency management
  *
- * @author <a href="rgoers@apache.org">Ralph Goers</a>
  */
-public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
+@Deprecated
+class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p1 inherits from p0
@@ -49,7 +49,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    public void testDependencyManagement() throws Exception {
+    void testDependencyManagement() throws Exception {
         File localRepo = getLocalRepositoryPath();
         File pom0 = new File(localRepo, "p0/pom.xml");
 

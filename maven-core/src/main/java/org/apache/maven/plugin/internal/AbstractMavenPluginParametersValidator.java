@@ -18,46 +18,29 @@
  */
 package org.apache.maven.plugin.internal;
 
-import java.util.Arrays;
-import java.util.List;
-
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.PluginValidationManager;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.shared.utils.logging.MessageBuilder;
-import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.slf4j.Logger;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Common implementations for plugin parameters configuration validation.
  *
- * @author Slawomir Jaranowski
  */
 abstract class AbstractMavenPluginParametersValidator implements MavenPluginConfigurationValidator {
 
-    // plugin author can provide @Parameter( property = "session" ) in this case property will always evaluate
-    // so, we need ignore those
+    protected final PluginValidationManager pluginValidationManager;
 
-    // source org.apache.maven.plugin.PluginParameterExpressionEvaluator
-    private static final List<String> IGNORED_PROPERTY_VALUES = Arrays.asList(
-            "basedir",
-            "executedProject",
-            "localRepository",
-            "mojo",
-            "mojoExecution",
-            "plugin",
-            "project",
-            "reactorProjects",
-            "session",
-            "settings");
+    protected AbstractMavenPluginParametersValidator(PluginValidationManager pluginValidationManager) {
+        this.pluginValidationManager = requireNonNull(pluginValidationManager);
+    }
 
-    private static final List<String> IGNORED_PROPERTY_PREFIX =
-            Arrays.asList("mojo.", "plugin.", "project.", "session.", "settings.");
-
-    protected abstract Logger getLogger();
-
-    protected static boolean isValueSet(PlexusConfiguration config, ExpressionEvaluator expressionEvaluator) {
+    protected boolean isValueSet(PlexusConfiguration config, ExpressionEvaluator expressionEvaluator) {
         if (config == null) {
             return false;
         }
@@ -91,35 +74,42 @@ abstract class AbstractMavenPluginParametersValidator implements MavenPluginConf
         return false;
     }
 
-    private static boolean isIgnoredProperty(String strValue) {
-        if (!strValue.startsWith("${")) {
-            return false;
-        }
+    @Override
+    public final void validate(
+            MavenSession mavenSession,
+            MojoDescriptor mojoDescriptor,
+            Class<?> mojoClass,
+            PlexusConfiguration pomConfiguration,
+            ExpressionEvaluator expressionEvaluator) {
+        doValidate(mavenSession, mojoDescriptor, mojoClass, pomConfiguration, expressionEvaluator);
+    }
 
-        String propertyName = strValue.replace("${", "").replace("}", "");
+    protected abstract void doValidate(
+            MavenSession mavenSession,
+            MojoDescriptor mojoDescriptor,
+            Class<?> mojoClass,
+            PlexusConfiguration pomConfiguration,
+            ExpressionEvaluator expressionEvaluator);
 
-        if (IGNORED_PROPERTY_VALUES.contains(propertyName)) {
-            return true;
-        }
-
-        return IGNORED_PROPERTY_PREFIX.stream().anyMatch(propertyName::startsWith);
+    protected boolean isIgnoredProperty(String strValue) {
+        return false;
     }
 
     protected abstract String getParameterLogReason(Parameter parameter);
 
-    protected void logParameter(Parameter parameter) {
-        MessageBuilder messageBuilder = MessageUtils.buffer()
-                .warning("Parameter '")
-                .warning(parameter.getName())
-                .warning('\'');
+    protected String formatParameter(Parameter parameter) {
+        StringBuilder stringBuilder = new StringBuilder()
+                .append("Parameter '")
+                .append(parameter.getName())
+                .append('\'');
 
         if (parameter.getExpression() != null) {
             String userProperty = parameter.getExpression().replace("${", "'").replace('}', '\'');
-            messageBuilder.warning(" (user property ").warning(userProperty).warning(")");
+            stringBuilder.append(" (user property ").append(userProperty).append(")");
         }
 
-        messageBuilder.warning(" ").warning(getParameterLogReason(parameter));
+        stringBuilder.append(" ").append(getParameterLogReason(parameter));
 
-        getLogger().warn(messageBuilder.toString());
+        return stringBuilder.toString();
     }
 }

@@ -23,33 +23,41 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-beta-1-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-core</artifactId>
   <name>Maven 4 API :: Core</name>
-  <description>Maven 4 API - Maven Core APIs.</description>
+  <description>Maven 4 API - Maven Core API</description>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-meta</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-model</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-settings</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-toolchain</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-plugin</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-di</artifactId>
     </dependency>
   </dependencies>
 

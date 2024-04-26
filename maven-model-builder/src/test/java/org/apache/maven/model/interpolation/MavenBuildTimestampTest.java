@@ -26,9 +26,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MavenBuildTimestampTest {
+class MavenBuildTimestampTest {
     @Test
-    public void testMavenBuildTimestampUsesUTC() {
+    void testMavenBuildTimestampUsesUTC() {
         Map<String, String> interpolationProperties = new HashMap<>();
         interpolationProperties.put("maven.build.timestamp.format", "yyyyMMdd'T'HHmm'Z'");
         MavenBuildTimestamp timestamp = new MavenBuildTimestamp(new Date(), interpolationProperties);

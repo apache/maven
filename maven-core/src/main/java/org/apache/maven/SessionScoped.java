@@ -30,7 +30,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Indicates that annotated component should be instantiated before session execution starts
  * and discarded after session execution completes.
  *
- * @author Jason van Zyl
  * @since 3.2.0
  */
 @Target({TYPE})

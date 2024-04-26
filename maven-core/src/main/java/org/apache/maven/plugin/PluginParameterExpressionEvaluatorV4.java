@@ -21,18 +21,15 @@ package org.apache.maven.plugin;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
-import org.apache.maven.internal.impl.DefaultMojoExecution;
-import org.apache.maven.internal.impl.DefaultSession;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.model.interpolation.reflection.ReflectionValueExtractor;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
-import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 /**
  * Evaluator for plugin parameters expressions. Content surrounded by <code>${</code> and <code>}</code> is evaluated.
@@ -40,49 +37,30 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * <table border="1">
  * <caption>Expression matrix</caption>
  * <tr><th>expression</th>                     <th></th>               <th>evaluation result</th></tr>
- * <tr><td><code>session</code></td>           <td></td>               <td>the actual {@link Session}</td></tr>
- * <tr><td><code>session.*</code></td>         <td>(since Maven 3)</td><td></td></tr>
- * <tr><td><code>localRepository</code></td>   <td></td>
- *                                             <td>{@link Session#getLocalRepository()}</td></tr>
- * <tr><td><code>reactorProjects</code></td>   <td></td>               <td>{@link Session#getProjects()}</td></tr>
- * <tr><td><code>project</code></td>           <td></td>
- *                                 <td>{@link org.apache.maven.execution.MavenSession#getCurrentProject()}</td></tr>
+ * <tr><td><code>session.*</code></td>         <td></td>               <td></td></tr>
  * <tr><td><code>project.*</code></td>         <td></td>               <td></td></tr>
- * <tr><td><code>pom.*</code></td>             <td>(since Maven 3)</td><td>same as <code>project.*</code></td></tr>
- * <tr><td><code>executedProject</code></td>   <td></td>
- *                                 <td>{@link org.apache.maven.project.MavenProject#getExecutionProject()}</td></tr>
- * <tr><td><code>settings</code></td>          <td></td>               <td>{@link Session#getSettings()}</td></tr>
  * <tr><td><code>settings.*</code></td>        <td></td>               <td></td></tr>
- * <tr><td><code>basedir</code></td>           <td></td>
- *                                 <td>{@link Session#getExecutionRootDirectory()} or
- *                                                 <code>System.getProperty( "user.dir" )</code> if null</td></tr>
- * <tr><td><code>mojoExecution</code></td>     <td></td>               <td>the actual {@link MojoExecution}</td></tr>
- * <tr><td><code>mojo</code></td>              <td>(since Maven 3)</td><td>same as <code>mojoExecution</code></td></tr>
- * <tr><td><code>mojo.*</code></td>            <td>(since Maven 3)</td><td></td></tr>
- * <tr><td><code>plugin</code></td>            <td>(since Maven 3)</td>
- *                             <td>{@link MojoExecution#getMojoDescriptor()}.{@link MojoDescriptor#getPluginDescriptor()
- *                                 getPluginDescriptor()}</td></tr>
- * <tr><td><code>plugin.*</code></td>          <td></td>               <td></td></tr>
+ * <tr><td><code>mojo.*</code></td>            <td></td>               <td>the actual {@link MojoExecution}</td></tr>
  * <tr><td><code>*</code></td>                 <td></td>               <td>user properties</td></tr>
  * <tr><td><code>*</code></td>                 <td></td>               <td>system properties</td></tr>
  * <tr><td><code>*</code></td>                 <td></td>               <td>project properties</td></tr>
  * </table>
- * <i>Notice:</i> <code>reports</code> was supported in Maven 2.x but was removed in Maven 3
  *
- * @author Jason van Zyl
  * @see Session
+ * @see Project
+ * @see org.apache.maven.api.settings.Settings
  * @see MojoExecution
  */
 public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpressionEvaluator {
-    private Session session;
+    private final Session session;
 
-    private MojoExecution mojoExecution;
+    private final MojoExecution mojoExecution;
 
-    private Project project;
+    private final Project project;
 
-    private Path basedir;
+    private final Path basedir;
 
-    private Properties properties;
+    private final Map<String, String> properties;
 
     public PluginParameterExpressionEvaluatorV4(Session session, Project project) {
         this(session, project, null);
@@ -91,29 +69,18 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
     public PluginParameterExpressionEvaluatorV4(Session session, Project project, MojoExecution mojoExecution) {
         this.session = session;
         this.mojoExecution = mojoExecution;
-        this.properties = new Properties();
+        this.properties = session.getEffectiveProperties(project);
         this.project = project;
-
-        //
-        // Maven4: We may want to evaluate how this is used but we add these separate as the
-        // getExecutionProperties is deprecated in MavenSession.
-        //
-        this.properties.putAll(session.getUserProperties());
-        this.properties.putAll(session.getSystemProperties());
 
         Path basedir = null;
 
         if (project != null) {
-            Optional<Path> projectFile = project.getBasedir();
-
-            // this should always be the case for non-super POM instances...
-            if (projectFile.isPresent()) {
-                basedir = projectFile.get().toAbsolutePath();
-            }
+            Path projectFile = project.getBasedir();
+            basedir = projectFile.toAbsolutePath();
         }
 
         if (basedir == null) {
-            basedir = session.getExecutionRootDirectory();
+            basedir = session.getTopDirectory();
         }
 
         if (basedir == null) {
@@ -166,123 +133,34 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
             return expression.replace("$$", "$");
         }
 
-        if ("localRepository".equals(expression)) {
-            // TODO: v4
-            value = session.getLocalRepository();
-        } else if ("session".equals(expression)) {
-            value = session;
-        } else if (expression.startsWith("session")) {
-            // TODO: v4
-            try {
-                int pathSeparator = expression.indexOf('/');
-
-                if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
-                    value = ReflectionValueExtractor.evaluate(pathExpression, session);
-                    value = value + expression.substring(pathSeparator);
-                } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), session);
+        Map<String, Object> objects = new HashMap<>();
+        objects.put("session.", session);
+        objects.put("project.", project);
+        objects.put("mojo.", mojoExecution);
+        objects.put("settings.", session.getSettings());
+        for (Map.Entry<String, Object> ctx : objects.entrySet()) {
+            if (expression.startsWith(ctx.getKey())) {
+                try {
+                    int pathSeparator = expression.indexOf('/');
+                    if (pathSeparator > 0) {
+                        String pathExpression = expression.substring(0, pathSeparator);
+                        value = ReflectionValueExtractor.evaluate(pathExpression, ctx.getValue());
+                        if (pathSeparator < expression.length() - 1) {
+                            if (value instanceof Path) {
+                                value = ((Path) value).resolve(expression.substring(pathSeparator + 1));
+                            } else {
+                                value = value + expression.substring(pathSeparator);
+                            }
+                        }
+                    } else {
+                        value = ReflectionValueExtractor.evaluate(expression, ctx.getValue());
+                    }
+                    break;
+                } catch (Exception e) {
+                    // TODO don't catch exception
+                    throw new ExpressionEvaluationException(
+                            "Error evaluating plugin parameter expression: " + expression, e);
                 }
-            } catch (Exception e) {
-                // TODO don't catch exception
-                throw new ExpressionEvaluationException(
-                        "Error evaluating plugin parameter expression: " + expression, e);
-            }
-        } else if ("reactorProjects".equals(expression)) {
-            value = session.getProjects();
-        } else if ("project".equals(expression)) {
-            value = project;
-        } else if ("executedProject".equals(expression)) {
-            value = ((DefaultSession) session)
-                    .getProject(((DefaultSession) session)
-                            .getMavenSession()
-                            .getCurrentProject()
-                            .getExecutionProject());
-        } else if (expression.startsWith("project") || expression.startsWith("pom")) {
-            // TODO: v4
-            try {
-                int pathSeparator = expression.indexOf('/');
-
-                if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(0, pathSeparator);
-                    value = ReflectionValueExtractor.evaluate(pathExpression, project);
-                    value = value + expression.substring(pathSeparator);
-                } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), project);
-                }
-            } catch (Exception e) {
-                // TODO don't catch exception
-                throw new ExpressionEvaluationException(
-                        "Error evaluating plugin parameter expression: " + expression, e);
-            }
-        } else if (expression.equals("repositorySystemSession")) {
-            // TODO: v4
-        } else if (expression.equals("mojo") || expression.equals("mojoExecution")) {
-            value = new DefaultMojoExecution(mojoExecution);
-        } else if (expression.startsWith("mojo")) {
-            // TODO: v4
-            try {
-                int pathSeparator = expression.indexOf('/');
-
-                if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
-                    value = ReflectionValueExtractor.evaluate(pathExpression, mojoExecution);
-                    value = value + expression.substring(pathSeparator);
-                } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), mojoExecution);
-                }
-            } catch (Exception e) {
-                // TODO don't catch exception
-                throw new ExpressionEvaluationException(
-                        "Error evaluating plugin parameter expression: " + expression, e);
-            }
-        } else if (expression.equals("plugin")) {
-            // TODO: v4
-            value = mojoExecution.getMojoDescriptor().getPluginDescriptor();
-        } else if (expression.startsWith("plugin")) {
-            // TODO: v4
-            try {
-                int pathSeparator = expression.indexOf('/');
-
-                PluginDescriptor pluginDescriptor =
-                        mojoExecution.getMojoDescriptor().getPluginDescriptor();
-
-                if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
-                    value = ReflectionValueExtractor.evaluate(pathExpression, pluginDescriptor);
-                    value = value + expression.substring(pathSeparator);
-                } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), pluginDescriptor);
-                }
-            } catch (Exception e) {
-                throw new ExpressionEvaluationException(
-                        "Error evaluating plugin parameter expression: " + expression, e);
-            }
-        } else if ("settings".equals(expression)) {
-            value = session.getSettings();
-        } else if (expression.startsWith("settings")) {
-            try {
-                int pathSeparator = expression.indexOf('/');
-
-                if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
-                    value = ReflectionValueExtractor.evaluate(pathExpression, session.getSettings());
-                    value = value + expression.substring(pathSeparator);
-                } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), session.getSettings());
-                }
-            } catch (Exception e) {
-                // TODO don't catch exception
-                throw new ExpressionEvaluationException(
-                        "Error evaluating plugin parameter expression: " + expression, e);
-            }
-        } else if ("basedir".equals(expression)) {
-            value = basedir.toString();
-        } else if (expression.startsWith("basedir")) {
-            int pathSeparator = expression.indexOf('/');
-
-            if (pathSeparator > 0) {
-                value = basedir.toString() + expression.substring(pathSeparator);
             }
         }
 
@@ -307,11 +185,7 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
                 // to run a single test so I want to specify that class on the cli as
                 // a parameter.
 
-                value = properties.getProperty(expression);
-            }
-
-            if ((value == null) && ((project != null) && (project.getModel().getProperties() != null))) {
-                value = project.getModel().getProperties().get(expression);
+                value = properties.get(expression);
             }
         }
 

@@ -18,25 +18,38 @@
  */
 package org.apache.maven.model.io.xpp3;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.v4.MavenStaxWriter;
 
+/**
+ * @deprecated Use MavenStaxWriter instead
+ */
+@Deprecated
 public class MavenXpp3Writer {
     // --------------------------/
     // - Class/Member Variables -/
     // --------------------------/
 
-    /**
-     * Field fileComment.
-     */
-    private String fileComment = null;
+    private final MavenStaxWriter delegate = new MavenStaxWriter();
 
     // -----------/
     // - Methods -/
     // -----------/
+
+    public MavenXpp3Writer() {
+        this(false);
+    }
+
+    protected MavenXpp3Writer(boolean addLocationInformation) {
+        delegate.setAddLocationInformation(addLocationInformation);
+    }
 
     /**
      * Method setFileComment.
@@ -44,8 +57,25 @@ public class MavenXpp3Writer {
      * @param fileComment a fileComment object.
      */
     public void setFileComment(String fileComment) {
-        this.fileComment = fileComment;
+        delegate.setFileComment(fileComment);
     } // -- void setFileComment( String )
+
+    /**
+     * Method setStringFormatter.
+     *
+     * @param stringFormatter
+     */
+    public void setStringFormatter(InputLocation.StringFormatter stringFormatter) {
+        delegate.setStringFormatter(
+                stringFormatter != null
+                        ? new org.apache.maven.api.model.InputLocation.StringFormatter() {
+                            @Override
+                            public String toString(org.apache.maven.api.model.InputLocation location) {
+                                return stringFormatter.toString(new InputLocation(location));
+                            }
+                        }
+                        : null);
+    } // -- void setStringFormatter( InputLocation.StringFormatter )
 
     /**
      * Method write.
@@ -55,9 +85,11 @@ public class MavenXpp3Writer {
      * @throws IOException java.io.IOException if any.
      */
     public void write(Writer writer, Model model) throws IOException {
-        org.apache.maven.model.v4.MavenXpp3Writer xw = new org.apache.maven.model.v4.MavenXpp3Writer();
-        xw.setFileComment(fileComment);
-        xw.write(writer, model.getDelegate());
+        try {
+            delegate.write(writer, model.getDelegate());
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
     } // -- void write( Writer, Model )
 
     /**
@@ -68,8 +100,10 @@ public class MavenXpp3Writer {
      * @throws IOException java.io.IOException if any.
      */
     public void write(OutputStream stream, Model model) throws IOException {
-        org.apache.maven.model.v4.MavenXpp3Writer xw = new org.apache.maven.model.v4.MavenXpp3Writer();
-        xw.setFileComment(fileComment);
-        xw.write(stream, model.getDelegate());
+        try {
+            delegate.write(stream, model.getDelegate());
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
     } // -- void write( OutputStream, Model )
 }

@@ -22,7 +22,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-beta-1-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-toolchain-model</artifactId>
@@ -34,16 +34,18 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-toolchain</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-xml-impl</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
+      <artifactId>maven-api-xml</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <artifactId>maven-api-meta</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
     </dependency>
   </dependencies>
 
@@ -70,9 +72,6 @@ under the License.
             <configuration>
               <templates>
                 <template>model-v3.vm</template>
-                <template>merger.vm</template>
-                <template>reader.vm</template>
-                <template>writer.vm</template>
               </templates>
               <params>
                 <param>packageModelV3=org.apache.maven.toolchain.model</param>

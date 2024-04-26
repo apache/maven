@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.maven.model.Model;
@@ -29,7 +30,6 @@ import org.apache.maven.model.Model;
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
  *
- * @author Benjamin Bentmann
  */
 public interface ModelReader {
 
@@ -47,10 +47,23 @@ public interface ModelReader {
     String INPUT_SOURCE = "org.apache.maven.model.io.inputSource";
 
     /**
-     * The key for the option to provide a transformer context, which can be used to transform the input while reading
-     * to get an advanced version of the model.
+     * Name of the property used to store the project's root directory to use with
+     * XInclude support.
      */
-    String TRANSFORMER_CONTEXT = "transformerContext";
+    String ROOT_DIRECTORY = "rootDirectory";
+
+    /**
+     * Reads the model from the specified file.
+     *
+     * @param input The file to deserialize the model from, must not be {@code null}.
+     * @param options The options to use for deserialization, may be {@code null} to use the default values.
+     * @return The deserialized model, never {@code null}.
+     * @throws IOException If the model could not be deserialized.
+     * @throws ModelParseException If the input format could not be parsed.
+     * @deprecated Use {@link #read(Path, Map)} instead.
+     */
+    @Deprecated
+    Model read(File input, Map<String, ?> options) throws IOException, ModelParseException;
 
     /**
      * Reads the model from the specified file.
@@ -61,7 +74,7 @@ public interface ModelReader {
      * @throws IOException If the model could not be deserialized.
      * @throws ModelParseException If the input format could not be parsed.
      */
-    Model read(File input, Map<String, ?> options) throws IOException, ModelParseException;
+    Model read(Path input, Map<String, ?> options) throws IOException, ModelParseException;
 
     /**
      * Reads the model from the specified character reader. The reader will be automatically closed before the method

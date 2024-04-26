@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 
 import java.util.Objects;
 
-import org.codehaus.plexus.PlexusContainer;
+import org.apache.maven.internal.CoreRealm;
 
 /**
  * CoreExportsProvider
@@ -37,8 +37,8 @@ public class CoreExportsProvider implements Provider<CoreExports> {
     private final CoreExports exports;
 
     @Inject
-    public CoreExportsProvider(PlexusContainer container) {
-        this(new CoreExports(CoreExtensionEntry.discoverFrom(container.getContainerRealm())));
+    public CoreExportsProvider(CoreRealm coreRealm) {
+        this(new CoreExports(CoreExtensionEntry.discoverFrom(coreRealm.getRealm())));
     }
 
     public CoreExportsProvider(CoreExports exports) {

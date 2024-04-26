@@ -19,11 +19,10 @@
 package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.apache.commons.lang3.Validate;
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -33,152 +32,13 @@ import org.eclipse.aether.transfer.TransferResource;
  * AbstractMavenTransferListener
  */
 public abstract class AbstractMavenTransferListener extends AbstractTransferListener {
+    public static final String STYLE = ".transfer:-faint";
 
-    // CHECKSTYLE_OFF: LineLength
-    /**
-     * Formats file size with the associated <a href="https://en.wikipedia.org/wiki/Metric_prefix">SI</a> prefix
-     * (GB, MB, kB) and using the patterns <code>#0.0</code> for numbers between 1 and 10
-     * and <code>###0</code> for numbers between 10 and 1000+ by default.
-     *
-     * @see <a href="https://en.wikipedia.org/wiki/Metric_prefix">https://en.wikipedia.org/wiki/Metric_prefix</a>
-     * @see <a href="https://en.wikipedia.org/wiki/Binary_prefix">https://en.wikipedia.org/wiki/Binary_prefix</a>
-     * @see <a
-     *      href="https://en.wikipedia.org/wiki/Octet_%28computing%29">https://en.wikipedia.org/wiki/Octet_(computing)</a>
-     */
-    // CHECKSTYLE_ON: LineLength
-    // TODO Move me to Maven Shared Utils
-    static class FileSizeFormat {
-        enum ScaleUnit {
-            BYTE {
-                @Override
-                public long bytes() {
-                    return 1L;
-                }
+    protected final MessageBuilderFactory messageBuilderFactory;
+    protected final PrintStream out;
 
-                @Override
-                public String symbol() {
-                    return "B";
-                }
-            },
-            KILOBYTE {
-                @Override
-                public long bytes() {
-                    return 1000L;
-                }
-
-                @Override
-                public String symbol() {
-                    return "kB";
-                }
-            },
-            MEGABYTE {
-                @Override
-                public long bytes() {
-                    return KILOBYTE.bytes() * KILOBYTE.bytes();
-                }
-
-                @Override
-                public String symbol() {
-                    return "MB";
-                }
-            },
-            GIGABYTE {
-                @Override
-                public long bytes() {
-                    return MEGABYTE.bytes() * KILOBYTE.bytes();
-                }
-                ;
-
-                @Override
-                public String symbol() {
-                    return "GB";
-                }
-            };
-
-            public abstract long bytes();
-
-            public abstract String symbol();
-
-            public static ScaleUnit getScaleUnit(long size) {
-                Validate.isTrue(size >= 0L, "file size cannot be negative: %s", size);
-
-                if (size >= GIGABYTE.bytes()) {
-                    return GIGABYTE;
-                } else if (size >= MEGABYTE.bytes()) {
-                    return MEGABYTE;
-                } else if (size >= KILOBYTE.bytes()) {
-                    return KILOBYTE;
-                } else {
-                    return BYTE;
-                }
-            }
-        }
-
-        private DecimalFormat smallFormat;
-        private DecimalFormat largeFormat;
-
-        FileSizeFormat(Locale locale) {
-            smallFormat = new DecimalFormat("#0.0", new DecimalFormatSymbols(locale));
-            largeFormat = new DecimalFormat("###0", new DecimalFormatSymbols(locale));
-        }
-
-        public String format(long size) {
-            return format(size, null);
-        }
-
-        public String format(long size, ScaleUnit unit) {
-            return format(size, unit, false);
-        }
-
-        @SuppressWarnings("checkstyle:magicnumber")
-        public String format(long size, ScaleUnit unit, boolean omitSymbol) {
-            Validate.isTrue(size >= 0L, "file size cannot be negative: %s", size);
-
-            if (unit == null) {
-                unit = ScaleUnit.getScaleUnit(size);
-            }
-
-            double scaledSize = (double) size / unit.bytes();
-            String scaledSymbol = " " + unit.symbol();
-
-            if (omitSymbol) {
-                scaledSymbol = "";
-            }
-
-            if (unit == ScaleUnit.BYTE) {
-                return largeFormat.format(size) + scaledSymbol;
-            }
-
-            if (scaledSize < 0.05 || scaledSize >= 10.0) {
-                return largeFormat.format(scaledSize) + scaledSymbol;
-            } else {
-                return smallFormat.format(scaledSize) + scaledSymbol;
-            }
-        }
-
-        public String formatProgress(long progressedSize, long size) {
-            Validate.isTrue(progressedSize >= 0L, "progressed file size cannot be negative: %s", progressedSize);
-            Validate.isTrue(
-                    size < 0L || progressedSize <= size,
-                    "progressed file size cannot be greater than size: %s > %s",
-                    progressedSize,
-                    size);
-
-            if (size >= 0L && progressedSize != size) {
-                ScaleUnit unit = ScaleUnit.getScaleUnit(size);
-                String formattedProgressedSize = format(progressedSize, unit, true);
-                String formattedSize = format(size, unit);
-
-                return formattedProgressedSize + "/" + formattedSize;
-            } else {
-                return format(progressedSize);
-            }
-        }
-    }
-
-    protected PrintStream out;
-
-    protected AbstractMavenTransferListener(PrintStream out) {
+    protected AbstractMavenTransferListener(MessageBuilderFactory messageBuilderFactory, PrintStream out) {
+        this.messageBuilderFactory = messageBuilderFactory;
         this.out = out;
     }
 
@@ -188,10 +48,11 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();
-        StringBuilder message = new StringBuilder();
-        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
-        message.append(": ");
-        message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
+        MessageBuilder message = messageBuilderFactory.builder();
+        message.style(STYLE).append(action).append(' ').append(direction).append(' ');
+        message.resetStyle().append(resource.getRepositoryId());
+        message.style(STYLE).append(": ").append(resource.getRepositoryUrl());
+        message.resetStyle().append(resource.getResourceName());
 
         out.println(message.toString());
     }
@@ -213,19 +74,22 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         long contentLength = event.getTransferredBytes();
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
-        StringBuilder message = new StringBuilder();
-        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
-        message.append(": ");
-        message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
-        message.append(" (").append(format.format(contentLength));
+        MessageBuilder message = messageBuilderFactory.builder();
+        message.append(action).style(STYLE).append(' ').append(direction).append(' ');
+        message.resetStyle().append(resource.getRepositoryId());
+        message.style(STYLE).append(": ").append(resource.getRepositoryUrl());
+        message.resetStyle().append(resource.getResourceName());
+        message.style(STYLE).append(" (").append(format.format(contentLength));
 
         long duration = System.currentTimeMillis() - resource.getTransferStartTime();
         if (duration > 0L) {
             double bytesPerSecond = contentLength / (duration / 1000.0);
-            message.append(" at ").append(format.format((long) bytesPerSecond)).append("/s");
+            message.append(" at ");
+            format.format(message, (long) bytesPerSecond);
+            message.append("/s");
         }
 
-        message.append(')');
+        message.append(')').resetStyle();
         out.println(message.toString());
     }
 }

@@ -35,7 +35,6 @@ import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
  * Artifact collector - takes a set of original artifacts and resolves all of the best versions to use
  * along with their metadata. No artifacts are downloaded.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @Deprecated
 @SuppressWarnings("checkstyle:parameternumber")

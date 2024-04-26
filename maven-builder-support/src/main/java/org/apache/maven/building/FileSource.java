@@ -19,18 +19,18 @@
 package org.apache.maven.building;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 
 /**
  * Wraps an ordinary {@link File} as a source.
  *
- * @author Benjamin Bentmann
  */
 public class FileSource implements Source {
-    private final File file;
+    private final Path path;
 
     private final int hashCode;
 
@@ -38,29 +38,53 @@ public class FileSource implements Source {
      * Creates a new source backed by the specified file.
      *
      * @param file The file, must not be {@code null}.
+     * @deprecated Use {@link #FileSource(Path)} instead.
      */
+    @Deprecated
     public FileSource(File file) {
-        this.file = Objects.requireNonNull(file, "file cannot be null").getAbsoluteFile();
-        this.hashCode = Objects.hash(file);
+        this(Objects.requireNonNull(file, "file cannot be null").toPath());
+    }
+
+    /**
+     * Creates a new source backed by the specified file.
+     *
+     * @param path The file, must not be {@code null}.
+     * @since 4.0.0
+     */
+    public FileSource(Path path) {
+        this.path = Objects.requireNonNull(path, "path cannot be null").toAbsolutePath();
+        this.hashCode = Objects.hash(path);
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return new FileInputStream(file);
+        return Files.newInputStream(path);
     }
 
     @Override
     public String getLocation() {
-        return file.getPath();
+        return path.toString();
     }
 
     /**
      * Gets the file of this source.
      *
      * @return The underlying file, never {@code null}.
+     * @deprecated Use {@link #getPath()} instead.
      */
+    @Deprecated
     public File getFile() {
-        return file;
+        return path.toFile();
+    }
+
+    /**
+     * Gets the file of this source.
+     *
+     * @return The underlying file, never {@code null}.
+     * @since 4.0.0
+     */
+    public Path getPath() {
+        return path;
     }
 
     @Override
@@ -88,6 +112,6 @@ public class FileSource implements Source {
         }
 
         FileSource other = (FileSource) obj;
-        return this.file.equals(other.file);
+        return this.path.equals(other.path);
     }
 }

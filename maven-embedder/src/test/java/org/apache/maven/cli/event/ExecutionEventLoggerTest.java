@@ -24,8 +24,9 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.jline.JLineMessageBuilderFactory;
+import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,14 +45,15 @@ class ExecutionEventLoggerTest {
 
     private Logger logger;
     private ExecutionEventLogger executionEventLogger;
+    private JLineMessageBuilderFactory messageBuilderFactory = new JLineMessageBuilderFactory();
 
     @BeforeAll
-    public static void setUp() {
+    static void setUp() {
         MessageUtils.setColorEnabled(false);
     }
 
     @AfterAll
-    public static void tearDown() {
+    static void tearDown() {
         MessageUtils.setColorEnabled(true);
     }
 
@@ -59,7 +61,7 @@ class ExecutionEventLoggerTest {
     void beforeEach() {
         logger = mock(Logger.class);
         when(logger.isInfoEnabled()).thenReturn(true);
-        executionEventLogger = new ExecutionEventLogger(logger);
+        executionEventLogger = new ExecutionEventLogger(messageBuilderFactory, logger);
     }
 
     @Test
@@ -80,6 +82,7 @@ class ExecutionEventLoggerTest {
         when(rootProject.getBasedir()).thenReturn(basedir);
         MavenSession session = mock(MavenSession.class);
         when(session.getTopLevelProject()).thenReturn(rootProject);
+        when(session.getTopDirectory()).thenReturn(basedir.toPath());
         when(event.getSession()).thenReturn(session);
 
         // execute
@@ -112,6 +115,7 @@ class ExecutionEventLoggerTest {
         MavenSession session = mock(MavenSession.class);
         when(session.getTopLevelProject()).thenReturn(project);
         when(event.getSession()).thenReturn(session);
+        when(session.getTopDirectory()).thenReturn(basedir.toPath());
 
         // execute
         executionEventLogger.projectStarted(event);
@@ -141,32 +145,32 @@ class ExecutionEventLoggerTest {
         when(event.getProject()).thenReturn(project);
 
         // default width
-        new ExecutionEventLogger(logger, -1).projectStarted(event);
+        new ExecutionEventLogger(messageBuilderFactory, logger, -1).projectStarted(event);
         Mockito.verify(logger).info("----------------------------[ maven-plugin ]----------------------------");
 
         // terminal width: 30
-        new ExecutionEventLogger(logger, 30).projectStarted(event);
+        new ExecutionEventLogger(messageBuilderFactory, logger, 30).projectStarted(event);
         Mockito.verify(logger).info("------------------[ maven-plugin ]------------------");
 
         // terminal width: 70
-        new ExecutionEventLogger(logger, 70).projectStarted(event);
+        new ExecutionEventLogger(messageBuilderFactory, logger, 70).projectStarted(event);
         Mockito.verify(logger).info("-----------------------[ maven-plugin ]-----------------------");
 
         // terminal width: 110
-        new ExecutionEventLogger(logger, 110).projectStarted(event);
+        new ExecutionEventLogger(messageBuilderFactory, logger, 110).projectStarted(event);
         Mockito.verify(logger)
                 .info(
                         "-------------------------------------------[ maven-plugin ]-------------------------------------------");
 
         // terminal width: 200
-        new ExecutionEventLogger(logger, 200).projectStarted(event);
+        new ExecutionEventLogger(messageBuilderFactory, logger, 200).projectStarted(event);
         Mockito.verify(logger)
                 .info(
                         "-----------------------------------------------------[ maven-plugin ]-----------------------------------------------------");
     }
 
     @Test
-    public void testProjectStartedNoPom() {
+    void testProjectStartedNoPom() {
         // prepare
         File basedir = new File("").getAbsoluteFile();
         ExecutionEvent event = mock(ExecutionEvent.class);

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.model.building;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
@@ -25,13 +26,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.locator.ModelLocator;
 
 /**
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 class DefaultTransformerContext implements TransformerContext {
+    final ModelLocator modelLocator;
+
     final Map<String, String> userProperties = new ConcurrentHashMap<>();
 
     final Map<Path, Holder> modelByPath = new ConcurrentHashMap<>();
@@ -43,6 +46,11 @@ class DefaultTransformerContext implements TransformerContext {
         private volatile Model model;
 
         Holder() {}
+
+        Holder(Model model) {
+            this.model = Objects.requireNonNull(model);
+            this.set = true;
+        }
 
         public static Model deref(Holder holder) {
             return holder != null ? holder.get() : null;
@@ -77,19 +85,29 @@ class DefaultTransformerContext implements TransformerContext {
         }
     }
 
+    DefaultTransformerContext(ModelLocator modelLocator) {
+        this.modelLocator = modelLocator;
+    }
+
     @Override
     public String getUserProperty(String key) {
         return userProperties.get(key);
     }
 
     @Override
-    public Model getRawModel(Path p) {
+    public Model getRawModel(Path from, Path p) {
         return Holder.deref(modelByPath.get(p));
     }
 
     @Override
-    public Model getRawModel(String groupId, String artifactId) {
+    public Model getRawModel(Path from, String groupId, String artifactId) {
         return Holder.deref(modelByGA.get(new GAKey(groupId, artifactId)));
+    }
+
+    @Override
+    public Path locate(Path path) {
+        File file = modelLocator.locateExistingPom(path.toFile());
+        return file != null ? file.toPath() : null;
     }
 
     static class GAKey {

@@ -22,9 +22,9 @@ package org.apache.maven.repository.metadata;
  *  MetadataGraph edge selection policy. Complements
  *  GraphConflictResolver by being injected into it
  *
- * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
+@Deprecated
 public interface GraphConflictResolutionPolicy {
     String ROLE = GraphConflictResolutionPolicy.class.getName();
 

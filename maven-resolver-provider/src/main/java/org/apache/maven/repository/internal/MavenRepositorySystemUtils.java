@@ -19,34 +19,16 @@
 package org.apache.maven.repository.internal;
 
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.artifact.DefaultArtifactType;
-import org.eclipse.aether.collection.DependencyGraphTransformer;
-import org.eclipse.aether.collection.DependencyManager;
-import org.eclipse.aether.collection.DependencySelector;
-import org.eclipse.aether.collection.DependencyTraverser;
-import org.eclipse.aether.util.artifact.DefaultArtifactTypeRegistry;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
-import org.eclipse.aether.util.graph.selector.AndDependencySelector;
-import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
-import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
-import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
-import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
-import org.eclipse.aether.util.graph.transformer.ConflictResolver;
-import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
-import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
-import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
-import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
-import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
-import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
-import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 /**
  * A utility class to assist in setting up a Maven-like repository system. <em>Note:</em> This component is meant to
  * assist those clients that employ the repository system outside of an IoC container, Maven plugins should instead
  * always use regular dependency injection to acquire the repository system.
  *
- * @author Benjamin Bentmann
+ * @deprecated See {@link MavenSessionBuilderSupplier}
  */
+@Deprecated
 public final class MavenRepositorySystemUtils {
 
     private MavenRepositorySystemUtils() {
@@ -54,51 +36,20 @@ public final class MavenRepositorySystemUtils {
     }
 
     /**
-     * Creates a new Maven-like repository system session by initializing the session with values typical for
-     * Maven-based resolution. In more detail, this method configures settings relevant for the processing of dependency
-     * graphs, most other settings remain at their generic default value. Use the various setters to further configure
-     * the session with authentication, mirror, proxy and other information required for your environment.
+     * This method is deprecated, nobody should use it.
      *
-     * @return The new repository system session, never {@code null}.
+     * @deprecated This method is here only for legacy uses (like UTs), nothing else should use it.
      */
+    @Deprecated
     public static DefaultRepositorySystemSession newSession() {
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
-
-        DependencyTraverser depTraverser = new FatArtifactTraverser();
-        session.setDependencyTraverser(depTraverser);
-
-        DependencyManager depManager = new ClassicDependencyManager();
-        session.setDependencyManager(depManager);
-
-        DependencySelector depFilter = new AndDependencySelector(
-                new ScopeDependencySelector("test", "provided"),
-                new OptionalDependencySelector(),
-                new ExclusionDependencySelector());
-        session.setDependencySelector(depFilter);
-
-        DependencyGraphTransformer transformer = new ConflictResolver(
-                new NearestVersionSelector(), new JavaScopeSelector(),
-                new SimpleOptionalitySelector(), new JavaScopeDeriver());
-        transformer = new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner());
-        session.setDependencyGraphTransformer(transformer);
-
-        DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
-        stereotypes.add(new DefaultArtifactType("pom"));
-        stereotypes.add(new DefaultArtifactType("maven-plugin", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("jar", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("ejb", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("ejb-client", "jar", "client", "java"));
-        stereotypes.add(new DefaultArtifactType("test-jar", "jar", "tests", "java"));
-        stereotypes.add(new DefaultArtifactType("javadoc", "jar", "javadoc", "java"));
-        stereotypes.add(new DefaultArtifactType("java-source", "jar", "sources", "java", false, false));
-        stereotypes.add(new DefaultArtifactType("war", "war", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("ear", "ear", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("rar", "rar", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("par", "par", "", "java", false, true));
-        session.setArtifactTypeRegistry(stereotypes);
-
-        session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, true));
-
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false); // no close handle
+        MavenSessionBuilderSupplier builder = new MavenSessionBuilderSupplier();
+        session.setDependencyTraverser(builder.getDependencyTraverser());
+        session.setDependencyManager(new ClassicDependencyManager()); // Maven 3 behavior
+        session.setDependencySelector(builder.getDependencySelector());
+        session.setDependencyGraphTransformer(builder.getDependencyGraphTransformer());
+        session.setArtifactTypeRegistry(builder.getArtifactTypeRegistry());
+        session.setArtifactDescriptorPolicy(builder.getArtifactDescriptorPolicy());
         return session;
     }
 }

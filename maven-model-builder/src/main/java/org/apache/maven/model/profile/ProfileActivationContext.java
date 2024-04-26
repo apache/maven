@@ -25,13 +25,12 @@ import java.util.Map;
 /**
  * Describes the environmental context used to determine the activation status of profiles.
  *
- * @author Benjamin Bentmann
  */
 public interface ProfileActivationContext {
     /**
      * Key of the property containing the project's packaging.
      * Available in {@link #getUserProperties()}.
-     * @since 4.0
+     * @since 4.0.0
      */
     String PROPERTY_NAME_PACKAGING = "packaging";
 

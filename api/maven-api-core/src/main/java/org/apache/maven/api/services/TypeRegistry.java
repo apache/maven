@@ -18,7 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import org.apache.maven.api.Service;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -26,10 +25,10 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Access to {@link Type} registry.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
-public interface TypeRegistry extends Service {
+public interface TypeRegistry extends ExtensibleEnumRegistry<Type> {
 
     /**
      * Obtain the {@link Type} from the specified {@code id}.
@@ -40,5 +39,8 @@ public interface TypeRegistry extends Service {
      * @return the type
      */
     @Nonnull
-    Type getType(@Nonnull String id);
+    @Override
+    default Type require(@Nonnull String id) {
+        return lookup(id).orElseThrow(() -> new IllegalArgumentException("Unknown extensible enum value '" + id + "'"));
+    }
 }

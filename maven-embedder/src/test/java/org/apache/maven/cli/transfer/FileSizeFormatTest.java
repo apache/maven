@@ -20,17 +20,16 @@ package org.apache.maven.cli.transfer;
 
 import java.util.Locale;
 
-import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
-import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat.ScaleUnit;
+import org.apache.maven.cli.transfer.FileSizeFormat.ScaleUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class FileSizeFormatTest {
+class FileSizeFormatTest {
 
     @Test
-    public void testNegativeSize() {
+    void testNegativeSize() {
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         long negativeSize = -100L;
@@ -38,7 +37,7 @@ public class FileSizeFormatTest {
     }
 
     @Test
-    public void testSize() {
+    void testSize() {
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         long _0_bytes = 0L;
@@ -103,7 +102,7 @@ public class FileSizeFormatTest {
     }
 
     @Test
-    public void testSizeWithSelectedScaleUnit() {
+    void testSizeWithSelectedScaleUnit() {
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         long _0_bytes = 0L;
@@ -206,7 +205,7 @@ public class FileSizeFormatTest {
     }
 
     @Test
-    public void testNegativeProgressedSize() {
+    void testNegativeProgressedSize() {
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         long negativeProgressedSize = -100L;
@@ -214,14 +213,14 @@ public class FileSizeFormatTest {
     }
 
     @Test
-    public void testNegativeProgressedSizeBiggerThanSize() {
+    void testNegativeProgressedSizeBiggerThanSize() {
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         assertThrows(IllegalArgumentException.class, () -> format.formatProgress(100L, 10L));
     }
 
     @Test
-    public void testProgressedSizeWithoutSize() {
+    void testProgressedSizeWithoutSize() {
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         long _0_bytes = 0L;
@@ -238,7 +237,7 @@ public class FileSizeFormatTest {
     }
 
     @Test
-    public void testProgressedBothZero() {
+    void testProgressedBothZero() {
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         long _0_bytes = 0L;
@@ -246,7 +245,7 @@ public class FileSizeFormatTest {
     }
 
     @Test
-    public void testProgressedSizeWithSize() {
+    void testProgressedSizeWithSize() {
         FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         long _0_bytes = 0L;

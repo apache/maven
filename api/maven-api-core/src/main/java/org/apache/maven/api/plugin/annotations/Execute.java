@@ -26,39 +26,32 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Used if your Mojo needs to fork a <a href="/ref/3.0.4/maven-core/lifecycles.html">lifecycle</a>.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Documented
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
 public @interface Execute {
     /**
      * Lifecycle phase to fork. Note that specifying a phase overrides specifying a goal.
-     * For custom lifecycle phase ids use {@link #customPhase()} instead.
-     * Only one of {@link #customPhase()} and {@link #phase()} must be set.
      * @return the phase
      */
-    LifecyclePhase phase() default LifecyclePhase.NONE;
-
-    /**
-     * Custom lifecycle phase to fork. Note that specifying a phase overrides specifying a goal.
-     * This element should only be used for non-standard phases. For standard phases rather use {@link #phase()}.
-     * Only one of {@link #customPhase()} and {@link #phase()} must be set.
-     * @return the custom phase id
-     */
-    String customPhase() default "";
+    @Nonnull
+    String phase() default "";
 
     /**
      * Goal to fork. Note that specifying a phase overrides specifying a goal. The specified <code>goal</code> must be
      * another goal of the same plugin.
      * @return the goal
      */
+    @Nonnull
     String goal() default "";
 
     /**
@@ -68,5 +61,6 @@ public @interface Execute {
      * @see <a href="https://maven.apache.org/maven-plugin-api/lifecycle-mappings.html">Lifecycle Mappings</a>
      * @return the lifecycle id
      */
+    @Nonnull
     String lifecycle() default "";
 }

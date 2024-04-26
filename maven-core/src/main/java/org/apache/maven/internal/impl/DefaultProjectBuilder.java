@@ -25,14 +25,12 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.annotations.Nonnull;
@@ -43,10 +41,9 @@ import org.apache.maven.api.services.ProjectBuilderException;
 import org.apache.maven.api.services.ProjectBuilderRequest;
 import org.apache.maven.api.services.ProjectBuilderResult;
 import org.apache.maven.api.services.Source;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.model.building.ModelSource2;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -68,7 +65,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     @Override
     public ProjectBuilderResult build(ProjectBuilderRequest request)
             throws ProjectBuilderException, IllegalArgumentException {
-        DefaultSession session = (DefaultSession) request.getSession();
+        InternalMavenSession session = InternalMavenSession.from(request.getSession());
         try {
             List<ArtifactRepository> repositories = session.toArtifactRepositories(session.getRemoteRepositories());
             ProjectBuildingRequest req = new DefaultProjectBuildingRequest()
@@ -82,34 +79,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 res = builder.build(path.toFile(), req);
             } else if (request.getSource().isPresent()) {
                 Source source = request.getSource().get();
-                ModelSource modelSource = new ModelSource() {
-                    @Override
-                    public InputStream getInputStream() throws IOException {
-                        return source.getInputStream();
-                    }
-
-                    @Override
-                    public String getLocation() {
-                        return source.getLocation();
-                    }
-                };
+                ModelSource2 modelSource = new SourceWrapper(source);
                 res = builder.build(modelSource, req);
-            } else if (request.getArtifact().isPresent()) {
-                Artifact a = request.getArtifact().get();
-                org.eclipse.aether.artifact.Artifact aetherArtifact = session.toArtifact(a);
-                org.apache.maven.artifact.Artifact artifact = RepositoryUtils.toArtifact(aetherArtifact);
-                res = builder.build(artifact, request.isAllowStubModel(), req);
-            } else if (request.getCoordinate().isPresent()) {
-                ArtifactCoordinate c = request.getCoordinate().get();
-                org.apache.maven.artifact.Artifact artifact = new DefaultArtifact(
-                        c.getGroupId(),
-                        c.getArtifactId(),
-                        c.getVersion().asString(),
-                        null,
-                        c.getExtension(),
-                        c.getClassifier(),
-                        null);
-                res = builder.build(artifact, request.isAllowStubModel(), req);
             } else {
                 throw new IllegalArgumentException("Invalid request");
             }
@@ -159,10 +130,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         public String getLocation() {
                             StringBuilder buffer = new StringBuilder(256);
 
-                            if (getSource().length() > 0) {
-                                if (buffer.length() > 0) {
-                                    buffer.append(", ");
-                                }
+                            if (!getSource().isEmpty()) {
                                 buffer.append(getSource());
                             }
 
@@ -214,18 +182,41 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                                 public Node getRoot() {
                                     return session.getNode(r.getDependencyGraph());
                                 }
-
-                                //                                @Override
-                                //                                public List<ArtifactResolverResult>
-                                // getArtifactResults()
-                                //                                {
-                                //                                    return Collections.emptyList();
-                                //                                }
                             });
                 }
             };
         } catch (ProjectBuildingException e) {
             throw new ProjectBuilderException("Unable to build project", e);
+        }
+    }
+
+    private static class SourceWrapper implements ModelSource2 {
+        private final Source source;
+
+        SourceWrapper(Source source) {
+            this.source = source;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return source.openStream();
+        }
+
+        @Override
+        public String getLocation() {
+            return source.getLocation();
+        }
+
+        @Override
+        public ModelSource2 getRelatedSource(String relPath) {
+            Source rel = source.resolve(relPath);
+            return rel != null ? new SourceWrapper(rel) : null;
+        }
+
+        @Override
+        public URI getLocationURI() {
+            Path path = source.getPath();
+            return path != null ? path.toUri() : URI.create(source.getLocation());
         }
     }
 }

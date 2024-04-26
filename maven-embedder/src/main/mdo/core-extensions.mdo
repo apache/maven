@@ -20,8 +20,8 @@
 
 -->
 
-<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/2.0.0 https://codehaus-plexus.github.io/modello/xsd/modello-2.0.0.xsd"
   xml.namespace="http://maven.apache.org/EXTENSIONS/${version}"
   xml.schemaLocation="http://maven.apache.org/xsd/core-extensions-${version}.xsd">
 
@@ -90,6 +90,12 @@
           <required>false</required>
           <type>String</type>
         </field>
+        <field>
+          <name>configuration</name>
+          <version>1.2.0+</version>
+          <required>false</required>
+          <type>DOM</type>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
@@ -101,17 +107,10 @@
      *
      * @return The extension id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}.
      */
-    public String getId()
-    {
-        StringBuilder id = new StringBuilder( 128 );
-
-        id.append( ( getGroupId() == null ) ? "[unknown-group-id]" : getGroupId() );
-        id.append( ":" );
-        id.append( ( getArtifactId() == null ) ? "[unknown-artifact-id]" : getArtifactId() );
-        id.append( ":" );
-        id.append( ( getVersion() == null ) ? "[unknown-version]" : getVersion() );
-
-        return id.toString();
+    public String getId() {
+        return (getGroupId() == null ? "[unknown-group-id]" : getGroupId())
+            + ":" + (getArtifactId() == null ? "[unknown-artifact-id]" : getArtifactId())
+            + ":" + (getVersion() == null ? "[unknown-version]" : getVersion());
     }
             ]]>
           </code>

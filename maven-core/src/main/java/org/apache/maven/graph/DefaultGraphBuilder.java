@@ -43,14 +43,13 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.Result;
+import org.apache.maven.project.CycleDetectedException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
 import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +99,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
             if (result == null) {
                 final List<MavenProject> projects = getProjectsForMavenReactor(session);
                 validateProjects(projects, session.getRequest());
+                processPackagingAttribute(projects, session.getRequest());
                 enrichRequestFromResumptionData(projects, session.getRequest());
                 result = reactorDependencyGraph(session, projects);
             }
@@ -202,7 +202,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
             throws MavenExecutionException {
         List<MavenProject> result = projects;
 
-        if (StringUtils.isNotEmpty(request.getResumeFrom())) {
+        if (request.getResumeFrom() != null && !request.getResumeFrom().isEmpty()) {
             File reactorDirectory = projectSelector.getBaseDirectoryFromRequest(request);
 
             String selector = request.getResumeFrom();
@@ -266,7 +266,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
         boolean makeUpstream = makeBoth || MavenExecutionRequest.REACTOR_MAKE_UPSTREAM.equals(makeBehavior);
         boolean makeDownstream = makeBoth || MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM.equals(makeBehavior);
 
-        if (StringUtils.isNotEmpty(makeBehavior) && !makeUpstream && !makeDownstream) {
+        if ((makeBehavior != null && !makeBehavior.isEmpty()) && !makeUpstream && !makeDownstream) {
             throw new MavenExecutionException("Invalid reactor make behavior: " + makeBehavior, request.getPom());
         }
 
@@ -388,6 +388,19 @@ public class DefaultGraphBuilder implements GraphBuilder {
                                 plugin.getKey());
                     }
                 }
+            }
+        }
+    }
+
+    private void processPackagingAttribute(List<MavenProject> projects, MavenExecutionRequest request)
+            throws MavenExecutionException {
+        List<MavenProject> projectsInRequestScope = getProjectsInRequestScope(request, projects);
+        for (MavenProject p : projectsInRequestScope) {
+            if ("bom".equals(p.getPackaging())) {
+                LOGGER.info(
+                        "The packaging attribute of the '{}' project is configured as 'bom' and changed to 'pom'",
+                        p.getName());
+                p.setPackaging("pom");
             }
         }
     }

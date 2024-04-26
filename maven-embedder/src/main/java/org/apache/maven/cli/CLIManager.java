@@ -28,15 +28,18 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.shared.utils.logging.MessageUtils;
+import org.apache.maven.jline.MessageUtils;
 
 /**
- * @author Jason van Zyl
  */
 public class CLIManager {
     public static final char ALTERNATE_POM_FILE = 'f';
 
     public static final char BATCH_MODE = 'B';
+
+    public static final String NON_INTERACTIVE = "non-interactive";
+
+    public static final String FORCE_INTERACTIVE = "force-interactive";
 
     public static final char SET_USER_PROPERTY = 'D';
 
@@ -74,6 +77,8 @@ public class CLIManager {
 
     public static final char ALTERNATE_USER_SETTINGS = 's';
 
+    public static final String ALTERNATE_PROJECT_SETTINGS = "ps";
+
     public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
 
     public static final char ALTERNATE_USER_TOOLCHAINS = 't';
@@ -106,13 +111,17 @@ public class CLIManager {
 
     public static final String THREADS = "T";
 
-    public static final String LEGACY_LOCAL_REPOSITORY = "llr";
-
     public static final String BUILDER = "b";
 
     public static final String NO_TRANSFER_PROGRESS = "ntp";
 
     public static final String COLOR = "color";
+
+    public static final String CACHE_ARTIFACT_NOT_FOUND = "canf";
+
+    public static final String STRICT_ARTIFACT_DESCRIPTOR_POLICY = "sadp";
+
+    public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
 
     public static final String INSTALLATION_STATUS = "status";
 
@@ -177,7 +186,16 @@ public class CLIManager {
                 .build());
         options.addOption(Option.builder(Character.toString(BATCH_MODE))
                 .longOpt("batch-mode")
-                .desc("Run in non-interactive (batch) mode (disables output color)")
+                .desc("Run in non-interactive mode. Alias for --non-interactive (kept for backwards compatability)")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(NON_INTERACTIVE)
+                .desc("Run in non-interactive mode. Alias for --batch-mode")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(FORCE_INTERACTIVE)
+                .desc(
+                        "Run in interactive mode. Overrides, if applicable, the CI environment variable and --non-interactive/--batch-mode options")
                 .build());
         options.addOption(Option.builder(SUPPRESS_SNAPSHOT_UPDATES)
                 .longOpt("no-snapshot-updates")
@@ -194,6 +212,11 @@ public class CLIManager {
         options.addOption(Option.builder(Character.toString(ALTERNATE_USER_SETTINGS))
                 .longOpt("settings")
                 .desc("Alternate path for the user settings file")
+                .hasArg()
+                .build());
+        options.addOption(Option.builder(ALTERNATE_PROJECT_SETTINGS)
+                .longOpt("project-settings")
+                .desc("Alternate path for the project settings file")
                 .hasArg()
                 .build());
         options.addOption(Option.builder(ALTERNATE_GLOBAL_SETTINGS)
@@ -278,11 +301,6 @@ public class CLIManager {
                 .hasArg()
                 .desc("Thread count, for instance 4 (int) or 2C/2.5C (int/float) where C is core multiplied")
                 .build());
-        options.addOption(Option.builder(LEGACY_LOCAL_REPOSITORY)
-                .longOpt("legacy-local-repository")
-                .desc(
-                        "Use Maven 2 Legacy Local Repository behaviour, ie no use of _remote.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true")
-                .build());
         options.addOption(Option.builder(BUILDER)
                 .longOpt("builder")
                 .hasArg()
@@ -297,6 +315,27 @@ public class CLIManager {
                 .hasArg()
                 .optionalArg(true)
                 .desc("Defines the color mode of the output. Supported are 'auto', 'always', 'never'.")
+                .build());
+        options.addOption(Option.builder(CACHE_ARTIFACT_NOT_FOUND)
+                .longOpt("cache-artifact-not-found")
+                .hasArg()
+                .desc(
+                        "Defines caching behaviour for 'not found' artifacts. Supported values are 'true' (default), 'false'.")
+                .build());
+        options.addOption(Option.builder(STRICT_ARTIFACT_DESCRIPTOR_POLICY)
+                .longOpt("strict-artifact-descriptor-policy")
+                .hasArg()
+                .desc("Defines 'strict' artifact descriptor policy. Supported values are 'true', 'false' (default).")
+                .build());
+        options.addOption(Option.builder(IGNORE_TRANSITIVE_REPOSITORIES)
+                .longOpt("ignore-transitive-repositories")
+                .desc("If set, Maven will ignore remote repositories introduced by transitive dependencies.")
+                .build());
+
+        // Adding this back to make Maven fail if used
+        options.addOption(Option.builder("llr")
+                .longOpt("legacy-local-repository")
+                .desc("UNSUPPORTED: Use of this option will make Maven invocation fail.")
                 .build());
         options.addOption(Option.builder()
                 .longOpt(INSTALLATION_STATUS)

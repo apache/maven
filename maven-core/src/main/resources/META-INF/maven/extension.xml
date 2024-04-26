@@ -99,6 +99,10 @@ under the License.
     <exportedPackage>org.codehaus.plexus.logging</exportedPackage>
     <exportedPackage>org.codehaus.plexus.personality</exportedPackage>
 
+    <!-- plexus-interactivity-api -->
+    <exportedPackage>org.codehaus.plexus.components.interactivity</exportedPackage>
+    <exportedPackage>org.fusesource.jansi.Ansi</exportedPackage>
+
     <!-- javax.inject (JSR-330) -->
     <exportedPackage>javax.inject.*</exportedPackage>
     <!-- javax.enterprise.inject (JSR-299): Must never be exported if needed at plugin level, plugin adds it
@@ -110,6 +114,9 @@ under the License.
     <!-- javax.annotation (JSR-250) -->
     <exportedPackage>javax.annotation.*</exportedPackage>
     <exportedPackage>javax.annotation.security.*</exportedPackage>
+
+    <exportedPackage>jakarta.inject.*</exportedPackage>
+    <exportedPackage>jakarta.annotation.*</exportedPackage>
 
     <!--
       | We may potentially want to export these, but right now I'm not sure that anything Guice specific needs

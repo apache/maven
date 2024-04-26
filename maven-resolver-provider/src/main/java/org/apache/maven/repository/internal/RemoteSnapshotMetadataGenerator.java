@@ -40,14 +40,20 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
 
     private final Map<Object, RemoteSnapshotMetadata> snapshots;
 
-    private final boolean legacyFormat;
-
     private final Date timestamp;
 
-    RemoteSnapshotMetadataGenerator(RepositorySystemSession session, DeployRequest request) {
-        legacyFormat = ConfigUtils.getBoolean(session, false, "maven.metadata.legacy");
+    private final Integer buildNumber;
 
+    RemoteSnapshotMetadataGenerator(RepositorySystemSession session, DeployRequest request) {
         timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
+        Object bn = ConfigUtils.getObject(session, null, "maven.buildNumber");
+        if (bn instanceof Integer) {
+            this.buildNumber = (Integer) bn;
+        } else if (bn instanceof String) {
+            this.buildNumber = Integer.valueOf((String) bn);
+        } else {
+            this.buildNumber = null;
+        }
 
         snapshots = new LinkedHashMap<>();
 
@@ -65,13 +71,14 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
         }
     }
 
+    @Override
     public Collection<? extends Metadata> prepare(Collection<? extends Artifact> artifacts) {
         for (Artifact artifact : artifacts) {
             if (artifact.isSnapshot()) {
                 Object key = RemoteSnapshotMetadata.getKey(artifact);
                 RemoteSnapshotMetadata snapshotMetadata = snapshots.get(key);
                 if (snapshotMetadata == null) {
-                    snapshotMetadata = new RemoteSnapshotMetadata(artifact, legacyFormat, timestamp);
+                    snapshotMetadata = new RemoteSnapshotMetadata(artifact, timestamp, buildNumber);
                     snapshots.put(key, snapshotMetadata);
                 }
                 snapshotMetadata.bind(artifact);
@@ -81,6 +88,7 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
         return snapshots.values();
     }
 
+    @Override
     public Artifact transformArtifact(Artifact artifact) {
         if (artifact.isSnapshot() && artifact.getVersion().equals(artifact.getBaseVersion())) {
             Object key = RemoteSnapshotMetadata.getKey(artifact);
@@ -93,6 +101,7 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
         return artifact;
     }
 
+    @Override
     public Collection<? extends Metadata> finish(Collection<? extends Artifact> artifacts) {
         return Collections.emptyList();
     }

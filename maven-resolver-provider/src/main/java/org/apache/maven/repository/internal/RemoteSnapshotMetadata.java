@@ -19,6 +19,7 @@
 package org.apache.maven.repository.internal;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,16 +45,27 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
 
     private final Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
 
-    RemoteSnapshotMetadata(Artifact artifact, boolean legacyFormat, Date timestamp) {
-        super(createRepositoryMetadata(artifact, legacyFormat), null, legacyFormat, timestamp);
+    private final Integer buildNumber;
+
+    RemoteSnapshotMetadata(Artifact artifact, Date timestamp, Integer buildNumber) {
+        super(createRepositoryMetadata(artifact), null, timestamp);
+        this.buildNumber = buildNumber;
     }
 
-    private RemoteSnapshotMetadata(Metadata metadata, File file, boolean legacyFormat, Date timestamp) {
-        super(metadata, file, legacyFormat, timestamp);
+    private RemoteSnapshotMetadata(Metadata metadata, Path path, Date timestamp, Integer buildNumber) {
+        super(metadata, path, timestamp);
+        this.buildNumber = buildNumber;
     }
 
+    @Deprecated
+    @Override
     public MavenMetadata setFile(File file) {
-        return new RemoteSnapshotMetadata(metadata, file, legacyFormat, timestamp);
+        return new RemoteSnapshotMetadata(metadata, file.toPath(), timestamp, buildNumber);
+    }
+
+    @Override
+    public MavenMetadata setPath(Path path) {
+        return new RemoteSnapshotMetadata(metadata, path, timestamp, buildNumber);
     }
 
     public String getExpandedVersion(Artifact artifact) {
@@ -72,7 +84,7 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
             utcDateFormatter.setTimeZone(DEFAULT_SNAPSHOT_TIME_ZONE);
 
             snapshot = new Snapshot();
-            snapshot.setBuildNumber(getBuildNumber(recessive) + 1);
+            snapshot.setBuildNumber(buildNumber != null ? buildNumber : getBuildNumber(recessive) + 1);
             snapshot.setTimestamp(utcDateFormatter.format(timestamp));
 
             Versioning versioning = new Versioning();
@@ -115,8 +127,11 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
             }
         }
 
-        if (!legacyFormat) {
-            metadata.getVersioning().setSnapshotVersions(new ArrayList<>(versions.values()));
+        metadata.getVersioning().setSnapshotVersions(new ArrayList<>(versions.values()));
+
+        // just carry-on as-is
+        if (!recessive.getPlugins().isEmpty()) {
+            metadata.setPlugins(new ArrayList<>(recessive.getPlugins()));
         }
     }
 

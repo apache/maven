@@ -22,9 +22,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MojoDescriptorTest {
+class MojoDescriptorTest {
     @Test
-    public void getParameterMap() throws DuplicateParameterException {
+    void getParameterMap() throws DuplicateParameterException {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         Parameter param1 = new Parameter();
         param1.setName("param1");

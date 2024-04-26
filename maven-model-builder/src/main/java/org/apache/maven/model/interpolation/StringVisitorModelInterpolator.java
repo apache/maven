@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
@@ -51,21 +53,29 @@ import org.codehaus.plexus.interpolation.ValueSource;
 @Singleton
 public class StringVisitorModelInterpolator extends AbstractStringBasedModelInterpolator {
     @Inject
-    public StringVisitorModelInterpolator(PathTranslator pathTranslator, UrlNormalizer urlNormalizer) {
-        super(pathTranslator, urlNormalizer);
+    public StringVisitorModelInterpolator(
+            PathTranslator pathTranslator, UrlNormalizer urlNormalizer, RootLocator rootLocator) {
+        super(pathTranslator, urlNormalizer, rootLocator);
     }
 
     interface InnerInterpolator {
         String interpolate(String value);
     }
 
+    @Deprecated
     @Override
     public Model interpolateModel(
             Model model, File projectDir, ModelBuildingRequest config, ModelProblemCollector problems) {
-        List<? extends ValueSource> valueSources = createValueSources(model, projectDir, config);
+        return interpolateModel(model, projectDir != null ? projectDir.toPath() : null, config, problems);
+    }
+
+    @Override
+    public Model interpolateModel(
+            Model model, Path projectDir, ModelBuildingRequest config, ModelProblemCollector problems) {
+        List<? extends ValueSource> valueSources = createValueSources(model, projectDir, config, problems);
         List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors(model, projectDir, config);
 
-        InnerInterpolator innerInterpolator = createInterpolator(valueSources, postProcessors, problems);
+        InnerInterpolator innerInterpolator = createInterpolator(valueSources, postProcessors, problems, config);
 
         return new MavenTransformer(innerInterpolator::interpolate).visit(model);
     }
@@ -73,7 +83,8 @@ public class StringVisitorModelInterpolator extends AbstractStringBasedModelInte
     private InnerInterpolator createInterpolator(
             List<? extends ValueSource> valueSources,
             List<? extends InterpolationPostProcessor> postProcessors,
-            final ModelProblemCollector problems) {
+            final ModelProblemCollector problems,
+            ModelBuildingRequest config) {
         final Map<String, String> cache = new HashMap<>();
         final StringSearchInterpolator interpolator = new StringSearchInterpolator();
         interpolator.setCacheAnswers(true);
@@ -83,7 +94,7 @@ public class StringVisitorModelInterpolator extends AbstractStringBasedModelInte
         for (InterpolationPostProcessor postProcessor : postProcessors) {
             interpolator.addPostProcessor(postProcessor);
         }
-        final RecursionInterceptor recursionInterceptor = createRecursionInterceptor();
+        final RecursionInterceptor recursionInterceptor = createRecursionInterceptor(config);
         return value -> {
             if (value != null && value.contains("${")) {
                 String c = cache.get(value);

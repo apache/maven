@@ -32,7 +32,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 /**
  * A request for resolving an artifact.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable

@@ -34,6 +34,7 @@ import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 
 @Named("test")
 @Singleton
+@Deprecated
 public class TestMetadataSource implements ArtifactMetadataSource {
     @Inject
     private ArtifactFactory factory;

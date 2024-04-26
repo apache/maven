@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -66,6 +67,8 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
 
     public static final File DEFAULT_USER_SETTINGS_FILE = new File(USER_MAVEN_CONFIGURATION_HOME, "settings.xml");
 
+    public static final File DEFAULT_PROJECT_SETTINGS_FILE = new File(".mvn", "settings.xml");
+
     public static final File DEFAULT_GLOBAL_SETTINGS_FILE = new File(System.getProperty("maven.conf"), "settings.xml");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsXmlConfigurationProcessor.class);
@@ -98,6 +101,24 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
             userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
         }
 
+        File projectSettingsFile;
+
+        if (commandLine.hasOption(CLIManager.ALTERNATE_PROJECT_SETTINGS)) {
+            projectSettingsFile = new File(commandLine.getOptionValue(CLIManager.ALTERNATE_PROJECT_SETTINGS));
+            projectSettingsFile = resolveFile(projectSettingsFile, workingDirectory);
+
+            if (!projectSettingsFile.isFile()) {
+                throw new FileNotFoundException(
+                        "The specified project settings file does not exist: " + projectSettingsFile);
+            }
+        } else if (cliRequest.getRootDirectory() != null) {
+            projectSettingsFile = DEFAULT_PROJECT_SETTINGS_FILE;
+            projectSettingsFile = resolveFile(
+                    projectSettingsFile, cliRequest.getRootDirectory().toString());
+        } else {
+            projectSettingsFile = null;
+        }
+
         File globalSettingsFile;
 
         if (commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_SETTINGS)) {
@@ -113,13 +134,21 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
         }
 
         request.setGlobalSettingsFile(globalSettingsFile);
+        request.setProjectSettingsFile(projectSettingsFile);
         request.setUserSettingsFile(userSettingsFile);
 
         SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
         settingsRequest.setGlobalSettingsFile(globalSettingsFile);
+        settingsRequest.setProjectSettingsFile(projectSettingsFile);
         settingsRequest.setUserSettingsFile(userSettingsFile);
         settingsRequest.setSystemProperties(cliRequest.getSystemProperties());
-        settingsRequest.setUserProperties(cliRequest.getUserProperties());
+        Properties props = cliRequest.getUserProperties();
+        if (cliRequest.getRootDirectory() != null) {
+            props = new Properties();
+            props.putAll(cliRequest.getUserProperties());
+            props.put("session.rootDirectory", cliRequest.getRootDirectory().toString());
+        }
+        settingsRequest.setUserProperties(props);
 
         if (request.getEventSpyDispatcher() != null) {
             request.getEventSpyDispatcher().onEvent(settingsRequest);
@@ -128,6 +157,9 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
         LOGGER.debug(
                 "Reading global settings from '{}'",
                 getLocation(settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile()));
+        LOGGER.debug(
+                "Reading project settings from '{}'",
+                getLocation(settingsRequest.getProjectSettingsSource(), settingsRequest.getProjectSettingsFile()));
         LOGGER.debug(
                 "Reading user settings from '{}'",
                 getLocation(settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile()));
@@ -199,6 +231,22 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
 
         for (Mirror mirror : settings.getMirrors()) {
             request.addMirror(mirror);
+        }
+
+        for (Repository remoteRepository : settings.getRepositories()) {
+            try {
+                request.addRemoteRepository(MavenRepositorySystem.buildArtifactRepository(remoteRepository));
+            } catch (InvalidRepositoryException e) {
+                // do nothing for now
+            }
+        }
+
+        for (Repository pluginRepository : settings.getPluginRepositories()) {
+            try {
+                request.addPluginArtifactRepository(MavenRepositorySystem.buildArtifactRepository(pluginRepository));
+            } catch (InvalidRepositoryException e) {
+                // do nothing for now
+            }
         }
 
         request.setActiveProfiles(settings.getActiveProfiles());

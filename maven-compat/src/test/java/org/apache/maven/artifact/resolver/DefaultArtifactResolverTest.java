@@ -24,13 +24,13 @@ import java.util.Collections;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.DefaultArtifactResolver.DaemonThreadCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
+@Deprecated
+class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
     @Inject
     private ArtifactResolver artifactResolver;
 
@@ -49,7 +49,7 @@ public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCa
     }
 
     @Test
-    public void testMNG4738() throws Exception {
+    void testMNG4738() throws Exception {
         Artifact g = createLocalArtifact("g", "1.0");
         createLocalArtifact("h", "1.0");
         artifactResolver.resolveTransitively(
@@ -67,7 +67,7 @@ public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCa
         boolean seen = false;
 
         for (ThreadGroup aTgList : tgList) {
-            if (!aTgList.getName().equals(DaemonThreadCreator.THREADGROUP_NAME)) {
+            if (!aTgList.getName().equals(DefaultArtifactResolver.DaemonThreadCreator.THREADGROUP_NAME)) {
                 continue;
             }
 
@@ -84,11 +84,11 @@ public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCa
             }
         }
 
-        assertTrue(seen, "Could not find ThreadGroup: " + DaemonThreadCreator.THREADGROUP_NAME);
+        assertTrue(seen, "Could not find ThreadGroup: " + DefaultArtifactResolver.DaemonThreadCreator.THREADGROUP_NAME);
     }
 
     @Test
-    public void testLookup() throws Exception {
+    void testLookup() throws Exception {
         ArtifactResolver resolver = getContainer().lookup(ArtifactResolver.class, "default");
     }
 }

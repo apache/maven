@@ -18,7 +18,7 @@
  */
 package org.apache.maven.repository.internal;
 
-import java.io.Reader;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -30,10 +30,9 @@ import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeBuilder;
 import org.apache.maven.repository.internal.PluginsMetadata.PluginInfo;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.deployment.DeployRequest;
@@ -116,21 +115,20 @@ class PluginsMetadataGenerator implements MetadataGenerator {
         if (artifact != null
                 && "jar".equals(artifact.getExtension())
                 && "".equals(artifact.getClassifier())
-                && artifact.getFile() != null) {
-            Path artifactPath = artifact.getFile().toPath();
+                && artifact.getPath() != null) {
+            Path artifactPath = artifact.getPath();
             if (Files.isRegularFile(artifactPath)) {
                 try (JarFile artifactJar = new JarFile(artifactPath.toFile(), false)) {
                     ZipEntry pluginDescriptorEntry = artifactJar.getEntry(PLUGIN_DESCRIPTOR_LOCATION);
 
                     if (pluginDescriptorEntry != null) {
-                        try (Reader reader =
-                                ReaderFactory.newXmlReader(artifactJar.getInputStream(pluginDescriptorEntry))) {
+                        try (InputStream is = artifactJar.getInputStream(pluginDescriptorEntry)) {
                             // Note: using DOM instead of use of
                             // org.apache.maven.plugin.descriptor.PluginDescriptor
                             // as it would pull in dependency on:
                             // - maven-plugin-api (for model)
                             // - Plexus Container (for model supporting classes and exceptions)
-                            Xpp3Dom root = Xpp3DomBuilder.build(reader);
+                            XmlNode root = XmlNodeBuilder.build(is, null);
                             String groupId = root.getChild("groupId").getValue();
                             String artifactId = root.getChild("artifactId").getValue();
                             String goalPrefix = root.getChild("goalPrefix").getValue();

@@ -18,10 +18,11 @@
  */
 package org.apache.maven.settings;
 
+import org.apache.maven.internal.impl.SettingsUtilsV4;
+
 /**
  * Several convenience methods to handle settings
  *
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  */
 public final class SettingsUtils {
 
@@ -66,19 +67,6 @@ public final class SettingsUtils {
             return null;
         }
 
-        Settings clone = new Settings();
-        clone.setActiveProfiles(settings.getActiveProfiles());
-        clone.setInteractiveMode(settings.isInteractiveMode());
-        clone.setLocalRepository(settings.getLocalRepository());
-        clone.setMirrors(settings.getMirrors());
-        clone.setOffline(settings.isOffline());
-        clone.setPluginGroups(settings.getPluginGroups());
-        clone.setProfiles(settings.getProfiles());
-        clone.setProxies(settings.getProxies());
-        clone.setServers(settings.getServers());
-        clone.setSourceLevel(settings.getSourceLevel());
-        clone.setUsePluginRegistry(settings.isUsePluginRegistry());
-
-        return clone;
+        return new Settings(settings.getDelegate());
     }
 }

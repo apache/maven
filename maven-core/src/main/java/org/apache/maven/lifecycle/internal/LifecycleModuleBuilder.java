@@ -35,7 +35,6 @@ import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.session.scope.internal.SessionScope;
 
 /**
  * <p>
@@ -44,9 +43,6 @@ import org.apache.maven.session.scope.internal.SessionScope;
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Jason van Zyl
- * @author Kristian Rosenvold (extracted class)
  */
 @Named
 @Singleton
@@ -57,7 +53,6 @@ public class LifecycleModuleBuilder {
     private final ExecutionEventCatapult eventCatapult;
     private final ProjectExecutionListener projectExecutionListener;
     private final ConsumerPomArtifactTransformer consumerPomArtifactTransformer;
-    private final SessionScope sessionScope;
 
     @Inject
     public LifecycleModuleBuilder(
@@ -65,14 +60,12 @@ public class LifecycleModuleBuilder {
             BuilderCommon builderCommon,
             ExecutionEventCatapult eventCatapult,
             List<ProjectExecutionListener> listeners,
-            ConsumerPomArtifactTransformer consumerPomArtifactTransformer,
-            SessionScope sessionScope) {
+            ConsumerPomArtifactTransformer consumerPomArtifactTransformer) {
         this.mojoExecutor = mojoExecutor;
         this.builderCommon = builderCommon;
         this.eventCatapult = eventCatapult;
         this.projectExecutionListener = new CompoundProjectExecutionListener(listeners);
         this.consumerPomArtifactTransformer = consumerPomArtifactTransformer;
-        this.sessionScope = sessionScope;
     }
 
     public void buildProject(
@@ -97,7 +90,7 @@ public class LifecycleModuleBuilder {
                 return;
             }
 
-            consumerPomArtifactTransformer.injectTransformedArtifacts(currentProject, session.getRepositorySession());
+            consumerPomArtifactTransformer.injectTransformedArtifacts(session.getRepositorySession(), currentProject);
 
             BuilderCommon.attachToThread(currentProject);
 
@@ -111,7 +104,7 @@ public class LifecycleModuleBuilder {
 
             projectExecutionListener.beforeProjectLifecycleExecution(
                     new ProjectExecutionEvent(session, currentProject, mojoExecutions));
-            mojoExecutor.execute(session, mojoExecutions, reactorContext.getProjectIndex());
+            mojoExecutor.execute(session, mojoExecutions);
 
             long buildEndTime = System.currentTimeMillis();
 

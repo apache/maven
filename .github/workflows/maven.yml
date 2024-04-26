@@ -36,13 +36,13 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
-          java-version: 8
+          java-version: 17
           distribution: 'temurin'
           cache: 'maven'
 
@@ -50,7 +50,7 @@ jobs:
         run: mvn verify -e -B -V -DdistributionFileName=apache-maven
 
       - name: Upload built Maven
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
           name: built-maven
@@ -61,7 +61,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [8, 11, 17]
+        java: [17, 21]
 
       fail-fast: false
     runs-on: ${{ matrix.os }}
@@ -99,26 +99,35 @@ jobs:
           echo "REPO_USER=$target_user" >> $GITHUB_ENV
 
       - name: Checkout maven-integration-testing
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO_USER }}/maven-integration-testing
           path: maven-integration-testing/
           ref: ${{ env.REPO_BRANCH }}
           persist-credentials: false
 
-      - name: Download built Maven
-        uses: actions/download-artifact@v3
-        with:
-          name: built-maven
-          path: built-maven/
-
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 #          cache: 'maven' - don't use cache for integration tests
 
+      - uses: actions/checkout@v4
+        with:
+          path: maven/
+          persist-credentials: false
+
+      - name: Build Maven
+        run: mvn install -e -B -V -DdistributionFileName=apache-maven -DskipTests -f maven/pom.xml
+
       - name: Running integration tests
         shell: bash
-        run: mvn install -e -B -V -Prun-its,embedded -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
+        run: mvn install -e -B -V -Prun-its,embedded -DmavenDistro="$GITHUB_WORKSPACE/maven/apache-maven/target/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
+
+      - name: Upload artifact on integration testing
+        uses: actions/upload-artifact@v4
+        if: failure() && matrix.os != 'windows-latest'
+        with:
+          name: ${{ github.run_number }}-integration-test-artifact-${{ matrix.os }}-${{ matrix.java }}
+          path: ./maven-integration-testing/core-it-suite/target/test-classes/

@@ -54,9 +54,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.repository.Proxy;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
@@ -64,11 +62,18 @@ import org.eclipse.aether.repository.ProxySelector;
 import org.eclipse.aether.repository.RemoteRepository;
 
 /**
- * @author Jason van Zyl
+ * @since 3.2.3
  */
 @Named("default")
 @Singleton
 public class MavenRepositorySystem {
+
+    public static final String DEFAULT_REMOTE_REPO_ID = "central";
+
+    public static final String DEFAULT_REMOTE_REPO_URL = "https://repo.maven.apache.org/maven2";
+
+    public static final String DEFAULT_LOCAL_REPO_ID = "local";
+
     private final ArtifactHandlerManager artifactHandlerManager;
 
     private final Map<String, ArtifactRepositoryLayout> layouts;
@@ -145,7 +150,7 @@ public class MavenRepositorySystem {
         VersionRange versionRange;
         try {
             String version = plugin.getVersion();
-            if (StringUtils.isEmpty(version)) {
+            if (version == null || version.isEmpty()) {
                 version = "RELEASE";
             }
             versionRange = VersionRange.createFromVersionSpec(version);
@@ -206,7 +211,7 @@ public class MavenRepositorySystem {
             repository.setId(mirror.getId());
             repository.setUrl(mirror.getUrl());
 
-            if (StringUtils.isNotEmpty(mirror.getLayout())) {
+            if (mirror.getLayout() != null && !mirror.getLayout().isEmpty()) {
                 repository.setLayout(getLayout(mirror.getLayout()));
             }
 
@@ -323,13 +328,13 @@ public class MavenRepositorySystem {
         if (repo != null) {
             String id = repo.getId();
 
-            if (StringUtils.isEmpty(id)) {
+            if (id == null || id.isEmpty()) {
                 throw new InvalidRepositoryException("Repository identifier missing", "");
             }
 
             String url = repo.getUrl();
 
-            if (StringUtils.isEmpty(url)) {
+            if (url == null || url.isEmpty()) {
                 throw new InvalidRepositoryException("URL missing for repository " + id, id);
             }
 
@@ -373,7 +378,7 @@ public class MavenRepositorySystem {
             String layoutId,
             ArtifactRepositoryPolicy snapshots,
             ArtifactRepositoryPolicy releases)
-            throws Exception {
+            throws InvalidRepositoryException {
         ArtifactRepositoryLayout layout = layouts.get(layoutId);
 
         checkLayout(id, layoutId, layout);
@@ -381,10 +386,12 @@ public class MavenRepositorySystem {
         return createArtifactRepository(id, url, layout, snapshots, releases);
     }
 
-    private void checkLayout(String repositoryId, String layoutId, ArtifactRepositoryLayout layout) throws Exception {
+    private void checkLayout(String repositoryId, String layoutId, ArtifactRepositoryLayout layout)
+            throws InvalidRepositoryException {
         if (layout == null) {
-            throw new Exception(
-                    String.format("Cannot find ArtifactRepositoryLayout instance for: %s %s", layoutId, repositoryId));
+            throw new InvalidRepositoryException(
+                    String.format("Cannot find ArtifactRepositoryLayout instance for: %s %s", layoutId, repositoryId),
+                    repositoryId);
         }
     }
 
@@ -518,11 +525,14 @@ public class MavenRepositorySystem {
     //
     // Code taken from LegacyRepositorySystem
     //
+    public ArtifactRepository createDefaultRemoteRepository() throws Exception {
+        return createDefaultRemoteRepository(null);
+    }
 
     public ArtifactRepository createDefaultRemoteRepository(MavenExecutionRequest request) throws Exception {
         return createRepository(
-                RepositorySystem.DEFAULT_REMOTE_REPO_URL,
-                RepositorySystem.DEFAULT_REMOTE_REPO_ID,
+                MavenRepositorySystem.DEFAULT_REMOTE_REPO_URL,
+                MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID,
                 true,
                 ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
                 false,
@@ -538,7 +548,7 @@ public class MavenRepositorySystem {
             boolean snapshots,
             String snapshotUpdates,
             String checksumPolicy)
-            throws Exception {
+            throws InvalidRepositoryException {
         ArtifactRepositoryPolicy snapshotsPolicy =
                 new ArtifactRepositoryPolicy(snapshots, snapshotUpdates, checksumPolicy);
 
@@ -638,10 +648,14 @@ public class MavenRepositorySystem {
     }
 
     public ArtifactRepository createLocalRepository(MavenExecutionRequest request, File localRepository)
-            throws Exception {
+            throws InvalidRepositoryException {
+        return createLocalRepository(localRepository);
+    }
+
+    public ArtifactRepository createLocalRepository(File localRepository) throws InvalidRepositoryException {
         return createRepository(
                 "file://" + localRepository.toURI().getRawPath(),
-                RepositorySystem.DEFAULT_LOCAL_REPO_ID,
+                MavenRepositorySystem.DEFAULT_LOCAL_REPO_ID,
                 true,
                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
                 true,
@@ -678,11 +692,11 @@ public class MavenRepositorySystem {
     /**
      * This method checks if the pattern matches the originalRepository. Valid patterns:
      * <ul>
-     * <li>{@code *} = everything,</li>
-     * <li>{@code external:*} = everything not on the localhost and not file based,</li>
-     * <li>{@code external:http:*} = any repository not on the localhost using HTTP,</li>
-     * <li>{@code repo,repo1} = {@code repo} or {@code repo1},</li>
-     * <li>{@code *,!repo1} = everything except {@code repo1}.</li>
+     * <li>{@code *} (since 2.0.5)= everything,</li>
+     * <li>{@code external:*}  (since 2.0.9)= everything not on the localhost and not file based,</li>
+     * <li>{@code external:http:*} (since 3.8.0)= any repository not on the localhost using HTTP,</li>
+     * <li>{@code repo,repo1}  (since 2.0.9)= {@code repo} or {@code repo1},</li>
+     * <li>{@code *,!repo1} (since 2.0.9)= everything except {@code repo1}.</li>
      * </ul>
      *
      * @param originalRepository to compare for a match.
@@ -787,7 +801,7 @@ public class MavenRepositorySystem {
         boolean result = false;
 
         // simple checks first to short circuit processing below.
-        if (StringUtils.isEmpty(mirrorLayout) || WILDCARD.equals(mirrorLayout)) {
+        if ((mirrorLayout == null || mirrorLayout.isEmpty()) || WILDCARD.equals(mirrorLayout)) {
             result = true;
         } else if (mirrorLayout.equals(repoLayout)) {
             result = true;

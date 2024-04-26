@@ -18,6 +18,9 @@
  */
 package org.apache.maven.repository.legacy.resolver.transform;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,14 +38,12 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka</a>
  */
-@Component(role = ArtifactTransformation.class, hint = "snapshot")
+@Named("snapshot")
+@Singleton
+@Deprecated
 public class SnapshotTransformation extends AbstractVersionTransformation {
     private static final String DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT = "yyyyMMdd.HHmmss";
 
@@ -115,7 +116,7 @@ public class SnapshotTransformation extends AbstractVersionTransformation {
         if (snapshot != null) {
             if (snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0) {
                 String newVersion = snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
-                version = StringUtils.replace(baseVersion, Artifact.SNAPSHOT_VERSION, newVersion);
+                version = baseVersion.replace(Artifact.SNAPSHOT_VERSION, newVersion);
             } else {
                 version = baseVersion;
             }

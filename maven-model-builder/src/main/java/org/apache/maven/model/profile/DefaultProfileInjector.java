@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.BuildBase;
@@ -34,6 +36,7 @@ import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.ReportPlugin;
 import org.apache.maven.api.model.ReportSet;
 import org.apache.maven.api.model.Reporting;
@@ -44,12 +47,18 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles profile injection into the model.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
 @SuppressWarnings({"checkstyle:methodname"})
 public class DefaultProfileInjector implements ProfileInjector {
+
+    private static final Map<Model, Map<List<Profile>, Model>> CACHE = Collections.synchronizedMap(new WeakHashMap<>());
+
+    // In order for the weak hash map to work correctly, we must not hold any reference to
+    // the model used as the key.  So we use a dummy model as a placeholder to indicate that
+    // we want to store the model used as they key.
+    private static final Model KEY = Model.newInstance();
 
     private ProfileModelMerger merger = new ProfileModelMerger();
 
@@ -59,19 +68,42 @@ public class DefaultProfileInjector implements ProfileInjector {
             org.apache.maven.model.Profile profile,
             ModelBuildingRequest request,
             ModelProblemCollector problems) {
-        if (profile != null) {
-            Model.Builder builder = Model.newBuilder(model.getDelegate());
-            merger.mergeModelBase(builder, model.getDelegate(), profile.getDelegate());
+        model.update(
+                injectProfile(model.getDelegate(), profile != null ? profile.getDelegate() : null, request, problems));
+    }
 
-            if (profile.getBuild() != null) {
-                Build build = model.getBuild() != null ? model.getBuild().getDelegate() : Build.newInstance();
-                Build.Builder bbuilder = Build.newBuilder(build);
-                merger.mergeBuildBase(bbuilder, build, profile.getBuild().getDelegate());
-                builder.build(bbuilder.build());
+    @Override
+    public Model injectProfile(
+            Model model, Profile profile, ModelBuildingRequest request, ModelProblemCollector problems) {
+        return injectProfiles(model, Collections.singletonList(profile), request, problems);
+    }
+
+    @Override
+    public Model injectProfiles(
+            Model model, List<Profile> profiles, ModelBuildingRequest request, ModelProblemCollector problems) {
+        Model result = CACHE.computeIfAbsent(model, k -> new ConcurrentHashMap<>())
+                .computeIfAbsent(profiles, l -> doInjectProfiles(model, profiles));
+        return result == KEY ? model : result;
+    }
+
+    private Model doInjectProfiles(Model model, List<Profile> profiles) {
+        Model orgModel = model;
+        for (Profile profile : profiles) {
+            if (profile != null) {
+                Model.Builder builder = Model.newBuilder(model);
+                merger.mergeModelBase(builder, model, profile);
+
+                if (profile.getBuild() != null) {
+                    Build build = model.getBuild() != null ? model.getBuild() : Build.newInstance();
+                    Build.Builder bbuilder = Build.newBuilder(build);
+                    merger.mergeBuildBase(bbuilder, build, profile.getBuild());
+                    builder.build(bbuilder.build());
+                }
+
+                model = builder.build();
             }
-
-            model.update(builder.build());
         }
+        return model == orgModel ? KEY : model;
     }
 
     /**

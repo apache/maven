@@ -19,15 +19,16 @@
 package org.apache.maven.plugin;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.interpolation.reflection.ReflectionValueExtractor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
-import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 /**
  * Evaluator for plugin parameters expressions. Content surrounded by <code>${</code> and <code>}</code> is evaluated.
@@ -38,7 +39,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * <tr><td><code>session</code></td>           <td></td>               <td>the actual {@link MavenSession}</td></tr>
  * <tr><td><code>session.*</code></td>         <td>(since Maven 3)</td><td></td></tr>
  * <tr><td><code>localRepository</code></td>   <td></td>
- *                                             <td>{@link MavenSession#getLocalRepository()}</td></tr>
+ *                                             <td>{@link MavenSession#getLocalRepository()} DEPRECATED: Avoid use of {@link org.apache.maven.artifact.repository.ArtifactRepository} type. If you need access to local repository, switch to '${repositorySystemSession}' expression and get LRM from it instead. See <a href="https://issues.apache.org/jira/browse/MNG-7706">MNG-7706</a></td></tr>
  * <tr><td><code>reactorProjects</code></td>   <td></td>               <td>{@link MavenSession#getProjects()}</td></tr>
  * <tr><td><code>repositorySystemSession</code></td><td> (since Maven 3)</td>
  *                                             <td>{@link MavenSession#getRepositorySession()}</td></tr>
@@ -66,7 +67,6 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * </table>
  * <i>Notice:</i> <code>reports</code> was supported in Maven 2.x but was removed in Maven 3
  *
- * @author Jason van Zyl
  * @see MavenSession
  * @see MojoExecution
  */
@@ -174,11 +174,17 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                 int pathSeparator = expression.indexOf('/');
 
                 if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
+                    String pathExpression = expression.substring(0, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, session);
-                    value = value + expression.substring(pathSeparator);
+                    if (pathSeparator < expression.length() - 1) {
+                        if (value instanceof Path) {
+                            value = ((Path) value).resolve(expression.substring(pathSeparator + 1));
+                        } else {
+                            value = value + expression.substring(pathSeparator);
+                        }
+                    }
                 } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), session);
+                    value = ReflectionValueExtractor.evaluate(expression, session);
                 }
             } catch (Exception e) {
                 // TODO don't catch exception
@@ -200,7 +206,7 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                     value = ReflectionValueExtractor.evaluate(pathExpression, project);
                     value = value + expression.substring(pathSeparator);
                 } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), project);
+                    value = ReflectionValueExtractor.evaluate(expression, project);
                 }
             } catch (Exception e) {
                 // TODO don't catch exception
@@ -216,11 +222,11 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                 int pathSeparator = expression.indexOf('/');
 
                 if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
+                    String pathExpression = expression.substring(0, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, mojoExecution);
                     value = value + expression.substring(pathSeparator);
                 } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), mojoExecution);
+                    value = ReflectionValueExtractor.evaluate(expression, mojoExecution);
                 }
             } catch (Exception e) {
                 // TODO don't catch exception
@@ -236,11 +242,11 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                 PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
                 if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
+                    String pathExpression = expression.substring(0, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, pluginDescriptor);
                     value = value + expression.substring(pathSeparator);
                 } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), pluginDescriptor);
+                    value = ReflectionValueExtractor.evaluate(expression, pluginDescriptor);
                 }
             } catch (Exception e) {
                 throw new ExpressionEvaluationException(
@@ -253,11 +259,11 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                 int pathSeparator = expression.indexOf('/');
 
                 if (pathSeparator > 0) {
-                    String pathExpression = expression.substring(1, pathSeparator);
+                    String pathExpression = expression.substring(0, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, session.getSettings());
                     value = value + expression.substring(pathSeparator);
                 } else {
-                    value = ReflectionValueExtractor.evaluate(expression.substring(1), session.getSettings());
+                    value = ReflectionValueExtractor.evaluate(expression, session.getSettings());
                 }
             } catch (Exception e) {
                 // TODO don't catch exception

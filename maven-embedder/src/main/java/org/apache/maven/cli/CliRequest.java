@@ -19,6 +19,7 @@
 package org.apache.maven.cli;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
@@ -39,6 +40,10 @@ public class CliRequest {
     String workingDirectory;
 
     File multiModuleProjectDirectory;
+
+    Path rootDirectory;
+
+    Path topDirectory;
 
     boolean verbose;
 
@@ -104,5 +109,13 @@ public class CliRequest {
 
     public void setUserProperties(Properties properties) {
         this.userProperties.putAll(properties);
+    }
+
+    public Path getRootDirectory() {
+        return rootDirectory;
+    }
+
+    public Path getTopDirectory() {
+        return topDirectory;
     }
 }

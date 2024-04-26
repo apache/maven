@@ -35,7 +35,6 @@ import org.eclipse.aether.repository.RemoteRepository;
  * plugins as well as special purpose plugins like reports.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 public interface MavenPluginManager {
 

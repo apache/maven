@@ -20,14 +20,15 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.apache.maven</groupId>
-    <artifactId>maven-parent</artifactId>
-    <version>39</version>
+    <groupId>org.apache</groupId>
+    <artifactId>apache</artifactId>
+    <version>32</version>
     <relativePath />
   </parent>
 
+  <groupId>org.apache.maven</groupId>
   <artifactId>maven-bom</artifactId>
-  <version>4.0.0-alpha-5-SNAPSHOT</version>
+  <version>4.0.0-beta-1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Maven Dependencies BOM</name>
@@ -37,7 +38,7 @@ under the License.
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>maven-4.0.0-alpha-3</tag>
+    <tag>maven-4.0.0-alpha-10</tag>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}/${project.artifactId}</url>
   </scm>
   <issueManagement>
@@ -99,12 +100,42 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-model-builder</artifactId>
+        <artifactId>maven-api-meta</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-model-transform</artifactId>
+        <artifactId>maven-api-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-settings</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-toolchain</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-plugin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-xml</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-model-builder</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -145,6 +176,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-slf4j-wrapper</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-xml-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>

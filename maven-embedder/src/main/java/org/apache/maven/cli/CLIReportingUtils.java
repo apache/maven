@@ -25,16 +25,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
-import org.codehaus.plexus.util.Os;
+import org.apache.maven.jline.MessageUtils;
+import org.apache.maven.utils.Os;
 import org.slf4j.Logger;
-
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.
  *
- * @author jdcasey
  */
 public final class CLIReportingUtils {
     // CHECKSTYLE_OFF: MagicNumber
@@ -55,7 +52,8 @@ public final class CLIReportingUtils {
         final String ls = System.lineSeparator();
         Properties properties = getBuildProperties();
         StringBuilder version = new StringBuilder(256);
-        version.append(buffer().strong(createMavenVersionString(properties))).append(ls);
+        version.append(MessageUtils.builder().strong(createMavenVersionString(properties)))
+                .append(ls);
         version.append(reduce(properties.getProperty("distributionShortName") + " home: "
                         + System.getProperty("maven.home", "<unknown Maven " + "home>")))
                 .append(ls);
@@ -106,7 +104,7 @@ public final class CLIReportingUtils {
         if (rev != null || timestamp != null) {
             msg += " (";
             msg += (rev != null ? rev : "");
-            if (StringUtils.isNotBlank(timestamp)) {
+            if (timestamp != null && !timestamp.isEmpty()) {
                 String ts = formatTimestamp(Long.parseLong(timestamp));
                 msg += (rev != null ? "; " : "") + ts;
             }
@@ -136,6 +134,13 @@ public final class CLIReportingUtils {
     }
 
     public static void showError(Logger logger, String message, Throwable e, boolean showStackTrace) {
+        if (logger == null) {
+            System.err.println(message);
+            if (showStackTrace && e != null) {
+                e.printStackTrace(System.err);
+            }
+            return;
+        }
         if (showStackTrace) {
             logger.error(message, e);
         } else {
@@ -144,7 +149,9 @@ public final class CLIReportingUtils {
             if (e != null) {
                 logger.error(e.getMessage());
 
-                for (Throwable cause = e.getCause(); cause != null; cause = cause.getCause()) {
+                for (Throwable cause = e.getCause();
+                        cause != null && cause != cause.getCause();
+                        cause = cause.getCause()) {
                     logger.error("Caused by: {}", cause.getMessage());
                 }
             }

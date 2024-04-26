@@ -37,7 +37,6 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 /**
  * Determines profile activation based on the version of the current Java runtime.
  *
- * @author Benjamin Bentmann
  * @see Activation#getJdk()
  */
 @Named("jdk-version")
@@ -64,7 +63,7 @@ public class JdkVersionProfileActivator implements ProfileActivator {
 
         String version = context.getSystemProperties().get("java.version");
 
-        if (version == null || version.length() <= 0) {
+        if (version == null || version.isEmpty()) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
                     .setMessage("Failed to determine Java version for profile " + profile.getId())
                     .setLocation(activation.getLocation("jdk")));
@@ -111,7 +110,7 @@ public class JdkVersionProfileActivator implements ProfileActivator {
     }
 
     private static int getRelationOrder(String value, RangeValue rangeValue, boolean isLeft) {
-        if (rangeValue.value.length() <= 0) {
+        if (rangeValue.value.isEmpty()) {
             return isLeft ? 1 : -1;
         }
 
@@ -160,7 +159,7 @@ public class JdkVersionProfileActivator implements ProfileActivator {
                 ranges.add(new RangeValue(token.replace("]", ""), true));
             } else if (token.endsWith(")")) {
                 ranges.add(new RangeValue(token.replace(")", ""), false));
-            } else if (token.length() <= 0) {
+            } else if (token.isEmpty()) {
                 ranges.add(new RangeValue("", false));
             }
         }

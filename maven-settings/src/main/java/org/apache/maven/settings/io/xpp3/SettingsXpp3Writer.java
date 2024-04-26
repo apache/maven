@@ -18,34 +18,36 @@
  */
 package org.apache.maven.settings.io.xpp3;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.v4.SettingsStaxWriter;
 
+/**
+ * @deprecated Maven 3 compatibility - please use {@code org.apache.maven.api.services.xml.SettingsXmlFactory} from {@code maven-api-core}
+ * or {@link SettingsStaxWriter}
+ */
+@Deprecated
 public class SettingsXpp3Writer {
-    // --------------------------/
-    // - Class/Member Variables -/
-    // --------------------------/
 
-    /**
-     * Field fileComment.
-     */
-    private String fileComment = null;
+    private final SettingsStaxWriter delegate;
 
-    // -----------/
-    // - Methods -/
-    // -----------/
-
+    public SettingsXpp3Writer() {
+        delegate = new SettingsStaxWriter();
+        delegate.setAddLocationInformation(false);
+    }
     /**
      * Method setFileComment.
      *
      * @param fileComment a fileComment object.
      */
     public void setFileComment(String fileComment) {
-        this.fileComment = fileComment;
-    } // -- void setFileComment( String )
+        delegate.setFileComment(fileComment);
+    }
 
     /**
      * Method write.
@@ -55,10 +57,12 @@ public class SettingsXpp3Writer {
      * @throws IOException java.io.IOException if any.
      */
     public void write(Writer writer, Settings settings) throws IOException {
-        org.apache.maven.settings.v4.SettingsXpp3Writer xw = new org.apache.maven.settings.v4.SettingsXpp3Writer();
-        xw.setFileComment(fileComment);
-        xw.write(writer, settings.getDelegate());
-    } // -- void write( Writer, Model )
+        try {
+            delegate.write(writer, settings.getDelegate());
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
+    }
 
     /**
      * Method write.
@@ -68,8 +72,10 @@ public class SettingsXpp3Writer {
      * @throws IOException java.io.IOException if any.
      */
     public void write(OutputStream stream, Settings settings) throws IOException {
-        org.apache.maven.settings.v4.SettingsXpp3Writer xw = new org.apache.maven.settings.v4.SettingsXpp3Writer();
-        xw.setFileComment(fileComment);
-        xw.write(stream, settings.getDelegate());
-    } // -- void write( OutputStream, Model )
+        try {
+            delegate.write(stream, settings.getDelegate());
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
+    }
 }

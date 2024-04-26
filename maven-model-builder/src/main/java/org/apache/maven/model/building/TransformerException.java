@@ -20,7 +20,6 @@ package org.apache.maven.model.building;
 
 /**
  *
- * @author Robert Scholte
  * @since 4.0.0
  */
 public class TransformerException extends Exception {

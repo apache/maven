@@ -23,9 +23,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.model.profile.ProfileActivationContext;
+import org.apache.maven.model.root.RootLocator;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -34,7 +36,6 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 /**
  * Finds an absolute path for {@link ActivationFile#getExists()} or {@link ActivationFile#getMissing()}
  *
- * @author Ravil Galeyev
  */
 @Named
 @Singleton
@@ -42,9 +43,12 @@ public class ProfileActivationFilePathInterpolator {
 
     private final PathTranslator pathTranslator;
 
+    private final RootLocator rootLocator;
+
     @Inject
-    public ProfileActivationFilePathInterpolator(PathTranslator pathTranslator) {
+    public ProfileActivationFilePathInterpolator(PathTranslator pathTranslator, RootLocator rootLocator) {
         this.pathTranslator = pathTranslator;
+        this.rootLocator = rootLocator;
     }
 
     /**
@@ -65,11 +69,7 @@ public class ProfileActivationFilePathInterpolator {
             interpolator.addValueSource(new AbstractValueSource(false) {
                 @Override
                 public Object getValue(String expression) {
-                    /*
-                     * We intentionally only support ${basedir} and not ${project.basedir} as the latter form
-                     * would suggest that other project.* expressions can be used which is beyond the design.
-                     */
-                    if ("basedir".equals(expression)) {
+                    if ("basedir".equals(expression) || "project.basedir".equals(expression)) {
                         return basedir.getAbsolutePath();
                     }
                     return null;
@@ -78,6 +78,18 @@ public class ProfileActivationFilePathInterpolator {
         } else if (path.contains("${basedir}")) {
             return null;
         }
+
+        interpolator.addValueSource(new AbstractValueSource(false) {
+            @Override
+            public Object getValue(String expression) {
+                if ("rootDirectory".equals(expression)) {
+                    Path base = basedir != null ? basedir.toPath() : null;
+                    Path root = rootLocator.findMandatoryRoot(base);
+                    return root.toFile().getAbsolutePath();
+                }
+                return null;
+            }
+        });
 
         interpolator.addValueSource(new MapBasedValueSource(context.getProjectProperties()));
 

@@ -25,26 +25,28 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.Language;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.Repository;
+import org.apache.maven.repository.internal.artifact.MavenArtifactProperties;
+import org.apache.maven.repository.internal.type.DefaultType;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
  * Populates Aether {@link ArtifactDescriptorResult} from Maven project {@link Model}.
- *
+ * <p>
  * <strong>Note:</strong> This class is part of work in progress and can be changed or removed without notice.
  * @since 3.2.4
  */
@@ -92,15 +94,16 @@ public class ArtifactDescriptorReaderDelegate {
     private Dependency convert(org.apache.maven.model.Dependency dependency, ArtifactTypeRegistry stereotypes) {
         ArtifactType stereotype = stereotypes.get(dependency.getType());
         if (stereotype == null) {
-            stereotype = new DefaultArtifactType(dependency.getType());
+            // TODO: this here is fishy
+            stereotype = new DefaultType(dependency.getType(), Language.NONE, "", null, false);
         }
 
-        boolean system =
-                dependency.getSystemPath() != null && dependency.getSystemPath().length() > 0;
+        boolean system = dependency.getSystemPath() != null
+                && !dependency.getSystemPath().isEmpty();
 
         Map<String, String> props = null;
         if (system) {
-            props = Collections.singletonMap(ArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
+            props = Collections.singletonMap(MavenArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
         }
 
         Artifact artifact = new DefaultArtifact(
@@ -134,7 +137,7 @@ public class ArtifactDescriptorReaderDelegate {
         if (distMgmt != null) {
             downloadUrl = distMgmt.getDownloadUrl();
         }
-        if (downloadUrl != null && downloadUrl.length() > 0) {
+        if (downloadUrl != null && !downloadUrl.isEmpty()) {
             Artifact artifact = result.getArtifact();
             Map<String, String> props = new HashMap<>(artifact.getProperties());
             props.put(ArtifactProperties.DOWNLOAD_URL, downloadUrl);

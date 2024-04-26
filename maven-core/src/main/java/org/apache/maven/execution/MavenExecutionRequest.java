@@ -19,6 +19,7 @@
 package org.apache.maven.execution;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,6 @@ import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.transfer.TransferListener;
 
 /**
- * @author Jason van Zyl
  */
 public interface MavenExecutionRequest {
     // ----------------------------------------------------------------------
@@ -91,8 +91,17 @@ public interface MavenExecutionRequest {
     // ----------------------------------------------------------------------
 
     // Base directory
+
+    /**
+     * @deprecated use {@link #setTopDirectory(Path)} instead
+     */
+    @Deprecated
     MavenExecutionRequest setBaseDirectory(File basedir);
 
+    /**
+     * @deprecated use {@link #getTopDirectory()} instead
+     */
+    @Deprecated
     String getBaseDirectory();
 
     // Timing (remove this)
@@ -276,6 +285,36 @@ public interface MavenExecutionRequest {
 
     MavenExecutionRequest setCacheNotFound(boolean cacheNotFound);
 
+    /**
+     * @since 4.0.0
+     */
+    boolean isIgnoreMissingArtifactDescriptor();
+
+    /**
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setIgnoreMissingArtifactDescriptor(boolean ignoreMissing);
+
+    /**
+     * @since 4.0.0
+     */
+    boolean isIgnoreInvalidArtifactDescriptor();
+
+    /**
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setIgnoreInvalidArtifactDescriptor(boolean ignoreInvalid);
+
+    /**
+     * @since 4.0.0
+     */
+    boolean isIgnoreTransitiveRepositories();
+
+    /**
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setIgnoreTransitiveRepositories(boolean ignoreTransitiveRepositories);
+
     // Profiles
     List<Profile> getProfiles();
 
@@ -383,6 +422,10 @@ public interface MavenExecutionRequest {
 
     MavenExecutionRequest setUserSettingsFile(File userSettingsFile);
 
+    File getProjectSettingsFile();
+
+    MavenExecutionRequest setProjectSettingsFile(File projectSettingsFile);
+
     File getGlobalSettingsFile();
 
     MavenExecutionRequest setGlobalSettingsFile(File globalSettingsFile);
@@ -443,12 +486,22 @@ public interface MavenExecutionRequest {
 
     /**
      * @since 3.1
+     * @deprecated Since 3.9 there is no direct Maven2 interop offered at LRM level. See
+     * <a href="https://maven.apache.org/resolver/configuration.html">Resolver Configuration</a> page option
+     * {@code aether.artifactResolver.simpleLrmInterop} that provides similar semantics. This method should
+     * be never invoked, and always returns {@code false}.
      */
+    @Deprecated
     boolean isUseLegacyLocalRepository();
 
     /**
      * @since 3.1
+     * @deprecated Since 3.9 there is no direct Maven2 interop offered at LRM level. See
+     * <a href="https://maven.apache.org/resolver/configuration.html">Resolver Configuration</a> page option
+     * {@code aether.artifactResolver.simpleLrmInterop} that provides similar semantics. This method should
+     * be never invoked, and ignores parameter (value remains always {@code false}).
      */
+    @Deprecated
     MavenExecutionRequest setUseLegacyLocalRepository(boolean useLegacyLocalRepository);
 
     /**
@@ -484,13 +537,50 @@ public interface MavenExecutionRequest {
 
     /**
      * @since 3.3.0
+     * @deprecated use {@link #setRootDirectory(Path)} instead
      */
+    @Deprecated
     void setMultiModuleProjectDirectory(File file);
 
     /**
      * @since 3.3.0
+     * @deprecated use {@link #getRootDirectory()} instead
      */
+    @Deprecated
     File getMultiModuleProjectDirectory();
+
+    /**
+     * Sets the top directory of the project.
+     *
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setTopDirectory(Path topDirectory);
+
+    /**
+     * Gets the directory of the topmost project being built, usually the current directory or the
+     * directory pointed at by the {@code -f/--file} command line argument.
+     *
+     * @since 4.0.0
+     */
+    Path getTopDirectory();
+
+    /**
+     * Sets the root directory of the project.
+     *
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setRootDirectory(Path rootDirectory);
+
+    /**
+     * Gets the root directory of the top project, which is the parent directory containing the {@code .mvn}
+     * directory or a {@code pom.xml} file with the {@code root="true"} attribute.
+     * If there's no such directory, an {@code IllegalStateException} will be thrown.
+     *
+     * @throws IllegalStateException if the root directory could not be found
+     * @see #getTopDirectory()
+     * @since 4.0.0
+     */
+    Path getRootDirectory();
 
     /**
      * @since 3.3.0

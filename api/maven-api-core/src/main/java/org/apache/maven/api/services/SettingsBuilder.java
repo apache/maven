@@ -19,14 +19,20 @@
 package org.apache.maven.api.services;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.settings.Settings;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
+ *
+ * @since 4.0.0
  */
+@Experimental
 public interface SettingsBuilder extends Service {
 
     /**
@@ -48,7 +54,7 @@ public interface SettingsBuilder extends Service {
     @Nonnull
     default SettingsBuilderResult build(
             @Nonnull Session session, @Nonnull Source globalSettingsSource, @Nonnull Source userSettingsSource) {
-        return build(SettingsBuilderRequest.build(session, globalSettingsSource, userSettingsSource));
+        return build(session, globalSettingsSource, null, userSettingsSource);
     }
 
     /**
@@ -60,6 +66,70 @@ public interface SettingsBuilder extends Service {
     @Nonnull
     default SettingsBuilderResult build(
             @Nonnull Session session, @Nonnull Path globalSettingsPath, @Nonnull Path userSettingsPath) {
-        return build(SettingsBuilderRequest.build(session, globalSettingsPath, userSettingsPath));
+        return build(session, globalSettingsPath, null, userSettingsPath);
     }
+
+    /**
+     * Builds the effective settings of the specified settings sources.
+     *
+     * @return the result of the settings building, never {@code null}
+     * @throws SettingsBuilderException if the effective settings could not be built
+     */
+    @Nonnull
+    default SettingsBuilderResult build(
+            @Nonnull Session session,
+            @Nonnull Source globalSettingsSource,
+            @Nonnull Source projectSettingsSource,
+            @Nonnull Source userSettingsSource) {
+        return build(
+                SettingsBuilderRequest.build(session, globalSettingsSource, projectSettingsSource, userSettingsSource));
+    }
+
+    /**
+     * Builds the effective settings of the specified settings paths.
+     *
+     * @return the result of the settings building, never {@code null}
+     * @throws SettingsBuilderException if the effective settings could not be built
+     */
+    @Nonnull
+    default SettingsBuilderResult build(
+            @Nonnull Session session,
+            @Nonnull Path globalSettingsPath,
+            @Nonnull Path projectSettingsPath,
+            @Nonnull Path userSettingsPath) {
+        return build(SettingsBuilderRequest.build(session, globalSettingsPath, projectSettingsPath, userSettingsPath));
+    }
+
+    /**
+     * Validate the specified settings.
+     *
+     * @param settings The settings to validate, must not be {@code null}.
+     * @return The list of problems that were encountered, must not be {@code null}.
+     */
+    @Nonnull
+    default List<BuilderProblem> validate(@Nonnull Settings settings) {
+        return validate(settings, false);
+    }
+
+    /**
+     * Validate the specified settings.
+     *
+     * @param settings The settings to validate, must not be {@code null}.
+     * @param isProjectSettings Boolean indicating if the validation is for project settings or user / global settings.
+     * @return The list of problems that were encountered, must not be {@code null}.
+     */
+    @Nonnull
+    List<BuilderProblem> validate(@Nonnull Settings settings, boolean isProjectSettings);
+
+    /**
+     * Convert a model profile to a settings profile.
+     */
+    @Nonnull
+    org.apache.maven.api.settings.Profile convert(@Nonnull org.apache.maven.api.model.Profile profile);
+
+    /**
+     * Convert a settings profile to a model profile.
+     */
+    @Nonnull
+    org.apache.maven.api.model.Profile convert(@Nonnull org.apache.maven.api.settings.Profile profile);
 }

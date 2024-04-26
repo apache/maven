@@ -26,6 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Used to configure your Mojo parameters to be injected by
@@ -36,11 +37,11 @@ import org.apache.maven.api.annotations.Experimental;
  * container: this annotation is only effective on fields of the Mojo class itself, nested bean injection
  * requires Sisu or JSR330 annotations.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Documented
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Inherited
 public @interface Parameter {
@@ -48,12 +49,14 @@ public @interface Parameter {
      * name of the bean property used to get/set the field: by default, field name is used.
      * @return the name of the bean property
      */
+    @Nonnull
     String name() default "";
 
     /**
      * alias supported to get parameter value.
      * @return the alias
      */
+    @Nonnull
     String alias() default "";
 
     /**
@@ -61,6 +64,7 @@ public @interface Parameter {
      * properties.
      * @return property name
      */
+    @Nonnull
     String property() default "";
 
     /**
@@ -70,6 +74,7 @@ public @interface Parameter {
      * PluginParameterExpressionEvaluator</a>.
      * @return the default value
      */
+    @Nonnull
     String defaultValue() default "";
 
     /**

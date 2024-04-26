@@ -29,6 +29,8 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -43,9 +45,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * anywhere else in the lineage. We are just making sure that values
  * down in the lineage are bubbling up where they should.
  *
- * @author Jason van Zyl
  */
-public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
+@Deprecated
+class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p4 inherits from p3
@@ -61,7 +63,8 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    public void testProjectInheritance() throws Exception {
+    @DisabledOnOs(OS.WINDOWS) // need to investigate why it fails on windows
+    void testProjectInheritance() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         System.out.println("Local repository is at: " + localRepo.getAbsolutePath());

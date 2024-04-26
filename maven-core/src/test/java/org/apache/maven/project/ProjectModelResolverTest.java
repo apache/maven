@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,10 +45,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * Test cases for the project {@code ModelResolver} implementation.
  *
- * @author Christian Schulte
  * @since 3.5.0
  */
-public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
+class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
 
     /**
      * Creates a new {@code ProjectModelResolverTest} instance.
@@ -58,7 +57,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -69,11 +68,11 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 () -> newModelResolver().resolveModel(parent.getDelegate(), new AtomicReference<>()),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertNotNull(e.getMessage());
-        assertThat(e.getMessage(), startsWith("Could not find artifact org.apache:apache:pom:0 in central"));
+        assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -87,7 +86,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -101,7 +100,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
+    void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -112,7 +111,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
+    void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -124,7 +123,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -135,11 +134,11 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 () -> newModelResolver().resolveModel(dependency.getDelegate(), new AtomicReference<>()),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertNotNull(e.getMessage());
-        assertThat(e.getMessage(), startsWith("Could not find artifact org.apache:apache:pom:0 in central"));
+        assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -153,8 +152,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound()
-            throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -168,7 +166,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
+    void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -179,7 +177,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
+    void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -192,7 +190,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
 
     private ModelResolver newModelResolver() throws Exception {
         final File localRepo = new File(this.getLocalRepository().getBasedir());
-        final DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
+        final DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(h -> false);
         repoSession.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));
 
         return new ProjectModelResolver(
@@ -202,13 +200,14 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 getContainer().lookup(RemoteRepositoryManager.class),
                 this.getRemoteRepositories(),
                 ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT,
+                null,
                 null);
     }
 
     private List<RemoteRepository> getRemoteRepositories() throws InvalidRepositoryException {
         final File repoDir = new File(getBasedir(), "src/test/remote-repo").getAbsoluteFile();
         final RemoteRepository remoteRepository = new RemoteRepository.Builder(
-                        org.apache.maven.repository.RepositorySystem.DEFAULT_REMOTE_REPO_ID,
+                        MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID,
                         "default",
                         repoDir.toURI().toASCIIString())
                 .build();

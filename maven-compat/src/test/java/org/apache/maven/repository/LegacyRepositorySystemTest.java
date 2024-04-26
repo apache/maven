@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.SwitchableMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -32,16 +33,21 @@ import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.project.artifact.DefaultMetadataSource;
 import org.apache.maven.repository.legacy.LegacyRepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
@@ -52,12 +58,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@link LegacyRepositorySystem}.
  *
- * @author Benjamin Bentmann
  */
 @PlexusTest
-public class LegacyRepositorySystemTest {
+@Deprecated
+class LegacyRepositorySystemTest {
     @Inject
-    private RepositorySystem repositorySystem;
+    private LegacyRepositorySystem repositorySystem;
 
     @Inject
     private ResolutionErrorHandler resolutionErrorHandler;
@@ -89,7 +95,7 @@ public class LegacyRepositorySystemTest {
     }
 
     @Test
-    public void testThatASystemScopedDependencyIsNotResolvedFromRepositories() throws Exception {
+    void testThatASystemScopedDependencyIsNotResolvedFromRepositories() throws Exception {
         //
         // We should get a whole slew of dependencies resolving this artifact transitively
         //
@@ -112,8 +118,12 @@ public class LegacyRepositorySystemTest {
                 new LocalRepository(request.getLocalRepository().getBasedir());
         session.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory().newInstance(session, localRepo));
         LegacySupport legacySupport = container.lookup(LegacySupport.class);
-        legacySupport.setSession(new MavenSession(
-                container, session, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult()));
+        DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
+        MavenSession mavenSession =
+                new MavenSession(container, session, mavenExecutionRequest, new DefaultMavenExecutionResult());
+        legacySupport.setSession(mavenSession);
+        InternalSession iSession = new DefaultSession(mavenSession, null, null, null, null, null);
+        InternalSession.associate(session, iSession);
 
         ArtifactResolutionResult result = repositorySystem.resolve(request);
         resolutionErrorHandler.throwErrors(request, result);
@@ -170,7 +180,7 @@ public class LegacyRepositorySystemTest {
     }
 
     @Test
-    public void testLocalRepositoryBasedir() throws Exception {
+    void testLocalRepositoryBasedir() throws Exception {
         File localRepoDir = new File("").getAbsoluteFile();
 
         ArtifactRepository localRepo = repositorySystem.createLocalRepository(localRepoDir);
@@ -183,5 +193,16 @@ public class LegacyRepositorySystemTest {
         assertEquals(localRepoDir, new File(basedir));
 
         assertEquals(localRepoDir.getPath(), basedir);
+    }
+
+    @Inject
+    DefaultMetadataSource defaultMetadataSource;
+
+    @Inject
+    SwitchableMetadataSource switchableMetadataSource;
+
+    @BeforeEach
+    void setup() throws CycleDetectedInComponentGraphException {
+        switchableMetadataSource.setDelegate(defaultMetadataSource);
     }
 }

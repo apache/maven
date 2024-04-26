@@ -18,18 +18,20 @@
  */
 package org.apache.maven.repository.legacy.resolver.conflict;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.resolver.ResolutionNode;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Resolves conflicting artifacts by always selecting the <em>nearest</em> declaration. Nearest is defined as the
  * declaration that has the least transitive steps away from the project being built.
  *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @since 3.0
  */
-@Component(role = ConflictResolver.class, hint = "nearest")
+@Named("nearest")
+@Singleton
+@Deprecated
 public class NearestConflictResolver implements ConflictResolver {
     // ConflictResolver methods -----------------------------------------------
 

@@ -18,29 +18,28 @@
  */
 package org.apache.maven.plugin.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Print warnings if read-only parameters of a plugin are used in configuration.
  *
- * @author Slawomir Jaranowski
  */
 @Named
 @Singleton
-public class ReadOnlyPluginParametersValidator extends AbstractMavenPluginParametersValidator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReadOnlyPluginParametersValidator.class);
+class ReadOnlyPluginParametersValidator extends AbstractMavenPluginDescriptorSourcedParametersValidator {
 
-    @Override
-    protected Logger getLogger() {
-        return LOGGER;
+    @Inject
+    ReadOnlyPluginParametersValidator(PluginValidationManager pluginValidationManager) {
+        super(pluginValidationManager);
     }
 
     @Override
@@ -49,25 +48,38 @@ public class ReadOnlyPluginParametersValidator extends AbstractMavenPluginParame
     }
 
     @Override
-    public void validate(
+    protected void doValidate(
+            MavenSession mavenSession,
             MojoDescriptor mojoDescriptor,
+            Class<?> mojoClass,
             PlexusConfiguration pomConfiguration,
             ExpressionEvaluator expressionEvaluator) {
-        if (!LOGGER.isWarnEnabled()) {
+        if (mojoDescriptor.getParameters() == null) {
             return;
         }
 
         mojoDescriptor.getParameters().stream()
                 .filter(parameter -> !parameter.isEditable())
-                .forEach(parameter -> checkParameter(parameter, pomConfiguration, expressionEvaluator));
+                .forEach(parameter -> checkParameter(
+                        mavenSession, mojoDescriptor, mojoClass, parameter, pomConfiguration, expressionEvaluator));
     }
 
-    protected void checkParameter(
-            Parameter parameter, PlexusConfiguration pomConfiguration, ExpressionEvaluator expressionEvaluator) {
+    private void checkParameter(
+            MavenSession mavenSession,
+            MojoDescriptor mojoDescriptor,
+            Class<?> mojoClass,
+            Parameter parameter,
+            PlexusConfiguration pomConfiguration,
+            ExpressionEvaluator expressionEvaluator) {
         PlexusConfiguration config = pomConfiguration.getChild(parameter.getName(), false);
 
         if (isValueSet(config, expressionEvaluator)) {
-            logParameter(parameter);
+            pluginValidationManager.reportPluginMojoValidationIssue(
+                    PluginValidationManager.IssueLocality.INTERNAL,
+                    mavenSession,
+                    mojoDescriptor,
+                    mojoClass,
+                    formatParameter(parameter));
         }
     }
 }

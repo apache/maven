@@ -22,11 +22,13 @@ import java.util.List;
 
 import org.apache.maven.api.Node;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * The result of a dependency collection request.
  *
- * @since 4.0
+ * @since 4.0.0
  * @see DependencyCollector#collect(DependencyCollectorRequest)
  */
 @Experimental
@@ -36,6 +38,7 @@ public interface DependencyCollectorResult {
      *
      * @return the exceptions that occurred, never {@code null}
      */
+    @Nonnull
     List<Exception> getExceptions();
 
     /**
@@ -43,5 +46,6 @@ public interface DependencyCollectorResult {
      *
      * @return the root node of the dependency graph or {@code null} if none
      */
+    @Nullable
     Node getRoot();
 }

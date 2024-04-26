@@ -27,7 +27,7 @@ import org.apache.maven.api.annotations.Experimental;
  * It features an <code>execute()</code> method, which triggers the Mojo's build-process behavior, and can throw
  * a MojoException if error conditions occur.<br>
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @FunctionalInterface

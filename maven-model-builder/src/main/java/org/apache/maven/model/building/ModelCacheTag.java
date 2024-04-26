@@ -25,7 +25,6 @@ import org.apache.maven.api.model.Model;
  * Describes a tag used by the model builder to access a {@link ModelCache}. This interface basically aggregates a name
  * and a class to provide some type safety when working with the otherwise untyped cache.
  *
- * @author Benjamin Bentmann
  * @param <T> The type of data associated with the tag.
  */
 interface ModelCacheTag<T> {
@@ -45,24 +44,6 @@ interface ModelCacheTag<T> {
     Class<T> getType();
 
     /**
-     * Creates a copy of the data suitable for storage in the cache. The original data to store can be mutated after the
-     * cache is populated but the state of the cache must not change so we need to make a copy.
-     *
-     * @param data The data to store in the cache, must not be {@code null}.
-     * @return The data being stored in the cache, never {@code null}.
-     */
-    T intoCache(T data);
-
-    /**
-     * Creates a copy of the data suitable for retrieval from the cache. The retrieved data can be mutated after the
-     * cache is queried but the state of the cache must not change so we need to make a copy.
-     *
-     * @param data The data to retrieve from the cache, must not be {@code null}.
-     * @return The data being retrieved from the cache, never {@code null}.
-     */
-    T fromCache(T data);
-
-    /**
      * The tag used for the raw model without profile activation
      */
     ModelCacheTag<ModelData> RAW = new ModelCacheTag<ModelData>() {
@@ -75,16 +56,6 @@ interface ModelCacheTag<T> {
         @Override
         public Class<ModelData> getType() {
             return ModelData.class;
-        }
-
-        @Override
-        public ModelData intoCache(ModelData data) {
-            return data;
-        }
-
-        @Override
-        public ModelData fromCache(ModelData data) {
-            return data;
         }
     };
 
@@ -102,16 +73,6 @@ interface ModelCacheTag<T> {
         public Class<DependencyManagement> getType() {
             return DependencyManagement.class;
         }
-
-        @Override
-        public DependencyManagement intoCache(DependencyManagement data) {
-            return data;
-        }
-
-        @Override
-        public DependencyManagement fromCache(DependencyManagement data) {
-            return data;
-        }
     };
 
     /**
@@ -127,16 +88,6 @@ interface ModelCacheTag<T> {
         @Override
         public Class<Model> getType() {
             return Model.class;
-        }
-
-        @Override
-        public Model intoCache(Model data) {
-            return data;
-        }
-
-        @Override
-        public Model fromCache(Model data) {
-            return data;
         }
     };
 }

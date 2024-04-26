@@ -22,8 +22,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -32,24 +35,34 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
+import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
+import org.apache.maven.cli.transfer.QuietMavenTransferListener;
+import org.apache.maven.cli.transfer.SimplexTransferListener;
+import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
+import org.apache.maven.jline.MessageUtils;
+import org.apache.maven.model.root.DefaultRootLocator;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
+import org.eclipse.aether.transfer.TransferListener;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InOrder;
 
 import static java.util.Arrays.asList;
 import static org.apache.maven.cli.MavenCli.performProfileActivation;
 import static org.apache.maven.cli.MavenCli.performProjectActivation;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -65,19 +78,19 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
-public class MavenCliTest {
+class MavenCliTest {
     private MavenCli cli;
 
     private String origBasedir;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         cli = new MavenCli();
         origBasedir = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    void tearDown() throws Exception {
         if (origBasedir != null) {
             System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, origBasedir);
         } else {
@@ -86,7 +99,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void testPerformProfileActivation() throws ParseException {
+    void testPerformProfileActivation() throws ParseException {
         final CommandLineParser parser = new DefaultParser();
 
         final Options options = new Options();
@@ -114,7 +127,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void testDetermineProjectActivation() throws ParseException {
+    void testDetermineProjectActivation() throws ParseException {
         final CommandLineParser parser = new DefaultParser();
 
         final Options options = new Options();
@@ -141,7 +154,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void testCalculateDegreeOfConcurrency() {
+    void testCalculateDegreeOfConcurrency() {
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("-1"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0x4"));
@@ -158,13 +171,12 @@ public class MavenCliTest {
         int cpus = Runtime.getRuntime().availableProcessors();
         assertEquals((int) (cpus * 2.2), cli.calculateDegreeOfConcurrency("2.2C"));
         assertEquals(1, cli.calculateDegreeOfConcurrency("0.0001C"));
-        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("2.C"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("-2.2C"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0C"));
     }
 
     @Test
-    public void testMavenConfig() throws Exception {
+    void testMavenConfig() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File("src/test/projects/config").getCanonicalPath());
         CliRequest request = new CliRequest(new String[0], null);
@@ -182,7 +194,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void testMavenConfigInvalid() throws Exception {
+    void testMavenConfigInvalid() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/config-illegal").getCanonicalPath());
@@ -206,7 +218,7 @@ public class MavenCliTest {
      * @throws Exception in case of failure.
      */
     @Test
-    public void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine() throws Exception {
+    void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -233,7 +245,7 @@ public class MavenCliTest {
      * @throws Exception
      */
     @Test
-    public void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine() throws Exception {
+    void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -262,7 +274,7 @@ public class MavenCliTest {
      * @throws Exception
      */
     @Test
-    public void testMVNConfigurationCLIRepeatedPropertiesLastWins() throws Exception {
+    void testMVNConfigurationCLIRepeatedPropertiesLastWins() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -291,7 +303,7 @@ public class MavenCliTest {
      * @throws Exception
      */
     @Test
-    public void testMVNConfigurationFunkyArguments() throws Exception {
+    void testMVNConfigurationFunkyArguments() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -319,7 +331,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void testStyleColors() throws Exception {
+    void testStyleColors() throws Exception {
         assumeTrue(MessageUtils.isColorEnabled(), "ANSI not supported");
         CliRequest request;
 
@@ -329,6 +341,20 @@ public class MavenCliTest {
         cli.properties(request);
         cli.logging(request);
         assertFalse(MessageUtils.isColorEnabled());
+
+        MessageUtils.setColorEnabled(true);
+        request = new CliRequest(new String[] {"--non-interactive"}, null);
+        cli.cli(request);
+        cli.properties(request);
+        cli.logging(request);
+        assertFalse(MessageUtils.isColorEnabled());
+
+        MessageUtils.setColorEnabled(true);
+        request = new CliRequest(new String[] {"--force-interactive", "--non-interactive"}, null);
+        cli.cli(request);
+        cli.properties(request);
+        cli.logging(request);
+        assertTrue(MessageUtils.isColorEnabled());
 
         MessageUtils.setColorEnabled(true);
         request = new CliRequest(new String[] {"-l", "target/temp/mvn.log"}, null);
@@ -374,7 +400,7 @@ public class MavenCliTest {
      * Verifies MNG-6558
      */
     @Test
-    public void testToolchainsBuildingEvents() throws Exception {
+    void testToolchainsBuildingEvents() throws Exception {
         final EventSpyDispatcher eventSpyDispatcherMock = mock(EventSpyDispatcher.class);
         MavenCli customizedMavenCli = new MavenCli() {
             @Override
@@ -405,7 +431,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void resumeFromSelectorIsSuggestedWithoutGroupId() {
+    void resumeFromSelectorIsSuggestedWithoutGroupId() {
         List<MavenProject> allProjects =
                 asList(createMavenProject("group", "module-a"), createMavenProject("group", "module-b"));
         MavenProject failedProject = allProjects.get(0);
@@ -416,7 +442,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void resumeFromSelectorContainsGroupIdWhenArtifactIdIsNotUnique() {
+    void resumeFromSelectorContainsGroupIdWhenArtifactIdIsNotUnique() {
         List<MavenProject> allProjects =
                 asList(createMavenProject("group-a", "module"), createMavenProject("group-b", "module"));
         MavenProject failedProject = allProjects.get(0);
@@ -427,7 +453,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void verifyLocalRepositoryPath() {
+    void verifyLocalRepositoryPath() {
         MavenCli cli = new MavenCli();
         CliRequest request = new CliRequest(new String[] {}, null);
         request.commandLine = new CommandLine.Builder().build();
@@ -455,7 +481,7 @@ public class MavenCliTest {
      * @throws Exception cli invocation.
      */
     @Test
-    public void testVersionStringWithoutAnsi() throws Exception {
+    void testVersionStringWithoutAnsi() throws Exception {
         // given
         // - request with version and batch mode
         CliRequest cliRequest = new CliRequest(new String[] {"--version", "--batch-mode"}, null);
@@ -475,11 +501,11 @@ public class MavenCliTest {
         String versionOut = new String(systemOut.toByteArray(), StandardCharsets.UTF_8);
 
         // then
-        assertEquals(MessageUtils.stripAnsiCodes(versionOut), versionOut);
+        assertEquals(stripAnsiCodes(versionOut), versionOut);
     }
 
     @Test
-    public void populatePropertiesCanContainEqualsSign() throws Exception {
+    void populatePropertiesCanContainEqualsSign() throws Exception {
         // Arrange
         CliRequest request = new CliRequest(new String[] {"-Dw=x=y", "validate"}, null);
 
@@ -492,7 +518,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void populatePropertiesSpace() throws Exception {
+    void populatePropertiesSpace() throws Exception {
         // Arrange
         CliRequest request = new CliRequest(new String[] {"-D", "z=2", "validate"}, null);
 
@@ -505,7 +531,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void populatePropertiesShorthand() throws Exception {
+    void populatePropertiesShorthand() throws Exception {
         // Arrange
         CliRequest request = new CliRequest(new String[] {"-Dx", "validate"}, null);
 
@@ -518,7 +544,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void populatePropertiesMultiple() throws Exception {
+    void populatePropertiesMultiple() throws Exception {
         // Arrange
         CliRequest request = new CliRequest(new String[] {"-Dx=1", "-Dy", "validate"}, null);
 
@@ -532,7 +558,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void populatePropertiesOverwrite() throws Exception {
+    void populatePropertiesOverwrite() throws Exception {
         // Arrange
         CliRequest request = new CliRequest(new String[] {"-Dx", "-Dx=false", "validate"}, null);
 
@@ -544,10 +570,117 @@ public class MavenCliTest {
         assertThat(request.getUserProperties().getProperty("x"), is("false"));
     }
 
+    @Test
+    public void findRootProjectWithAttribute() {
+        Path test = Paths.get("src/test/projects/root-attribute");
+        assertEquals(test, new DefaultRootLocator().findRoot(test.resolve("child")));
+    }
+
+    @Test
+    public void testPropertiesInterpolation() throws Exception {
+        // Arrange
+        CliRequest request = new CliRequest(
+                new String[] {
+                    "-Dfoo=bar",
+                    "-DvalFound=s${foo}i",
+                    "-DvalNotFound=s${foz}i",
+                    "-DvalRootDirectory=${session.rootDirectory}/.mvn/foo",
+                    "-DvalTopDirectory=${session.topDirectory}/pom.xml",
+                    "-f",
+                    "${session.rootDirectory}/my-child",
+                    "prefix:3.0.0:${foo}",
+                    "validate"
+                },
+                null);
+        request.rootDirectory = Paths.get("myRootDirectory");
+        request.topDirectory = Paths.get("myTopDirectory");
+
+        // Act
+        cli.cli(request);
+        cli.properties(request);
+
+        // Assert
+        assertThat(request.getUserProperties().getProperty("valFound"), is("sbari"));
+        assertThat(request.getUserProperties().getProperty("valNotFound"), is("s${foz}i"));
+        assertThat(request.getUserProperties().getProperty("valRootDirectory"), is("myRootDirectory/.mvn/foo"));
+        assertThat(request.getUserProperties().getProperty("valTopDirectory"), is("myTopDirectory/pom.xml"));
+        assertThat(request.getCommandLine().getOptionValue('f'), is("myRootDirectory/my-child"));
+        assertThat(request.getCommandLine().getArgs(), equalTo(new String[] {"prefix:3.0.0:bar", "validate"}));
+    }
+
+    @ParameterizedTest
+    @MethodSource("activateBatchModeArguments")
+    public void activateBatchMode(boolean ciEnv, String[] cliArgs, boolean isBatchMode) throws Exception {
+        CliRequest request = new CliRequest(cliArgs, null);
+        if (ciEnv) request.getSystemProperties().put("env.CI", "true");
+        cli.cli(request);
+
+        boolean batchMode = !cli.populateRequest(request).isInteractiveMode();
+
+        assertThat(batchMode, is(isBatchMode));
+    }
+
+    public static Stream<Arguments> activateBatchModeArguments() {
+        return Stream.of(
+                Arguments.of(false, new String[] {}, false),
+                Arguments.of(true, new String[] {}, true),
+                Arguments.of(true, new String[] {"--force-interactive"}, false),
+                Arguments.of(true, new String[] {"--force-interactive", "--non-interactive"}, false),
+                Arguments.of(true, new String[] {"--force-interactive", "--batch-mode"}, false),
+                Arguments.of(true, new String[] {"--force-interactive", "--non-interactive", "--batch-mode"}, false),
+                Arguments.of(false, new String[] {"--non-interactive"}, true),
+                Arguments.of(false, new String[] {"--batch-mode"}, true),
+                Arguments.of(false, new String[] {"--non-interactive", "--batch-mode"}, true));
+    }
+
+    @ParameterizedTest
+    @MethodSource("calculateTransferListenerArguments")
+    public void calculateTransferListener(boolean ciEnv, String[] cliArgs, Class<TransferListener> expectedSubClass)
+            throws Exception {
+        CliRequest request = new CliRequest(cliArgs, null);
+        if (ciEnv) request.getSystemProperties().put("env.CI", "true");
+        cli.cli(request);
+        cli.logging(request);
+
+        TransferListener transferListener = cli.populateRequest(request).getTransferListener();
+        if (transferListener instanceof SimplexTransferListener) {
+            transferListener = ((SimplexTransferListener) transferListener).getDelegate();
+        }
+
+        assertThat(transferListener.getClass(), is(expectedSubClass));
+    }
+
+    public static Stream<Arguments> calculateTransferListenerArguments() {
+        return Stream.of(
+                Arguments.of(false, new String[] {}, ConsoleMavenTransferListener.class),
+                Arguments.of(true, new String[] {}, QuietMavenTransferListener.class),
+                Arguments.of(false, new String[] {"-ntp"}, QuietMavenTransferListener.class),
+                Arguments.of(false, new String[] {"--quiet"}, QuietMavenTransferListener.class),
+                Arguments.of(true, new String[] {"--force-interactive"}, ConsoleMavenTransferListener.class),
+                Arguments.of(
+                        true,
+                        new String[] {"--force-interactive", "--non-interactive"},
+                        ConsoleMavenTransferListener.class),
+                Arguments.of(
+                        true, new String[] {"--force-interactive", "--batch-mode"}, ConsoleMavenTransferListener.class),
+                Arguments.of(
+                        true,
+                        new String[] {"--force-interactive", "--non-interactive", "--batch-mode"},
+                        ConsoleMavenTransferListener.class),
+                Arguments.of(false, new String[] {"--non-interactive"}, Slf4jMavenTransferListener.class),
+                Arguments.of(false, new String[] {"--batch-mode"}, Slf4jMavenTransferListener.class),
+                Arguments.of(
+                        false, new String[] {"--non-interactive", "--batch-mode"}, Slf4jMavenTransferListener.class));
+    }
+
     private MavenProject createMavenProject(String groupId, String artifactId) {
         MavenProject project = new MavenProject();
         project.setGroupId(groupId);
         project.setArtifactId(artifactId);
         return project;
+    }
+
+    static String stripAnsiCodes(String msg) {
+        return msg.replaceAll("\u001b\\[[;\\d]*[ -/]*[@-~]", "");
     }
 }

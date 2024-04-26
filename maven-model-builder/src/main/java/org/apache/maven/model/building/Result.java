@@ -37,7 +37,6 @@ import static org.apache.maven.model.building.ModelProblem.Severity.FATAL;
  * </ol>
  * Could encode these variants as subclasses, but kept in one for now
  *
- * @author bbusjaeger
  * @param <T> the model type
  */
 public class Result<T> {

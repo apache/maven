@@ -18,11 +18,11 @@
  */
 package org.apache.maven.internal.xml;
 
-import java.io.IOException;
+import javax.xml.stream.XMLStreamException;
+
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,20 +31,21 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.xml.XmlNode;
-import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
-import org.codehaus.plexus.util.xml.SerializerXMLWriter;
-import org.codehaus.plexus.util.xml.XMLWriter;
-import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 
 /**
  *  NOTE: remove all the util code in here when separated, this class should be pure data.
  */
 public class XmlNodeImpl implements Serializable, XmlNode {
     private static final long serialVersionUID = 2567894443061173996L;
+
+    protected final String prefix;
+
+    protected final String namespaceUri;
 
     protected final String name;
 
@@ -70,12 +71,23 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     public XmlNodeImpl(
             String name, String value, Map<String, String> attributes, List<XmlNode> children, Object location) {
+        this("", "", name, value, attributes, children, location);
+    }
+
+    public XmlNodeImpl(
+            String prefix,
+            String namespaceUri,
+            String name,
+            String value,
+            Map<String, String> attributes,
+            List<XmlNode> children,
+            Object location) {
+        this.prefix = prefix == null ? "" : prefix;
+        this.namespaceUri = namespaceUri == null ? "" : namespaceUri;
         this.name = Objects.requireNonNull(name);
         this.value = value;
-        this.attributes =
-                attributes != null ? Collections.unmodifiableMap(new HashMap<>(attributes)) : Collections.emptyMap();
-        this.children =
-                children != null ? Collections.unmodifiableList(new ArrayList<>(children)) : Collections.emptyList();
+        this.attributes = ImmutableCollections.copy(attributes);
+        this.children = ImmutableCollections.copy(children);
         this.location = location;
     }
 
@@ -84,14 +96,21 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         return merge(this, source, childMergeOverride);
     }
 
-    public XmlNode clone() {
-        return this;
-    }
-
     // ----------------------------------------------------------------------
     // Name handling
     // ----------------------------------------------------------------------
 
+    @Override
+    public String getPrefix() {
+        return prefix;
+    }
+
+    @Override
+    public String getNamespaceUri() {
+        return namespaceUri;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -158,16 +177,6 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     // Helpers
     // ----------------------------------------------------------------------
 
-    public void writeToSerializer(String namespace, XmlSerializer serializer) throws IOException {
-        // TODO: WARNING! Later versions of plexus-utils psit out an <?xml ?> header due to thinking this is a new
-        // document - not the desired behaviour!
-        SerializerXMLWriter xmlWriter = new SerializerXMLWriter(namespace, serializer);
-        XmlNodeWriter.write(xmlWriter, this);
-        if (xmlWriter.getExceptions().size() > 0) {
-            throw (IOException) xmlWriter.getExceptions().get(0);
-        }
-    }
-
     /**
      * Merges one DOM into another, given a specific algorithm and possible override points for that algorithm.<p>
      * The algorithm is as follows:
@@ -225,27 +234,39 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
             String value = dominant.getValue();
             Object location = dominant.getInputLocation();
-            Map<String, String> attrs = null;
+            Map<String, String> attrs = dominant.getAttributes();
             List<XmlNode> children = null;
 
             for (Map.Entry<String, String> attr : recessive.getAttributes().entrySet()) {
                 String key = attr.getKey();
-                if (isEmpty(dominant.getAttribute(key)) && !SELF_COMBINATION_MODE_ATTRIBUTE.equals(key)) {
-                    if (attrs == null) {
-                        attrs = new HashMap<>();
+                if (isEmpty(attrs.get(key))) {
+                    if (attrs == dominant.getAttributes()) {
+                        attrs = new HashMap<>(attrs);
                     }
                     attrs.put(key, attr.getValue());
                 }
             }
 
-            if (recessive.getChildren().size() > 0) {
+            if (!recessive.getChildren().isEmpty()) {
                 boolean mergeChildren = true;
                 if (childMergeOverride != null) {
                     mergeChildren = childMergeOverride;
                 } else {
-                    String childMergeMode = dominant.getAttribute(CHILDREN_COMBINATION_MODE_ATTRIBUTE);
+                    String childMergeMode = attrs.get(CHILDREN_COMBINATION_MODE_ATTRIBUTE);
                     if (CHILDREN_COMBINATION_APPEND.equals(childMergeMode)) {
                         mergeChildren = false;
+                    }
+                }
+
+                Map<String, Iterator<XmlNode>> commonChildren = new HashMap<>();
+                Set<String> names =
+                        recessive.getChildren().stream().map(XmlNode::getName).collect(Collectors.toSet());
+                for (String name : names) {
+                    List<XmlNode> dominantChildren = dominant.getChildren().stream()
+                            .filter(n -> n.getName().equals(name))
+                            .collect(Collectors.toList());
+                    if (!dominantChildren.isEmpty()) {
+                        commonChildren.put(name, dominantChildren.iterator());
                     }
                 }
 
@@ -255,7 +276,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                     String idValue = recessiveChild.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE);
 
                     XmlNode childDom = null;
-                    if (isNotEmpty(idValue)) {
+                    if (!isEmpty(idValue)) {
                         for (XmlNode dominantChild : dominant.getChildren()) {
                             if (idValue.equals(dominantChild.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE))) {
                                 childDom = dominantChild;
@@ -263,7 +284,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                                 mergeChildren = true;
                             }
                         }
-                    } else if (isNotEmpty(keysValue)) {
+                    } else if (!isEmpty(keysValue)) {
                         String[] keys = keysValue.split(",");
                         Map<String, Optional<String>> recessiveKeyValues = Stream.of(keys)
                                 .collect(Collectors.toMap(
@@ -285,19 +306,6 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                     }
 
                     if (mergeChildren && childDom != null) {
-                        Map<String, Iterator<XmlNode>> commonChildren = new HashMap<>();
-                        Set<String> names = recessive.getChildren().stream()
-                                .map(XmlNode::getName)
-                                .collect(Collectors.toSet());
-                        for (String name : names) {
-                            List<XmlNode> dominantChildren = dominant.getChildren().stream()
-                                    .filter(n -> n.getName().equals(name))
-                                    .collect(Collectors.toList());
-                            if (dominantChildren.size() > 0) {
-                                commonChildren.put(name, dominantChildren.iterator());
-                            }
-                        }
-
                         String name = recessiveChild.getName();
                         Iterator<XmlNode> it =
                                 commonChildren.computeIfAbsent(name, n1 -> Stream.of(dominant.getChildren().stream()
@@ -345,19 +353,19 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                 }
             }
 
-            if (value != null || attrs != null || children != null) {
-                if (attrs != null) {
-                    Map<String, String> nattrs = attrs;
-                    attrs = new HashMap<>(dominant.getAttributes());
-                    attrs.putAll(nattrs);
-                } else {
-                    attrs = dominant.getAttributes();
-                }
+            if (value != null || attrs != dominant.getAttributes() || children != null) {
                 if (children == null) {
                     children = dominant.getChildren();
                 }
-                return new XmlNodeImpl(
-                        dominant.getName(), value != null ? value : dominant.getValue(), attrs, children, location);
+                if (!Objects.equals(value, dominant.getValue())
+                        || !Objects.equals(attrs, dominant.getAttributes())
+                        || !Objects.equals(children, dominant.getChildren())
+                        || !Objects.equals(location, dominant.getInputLocation())) {
+                    return new XmlNodeImpl(
+                            dominant.getName(), value != null ? value : dominant.getValue(), attrs, children, location);
+                } else {
+                    return dominant;
+                }
             }
         }
         return dominant;
@@ -403,23 +411,47 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     @Override
     public String toString() {
+        try {
+            return toStringXml();
+        } catch (XMLStreamException e) {
+            return toStringObject();
+        }
+    }
+
+    public String toStringXml() throws XMLStreamException {
         StringWriter writer = new StringWriter();
         XmlNodeWriter.write(writer, this);
         return writer.toString();
     }
 
-    public String toUnescapedString() {
-        StringWriter writer = new StringWriter();
-        XMLWriter xmlWriter = new PrettyPrintXMLWriter(writer);
-        XmlNodeWriter.write(xmlWriter, this, false);
-        return writer.toString();
+    public String toStringObject() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("XmlNode[");
+        boolean w = false;
+        w = addToStringField(sb, prefix, o -> !o.isEmpty(), "prefix", w);
+        w = addToStringField(sb, namespaceUri, o -> !o.isEmpty(), "namespaceUri", w);
+        w = addToStringField(sb, name, o -> !o.isEmpty(), "name", w);
+        w = addToStringField(sb, value, o -> !o.isEmpty(), "value", w);
+        w = addToStringField(sb, attributes, o -> !o.isEmpty(), "attributes", w);
+        w = addToStringField(sb, children, o -> !o.isEmpty(), "children", w);
+        w = addToStringField(sb, location, Objects::nonNull, "location", w);
+        sb.append("]");
+        return sb.toString();
     }
 
-    private static boolean isNotEmpty(String str) {
-        return ((str != null) && (str.length() > 0));
+    private static <T> boolean addToStringField(StringBuilder sb, T o, Function<T, Boolean> p, String n, boolean w) {
+        if (!p.apply(o)) {
+            if (w) {
+                sb.append(", ");
+            } else {
+                w = true;
+            }
+            sb.append(n).append("='").append(o).append('\'');
+        }
+        return w;
     }
 
     private static boolean isEmpty(String str) {
-        return ((str == null) || (str.length() == 0));
+        return str == null || str.isEmpty();
     }
 }

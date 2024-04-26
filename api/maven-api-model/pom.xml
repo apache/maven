@@ -23,19 +23,22 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-beta-1-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-model</artifactId>
 
   <name>Maven 4 API :: Model</name>
-  <description>Maven 4 API - Immutable Model for Maven POM (Project Object Model)</description>
+  <description>Maven 4 API - Immutable Model for Maven POM (Project Object Model).</description>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-meta</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-xml</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -51,7 +54,7 @@ under the License.
               <goal>velocity</goal>
             </goals>
             <configuration>
-              <version>4.2.0</version>
+              <version>4.1.0</version>
               <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
               <models>
                 <model>src/main/mdo/maven.mdo</model>
@@ -68,13 +71,23 @@ under the License.
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/package-info.java</exclude>
-          </excludes>
-        </configuration>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${basedir}/src/main/mdo/maven.mdo</file>
+                  <type>mdo</type>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

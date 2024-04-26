@@ -18,28 +18,32 @@
  */
 package org.apache.maven.settings.io.xpp3;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
-import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.apache.maven.settings.v4.SettingsStaxReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+/**
+ * @deprecated Maven 3 compatibility - please use {@code org.apache.maven.api.services.xml.SettingsXmlFactory} from {@code maven-api-core}
+ * or {@link SettingsStaxReader}
+ */
+@Deprecated
 public class SettingsXpp3Reader {
-    private boolean addDefaultEntities = true;
 
-    private final ContentTransformer contentTransformer;
+    private final SettingsStaxReader delegate;
 
     public SettingsXpp3Reader() {
-        this((source, fieldName) -> source);
+        delegate = new SettingsStaxReader();
     }
 
     public SettingsXpp3Reader(ContentTransformer contentTransformer) {
-        this.contentTransformer = contentTransformer;
+        delegate = new SettingsStaxReader(contentTransformer::transform);
     }
 
     /**
@@ -48,12 +52,19 @@ public class SettingsXpp3Reader {
      * @return boolean
      */
     public boolean getAddDefaultEntities() {
-        return addDefaultEntities;
-    } // -- boolean getAddDefaultEntities()
+        return delegate.getAddDefaultEntities();
+    }
 
     /**
-     * @see ReaderFactory#newXmlReader
+     * Sets the state of the "add default entities" flag.
      *
+     * @param addDefaultEntities a addDefaultEntities object.
+     */
+    public void setAddDefaultEntities(boolean addDefaultEntities) {
+        delegate.setAddDefaultEntities(addDefaultEntities);
+    }
+
+    /**
      * @param reader a reader object.
      * @param strict a strict object.
      * @throws IOException IOException if any.
@@ -62,15 +73,14 @@ public class SettingsXpp3Reader {
      * @return Settings
      */
     public Settings read(Reader reader, boolean strict) throws IOException, XmlPullParserException {
-        XmlPullParser parser =
-                addDefaultEntities ? new MXParser(EntityReplacementMap.defaultEntityReplacementMap) : new MXParser();
-        parser.setInput(reader);
-        return read(parser, strict);
-    } // -- Model read( Reader, boolean )
+        try {
+            return new Settings(delegate.read(reader, strict, null));
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
 
     /**
-     * @see ReaderFactory#newXmlReader
-     *
      * @param reader a reader object.
      * @throws IOException IOException if any.
      * @throws XmlPullParserException XmlPullParserException if
@@ -78,8 +88,12 @@ public class SettingsXpp3Reader {
      * @return Model
      */
     public Settings read(Reader reader) throws IOException, XmlPullParserException {
-        return read(reader, true);
-    } // -- Model read( Reader )
+        try {
+            return new Settings(delegate.read(reader));
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
 
     /**
      * Method read.
@@ -92,8 +106,12 @@ public class SettingsXpp3Reader {
      * @return Settings
      */
     public Settings read(InputStream in, boolean strict) throws IOException, XmlPullParserException {
-        return read(ReaderFactory.newXmlReader(in), strict);
-    } // -- Model read( InputStream, boolean )
+        try {
+            return new Settings(delegate.read(in, strict, null));
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
 
     /**
      * Method read.
@@ -105,8 +123,12 @@ public class SettingsXpp3Reader {
      * @return Settings
      */
     public Settings read(InputStream in) throws IOException, XmlPullParserException {
-        return read(ReaderFactory.newXmlReader(in));
-    } // -- Model read( InputStream )
+        try {
+            return new Settings(delegate.read(in));
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
 
     /**
      * Method read.
@@ -118,23 +140,13 @@ public class SettingsXpp3Reader {
      * any.
      * @return Settings
      */
-    public Settings read(XmlPullParser parser, boolean strict) throws IOException, XmlPullParserException {
-        org.apache.maven.settings.v4.SettingsXpp3Reader reader = contentTransformer != null
-                ? new org.apache.maven.settings.v4.SettingsXpp3Reader(contentTransformer::transform)
-                : new org.apache.maven.settings.v4.SettingsXpp3Reader();
-        reader.setAddDefaultEntities(addDefaultEntities);
-        org.apache.maven.api.settings.Settings settings = reader.read(parser, strict);
-        return new Settings(settings);
-    } // -- Model read( XmlPullParser, boolean )
-
-    /**
-     * Sets the state of the "add default entities" flag.
-     *
-     * @param addDefaultEntities a addDefaultEntities object.
-     */
-    public void setAddDefaultEntities(boolean addDefaultEntities) {
-        this.addDefaultEntities = addDefaultEntities;
-    } // -- void setAddDefaultEntities( boolean )
+    public Settings read(XMLStreamReader parser, boolean strict) throws IOException, XmlPullParserException {
+        try {
+            return new Settings(delegate.read(parser, strict, null));
+        } catch (XMLStreamException e) {
+            throw new XmlPullParserException(e.getMessage(), null, e);
+        }
+    }
 
     public interface ContentTransformer {
         /**

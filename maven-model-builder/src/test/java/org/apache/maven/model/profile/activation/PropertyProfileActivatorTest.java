@@ -29,9 +29,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests {@link PropertyProfileActivator}.
  *
- * @author Benjamin Bentmann
  */
-public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<PropertyProfileActivator> {
+class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<PropertyProfileActivator> {
 
     @BeforeEach
     @Override
@@ -57,7 +56,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     }
 
     @Test
-    public void testNullSafe() throws Exception {
+    void testNullSafe() throws Exception {
         Profile p = Profile.newInstance();
 
         assertActivation(false, p, newContext(null, null));
@@ -68,7 +67,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     }
 
     @Test
-    public void testWithNameOnly_UserProperty() throws Exception {
+    void testWithNameOnly_UserProperty() throws Exception {
         Profile profile = newProfile("prop", null);
 
         assertActivation(true, profile, newContext(newProperties("prop", "value"), null));
@@ -79,7 +78,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     }
 
     @Test
-    public void testWithNameOnly_SystemProperty() throws Exception {
+    void testWithNameOnly_SystemProperty() throws Exception {
         Profile profile = newProfile("prop", null);
 
         assertActivation(true, profile, newContext(null, newProperties("prop", "value")));
@@ -90,7 +89,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     }
 
     @Test
-    public void testWithNegatedNameOnly_UserProperty() throws Exception {
+    void testWithNegatedNameOnly_UserProperty() throws Exception {
         Profile profile = newProfile("!prop", null);
 
         assertActivation(false, profile, newContext(newProperties("prop", "value"), null));
@@ -101,7 +100,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     }
 
     @Test
-    public void testWithNegatedNameOnly_SystemProperty() throws Exception {
+    void testWithNegatedNameOnly_SystemProperty() throws Exception {
         Profile profile = newProfile("!prop", null);
 
         assertActivation(false, profile, newContext(null, newProperties("prop", "value")));
@@ -112,7 +111,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     }
 
     @Test
-    public void testWithValue_UserProperty() throws Exception {
+    void testWithValue_UserProperty() throws Exception {
         Profile profile = newProfile("prop", "value");
 
         assertActivation(true, profile, newContext(newProperties("prop", "value"), null));
@@ -123,7 +122,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     }
 
     @Test
-    public void testWithValue_SystemProperty() throws Exception {
+    void testWithValue_SystemProperty() throws Exception {
         Profile profile = newProfile("prop", "value");
 
         assertActivation(true, profile, newContext(null, newProperties("prop", "value")));
@@ -134,7 +133,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     }
 
     @Test
-    public void testWithNegatedValue_UserProperty() throws Exception {
+    void testWithNegatedValue_UserProperty() throws Exception {
         Profile profile = newProfile("prop", "!value");
 
         assertActivation(false, profile, newContext(newProperties("prop", "value"), null));
@@ -145,7 +144,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     }
 
     @Test
-    public void testWithNegatedValue_SystemProperty() throws Exception {
+    void testWithNegatedValue_SystemProperty() throws Exception {
         Profile profile = newProfile("prop", "!value");
 
         assertActivation(false, profile, newContext(null, newProperties("prop", "value")));
@@ -156,7 +155,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
     }
 
     @Test
-    public void testWithValue_UserPropertyDominantOverSystemProperty() throws Exception {
+    void testWithValue_UserPropertyDominantOverSystemProperty() throws Exception {
         Profile profile = newProfile("prop", "value");
 
         Properties props1 = newProperties("prop", "value");

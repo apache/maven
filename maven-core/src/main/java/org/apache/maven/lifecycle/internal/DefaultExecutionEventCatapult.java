@@ -31,16 +31,17 @@ import org.apache.maven.plugin.MojoExecution;
  * for technical reasons, it is not part of the public API. In particular, this class can be changed or deleted without
  * prior notice.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
 public class DefaultExecutionEventCatapult implements ExecutionEventCatapult {
 
+    @Override
     public void fire(ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution) {
         fire(eventType, session, mojoExecution, null);
     }
 
+    @Override
     public void fire(
             ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution, Exception exception) {
         ExecutionListener listener = session.getRequest().getExecutionListener();

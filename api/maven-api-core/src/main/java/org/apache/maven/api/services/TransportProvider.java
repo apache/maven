@@ -34,7 +34,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * This implementation is backed by Maven Resolver API, supported protocols and transport selection depends on it. If
  * resolver preference regarding transport is altered, it will affect this service as well.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Consumer

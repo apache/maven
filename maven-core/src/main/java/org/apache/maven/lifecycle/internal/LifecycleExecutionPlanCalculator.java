@@ -38,17 +38,15 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Kristian Rosenvold  (extract interface only)
  */
 public interface LifecycleExecutionPlanCalculator {
-    MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<Object> tasks)
+    MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<Task> tasks)
             throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
                     PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
                     NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException;
 
     MavenExecutionPlan calculateExecutionPlan(
-            MavenSession session, MavenProject project, List<Object> tasks, boolean setup)
+            MavenSession session, MavenProject project, List<Task> tasks, boolean setup)
             throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
                     PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
                     NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException;

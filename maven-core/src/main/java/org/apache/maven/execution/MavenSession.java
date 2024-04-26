@@ -19,6 +19,7 @@
 package org.apache.maven.execution;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
+import org.apache.maven.internal.impl.SettingsUtilsV4;
 import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -40,24 +42,24 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsUtilsV4;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A Maven execution session.
  *
- * @author Jason van Zyl
  */
 public class MavenSession implements Cloneable {
-    private MavenExecutionRequest request;
+    private final MavenExecutionRequest request;
 
-    private MavenExecutionResult result;
+    private final MavenExecutionResult result;
 
-    private RepositorySystemSession repositorySession;
+    private final RepositorySystemSession repositorySystemSession;
 
-    private Properties executionProperties;
+    private final Properties executionProperties;
 
     private ThreadLocal<MavenProject> currentProject = new ThreadLocal<>();
 
@@ -141,8 +143,28 @@ public class MavenSession implements Cloneable {
         return projects;
     }
 
+    /**
+     * @deprecated use {@link #getTopDirectory()} ()}
+     */
+    @Deprecated
     public String getExecutionRootDirectory() {
         return request.getBaseDirectory();
+    }
+
+    /**
+     * @see MavenExecutionRequest#getTopDirectory()
+     * @since 4.0.0
+     */
+    public Path getTopDirectory() {
+        return request.getTopDirectory();
+    }
+
+    /**
+     * @see MavenExecutionRequest#getRootDirectory()
+     * @since 4.0.0
+     */
+    public Path getRootDirectory() {
+        return request.getRootDirectory();
     }
 
     public MavenExecutionRequest getRequest() {
@@ -237,7 +259,7 @@ public class MavenSession implements Cloneable {
     }
 
     public RepositorySystemSession getRepositorySession() {
-        return repositorySession;
+        return repositorySystemSession;
     }
 
     private Map<String, MavenProject> projectMap;
@@ -262,7 +284,7 @@ public class MavenSession implements Cloneable {
     // Deprecated
     //
 
-    private PlexusContainer container;
+    private final PlexusContainer container;
 
     private final Settings settings;
 
@@ -272,6 +294,21 @@ public class MavenSession implements Cloneable {
     /** @deprecated This appears not to be used anywhere within Maven itself. */
     public Map<String, MavenProject> getProjectMap() {
         return projectMap;
+    }
+
+    public MavenSession(
+            RepositorySystemSession repositorySystemSession,
+            MavenExecutionRequest request,
+            MavenExecutionResult result) {
+        this.container = null;
+        this.request = requireNonNull(request);
+        this.result = requireNonNull(result);
+        this.settings = adaptSettings(request);
+        this.repositorySystemSession = requireNonNull(repositorySystemSession);
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
     }
 
     @Deprecated
@@ -284,7 +321,11 @@ public class MavenSession implements Cloneable {
         this.request = request;
         this.result = result;
         this.settings = adaptSettings(request);
-        this.repositorySession = repositorySession;
+        this.repositorySystemSession = repositorySession;
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
     }
 
     @Deprecated
@@ -343,6 +384,8 @@ public class MavenSession implements Cloneable {
         this.request.setGoals(goals);
         this.request.setBaseDirectory((executionRootDir != null) ? new File(executionRootDir) : null);
         this.request.setStartTime(startTime);
+        this.result = null;
+        this.repositorySystemSession = null;
     }
 
     @Deprecated
@@ -355,7 +398,12 @@ public class MavenSession implements Cloneable {
         this.request = request;
         this.result = result;
         this.settings = adaptSettings(request);
+        Properties executionProperties = new Properties();
+        executionProperties.putAll(request.getSystemProperties());
+        executionProperties.putAll(request.getUserProperties());
+        this.executionProperties = executionProperties;
         setProjects(projects);
+        this.repositorySystemSession = null;
     }
 
     /**
@@ -411,12 +459,6 @@ public class MavenSession implements Cloneable {
      */
     @Deprecated
     public Properties getExecutionProperties() {
-        if (executionProperties == null) {
-            executionProperties = new Properties();
-            executionProperties.putAll(request.getSystemProperties());
-            executionProperties.putAll(request.getUserProperties());
-        }
-
         return executionProperties;
     }
 

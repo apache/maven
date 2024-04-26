@@ -28,13 +28,11 @@ import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
 import org.apache.maven.api.xml.XmlNode;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * A node iterator for JXPath to support <code>Xpp3Dom</code>.
  *
- * @author Benjamin Bentmann
  */
 class Xpp3DomNodeIterator implements NodeIterator {
 
@@ -106,7 +104,7 @@ class Xpp3DomNodeIterator implements NodeIterator {
         }
         if (test instanceof NodeNameTest) {
             String nodeName = node.getName();
-            if (StringUtils.isEmpty(nodeName)) {
+            if (nodeName == null || nodeName.isEmpty()) {
                 return false;
             }
 
@@ -119,7 +117,7 @@ class Xpp3DomNodeIterator implements NodeIterator {
                 return true;
             }
             if (wildcard || testName.equals(nodeName)) {
-                return StringUtils.isEmpty(namespaceURI) || StringUtils.isEmpty(testPrefix);
+                return (namespaceURI == null || namespaceURI.isEmpty()) || (testPrefix == null || testPrefix.isEmpty());
             }
             return false;
         }

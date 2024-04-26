@@ -29,7 +29,6 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
 /**
- * @author Jason van Zyl
  */
 public interface BuildPluginManager {
     // igorf: Way too many declared exceptions!

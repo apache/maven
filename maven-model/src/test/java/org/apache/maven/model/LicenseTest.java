@@ -27,30 +27,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests {@code License}.
  *
- * @author Benjamin Bentmann
  */
-public class LicenseTest {
+class LicenseTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new License().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new License().equals(null));
 
         new License().equals(new License());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         License thing = new License();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new License().toString());
     }
 

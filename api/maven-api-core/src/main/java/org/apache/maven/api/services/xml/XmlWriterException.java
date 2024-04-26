@@ -24,16 +24,23 @@ import org.apache.maven.api.services.MavenException;
 /**
  * An exception thrown during the writing of an xml file.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class XmlWriterException extends MavenException {
+
+    private final Location location;
 
     /**
      * @param message the message for the exception
      * @param e the exception itself
      */
-    public XmlWriterException(String message, Exception e) {
+    public XmlWriterException(String message, Location location, Exception e) {
         super(message, e);
+        this.location = location;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 }

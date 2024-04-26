@@ -23,11 +23,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * @author Karl Heinz Marbaise
  */
-public class CleanArgumentTest {
+class CleanArgumentTest {
     @Test
-    public void cleanArgsShouldRemoveWrongSurroundingQuotes() {
+    void cleanArgsShouldRemoveWrongSurroundingQuotes() {
         String[] args = {"\"-Dfoo=bar", "\"-Dfoo2=bar two\""};
         String[] cleanArgs = CleanArgument.cleanArgs(args);
         assertEquals(args.length, cleanArgs.length);
@@ -36,7 +35,7 @@ public class CleanArgumentTest {
     }
 
     @Test
-    public void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingDoubleQuotes() {
+    void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingDoubleQuotes() {
         String information = "-Dinformation=\"The Information is important.\"";
         String[] args = {information};
         String[] cleanArgs = CleanArgument.cleanArgs(args);
@@ -45,7 +44,7 @@ public class CleanArgumentTest {
     }
 
     @Test
-    public void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingSingleQuotes() {
+    void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingSingleQuotes() {
         String information = "-Dinformation='The Information is important.'";
         String[] args = {information};
         String[] cleanArgs = CleanArgument.cleanArgs(args);

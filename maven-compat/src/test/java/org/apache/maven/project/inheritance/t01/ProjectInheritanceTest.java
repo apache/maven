@@ -29,9 +29,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * we are testing to make sure that elements stated in a model are
  * not clobbered by the same elements elsewhere in the lineage.
  *
- * @author Jason van Zyl
  */
-public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
+@Deprecated
+class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p4 inherits from p3
@@ -47,7 +47,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    public void testProjectInheritance() throws Exception {
+    void testProjectInheritance() throws Exception {
         // ----------------------------------------------------------------------
         // Check p0 value for org name
         // ----------------------------------------------------------------------

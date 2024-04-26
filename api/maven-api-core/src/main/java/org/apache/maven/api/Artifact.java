@@ -25,7 +25,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * An artifact points to a resource such as a jar file or war application.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable
@@ -33,17 +33,18 @@ public interface Artifact {
 
     /**
      * Returns a unique identifier for this artifact.
-     * The identifier is composed of groupId, artifactId, version, classifier, extension.
+     * The identifier is composed of groupId, artifactId, extension, classifier, and version.
      *
      * @return the unique identifier
      */
+    @Nonnull
     default String key() {
         return getGroupId()
                 + ':'
                 + getArtifactId()
                 + ':'
                 + getExtension()
-                + (getClassifier().length() > 0 ? ":" + getClassifier() : "")
+                + (getClassifier().isEmpty() ? "" : ":" + getClassifier())
                 + ':'
                 + getVersion();
     }
@@ -71,6 +72,14 @@ public interface Artifact {
      */
     @Nonnull
     Version getVersion();
+
+    /**
+     * The base version of the artifact.
+     *
+     * @return the version
+     */
+    @Nonnull
+    Version getBaseVersion();
 
     /**
      * The classifier of the artifact.

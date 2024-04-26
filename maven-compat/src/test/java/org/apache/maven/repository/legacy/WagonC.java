@@ -24,8 +24,6 @@ import javax.inject.Singleton;
 /**
  * Wagon for testing, for protocol <code>c</code>
  *
- * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
 @Named("c")
 @Singleton

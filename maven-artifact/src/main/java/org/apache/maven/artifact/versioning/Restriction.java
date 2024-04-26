@@ -21,7 +21,6 @@ package org.apache.maven.artifact.versioning;
 /**
  * Describes a restriction in versioning.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class Restriction {
     private final ArtifactVersion lowerBound;

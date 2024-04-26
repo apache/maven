@@ -31,11 +31,11 @@ import java.lang.annotation.Target;
  * A type can be marked {@link Consumer} or {@link Provider} but not both. A type is assumed to be
  * {@link Consumer} if it is not marked either {@link Consumer} or {@link Provider}.
  * <p>
- * A package can be marked {@link Provider}. In this case, all types in the package are considered
+ * A package can be marked {@link Consumer}. In this case, all types in the package are considered
  * to be a provider type regardless of whether they are marked {@link Consumer} or {@link Provider}.
  *
  * @see Provider
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Documented

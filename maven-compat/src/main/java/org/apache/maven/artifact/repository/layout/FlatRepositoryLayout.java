@@ -18,16 +18,20 @@
  */
 package org.apache.maven.artifact.repository.layout;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * FlatRepositoryLayout
  */
-@Component(role = ArtifactRepositoryLayout.class, hint = "flat")
+@Named("flat")
+@Singleton
+@Deprecated
 public class FlatRepositoryLayout implements ArtifactRepositoryLayout {
 
     private static final char ARTIFACT_SEPARATOR = '-';
@@ -50,7 +54,7 @@ public class FlatRepositoryLayout implements ArtifactRepositoryLayout {
         }
 
         if (artifactHandler.getExtension() != null
-                && artifactHandler.getExtension().length() > 0) {
+                && !artifactHandler.getExtension().isEmpty()) {
             path.append(GROUP_SEPARATOR).append(artifactHandler.getExtension());
         }
 

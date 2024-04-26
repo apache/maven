@@ -32,6 +32,28 @@ under the License.
     <category rdf:resource="http://projects.apache.org/category/build-management"/>
     <release>
       <Version>
+        <name>Apache Maven 4.0.0-alpha-7</name>
+        <created>2023-06-28</created>
+        <revision>4.0.0-alpha-7</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-7/binaries/apache-maven-4.0.0-alpha-7-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-7/binaries/apache-maven-4.0.0-alpha-7-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-7/source/apache-maven-4.0.0-alpha-7-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-7/source/apache-maven-4.0.0-alpha-7-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 4.0.0-alpha-5</name>
+        <created>2023-03-20</created>
+        <revision>4.0.0-alpha-5</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-5/binaries/apache-maven-4.0.0-alpha-5-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-5/binaries/apache-maven-4.0.0-alpha-5-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-5/source/apache-maven-4.0.0-alpha-5-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-5/source/apache-maven-4.0.0-alpha-5-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
         <name>Apache Maven 4.0.0-alpha-4</name>
         <created>2023-01-31</created>
         <revision>4.0.0-alpha-4</revision>
@@ -66,12 +88,89 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2023-12-01</created>
+        <revision>3.9.6</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.6/source/apache-maven-3.9.6-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.6/source/apache-maven-3.9.6-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.9.5</name>
+        <created>2023-10-04</created>
+        <revision>3.9.5</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.5/binaries/apache-maven-3.9.5-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.5/binaries/apache-maven-3.9.5-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.5/source/apache-maven-3.9.5-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.5/source/apache-maven-3.9.5-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.9.4</name>
+        <created>2023-08-03</created>
+        <revision>3.9.4</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.4/source/apache-maven-3.9.4-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.4/source/apache-maven-3.9.4-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.9.3</name>
+        <created>2023-06-26</created>
+        <revision>3.9.3</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.3/binaries/apache-maven-3.9.3-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.3/binaries/apache-maven-3.9.3-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.3/source/apache-maven-3.9.3-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.3/source/apache-maven-3.9.3-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.9.2</name>
+        <created>2023-05-11</created>
+        <revision>3.9.2</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.2/binaries/apache-maven-3.9.2-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.2/binaries/apache-maven-3.9.2-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.2/source/apache-maven-3.9.2-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.2/source/apache-maven-3.9.2-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.9.1</name>
+        <created>2023-03-15</created>
+        <revision>3.9.1</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.1/binaries/apache-maven-3.9.1-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.1/binaries/apache-maven-3.9.1-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.1/source/apache-maven-3.9.1-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.1/source/apache-maven-3.9.1-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.9.0</name>
         <created>2023-01-31</created>
         <revision>3.9.0</revision>
-        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip</file-release>
-        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.tar.gz</file-release>
-        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/source/apache-maven-3.9.0-src.zip</file-release>
-        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/source/apache-maven-3.9.0-src.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.0/source/apache-maven-3.9.0-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.0/source/apache-maven-3.9.0-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.8.8</name>
+        <created>2023-03-08</created>
+        <revision>3.8.8</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.8/source/apache-maven-3.8.8-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.8/source/apache-maven-3.8.8-src.tar.gz</file-release>
       </Version>
     </release>
     <release>

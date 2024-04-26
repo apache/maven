@@ -22,20 +22,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.Session;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.SessionData;
 
 @Singleton
 @Named
 public class DefaultSessionFactory {
     private final RepositorySystem repositorySystem;
     private final MavenRepositorySystem mavenRepositorySystem;
-    private final PlexusContainer plexusContainer;
+    private final Lookup lookup;
     private final RuntimeInformation runtimeInformation;
 
     @Inject
@@ -43,21 +41,18 @@ public class DefaultSessionFactory {
     public DefaultSessionFactory(
             RepositorySystem repositorySystem,
             MavenRepositorySystem mavenRepositorySystem,
-            PlexusContainer plexusContainer,
+            Lookup lookup,
             RuntimeInformation runtimeInformation) {
         this.repositorySystem = repositorySystem;
         this.mavenRepositorySystem = mavenRepositorySystem;
-        this.plexusContainer = plexusContainer;
+        this.lookup = lookup;
         this.runtimeInformation = runtimeInformation;
     }
 
-    public Session getSession(MavenSession mavenSession) {
-        SessionData data = mavenSession.getRepositorySession().getData();
-        return (Session) data.computeIfAbsent(DefaultSession.class, () -> newSession(mavenSession));
-    }
-
-    private Session newSession(MavenSession mavenSession) {
-        return new DefaultSession(
-                mavenSession, repositorySystem, null, mavenRepositorySystem, plexusContainer, runtimeInformation);
+    public InternalSession newSession(MavenSession mavenSession) {
+        InternalSession session = new DefaultSession(
+                mavenSession, repositorySystem, null, mavenRepositorySystem, lookup, runtimeInformation);
+        InternalSession.associate(mavenSession.getRepositorySession(), session);
+        return session;
     }
 }

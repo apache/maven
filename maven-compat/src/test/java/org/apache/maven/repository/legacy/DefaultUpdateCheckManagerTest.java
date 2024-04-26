@@ -39,7 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
+@Deprecated
+class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
 
     @Inject
     private ArtifactFactory artifactFactory;
@@ -60,7 +61,7 @@ public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTest
     }
 
     @Test
-    public void testArtifact() throws Exception {
+    void testArtifact() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -88,7 +89,7 @@ public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTest
     }
 
     @Test
-    public void testMissingArtifact() throws Exception {
+    void testMissingArtifact() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -113,7 +114,7 @@ public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTest
     }
 
     @Test
-    public void testPom() throws Exception {
+    void testPom() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -141,7 +142,7 @@ public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTest
     }
 
     @Test
-    public void testMissingPom() throws Exception {
+    void testMissingPom() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -166,7 +167,7 @@ public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTest
     }
 
     @Test
-    public void testMetadata() throws Exception {
+    void testMetadata() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -194,7 +195,7 @@ public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTest
     }
 
     @Test
-    public void testMissingMetadata() throws Exception {
+    void testMissingMetadata() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -220,7 +221,7 @@ public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTest
     }
 
     @Test
-    public void testArtifactTouchFileName() throws Exception {
+    void testArtifactTouchFileName() throws Exception {
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = artifactFactory.createArtifactWithClassifier("groupId", "a", "0.0.1-SNAPSHOT", "jar", null);

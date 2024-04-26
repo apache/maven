@@ -26,8 +26,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * Provides some metadata operations, like querying the remote repository for a list of versions available for an
  * artifact.
  *
- * @author Jason van Zyl
  */
+@Deprecated
 public interface MetadataSource {
     String ROLE = MetadataSource.class.getName();
 

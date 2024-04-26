@@ -152,7 +152,7 @@ public class MavenStatusCommand {
     }
 
     private List<String> verifyArtifactResolution(final MavenExecutionRequest mavenExecutionRequest) {
-        final Session session = this.defaultSessionFactory.getSession(new MavenSession(
+        final Session session = this.defaultSessionFactory.newSession(new MavenSession(
                 container,
                 repoSession.newRepositorySession(mavenExecutionRequest),
                 mavenExecutionRequest,

@@ -23,22 +23,28 @@ import java.io.Writer;
 import java.nio.file.Path;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * An XML writer request.
  *
- * @since 4.0
+ * @since 4.0.0
  * @param <T> the object type to read
  */
 @Experimental
 public interface XmlWriterRequest<T> {
 
+    @Nullable
     Path getPath();
 
+    @Nullable
     OutputStream getOutputStream();
 
+    @Nullable
     Writer getWriter();
 
+    @Nonnull
     T getContent();
 
     static <T> XmlWriterRequestBuilder<T> builder() {

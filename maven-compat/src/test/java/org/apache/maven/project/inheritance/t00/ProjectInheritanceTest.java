@@ -33,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * anywhere else in the lineage. We are just making sure that values
  * down in the lineage are bubbling up where they should.
  *
- * @author Jason van Zyl
  */
-public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
+@Deprecated
+class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p4 inherits from p3
@@ -51,7 +51,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    public void testProjectInheritance() throws Exception {
+    void testProjectInheritance() throws Exception {
         MavenProject p4 = getProject(projectFile("p4"));
 
         assertEquals("p4", p4.getName());

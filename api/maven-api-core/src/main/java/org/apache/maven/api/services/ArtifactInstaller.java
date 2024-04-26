@@ -25,11 +25,12 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Installs {@link Artifact}s to the local repository.
  *
- * @since 4.0
+ * @since 4.0.0
  * @see Session#withLocalRepository(org.apache.maven.api.LocalRepository)
  */
 @Experimental
@@ -39,7 +40,7 @@ public interface ArtifactInstaller extends Service {
      * @throws ArtifactInstallerException in case of an error
      * @throws IllegalArgumentException in case {@code request} is {@code null}
      */
-    void install(ArtifactInstallerRequest request);
+    void install(@Nonnull ArtifactInstallerRequest request);
 
     /**
      * @param session the repository session

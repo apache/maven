@@ -47,7 +47,6 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.
  *
- * @author Benjamin Bentmann
  */
 @Named
 @Singleton
@@ -97,10 +96,10 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
                 targetBuild = Build.newInstance();
             }
 
-            Map<Object, Object> context = Collections.singletonMap(
-                    PLUGIN_MANAGEMENT, target.getBuild().getPluginManagement());
+            Map<Object, Object> context =
+                    Collections.singletonMap(PLUGIN_MANAGEMENT, targetBuild.getPluginManagement());
 
-            Build.Builder builder = Build.newBuilder(target.getBuild());
+            Build.Builder builder = Build.newBuilder(targetBuild);
             mergePluginContainer_Plugins(builder, targetBuild, source.getBuild(), false, context);
 
             return target.withBuild(builder.build());

@@ -22,59 +22,83 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.services.LanguageRegistry;
 import org.apache.maven.api.services.TypeRegistry;
+import org.apache.maven.api.spi.TypeProvider;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.handler.manager.LegacyArtifactHandlerManager;
+import org.apache.maven.eventspy.AbstractEventSpy;
+import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.internal.impl.resolver.type.DefaultType;
 
+import static java.util.function.Function.identity;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton
-public class DefaultTypeRegistry implements TypeRegistry {
+public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistry {
+    private final Map<String, Type> types;
 
-    private final ArtifactHandlerManager manager;
+    private final LanguageRegistry languageRegistry;
+
+    private final ConcurrentHashMap<String, Type> usedTypes;
+
+    private final LegacyArtifactHandlerManager manager;
 
     @Inject
-    public DefaultTypeRegistry(ArtifactHandlerManager manager) {
+    public DefaultTypeRegistry(
+            List<TypeProvider> providers, LanguageRegistry languageRegistry, LegacyArtifactHandlerManager manager) {
+        this.types = nonNull(providers, "providers").stream()
+                .flatMap(p -> p.provides().stream())
+                .collect(Collectors.toMap(Type::id, identity()));
+        this.languageRegistry = nonNull(languageRegistry, "languageRegistry");
+        this.usedTypes = new ConcurrentHashMap<>();
         this.manager = nonNull(manager, "artifactHandlerManager");
     }
 
     @Override
+    public void onEvent(Object event) {
+        if (event instanceof ExecutionEvent) {
+            ExecutionEvent executionEvent = (ExecutionEvent) event;
+            if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
+                usedTypes.clear();
+            }
+        }
+    }
+
+    @Override
+    public Optional<Type> lookup(String id) {
+        return Optional.of(require(id));
+    }
+
+    @Override
     @Nonnull
-    public Type getType(String id) {
-        // Copy data as the ArtifacHandler is not immutable, but Type should be.
-        ArtifactHandler handler = manager.getArtifactHandler(nonNull(id, "id"));
-        String extension = handler.getExtension();
-        String classifier = handler.getClassifier();
-        boolean includeDependencies = handler.isIncludesDependencies();
-        boolean addedToClasspath = handler.isAddedToClasspath();
-        return new Type() {
-            @Override
-            public String getName() {
-                return id;
+    public Type require(String id) {
+        nonNull(id, "id");
+        return usedTypes.computeIfAbsent(id, i -> {
+            Type type = types.get(id);
+            if (type == null) {
+                // Copy data as the ArtifactHandler is not immutable, but Type should be.
+                ArtifactHandler handler = manager.getArtifactHandler(id);
+                type = new DefaultType(
+                        id,
+                        languageRegistry.require(handler.getLanguage()),
+                        handler.getExtension(),
+                        handler.getClassifier(),
+                        handler.isIncludesDependencies(),
+                        JavaPathType.CLASSES,
+                        JavaPathType.MODULES);
             }
-
-            @Override
-            public String getExtension() {
-                return extension;
-            }
-
-            @Override
-            public String getClassifier() {
-                return classifier;
-            }
-
-            @Override
-            public boolean isIncludesDependencies() {
-                return includeDependencies;
-            }
-
-            @Override
-            public boolean isAddedToClasspath() {
-                return addedToClasspath;
-            }
-        };
+            return type;
+        });
     }
 }

@@ -41,6 +41,7 @@ import java.util.Properties;
 import java.util.Objects;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.annotations.Generated;
@@ -48,89 +49,90 @@ import org.apache.maven.api.xml.XmlNode;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.apache.maven.internal.xml.XmlNodeImpl;
 
 @Generated
-public class ${className}
-{
+public class ${className} {
 
     private final Function<String, String> transformer;
 
-    public ${className}( Function<String, String> transformer )
-    {
+    public ${className}(Function<String, String> transformer) {
         this.transformer = transformer;
     }
 
     /**
      * Transforms the given model
      */
-    public ${root.name} visit( ${root.name} target )
-    {
-        Objects.requireNonNull( target, "target cannot be null" );
-        return transform${root.name}( target );
+    public ${root.name} visit(${root.name} target) {
+        Objects.requireNonNull(target, "target cannot be null");
+        return transform${root.name}(target);
     }
 
     /**
      * The transformation function.
      */
-    protected String transform( String value )
-    {
-        return transformer.apply( value );
+    protected String transform(String value) {
+        return transformer.apply(value);
     }
 
 #foreach ( $class in $model.allClasses )
   #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
     #set ( $ancestors = $Helper.ancestors( $class ) )
     #set ( $allFields = $Helper.xmlFields( $class ) )
-    protected ${class.name} transform${class.name}( ${class.name} target )
-    {
-        if ( target == null )
-        {
+    protected ${class.name} transform${class.name}(${class.name} target) {
+        if (target == null) {
             return null;
         }
-        ${class.name}.Builder builder = ${class.name}.newBuilder( target );
+        Supplier<${class.name}.Builder> creator = () -> ${class.name}.newBuilder(target);
+        ${class.name}.Builder builder = null;
     #foreach ( $field in $allFields )
-        transform${field.modelClass.name}_${Helper.capitalise($field.name)}( builder, target );
+        builder = (${class.name}.Builder) transform${field.modelClass.name}_${Helper.capitalise($field.name)}(creator, builder, target);
     #end
-        return builder.build();
+        return builder != null ? builder.build() : target;
     }
 
     #foreach ( $field in $allFields )
       #set ( $capField = ${Helper.capitalise($field.name)} )
-    protected void transform${class.name}_${capField}( ${class.name}.Builder builder, ${class.name} target )
-    {
+    protected ${class.name}.Builder transform${class.name}_${capField}(Supplier<? extends ${class.name}.Builder> creator, ${class.name}.Builder builder, ${class.name} target) {
       #if ( $field.type == "String" )
-        String newVal = transform( target.get${capField}() );
-        builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
+        String oldVal = target.get${capField}();
+        String newVal = transform(oldVal);
+        return newVal != oldVal ? (builder != null ? builder : creator.get()).${field.name}(newVal) : builder;
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
-        builder.${field.name}( transform( target.get${capField}(), this::transform ) );
+        List<String> oldVal = target.get${capField}();
+        List<String> newVal = transform(oldVal, this::transform);
+        return newVal != oldVal ? (builder != null ? builder : creator.get()).${field.name}(newVal) : builder;
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
         Map<String, String> props = target.get${capField}();
         Map<String, String> newProps = null;
-        for ( Map.Entry<String, String> entry : props.entrySet() )
-        {
-            String newVal = transform( entry.getValue() );
-            if ( newVal != null && newVal != entry.getValue() )
-            {
-                if ( newProps == null )
-                {
+        for (Map.Entry<String, String> entry : props.entrySet()) {
+            String newVal = transform(entry.getValue());
+            if (newVal != null && newVal != entry.getValue()) {
+                if (newProps == null) {
                     newProps = new HashMap<>();
-                    newProps.putAll( props );
-                    builder.${field.name}( newProps );
+                    newProps.putAll(props);
+                    builder = builder != null ? builder : creator.get();
+                    builder.${field.name}(newProps);
                 }
-                newProps.put( entry.getKey(), newVal );
+                newProps.put(entry.getKey(), newVal);
             }
         }
+        return builder;
       #elseif ( $field.to && $field.multiplicity == "1" )
-        ${field.to} newVal = transform${field.to}( target.get${capField}() );
-        builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
+        ${field.to} oldVal = target.get${capField}();
+        ${field.to} newVal = transform${field.to}(oldVal);
+        return newVal != oldVal ? (builder != null ? builder : creator.get()).${field.name}(newVal) : builder;
       #elseif ( $field.to && $field.multiplicity == "*" )
-        builder.${field.name}( transform( target.get${capField}(), this::transform${field.to} ) );
+        List<${field.to}> oldVal = target.get${capField}();
+        List<${field.to}> newVal = transform(oldVal, this::transform${field.to});
+        return newVal != oldVal ? (builder != null ? builder : creator.get()).${field.name}(newVal) : builder;
       #elseif ( $field.type == "DOM" )
-        XmlNode newVal = transform( target.get${capField}() );
-        builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
+        XmlNode oldVal = target.get${capField}();
+        XmlNode newVal = transform(oldVal);
+        return newVal != oldVal ? (builder != null ? builder : creator.get()).${field.name}(newVal) : builder;
       #elseif ( $field.type == "boolean" || $field.type == "int" || $field.type == "java.nio.file.Path" )
         // nothing to do, the transformer only handles strings
+        return builder;
       #else
         // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end
@@ -139,62 +141,49 @@ public class ${className}
 
   #end
 #end
-    protected <T> List<T> transform( List<T> list, Function<T, T> transformer )
-    {
-        List<T> newList = null;
-        for ( int i = 0; i < list.size(); i++ )
-        {
-            T newVal = transformer.apply( list.get( i ) );
-            if ( newVal != list.get( i ) )
-            {
-                if ( newList == null )
-                {
-                    newList = new ArrayList<>( list );
+    protected <T> List<T> transform(List<T> list, Function<T, T> transformer) {
+        List<T> newList = list;
+        for (int i = 0; i < list.size(); i++) {
+            T oldVal = list.get(i);
+            T newVal = transformer.apply(oldVal);
+            if (newVal != oldVal) {
+                if (newList == list) {
+                    newList = new ArrayList<>(list);
                 }
-                newList.set( i, newVal );
+                newList.set(i, newVal);
             }
         }
         return newList;
     }
 
-    protected XmlNode transform( XmlNode node )
-    {
-        if ( node != null )
-        {
-            Xpp3Dom xpp = new Xpp3Dom( node );
-            transform( xpp );
-            return xpp.getDom();
+    protected <T> Map<String, T> transform(Map<String, T> map, Function<T, T> transformer) {
+        Map<String, T> newMap = map;
+        for (String key : map.keySet()) {
+            T oldVal = map.get(key);
+            T newVal = transformer.apply(oldVal);
+            if (newVal != oldVal) {
+                if (newMap == map) {
+                    newMap = new HashMap<>(map);
+                }
+                newMap.put(key, newVal);
+            }
         }
-        return node;
+        return newMap;
     }
 
-    protected void transform( Xpp3Dom dom )
-    {
-        if ( dom != null )
-        {
-            String org, val;
-            // Content
-            org = dom.getValue();
-            val = transform( org );
-            if ( org != val )
-            {
-                dom.setValue( val );
-            }
-            // Attributes
-            for ( String attr : dom.getAttributeNames() )
-            {
-                org = dom.getAttribute( attr );
-                val = transform( org );
-                if ( org != val )
-                {
-                    dom.setAttribute( attr, val );
-                }
-            }
-            // Children
-            for ( int i = 0, l = dom.getChildCount(); i < l; i++ )
-            {
-                transform( dom.getChild( i ) );
+    protected XmlNode transform(XmlNode node) {
+        if (node != null) {
+            String oldValue = node.getValue();
+            String newValue = transform(oldValue);
+            Map<String, String> oldAttrs = node.getAttributes();
+            Map<String, String> newAttrs = transform(oldAttrs, this::transform);
+            List<XmlNode> oldChildren = node.getChildren();
+            List<XmlNode> newChildren = transform(oldChildren, this::transform);
+            if (oldValue != newValue || oldAttrs != newAttrs || oldChildren != newChildren) {
+                return new XmlNodeImpl(node.getPrefix(), node.getNamespaceUri(), node.getName(),
+                        newValue, newAttrs, newChildren, node.getInputLocation());
             }
         }
+        return node;
     }
 }

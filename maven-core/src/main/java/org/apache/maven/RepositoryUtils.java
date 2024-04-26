@@ -18,6 +18,7 @@
  */
 package org.apache.maven;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +34,9 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.repository.internal.artifact.MavenArtifactProperties;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactProperties;
@@ -45,6 +49,8 @@ import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.repository.Authentication;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.Proxy;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
@@ -56,12 +62,11 @@ import org.eclipse.aether.util.repository.AuthenticationBuilder;
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
  * of the public API. In particular, this class can be changed or deleted without prior notice.
  *
- * @author Benjamin Bentmann
  */
 public class RepositoryUtils {
 
     private static String nullify(String string) {
-        return (string == null || string.length() <= 0) ? null : string;
+        return (string == null || string.isEmpty()) ? null : string;
     }
 
     private static org.apache.maven.artifact.Artifact toArtifact(Dependency dependency) {
@@ -140,7 +145,7 @@ public class RepositoryUtils {
         Map<String, String> props = null;
         if (org.apache.maven.artifact.Artifact.SCOPE_SYSTEM.equals(artifact.getScope())) {
             String localPath = (artifact.getFile() != null) ? artifact.getFile().getPath() : "";
-            props = Collections.singletonMap(ArtifactProperties.LOCAL_PATH, localPath);
+            props = Collections.singletonMap(MavenArtifactProperties.LOCAL_PATH, localPath);
         }
 
         Artifact result = new DefaultArtifact(
@@ -202,7 +207,7 @@ public class RepositoryUtils {
             String className = repo.getLayout().getClass().getSimpleName();
             if (className.endsWith("RepositoryLayout")) {
                 String layout = className.substring(0, className.length() - "RepositoryLayout".length());
-                if (layout.length() > 0) {
+                if (!layout.isEmpty()) {
                     layout = Character.toLowerCase(layout.charAt(0)) + layout.substring(1);
                     return layout;
                 }
@@ -248,9 +253,9 @@ public class RepositoryUtils {
                 null,
                 null,
                 null,
-                Boolean.parseBoolean(artifact.getProperty(ArtifactProperties.INCLUDES_DEPENDENCIES, "")),
+                Boolean.parseBoolean(artifact.getProperty(MavenArtifactProperties.INCLUDES_DEPENDENCIES, "")),
                 artifact.getProperty(ArtifactProperties.LANGUAGE, null),
-                Boolean.parseBoolean(artifact.getProperty(ArtifactProperties.CONSTITUTES_BUILD_PATH, "")));
+                Boolean.parseBoolean(artifact.getProperty(MavenArtifactProperties.CONSTITUTES_BUILD_PATH, "")));
     }
 
     public static ArtifactType newArtifactType(String id, ArtifactHandler handler) {
@@ -275,7 +280,7 @@ public class RepositoryUtils {
 
         Map<String, String> props = null;
         if (system) {
-            props = Collections.singletonMap(ArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
+            props = Collections.singletonMap(MavenArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
         }
 
         Artifact artifact = new DefaultArtifact(
@@ -349,6 +354,29 @@ public class RepositoryUtils {
             result = 31 * result + repositoryHashCode(repository);
         }
         return result;
+    }
+
+    public static RepositorySystemSession overlay(
+            ArtifactRepository repository, RepositorySystemSession session, RepositorySystem system) {
+        if (repository == null || repository.getBasedir() == null) {
+            return session;
+        }
+
+        DefaultRepositorySystemSession newSession;
+        if (session != null) {
+            LocalRepositoryManager lrm = session.getLocalRepositoryManager();
+            if (lrm != null && lrm.getRepository().getBasedir().equals(new File(repository.getBasedir()))) {
+                return session;
+            }
+            newSession = new DefaultRepositorySystemSession(session);
+        } else {
+            newSession = new DefaultRepositorySystemSession(h -> false); // no close handle used
+        }
+
+        final LocalRepositoryManager llrm =
+                system.newLocalRepositoryManager(newSession, new LocalRepository(repository.getBasedir()));
+        newSession.setLocalRepositoryManager(llrm);
+        return newSession;
     }
 
     private static int repositoryHashCode(RemoteRepository repository) {

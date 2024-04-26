@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-beta-1-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-settings</artifactId>
@@ -35,16 +35,30 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-settings</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-meta</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-xml-impl</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.woodstox</groupId>
+      <artifactId>stax2-api</artifactId>
     </dependency>
   </dependencies>
 
@@ -60,6 +74,12 @@ under the License.
           <models>
             <model>src/main/mdo/settings.mdo</model>
           </models>
+          <params>
+            <param>forcedIOModelVersion=1.2.0</param>
+            <param>packageModelV3=org.apache.maven.settings</param>
+            <param>packageModelV4=org.apache.maven.api.settings</param>
+            <param>packageToolV4=org.apache.maven.settings.v4</param>
+          </params>
         </configuration>
         <executions>
           <execution>
@@ -70,16 +90,28 @@ under the License.
             <phase>generate-sources</phase>
             <configuration>
               <templates>
-                <template>model-v3.vm</template>
                 <template>merger.vm</template>
-                <template>reader.vm</template>
-                <template>writer.vm</template>
+                <template>transformer.vm</template>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
               </templates>
-              <params>
-                <param>packageModelV3=org.apache.maven.settings</param>
-                <param>packageModelV4=org.apache.maven.api.settings</param>
-                <param>packageToolV4=org.apache.maven.settings.v4</param>
+              <params combine.children="append">
+                <param>locationTracking=true</param>
+                <param>generateLocationClasses=true</param>
               </params>
+            </configuration>
+          </execution>
+          <execution>
+            <id>v3</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <version>1.3.0</version>
+              <templates>
+                <template>model-v3.vm</template>
+              </templates>
             </configuration>
           </execution>
         </executions>

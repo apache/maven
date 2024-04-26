@@ -30,11 +30,7 @@ import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.lifecycle.internal.DefaultLifecyclePluginAnalyzer;
-import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
-import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
-import org.apache.maven.lifecycle.internal.ProjectBuildList;
-import org.apache.maven.lifecycle.internal.ProjectSegment;
+import org.apache.maven.lifecycle.internal.*;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
@@ -52,7 +48,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
- * @author Kristian Rosenvold
  */
 public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionPlanCalculator {
     // clean
@@ -131,7 +126,7 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
     }
 
     public MavenExecutionPlan calculateExecutionPlan(
-            MavenSession session, MavenProject project, List<Object> tasks, boolean setup)
+            MavenSession session, MavenProject project, List<Task> tasks, boolean setup)
             throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
                     PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
                     NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException {
@@ -148,7 +143,7 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
         return createExecutionPlan(project, me);
     }
 
-    public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<Object> tasks)
+    public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<Task> tasks)
             throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
                     PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
                     NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException {

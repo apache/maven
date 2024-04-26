@@ -24,7 +24,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 
 /**
  *
- * @author mkleint
  */
 public final class RequirementMatcherFactory {
     private RequirementMatcherFactory() {}
@@ -73,8 +72,6 @@ public final class RequirementMatcherFactory {
                     return range.getRecommendedVersion().compareTo(version) == 0;
                 }
             } catch (InvalidVersionSpecificationException ex) {
-                // TODO error reporting
-                ex.printStackTrace();
                 return false;
             }
         }

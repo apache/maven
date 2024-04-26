@@ -18,41 +18,34 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.DependencyCoordinate;
-import org.apache.maven.api.Exclusion;
-import org.apache.maven.api.Project;
-import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Scope;
-import org.apache.maven.api.Type;
-import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.ArtifactManager;
-import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.artifact.ProjectArtifact;
+import org.eclipse.aether.util.artifact.ArtifactIdUtils;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultProject implements Project {
 
-    private final AbstractSession session;
+    private final InternalMavenSession session;
     private final MavenProject project;
+    private final Packaging packaging;
 
-    public DefaultProject(AbstractSession session, MavenProject project) {
+    public DefaultProject(InternalMavenSession session, MavenProject project) {
         this.session = session;
         this.project = project;
+        this.packaging = session.requirePackaging(project.getPackaging());
     }
 
-    public AbstractSession getSession() {
+    public InternalMavenSession getSession() {
         return session;
     }
 
@@ -80,19 +73,22 @@ public class DefaultProject implements Project {
 
     @Nonnull
     @Override
-    public Artifact getArtifact() {
-        org.eclipse.aether.artifact.Artifact resolverArtifact = RepositoryUtils.toArtifact(project.getArtifact());
-        Artifact artifact = session.getArtifact(resolverArtifact);
-        Path path =
-                resolverArtifact.getFile() != null ? resolverArtifact.getFile().toPath() : null;
-        session.getService(ArtifactManager.class).setPath(artifact, path);
-        return artifact;
+    public List<Artifact> getArtifacts() {
+        org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(new ProjectArtifact(project));
+        org.eclipse.aether.artifact.Artifact projectArtifact = RepositoryUtils.toArtifact(project.getArtifact());
+
+        ArrayList<Artifact> result = new ArrayList<>(2);
+        result.add(session.getArtifact(pomArtifact));
+        if (!ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
+            result.add(session.getArtifact(projectArtifact));
+        }
+        return Collections.unmodifiableList(result);
     }
 
     @Nonnull
     @Override
-    public String getPackaging() {
-        return project.getPackaging();
+    public Packaging getPackaging() {
+        return packaging;
     }
 
     @Nonnull
@@ -103,9 +99,13 @@ public class DefaultProject implements Project {
 
     @Nonnull
     @Override
-    public Optional<Path> getPomPath() {
-        File file = project.getFile();
-        return Optional.ofNullable(file).map(File::toPath);
+    public Path getPomPath() {
+        return nonNull(project.getFile(), "pomPath").toPath();
+    }
+
+    @Override
+    public Path getBasedir() {
+        return nonNull(project.getBasedir(), "basedir").toPath();
     }
 
     @Nonnull
@@ -125,24 +125,24 @@ public class DefaultProject implements Project {
     }
 
     @Override
-    public boolean isExecutionRoot() {
-        return project.isExecutionRoot();
+    public boolean isTopProject() {
+        return getBasedir().equals(getSession().getTopDirectory());
+    }
+
+    @Override
+    public boolean isRootProject() {
+        return getBasedir().equals(getRootDirectory());
+    }
+
+    @Override
+    public Path getRootDirectory() {
+        return project.getRootDirectory();
     }
 
     @Override
     public Optional<Project> getParent() {
         MavenProject parent = project.getParent();
         return parent != null ? Optional.of(session.getProject(parent)) : Optional.empty();
-    }
-
-    @Override
-    public List<RemoteRepository> getRemoteProjectRepositories() {
-        return new MappedList<>(project.getRemoteProjectRepositories(), session::getRemoteRepository);
-    }
-
-    @Override
-    public List<RemoteRepository> getRemotePluginRepositories() {
-        return new MappedList<>(project.getRemotePluginRepositories(), session::getRemoteRepository);
     }
 
     @Nonnull
@@ -164,8 +164,8 @@ public class DefaultProject implements Project {
             }
 
             @Override
-            public VersionRange getVersion() {
-                return session.parseVersionRange(dependency.getVersion());
+            public VersionConstraint getVersion() {
+                return session.parseVersionConstraint(dependency.getVersion());
             }
 
             @Override
@@ -176,13 +176,14 @@ public class DefaultProject implements Project {
             @Override
             public Type getType() {
                 String type = dependency.getType();
-                return session.getService(TypeRegistry.class).getType(type);
+                return session.requireType(type);
             }
 
             @Nonnull
             @Override
-            public Scope getScope() {
-                return Scope.get(dependency.getScope());
+            public DependencyScope getScope() {
+                String scope = dependency.getScope() != null ? dependency.getScope() : "";
+                return session.requireDependencyScope(scope);
             }
 
             @Override

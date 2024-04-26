@@ -19,6 +19,8 @@
 package org.apache.maven.model.interpolation;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -41,15 +43,16 @@ import org.apache.maven.api.model.Scm;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
+import org.apache.maven.model.root.RootLocator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author jdcasey
  */
 public abstract class AbstractModelInterpolatorTest {
     private Properties context;
@@ -161,7 +164,7 @@ public abstract class AbstractModelInterpolatorTest {
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
+        interpolator.interpolateModel(model, (Path) null, createModelBuildingRequest(context), collector);
         assertCollectorState(0, 1, 0, collector);
     }
 
@@ -280,7 +283,7 @@ public abstract class AbstractModelInterpolatorTest {
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out = interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
+        Model out = interpolator.interpolateModel(model, (Path) null, createModelBuildingRequest(context), collector);
         assertProblemFree(collector);
 
         assertEquals(
@@ -300,15 +303,81 @@ public abstract class AbstractModelInterpolatorTest {
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out = interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
+        Model out = interpolator.interpolateModel(model, (Path) null, createModelBuildingRequest(context), collector);
         assertProblemFree(collector);
 
         assertEquals("myBaseUri/temp-repo", (out.getRepositories().get(0)).getUrl());
     }
 
     @Test
+    void testRootDirectory() throws Exception {
+        Path rootDirectory = Paths.get("myRootDirectory");
+
+        Model model = Model.newBuilder()
+                .version("3.8.1")
+                .artifactId("foo")
+                .repositories(Collections.singletonList(Repository.newBuilder()
+                        .url("file:${project.rootDirectory}/temp-repo")
+                        .build()))
+                .build();
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model, rootDirectory.toFile(), createModelBuildingRequest(context), collector);
+        assertProblemFree(collector);
+
+        assertEquals("file:myRootDirectory/temp-repo", (out.getRepositories().get(0)).getUrl());
+    }
+
+    @Test
+    void testRootDirectoryWithUri() throws Exception {
+        Path rootDirectory = Paths.get("myRootDirectory");
+
+        Model model = Model.newBuilder()
+                .version("3.8.1")
+                .artifactId("foo")
+                .repositories(Collections.singletonList(Repository.newBuilder()
+                        .url("${project.rootDirectory.uri}/temp-repo")
+                        .build()))
+                .build();
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model, rootDirectory.toFile(), createModelBuildingRequest(context), collector);
+        assertProblemFree(collector);
+
+        assertEquals(
+                rootDirectory.resolve("temp-repo").toUri().toString(),
+                (out.getRepositories().get(0)).getUrl());
+    }
+
+    @Test
+    void testRootDirectoryWithNull() throws Exception {
+        Model model = Model.newBuilder()
+                .version("3.8.1")
+                .artifactId("foo")
+                .repositories(Collections.singletonList(Repository.newBuilder()
+                        .url("file:///${project.rootDirectory}/temp-repo")
+                        .build()))
+                .build();
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        IllegalStateException e = assertThrows(
+                IllegalStateException.class,
+                () -> interpolator.interpolateModel(
+                        model, (Path) null, createModelBuildingRequest(context), collector));
+
+        assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
+    }
+
+    @Test
     public void testEnvars() throws Exception {
-        Properties context = new Properties();
         context.put("env.HOME", "/path/to/home");
 
         Map<String, String> modelProperties = new HashMap<>();
@@ -372,7 +441,7 @@ public abstract class AbstractModelInterpolatorTest {
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out = interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
+        Model out = interpolator.interpolateModel(model, (Path) null, createModelBuildingRequest(context), collector);
         assertCollectorState(0, 0, 0, collector);
 
         List<Resource> outResources = out.getBuild().getResources();
@@ -415,7 +484,7 @@ public abstract class AbstractModelInterpolatorTest {
 
         SimpleProblemCollector collector = new SimpleProblemCollector();
         ModelInterpolator interpolator = createInterpolator();
-        interpolator.interpolateModel(model, null, request, collector);
+        interpolator.interpolateModel(model, (Path) null, request, collector);
 
         assertCollectorState(0, 2, 0, collector);
         assertTrue(collector.getErrors().get(0).contains("Detected the following recursive expression cycle"));
@@ -431,7 +500,7 @@ public abstract class AbstractModelInterpolatorTest {
 
         SimpleProblemCollector collector = new SimpleProblemCollector();
         ModelInterpolator interpolator = createInterpolator();
-        interpolator.interpolateModel(model, null, request, collector);
+        interpolator.interpolateModel(model, (Path) null, request, collector);
 
         assertCollectorState(0, 1, 0, collector);
         assertEquals(
@@ -442,19 +511,47 @@ public abstract class AbstractModelInterpolatorTest {
     @Test
     public void shouldIgnorePropertiesWithPomPrefix() throws Exception {
         final String orgName = "MyCo";
-        final String expectedName = "${pom.organization.name} Tools";
+        final String uninterpolatedName = "${pom.organization.name} Tools";
+        final String interpolatedName = uninterpolatedName;
 
         Model model = Model.newBuilder()
-                .name(expectedName)
+                .name(uninterpolatedName)
                 .organization(Organization.newBuilder().name(orgName).build())
                 .build();
 
         ModelInterpolator interpolator = createInterpolator();
         SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out = interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
+        Model out = interpolator.interpolateModel(
+                model,
+                (Path) null,
+                createModelBuildingRequest(context).setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_4_0),
+                collector);
 
         assertCollectorState(0, 0, 0, collector);
-        assertEquals(out.getName(), expectedName);
+        assertEquals(interpolatedName, out.getName());
+    }
+
+    @Test
+    public void shouldWarnPropertiesWithPomPrefix() throws Exception {
+        final String orgName = "MyCo";
+        final String uninterpolatedName = "${pom.organization.name} Tools";
+        final String interpolatedName = "MyCo Tools";
+
+        Model model = Model.newBuilder()
+                .name(uninterpolatedName)
+                .organization(Organization.newBuilder().name(orgName).build())
+                .build();
+
+        ModelInterpolator interpolator = createInterpolator();
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model,
+                (Path) null,
+                createModelBuildingRequest(context).setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1),
+                collector);
+
+        assertCollectorState(0, 0, 1, collector);
+        assertEquals(interpolatedName, out.getName());
     }
 
     protected abstract ModelInterpolator createInterpolator() throws Exception;

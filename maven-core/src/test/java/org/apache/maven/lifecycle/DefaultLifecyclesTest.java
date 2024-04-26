@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
+import org.apache.maven.internal.impl.DefaultLookup;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.testing.PlexusTest;
@@ -40,50 +42,49 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * @author Kristian Rosenvold
  */
 @PlexusTest
-public class DefaultLifecyclesTest {
+class DefaultLifecyclesTest {
     @Inject
     private DefaultLifecycles defaultLifeCycles;
 
     @Test
-    public void testDefaultLifecycles() {
+    void testDefaultLifecycles() {
         final List<Lifecycle> lifecycles = defaultLifeCycles.getLifeCycles();
         assertThat(lifecycles, hasSize(4));
         assertThat(DefaultLifecycles.STANDARD_LIFECYCLES, arrayWithSize(4));
     }
 
     @Test
-    public void testDefaultLifecycle() {
+    void testDefaultLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("default");
         assertThat(lifecycle.getId(), is("default"));
         assertThat(lifecycle.getPhases(), hasSize(23));
     }
 
     @Test
-    public void testCleanLifecycle() {
+    void testCleanLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("clean");
         assertThat(lifecycle.getId(), is("clean"));
         assertThat(lifecycle.getPhases(), hasSize(3));
     }
 
     @Test
-    public void testSiteLifecycle() {
+    void testSiteLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("site");
         assertThat(lifecycle.getId(), is("site"));
         assertThat(lifecycle.getPhases(), hasSize(4));
     }
 
     @Test
-    public void testWrapperLifecycle() {
+    void testWrapperLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("wrapper");
         assertThat(lifecycle.getId(), is("wrapper"));
         assertThat(lifecycle.getPhases(), hasSize(1));
     }
 
     @Test
-    public void testCustomLifecycle() throws ComponentLookupException {
+    void testCustomLifecycle() throws ComponentLookupException {
         List<Lifecycle> myLifecycles = new ArrayList<>();
         Lifecycle myLifecycle =
                 new Lifecycle("etl", Arrays.asList("extract", "transform", "load"), Collections.emptyMap());
@@ -94,7 +95,9 @@ public class DefaultLifecyclesTest {
         PlexusContainer mockedPlexusContainer = mock(PlexusContainer.class);
         when(mockedPlexusContainer.lookupMap(Lifecycle.class)).thenReturn(lifeCycles);
 
-        DefaultLifecycles dl = new DefaultLifecycles(mockedPlexusContainer);
+        DefaultLifecycles dl = new DefaultLifecycles(
+                new DefaultLifecycleRegistry(Collections.emptyList(), Collections.emptyMap()),
+                new DefaultLookup(mockedPlexusContainer));
 
         assertThat(dl.getLifeCycles().get(0).getId(), is("clean"));
         assertThat(dl.getLifeCycles().get(1).getId(), is("default"));

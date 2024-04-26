@@ -26,9 +26,9 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
@@ -40,9 +40,6 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,10 +50,6 @@ import static java.util.Objects.requireNonNull;
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
- * @author Jason van Zyl
- * @author jdcasey
- * @author Kristian Rosenvold (extracted class only)
  */
 @Singleton
 @Named
@@ -67,14 +60,13 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final PlexusContainer plexusContainer;
+    private final Lookup lookup;
 
     private final DefaultLifecycles defaultLifeCycles;
 
     @Inject
-    public DefaultLifecyclePluginAnalyzer(
-            final PlexusContainer plexusContainer, final DefaultLifecycles defaultLifeCycles) {
-        this.plexusContainer = requireNonNull(plexusContainer);
+    public DefaultLifecyclePluginAnalyzer(Lookup lookup, DefaultLifecycles defaultLifeCycles) {
+        this.lookup = requireNonNull(lookup);
         this.defaultLifeCycles = requireNonNull(defaultLifeCycles);
     }
 
@@ -134,14 +126,7 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
      * from current module and for example not extensions coming from other modules.
      */
     private LifecycleMapping lookupLifecycleMapping(final String packaging) {
-        try {
-            return plexusContainer.lookup(LifecycleMapping.class, packaging);
-        } catch (ComponentLookupException e) {
-            if (e.getCause() instanceof NoSuchElementException) {
-                return null;
-            }
-            throw new RuntimeException(e);
-        }
+        return lookup.lookupOptional(LifecycleMapping.class, packaging).orElse(null);
     }
 
     private void parseLifecyclePhaseDefinitions(Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals) {
@@ -159,8 +144,10 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
                 GoalSpec gs = parseGoalSpec(mojo.getGoal());
 
                 if (gs == null) {
-                    logger.warn("Ignored invalid goal specification '" + mojo.getGoal()
-                            + "' from lifecycle mapping for phase " + phase);
+                    logger.warn(
+                            "Ignored invalid goal specification '{}' from lifecycle mapping for phase {}",
+                            mojo.getGoal(),
+                            phase);
                     continue;
                 }
 
@@ -212,7 +199,7 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
     private GoalSpec parseGoalSpec(String goalSpec) {
         GoalSpec gs = new GoalSpec();
 
-        String[] p = StringUtils.split(goalSpec.trim(), ":");
+        String[] p = goalSpec.trim().split(":");
 
         if (p.length == 3) {
             // <groupId>:<artifactId>:<goal>

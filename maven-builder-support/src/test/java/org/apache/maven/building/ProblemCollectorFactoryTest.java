@@ -25,10 +25,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
-public class ProblemCollectorFactoryTest {
+class ProblemCollectorFactoryTest {
 
     @Test
-    public void testNewInstance() {
+    void testNewInstance() {
         ProblemCollector collector1 = ProblemCollectorFactory.newInstance(null);
 
         Problem problem = new DefaultProblem("MESSAGE1", null, null, -1, -1, null);

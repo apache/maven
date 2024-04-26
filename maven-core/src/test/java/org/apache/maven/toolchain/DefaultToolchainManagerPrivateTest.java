@@ -41,7 +41,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class DefaultToolchainManagerPrivateTest {
+class DefaultToolchainManagerPrivateTest {
     // Mocks to inject into toolchainManager
     @Mock
     private Logger logger;
@@ -56,7 +56,7 @@ public class DefaultToolchainManagerPrivateTest {
     private ToolchainFactory toolchainFactory_rareType;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
 
         MockitoAnnotations.initMocks(this);
 
@@ -67,7 +67,7 @@ public class DefaultToolchainManagerPrivateTest {
     }
 
     @Test
-    public void testToolchainsForAvailableType() throws Exception {
+    void testToolchainsForAvailableType() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
@@ -87,7 +87,7 @@ public class DefaultToolchainManagerPrivateTest {
     }
 
     @Test
-    public void testToolchainsForUnknownType() throws Exception {
+    void testToolchainsForUnknownType() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
@@ -107,7 +107,7 @@ public class DefaultToolchainManagerPrivateTest {
     }
 
     @Test
-    public void testToolchainsForConfiguredType() throws Exception {
+    void testToolchainsForConfiguredType() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
@@ -137,7 +137,7 @@ public class DefaultToolchainManagerPrivateTest {
     }
 
     @Test
-    public void testMisconfiguredToolchain() throws Exception {
+    void testMisconfiguredToolchain() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();

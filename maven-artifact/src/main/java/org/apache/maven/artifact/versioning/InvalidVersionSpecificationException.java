@@ -21,7 +21,6 @@ package org.apache.maven.artifact.versioning;
 /**
  * Occurs when a version is invalid.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class InvalidVersionSpecificationException extends Exception {
     public InvalidVersionSpecificationException(String message) {

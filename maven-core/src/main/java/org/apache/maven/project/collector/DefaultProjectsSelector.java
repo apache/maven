@@ -34,7 +34,6 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +75,7 @@ public class DefaultProjectsSelector implements ProjectsSelector {
 
                 for (ModelProblem problem : result.getProblems()) {
                     String loc = ModelProblemUtils.formatLocation(problem, result.getProjectId());
-                    LOGGER.warn("{}{}", problem.getMessage(), (StringUtils.isNotEmpty(loc) ? " @ " + loc : ""));
+                    LOGGER.warn("{}{}", problem.getMessage(), ((loc != null && !loc.isEmpty()) ? " @ " + loc : ""));
                 }
 
                 problems = true;

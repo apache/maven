@@ -18,14 +18,13 @@
  */
 package org.apache.maven.lifecycle;
 
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilderFactory;
+import org.apache.maven.internal.impl.DefaultMessageBuilderFactory;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.utils.logging.MessageBuilder;
-
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
 public class LifecycleExecutionException extends Exception {
     private MavenProject project;
@@ -58,15 +57,27 @@ public class LifecycleExecutionException extends Exception {
     }
 
     public LifecycleExecutionException(MojoExecution execution, MavenProject project, Throwable cause) {
-        this(createMessage(execution, project, cause), execution, project, cause);
+        this(new DefaultMessageBuilderFactory(), execution, project, cause);
+    }
+
+    public LifecycleExecutionException(
+            MessageBuilderFactory messageBuilderFactory,
+            MojoExecution execution,
+            MavenProject project,
+            Throwable cause) {
+        this(createMessage(messageBuilderFactory, execution, project, cause), execution, project, cause);
     }
 
     public MavenProject getProject() {
         return project;
     }
 
-    private static String createMessage(MojoExecution execution, MavenProject project, Throwable cause) {
-        MessageBuilder buffer = buffer(256);
+    private static String createMessage(
+            MessageBuilderFactory messageBuilderFactory,
+            MojoExecution execution,
+            MavenProject project,
+            Throwable cause) {
+        MessageBuilder buffer = messageBuilderFactory.builder(256);
 
         buffer.a("Failed to execute goal");
 

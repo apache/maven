@@ -21,6 +21,7 @@ package org.apache.maven.repository.legacy;
 import org.apache.maven.repository.ArtifactTransferResource;
 import org.apache.maven.wagon.resource.Resource;
 
+@Deprecated
 class MavenArtifact implements ArtifactTransferResource {
 
     private String repositoryUrl;
@@ -32,7 +33,7 @@ class MavenArtifact implements ArtifactTransferResource {
     MavenArtifact(String repositoryUrl, Resource resource) {
         if (repositoryUrl == null) {
             this.repositoryUrl = "";
-        } else if (!repositoryUrl.endsWith("/") && repositoryUrl.length() > 0) {
+        } else if (!repositoryUrl.endsWith("/") && !repositoryUrl.isEmpty()) {
             this.repositoryUrl = repositoryUrl + '/';
         } else {
             this.repositoryUrl = repositoryUrl;

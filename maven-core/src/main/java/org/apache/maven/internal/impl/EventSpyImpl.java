@@ -47,7 +47,8 @@ public class EventSpyImpl implements EventSpy {
     public void onEvent(Object arg) throws Exception {
         if (arg instanceof ExecutionEvent) {
             ExecutionEvent ee = (ExecutionEvent) arg;
-            AbstractSession session = (AbstractSession) sessionFactory.getSession(ee.getSession());
+            InternalMavenSession session =
+                    InternalMavenSession.from(ee.getSession().getSession());
             Collection<Listener> listeners = session.getListeners();
             if (!listeners.isEmpty()) {
                 Event event = new DefaultEvent(session, ee);

@@ -32,7 +32,6 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
  * execution failed; a message detailing the problem; the ClassRealm used to
  * look up the plugin; and the Plexus exception that caused this error.
  *
- * @author jdcasey
  *
  */
 public class PluginContainerException extends PluginManagerException {
@@ -59,18 +58,26 @@ public class PluginContainerException extends PluginManagerException {
         this.pluginRealm = pluginRealm;
     }
 
+    /**
+     * Ctor left for binary compatibility.
+     *
+     * @deprecated Use {@link #PluginContainerException(Plugin, ClassRealm, String, Throwable)}
+     */
+    @Deprecated
     public PluginContainerException(
             Plugin plugin, ClassRealm pluginRealm, String message, PlexusConfigurationException e) {
-        super(plugin, message, e);
-
-        this.pluginRealm = pluginRealm;
+        this(plugin, pluginRealm, message, (Throwable) e);
     }
 
+    /**
+     * Ctor left for binary compatibility.
+     *
+     * @deprecated Use {@link #PluginContainerException(Plugin, ClassRealm, String, Throwable)}
+     */
+    @Deprecated
     public PluginContainerException(
             Plugin plugin, ClassRealm pluginRealm, String message, ComponentRepositoryException e) {
-        super(plugin, message, e);
-
-        this.pluginRealm = pluginRealm;
+        this(plugin, pluginRealm, message, (Throwable) e);
     }
 
     public ClassRealm getPluginRealm() {

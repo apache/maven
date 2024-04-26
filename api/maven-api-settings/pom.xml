@@ -23,19 +23,28 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-beta-1-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-settings</artifactId>
 
   <name>Maven 4 API :: Settings</name>
-  <description>Maven 4 API - Immutable Settings model</description>
+  <description>Maven 4 API - Immutable Settings model.</description>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-meta</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-xml</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -61,19 +70,26 @@ under the License.
               </templates>
               <params>
                 <param>packageModelV4=org.apache.maven.api.settings</param>
+                <param>locationTracking=true</param>
+                <param>generateLocationClasses=true</param>
               </params>
             </configuration>
           </execution>
+          <execution>
+            <id>modello-site-docs</id>
+            <goals>
+              <goal>xdoc</goal>
+              <goal>xsd</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <version>1.3.0</version>
+              <models>
+                <model>src/main/mdo/settings.mdo</model>
+              </models>
+            </configuration>
+          </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/package-info.java</exclude>
-          </excludes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

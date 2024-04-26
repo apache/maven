@@ -28,10 +28,38 @@ under the License.
     <href>https://maven.apache.org/</href>
   </bannerLeft>
 
+  <bannerRight>
+    <src>https://maven.apache.org/images/maven-logo-black-on-white.png</src>
+    <href>https://maven.apache.org/</href>
+  </bannerRight>
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.11.2</version>
+  </skin>
+
   <edit>${project.scm.url}</edit>
+
+  <custom>
+    <matomo>
+      <siteId>3</siteId>
+      <url>https://analytics.apache.org/</url>
+      <options>
+        <disableCookies/>
+        <trackPageView/>
+        <enableLinkTracking/>
+      </options>
+    </matomo>
+  </custom>
+
+  <publishDate position="right" />
+  <version position="right" />
 
   <body>
     <breadcrumbs>
+      <item name="Apache" href="https://www.apache.org/" />
+      <item name="Maven"  href="https://maven.apache.org/index.html" />
       <item name="Ref" href="../" />
       <item name="Maven ${project.version}" href="../" />
       <item name="${project.name}" href="./" />

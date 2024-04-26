@@ -23,22 +23,23 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.lifecycle.internal.SetWithResolutionResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-public class DefaultProjectArtifactsCacheTest {
+class DefaultProjectArtifactsCacheTest {
 
     private ProjectArtifactsCache cache;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         cache = new DefaultProjectArtifactsCache();
     }
 
     @Test
-    public void testProjectDependencyOrder() throws Exception {
+    void testProjectDependencyOrder() throws Exception {
         ProjectArtifactsCache.Key project1 = new ProjectArtifactsCache.Key() {};
 
         Set<Artifact> artifacts = new LinkedHashSet<>(4);
@@ -47,7 +48,7 @@ public class DefaultProjectArtifactsCacheTest {
         artifacts.add(new DefaultArtifact("g", "a3", "v", "compile", "jar", "", null));
         artifacts.add(new DefaultArtifact("g", "a4", "v", "compile", "jar", "", null));
 
-        cache.put(project1, artifacts);
+        cache.put(project1, new SetWithResolutionResult(null, artifacts));
 
         assertArrayEquals(
                 artifacts.toArray(new Artifact[0]),
@@ -61,7 +62,7 @@ public class DefaultProjectArtifactsCacheTest {
         artifacts.add(new DefaultArtifact("g", "a2", "v", "compile", "jar", "", null));
         artifacts.add(new DefaultArtifact("g", "a1", "v", "compile", "jar", "", null));
 
-        cache.put(project2, reversedArtifacts);
+        cache.put(project2, new SetWithResolutionResult(null, reversedArtifacts));
 
         assertArrayEquals(
                 reversedArtifacts.toArray(new Artifact[0]),

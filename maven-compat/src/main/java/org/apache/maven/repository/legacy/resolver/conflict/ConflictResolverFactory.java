@@ -21,10 +21,10 @@ package org.apache.maven.repository.legacy.resolver.conflict;
 /**
  * A factory that produces conflict resolvers of various types.
  *
- * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @see ConflictResolver
  * @since 3.0
  */
+@Deprecated
 public interface ConflictResolverFactory {
     // constants --------------------------------------------------------------
 

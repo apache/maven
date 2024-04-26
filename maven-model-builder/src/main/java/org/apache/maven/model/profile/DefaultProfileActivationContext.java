@@ -30,7 +30,6 @@ import static java.util.stream.Collectors.toMap;
 /**
  * Describes the environmental context used to determine the activation status of profiles.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultProfileActivationContext implements ProfileActivationContext {
 

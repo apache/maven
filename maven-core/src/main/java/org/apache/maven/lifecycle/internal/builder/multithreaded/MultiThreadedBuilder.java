@@ -58,7 +58,6 @@ import org.slf4j.LoggerFactory;
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Kristian Rosenvold
  *         Builds one or more lifecycles for a full module
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
@@ -139,7 +138,7 @@ public class MultiThreadedBuilder implements Builder {
         // schedule independent projects
         for (MavenProject mavenProject : analyzer.getRootSchedulableBuilds()) {
             ProjectSegment projectSegment = projectBuildList.get(mavenProject);
-            logger.debug("Scheduling: " + projectSegment.getProject());
+            logger.debug("Scheduling: {}", projectSegment.getProject());
             Callable<ProjectSegment> cb = createBuildCallable(
                     rootSession, projectSegment, reactorContext, taskSegment, muxer, duplicateArtifactIds);
             service.submit(cb);
@@ -159,7 +158,7 @@ public class MultiThreadedBuilder implements Builder {
                             analyzer.markAsFinished(projectBuild.getProject());
                     for (MavenProject mavenProject : newItemsThatCanBeBuilt) {
                         ProjectSegment scheduledDependent = projectBuildList.get(mavenProject);
-                        logger.debug("Scheduling: " + scheduledDependent);
+                        logger.debug("Scheduling: {}", scheduledDependent);
                         Callable<ProjectSegment> cb = createBuildCallable(
                                 rootSession,
                                 scheduledDependent,

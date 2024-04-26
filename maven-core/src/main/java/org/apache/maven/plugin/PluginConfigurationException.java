@@ -24,7 +24,6 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluatio
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
- * @author Jason van Zyl
  */
 public class PluginConfigurationException extends Exception {
     private PluginDescriptor pluginDescriptor;
@@ -43,24 +42,36 @@ public class PluginConfigurationException extends Exception {
         this.originalMessage = originalMessage;
     }
 
+    /**
+     * Ctor left for binary compatibility.
+     *
+     * @deprecated Use {@link #PluginConfigurationException(PluginDescriptor, String, Throwable)}
+     */
+    @Deprecated
     public PluginConfigurationException(
             PluginDescriptor pluginDescriptor, String originalMessage, ExpressionEvaluationException cause) {
-        super(originalMessage, cause);
-        this.pluginDescriptor = pluginDescriptor;
-        this.originalMessage = originalMessage;
+        this(pluginDescriptor, originalMessage, (Throwable) cause);
     }
 
+    /**
+     * Ctor left for binary compatibility.
+     *
+     * @deprecated Use {@link #PluginConfigurationException(PluginDescriptor, String, Throwable)}
+     */
+    @Deprecated
     public PluginConfigurationException(
             PluginDescriptor pluginDescriptor, String originalMessage, ComponentConfigurationException cause) {
-        super(originalMessage, cause);
-        this.pluginDescriptor = pluginDescriptor;
-        this.originalMessage = originalMessage;
+        this(pluginDescriptor, originalMessage, (Throwable) cause);
     }
 
+    /**
+     * Ctor left for binary compatibility.
+     *
+     * @deprecated Use {@link #PluginConfigurationException(PluginDescriptor, String, Throwable)}
+     */
+    @Deprecated
     public PluginConfigurationException(
             PluginDescriptor pluginDescriptor, String originalMessage, ComponentLookupException cause) {
-        super(originalMessage, cause);
-        this.pluginDescriptor = pluginDescriptor;
-        this.originalMessage = originalMessage;
+        this(pluginDescriptor, originalMessage, (Throwable) cause);
     }
 }

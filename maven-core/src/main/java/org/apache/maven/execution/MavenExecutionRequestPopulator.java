@@ -24,7 +24,6 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 /**
  * Assists in populating an execution request for invocation of Maven.
  *
- * @author Benjamin Bentmann
  */
 public interface MavenExecutionRequestPopulator {
     /**

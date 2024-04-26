@@ -22,7 +22,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-beta-1-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-toolchain</artifactId>
@@ -33,8 +33,11 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-meta</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-xml</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -60,19 +63,12 @@ under the License.
               </templates>
               <params>
                 <param>packageModelV4=org.apache.maven.api.toolchain</param>
+                <param>locationTracking=true</param>
+                <param>generateLocationClasses=true</param>
               </params>
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/package-info.java</exclude>
-          </excludes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

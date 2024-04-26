@@ -25,7 +25,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles inheritance of model values.
  *
- * @author Benjamin Bentmann
  */
 public interface InheritanceAssembler {
 

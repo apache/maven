@@ -18,6 +18,7 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -26,7 +27,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.impl.DefaultMessageBuilderFactory;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.model.Plugin;
@@ -35,13 +39,12 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.utils.logging.MessageBuilder;
-import org.apache.maven.shared.utils.logging.MessageUtils;
-import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.Arrays.stream;
+import static java.util.Objects.requireNonNull;
 
 /**
  * @since 3.3.1, MNG-5753
@@ -50,6 +53,24 @@ import static java.util.Arrays.stream;
 @Singleton
 public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurator {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final MessageBuilderFactory messageBuilderFactory;
+
+    /**
+     * Default ctor is used in IT and most probably some 3rd party code. For those cases, we do provide sane defaults
+     * but given this is a component, injection should be used, replacing direct instantiation.
+     *
+     * @deprecated Do not use this ctor directly, inject this component instead.
+     */
+    @Deprecated
+    public DefaultMojoExecutionConfigurator() {
+        this.messageBuilderFactory = new DefaultMessageBuilderFactory();
+    }
+
+    @Inject
+    public DefaultMojoExecutionConfigurator(MessageBuilderFactory messageBuilderFactory) {
+        this.messageBuilderFactory = requireNonNull(messageBuilderFactory);
+    }
 
     @Override
     public void configure(MavenProject project, MojoExecution mojoExecution, boolean allowPluginLevelConfig) {
@@ -98,7 +119,7 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
     }
 
     private PluginExecution findPluginExecution(String executionId, Collection<PluginExecution> executions) {
-        if (StringUtils.isNotEmpty(executionId)) {
+        if (executionId != null && !executionId.isEmpty()) {
             for (PluginExecution execution : executions) {
                 if (executionId.equals(execution.getId())) {
                     return execution;
@@ -137,7 +158,8 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
         unknownParameters = getUnknownParameters(mojoExecution, parametersNamesAll);
 
         unknownParameters.forEach(name -> {
-            MessageBuilder messageBuilder = MessageUtils.buffer()
+            MessageBuilder messageBuilder = messageBuilderFactory
+                    .builder()
                     .warning("Parameter '")
                     .warning(name)
                     .warning("' is unknown for plugin '")
@@ -169,7 +191,7 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
 
     private Set<String> getUnknownParameters(MojoExecution mojoExecution, Set<String> parameters) {
         return stream(mojoExecution.getConfiguration().getChildren())
-                .map(x -> x.getName())
+                .map(Xpp3Dom::getName)
                 .filter(name -> !parameters.contains(name))
                 .collect(Collectors.toSet());
     }

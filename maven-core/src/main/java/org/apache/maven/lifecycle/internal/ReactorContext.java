@@ -24,14 +24,10 @@ import org.apache.maven.execution.MavenExecutionResult;
  * Context that is fixed for the entire reactor build.
  *
  * @since 3.0
- * @author Jason van Zyl
- * @author Kristian Rosenvold
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 public class ReactorContext {
     private final MavenExecutionResult result;
-
-    private final ProjectIndex projectIndex;
 
     private final ClassLoader originalContextClassLoader;
 
@@ -39,11 +35,9 @@ public class ReactorContext {
 
     public ReactorContext(
             MavenExecutionResult result,
-            ProjectIndex projectIndex,
             ClassLoader originalContextClassLoader,
             ReactorBuildStatus reactorBuildStatus) {
         this.result = result;
-        this.projectIndex = projectIndex;
         this.originalContextClassLoader = originalContextClassLoader;
         this.reactorBuildStatus = reactorBuildStatus;
     }
@@ -54,10 +48,6 @@ public class ReactorContext {
 
     public MavenExecutionResult getResult() {
         return result;
-    }
-
-    public ProjectIndex getProjectIndex() {
-        return projectIndex;
     }
 
     public ClassLoader getOriginalContextClassLoader() {

@@ -25,7 +25,6 @@ import org.apache.maven.model.Model;
  * or a simple string message. In addition, a problem carries a hint about its source, e.g. the POM file that exhibits
  * the problem.
  *
- * @author Benjamin Bentmann
  */
 public class DefaultModelProblem implements ModelProblem {
 
@@ -137,16 +136,16 @@ public class DefaultModelProblem implements ModelProblem {
 
     @Override
     public String getMessage() {
-        String msg;
+        String msg = null;
 
-        if (message != null && message.length() > 0) {
+        if (message != null && !message.isEmpty()) {
             msg = message;
-        } else {
+        } else if (exception != null) {
             msg = exception.getMessage();
+        }
 
-            if (msg == null) {
-                msg = "";
-            }
+        if (msg == null) {
+            msg = "";
         }
 
         return msg;

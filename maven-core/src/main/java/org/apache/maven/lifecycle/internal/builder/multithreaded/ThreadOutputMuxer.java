@@ -37,7 +37,6 @@ import org.apache.maven.lifecycle.internal.ProjectSegment;
  * logger implementation at any time.
  *
  * @since 3.0
- * @author Kristian Rosenvold
  */
 @SuppressWarnings({"SynchronizationOnLocalVariableOrMethodParameter"})
 public class ThreadOutputMuxer {

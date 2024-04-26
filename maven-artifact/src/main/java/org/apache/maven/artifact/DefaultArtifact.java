@@ -19,11 +19,7 @@
 package org.apache.maven.artifact;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -33,10 +29,8 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
- * @author Jason van Zyl
  */
 public class DefaultArtifact implements Artifact {
     private String groupId;
@@ -94,6 +88,26 @@ public class DefaultArtifact implements Artifact {
                 classifier,
                 artifactHandler,
                 false);
+    }
+
+    public DefaultArtifact(
+            String groupId,
+            String artifactId,
+            String version,
+            String scope,
+            String type,
+            String classifier,
+            ArtifactHandler artifactHandler,
+            boolean optional) {
+        this(
+                groupId,
+                artifactId,
+                VersionRange.createFromVersion(version),
+                scope,
+                type,
+                classifier,
+                artifactHandler,
+                optional);
     }
 
     public DefaultArtifact(
@@ -167,52 +181,64 @@ public class DefaultArtifact implements Artifact {
         return (value == null) || (value.trim().length() < 1);
     }
 
+    @Override
     public String getClassifier() {
         return classifier;
     }
 
+    @Override
     public boolean hasClassifier() {
-        return StringUtils.isNotEmpty(classifier);
+        return classifier != null && !classifier.isEmpty();
     }
 
+    @Override
     public String getScope() {
         return scope;
     }
 
+    @Override
     public String getGroupId() {
         return groupId;
     }
 
+    @Override
     public String getArtifactId() {
         return artifactId;
     }
 
+    @Override
     public String getVersion() {
         return version;
     }
 
+    @Override
     public void setVersion(String version) {
         this.version = version;
         setBaseVersionInternal(version);
         versionRange = null;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public void setFile(File file) {
         this.file = file;
     }
 
+    @Override
     public File getFile() {
         return file;
     }
 
+    @Override
     public ArtifactRepository getRepository() {
         return repository;
     }
 
+    @Override
     public void setRepository(ArtifactRepository repository) {
         this.repository = repository;
     }
@@ -221,10 +247,12 @@ public class DefaultArtifact implements Artifact {
     //
     // ----------------------------------------------------------------------
 
+    @Override
     public String getId() {
         return getDependencyConflictId() + ":" + getBaseVersion();
     }
 
+    @Override
     public String getDependencyConflictId() {
         StringBuilder sb = new StringBuilder(128);
         sb.append(getGroupId());
@@ -243,6 +271,7 @@ public class DefaultArtifact implements Artifact {
         }
     }
 
+    @Override
     public void addMetadata(ArtifactMetadata metadata) {
         if (metadataMap == null) {
             metadataMap = new HashMap<>();
@@ -256,6 +285,7 @@ public class DefaultArtifact implements Artifact {
         }
     }
 
+    @Override
     public Collection<ArtifactMetadata> getMetadataList() {
         if (metadataMap == null) {
             return Collections.emptyList();
@@ -268,6 +298,7 @@ public class DefaultArtifact implements Artifact {
     // Object overrides
     // ----------------------------------------------------------------------
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if (getGroupId() != null) {
@@ -288,46 +319,28 @@ public class DefaultArtifact implements Artifact {
         return sb.toString();
     }
 
-    public int hashCode() {
-        int result = 17;
-        result = 37 * result + groupId.hashCode();
-        result = 37 * result + artifactId.hashCode();
-        result = 37 * result + type.hashCode();
-        if (version != null) {
-            result = 37 * result + version.hashCode();
-        }
-        result = 37 * result + (classifier != null ? classifier.hashCode() : 0);
-        return result;
-    }
-
+    @Override
     public boolean equals(Object o) {
-        if (o == this) {
+        if (this == o) {
             return true;
         }
-
-        if (!(o instanceof Artifact)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        Artifact a = (Artifact) o;
-
-        if (!a.getGroupId().equals(groupId)) {
-            return false;
-        } else if (!a.getArtifactId().equals(artifactId)) {
-            return false;
-        } else if (!a.getVersion().equals(version)) {
-            return false;
-        } else if (!a.getType().equals(type)) {
-            return false;
-        } else {
-            return a.getClassifier() == null
-                    ? classifier == null
-                    : a.getClassifier().equals(classifier);
-        }
-
-        // We don't consider the version range in the comparison, just the resolved version
+        DefaultArtifact that = (DefaultArtifact) o;
+        return Objects.equals(groupId, that.groupId)
+                && Objects.equals(artifactId, that.artifactId)
+                && Objects.equals(type, that.type)
+                && Objects.equals(classifier, that.classifier)
+                && Objects.equals(version, that.version);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(groupId, artifactId, type, classifier, version);
+    }
+
+    @Override
     public String getBaseVersion() {
         if (baseVersion == null && version != null) {
             setBaseVersionInternal(version);
@@ -344,6 +357,7 @@ public class DefaultArtifact implements Artifact {
         return baseVersion;
     }
 
+    @Override
     public void setBaseVersion(String baseVersion) {
         setBaseVersionInternal(baseVersion);
     }
@@ -352,6 +366,7 @@ public class DefaultArtifact implements Artifact {
         this.baseVersion = ArtifactUtils.toSnapshotVersion(baseVersion);
     }
 
+    @Override
     public int compareTo(Artifact a) {
         int result = groupId.compareTo(a.getGroupId());
         if (result == 0) {
@@ -381,47 +396,58 @@ public class DefaultArtifact implements Artifact {
         return result;
     }
 
+    @Override
     public void updateVersion(String version, ArtifactRepository localRepository) {
         setResolvedVersion(version);
         setFile(new File(localRepository.getBasedir(), localRepository.pathOf(this)));
     }
 
+    @Override
     public String getDownloadUrl() {
         return downloadUrl;
     }
 
+    @Override
     public void setDownloadUrl(String downloadUrl) {
         this.downloadUrl = downloadUrl;
     }
 
+    @Override
     public ArtifactFilter getDependencyFilter() {
         return dependencyFilter;
     }
 
+    @Override
     public void setDependencyFilter(ArtifactFilter artifactFilter) {
         dependencyFilter = artifactFilter;
     }
 
+    @Override
     public ArtifactHandler getArtifactHandler() {
         return artifactHandler;
     }
 
+    @Override
     public List<String> getDependencyTrail() {
         return dependencyTrail;
     }
 
+    @Override
     public void setDependencyTrail(List<String> dependencyTrail) {
         this.dependencyTrail = dependencyTrail;
     }
 
+    @Override
     public void setScope(String scope) {
         this.scope = scope;
     }
 
+    @Override
     public VersionRange getVersionRange() {
         return versionRange;
     }
 
+    @Override
     public void setVersionRange(VersionRange versionRange) {
         this.versionRange = versionRange;
         selectVersionFromNewRangeIfAvailable();
@@ -436,70 +462,86 @@ public class DefaultArtifact implements Artifact {
         }
     }
 
+    @Override
     public void selectVersion(String version) {
         this.version = version;
         setBaseVersionInternal(version);
     }
 
+    @Override
     public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
+    @Override
     public void setArtifactId(String artifactId) {
         this.artifactId = artifactId;
     }
 
+    @Override
     public boolean isSnapshot() {
         return getBaseVersion() != null
                 && (getBaseVersion().endsWith(SNAPSHOT_VERSION)
                         || getBaseVersion().equals(LATEST_VERSION));
     }
 
+    @Override
     public void setResolved(boolean resolved) {
         this.resolved = resolved;
     }
 
+    @Override
     public boolean isResolved() {
         return resolved;
     }
 
+    @Override
     public void setResolvedVersion(String version) {
         this.version = version;
         // retain baseVersion
     }
 
+    @Override
     public void setArtifactHandler(ArtifactHandler artifactHandler) {
         this.artifactHandler = artifactHandler;
     }
 
+    @Override
     public void setRelease(boolean release) {
         this.release = release;
     }
 
+    @Override
     public boolean isRelease() {
         return release;
     }
 
+    @Override
     public List<ArtifactVersion> getAvailableVersions() {
         return availableVersions;
     }
 
+    @Override
     public void setAvailableVersions(List<ArtifactVersion> availableVersions) {
         this.availableVersions = availableVersions;
     }
 
+    @Override
     public boolean isOptional() {
         return optional;
     }
 
+    @Override
     public ArtifactVersion getSelectedVersion() throws OverConstrainedVersionException {
         return versionRange.getSelectedVersion(this);
     }
 
+    @Override
     public boolean isSelectedVersionKnown() throws OverConstrainedVersionException {
         return versionRange.isSelectedVersionKnown(this);
     }
 
+    @Override
     public void setOptional(boolean optional) {
         this.optional = optional;
     }

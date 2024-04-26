@@ -27,7 +27,7 @@ import org.apache.maven.api.annotations.Nullable;
 
 /**
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable
@@ -41,7 +41,7 @@ public interface DependencyCoordinate extends ArtifactCoordinate {
     Type getType();
 
     @Nonnull
-    Scope getScope();
+    DependencyScope getScope();
 
     @Nullable
     Boolean getOptional();

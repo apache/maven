@@ -21,7 +21,6 @@ package org.apache.maven;
 /**
  * One or more builds failed.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class BuildFailureException extends Exception {
     public BuildFailureException(String message) {
