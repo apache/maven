@@ -47,6 +47,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.impl.DefaultArtifactCoordinate;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
@@ -140,32 +141,29 @@ public class MavenStatusCommand {
         final List<String> issues = new ArrayList<>();
 
         for (ArtifactRepository remoteRepository : remoteRepositories) {
-            final RepositorySystemSession.CloseableSession repositorySession = repoSession
+            try (RepositorySystemSession.CloseableSession repositorySession = repoSession
                     .newRepositorySessionBuilder(mavenExecutionRequest)
-                    .build();
-            remoteRepositoryConnectionVerifier
-                    .verifyConnectionToRemoteRepository(repositorySession, remoteRepository)
-                    .ifPresent(issues::add);
-            repositorySession.close();
+                    .build()) {
+                remoteRepositoryConnectionVerifier
+                        .verifyConnectionToRemoteRepository(repositorySession, remoteRepository)
+                        .ifPresent(issues::add);
+            }
         }
 
         return issues;
     }
 
     private List<String> verifyArtifactResolution(final MavenExecutionRequest mavenExecutionRequest) {
-        RepositorySystemSession.CloseableSession repoSession = this.repoSession
+        this.sessionScope.enter();
+        try (RepositorySystemSession.CloseableSession repoSession = this.repoSession
                 .newRepositorySessionBuilder(mavenExecutionRequest)
-                .build();
-        final Session session = this.defaultSessionFactory.newSession(
-                new MavenSession(repoSession, mavenExecutionRequest, new DefaultMavenExecutionResult()));
-        repoSession.close();
-        sessionScope.enter();
-        try {
+                .build()) {
+            final Session session = this.defaultSessionFactory.newSession(
+                    new MavenSession(repoSession, mavenExecutionRequest, new DefaultMavenExecutionResult()));
             InternalMavenSession internalSession = InternalMavenSession.from(session);
             sessionScope.seed(InternalMavenSession.class, internalSession);
-
             ArtifactCoordinate artifactCoordinate =
-                    new DefaultArtifactCoordinate(internalSession, APACHE_MAVEN_ARTIFACT);
+                    new DefaultArtifactCoordinate(InternalSession.from(session), APACHE_MAVEN_ARTIFACT);
             ArtifactResolverResult resolverResult =
                     artifactResolver.resolve(session, Collections.singleton(artifactCoordinate));
             resolverResult
@@ -176,7 +174,7 @@ public class MavenStatusCommand {
         } catch (ArtifactResolverException are) {
             return extractIssuesFromArtifactResolverException(are);
         } finally {
-            sessionScope.exit();
+            this.sessionScope.exit();
             LOGGER.info("Artifact resolution check completed");
         }
     }
