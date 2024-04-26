@@ -26,23 +26,28 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputLocationTracker;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -78,6 +83,7 @@ import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.sisu.Nullable;
@@ -299,13 +305,18 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             profileActivationContext.setProjectProperties(tmpModel.getProperties());
 
-            List<Profile> activePomProfiles =
-                    profileSelector.getActiveProfiles(rawModel.getProfiles(), profileActivationContext, problems);
-            currentData.setActiveProfiles(activePomProfiles);
-
             Map<String, Activation> interpolatedActivations =
                     getInterpolatedActivations(rawModel, profileActivationContext, problems);
             injectProfileActivations(tmpModel, interpolatedActivations);
+
+            List<Profile> activePomProfiles =
+                    profileSelector.getActiveProfiles(tmpModel.getProfiles(), profileActivationContext, problems);
+
+            Set<String> activeProfileIds =
+                    activePomProfiles.stream().map(Profile::getId).collect(Collectors.toSet());
+            currentData.setActiveProfiles(rawModel.getProfiles().stream()
+                    .filter(p -> activeProfileIds.contains(p.getId()))
+                    .collect(Collectors.toList()));
 
             // profile injection
             for (Profile activeProfile : activePomProfiles) {
@@ -413,40 +424,72 @@ public class DefaultModelBuilder implements ModelBuilder {
         return result;
     }
 
+    @FunctionalInterface
+    private interface InterpolateString {
+        String apply(String s) throws InterpolationException;
+    }
+
     private Map<String, Activation> getInterpolatedActivations(
             Model rawModel, DefaultProfileActivationContext context, DefaultModelProblemCollector problems) {
         Map<String, Activation> interpolatedActivations = getProfileActivations(rawModel, true);
-        for (Activation activation : interpolatedActivations.values()) {
-            if (activation.getFile() != null) {
-                replaceWithInterpolatedValue(activation.getFile(), context, problems);
+
+        if (interpolatedActivations.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+
+        interpolator.addValueSource(new MapBasedValueSource(context.getProjectProperties()));
+        interpolator.addValueSource(new MapBasedValueSource(context.getUserProperties()));
+        interpolator.addValueSource(new MapBasedValueSource(context.getSystemProperties()));
+
+        class Interpolation {
+            final InputLocationTracker target;
+
+            final InterpolateString impl;
+
+            Interpolation(InputLocationTracker target, InterpolateString impl) {
+                this.target = target;
+                this.impl = impl;
             }
+
+            void performFor(String value, String locationKey, Consumer<String> mutator) {
+                if (StringUtils.isEmpty(value)) {
+                    return;
+                }
+                try {
+                    mutator.accept(impl.apply(value));
+                } catch (InterpolationException e) {
+                    problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                            .setMessage("Failed to interpolate value " + value + ": " + e.getMessage())
+                            .setLocation(target.getLocation(locationKey))
+                            .setException(e));
+                }
+            }
+        }
+        for (Activation activation : interpolatedActivations.values()) {
+            Optional<Activation> a = Optional.of(activation);
+            a.map(Activation::getFile).ifPresent(fa -> {
+                Interpolation nt =
+                        new Interpolation(fa, s -> profileActivationFilePathInterpolator.interpolate(s, context));
+                nt.performFor(fa.getExists(), "exists", fa::setExists);
+                nt.performFor(fa.getMissing(), "missing", fa::setMissing);
+            });
+            a.map(Activation::getOs).ifPresent(oa -> {
+                Interpolation nt = new Interpolation(oa, interpolator::interpolate);
+                nt.performFor(oa.getArch(), "arch", oa::setArch);
+                nt.performFor(oa.getFamily(), "family", oa::setFamily);
+                nt.performFor(oa.getName(), "name", oa::setName);
+                nt.performFor(oa.getVersion(), "version", oa::setVersion);
+            });
+            a.map(Activation::getProperty).ifPresent(pa -> {
+                Interpolation nt = new Interpolation(pa, interpolator::interpolate);
+                nt.performFor(pa.getName(), "name", pa::setName);
+                nt.performFor(pa.getValue(), "value", pa::setValue);
+            });
+            a.map(Activation::getJdk).ifPresent(ja -> new Interpolation(activation, interpolator::interpolate)
+                    .performFor(ja, "jdk", activation::setJdk));
         }
         return interpolatedActivations;
-    }
-
-    private void replaceWithInterpolatedValue(
-            ActivationFile activationFile, ProfileActivationContext context, DefaultModelProblemCollector problems) {
-        try {
-            if (StringUtils.isNotEmpty(activationFile.getExists())) {
-                String path = activationFile.getExists();
-                String absolutePath = profileActivationFilePathInterpolator.interpolate(path, context);
-                activationFile.setExists(absolutePath);
-            } else if (StringUtils.isNotEmpty(activationFile.getMissing())) {
-                String path = activationFile.getMissing();
-                String absolutePath = profileActivationFilePathInterpolator.interpolate(path, context);
-                activationFile.setMissing(absolutePath);
-            }
-        } catch (InterpolationException e) {
-            String path = StringUtils.isNotEmpty(activationFile.getExists())
-                    ? activationFile.getExists()
-                    : activationFile.getMissing();
-
-            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
-                    .setMessage("Failed to interpolate file location " + path + ": " + e.getMessage())
-                    .setLocation(activationFile.getLocation(
-                            StringUtils.isNotEmpty(activationFile.getExists()) ? "exists" : "missing"))
-                    .setException(e));
-        }
     }
 
     @Override
