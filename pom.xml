@@ -886,6 +886,10 @@ under the License.
                   <packages>org.apache.maven.api.di</packages>
                 </group>
                 <group>
+                  <title>Maven 4 API - Metadata</title>
+                  <packages>org.apache.maven.api.metadata</packages>
+                </group>
+                <group>
                   <title>Maven 4 API - SPI</title>
                   <packages>org.apache.maven.api.spi</packages>
                 </group>
