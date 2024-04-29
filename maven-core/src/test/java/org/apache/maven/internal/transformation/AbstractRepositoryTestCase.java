@@ -21,10 +21,13 @@ package org.apache.maven.internal.transformation;
 import javax.inject.Inject;
 
 import java.net.MalformedURLException;
+import java.util.List;
 
+import org.apache.maven.SimpleLookup;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultRepositoryFactory;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.internal.impl.InternalSession;
 import org.codehaus.plexus.PlexusContainer;
@@ -33,6 +36,9 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
+import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.transfer.TransferListener;
@@ -71,7 +77,14 @@ public abstract class AbstractRepositoryTestCase {
 
         DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
         MavenSession mavenSession = new MavenSession(rsession, request, new DefaultMavenExecutionResult());
-        DefaultSession session = new DefaultSession(mavenSession, null, null, null, null, null);
+        DefaultSession session = new DefaultSession(
+                mavenSession,
+                null,
+                null,
+                null,
+                new SimpleLookup(List.of(new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
+                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())))),
+                null);
         InternalSession.associate(rsession, session);
 
         return rsession;

@@ -19,18 +19,31 @@
 package org.apache.maven.internal.impl;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.RepositoryPolicy;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton
 public class DefaultRepositoryFactory implements RepositoryFactory {
+
+    final RemoteRepositoryManager remoteRepositoryManager;
+
+    @Inject
+    public DefaultRepositoryFactory(RemoteRepositoryManager remoteRepositoryManager) {
+        this.remoteRepositoryManager = remoteRepositoryManager;
+    }
 
     @Override
     public LocalRepository createLocal(Path path) {
@@ -50,6 +63,23 @@ public class DefaultRepositoryFactory implements RepositoryFactory {
                 .setReleasePolicy(buildRepositoryPolicy(repository.getReleases()))
                 .setSnapshotPolicy(buildRepositoryPolicy(repository.getSnapshots()))
                 .build());
+    }
+
+    @Override
+    public List<RemoteRepository> aggregate(
+            Session session,
+            List<RemoteRepository> dominant,
+            List<RemoteRepository> recessive,
+            boolean processRecessive) {
+        InternalSession internalSession = InternalSession.from(nonNull(session, "session"));
+        List<org.eclipse.aether.repository.RemoteRepository> repos = remoteRepositoryManager.aggregateRepositories(
+                internalSession.getSession(),
+                internalSession.toRepositories(nonNull(dominant, "dominant")),
+                internalSession.toRepositories(nonNull(recessive, "recessive")),
+                processRecessive);
+        return repos.stream()
+                .<RemoteRepository>map(DefaultRemoteRepository::new)
+                .toList();
     }
 
     public static org.eclipse.aether.repository.RepositoryPolicy buildRepositoryPolicy(

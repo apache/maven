@@ -24,11 +24,13 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.SimpleLookup;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultRepositoryFactory;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -38,6 +40,9 @@ import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
+import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,8 +73,14 @@ public class ModelBuilderTest {
                 .build();
         request.setRepositorySession(rsession);
         MavenSession msession = new MavenSession(rsession, mavenRequest, new DefaultMavenExecutionResult());
-        InternalSession session =
-                new DefaultSession(msession, repositorySystem, null, mavenRepositorySystem, null, null);
+        InternalSession session = new DefaultSession(
+                msession,
+                repositorySystem,
+                null,
+                mavenRepositorySystem,
+                new SimpleLookup(List.of(new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
+                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())))),
+                null);
         InternalSession.associate(rsession, session);
 
         List<ProjectBuildingResult> results = projectBuilder.build(

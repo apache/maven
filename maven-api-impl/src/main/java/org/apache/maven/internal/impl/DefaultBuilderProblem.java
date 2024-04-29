@@ -76,7 +76,7 @@ class DefaultBuilderProblem implements BuilderProblem {
     @Override
     public String getLocation() {
         StringBuilder buffer = new StringBuilder(256);
-        if (!getSource().isEmpty()) {
+        if (getSource() != null && !getSource().isEmpty()) {
             buffer.append(getSource());
         }
         if (getLineNumber() > 0) {

@@ -37,6 +37,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
@@ -61,6 +62,7 @@ import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.ModelCache;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelResolver;
@@ -74,16 +76,16 @@ import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.VersionParserException;
 import org.apache.maven.api.services.model.*;
-import org.apache.maven.api.services.model.ModelCache;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
-import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.resolver.DefaultModelCache;
+import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
 import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  */
@@ -94,6 +96,8 @@ public class DefaultModelBuilder implements ModelBuilder {
     private static final String RAW = "raw";
     private static final String FILE = "file";
     private static final String IMPORT = "import";
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ModelProcessor modelProcessor;
     private final ModelValidator modelValidator;
@@ -113,7 +117,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final ModelTransformer transformer;
     private final ModelVersionParser versionParser;
-    private final RemoteRepositoryManager remoteRepositoryManager;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -135,8 +138,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             PluginConfigurationExpander pluginConfigurationExpander,
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             ModelTransformer transformer,
-            ModelVersionParser versionParser,
-            RemoteRepositoryManager remoteRepositoryManager) {
+            ModelVersionParser versionParser) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
         this.modelNormalizer = modelNormalizer;
@@ -155,7 +157,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.transformer = transformer;
         this.versionParser = versionParser;
-        this.remoteRepositoryManager = remoteRepositoryManager;
     }
 
     @Override
@@ -165,11 +166,29 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     @Override
     public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
+        request = fillRequestDefaults(request);
         if (request.getInterimResult() != null) {
             return build(request, request.getInterimResult(), new LinkedHashSet<>());
         } else {
             return build(request, new LinkedHashSet<>());
         }
+    }
+
+    private static ModelBuilderRequest fillRequestDefaults(ModelBuilderRequest request) {
+        ModelBuilderRequest.ModelBuilderRequestBuilder builder = ModelBuilderRequest.builder(request);
+        if (request.getModelCache() == null) {
+            builder.modelCache(new DefaultModelCache());
+        }
+        if (request.getModelRepositoryHolder() == null) {
+            builder.modelRepositoryHolder(new DefaultModelRepositoryHolder(
+                    request.getSession(),
+                    DefaultModelRepositoryHolder.RepositoryMerging.POM_DOMINANT,
+                    request.getSession().getRemoteRepositories()));
+        }
+        if (request.getModelResolver() == null) {
+            builder.modelResolver(new DefaultModelResolver());
+        }
+        return builder.build();
     }
 
     protected ModelBuilderResult build(ModelBuilderRequest request, Collection<String> importIds)
@@ -316,7 +335,19 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             // add repositories specified by the current model so that we can resolve the parent
-            configureResolver(getModelResolver(request), model, request, problems, false);
+            if (!model.getRepositories().isEmpty()) {
+                List<String> oldRepos = request.getModelRepositoryHolder().getRepositories().stream()
+                        .map(Object::toString)
+                        .toList();
+                request.getModelRepositoryHolder().merge(model.getRepositories(), false);
+                List<String> newRepos = request.getModelRepositoryHolder().getRepositories().stream()
+                        .map(Object::toString)
+                        .toList();
+                if (!Objects.equals(oldRepos, newRepos)) {
+                    logger.info("Merging repositories from " + model.getId() + "\n"
+                            + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
+                }
+            }
 
             // we pass a cloned model, so that resolving the parent version does not affect the returned model
             ModelData parentData = readParent(model, currentData.source(), request, problems);
@@ -370,7 +401,19 @@ public class DefaultModelBuilder implements ModelBuilder {
         result.setEffectiveModel(resultModel);
 
         // Now the fully interpolated model is available: reconfigure the resolver
-        configureResolver(getModelResolver(request), resultModel, request, problems, true);
+        if (!resultModel.getRepositories().isEmpty()) {
+            List<String> oldRepos = request.getModelRepositoryHolder().getRepositories().stream()
+                    .map(Object::toString)
+                    .toList();
+            request.getModelRepositoryHolder().merge(resultModel.getRepositories(), true);
+            List<String> newRepos = request.getModelRepositoryHolder().getRepositories().stream()
+                    .map(Object::toString)
+                    .toList();
+            if (!Objects.equals(oldRepos, newRepos)) {
+                logger.info("Replacing repositories from " + resultModel.getId() + "\n"
+                        + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
+            }
+        }
 
         return resultModel;
     }
@@ -449,7 +492,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         return build(request, result, new LinkedHashSet<>());
     }
 
-    public Model buildRawModel(final ModelBuilderRequest request) throws ModelBuilderException {
+    public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
+        request = fillRequestDefaults(request);
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector(new DefaultModelBuilderResult());
         Model model = readRawModel(request, problems);
         if (hasModelErrors(problems)) {
@@ -461,15 +505,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     private ModelBuilderResult build(
             ModelBuilderRequest request, final ModelBuilderResult phaseOneResult, Collection<String> importIds)
             throws ModelBuilderException {
-        if (request.getModelResolver() == null) {
-            ModelResolver resolver = new DefaultModelResolver(
-                    remoteRepositoryManager,
-                    InternalSession.from(request.getSession())
-                            .toRepositories(request.getSession().getRemoteRepositories()));
-            request =
-                    ModelBuilderRequest.builder(request).modelResolver(resolver).build();
-        }
-
         DefaultModelBuilderResult result = asDefaultModelBuilderResult(phaseOneResult);
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector(result);
@@ -733,15 +768,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         return context;
     }
 
-    private void configureResolver(
-            ModelResolver modelResolver,
-            Model model,
-            ModelBuilderRequest request,
-            DefaultModelProblemCollector problems,
-            boolean replaceRepositories) {
-        model.getRepositories().forEach(r -> modelResolver.addRepository(request.getSession(), r, replaceRepositories));
-    }
-
     private void checkPluginVersions(List<Model> lineage, ModelBuilderRequest request, ModelProblemCollector problems) {
         if (request.getValidationLevel() < ModelBuilderRequest.VALIDATION_LEVEL_MAVEN_2_0) {
             return;
@@ -852,7 +878,9 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         Parent parent = childModel.getParent();
         if (parent != null) {
-            parentData = readParentLocally(childModel, childSource, request, problems);
+            if (request.isProjectBuild()) {
+                parentData = readParentLocally(childModel, childSource, request, problems);
+            }
             if (parentData == null) {
                 parentData = readParentExternally(childModel, request, problems);
             }
@@ -1020,7 +1048,9 @@ public class DefaultModelBuilder implements ModelBuilder {
         ModelSource modelSource;
         try {
             AtomicReference<Parent> modified = new AtomicReference<>();
-            modelSource = modelResolver.resolveModel(request.getSession(), parent, modified);
+            Session session = request.getSession()
+                    .withRemoteRepositories(request.getModelRepositoryHolder().getRepositories());
+            modelSource = modelResolver.resolveModel(session, parent, modified);
             if (modified.get() != null) {
                 parent = modified.get();
             }
@@ -1186,7 +1216,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
-        DependencyManagement importMgmt = cache(
+        Model importModel = cache(
                 getModelCache(request),
                 groupId,
                 artifactId,
@@ -1194,6 +1224,10 @@ public class DefaultModelBuilder implements ModelBuilder {
                 IMPORT,
                 () -> doLoadDependencyManagement(
                         model, request, problems, dependency, groupId, artifactId, version, importIds));
+        DependencyManagement importMgmt = importModel.getDependencyManagement();
+        if (importMgmt == null) {
+            importMgmt = DependencyManagement.newInstance();
+        }
 
         // [MNG-5600] Dependency management import should support exclusions.
         List<Exclusion> exclusions = dependency.getExclusions();
@@ -1219,7 +1253,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
-    private DependencyManagement doLoadDependencyManagement(
+    private Model doLoadDependencyManagement(
             Model model,
             ModelBuilderRequest request,
             DefaultModelProblemCollector problems,
@@ -1228,7 +1262,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             String artifactId,
             String version,
             Collection<String> importIds) {
-        DependencyManagement importMgmt;
         final WorkspaceModelResolver workspaceResolver = getWorkspaceModelResolver(request);
         final ModelResolver modelResolver = getModelResolver(request);
         if (workspaceResolver == null && modelResolver == null) {
@@ -1251,7 +1284,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         if (importModel == null) {
             final ModelSource importSource;
             try {
-                importSource = modelResolver.resolveModel(request.getSession(), dependency, new AtomicReference<>());
+                Session session = request.getSession()
+                        .withRemoteRepositories(
+                                request.getModelRepositoryHolder().getRepositories());
+                importSource = modelResolver.resolveModel(session, dependency, new AtomicReference<>());
             } catch (ModelBuilderException e) {
                 StringBuilder buffer = new StringBuilder(256);
                 buffer.append("Non-resolvable import POM");
@@ -1285,12 +1321,17 @@ public class DefaultModelBuilder implements ModelBuilder {
             final ModelBuilderResult importResult;
             try {
                 ModelBuilderRequest importRequest = ModelBuilderRequest.builder()
-                        .session(request.getSession())
+                        .session(request.getSession()
+                                .withRemoteRepositories(
+                                        request.getModelRepositoryHolder().getRepositories()))
                         .validationLevel(ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL)
                         .systemProperties(request.getSystemProperties())
                         .userProperties(request.getUserProperties())
                         .source(importSource)
-                        .modelResolver(modelResolver.newCopy())
+                        .modelResolver(modelResolver)
+                        .modelCache(request.getModelCache())
+                        .modelRepositoryHolder(
+                                request.getModelRepositoryHolder().copy())
                         .twoPhaseBuilding(false)
                         .build();
                 importResult = build(importRequest, importIds);
@@ -1304,12 +1345,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             importModel = importResult.getEffectiveModel();
         }
 
-        importMgmt = importModel.getDependencyManagement();
-
-        if (importMgmt == null) {
-            importMgmt = DependencyManagement.newInstance();
-        }
-        return importMgmt;
+        return importModel;
     }
 
     private static <T> T cache(
@@ -1386,10 +1422,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private static ModelCache getModelCache(ModelBuilderRequest request) {
-        return request.isProjectBuild()
-                ? DefaultModelCache.newInstance(
-                        InternalSession.from(request.getSession()).getSession())
-                : null;
+        return request.getModelCache();
     }
 
     private static ModelBuildingListener getModelBuildingListener(ModelBuilderRequest request) {

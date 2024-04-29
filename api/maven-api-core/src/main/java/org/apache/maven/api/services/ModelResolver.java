@@ -19,107 +19,67 @@
 package org.apache.maven.api.services;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Parent;
-import org.apache.maven.api.model.Repository;
 
 /**
- * Resolves a POM from its coordinates. During the build process, the
- * {@link org.apache.maven.api.services.ModelBuilder} will add any relevant repositories to the model resolver. In
- * other words, the model resolver is stateful and should not be reused across multiple model building requests.
- *
+ * Resolves a POM from its coordinates.
  */
 public interface ModelResolver extends Service {
 
     /**
-     * Tries to resolve the POM for the specified coordinates.
-     *
-     * @param groupId The group identifier of the POM, must not be {@code null}.
-     * @param artifactId The artifact identifier of the POM, must not be {@code null}.
-     * @param version The version of the POM, must not be {@code null}.
-     * @return The source of the requested POM, never {@code null}.
-     * @throws ModelResolverException If the POM could not be resolved from any configured repository.
-     */
-    @Nonnull
-    ModelSource resolveModel(
-            @Nonnull Session session, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version)
-            throws ModelResolverException;
-
-    /**
      * Tries to resolve the POM for the specified parent coordinates possibly updating {@code parent}.
-     * <p>
-     * Unlike the {@link #resolveModel(Session, String, String, String)} method, this method
-     * supports version ranges and updates the given {@code parent} instance to match the returned {@code ModelSource}.
-     * If {@code parent} declares a version range, the version corresponding to the returned {@code ModelSource} will
-     * be set on the given {@code parent}.
-     * </p>
      *
+     * @param session The session to use to resolve the model, must not be {@code null}.
      * @param parent The parent coordinates to resolve, must not be {@code null}.
-     *
+     * @param modified a holder for the updated parent, must not be {@code null}.
      * @return The source of the requested POM, never {@code null}.
-     *
      * @throws ModelResolverException If the POM could not be resolved from any configured repository.
      */
     @Nonnull
-    ModelSource resolveModel(
+    default ModelSource resolveModel(
             @Nonnull Session session, @Nonnull Parent parent, @Nonnull AtomicReference<Parent> modified)
-            throws ModelResolverException;
+            throws ModelResolverException {
+        return resolveModel(
+                session,
+                parent.getGroupId(),
+                parent.getArtifactId(),
+                parent.getVersion(),
+                version -> modified.set(parent.withVersion(version)));
+    }
 
     /**
      * Tries to resolve the POM for the specified dependency coordinates possibly updating {@code dependency}.
-     * <p>
-     * Unlike the {@link #resolveModel(Session, String, String, String)} method, this method
-     * supports version ranges and updates the given {@code dependency} instance to match the returned
-     * {@code ModelSource}. If {@code dependency} declares a version range, the version corresponding to the returned
-     * {@code ModelSource} will be set on the given {@code dependency}.
-     * </p>
      *
+     * @param session The session to use to resolve the model, must not be {@code null}.
      * @param dependency The dependency coordinates to resolve, must not be {@code null}.
-     *
+     * @param modified a holder for the updated dependency, must not be {@code null}.
      * @return The source of the requested POM, never {@code null}.
-     *
      * @throws ModelResolverException If the POM could not be resolved from any configured repository.
-     *
-     * @see Dependency#clone()
      */
     @Nonnull
-    ModelSource resolveModel(
+    default ModelSource resolveModel(
             @Nonnull Session session, @Nonnull Dependency dependency, @Nonnull AtomicReference<Dependency> modified)
+            throws ModelResolverException {
+        return resolveModel(
+                session,
+                dependency.getGroupId(),
+                dependency.getArtifactId(),
+                dependency.getVersion(),
+                version -> modified.set(dependency.withVersion(version)));
+    }
+
+    @Nonnull
+    ModelSource resolveModel(
+            @Nonnull Session session,
+            @Nonnull String groupId,
+            @Nonnull String artifactId,
+            @Nonnull String version,
+            @Nonnull Consumer<String> resolvedVersion)
             throws ModelResolverException;
-
-    /**
-     * Adds a repository to use for subsequent resolution requests. The order in which repositories are added matters,
-     * repositories that were added first should also be searched first. When multiple repositories with the same
-     * identifier are added, only the first repository being added will be used.
-     *
-     * @param repository The repository to add to the internal search chain, must not be {@code null}.
-     * @throws ModelResolverException If the repository could not be added (e.g. due to invalid URL or layout).
-     */
-    void addRepository(@Nonnull Session session, Repository repository) throws ModelResolverException;
-
-    /**
-     * Adds a repository to use for subsequent resolution requests. The order in which repositories are added matters,
-     * repositories that were added first should also be searched first. When multiple repositories with the same
-     * identifier are added, then the value of the replace argument determines the behaviour.
-     *
-     * If replace is false then any existing repository with the same Id will remain in use. If replace
-     * is true the new repository replaces the original.
-     *
-     * @param repository The repository to add to the internal search chain, must not be {@code null}.
-     * @throws ModelResolverException If the repository could not be added (e.g. due to invalid URL or layout).
-     */
-    void addRepository(@Nonnull Session session, Repository repository, boolean replace) throws ModelResolverException;
-
-    /**
-     * Clones this resolver for usage in a forked resolution process. In general, implementors need not provide a deep
-     * clone. The only requirement is that invocations of {@link #addRepository(Session, Repository)} on the clone do not affect
-     * the state of the original resolver and vice versa.
-     *
-     * @return The cloned resolver, never {@code null}.
-     */
-    ModelResolver newCopy();
 }

@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,11 +42,11 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.*;
-import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.ModelCache;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
@@ -61,6 +62,8 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.resolver.DefaultModelCache;
+import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
 import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
@@ -143,7 +146,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     }
 
     @Deprecated
-    private ModelSource toSource(org.apache.maven.model.building.ModelSource modelSource) {
+    static ModelSource toSource(org.apache.maven.model.building.ModelSource modelSource) {
         if (modelSource instanceof FileModelSource fms) {
             return ModelSource.fromPath(fms.getPath());
         } else if (modelSource instanceof ArtifactModelSource ams) {
@@ -277,6 +280,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private final ConcurrentMap<String, Object> parentCache;
         private final ModelTransformerContextBuilder transformerContextBuilder;
         private final ExecutorService executor;
+        private final ModelCache modelCache;
 
         BuildSession(ProjectBuildingRequest request, boolean localProjects) {
             this.request = request;
@@ -293,6 +297,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 this.transformerContextBuilder = null;
             }
             this.parentCache = new ConcurrentHashMap<>();
+            this.modelCache = DefaultModelCache.newInstance(session, true);
         }
 
         ExecutorService createExecutor(int parallelism) {
@@ -368,6 +373,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
                     ModelBuilderRequest request = builder.projectBuild(modelPool != null)
                             .source(modelSource)
+                            .projectBuild(true)
                             .locationTracking(true)
                             .listener(listener)
                             .build();
@@ -1001,18 +1007,26 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             RequestTrace trace = RequestTrace.newChild(null, request).newChild(modelBuildingRequest);
 
-            ProjectModelResolver pmr = new ProjectModelResolver(
-                    session,
-                    trace,
-                    repoSystem,
-                    repositoryManager,
-                    repositories,
-                    request.getRepositoryMerging(),
-                    modelPool,
-                    parentCache);
-            ModelResolver resolver = new ModelResolverWrapper(pmr);
+            ModelResolver resolver = new ModelResolverWrapper() {
+                @Override
+                protected org.apache.maven.model.resolution.ModelResolver getResolver(
+                        List<RemoteRepository> repositories) {
+                    return new ProjectModelResolver(
+                            session,
+                            trace,
+                            repoSystem,
+                            repositoryManager,
+                            repositories,
+                            request.getRepositoryMerging(),
+                            modelPool,
+                            parentCache);
+                }
+            };
 
-            modelBuildingRequest.session(InternalSession.from(session));
+            InternalSession internalSession = InternalSession.from(session);
+            modelBuildingRequest.session(internalSession.withRemoteRepositories(request.getRemoteRepositories().stream()
+                    .map(r -> internalSession.getRemoteRepository(RepositoryUtils.toRepo(r)))
+                    .toList()));
             modelBuildingRequest.validationLevel(request.getValidationLevel());
             modelBuildingRequest.processPlugins(request.isProcessPlugins());
             modelBuildingRequest.profiles(
@@ -1027,6 +1041,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             modelBuildingRequest.userProperties(toMap(request.getUserProperties()));
             // bv4: modelBuildingRequest.setBuildStartTime(request.getBuildStartTime());
             modelBuildingRequest.modelResolver(resolver);
+            modelBuildingRequest.modelRepositoryHolder(new DefaultModelRepositoryHolder(
+                    internalSession,
+                    DefaultModelRepositoryHolder.RepositoryMerging.valueOf(
+                            request.getRepositoryMerging().name()),
+                    repositories.stream()
+                            .map(internalSession::getRemoteRepository)
+                            .toList()));
+            modelBuildingRequest.modelCache(modelCache);
             modelBuildingRequest.transformerContextBuilder(transformerContextBuilder);
             /* TODO: bv4
             InternalMavenSession session =
@@ -1185,18 +1207,29 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
     }
 
-    protected class ModelResolverWrapper implements ModelResolver {
-        protected final org.apache.maven.model.resolution.ModelResolver resolver;
+    protected abstract class ModelResolverWrapper implements ModelResolver {
 
-        protected ModelResolverWrapper(org.apache.maven.model.resolution.ModelResolver resolver) {
-            this.resolver = resolver;
-        }
+        protected abstract org.apache.maven.model.resolution.ModelResolver getResolver(
+                List<RemoteRepository> repositories);
 
         @Override
-        public ModelSource resolveModel(Session session, String groupId, String artifactId, String version)
+        public ModelSource resolveModel(
+                Session session, String groupId, String artifactId, String version, Consumer<String> resolved)
                 throws ModelResolverException {
             try {
-                return toSource(resolver.resolveModel(groupId, artifactId, version));
+                InternalSession internalSession = InternalSession.from(session);
+                org.apache.maven.model.resolution.ModelResolver resolver =
+                        getResolver(internalSession.toRepositories(internalSession.getRemoteRepositories()));
+                org.apache.maven.model.Parent p = new org.apache.maven.model.Parent(Parent.newBuilder()
+                        .groupId(groupId)
+                        .artifactId(artifactId)
+                        .version(version)
+                        .build());
+                org.apache.maven.model.building.ModelSource modelSource = resolver.resolveModel(p);
+                if (!p.getVersion().equals(version)) {
+                    resolved.accept(p.getVersion());
+                }
+                return toSource(modelSource);
             } catch (UnresolvableModelException e) {
                 throw new ModelResolverException(e.getMessage(), e.getGroupId(), e.getArtifactId(), e.getVersion(), e);
             }
@@ -1207,6 +1240,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 throws ModelResolverException {
             try {
                 org.apache.maven.model.Parent p = new org.apache.maven.model.Parent(parent);
+                InternalSession internalSession = InternalSession.from(session);
+                org.apache.maven.model.resolution.ModelResolver resolver =
+                        getResolver(internalSession.toRepositories(internalSession.getRemoteRepositories()));
                 ModelSource source = toSource(resolver.resolveModel(p));
                 if (p.getDelegate() != parent) {
                     modified.set(p.getDelegate());
@@ -1222,6 +1258,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 throws ModelResolverException {
             try {
                 org.apache.maven.model.Dependency d = new org.apache.maven.model.Dependency(dependency);
+                InternalSession internalSession = InternalSession.from(session);
+                org.apache.maven.model.resolution.ModelResolver resolver =
+                        getResolver(internalSession.toRepositories(internalSession.getRemoteRepositories()));
                 ModelSource source = toSource(resolver.resolveModel(d));
                 if (d.getDelegate() != dependency) {
                     modified.set(d.getDelegate());
@@ -1230,26 +1269,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             } catch (UnresolvableModelException e) {
                 throw new ModelResolverException(e.getMessage(), e.getGroupId(), e.getArtifactId(), e.getVersion(), e);
             }
-        }
-
-        @Override
-        public void addRepository(Session session, Repository repository) throws ModelResolverException {
-            addRepository(session, repository, false);
-        }
-
-        @Override
-        public void addRepository(Session session, Repository repository, boolean replace)
-                throws ModelResolverException {
-            try {
-                resolver.addRepository(new org.apache.maven.model.Repository(repository), replace);
-            } catch (org.apache.maven.model.resolution.InvalidRepositoryException e) {
-                throw new MavenException(e);
-            }
-        }
-
-        @Override
-        public ModelResolver newCopy() {
-            return new ModelResolverWrapper(resolver.newCopy());
         }
     }
 }

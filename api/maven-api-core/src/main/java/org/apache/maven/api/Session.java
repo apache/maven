@@ -37,6 +37,10 @@ import org.apache.maven.api.settings.Settings;
 /**
  * The session to install / deploy / resolve artifacts and dependencies.
  *
+ * TODO: move the remote repositories in the requests (plugins will need to access this list somehow)
+ * TODO: add request trace so that requests can be linked together and through the resolver
+ * TODO: add a Request interface holding session + parent request
+ *
  * @since 4.0.0
  */
 @Experimental
