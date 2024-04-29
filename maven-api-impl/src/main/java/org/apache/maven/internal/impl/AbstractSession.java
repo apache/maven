@@ -214,7 +214,7 @@ public abstract class AbstractSession implements InternalSession {
     public Session withLocalRepository(@Nonnull LocalRepository localRepository) {
         nonNull(localRepository, "localRepository");
         if (session.getLocalRepository() != null
-                && Objects.equals(session.getLocalRepository().getBasedir().toPath(), localRepository.getPath())) {
+                && Objects.equals(session.getLocalRepository().getBasePath(), localRepository.getPath())) {
             return this;
         }
         org.eclipse.aether.repository.LocalRepository repository = toRepository(localRepository);
@@ -293,13 +293,10 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public org.eclipse.aether.artifact.Artifact toArtifact(Artifact artifact) {
-        File file = getService(ArtifactManager.class)
-                .getPath(artifact)
-                .map(Path::toFile)
-                .orElse(null);
+        Path path = getService(ArtifactManager.class).getPath(artifact).orElse(null);
         if (artifact instanceof DefaultArtifact) {
             org.eclipse.aether.artifact.Artifact a = ((DefaultArtifact) artifact).getArtifact();
-            if (Objects.equals(file, a.getFile())) {
+            if (Objects.equals(path, a.getPath())) {
                 return a;
             }
         }
@@ -310,7 +307,7 @@ public abstract class AbstractSession implements InternalSession {
                 artifact.getExtension(),
                 artifact.getVersion().toString(),
                 null,
-                file);
+                path);
     }
 
     @Override

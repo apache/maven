@@ -21,7 +21,6 @@ package org.apache.maven.internal.impl;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
@@ -67,10 +66,7 @@ public class DefaultArtifactManager implements ArtifactManager {
         }
         Path path = paths.get(id);
         if (path == null && artifact instanceof DefaultArtifact) {
-            File file = ((DefaultArtifact) artifact).getArtifact().getFile();
-            if (file != null) {
-                path = file.toPath();
-            }
+            path = ((DefaultArtifact) artifact).getArtifact().getPath();
         }
         return Optional.ofNullable(path);
     }

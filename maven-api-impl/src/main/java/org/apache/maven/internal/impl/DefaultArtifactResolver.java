@@ -69,7 +69,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                         session.getRepositorySystem().resolveArtifacts(session.getSession(), requests);
                 for (ArtifactResult result : results) {
                     Artifact artifact = session.getArtifact(result.getArtifact());
-                    Path path = result.getArtifact().getFile().toPath();
+                    Path path = result.getArtifact().getPath();
                     artifactManager.setPath(artifact, path);
                     paths.put(artifact, path);
                 }

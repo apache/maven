@@ -53,6 +53,6 @@ public class DefaultLocalRepository implements LocalRepository {
     @Nonnull
     @Override
     public Path getPath() {
-        return repository.getBasedir().toPath();
+        return repository.getBasePath();
     }
 }

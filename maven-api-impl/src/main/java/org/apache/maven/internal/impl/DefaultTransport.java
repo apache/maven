@@ -54,7 +54,7 @@ public class DefaultTransport implements Transport {
             throw new IllegalArgumentException("Supplied relative URI escapes baseUrl");
         }
         GetTask getTask = new GetTask(source);
-        getTask.setDataFile(target.toFile());
+        getTask.setDataPath(target);
         try {
             transporter.get(getTask);
             return true;
@@ -110,7 +110,7 @@ public class DefaultTransport implements Transport {
         }
 
         PutTask putTask = new PutTask(target);
-        putTask.setDataFile(source.toFile());
+        putTask.setDataPath(source);
         try {
             transporter.put(putTask);
         } catch (Exception e) {
