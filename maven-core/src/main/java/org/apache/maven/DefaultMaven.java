@@ -224,6 +224,9 @@ public class DefaultMaven implements Maven {
 
             result = doExecute(request, session, result, chainedWorkspaceReader);
         } catch (Exception e) {
+            if (e instanceof ClassCastException) {
+                throw e;
+            }
             result.addException(e);
         } finally {
             sessionScope.exit();
