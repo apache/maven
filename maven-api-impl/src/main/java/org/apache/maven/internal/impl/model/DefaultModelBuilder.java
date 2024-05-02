@@ -344,7 +344,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .map(Object::toString)
                         .toList();
                 if (!Objects.equals(oldRepos, newRepos)) {
-                    logger.info("Merging repositories from " + model.getId() + "\n"
+                    logger.debug("Merging repositories from " + model.getId() + "\n"
                             + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
                 }
             }
@@ -410,7 +410,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .map(Object::toString)
                     .toList();
             if (!Objects.equals(oldRepos, newRepos)) {
-                logger.info("Replacing repositories from " + resultModel.getId() + "\n"
+                logger.debug("Replacing repositories from " + resultModel.getId() + "\n"
                         + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
             }
         }
