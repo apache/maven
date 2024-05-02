@@ -409,7 +409,7 @@ class ReactorReader implements MavenWorkspaceReader {
             LOGGER.info("Copying {} to project local repository", artifact);
             Files.createDirectories(target.getParent());
             Files.copy(
-                    artifact.getFile().toPath(),
+                    artifact.getPath(),
                     target,
                     StandardCopyOption.REPLACE_EXISTING,
                     StandardCopyOption.COPY_ATTRIBUTES);

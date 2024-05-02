@@ -1217,7 +1217,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         if (modelSource instanceof FileModelSource) {
-            model = model.withPomFile(((FileModelSource) modelSource).getFile().toPath());
+            model = model.withPomFile(((FileModelSource) modelSource).getPath());
         }
 
         Model retModel = new Model(model);

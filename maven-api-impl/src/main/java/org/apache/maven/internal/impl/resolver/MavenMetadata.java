@@ -89,6 +89,7 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
         return path;
     }
 
+    @Deprecated
     public void merge(File existing, File result) throws RepositoryException {
         merge(existing != null ? existing.toPath() : null, result != null ? result.toPath() : null);
     }
