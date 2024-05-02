@@ -35,7 +35,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nullable;
@@ -50,6 +52,7 @@ import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.InputLocationTracker;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
@@ -80,8 +83,11 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.resolver.DefaultModelCache;
 import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
+import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 
@@ -377,54 +383,75 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private List<Profile> interpolateActivations(
             List<Profile> profiles, DefaultProfileActivationContext context, DefaultModelProblemCollector problems) {
-        List<Profile> newProfiles = null;
-        for (int index = 0; index < profiles.size(); index++) {
-            Profile profile = profiles.get(index);
-            Activation activation = profile.getActivation();
-            if (activation != null) {
-                ActivationFile file = activation.getFile();
-                if (file != null) {
-                    String oldExists = file.getExists();
-                    if (isNotEmpty(oldExists)) {
+        if (profiles.stream()
+                .map(org.apache.maven.api.model.Profile::getActivation)
+                .noneMatch(Objects::nonNull)) {
+            return profiles;
+        }
+        final Interpolator xform = new RegexBasedInterpolator();
+        xform.setCacheAnswers(true);
+        Stream.of(context.getUserProperties(), context.getSystemProperties())
+                .map(MapBasedValueSource::new)
+                .forEach(xform::addValueSource);
+
+        class ProfileInterpolator extends MavenTransformer implements UnaryOperator<Profile> {
+            ProfileInterpolator() {
+                super(s -> {
+                    if (isNotEmpty(s)) {
                         try {
-                            String newExists = interpolate(oldExists, context);
-                            if (!Objects.equals(oldExists, newExists)) {
-                                if (newProfiles == null) {
-                                    newProfiles = new ArrayList<>(profiles);
-                                }
-                                newProfiles.set(
-                                        index, profile.withActivation(activation.withFile(file.withExists(newExists))));
-                            }
+                            return xform.interpolate(s);
                         } catch (InterpolationException e) {
-                            addInterpolationProblem(problems, file, oldExists, e, "exists");
-                        }
-                    } else {
-                        String oldMissing = file.getMissing();
-                        if (isNotEmpty(oldMissing)) {
-                            try {
-                                String newMissing = interpolate(oldMissing, context);
-                                if (!Objects.equals(oldMissing, newMissing)) {
-                                    if (newProfiles == null) {
-                                        newProfiles = new ArrayList<>(profiles);
-                                    }
-                                    newProfiles.set(
-                                            index,
-                                            profile.withActivation(activation.withFile(file.withMissing(newMissing))));
-                                }
-                            } catch (InterpolationException e) {
-                                addInterpolationProblem(problems, file, oldMissing, e, "missing");
-                            }
+                            problems.add(Severity.ERROR, ModelProblem.Version.BASE, e.getMessage(), e);
                         }
                     }
+                    return s;
+                });
+            }
+
+            @Override
+            public Profile apply(Profile p) {
+                return Profile.newBuilder(p)
+                        .activation(transformActivation(p.getActivation()))
+                        .build();
+            }
+
+            @Override
+            protected ActivationFile.Builder transformActivationFile_Missing(
+                    Supplier<? extends ActivationFile.Builder> creator,
+                    ActivationFile.Builder builder,
+                    ActivationFile target) {
+                String path = target.getMissing();
+                String xformed = transformPath(path, target, "missing");
+                return xformed != path ? (builder != null ? builder : creator.get()).missing(xformed) : builder;
+            }
+
+            @Override
+            protected ActivationFile.Builder transformActivationFile_Exists(
+                    Supplier<? extends ActivationFile.Builder> creator,
+                    ActivationFile.Builder builder,
+                    ActivationFile target) {
+                final String path = target.getExists();
+                final String xformed = transformPath(path, target, "exists");
+                return xformed != path ? (builder != null ? builder : creator.get()).exists(xformed) : builder;
+            }
+
+            private String transformPath(String path, ActivationFile target, String locationKey) {
+                if (isNotEmpty(path)) {
+                    try {
+                        return profileActivationFilePathInterpolator.interpolate(path, context);
+                    } catch (InterpolationException e) {
+                        addInterpolationProblem(problems, target, path, e, locationKey);
+                    }
                 }
+                return path;
             }
         }
-        return newProfiles != null ? newProfiles : profiles;
+        return profiles.stream().map(new ProfileInterpolator()).toList();
     }
 
     private static void addInterpolationProblem(
             DefaultModelProblemCollector problems,
-            ActivationFile file,
+            InputLocationTracker target,
             String path,
             InterpolationException e,
             String locationKey) {
@@ -432,12 +459,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Severity.ERROR,
                 ModelProblem.Version.BASE,
                 "Failed to interpolate file location " + path + ": " + e.getMessage(),
-                file.getLocation(locationKey),
+                target.getLocation(locationKey),
                 e);
-    }
-
-    private String interpolate(String path, ProfileActivationContext context) throws InterpolationException {
-        return isNotEmpty(path) ? profileActivationFilePathInterpolator.interpolate(path, context) : path;
     }
 
     private static boolean isNotEmpty(String string) {
