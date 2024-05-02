@@ -762,20 +762,17 @@ public class DefaultModelValidatorTest extends TestCase {
                 result.getWarnings().get(0));
     }
 
-    public void repositoryWithExpression() throws Exception {
+    public void testRepositoryWithExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-expression.xml");
-        assertViolations(result, 0, 1, 0);
-        assertEquals(
-                "'repositories.repository.[repo].url' contains an expression but should be a constant.",
-                result.getErrors().get(0));
+        assertViolations(result, 0, 0, 0);
     }
 
-    public void repositoryWithBasedirExpression() throws Exception {
+    public void testRepositoryWithBasedirExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-basedir-expression.xml");
         assertViolations(result, 0, 0, 0);
     }
 
-    public void profileActivationWithAllowedExpression() throws Exception {
+    public void testProfileActivationWithAllowedExpression() throws Exception {
         SimpleProblemCollector result = validateRaw(
                 "raw-model/profile-activation-file-with-allowed-expressions.xml",
                 mbr -> mbr.setUserProperties(new Properties() {
@@ -789,7 +786,7 @@ public class DefaultModelValidatorTest extends TestCase {
         assertViolations(result, 0, 0, 0);
     }
 
-    public void profileActivationFileWithProjectExpression() throws Exception {
+    public void testProfileActivationFileWithProjectExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/profile-activation-file-with-project-expressions.xml");
         assertViolations(result, 0, 0, 2);
 
@@ -806,7 +803,7 @@ public class DefaultModelValidatorTest extends TestCase {
                 result.getWarnings().get(1));
     }
 
-    public void profileActivationPropertyWithProjectExpression() throws Exception {
+    public void testProfileActivationPropertyWithProjectExpression() throws Exception {
         SimpleProblemCollector result =
                 validateRaw("raw-model/profile-activation-property-with-project-expressions.xml");
         assertViolations(result, 0, 0, 2);
