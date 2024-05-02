@@ -79,4 +79,9 @@ class PathSource implements ModelSource {
     public int hashCode() {
         return Objects.hash(path);
     }
+
+    @Override
+    public String toString() {
+        return "PathSource[" + "location='" + location + '\'' + ", " + "path=" + path + ']';
+    }
 }

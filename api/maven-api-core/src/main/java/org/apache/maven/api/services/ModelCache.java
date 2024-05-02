@@ -16,11 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services.model;
+package org.apache.maven.api.services;
 
 import java.util.function.Supplier;
-
-import org.apache.maven.api.services.Source;
 
 /**
  * Caches auxiliary data used during model building like already processed raw/effective models. The data in the cache

@@ -32,6 +32,7 @@ import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.api.services.ModelRepositoryHolder;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
@@ -189,14 +190,20 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             }
 
             try {
-                Session iSession = InternalSession.from(session);
+                InternalSession iSession = InternalSession.from(session);
+                Session iSessionWithRepos = iSession.withRemoteRepositories(request.getRepositories().stream()
+                        .map(iSession::getRemoteRepository)
+                        .toList());
                 String gav =
                         pomArtifact.getGroupId() + ":" + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion();
-                ModelResolver modelResolver =
-                        new DefaultModelResolver(remoteRepositoryManager, request.getRepositories());
+                ModelResolver modelResolver = new DefaultModelResolver();
+                ModelRepositoryHolder modelRepositoryHolder = new DefaultModelRepositoryHolder(
+                        iSessionWithRepos,
+                        DefaultModelRepositoryHolder.RepositoryMerging.REQUEST_DOMINANT,
+                        iSessionWithRepos.getRemoteRepositories());
                 ModelBuilderRequest modelRequest = ModelBuilderRequest.builder()
-                        .session(iSession)
-                        .projectBuild(true)
+                        .session(iSessionWithRepos)
+                        .projectBuild(false)
                         .processPlugins(false)
                         .twoPhaseBuilding(false)
                         .source(ModelSource.fromPath(pomArtifact.getPath(), gav))
@@ -205,6 +212,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         .systemProperties(toProperties(session.getUserProperties(), session.getSystemProperties()))
                         .userProperties(Map.of())
                         .modelResolver(modelResolver)
+                        .modelRepositoryHolder(modelRepositoryHolder)
+                        .modelCache(DefaultModelCache.newInstance(session, false))
                         .build();
 
                 model = modelBuilder.build(modelRequest).getEffectiveModel();

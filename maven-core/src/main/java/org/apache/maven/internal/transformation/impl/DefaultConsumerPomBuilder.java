@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.Dependency;
@@ -39,6 +40,7 @@ import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblemCollector;
+import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ModelTransformer;
 import org.apache.maven.api.services.SuperPomProvider;
@@ -62,12 +64,14 @@ import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.model.DefaultModelBuilder;
 import org.apache.maven.internal.impl.model.DefaultProfileSelector;
 import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
-import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
+import org.apache.maven.internal.impl.resolver.DefaultModelCache;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
@@ -133,6 +137,11 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     @Inject
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
 
+    @Inject
+    private ModelResolver modelResolver;
+
+    Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuilderException {
         Model model = project.getModel().getDelegate();
@@ -184,21 +193,32 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 dependencyManagementImporter,
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
-                profileActivationFilePathInterpolator,
+                null,
                 modelTransformer,
-                versionParser,
-                remoteRepositoryManager);
+                versionParser);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
         request.projectBuild(true);
         request.session(InternalSession.from(session));
         request.source(ModelSource.fromPath(src));
         request.validationLevel(ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL);
         request.locationTracking(false);
-        request.modelResolver(
-                new DefaultModelResolver(remoteRepositoryManager, project.getRemoteProjectRepositories()));
+        request.modelResolver(modelResolver);
         request.transformerContextBuilder(modelBuilder.newTransformerContextBuilder());
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());
+        request.modelCache(DefaultModelCache.newInstance(session, false));
+        if (session.getCache() != null) {
+            Map<?, ?> map = (Map) session.getCache().get(session, DefaultModelCache.class.getName());
+            List<String> paths = map.keySet().stream()
+                    .map(Object::toString)
+                    .filter(s -> s.startsWith("SourceCacheKey"))
+                    .map(s -> s.substring("SourceCacheKey[location=".length(), s.indexOf(", tag")))
+                    .sorted()
+                    .distinct()
+                    .toList();
+            logger.info("ModelCache contains " + paths.size());
+            paths.forEach(s -> logger.info("    " + s));
+        }
         return modelBuilder.build(request.build());
     }
 

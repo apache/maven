@@ -37,7 +37,8 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
  * Request used to build a {@link org.apache.maven.api.Project} using
  * the {@link ProjectBuilder} service.
  *
- * TODO: add validationLevel, activeProfileIds, inactiveProfileIds, resolveDependencies
+ * TODO: replace ModelRepositoryHolder with just the enum for the strategy
+ * TODO: replace validation level with an enum (though, we usually need just a boolean)
  *
  * @since 4.0.0
  */
@@ -138,7 +139,14 @@ public interface ModelBuilderRequest {
     @Nonnull
     Map<String, String> getUserProperties();
 
+    @Nonnull
     ModelResolver getModelResolver();
+
+    @Nonnull
+    ModelRepositoryHolder getModelRepositoryHolder();
+
+    @Nullable
+    ModelCache getModelCache();
 
     @Nullable
     Object getListener();
@@ -197,6 +205,8 @@ public interface ModelBuilderRequest {
         Map<String, String> systemProperties;
         Map<String, String> userProperties;
         ModelResolver modelResolver;
+        ModelRepositoryHolder modelRepositoryHolder;
+        ModelCache modelCache;
         Object listener;
         ModelBuilderResult interimResult;
         ModelTransformerContextBuilder transformerContextBuilder;
@@ -217,6 +227,8 @@ public interface ModelBuilderRequest {
             this.systemProperties = request.getSystemProperties();
             this.userProperties = request.getUserProperties();
             this.modelResolver = request.getModelResolver();
+            this.modelRepositoryHolder = request.getModelRepositoryHolder();
+            this.modelCache = request.getModelCache();
             this.listener = request.getListener();
             this.interimResult = request.getInterimResult();
             this.transformerContextBuilder = request.getTransformerContextBuilder();
@@ -287,6 +299,16 @@ public interface ModelBuilderRequest {
             return this;
         }
 
+        public ModelBuilderRequestBuilder modelRepositoryHolder(ModelRepositoryHolder modelRepositoryHolder) {
+            this.modelRepositoryHolder = modelRepositoryHolder;
+            return this;
+        }
+
+        public ModelBuilderRequestBuilder modelCache(ModelCache modelCache) {
+            this.modelCache = modelCache;
+            return this;
+        }
+
         public ModelBuilderRequestBuilder listener(Object listener) {
             this.listener = listener;
             return this;
@@ -318,6 +340,8 @@ public interface ModelBuilderRequest {
                     systemProperties,
                     userProperties,
                     modelResolver,
+                    modelRepositoryHolder,
+                    modelCache,
                     listener,
                     interimResult,
                     transformerContextBuilder);
@@ -336,6 +360,8 @@ public interface ModelBuilderRequest {
             private final Map<String, String> systemProperties;
             private final Map<String, String> userProperties;
             private final ModelResolver modelResolver;
+            private final ModelRepositoryHolder modelRepositoryHolder;
+            private final ModelCache modelCache;
             private final Object listener;
             private final ModelBuilderResult interimResult;
             private final ModelTransformerContextBuilder transformerContextBuilder;
@@ -355,6 +381,8 @@ public interface ModelBuilderRequest {
                     Map<String, String> systemProperties,
                     Map<String, String> userProperties,
                     ModelResolver modelResolver,
+                    ModelRepositoryHolder modelRepositoryHolder,
+                    ModelCache modelCache,
                     Object listener,
                     ModelBuilderResult interimResult,
                     ModelTransformerContextBuilder transformerContextBuilder) {
@@ -372,6 +400,8 @@ public interface ModelBuilderRequest {
                         systemProperties != null ? Map.copyOf(systemProperties) : session.getSystemProperties();
                 this.userProperties = userProperties != null ? Map.copyOf(userProperties) : session.getUserProperties();
                 this.modelResolver = modelResolver;
+                this.modelRepositoryHolder = modelRepositoryHolder;
+                this.modelCache = modelCache;
                 this.listener = listener;
                 this.interimResult = interimResult;
                 this.transformerContextBuilder = transformerContextBuilder;
@@ -435,6 +465,16 @@ public interface ModelBuilderRequest {
             @Override
             public ModelResolver getModelResolver() {
                 return modelResolver;
+            }
+
+            @Override
+            public ModelRepositoryHolder getModelRepositoryHolder() {
+                return modelRepositoryHolder;
+            }
+
+            @Override
+            public ModelCache getModelCache() {
+                return modelCache;
             }
 
             public Object getListener() {

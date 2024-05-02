@@ -30,6 +30,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.ModelSource;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,8 +44,11 @@ class TestApiStandalone {
         Session session = ApiRunner.createSession();
 
         ModelBuilder builder = session.getService(ModelBuilder.class);
-        ModelBuilderResult result = builder.build(
-                ModelBuilderRequest.build(session, Paths.get("pom.xml").toAbsolutePath()));
+        ModelBuilderResult result = builder.build(ModelBuilderRequest.builder()
+                .session(session)
+                .source(ModelSource.fromPath(Paths.get("pom.xml").toAbsolutePath()))
+                .projectBuild(true)
+                .build());
         assertNotNull(result.getEffectiveModel());
 
         ArtifactCoordinate coord = session.createArtifactCoordinate("org.apache.maven:maven-api-core:4.0.0-alpha-13");

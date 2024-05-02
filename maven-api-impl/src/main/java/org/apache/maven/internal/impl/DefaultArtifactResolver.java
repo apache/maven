@@ -76,7 +76,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
             }
             return () -> paths;
         } catch (ArtifactResolutionException e) {
-            throw new ArtifactResolverException("Unable to resolve artifact", e);
+            throw new ArtifactResolverException("Unable to resolve artifact: " + e.getMessage(), e);
         }
     }
 }

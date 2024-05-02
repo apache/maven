@@ -23,8 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
+import org.apache.maven.api.services.ModelCache;
 import org.apache.maven.api.services.Source;
-import org.apache.maven.api.services.model.ModelCache;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositorySystemSession;
 
@@ -38,19 +38,28 @@ public class DefaultModelCache implements ModelCache {
     private static final String KEY = DefaultModelCache.class.getName();
 
     @SuppressWarnings("unchecked")
-    public static ModelCache newInstance(RepositorySystemSession session) {
+    public static ModelCache newInstance(RepositorySystemSession session, boolean anew) {
         ConcurrentHashMap<Object, Supplier<?>> cache;
-        RepositoryCache repositoryCache = session.getCache();
+        RepositoryCache repositoryCache = session != null ? session.getCache() : null;
         if (repositoryCache == null) {
-            cache = new ConcurrentHashMap<>();
+            return new DefaultModelCache(new ConcurrentHashMap<>());
         } else {
-            cache = (ConcurrentHashMap<Object, Supplier<?>>)
-                    repositoryCache.computeIfAbsent(session, KEY, ConcurrentHashMap::new);
+            if (anew) {
+                cache = new ConcurrentHashMap<>();
+                repositoryCache.put(session, KEY, cache);
+            } else {
+                cache = (ConcurrentHashMap<Object, Supplier<?>>)
+                        repositoryCache.computeIfAbsent(session, KEY, ConcurrentHashMap::new);
+            }
+            return new DefaultModelCache(cache);
         }
-        return new DefaultModelCache(cache);
     }
 
     private final ConcurrentMap<Object, Supplier<?>> cache;
+
+    public DefaultModelCache() {
+        this(new ConcurrentHashMap<>());
+    }
 
     private DefaultModelCache(ConcurrentMap<Object, Supplier<?>> cache) {
         this.cache = requireNonNull(cache);
@@ -125,7 +134,7 @@ public class DefaultModelCache implements ModelCache {
 
         @Override
         public String toString() {
-            return "GavCacheKey{" + "gav='" + gav + '\'' + ", tag='" + tag + '\'' + '}';
+            return "GavCacheKey[" + "gav='" + gav + '\'' + ", tag='" + tag + '\'' + ']';
         }
     }
 
@@ -144,7 +153,8 @@ public class DefaultModelCache implements ModelCache {
 
         @Override
         public String toString() {
-            return "SourceCacheKey{" + "source=" + source + ", tag='" + tag + '\'' + '}';
+            return "SourceCacheKey[" + "location=" + source.getLocation() + ", tag=" + tag + ", path="
+                    + source.getPath() + ']';
         }
 
         @Override

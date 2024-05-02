@@ -71,6 +71,9 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
+import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ArtifactResult;
@@ -264,7 +267,8 @@ public class BootstrapCoreExtensionManager {
             } else if (clazz == ArtifactManager.class) {
                 return (T) new DefaultArtifactManager(this);
             } else if (clazz == RepositoryFactory.class) {
-                return (T) new DefaultRepositoryFactory();
+                return (T) new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
+                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider()));
                 // } else if (clazz == ModelResolver.class) {
                 //    return (T) new DefaultModelResolver();
             }

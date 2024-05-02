@@ -1061,8 +1061,7 @@ public class MavenRepositorySystemSupplier implements Supplier<RepositorySystem>
                 new DefaultPluginConfigurationExpander(),
                 new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), new DefaultRootLocator()),
                 new BuildModelTransformer(),
-                new DefaultModelVersionParser(getVersionScheme()),
-                getRemoteRepositoryManager());
+                new DefaultModelVersionParser(getVersionScheme()));
     }
 
     private RepositorySystem repositorySystem;

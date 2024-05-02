@@ -18,15 +18,23 @@
  */
 package org.apache.maven.internal.transformation.impl;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.function.Consumer;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.ModelResolver;
+import org.apache.maven.api.services.ModelResolverException;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.internal.impl.InternalMavenSession;
@@ -85,5 +93,25 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
         assertNotNull(model);
         assertTrue(model.getProfiles().isEmpty());
+    }
+
+    @Named
+    @Singleton
+    @Priority(10)
+    public static class MyModelResolver implements ModelResolver {
+        @Override
+        public ModelSource resolveModel(
+                Session session, String groupId, String artifactId, String version, Consumer<String> resolvedVersion)
+                throws ModelResolverException {
+            String id = groupId + ":" + artifactId + ":" + version;
+            if (id.startsWith("org.sonatype.mavenbook.multi:parent:")) {
+                return ModelSource.fromPath(Paths.get("src/test/resources/consumer/simple/pom.xml"));
+            } else if (id.startsWith("org.sonatype.mavenbook.multi:simple-parent:")) {
+                return ModelSource.fromPath(Paths.get("src/test/resources/consumer/simple/simple-parent/pom.xml"));
+            } else if (id.startsWith("org.my.group:parent:")) {
+                return ModelSource.fromPath(Paths.get("src/test/resources/consumer/trivial/pom.xml"));
+            }
+            return null;
+        }
     }
 }
