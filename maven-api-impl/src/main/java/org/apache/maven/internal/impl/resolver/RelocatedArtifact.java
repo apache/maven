@@ -116,6 +116,17 @@ public final class RelocatedArtifact extends AbstractArtifact {
         return new RelocatedArtifact(artifact, groupId, artifactId, classifier, extension, version, message);
     }
 
+    @Deprecated
+    @Override
+    public Artifact setFile(File file) {
+        File current = getFile();
+        if (Objects.equals(current, file)) {
+            return this;
+        }
+        return new RelocatedArtifact(
+                artifact.setFile(file), groupId, artifactId, classifier, extension, version, message);
+    }
+
     @Override
     public Artifact setPath(Path path) {
         Path current = getPath();
