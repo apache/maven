@@ -20,6 +20,8 @@ package org.apache.maven.model.validation;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
+import java.util.function.UnaryOperator;
 
 import junit.framework.TestCase;
 import org.apache.maven.model.Model;
@@ -44,29 +46,41 @@ public class DefaultModelValidatorTest extends TestCase {
     }
 
     private SimpleProblemCollector validate(String pom) throws Exception {
-        return validateEffective(pom, ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
+        return validateEffective(pom, UnaryOperator.identity());
     }
 
     private SimpleProblemCollector validateRaw(String pom) throws Exception {
-        return validateRaw(pom, ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
+        return validateRaw(pom, UnaryOperator.identity());
     }
 
     private SimpleProblemCollector validateEffective(String pom, int level) throws Exception {
-        ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel(level);
+        return validateEffective(pom, mbr -> mbr.setValidationLevel(level));
+    }
 
-        SimpleProblemCollector problems = new SimpleProblemCollector(read(pom));
+    private SimpleProblemCollector validateEffective(String pom, UnaryOperator<ModelBuildingRequest> requestConfigurer)
+            throws Exception {
+        Model model = read(pom);
 
-        validator.validateEffectiveModel(problems.getModel(), request, problems);
+        SimpleProblemCollector problems = new SimpleProblemCollector(model);
+
+        validator.validateEffectiveModel(model, requestConfigurer.apply(new DefaultModelBuildingRequest()), problems);
 
         return problems;
     }
 
     private SimpleProblemCollector validateRaw(String pom, int level) throws Exception {
-        ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel(level);
+        return validateRaw(pom, mbr -> mbr.setValidationLevel(level));
+    }
 
-        SimpleProblemCollector problems = new SimpleProblemCollector(read(pom));
+    private SimpleProblemCollector validateRaw(String pom, UnaryOperator<ModelBuildingRequest> requestConfigurer)
+            throws Exception {
+        Model model = read(pom);
 
-        validator.validateRawModel(problems.getModel(), request, problems);
+        SimpleProblemCollector problems = new SimpleProblemCollector(model);
+
+        ModelBuildingRequest request = requestConfigurer.apply(new DefaultModelBuildingRequest());
+
+        validator.validateRawModel(model, request, problems);
 
         return problems;
     }
@@ -748,24 +762,61 @@ public class DefaultModelValidatorTest extends TestCase {
                 result.getWarnings().get(0));
     }
 
-    public void testProfileActivationWithAllowedExpression() throws Exception {
-        SimpleProblemCollector result = validateRaw("raw-model/profile-activation-file-with-allowed-expressions.xml");
+    public void testRepositoryWithExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/repository-with-expression.xml");
         assertViolations(result, 0, 0, 0);
     }
 
-    public void testProfileActivationWithProjectExpression() throws Exception {
+    public void testRepositoryWithBasedirExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/repository-with-basedir-expression.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    public void testProfileActivationWithAllowedExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw(
+                "raw-model/profile-activation-file-with-allowed-expressions.xml",
+                mbr -> mbr.setUserProperties(new Properties() {
+                    private static final long serialVersionUID = 1L;
+
+                    {
+                        setProperty("foo", "foo");
+                        setProperty("bar", "foo");
+                    }
+                }));
+        assertViolations(result, 0, 0, 0);
+    }
+
+    public void testProfileActivationFileWithProjectExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/profile-activation-file-with-project-expressions.xml");
         assertViolations(result, 0, 0, 2);
 
         assertEquals(
                 "'profiles.profile[exists-project-version].activation.file.exists' "
-                        + "Failed to interpolate file location ${project.version}/test.txt: "
+                        + "Failed to interpolate profile activation property ${project.version}/test.txt: "
                         + "${project.version} expressions are not supported during profile activation.",
                 result.getWarnings().get(0));
 
         assertEquals(
                 "'profiles.profile[missing-project-version].activation.file.missing' "
-                        + "Failed to interpolate file location ${project.version}/test.txt: "
+                        + "Failed to interpolate profile activation property ${project.version}/test.txt: "
+                        + "${project.version} expressions are not supported during profile activation.",
+                result.getWarnings().get(1));
+    }
+
+    public void testProfileActivationPropertyWithProjectExpression() throws Exception {
+        SimpleProblemCollector result =
+                validateRaw("raw-model/profile-activation-property-with-project-expressions.xml");
+        assertViolations(result, 0, 0, 2);
+
+        assertEquals(
+                "'profiles.profile[property-name-project-version].activation.property.name' "
+                        + "Failed to interpolate profile activation property ${project.version}: "
+                        + "${project.version} expressions are not supported during profile activation.",
+                result.getWarnings().get(0));
+
+        assertEquals(
+                "'profiles.profile[property-value-project-version].activation.property.value' "
+                        + "Failed to interpolate profile activation property ${project.version}: "
                         + "${project.version} expressions are not supported during profile activation.",
                 result.getWarnings().get(1));
     }
