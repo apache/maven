@@ -901,9 +901,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         Parent parent = childModel.getParent();
         if (parent != null) {
-            if (request.isProjectBuild()) {
-                parentData = readParentLocally(childModel, childSource, request, problems);
-            }
+            parentData = readParentLocally(childModel, childSource, request, problems);
             if (parentData == null) {
                 parentData = readParentExternally(childModel, request, problems);
             }
@@ -1247,7 +1245,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 IMPORT,
                 () -> doLoadDependencyManagement(
                         model, request, problems, dependency, groupId, artifactId, version, importIds));
-        DependencyManagement importMgmt = importModel.getDependencyManagement();
+        DependencyManagement importMgmt = importModel != null ? importModel.getDependencyManagement() : null;
         if (importMgmt == null) {
             importMgmt = DependencyManagement.newInstance();
         }
