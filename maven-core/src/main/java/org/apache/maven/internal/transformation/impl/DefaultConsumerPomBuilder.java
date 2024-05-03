@@ -193,7 +193,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 dependencyManagementImporter,
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
-                null,
+                profileActivationFilePathInterpolator,
                 modelTransformer,
                 versionParser);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
