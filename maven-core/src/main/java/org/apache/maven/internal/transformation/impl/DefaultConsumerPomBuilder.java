@@ -216,8 +216,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                     .sorted()
                     .distinct()
                     .toList();
-            logger.info("ModelCache contains " + paths.size());
-            paths.forEach(s -> logger.info("    " + s));
+            logger.debug("ModelCache contains " + paths.size());
+            paths.forEach(s -> logger.debug("    " + s));
         }
         return modelBuilder.build(request.build());
     }
