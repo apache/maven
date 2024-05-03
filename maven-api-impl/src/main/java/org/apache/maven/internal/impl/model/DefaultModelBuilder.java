@@ -901,9 +901,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         Parent parent = childModel.getParent();
         if (parent != null) {
-            if (request.isProjectBuild()) {
-                parentData = readParentLocally(childModel, childSource, request, problems);
-            }
+            parentData = readParentLocally(childModel, childSource, request, problems);
             if (parentData == null) {
                 parentData = readParentExternally(childModel, request, problems);
             }
