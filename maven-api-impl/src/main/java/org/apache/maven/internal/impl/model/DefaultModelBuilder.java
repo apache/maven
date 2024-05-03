@@ -1247,7 +1247,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 IMPORT,
                 () -> doLoadDependencyManagement(
                         model, request, problems, dependency, groupId, artifactId, version, importIds));
-        DependencyManagement importMgmt = importModel.getDependencyManagement();
+        DependencyManagement importMgmt = importModel != null ? importModel.getDependencyManagement() : null;
         if (importMgmt == null) {
             importMgmt = DependencyManagement.newInstance();
         }
