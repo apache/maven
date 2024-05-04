@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.Dependency;
+import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.annotations.Experimental;
@@ -43,6 +44,8 @@ public interface DependencyResolverResult extends DependencyCollectorResult {
     /**
      * Returns the file paths of all dependencies, regardless on which tool option those paths should be placed.
      * The returned list may contain a mix of Java class-path, Java module-path, and other types of path elements.
+     * This collection has the same content than {@code getDependencies.values()} except that it does not contain
+     * null elements.
      *
      * @return the paths of all dependencies
      */
@@ -55,36 +58,31 @@ public interface DependencyResolverResult extends DependencyCollectorResult {
      * In the case of Java tools, the map may also contain {@code --patch-module} options, which are
      * {@linkplain org.apache.maven.api.JavaPathType#patchModule(String) handled in a special way}.
      *
-     * <p><b>Design note:</b>
+     * <h4>Design note</h4>
      * All types of path are determined together because they are sometime mutually exclusive.
      * For example, an artifact of type {@value org.apache.maven.api.Type#JAR} can be placed
      * either on the class-path or on the module-path. The project needs to make a choice
      * (possibly using heuristic rules), then to add the dependency in only one of the options
-     * identified by {@link PathType}.</p>
+     * identified by {@link PathType}.
      *
      * @return file paths to place on the different tool options
      */
     @Nonnull
     Map<PathType, List<Path>> getDispatchedPaths();
 
+    /**
+     * {@return all dependencies associated to their paths}.
+     * Some dependencies may be associated to a null value if there is no path available.
+     */
     @Nonnull
     Map<Dependency, Path> getDependencies();
 
     /**
-     * Formats the command-line option for the path of the specified type.
-     * The option are documented in {@link org.apache.maven.api.JavaPathType} enumeration values.
+     * If the module-path contains at least one filename-based auto-module, prepares a warning message.
+     * The module path is the collection of dependencies associated to {@link JavaPathType#MODULES}.
+     * It is caller's responsibility to send the message to a logger.
      *
-     * @param type the desired type of path (class-path, module-path, …)
-     * @return the option to pass to Java tools
+     * @return warning message if at least one filename-based auto-module was found
      */
-    default Optional<String> formatOption(PathType type) {
-        List<Path> paths = getDispatchedPaths().get(type);
-        if (paths != null) {
-            String option = type.option(paths);
-            if (!option.isEmpty()) {
-                return Optional.of(option);
-            }
-        }
-        return Optional.empty();
-    }
+    Optional<String> warningForFilenameBasedAutomodules();
 }

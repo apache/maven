@@ -20,10 +20,13 @@ package org.apache.maven.internal.impl;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.function.Predicate;
 
 import org.apache.maven.api.JavaPathType;
@@ -108,12 +111,18 @@ class PathModularizationCache {
         boolean classes = false;
         boolean modules = false;
         boolean unknown = false;
+        boolean processorClasses = false;
+        boolean processorModules = false;
         for (PathType type : types) {
             if (filter.test(type)) {
                 if (JavaPathType.CLASSES.equals(type)) {
                     classes = true;
                 } else if (JavaPathType.MODULES.equals(type)) {
                     modules = true;
+                } else if (JavaPathType.PROCESSOR_CLASSES.equals(type)) {
+                    processorClasses = true;
+                } else if (JavaPathType.PROCESSOR_MODULES.equals(type)) {
+                    processorModules = true;
                 } else {
                     unknown = true;
                 }
@@ -126,9 +135,54 @@ class PathModularizationCache {
                 }
             }
         }
-        if (classes & modules) {
+        /*
+         * If the dependency can be both on the class-path and the module-path, we need to chose one of these.
+         * The choice done below will overwrite the current `selected` value because the latter is only the
+         * first value encountered in iteration order, which may be random.
+         */
+        if (classes | modules) {
+            if (classes & modules) {
+                selected = getPathType(path);
+            } else if (classes) {
+                selected = JavaPathType.CLASSES;
+            } else {
+                selected = JavaPathType.MODULES;
+            }
+        } else if (processorClasses & processorModules) {
             selected = getPathType(path);
+            if (JavaPathType.CLASSES.equals(selected)) {
+                selected = JavaPathType.PROCESSOR_CLASSES;
+            } else if (JavaPathType.MODULES.equals(selected)) {
+                selected = JavaPathType.PROCESSOR_MODULES;
+            }
         }
         return Optional.ofNullable(selected);
+    }
+
+    /**
+     * If the module-path contains a filename-based auto-module, prepares a warning message.
+     * It is caller's responsibility to send the message to a logger.
+     *
+     * @param modulePaths content of the module path, or {@code null} if none
+     * @return warning message if at least one filename-based auto-module was found
+     * @throws IOException if an error occurred while reading module information
+     */
+    Optional<String> warningForFilenameBasedAutomodules(Collection<Path> modulePaths) throws IOException {
+        if (modulePaths == null) {
+            return Optional.empty();
+        }
+        var automodulesDetected = new ArrayList<String>();
+        for (Path p : modulePaths) {
+            getModuleInfo(p).addIfFilenameBasedAutomodules(automodulesDetected);
+        }
+        if (automodulesDetected.isEmpty()) {
+            return Optional.empty();
+        }
+        var joiner = new StringJoiner(
+                ", ",
+                "Filename-based automodules detected on the module-path: ",
+                "Please don't publish this project to a public artifact repository.");
+        automodulesDetected.forEach(joiner::add);
+        return Optional.of(joiner.toString());
     }
 }

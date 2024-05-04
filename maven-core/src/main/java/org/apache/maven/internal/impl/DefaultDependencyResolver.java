@@ -91,12 +91,12 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 .collect(Collectors.toList());
         Map<Artifact, Path> artifacts = session.resolveArtifacts(coordinates);
         DefaultDependencyResolverResult result = new DefaultDependencyResolverResult(
-                collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
+                cache, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
         for (Node node : nodes) {
             Dependency d = node.getDependency();
             Path path = (d != null) ? artifacts.get(d) : null;
             try {
-                result.addDependency(node, d, filter, path, cache);
+                result.addDependency(node, d, filter, path);
             } catch (IOException e) {
                 throw cannotReadModuleInfo(path, e);
             }

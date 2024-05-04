@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -33,6 +34,7 @@ import org.apache.maven.api.Dependency;
 import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathType;
+import org.apache.maven.api.services.DependencyResolverException;
 import org.apache.maven.api.services.DependencyResolverRequest;
 import org.apache.maven.api.services.DependencyResolverResult;
 
@@ -42,8 +44,8 @@ import org.apache.maven.api.services.DependencyResolverResult;
  * to the following methods, in that order:
  *
  * <ul>
- *   <li>{@link #addOutputDirectory(Path, Path, PathModularizationCache)} (optional)</li>
- *   <li>{@link #addDependency(Node, Dependency, Predicate, Path, PathModularizationCache)}</li>
+ *   <li>{@link #addOutputDirectory(Path, Path)} (optional)</li>
+ *   <li>{@link #addDependency(Node, Dependency, Predicate, Path)}</li>
  * </ul>
  *
  * @see DefaultDependencyResolver#resolve(DependencyResolverRequest)
@@ -86,14 +88,21 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
     private PathModularization outputModules;
 
     /**
+     * Cache of module information about each dependency.
+     */
+    private final PathModularizationCache cache;
+
+    /**
      * Creates an initially empty result. Callers should add path elements by calls
      * to {@link #addDependency(Node, Dependency, Predicate, Path, PathModularizationCache)}.
      *
+     * @param cache cache of module information about each dependency
      * @param exceptions the exceptions that occurred while building the dependency graph
      * @param root the root node of the dependency graph
      * @param count estimated number of dependencies
      */
-    DefaultDependencyResolverResult(List<Exception> exceptions, Node root, int count) {
+    DefaultDependencyResolverResult(PathModularizationCache cache, List<Exception> exceptions, Node root, int count) {
+        this.cache = cache;
         this.exceptions = exceptions;
         this.root = root;
         nodes = new ArrayList<>(count);
@@ -137,18 +146,17 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
      *   </li>
      * </ul>
      *
-     * This method must be invoked before {@link #addDependency(Node, Dependency, Predicate, Path, PathModularizationCache)}
+     * This method must be invoked before {@link #addDependency(Node, Dependency, Predicate, Path)}
      * if output directories are desired on the class-path or module-path.
      * This method can be invoked at most once.
      *
      * @param main the main output directory, or {@code null} if none
      * @param test the test output directory, or {@code null} if none
-     * @param cache cache of module information about each dependency
      * @throws IOException if an error occurred while reading module information
      *
      * TODO: this is currently not called
      */
-    void addOutputDirectory(Path main, Path test, PathModularizationCache cache) throws IOException {
+    void addOutputDirectory(Path main, Path test) throws IOException {
         if (outputModules != null) {
             throw new IllegalStateException("Output directories must be set first and only once.");
         }
@@ -201,11 +209,9 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
      * @param dep the dependency for the given node, or {@code null} if none
      * @param filter filter the paths accepted by the tool which will consume the path.
      * @param path the path to the dependency, or {@code null} if the dependency was null
-     * @param cache cache of module information about each dependency
      * @throws IOException if an error occurred while reading module information
      */
-    void addDependency(Node node, Dependency dep, Predicate<PathType> filter, Path path, PathModularizationCache cache)
-            throws IOException {
+    void addDependency(Node node, Dependency dep, Predicate<PathType> filter, Path path) throws IOException {
         nodes.add(node);
         if (dep == null) {
             return;
@@ -235,7 +241,7 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
                     cache.getModuleInfo(path).getModuleNames().entrySet()) {
                 String moduleName = info.getValue();
                 type = JavaPathType.patchModule(moduleName);
-                if (!containsModule(moduleName, cache)) {
+                if (!containsModule(moduleName)) {
                     /*
                      * Not patching an existing module. This case should be unusual. If it nevertheless
                      * happens, add on class-path or module-path if allowed, or keep patching otherwise.
@@ -288,9 +294,8 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
      * Returns whether at least one previously added modular dependency contains a module of the given name.
      *
      * @param moduleName name of the module to search
-     * @param cache cache of module information about each dependency
      */
-    private boolean containsModule(String moduleName, PathModularizationCache cache) throws IOException {
+    private boolean containsModule(String moduleName) throws IOException {
         for (Path path : dispatchedPaths.getOrDefault(JavaPathType.MODULES, Collections.emptyList())) {
             if (cache.getModuleInfo(path).containsModule(moduleName)) {
                 return true;
@@ -344,5 +349,14 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
     @Override
     public Map<Dependency, Path> getDependencies() {
         return dependencies;
+    }
+
+    @Override
+    public Optional<String> warningForFilenameBasedAutomodules() {
+        try {
+            return cache.warningForFilenameBasedAutomodules(dispatchedPaths.get(JavaPathType.MODULES));
+        } catch (IOException e) {
+            throw new DependencyResolverException("Cannot read module information.", e);
+        }
     }
 }
