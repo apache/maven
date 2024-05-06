@@ -153,6 +153,7 @@ public class ApiRunner {
             super(session, repositorySystem, repositories, resolverRepositories, lookup);
             systemProperties = System.getenv().entrySet().stream()
                     .collect(Collectors.toMap(e -> "env." + e.getKey(), e -> e.getValue()));
+            System.getProperties().forEach((k, v) -> systemProperties.put(k.toString(), v.toString()));
         }
 
         @Override
