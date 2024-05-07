@@ -177,6 +177,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
         String version = null;
         ArtifactRepository repo = null;
         boolean resolvedPluginVersions = !versions.versions.isEmpty();
+        boolean searchPerformed = false;
 
         if (versions.releaseVersion != null && !versions.releaseVersion.isEmpty()) {
             version = versions.releaseVersion;
@@ -192,6 +193,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
                     request.getArtifactId());
             versions.versions.remove(version);
             version = null;
+            searchPerformed = true;
         }
 
         if (version == null) {
@@ -244,6 +246,10 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
         }
 
         if (version != null) {
+            // if LATEST worked out of the box, remain silent as today, otherwise inform user about search result
+            if (searchPerformed) {
+                logger.info("Selected plugin {}:{}:{}", request.getGroupId(), request.getArtifactId(), version);
+            }
             result.setVersion(version);
             result.setRepository(repo);
         } else {
