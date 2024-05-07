@@ -258,9 +258,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                             .build(null),
                     model);
             builder.packaging(POM_PACKAGING);
-            builder.profiles(model.getProfiles().stream()
-                    .map(p -> prune(Profile.newBuilder(p, true), p).build())
-                    .collect(Collectors.toList()));
+            builder.profiles(prune(model.getProfiles()));
 
             model = builder.build();
             String modelVersion = new MavenModelVersion().getModelVersion(model);
@@ -273,14 +271,38 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                             .parent(null)
                             .build(null),
                     model);
-            builder.profiles(model.getProfiles().stream()
-                    .map(p -> prune(Profile.newBuilder(p, true), p).build())
-                    .collect(Collectors.toList()));
+            builder.profiles(prune(model.getProfiles()));
+
             model = builder.build();
             String modelVersion = new MavenModelVersion().getModelVersion(model);
             model = model.withModelVersion(modelVersion);
         }
         return model;
+    }
+
+    private static List<Profile> prune(List<Profile> profiles) {
+        return profiles.stream()
+                .map(p -> {
+                    Profile.Builder builder = Profile.newBuilder(p, true);
+                    prune((ModelBase.Builder) builder, p);
+                    return builder.build(null).build();
+                })
+                .filter(p -> !isEmpty(p))
+                .collect(Collectors.toList());
+    }
+
+    private static boolean isEmpty(Profile profile) {
+        return profile.getActivation() == null
+                && profile.getBuild() == null
+                && profile.getDependencies().isEmpty()
+                && (profile.getDependencyManagement() == null
+                        || profile.getDependencyManagement().getDependencies().isEmpty())
+                && profile.getDistributionManagement() == null
+                && profile.getModules().isEmpty()
+                && profile.getProperties().isEmpty()
+                && profile.getRepositories().isEmpty()
+                && profile.getPluginRepositories().isEmpty()
+                && profile.getReporting() == null;
     }
 
     private static <T extends ModelBase.Builder> T prune(T builder, ModelBase model) {
