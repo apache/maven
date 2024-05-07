@@ -1812,12 +1812,18 @@ public class DefaultModelBuilder implements ModelBuilder {
             // Dependency excluded from import.
             List<org.apache.maven.api.model.Dependency> dependencies = importMgmt.getDependencies().stream()
                     .filter(candidate -> exclusions.stream().noneMatch(exclusion -> match(exclusion, candidate)))
-                    .map(candidate -> candidate.withExclusions(exclusions))
+                    .map(candidate -> addExclusions(candidate, exclusions))
                     .collect(Collectors.toList());
             importMgmt = importMgmt.withDependencies(dependencies);
         }
 
         return importMgmt != null ? new DependencyManagement(importMgmt) : null;
+    }
+
+    private static org.apache.maven.api.model.Dependency addExclusions(
+            org.apache.maven.api.model.Dependency candidate, List<Exclusion> exclusions) {
+        return candidate.withExclusions(Stream.concat(candidate.getExclusions().stream(), exclusions.stream())
+                .toList());
     }
 
     private boolean match(Exclusion exclusion, org.apache.maven.api.model.Dependency candidate) {
