@@ -253,7 +253,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             result.setVersion(version);
             result.setRepository(repo);
         } else {
-            logger.info(
+            logger.warn(
                     resolvedPluginVersions
                             ? "Could not find compatible version of plugin {}:{} in any plugin repository"
                             : "Plugin {}:{} not found in any plugin repository",
