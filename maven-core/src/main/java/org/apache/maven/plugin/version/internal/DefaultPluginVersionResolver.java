@@ -248,7 +248,9 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             result.setRepository(repo);
         } else {
             logger.info(
-                    "Could not find compatible version of plugin {}:{} in any plugin repository",
+                    resolvedPluginVersions
+                            ? "Could not find compatible version of plugin {}:{} in any plugin repository"
+                            : "Plugin {}:{} not found in any plugin repository",
                     request.getGroupId(),
                     request.getArtifactId());
             throw new PluginVersionResolutionException(
