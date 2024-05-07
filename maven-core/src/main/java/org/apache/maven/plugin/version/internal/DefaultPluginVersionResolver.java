@@ -39,6 +39,7 @@ import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.version.PluginVersionRequest;
@@ -175,6 +176,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             throws PluginVersionResolutionException {
         String version = null;
         ArtifactRepository repo = null;
+        boolean resolvedPluginVersions = !versions.versions.isEmpty();
 
         if (versions.releaseVersion != null && !versions.releaseVersion.isEmpty()) {
             version = versions.releaseVersion;
@@ -184,6 +186,10 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             repo = versions.latestRepository;
         }
         if (version != null && !isCompatible(request, version)) {
+            logger.info(
+                    "Latest version of plugin {}:{} failed compatibility check",
+                    request.getGroupId(),
+                    request.getArtifactId());
             versions.versions.remove(version);
             version = null;
         }
@@ -206,16 +212,26 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
                 }
             }
 
-            for (Version v : releases) {
-                String ver = v.toString();
-                if (isCompatible(request, ver)) {
-                    version = ver;
-                    repo = versions.versions.get(version);
-                    break;
+            if (!releases.isEmpty()) {
+                logger.info(
+                        "Looking for compatible RELEASE version of plugin {}:{}",
+                        request.getGroupId(),
+                        request.getArtifactId());
+                for (Version v : releases) {
+                    String ver = v.toString();
+                    if (isCompatible(request, ver)) {
+                        version = ver;
+                        repo = versions.versions.get(version);
+                        break;
+                    }
                 }
             }
 
-            if (version == null) {
+            if (version == null && !snapshots.isEmpty()) {
+                logger.info(
+                        "Looking for compatible SNAPSHOT version of plugin {}:{}",
+                        request.getGroupId(),
+                        request.getArtifactId());
                 for (Version v : snapshots) {
                     String ver = v.toString();
                     if (isCompatible(request, ver)) {
@@ -231,12 +247,18 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             result.setVersion(version);
             result.setRepository(repo);
         } else {
+            logger.info(
+                    "Could not find compatible version of plugin {}:{} in any plugin repository",
+                    request.getGroupId(),
+                    request.getArtifactId());
             throw new PluginVersionResolutionException(
                     request.getGroupId(),
                     request.getArtifactId(),
                     request.getRepositorySession().getLocalRepository(),
                     request.getRepositories(),
-                    "Plugin not found in any plugin repository");
+                    resolvedPluginVersions
+                            ? "Could not find compatible plugin version in any plugin repository"
+                            : "Plugin not found in any plugin repository");
         }
     }
 
@@ -261,8 +283,12 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
         try {
             pluginManager.checkPrerequisites(pluginDescriptor);
-        } catch (Exception e) {
-            logger.warn("Ignoring incompatible plugin version {}", version, e);
+        } catch (PluginIncompatibleException e) {
+            if (logger.isDebugEnabled()) {
+                logger.warn("Ignoring incompatible plugin version {}: {}", version, e.getMessage(), e);
+            } else {
+                logger.warn("Ignoring incompatible plugin version {}: {}", version, e.getMessage());
+            }
             return false;
         }
 
