@@ -46,9 +46,9 @@ import org.apache.maven.api.annotations.Nonnull;
  *
  * <h2>Relationship with Java compiler standard location</h2>
  * This enumeration is closely related to the {@link JavaFileManager.Location} enumerations.
- * A difference is that the latter enumerate input and output files, while {@code JavaPathType}
+ * A difference is that the latter enumerates input and output files, while {@code JavaPathType}
  * enumerates only input dependencies. Another difference is that {@code JavaPathType} contains
- * some enumeration values used only at runtime and therefor not available in {@code javax.tool},
+ * some enumeration values used only at runtime and therefore not available in {@code javax.tool},
  * such as agent paths.
  *
  * @see org.apache.maven.api.services.DependencyResolverResult#getDispatchedPaths()

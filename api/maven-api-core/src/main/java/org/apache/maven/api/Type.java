@@ -85,19 +85,19 @@ public interface Type extends ExtensibleEnum {
      * Artifact type name for a JAR file that can be placed either on the annotation processor class-path
      * or module-path. The path (classes or modules) is chosen by the plugin, possibly using heuristic rules.
      */
-    String PROCESSOR = "proc";
+    String PROCESSOR = "processor";
 
     /**
      * Artifact type name for a JAR file to unconditionally place on the annotation processor class-path.
      * If the JAR is modular, its module information are ignored.
      */
-    String CLASSPATH_PROCESSOR = "classpath-proc";
+    String CLASSPATH_PROCESSOR = "classpath-processor";
 
     /**
      * Artifact type name for a JAR file to unconditionally place on the annotation processor module-path.
      * If the JAR is not modular, then it is loaded by Java as an unnamed module.
      */
-    String MODULAR_PROCESSOR = "modular-proc";
+    String MODULAR_PROCESSOR = "modular-processor";
 
     /**
      * Artifact type name for source code packaged in a JAR file.
