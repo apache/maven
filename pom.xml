@@ -189,7 +189,7 @@ under the License.
     <stax2ApiVersion>4.2.1</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <woodstoxVersion>6.5.1</woodstoxVersion>
-    <xmlunitVersion>2.9.1</xmlunitVersion>
+    <xmlunitVersion>2.10.0</xmlunitVersion>
   </properties>
 
   <!--bootstrap-start-comment-->
