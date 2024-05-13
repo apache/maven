@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
@@ -65,6 +66,7 @@ import org.apache.maven.internal.impl.model.DefaultModelBuilder;
 import org.apache.maven.internal.impl.model.DefaultProfileSelector;
 import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.internal.impl.resolver.DefaultModelCache;
+import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
@@ -196,13 +198,15 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 profileActivationFilePathInterpolator,
                 modelTransformer,
                 versionParser);
+        InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
         request.projectBuild(true);
-        request.session(InternalSession.from(session));
+        request.session(iSession);
         request.source(ModelSource.fromPath(src));
         request.validationLevel(ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL);
         request.locationTracking(false);
         request.modelResolver(modelResolver);
+        request.modelRepositoryHolder(iSession.getData().get(SessionData.key(DefaultModelRepositoryHolder.class)));
         request.transformerContextBuilder(modelBuilder.newTransformerContextBuilder());
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());

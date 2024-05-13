@@ -40,6 +40,7 @@ import java.util.stream.Stream;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.*;
 import org.apache.maven.api.services.ModelBuilder;
@@ -1041,13 +1042,15 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             modelBuildingRequest.userProperties(toMap(request.getUserProperties()));
             // bv4: modelBuildingRequest.setBuildStartTime(request.getBuildStartTime());
             modelBuildingRequest.modelResolver(resolver);
-            modelBuildingRequest.modelRepositoryHolder(new DefaultModelRepositoryHolder(
+            DefaultModelRepositoryHolder holder = new DefaultModelRepositoryHolder(
                     internalSession,
                     DefaultModelRepositoryHolder.RepositoryMerging.valueOf(
                             request.getRepositoryMerging().name()),
                     repositories.stream()
                             .map(internalSession::getRemoteRepository)
-                            .toList()));
+                            .toList());
+            internalSession.getData().set(SessionData.key(DefaultModelRepositoryHolder.class), holder);
+            modelBuildingRequest.modelRepositoryHolder(holder);
             modelBuildingRequest.modelCache(modelCache);
             modelBuildingRequest.transformerContextBuilder(transformerContextBuilder);
             /* TODO: bv4
