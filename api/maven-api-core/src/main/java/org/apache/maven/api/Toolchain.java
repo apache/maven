@@ -30,7 +30,7 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 public interface Toolchain {
     /**
-     * get the type of toolchain.
+     * Gets the type of toolchain.
      *
      * @return the toolchain type
      */
@@ -47,7 +47,8 @@ public interface Toolchain {
     /**
      * Let the toolchain decide if it matches requirements defined
      * in the toolchain plugin configuration.
-     * @param requirements Map&lt;String, String&gt; key value pair, may not be {@code null}
+     *
+     * @param requirements key value pair, may not be {@code null}
      * @return {@code true} if the requirements match, otherwise {@code false}
      */
     boolean matchesRequirements(Map<String, String> requirements);

@@ -825,7 +825,7 @@ public class Ansi implements Appendable {
 
     public Ansi newline() {
         flushAttributes();
-        builder.append(System.getProperty("line.separator"));
+        builder.append(System.lineSeparator());
         return this;
     }
 

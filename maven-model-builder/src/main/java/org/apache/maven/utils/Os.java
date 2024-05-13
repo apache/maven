@@ -18,6 +18,7 @@
  */
 package org.apache.maven.utils;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.stream.Stream;
 
@@ -124,11 +125,6 @@ public class Os {
      */
     private static final String DARWIN = "darwin";
 
-    /**
-     * The path separator.
-     */
-    private static final String PATH_SEP = System.getProperty("path.separator");
-
     static {
         // Those two public constants are initialized here, as they need all the private constants
         // above to be initialized first, but the code style imposes the public constants to be
@@ -187,13 +183,13 @@ public class Os {
             case FAMILY_NETWARE:
                 return actualOsName.contains(FAMILY_NETWARE);
             case FAMILY_DOS:
-                return PATH_SEP.equals(";") && !isFamily(FAMILY_NETWARE, actualOsName) && !isWindows;
+                return File.pathSeparatorChar == ';' && !isFamily(FAMILY_NETWARE, actualOsName) && !isWindows;
             case FAMILY_MAC:
                 return actualOsName.contains(FAMILY_MAC) || actualOsName.contains(DARWIN);
             case FAMILY_TANDEM:
                 return actualOsName.contains("nonstop_kernel");
             case FAMILY_UNIX:
-                return PATH_SEP.equals(":")
+                return File.pathSeparatorChar == ':'
                         && !isFamily(FAMILY_OPENVMS, actualOsName)
                         && (!isFamily(FAMILY_MAC, actualOsName) || actualOsName.endsWith("x"));
             case FAMILY_ZOS:

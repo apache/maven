@@ -24,6 +24,7 @@ import java.io.UncheckedIOException;
 import java.lang.module.ModuleDescriptor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +60,11 @@ class PathModularization {
     private static final Attributes.Name AUTO_MODULE_NAME = new Attributes.Name("Automatic-Module-Name");
 
     /**
+     * Filename of the path specified at construction time.
+     */
+    private final String filename;
+
+    /**
      * Module information for the path specified at construction time.
      * This map is usually either empty if no module was found, or a singleton map.
      * It may however contain more than one entry if module hierarchy was detected,
@@ -88,6 +94,7 @@ class PathModularization {
      * @see #NONE
      */
     private PathModularization() {
+        filename = "(none)";
         descriptors = Collections.emptyMap();
         isModuleHierarchy = false;
     }
@@ -128,6 +135,7 @@ class PathModularization {
      * @throws IOException if an error occurred while reading the JAR file or the module descriptor
      */
     PathModularization(Path path, boolean resolve) throws IOException {
+        filename = path.getFileName().toString();
         if (Files.isDirectory(path)) {
             /*
              * Package hierarchy: only one module with descriptor at the root.
@@ -213,7 +221,7 @@ class PathModularization {
     }
 
     /**
-     * Returns the module name declared in the given {@code module-info} descriptor.
+     * {@return the module name declared in the given {@code module-info} descriptor}.
      * The input stream may be for a file or for an entry in a JAR file.
      */
     @Nonnull
@@ -222,7 +230,7 @@ class PathModularization {
     }
 
     /**
-     * Returns the type of path detected. The return value is {@link JavaPathType#MODULES}
+     * {@return the type of path detected}. The return value is {@link JavaPathType#MODULES}
      * if the dependency is a modular JAR file or a directory containing module descriptor(s),
      * or {@link JavaPathType#CLASSES} otherwise. A JAR file without module descriptor but with
      * an "Automatic-Module-Name" manifest attribute is considered modular.
@@ -232,7 +240,21 @@ class PathModularization {
     }
 
     /**
-     * Returns whether module hierarchy was detected. If false, then package hierarchy is assumed.
+     * If the module has no name, adds the filename of the JAR file in the given collection.
+     * This method should be invoked for dependencies placed on {@link JavaPathType#MODULES}
+     * for preparing a warning asking to not deploy the build artifact on a public repository.
+     * If the module has an explicit name either with a {@code module-info.class} file or with
+     * an {@code "Automatic-Module-Name"} attribute in the {@code META-INF/MANIFEST.MF} file,
+     * then this method does nothing.
+     */
+    public void addIfFilenameBasedAutomodules(Collection<String> automodulesDetected) {
+        if (descriptors.isEmpty()) {
+            automodulesDetected.add(filename);
+        }
+    }
+
+    /**
+     * {@return whether module hierarchy was detected}. If {@code false}, then package hierarchy is assumed.
      * In a package hierarchy, the {@linkplain #getModuleNames()} map of modules has either zero or one entry.
      * In a module hierarchy, the descriptors map may have an arbitrary number of entries,
      * including one (so the map size cannot be used as a criterion).
@@ -242,7 +264,7 @@ class PathModularization {
     }
 
     /**
-     * Returns the module names for the path specified at construction time.
+     * {@return the module names for the path specified at construction time}.
      * This map is usually either empty if no module was found, or a singleton map.
      * It may however contain more than one entry if module hierarchy was detected,
      * in which case there is one key per sub-directory.
@@ -257,9 +279,18 @@ class PathModularization {
     }
 
     /**
-     * Returns whether the dependency contains a module of the given name.
+     * {@return whether the dependency contains a module of the given name}.
      */
     public boolean containsModule(String name) {
         return descriptors.containsValue(name);
+    }
+
+    /**
+     * {@return a string representation of this object for debugging purposes}.
+     * This string representation may change in any future version.
+     */
+    @Override
+    public String toString() {
+        return getClass().getCanonicalName() + '[' + filename + ']';
     }
 }

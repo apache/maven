@@ -18,6 +18,10 @@
  */
 package org.apache.maven.api;
 
+import javax.tools.DocumentationTool;
+import javax.tools.JavaFileManager;
+import javax.tools.StandardLocation;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -40,6 +44,13 @@ import org.apache.maven.api.annotations.Nonnull;
  * <p>Path types are often exclusive. For example, a dependency should not be both on the Java class-path
  * and on the Java module-path.</p>
  *
+ * <h2>Relationship with Java compiler standard location</h2>
+ * This enumeration is closely related to the {@link JavaFileManager.Location} enumerations.
+ * A difference is that the latter enumerates input and output files, while {@code JavaPathType}
+ * enumerates only input dependencies. Another difference is that {@code JavaPathType} contains
+ * some enumeration values used only at runtime and therefore not available in {@code javax.tool},
+ * such as agent paths.
+ *
  * @see org.apache.maven.api.services.DependencyResolverResult#getDispatchedPaths()
  *
  * @since 4.0.0
@@ -49,11 +60,12 @@ public enum JavaPathType implements PathType {
     /**
      * The path identified by the Java {@code --class-path} option.
      * Used for compilation, execution and Javadoc among others.
+     * The Java tools location is {@link StandardLocation#CLASS_PATH}.
      *
-     * <p><b>Context-sensitive interpretation:</b>
+     * <h4>Context-sensitive interpretation</h4>
      * A dependency with this path type will not necessarily be placed on the class-path.
      * There are two circumstances where the dependency may nevertheless be placed somewhere else:
-     * </p>
+     *
      * <ul>
      *   <li>If {@link #MODULES} path type is also set, then the dependency can be placed either on the
      *       class-path or on the module-path, but only one of those. The choice is up to the plugin,
@@ -63,16 +75,17 @@ public enum JavaPathType implements PathType {
      *       class-path.</li>
      * </ul>
      */
-    CLASSES("--class-path"),
+    CLASSES(StandardLocation.CLASS_PATH, "--class-path"),
 
     /**
      * The path identified by the Java {@code --module-path} option.
      * Used for compilation, execution and Javadoc among others.
+     * The Java tools location is {@link StandardLocation#MODULE_PATH}.
      *
-     * <p><b>Context-sensitive interpretation:</b>
+     * <h4>Context-sensitive interpretation</h4>
      * A dependency with this flag will not necessarily be placed on the module-path.
      * There are two circumstances where the dependency may nevertheless be placed somewhere else:
-     * </p>
+     *
      * <ul>
      *   <li>If {@link #CLASSES} path type is also set, then the dependency <em>should</em> be placed on the
      *       module-path, but is also compatible with placement on the class-path. Compatibility can
@@ -84,57 +97,63 @@ public enum JavaPathType implements PathType {
      *       {@code --module-path} option.</li>
      * </ul>
      */
-    MODULES("--module-path"),
+    MODULES(StandardLocation.MODULE_PATH, "--module-path"),
 
     /**
      * The path identified by the Java {@code --upgrade-module-path} option.
+     * The Java tools location is {@link StandardLocation#UPGRADE_MODULE_PATH}.
      */
-    UPGRADE_MODULES("--upgrade-module-path"),
+    UPGRADE_MODULES(StandardLocation.UPGRADE_MODULE_PATH, "--upgrade-module-path"),
 
     /**
      * The path identified by the Java {@code --patch-module} option.
+     * The Java tools location is {@link StandardLocation#PATCH_MODULE_PATH}.
+     *
      * Note that this option is incomplete, because it must be followed by a module name.
      * Use this type only when the module to patch is unknown.
      *
      * @see #patchModule(String)
      */
-    PATCH_MODULE("--patch-module"),
+    PATCH_MODULE(StandardLocation.PATCH_MODULE_PATH, "--patch-module"),
 
     /**
      * The path identified by the Java {@code --processor-path} option.
+     * The Java tools location is {@link StandardLocation#ANNOTATION_PROCESSOR_PATH}.
      */
-    PROCESSOR_CLASSES("--processor-path"),
+    PROCESSOR_CLASSES(StandardLocation.ANNOTATION_PROCESSOR_PATH, "--processor-path"),
 
     /**
      * The path identified by the Java {@code --processor-module-path} option.
+     * The Java tools location is {@link StandardLocation#ANNOTATION_PROCESSOR_MODULE_PATH}.
      */
-    PROCESSOR_MODULES("--processor-module-path"),
+    PROCESSOR_MODULES(StandardLocation.ANNOTATION_PROCESSOR_MODULE_PATH, "--processor-module-path"),
 
     /**
      * The path identified by the Java {@code -agentpath} option.
      */
-    AGENT("-agentpath"),
+    AGENT(null, "-agentpath"),
 
     /**
      * The path identified by the Javadoc {@code -doclet} option.
+     * The Java tools location is {@link DocumentationTool.Location#DOCLET_PATH}.
      */
-    DOCLET("-doclet"),
+    DOCLET(DocumentationTool.Location.DOCLET_PATH, "-doclet"),
 
     /**
      * The path identified by the Javadoc {@code -tagletpath} option.
+     * The Java tools location is {@link DocumentationTool.Location#TAGLET_PATH}.
      */
-    TAGLETS("-tagletpath");
+    TAGLETS(DocumentationTool.Location.TAGLET_PATH, "-tagletpath");
 
     /**
      * Creates a path identified by the Java {@code --patch-module} option.
      * Contrarily to the other types of paths, this path is applied to only
      * one specific module. Used for compilation and execution among others.
      *
-     * <p><b>Context-sensitive interpretation:</b>
+     * <h4>Context-sensitive interpretation</h4>
      * This path type makes sense only when a main module is added on the module-path by another dependency.
      * In no main module is found, the patch dependency may be added on the class-path or module-path
      * depending on whether {@link #CLASSES} or {@link #MODULES} is present.
-     * </p>
      *
      * @param moduleName name of the module on which to apply the path
      * @return an identification of the patch-module path for the given module.
@@ -147,6 +166,13 @@ public enum JavaPathType implements PathType {
     }
 
     /**
+     * The {@code javax.tool} enumeration value corresponding to this {@code JavaPathType}, or {@code null} if none.
+     *
+     * @see #location()
+     */
+    private final JavaFileManager.Location location;
+
+    /**
      * The tools option for this path, or {@code null} if none.
      *
      * @see #option()
@@ -156,15 +182,49 @@ public enum JavaPathType implements PathType {
     /**
      * Creates a new enumeration value for a path associated to the given tool option.
      *
+     * @param location the {@code javax.tool} enumeration value, or {@code null} if none.
      * @param option the Java tools option for this path, or {@code null} if none
      */
-    JavaPathType(String option) {
+    JavaPathType(JavaFileManager.Location location, String option) {
+        this.location = location;
         this.option = option;
     }
 
+    /**
+     * Returns the unique name of this path type.
+     *
+     * @return the programmatic name of this enumeration value
+     */
     @Override
     public String id() {
         return name();
+    }
+
+    /**
+     * Returns the identification of this path in the {@code javax.tool} API.
+     * The value may be an instance of {@link StandardLocation} or {@link DocumentationTool.Location},
+     * depending which tool will use this location.
+     *
+     * @return the {@code javax.tool} enumeration value corresponding to this {@code JavaPathType}
+     */
+    public Optional<JavaFileManager.Location> location() {
+        return Optional.ofNullable(location);
+    }
+
+    /**
+     * Returns the path type associated to the given {@code javax.tool} location.
+     * This method is the converse of {@link #location()}.
+     *
+     * @param location identification of a path in the {@code javax.tool} API
+     * @return Java path type associated to the given location
+     */
+    public static Optional<JavaPathType> valueOf(JavaFileManager.Location location) {
+        for (JavaPathType type : JavaPathType.values()) {
+            if (location.equals(type.location)) {
+                return Optional.of(type);
+            }
+        }
+        return Optional.empty();
     }
 
     /**
@@ -187,31 +247,38 @@ public enum JavaPathType implements PathType {
      *
      * @param paths the path to format as a tool option
      * @return the option associated to this path type followed by the given path elements,
-     *         or an empty string if there is no path element
+     *         or an empty array if there is no path element
      * @throws IllegalStateException if no option is associated to this path type
      */
     @Nonnull
     @Override
-    public String option(Iterable<? extends Path> paths) {
+    public String[] option(Iterable<? extends Path> paths) {
         return format(null, paths);
     }
 
     /**
      * Implementation shared with {@link Modular}.
      */
-    String format(String moduleName, Iterable<? extends Path> paths) {
+    final String[] format(String moduleName, Iterable<? extends Path> paths) {
         if (option == null) {
             throw new IllegalStateException("No option is associated to this path type.");
         }
-        String prefix = (moduleName == null) ? (option + ' ') : (option + ' ' + moduleName + '=');
+        String prefix = (moduleName == null) ? "" : (moduleName + '=');
         StringJoiner joiner = new StringJoiner(File.pathSeparator, prefix, "");
         joiner.setEmptyValue("");
         for (Path p : paths) {
             joiner.add(p.toString());
         }
-        return joiner.toString();
+        String value = joiner.toString();
+        if (value.isEmpty()) {
+            return new String[0];
+        }
+        return new String[] {option, value};
     }
 
+    /**
+     * {@return a string representation of this path type for debugging purposes}.
+     */
     @Override
     public String toString() {
         return "PathType[" + id() + "]";
@@ -240,11 +307,6 @@ public enum JavaPathType implements PathType {
             this.moduleName = Objects.requireNonNull(moduleName);
         }
 
-        @Override
-        public String id() {
-            return JavaPathType.this.name() + ":" + moduleName;
-        }
-
         /**
          * Returns the type of path without indication about the target module.
          * This is usually {@link #PATCH_MODULE}.
@@ -257,11 +319,22 @@ public enum JavaPathType implements PathType {
         }
 
         /**
+         * Returns the name of the tool option for this path, including the module name.
+         *
+         * @return name of the tool option for this path, including the module name
+         */
+        @Override
+        public String id() {
+            return JavaPathType.this.name() + ":" + moduleName;
+        }
+
+        /**
          * Returns the name of the tool option for this path, not including the module name.
          *
          * @return name of the tool option for this path, not including the module name
          */
         @Nonnull
+        @Override
         public String name() {
             return JavaPathType.this.name();
         }
@@ -295,11 +368,11 @@ public enum JavaPathType implements PathType {
          *
          * @param paths the path to format as a string
          * @return the option associated to this path type followed by the given path elements,
-         *         or an empty string if there is no path element.
+         *         or an empty array if there is no path element.
          */
         @Nonnull
         @Override
-        public String option(Iterable<? extends Path> paths) {
+        public String[] option(Iterable<? extends Path> paths) {
             return format(moduleName, paths);
         }
 

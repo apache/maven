@@ -61,8 +61,8 @@ public interface PathType {
         }
 
         @Override
-        public String option(Iterable<? extends Path> paths) {
-            return "";
+        public String[] option(Iterable<? extends Path> paths) {
+            return new String[0];
         }
     };
 
@@ -94,23 +94,24 @@ public interface PathType {
      * The path elements are separated by an option-specific or platform-specific separator.
      * If the given {@code paths} argument contains no element, then this method returns an empty string.
      *
-     * <p><b>Examples:</b>
-     * If {@code paths} is a list containing two elements, {@code path1} and {@code path2}, then:
-     * </p>
+     * <h4>Examples</h4>
+     * If {@code paths} is a list containing two elements, {@code dir/path1} and {@code dir/path2}, then:
+     *
      * <ul>
      *   <li>If this type is {@link JavaPathType#MODULES}, then this method returns
-     *       {@code "--module-path path1:path2"} on Unix or {@code "--module-path path1;path2"} on Windows.</li>
+     *       {@code {"--module-path", "dir/path1:dir/path2"}} on Unix or
+     *       {@code {"--module-path", "dir\path1;dir\path2"}} on Windows.</li>
      *   <li>If this type was created by {@code JavaPathType.patchModule("foo.bar")}, then the method returns
-     *       {@code "--patch-module foo.bar=path1:path2"} on Unix or {@code "--patch-module foo.bar=path1;path2"}
-     *       on Windows.</li>
+     *       {@code {"--patch-module", "foo.bar=dir/path1:dir/path2"}} on Unix or
+     *       {@code {"--patch-module", "foo.bar=dir\path1;dir\path2"}} on Windows.</li>
      * </ul>
      *
      * @param paths the path to format as a string
      * @return the option associated to this path type followed by the given path elements,
-     *         or an empty string if there is no path element.
+     *         or an empty array if there is no path element.
      */
     @Nonnull
-    String option(Iterable<? extends Path> paths);
+    String[] option(Iterable<? extends Path> paths);
 
     /**
      * Returns the name of this path type. For example, if this path type
@@ -122,7 +123,7 @@ public interface PathType {
     String name();
 
     /**
-     * Returns a string representation for this extensible enum describing a path type.
+     * {@return a string representation for this extensible enum describing a path type}.
      * For example {@code "PathType[PATCH_MODULE:foo.bar]"}.
      */
     @Nonnull
