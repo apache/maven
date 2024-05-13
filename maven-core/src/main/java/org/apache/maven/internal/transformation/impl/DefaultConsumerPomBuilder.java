@@ -66,7 +66,6 @@ import org.apache.maven.internal.impl.model.DefaultModelBuilder;
 import org.apache.maven.internal.impl.model.DefaultProfileSelector;
 import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.internal.impl.resolver.DefaultModelCache;
-import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
@@ -139,9 +138,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     @Inject
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
 
-    @Inject
-    private ModelResolver modelResolver;
-
     Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -205,8 +201,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         request.source(ModelSource.fromPath(src));
         request.validationLevel(ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL);
         request.locationTracking(false);
-        request.modelResolver(modelResolver);
-        request.modelRepositoryHolder(iSession.getData().get(SessionData.key(DefaultModelRepositoryHolder.class)));
+        request.modelResolver(iSession.getData().get(SessionData.key(ModelResolver.class)));
         request.transformerContextBuilder(modelBuilder.newTransformerContextBuilder());
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());

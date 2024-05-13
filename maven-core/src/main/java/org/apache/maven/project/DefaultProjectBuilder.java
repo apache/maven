@@ -282,6 +282,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private final ModelTransformerContextBuilder transformerContextBuilder;
         private final ExecutorService executor;
         private final ModelCache modelCache;
+        private final ModelResolver modelResolver;
 
         BuildSession(ProjectBuildingRequest request, boolean localProjects) {
             this.request = request;
@@ -299,6 +300,21 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
             this.parentCache = new ConcurrentHashMap<>();
             this.modelCache = DefaultModelCache.newInstance(session, true);
+            this.modelResolver = new ModelResolverWrapper() {
+                @Override
+                protected org.apache.maven.model.resolution.ModelResolver getResolver(
+                        List<RemoteRepository> repositories) {
+                    return new ProjectModelResolver(
+                            session,
+                            RequestTrace.newChild(null, request),
+                            repoSystem,
+                            repositoryManager,
+                            repositories,
+                            request.getRepositoryMerging(),
+                            modelPool,
+                            parentCache);
+                }
+            };
         }
 
         ExecutorService createExecutor(int parallelism) {
@@ -1006,24 +1022,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private ModelBuilderRequest.ModelBuilderRequestBuilder getModelBuildingRequest() {
             ModelBuilderRequest.ModelBuilderRequestBuilder modelBuildingRequest = ModelBuilderRequest.builder();
 
-            RequestTrace trace = RequestTrace.newChild(null, request).newChild(modelBuildingRequest);
-
-            ModelResolver resolver = new ModelResolverWrapper() {
-                @Override
-                protected org.apache.maven.model.resolution.ModelResolver getResolver(
-                        List<RemoteRepository> repositories) {
-                    return new ProjectModelResolver(
-                            session,
-                            trace,
-                            repoSystem,
-                            repositoryManager,
-                            repositories,
-                            request.getRepositoryMerging(),
-                            modelPool,
-                            parentCache);
-                }
-            };
-
             InternalSession internalSession = InternalSession.from(session);
             modelBuildingRequest.session(internalSession.withRemoteRepositories(request.getRemoteRepositories().stream()
                     .map(r -> internalSession.getRemoteRepository(RepositoryUtils.toRepo(r)))
@@ -1041,7 +1039,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             modelBuildingRequest.systemProperties(toMap(request.getSystemProperties()));
             modelBuildingRequest.userProperties(toMap(request.getUserProperties()));
             // bv4: modelBuildingRequest.setBuildStartTime(request.getBuildStartTime());
-            modelBuildingRequest.modelResolver(resolver);
+            modelBuildingRequest.modelResolver(modelResolver);
             DefaultModelRepositoryHolder holder = new DefaultModelRepositoryHolder(
                     internalSession,
                     DefaultModelRepositoryHolder.RepositoryMerging.valueOf(
@@ -1049,7 +1047,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     repositories.stream()
                             .map(internalSession::getRemoteRepository)
                             .toList());
-            internalSession.getData().set(SessionData.key(DefaultModelRepositoryHolder.class), holder);
             modelBuildingRequest.modelRepositoryHolder(holder);
             modelBuildingRequest.modelCache(modelCache);
             modelBuildingRequest.transformerContextBuilder(transformerContextBuilder);
@@ -1064,6 +1061,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 }
             }
             */
+            internalSession.getData().set(SessionData.key(ModelResolver.class), modelResolver);
 
             return modelBuildingRequest;
         }
