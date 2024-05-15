@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.*;
@@ -49,7 +50,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     private final MavenSession mavenSession;
     private final MavenRepositorySystem mavenRepositorySystem;
     private final RuntimeInformation runtimeInformation;
-    private final Map<String, Project> allProjects = Collections.synchronizedMap(new WeakHashMap<>());
+    private final Map<String, Project> allProjects = new ConcurrentHashMap<>();
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultSession(
