@@ -100,7 +100,7 @@ under the License.
 
             for ( Plugin preExisting : getPlugins() )
             {
-                if ( preExisting.getPrefix().equals( plugin.getPrefix() ) )
+                if ( java.util.Objects.equals( preExisting.getPrefix(), plugin.getPrefix() ) )
                 {
                     found = true;
                     break;
