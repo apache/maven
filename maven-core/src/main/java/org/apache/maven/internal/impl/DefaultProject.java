@@ -42,7 +42,13 @@ public class DefaultProject implements Project {
     public DefaultProject(InternalMavenSession session, MavenProject project) {
         this.session = session;
         this.project = project;
-        this.packaging = session.requirePackaging(project.getPackaging());
+        ClassLoader ttcl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(project.getClassRealm());
+            this.packaging = session.requirePackaging(project.getPackaging());
+        } finally {
+            Thread.currentThread().setContextClassLoader(ttcl);
+        }
     }
 
     public InternalMavenSession getSession() {
