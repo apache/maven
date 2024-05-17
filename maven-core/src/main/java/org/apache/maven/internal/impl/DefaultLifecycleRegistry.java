@@ -20,13 +20,14 @@ package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,8 +35,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.services.LifecycleRegistry;
+import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.spi.LifecycleProvider;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -52,18 +57,12 @@ public class DefaultLifecycleRegistry
         implements LifecycleRegistry {
 
     public DefaultLifecycleRegistry() {
-        super(Collections.emptyList());
+        this(Collections.emptyList());
     }
 
     @Inject
-    public DefaultLifecycleRegistry(
-            List<LifecycleProvider> providers, Map<String, org.apache.maven.lifecycle.Lifecycle> lifecycles) {
-        super(
-                concat(providers, new LifecycleWrapperProvider(lifecycles)),
-                new CleanLifecycle(),
-                new DefaultLifecycle(),
-                new SiteLifecycle(),
-                new WrapperLifecycle());
+    public DefaultLifecycleRegistry(List<LifecycleProvider> providers) {
+        super(providers, new CleanLifecycle(), new DefaultLifecycle(), new SiteLifecycle(), new WrapperLifecycle());
         // validate lifecycle
         for (Lifecycle lifecycle : this) {
             Set<String> set = new HashSet<>();
@@ -86,29 +85,31 @@ public class DefaultLifecycleRegistry
         return values.values().stream();
     }
 
-    static <T> List<T> concat(List<T> l, T t) {
-        List<T> nl = new ArrayList<>(l.size() + 1);
-        nl.addAll(l);
-        nl.add(t);
-        return nl;
-    }
-
-    @Override
-    public List<String> computePhases(Lifecycle lifecycle) {
-        return lifecycle.phases().stream().map(Lifecycle.Phase::name).toList();
-    }
-
-    static class LifecycleWrapperProvider implements LifecycleProvider {
-        private final Map<String, org.apache.maven.lifecycle.Lifecycle> lifecycles;
+    @Named
+    @Singleton
+    public static class LifecycleWrapperProvider implements LifecycleProvider {
+        private final PlexusContainer container;
 
         @Inject
-        LifecycleWrapperProvider(Map<String, org.apache.maven.lifecycle.Lifecycle> lifecycles) {
-            this.lifecycles = lifecycles;
+        public LifecycleWrapperProvider(PlexusContainer container) {
+            this.container = container;
         }
 
         @Override
         public Collection<Lifecycle> provides() {
-            return lifecycles.values().stream().map(this::wrap).collect(Collectors.toList());
+            try {
+                Map<String, org.apache.maven.lifecycle.Lifecycle> all =
+                        container.lookupMap(org.apache.maven.lifecycle.Lifecycle.class);
+                return all.keySet().stream()
+                        .filter(id -> !Lifecycle.CLEAN.equals(id)
+                                && !Lifecycle.DEFAULT.equals(id)
+                                && !Lifecycle.SITE.equals(id)
+                                && !Lifecycle.WRAPPER.equals(id))
+                        .map(id -> wrap(all.get(id)))
+                        .collect(Collectors.toList());
+            } catch (ComponentLookupException e) {
+                throw new LookupException(e);
+            }
         }
 
         private Lifecycle wrap(org.apache.maven.lifecycle.Lifecycle lifecycle) {
@@ -120,10 +121,83 @@ public class DefaultLifecycleRegistry
 
                 @Override
                 public Collection<Phase> phases() {
-                    // TODO: implement
-                    throw new UnsupportedOperationException();
+                    return lifecycle.getDefaultLifecyclePhases().entrySet().stream()
+                            .map(e -> new Phase() {
+                                @Override
+                                public String name() {
+                                    return e.getKey();
+                                }
+
+                                @Override
+                                public List<Plugin> plugins() {
+                                    Map<String, Plugin> plugins = new LinkedHashMap<>();
+                                    DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(
+                                            plugins, e.getKey(), e.getValue());
+                                    return plugins.values().stream().toList();
+                                }
+                            })
+                            .collect(Collectors.toCollection(java.util.ArrayList::new));
                 }
             };
+        }
+    }
+
+    static class WrappedLifecycle extends org.apache.maven.lifecycle.Lifecycle {
+        WrappedLifecycle(Lifecycle lifecycle) {
+            super(lifecycle);
+        }
+    }
+
+    abstract static class BaseLifecycleProvider implements Provider<org.apache.maven.lifecycle.Lifecycle> {
+        @Inject
+        private PlexusContainer lookup;
+
+        private final String name;
+
+        BaseLifecycleProvider(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public org.apache.maven.lifecycle.Lifecycle get() {
+            try {
+                LifecycleRegistry registry = lookup.lookup(LifecycleRegistry.class);
+                return new WrappedLifecycle(registry.require(name));
+            } catch (ComponentLookupException e) {
+                throw new LookupException(e);
+            }
+        }
+    }
+
+    @Singleton
+    @Named(Lifecycle.CLEAN)
+    static class CleanLifecycleProvider extends BaseLifecycleProvider {
+        CleanLifecycleProvider() {
+            super(Lifecycle.CLEAN);
+        }
+    }
+
+    @Singleton
+    @Named(Lifecycle.DEFAULT)
+    static class DefaultLifecycleProvider extends BaseLifecycleProvider {
+        DefaultLifecycleProvider() {
+            super(Lifecycle.DEFAULT);
+        }
+    }
+
+    @Singleton
+    @Named(Lifecycle.SITE)
+    static class SiteLifecycleProvider extends BaseLifecycleProvider {
+        SiteLifecycleProvider() {
+            super(Lifecycle.SITE);
+        }
+    }
+
+    @Singleton
+    @Named(Lifecycle.WRAPPER)
+    static class WrapperLifecycleProvider extends BaseLifecycleProvider {
+        WrapperLifecycleProvider() {
+            super(Lifecycle.WRAPPER);
         }
     }
 

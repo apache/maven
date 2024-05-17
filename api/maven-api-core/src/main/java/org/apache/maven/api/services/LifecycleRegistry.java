@@ -18,16 +18,14 @@
  */
 package org.apache.maven.api.services;
 
-import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.maven.api.Lifecycle;
 
 public interface LifecycleRegistry extends ExtensibleEnumRegistry<Lifecycle>, Iterable<Lifecycle> {
+
     default Stream<Lifecycle> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
-
-    List<String> computePhases(Lifecycle lifecycle);
 }

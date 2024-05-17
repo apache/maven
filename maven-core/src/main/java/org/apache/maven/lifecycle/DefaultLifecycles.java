@@ -155,11 +155,9 @@ public class DefaultLifecycles {
 
         // Lifecycles cannot be cached as extensions might add custom lifecycles later in the execution.
         try {
-            Map<String, Lifecycle> lifecycles = new HashMap<>(lookup.lookupMap(Lifecycle.class));
-            for (org.apache.maven.api.Lifecycle lf : registry) {
-                lifecycles.put(lf.id(), new Lifecycle(registry, lf));
-            }
-            return lifecycles;
+            return registry != null
+                    ? registry.stream().collect(Collectors.toMap(lf -> lf.id(), lf -> new Lifecycle(lf)))
+                    : Map.of();
         } catch (LookupException e) {
             throw new IllegalStateException("Unable to lookup lifecycles from the plexus container", e);
         }
