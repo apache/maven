@@ -23,17 +23,7 @@ import javax.inject.Singleton;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -203,7 +193,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         mayReportInline(mavenSession.getRepositorySession(), locality, issue);
     }
 
-    private void reportSessionCollectedValidationIssues(MavenSession mavenSession) {
+    public void reportSessionCollectedValidationIssues(MavenSession mavenSession) {
         if (!logger.isWarnEnabled()) {
             return; // nothing can be reported
         }
@@ -222,7 +212,12 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
             logger.warn("");
             logger.warn("Plugin {} validation issues were detected in following plugin(s)", issueLocalitiesToReport);
             logger.warn("");
-            for (Map.Entry<String, PluginValidationIssues> entry : issuesMap.entrySet()) {
+
+            // Sorting the plugins (Fix the open issue)
+            List<Map.Entry<String, PluginValidationIssues>> sortedEntries = new ArrayList<>(issuesMap.entrySet());
+            sortedEntries.sort(Map.Entry.comparingByKey(String.CASE_INSENSITIVE_ORDER));
+
+            for (Map.Entry<String, PluginValidationIssues> entry : sortedEntries) {
                 PluginValidationIssues issues = entry.getValue();
                 if (!hasAnythingToReport(issues, issueLocalitiesToReport)) {
                     continue;
