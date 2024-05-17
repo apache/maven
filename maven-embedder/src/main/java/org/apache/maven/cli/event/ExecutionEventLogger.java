@@ -129,11 +129,11 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
             final List<MavenProject> projects = event.getSession().getProjects();
             for (MavenProject project : projects) {
-                int len = lineLength
-                        - project.getName().length()
-                        - project.getPackaging().length()
-                        - 2;
-                logger.info("{}{}[{}]", project.getName(), chars(' ', (len > 0) ? len : 1), project.getPackaging());
+                String projectInfo = String.format(
+                        "%s:%s:%s [%s]",
+                        project.getGroupId(), project.getArtifactId(), project.getVersion(), project.getPackaging());
+                int len = lineLength - projectInfo.length();
+                logger.info("{}{}", projectInfo, chars(' ', (len > 0) ? len : 1));
             }
 
             final List<MavenProject> allProjects = event.getSession().getAllProjects();
