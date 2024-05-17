@@ -169,7 +169,7 @@ under the License.
     <commonsIoVersion>2.16.1</commonsIoVersion>
     <guiceVersion>6.0.0</guiceVersion>
     <guavaVersion>33.2.0-jre</guavaVersion>
-    <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
+    <guavafailureaccessVersion>1.0.2</guavafailureaccessVersion>
     <hamcrestVersion>2.2</hamcrestVersion>
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
