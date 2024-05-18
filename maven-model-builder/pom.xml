@@ -179,6 +179,7 @@ under the License.
               <exclude>org.apache.maven.model.superpom.SuperPomProvider#getSuperModel(java.lang.String):METHOD_RETURN_TYPE_CHANGED</exclude>
               <exclude>org.apache.maven.model.validation.DefaultModelValidator#validateDependencyVersion(org.apache.maven.model.building.ModelProblemCollector,org.apache.maven.model.Dependency,java.lang.String):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.validation.ModelValidator#validateFileModel(org.apache.maven.model.Model,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.validation.ModelValidator#validateExternalProfiles(java.util.List,org.apache.maven.model.Model,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_NEW_DEFAULT</exclude>
             </excludes>
           </parameter>
         </configuration>

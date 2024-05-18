@@ -754,6 +754,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             profileInjector.injectProfile(inputModel, activeProfile, request, problems);
         }
 
+        modelValidator.validateExternalProfiles(activeExternalProfiles, inputModel, request, problems);
         for (Profile activeProfile : activeExternalProfiles) {
             profileInjector.injectProfile(inputModel, activeProfile, request, problems);
         }
