@@ -163,7 +163,7 @@ under the License.
     <!-- various versions -->
     <asmVersion>9.6</asmVersion>
     <byteBuddyVersion>1.14.15</byteBuddyVersion>
-    <cipherVersion>2.0</cipherVersion>
+    <cipherVersion>2.1.0</cipherVersion>
     <classWorldsVersion>2.8.0</classWorldsVersion>
     <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsIoVersion>2.11.0</commonsIoVersion>
