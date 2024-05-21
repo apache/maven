@@ -21,7 +21,7 @@ package org.apache.maven.repository.internal;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParserException;
-import org.apache.maven.model.version.ModelVersionParser;
+import org.apache.maven.api.services.model.ModelVersionParser;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 

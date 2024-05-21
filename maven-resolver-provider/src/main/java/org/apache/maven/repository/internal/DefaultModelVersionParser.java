@@ -28,7 +28,7 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParserException;
-import org.apache.maven.model.version.ModelVersionParser;
+import org.apache.maven.api.services.model.ModelVersionParser;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.VersionScheme;
 
