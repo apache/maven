@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,6 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,7 +40,9 @@ import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.LookupException;
+import org.apache.maven.api.spi.ExtensibleEnumProvider;
 import org.apache.maven.api.spi.LifecycleProvider;
+import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -52,9 +56,9 @@ import static org.apache.maven.internal.impl.Lifecycles.plugin;
  */
 @Named
 @Singleton
-public class DefaultLifecycleRegistry
-        extends ExtensibleEnumRegistries.DefaultExtensibleEnumRegistry<Lifecycle, LifecycleProvider>
-        implements LifecycleRegistry {
+public class DefaultLifecycleRegistry implements LifecycleRegistry {
+
+    private final List<LifecycleProvider> providers;
 
     public DefaultLifecycleRegistry() {
         this(Collections.emptyList());
@@ -62,7 +66,9 @@ public class DefaultLifecycleRegistry
 
     @Inject
     public DefaultLifecycleRegistry(List<LifecycleProvider> providers) {
-        super(providers, new CleanLifecycle(), new DefaultLifecycle(), new SiteLifecycle(), new WrapperLifecycle());
+        List<LifecycleProvider> p = new ArrayList<>(providers);
+        p.add(() -> List.of(new CleanLifecycle(), new DefaultLifecycle(), new SiteLifecycle(), new WrapperLifecycle()));
+        this.providers = p;
         // validate lifecycle
         for (Lifecycle lifecycle : this) {
             Set<String> set = new HashSet<>();
@@ -77,12 +83,17 @@ public class DefaultLifecycleRegistry
 
     @Override
     public Iterator<Lifecycle> iterator() {
-        return values.values().iterator();
+        return stream().toList().iterator();
     }
 
     @Override
     public Stream<Lifecycle> stream() {
-        return values.values().stream();
+        return providers.stream().map(ExtensibleEnumProvider::provides).flatMap(Collection::stream);
+    }
+
+    @Override
+    public Optional<Lifecycle> lookup(String id) {
+        return Optional.empty();
     }
 
     @Named
@@ -121,22 +132,26 @@ public class DefaultLifecycleRegistry
 
                 @Override
                 public Collection<Phase> phases() {
-                    return lifecycle.getDefaultLifecyclePhases().entrySet().stream()
-                            .map(e -> new Phase() {
+                    return lifecycle.getPhases().stream()
+                            .map(name -> (Phase) new Phase() {
                                 @Override
                                 public String name() {
-                                    return e.getKey();
+                                    return name;
                                 }
 
                                 @Override
                                 public List<Plugin> plugins() {
-                                    Map<String, Plugin> plugins = new LinkedHashMap<>();
-                                    DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(
-                                            plugins, e.getKey(), e.getValue());
-                                    return plugins.values().stream().toList();
+                                    Map<String, LifecyclePhase> lfPhases = lifecycle.getDefaultLifecyclePhases();
+                                    LifecyclePhase phase = lfPhases != null ? lfPhases.get(name) : null;
+                                    if (phase != null) {
+                                        Map<String, Plugin> plugins = new LinkedHashMap<>();
+                                        DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(plugins, name, phase);
+                                        return plugins.values().stream().toList();
+                                    }
+                                    return List.of();
                                 }
                             })
-                            .collect(Collectors.toCollection(java.util.ArrayList::new));
+                            .toList();
                 }
             };
         }
