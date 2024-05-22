@@ -22,6 +22,7 @@ org.apache.groovy:groovy:4.0.15
 org.apache.maven:maven-api-spi:4.0.0-alpha-8
 org.apache.maven:maven-api-model:mdo:4.0.0-alpha-8
 org.apache.maven.extensions:maven-extensions:pom:41
+org.apache.maven.extensions:maven-build-cache-extension:1.2.0
 org.apache.maven.its.plugins.class-loader:dep-c:${project.version}
 org.apache.maven.its.plugins:maven-it-plugin-active-collection:${project.version}
 org.apache.maven.its.plugins:maven-it-plugin-all:${project.version}
