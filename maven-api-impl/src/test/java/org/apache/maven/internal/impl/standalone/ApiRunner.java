@@ -311,10 +311,6 @@ public class ApiRunner {
     @Provides
     static LifecycleRegistry newLifecycleRegistry() {
         return new LifecycleRegistry() {
-            @Override
-            public List<String> computePhases(Lifecycle lifecycle) {
-                return List.of();
-            }
 
             @Override
             public Iterator<Lifecycle> iterator() {

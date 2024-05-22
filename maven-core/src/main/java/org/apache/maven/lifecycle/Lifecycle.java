@@ -35,11 +35,12 @@ public class Lifecycle {
         this.defaultPhases = defaultPhases;
     }
 
-    public Lifecycle(
-            org.apache.maven.api.services.LifecycleRegistry registry, org.apache.maven.api.Lifecycle lifecycle) {
+    public Lifecycle(org.apache.maven.api.Lifecycle lifecycle) {
         this.lifecycle = lifecycle;
         this.id = lifecycle.id();
-        this.phases = registry.computePhases(lifecycle);
+        this.phases = lifecycle.phases().stream()
+                .map(org.apache.maven.api.Lifecycle.Phase::name)
+                .toList();
         this.defaultPhases = getDefaultPhases(lifecycle);
     }
 

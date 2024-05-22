@@ -52,10 +52,6 @@ public class EmptyLifecycleBindingsInjector extends DefaultLifecycleBindingsInje
     private static PackagingRegistry packagingRegistry;
 
     private static final LifecycleRegistry emptyLifecycleRegistry = new LifecycleRegistry() {
-        @Override
-        public List<String> computePhases(Lifecycle lifecycle) {
-            return List.of();
-        }
 
         @Override
         public Iterator<Lifecycle> iterator() {
@@ -134,11 +130,6 @@ public class EmptyLifecycleBindingsInjector extends DefaultLifecycleBindingsInje
         @Nonnull
         public Optional<Lifecycle> lookup(String id) {
             return getDelegate().lookup(id);
-        }
-
-        @Override
-        public List<String> computePhases(Lifecycle lifecycle) {
-            return getDelegate().computePhases(lifecycle);
         }
 
         @Override

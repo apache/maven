@@ -104,7 +104,7 @@ public class DefaultPackagingRegistry
         return lfs;
     }
 
-    private void parseLifecyclePhaseDefinitions(Map<String, Plugin> plugins, String phase, LifecyclePhase goals) {
+    static void parseLifecyclePhaseDefinitions(Map<String, Plugin> plugins, String phase, LifecyclePhase goals) {
         InputSource inputSource =
                 new InputSource(DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID, null);
         InputLocation location = new InputLocation(-1, -1, inputSource, 0);

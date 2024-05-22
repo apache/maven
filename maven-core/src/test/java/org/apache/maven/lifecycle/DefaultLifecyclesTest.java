@@ -96,7 +96,8 @@ class DefaultLifecyclesTest {
         when(mockedPlexusContainer.lookupMap(Lifecycle.class)).thenReturn(lifeCycles);
 
         DefaultLifecycles dl = new DefaultLifecycles(
-                new DefaultLifecycleRegistry(Collections.emptyList(), Collections.emptyMap()),
+                new DefaultLifecycleRegistry(
+                        List.of(new DefaultLifecycleRegistry.LifecycleWrapperProvider(mockedPlexusContainer))),
                 new DefaultLookup(mockedPlexusContainer));
 
         assertThat(dl.getLifeCycles().get(0).getId(), is("clean"));
