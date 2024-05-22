@@ -204,7 +204,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         mayReportInline(mavenSession.getRepositorySession(), locality, issue);
     }
 
-    public void reportSessionCollectedValidationIssues(MavenSession mavenSession) {
+    private void reportSessionCollectedValidationIssues(MavenSession mavenSession) {
         if (!logger.isWarnEnabled()) {
             return; // nothing can be reported
         }
