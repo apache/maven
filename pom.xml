@@ -181,7 +181,7 @@ under the License.
     <plexusInteractivityVersion>1.3</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.27</plexusInterpolationVersion>
     <plexusTestingVersion>1.0.0</plexusTestingVersion>
-    <plexusXmlVersion>4.0.1</plexusXmlVersion>
+    <plexusXmlVersion>4.0.4</plexusXmlVersion>
     <resolverVersion>2.0.0-alpha-11</resolverVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <sisuVersion>0.9.0.M2</sisuVersion>
