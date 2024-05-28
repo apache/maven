@@ -67,4 +67,11 @@ class ModelTest {
     void testToStringNullSafe() {
         assertNotNull(new Model().toString());
     }
+
+    @Test
+    void testModelGroupId() {
+        Model model = new Model();
+        model.setGroupId("org.apache.maven");
+        assertEquals("org.apache.maven", model.getGroupId());
+    }
 }
