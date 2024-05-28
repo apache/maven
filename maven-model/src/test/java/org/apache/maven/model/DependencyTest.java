@@ -18,17 +18,26 @@
  */
 package org.apache.maven.model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@code Dependency}.
  *
  */
 class DependencyTest {
+
+    private Dependency dependency;
+
+    @BeforeEach
+    public void setUp() {
+        dependency = new Dependency();
+        dependency.setGroupId("groupId");
+        dependency.setArtifactId("artifactId");
+        dependency.setVersion("1.0");
+    }
 
     @Test
     void testHashCodeNullSafe() {
@@ -51,5 +60,19 @@ class DependencyTest {
     @Test
     void testToStringNullSafe() {
         assertNotNull(new Dependency().toString());
+    }
+
+    @Test
+    public void testDependencyExclusions() {
+        Exclusion exclusion = new Exclusion();
+        exclusion.setGroupId("excludedGroupId");
+        exclusion.setArtifactId("excludedArtifactId");
+
+        dependency.addExclusion(exclusion);
+
+        assertEquals(1, dependency.getExclusions().size());
+        Exclusion addedExclusion = dependency.getExclusions().get(0);
+        assertEquals("excludedGroupId", addedExclusion.getGroupId());
+        assertEquals("excludedArtifactId", addedExclusion.getArtifactId());
     }
 }
