@@ -432,7 +432,8 @@ public class DefaultModelValidatorTest {
 
     @Test
     public void testHardCodedSystemPath() throws Exception {
-        SimpleProblemCollector result = validateRaw("hard-coded-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
+        SimpleProblemCollector result =
+                validateRaw("hard-coded-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 1);
 
@@ -490,7 +491,6 @@ public class DefaultModelValidatorTest {
         assertTrue(result.getErrors().get(3).contains("duplicate declaration of plugin profile:managed-duplicate"));
     }
 
-
     public void testDuplicatePluginExecution() throws Exception {
         SimpleProblemCollector result = validateRaw("duplicate-plugin-execution.xml");
 
@@ -525,10 +525,8 @@ public class DefaultModelValidatorTest {
         assertContains(result.getErrors().get(0), "'repositories.repository.id'" + " must not be 'local'");
         assertContains(result.getErrors().get(1), "'pluginRepositories.pluginRepository.id' must not be 'local'");
         assertContains(result.getErrors().get(2), "'distributionManagement.repository.id' must not be 'local'");
-        assertContains(
-                result.getErrors().get(3), "'distributionManagement.snapshotRepository.id' must not be 'local'");
+        assertContains(result.getErrors().get(3), "'distributionManagement.snapshotRepository.id' must not be 'local'");
     }
-
 
     public void testMissingPluginDependencyGroupId() throws Exception {
         SimpleProblemCollector result = validate("missing-plugin-dependency-groupId.xml");
@@ -642,7 +640,6 @@ public class DefaultModelValidatorTest {
                 "'distributionManagement.snapshotRepository.id' must not contain any of these characters");
     }
 
-
     public void testBadDependencyExclusionId() throws Exception {
         SimpleProblemCollector result =
                 validateEffective("bad-dependency-exclusion-id.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0);
@@ -700,7 +697,8 @@ public class DefaultModelValidatorTest {
 
     @Test
     public void testSystemPathRefersToProjectBasedir() throws Exception {
-        SimpleProblemCollector result = validateRaw("basedir-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
+        SimpleProblemCollector result =
+                validateRaw("basedir-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 2);
 
