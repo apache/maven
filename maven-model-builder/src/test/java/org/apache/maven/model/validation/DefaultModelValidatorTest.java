@@ -432,7 +432,8 @@ public class DefaultModelValidatorTest {
 
     @Test
     public void testHardCodedSystemPath() throws Exception {
-        SimpleProblemCollector result = validateRaw("hard-coded-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
+        SimpleProblemCollector result =
+                validateRaw("hard-coded-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 1);
 
@@ -440,8 +441,7 @@ public class DefaultModelValidatorTest {
                 result.getWarnings().get(0),
                 "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path");
 
-        SimpleProblemCollector result31 =
-                validateRaw("hard-coded-system-path.xml");
+        SimpleProblemCollector result31 = validateRaw("hard-coded-system-path.xml");
 
         assertViolations(result31, 0, 0, 3);
 
@@ -467,7 +467,8 @@ public class DefaultModelValidatorTest {
 
     @Test
     public void testDuplicatePlugin30() throws Exception {
-        SimpleProblemCollector result = validateRaw("duplicate-plugin.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
+        SimpleProblemCollector result =
+                validateRaw("duplicate-plugin.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 4);
 
@@ -503,7 +504,8 @@ public class DefaultModelValidatorTest {
 
     @Test
     public void testReservedRepositoryId30() throws Exception {
-        SimpleProblemCollector result = validate("reserved-repository-id.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
+        SimpleProblemCollector result =
+                validate("reserved-repository-id.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 4);
 
@@ -523,8 +525,7 @@ public class DefaultModelValidatorTest {
         assertContains(result.getErrors().get(0), "'repositories.repository.id'" + " must not be 'local'");
         assertContains(result.getErrors().get(1), "'pluginRepositories.pluginRepository.id' must not be 'local'");
         assertContains(result.getErrors().get(2), "'distributionManagement.repository.id' must not be 'local'");
-        assertContains(
-                result.getErrors().get(3), "'distributionManagement.snapshotRepository.id' must not be 'local'");
+        assertContains(result.getErrors().get(3), "'distributionManagement.snapshotRepository.id' must not be 'local'");
     }
 
     @Test
@@ -583,7 +584,8 @@ public class DefaultModelValidatorTest {
 
     @Test
     public void testBadSnapshotVersion30() throws Exception {
-        SimpleProblemCollector result = validate("bad-snapshot-version.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
+        SimpleProblemCollector result =
+                validate("bad-snapshot-version.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 1);
 
@@ -601,7 +603,8 @@ public class DefaultModelValidatorTest {
 
     @Test
     public void testBadRepositoryId30() throws Exception {
-        SimpleProblemCollector result = validate("bad-repository-id.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
+        SimpleProblemCollector result =
+                validate("bad-repository-id.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 4);
 
@@ -695,7 +698,8 @@ public class DefaultModelValidatorTest {
 
     @Test
     public void testSystemPathRefersToProjectBasedir() throws Exception {
-        SimpleProblemCollector result = validateRaw("basedir-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
+        SimpleProblemCollector result =
+                validateRaw("basedir-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 2);
 
@@ -706,8 +710,7 @@ public class DefaultModelValidatorTest {
                 result.getWarnings().get(1),
                 "'dependencies.dependency.systemPath' for test:b:jar should not point at files within the project directory");
 
-        SimpleProblemCollector result31 =
-                validateRaw("basedir-system-path.xml");
+        SimpleProblemCollector result31 = validateRaw("basedir-system-path.xml");
 
         assertViolations(result31, 0, 0, 4);
 
