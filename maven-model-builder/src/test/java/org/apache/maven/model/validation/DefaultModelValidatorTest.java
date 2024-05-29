@@ -49,6 +49,10 @@ public class DefaultModelValidatorTest extends TestCase {
         return validateEffective(pom, UnaryOperator.identity());
     }
 
+    private SimpleProblemCollector validate(String pom, int level) throws Exception {
+        return validateEffective(pom, mbr -> mbr.setValidationLevel(level));
+    }
+
     private SimpleProblemCollector validateRaw(String pom) throws Exception {
         return validateRaw(pom, UnaryOperator.identity());
     }
@@ -408,7 +412,7 @@ public class DefaultModelValidatorTest extends TestCase {
     }
 
     public void testHardCodedSystemPath() throws Exception {
-        SimpleProblemCollector result = validateRaw("hard-coded-system-path.xml");
+        SimpleProblemCollector result = validateRaw("hard-coded-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 1);
 
@@ -417,7 +421,7 @@ public class DefaultModelValidatorTest extends TestCase {
                 "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path");
 
         SimpleProblemCollector result_31 =
-                validateRaw("hard-coded-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1);
+                validateRaw("hard-coded-system-path.xml");
 
         assertViolations(result_31, 0, 0, 3);
 
@@ -440,8 +444,8 @@ public class DefaultModelValidatorTest extends TestCase {
         assertTrue(result.getErrors().get(0).contains("'modules.module[0]' has been specified without a path"));
     }
 
-    public void testDuplicatePlugin() throws Exception {
-        SimpleProblemCollector result = validateRaw("duplicate-plugin.xml");
+    public void testDuplicatePlugin30() throws Exception {
+        SimpleProblemCollector result = validateRaw("duplicate-plugin.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 4);
 
@@ -449,6 +453,17 @@ public class DefaultModelValidatorTest extends TestCase {
         assertTrue(result.getWarnings().get(1).contains("duplicate declaration of plugin test:managed-duplicate"));
         assertTrue(result.getWarnings().get(2).contains("duplicate declaration of plugin profile:duplicate"));
         assertTrue(result.getWarnings().get(3).contains("duplicate declaration of plugin profile:managed-duplicate"));
+    }
+
+    public void testDuplicatePlugin() throws Exception {
+        SimpleProblemCollector result = validateRaw("duplicate-plugin.xml");
+
+        assertViolations(result, 0, 4, 0);
+
+        assertTrue(result.getErrors().get(0).contains("duplicate declaration of plugin test:duplicate"));
+        assertTrue(result.getErrors().get(1).contains("duplicate declaration of plugin test:managed-duplicate"));
+        assertTrue(result.getErrors().get(2).contains("duplicate declaration of plugin profile:duplicate"));
+        assertTrue(result.getErrors().get(3).contains("duplicate declaration of plugin profile:managed-duplicate"));
     }
 
     public void testDuplicatePluginExecution() throws Exception {
@@ -462,8 +477,8 @@ public class DefaultModelValidatorTest extends TestCase {
         assertContains(result.getErrors().get(3), "duplicate execution with id b");
     }
 
-    public void testReservedRepositoryId() throws Exception {
-        SimpleProblemCollector result = validate("reserved-repository-id.xml");
+    public void testReservedRepositoryId30() throws Exception {
+        SimpleProblemCollector result = validate("reserved-repository-id.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 4);
 
@@ -472,6 +487,18 @@ public class DefaultModelValidatorTest extends TestCase {
         assertContains(result.getWarnings().get(2), "'distributionManagement.repository.id' must not be 'local'");
         assertContains(
                 result.getWarnings().get(3), "'distributionManagement.snapshotRepository.id' must not be 'local'");
+    }
+
+    public void testReservedRepositoryId() throws Exception {
+        SimpleProblemCollector result = validate("reserved-repository-id.xml");
+
+        assertViolations(result, 0, 4, 0);
+
+        assertContains(result.getErrors().get(0), "'repositories.repository.id'" + " must not be 'local'");
+        assertContains(result.getErrors().get(1), "'pluginRepositories.pluginRepository.id' must not be 'local'");
+        assertContains(result.getErrors().get(2), "'distributionManagement.repository.id' must not be 'local'");
+        assertContains(
+                result.getErrors().get(3), "'distributionManagement.snapshotRepository.id' must not be 'local'");
     }
 
     public void testMissingPluginDependencyGroupId() throws Exception {
@@ -506,24 +533,40 @@ public class DefaultModelValidatorTest extends TestCase {
         assertTrue(result.getErrors().get(0).contains("test:b"));
     }
 
-    public void testBadVersion() throws Exception {
-        SimpleProblemCollector result = validate("bad-version.xml");
+    public void testBadVersion30() throws Exception {
+        SimpleProblemCollector result = validate("bad-version.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 1);
 
         assertContains(result.getWarnings().get(0), "'version' must not contain any of these characters");
     }
 
-    public void testBadSnapshotVersion() throws Exception {
-        SimpleProblemCollector result = validate("bad-snapshot-version.xml");
+    public void testBadVersion() throws Exception {
+        SimpleProblemCollector result = validate("bad-version.xml");
+
+        assertViolations(result, 0, 1, 0);
+
+        assertContains(result.getErrors().get(0), "'version' must not contain any of these characters");
+    }
+
+    public void testBadSnapshotVersion30() throws Exception {
+        SimpleProblemCollector result = validate("bad-snapshot-version.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 1);
 
         assertContains(result.getWarnings().get(0), "'version' uses an unsupported snapshot version format");
     }
 
-    public void testBadRepositoryId() throws Exception {
-        SimpleProblemCollector result = validate("bad-repository-id.xml");
+    public void testBadSnapshotVersion() throws Exception {
+        SimpleProblemCollector result = validate("bad-snapshot-version.xml");
+
+        assertViolations(result, 0, 1, 0);
+
+        assertContains(result.getErrors().get(0), "'version' uses an unsupported snapshot version format");
+    }
+
+    public void testBadRepositoryId30() throws Exception {
+        SimpleProblemCollector result = validate("bad-repository-id.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 4);
 
@@ -537,6 +580,24 @@ public class DefaultModelValidatorTest extends TestCase {
                 "'distributionManagement.repository.id' must not contain any of these characters");
         assertContains(
                 result.getWarnings().get(3),
+                "'distributionManagement.snapshotRepository.id' must not contain any of these characters");
+    }
+
+    public void testBadRepositoryId() throws Exception {
+        SimpleProblemCollector result = validate("bad-repository-id.xml");
+
+        assertViolations(result, 0, 4, 0);
+
+        assertContains(
+                result.getErrors().get(0), "'repositories.repository.id' must not contain any of these characters");
+        assertContains(
+                result.getErrors().get(1),
+                "'pluginRepositories.pluginRepository.id' must not contain any of these characters");
+        assertContains(
+                result.getErrors().get(2),
+                "'distributionManagement.repository.id' must not contain any of these characters");
+        assertContains(
+                result.getErrors().get(3),
                 "'distributionManagement.snapshotRepository.id' must not contain any of these characters");
     }
 
@@ -593,7 +654,7 @@ public class DefaultModelValidatorTest extends TestCase {
     }
 
     public void testSystemPathRefersToProjectBasedir() throws Exception {
-        SimpleProblemCollector result = validateRaw("basedir-system-path.xml");
+        SimpleProblemCollector result = validateRaw("basedir-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
         assertViolations(result, 0, 0, 2);
 
@@ -605,7 +666,7 @@ public class DefaultModelValidatorTest extends TestCase {
                 "'dependencies.dependency.systemPath' for test:b:jar should not point at files within the project directory");
 
         SimpleProblemCollector result_31 =
-                validateRaw("basedir-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1);
+                validateRaw("basedir-system-path.xml");
 
         assertViolations(result_31, 0, 0, 4);
 
