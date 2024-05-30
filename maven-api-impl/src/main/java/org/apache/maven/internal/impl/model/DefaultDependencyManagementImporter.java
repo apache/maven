@@ -78,7 +78,7 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
                                 Severity.WARNING,
                                 Version.V40,
                                 "Ignored POM import for: " + toString(dependency) + " as already imported "
-                                        + toString(present) + ".  Add a the conflicting managed dependency directly "
+                                        + toString(present) + ". Add the conflicting managed dependency directly "
                                         + "to the dependencyManagement section of the POM.");
                     }
                 }

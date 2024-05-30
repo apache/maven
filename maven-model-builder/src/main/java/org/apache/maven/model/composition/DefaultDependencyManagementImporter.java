@@ -70,7 +70,7 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
                         problems.add(new ModelProblemCollectorRequest(
                                         ModelProblem.Severity.WARNING, ModelProblem.Version.V40)
                                 .setMessage("Ignored POM import for: " + toString(dependency) + " as already imported "
-                                        + toString(present) + ".  Add a the conflicting managed dependency directly "
+                                        + toString(present) + ". Add the conflicting managed dependency directly "
                                         + "to the dependencyManagement section of the POM."));
                     }
                 }
