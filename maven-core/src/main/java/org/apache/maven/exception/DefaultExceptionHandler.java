@@ -32,7 +32,6 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.plugin.AbstractMojoExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.ProjectBuildingException;
@@ -171,8 +170,6 @@ public class DefaultExceptionHandler implements ExceptionHandler {
                         reference = ConnectException.class.getSimpleName();
                     }
                 }
-            } else if (exception instanceof MojoFailureException) {
-                reference = MojoFailureException.class.getSimpleName();
             } else if (exception instanceof LinkageError) {
                 reference = LinkageError.class.getSimpleName();
             } else if (exception instanceof PluginExecutionException) {
