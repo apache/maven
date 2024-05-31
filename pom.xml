@@ -42,6 +42,7 @@ under the License.
     process.</description>
   <url>https://maven.apache.org/ref/${project.version}/</url>
   <inceptionYear>2001</inceptionYear>
+
   <contributors>
     <contributor>
       <name>Stuart McCulloch</name>
