@@ -183,7 +183,7 @@ under the License.
     <plexusXmlVersion>4.0.4</plexusXmlVersion>
     <resolverVersion>2.0.0-alpha-11</resolverVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
-    <sisuVersion>0.9.0-20240531.165402-20</sisuVersion>
+    <sisuVersion>0.9.0-20240531.171034-21</sisuVersion>
     <slf4jVersion>2.0.13</slf4jVersion>
     <stax2ApiVersion>4.2.1</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
@@ -414,6 +414,11 @@ under the License.
         <groupId>javax.annotation</groupId>
         <artifactId>javax.annotation-api</artifactId>
         <version>${javaxAnnotationApiVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>org.eclipse.sisu.inject</artifactId>
+        <version>${sisuVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
