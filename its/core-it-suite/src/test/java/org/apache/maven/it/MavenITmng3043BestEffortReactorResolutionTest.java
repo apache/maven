@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.Verifier;
@@ -46,6 +47,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
     @Test
     public void testitTestPhase() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3043");
+        Files.createDirectories(testDir.toPath().resolve(".mvn"));
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
