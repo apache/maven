@@ -105,14 +105,14 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
                 reverse = true;
                 test = test.substring(1);
             }
-            result = actualVersion.equals(test);
+            result = actualVersion.equalsIgnoreCase(test);
         }
 
         return reverse != result;
     }
 
     private boolean determineArchMatch(String expectedArch, String actualArch) {
-        String test = expectedArch;
+        String test = expectedArch.toLowerCase(Locale.ENGLISH);
         boolean reverse = false;
 
         if (test.startsWith("!")) {
@@ -126,7 +126,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
     }
 
     private boolean determineNameMatch(String expectedName, String actualName) {
-        String test = expectedName;
+        String test = expectedName.toLowerCase(Locale.ENGLISH);
         boolean reverse = false;
 
         if (test.startsWith("!")) {
@@ -140,7 +140,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
     }
 
     private boolean determineFamilyMatch(String family, String actualName) {
-        String test = family;
+        String test = family.toLowerCase(Locale.ENGLISH);
         boolean reverse = false;
 
         if (test.startsWith("!")) {
