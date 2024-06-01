@@ -49,8 +49,12 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Set up Maven
+        run:
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=3.9.7"
+
       - name: Build with Maven
-        run: mvn verify -e -B -V -DdistributionFileName=apache-maven
+        run: ./mvnw verify -e -B -V -DdistributionFileName=apache-maven
 
       - name: Upload built Maven
         uses: actions/upload-artifact@v4
@@ -121,12 +125,16 @@ jobs:
           path: maven/
           persist-credentials: false
 
+      - name: Set up Maven
+        run:
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=3.9.7"
+
       - name: Build Maven
-        run: mvn install -e -B -V -DdistributionFileName=apache-maven -DskipTests -f maven/pom.xml
+        run: ./mvnw install -e -B -V -DdistributionFileName=apache-maven -DskipTests -f maven/pom.xml
 
       - name: Running integration tests
         shell: bash
-        run: mvn install -e -B -V -Prun-its,embedded -DmavenDistro="$GITHUB_WORKSPACE/maven/apache-maven/target/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
+        run: ./mvnw install -e -B -V -Prun-its,embedded -DmavenDistro="$GITHUB_WORKSPACE/maven/apache-maven/target/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
 
       - name: Upload artifact on integration testing
         uses: actions/upload-artifact@v4
