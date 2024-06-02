@@ -17,7 +17,7 @@
 
 name: Java CI
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 # clear all permissions for GITHUB_TOKEN
 permissions: {}
@@ -25,8 +25,11 @@ permissions: {}
 jobs:
   build:
 
-    # execute on any push or pull request from forked repo
-    if: github.event_name == 'push' || ( github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork )
+    # execute on any push, workflow_dispatch  or pull request from forked repo
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      ( github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork )
 
     strategy:
       matrix:
