@@ -542,7 +542,6 @@ under the License.
     </dependencies>
     <!--bootstrap-start-comment-->
   </dependencyManagement>
-
   <!--bootstrap-end-comment-->
   <!--bootstrap-start-comment-->
   <dependencies>
