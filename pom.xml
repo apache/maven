@@ -125,7 +125,7 @@ under the License.
 
   <properties>
     <javaVersion>8</javaVersion>
-    <version.sisu-maven-plugin>0.9.0-20240531.171034-21</version.sisu-maven-plugin>
+    <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
     <classWorldsVersion>2.8.0</classWorldsVersion>
     <commonsCliVersion>1.7.0</commonsCliVersion>
     <commonsIoVersion>2.16.1</commonsIoVersion>
@@ -557,31 +557,6 @@ under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <repositories>
-    <repository>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>sonatype-nexus-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>sonatype-nexus-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    </pluginRepository>
-  </pluginRepositories>
   <!--bootstrap-end-comment-->
 
   <build>
