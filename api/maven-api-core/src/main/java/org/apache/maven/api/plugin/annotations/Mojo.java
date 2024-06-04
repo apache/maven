@@ -29,10 +29,23 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * This annotation will mark your class as a Mojo (ie. goal in a Maven plugin).
- * The mojo can be annotated with {@code jakarta.inject.*} annotations.
+ * This annotation will mark your class as a Mojo, which is the implementation of a goal in a Maven plugin.
+ * <p>
+ * The mojo can be annotated with {@code org.apache.maven.api.di.*} annotations to
+ * control the lifecycle of the mojo itself, and to inject other beans.
+ * </p>
+ * <p>
+ * The mojo class can also be injected with an {@link Execute} annotation to specify a
+ * forked lifecycle.
+ * </p>
+ * <p>
  * The {@link Parameter} annotation can be added on fields to inject data
  * from the plugin configuration or from other components.
+ * </p>
+ * <p>
+ * Fields can also be annotated with the {@link Resolution} annotation to be injected
+ * with the dependency collection or resolution result for the project.
+ * </p>
  *
  * @since 4.0.0
  */
@@ -81,4 +94,22 @@ public @interface Mojo {
      */
     @Nonnull
     String configurator() default "";
+
+    /**
+     * Indicates whether dependency collection will be
+     * required when executing the Mojo.
+     * If not set, it will be inferred from the fields
+     * annotated with the {@link Resolution} annotation.
+     */
+    @Nonnull
+    boolean dependencyCollection() default false;
+
+    /**
+     * Comma separated list of path scopes that will be
+     * required for dependency resolution.
+     * If not set, it will be inferred from the fields
+     * annotated with the {@link Resolution} annotation.
+     */
+    @Nonnull
+    String dependencyResolutionPathScopes() default "";
 }

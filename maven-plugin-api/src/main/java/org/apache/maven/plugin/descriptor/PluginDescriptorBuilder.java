@@ -385,12 +385,6 @@ public class PluginDescriptorBuilder {
             mojo.setThreadSafe(Boolean.parseBoolean(threadSafe));
         }
 
-        String v4Api = c.getChild("v4Api").getValue();
-
-        if (v4Api != null) {
-            mojo.setV4Api(Boolean.parseBoolean(v4Api));
-        }
-
         // ----------------------------------------------------------------------
         // Configuration
         // ----------------------------------------------------------------------
