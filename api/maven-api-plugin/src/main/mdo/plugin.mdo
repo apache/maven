@@ -398,6 +398,15 @@ under the License.
           </association>
         </field>
         <field xdoc.separator="blank">
+          <name>resolutions</name>
+          <version>2.0.0+</version>
+          <description></description>
+          <association>
+            <type>Resolution</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field xdoc.separator="blank">
           <name>requirements</name>
           <version>1.0.0/1.1.0</version>
           <description></description>
@@ -577,6 +586,35 @@ under the License.
           <type>String</type>
           <defaultValue>jar</defaultValue>
           <description>The type of dependency.</description>
+        </field>
+      </fields>
+    </class>
+
+    <class xdoc.anchorName="resolution">
+      <name>Resolution</name>
+      <version>2.0.0+</version>
+      <description>Dependency collection or resolution injection.</description>
+      <fields>
+        <field>
+          <name>field</name>
+          <required>false</required>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>the name of the field to be injected</description>
+        </field>
+        <field>
+          <name>pathScope</name>
+          <required>false</required>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>pathScope used to flatten dependencies</description>
+        </field>
+        <field>
+          <name>requestType</name>
+          <required>false</required>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>either {@code collect}, {@code flatten}, or {@code resolve}</description>
         </field>
       </fields>
     </class>
