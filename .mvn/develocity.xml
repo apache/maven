@@ -24,7 +24,6 @@
     </local>
     <remote>
       <enabled>false</enabled>
-      <storeEnabled>#{isTrue(env['GITHUB_ACTIONS'])}</storeEnabled>
     </remote>
   </buildCache>
 </develocity>
