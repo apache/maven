@@ -22,6 +22,9 @@ on: [push, pull_request]
 # clear all permissions for GITHUB_TOKEN
 permissions: {}
 
+env:
+  DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_ACCESS_TOKEN }}
+
 jobs:
   build:
 
