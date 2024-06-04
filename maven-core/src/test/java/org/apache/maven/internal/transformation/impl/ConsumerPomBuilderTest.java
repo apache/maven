@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.transformation.impl;
 
-import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -43,6 +42,7 @@ import org.apache.maven.internal.transformation.AbstractRepositoryTestCase;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.sisu.Priority;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
