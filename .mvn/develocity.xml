@@ -34,7 +34,7 @@
     </obfuscation>
     <publishing>
       <onlyIf>
-        <![CDATA[authenticated]]>
+        <![CDATA[authenticated && env['GITHUB_ACTIONS'] != null]]>
       </onlyIf>
     </publishing>
   </buildScan>
