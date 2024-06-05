@@ -74,7 +74,16 @@ public class JdkVersionProfileActivator implements ProfileActivator {
         if (jdk.startsWith("!")) {
             return !version.startsWith(jdk.substring(1));
         } else if (isRange(jdk)) {
-            return isInRange(version, getRange(jdk));
+            try {
+                return isInRange(version, getRange(jdk));
+            } catch (NumberFormatException e) {
+                problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.BASE)
+                        .setMessage("Failed to determine JDK activation for profile " + profile.getId()
+                                + " due invalid JDK version: '" + version + "'")
+                        .setLocation(profile.getLocation(""))
+                        .setException(e));
+                return false;
+            }
         } else {
             return version.startsWith(jdk);
         }
