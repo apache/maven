@@ -142,13 +142,13 @@ public class OperatingSystemProfileActivatorTest extends AbstractProfileActivato
         assertActivation(true, profile, newContext(null, newProperties("windows", "99", "aarch64")));
     }
 
-    @Test
     public void testCapitalOsName() {
-        Profile profile = newProfile(ActivationOS.newBuilder()
-                .family("Mac")
-                .name("Mac OS X")
-                .arch("aarch64")
-                .version("14.5"));
+        ActivationOS os = new ActivationOS();
+        os.setFamily("Mac");
+        os.setName("Mac OS X");
+        os.setArch("aarch64");
+        os.setVersion("14.5");
+        Profile profile = newProfile(os);
 
         assertActivation(false, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
         assertActivation(false, profile, newContext(null, newProperties("windows", "1", "aarch64")));
