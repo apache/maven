@@ -105,6 +105,29 @@ import static org.apache.maven.model.building.Result.newResult;
 @Named
 @Singleton
 public class DefaultModelBuilder implements ModelBuilder {
+    /**
+     * Key for "fail on invalid model" property.
+     * <p>
+     * Visible for testing.
+     */
+    static final String FAIL_ON_INVALID_MODEL = "maven.modelBuilder.failOnInvalidModel";
+
+    /**
+     * Checks user and system properties (in this order) for value of {@link #FAIL_ON_INVALID_MODEL} property key, if
+     * set and returns it. If not set, defaults to {@code true}.
+     * <p>
+     * This is only meant to provide "escape hatch" for those builds, that are for some reason stuck with invalid models.
+     */
+    private static boolean isFailOnInvalidModel(ModelBuildingRequest request) {
+        String val = request.getUserProperties().getProperty(FAIL_ON_INVALID_MODEL);
+        if (val == null) {
+            val = request.getSystemProperties().getProperty(FAIL_ON_INVALID_MODEL);
+        }
+        if (val != null) {
+            return Boolean.parseBoolean(val);
+        }
+        return true;
+    }
 
     private final ModelProcessor modelProcessor;
     private final ModelValidator modelValidator;
@@ -690,6 +713,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     protected ModelBuildingResult build(ModelBuildingRequest request, Collection<String> importIds)
             throws ModelBuildingException {
         // phase 1
+        boolean failOnInvalidModel = isFailOnInvalidModel(request);
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector(result);
@@ -700,7 +724,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         request.setFileModel(fileModel);
         result.setFileModel(fileModel.clone());
 
-        activateFileModel(request, result, problems);
+        activateFileModel(request, result, failOnInvalidModel, problems);
 
         if (!request.isTwoPhaseBuilding()) {
             return build(request, result, importIds);
@@ -714,6 +738,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private void activateFileModel(
             final ModelBuildingRequest request,
             final DefaultModelBuildingResult result,
+            boolean failOnInvalidModel,
             DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         Model inputModel = request.getFileModel();
@@ -746,7 +771,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         problems.setSource(inputModel);
         inputModel.update(modelNormalizer.mergeDuplicates(inputModel.getDelegate(), request, problems));
 
-        Map<String, Activation> interpolatedActivations = getProfileActivations(inputModel, false);
+        Map<String, Activation> interpolatedActivations =
+                getProfileActivations(inputModel, false, failOnInvalidModel, problems);
         injectProfileActivations(inputModel, interpolatedActivations);
 
         // profile injection
@@ -888,7 +914,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         problems.setRootModel(resultModel);
 
         // model interpolation
-        resultModel = interpolateModel(resultModel, request, problems);
+        resultModel = interpolateModel(resultModel, request, false, problems);
 
         // url normalization
         modelUrlNormalizer.normalize(resultModel, request);
@@ -1395,7 +1421,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         return new Model(parent);
     }
 
-    private Map<String, Activation> getProfileActivations(Model model, boolean clone) {
+    private Map<String, Activation> getProfileActivations(
+            Model model, boolean clone, boolean failOnInvalidModel, ModelProblemCollector problems) {
         Map<String, Activation> activations = new HashMap<>();
         for (Profile profile : model.getProfiles()) {
             Activation activation = profile.getActivation();
@@ -1408,7 +1435,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                 activation = activation.clone();
             }
 
-            activations.put(profile.getId(), activation);
+            if (activations.put(profile.getId(), activation) != null) {
+                problems.add(new ModelProblemCollectorRequest(
+                                failOnInvalidModel ? Severity.FATAL : Severity.WARNING, ModelProblem.Version.BASE)
+                        .setMessage("Duplicate activation for profile " + profile.getId()));
+            }
         }
 
         return activations;
@@ -1427,9 +1458,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    private Model interpolateModel(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
+    private Model interpolateModel(
+            Model model, ModelBuildingRequest request, boolean failOnInvalidModel, ModelProblemCollector problems) {
         // save profile activations before interpolation, since they are evaluated with limited scope
-        Map<String, Activation> originalActivations = getProfileActivations(model, true);
+        Map<String, Activation> originalActivations = getProfileActivations(model, true, failOnInvalidModel, problems);
 
         Model interpolatedModel = new Model(modelInterpolator.interpolateModel(
                 model.getDelegate(), model.getProjectDirectoryPath(), request, problems));

@@ -98,6 +98,29 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultModelBuilder implements ModelBuilder {
+    /**
+     * Key for "fail on invalid model" property.
+     * <p>
+     * Visible for testing.
+     */
+    static final String FAIL_ON_INVALID_MODEL = "maven.modelBuilder.failOnInvalidModel";
+
+    /**
+     * Checks user and system properties (in this order) for value of {@link #FAIL_ON_INVALID_MODEL} property key, if
+     * set and returns it. If not set, defaults to {@code true}.
+     * <p>
+     * This is only meant to provide "escape hatch" for those builds, that are for some reason stuck with invalid models.
+     */
+    private static boolean isFailOnInvalidModel(ModelBuilderRequest request) {
+        String val = request.getUserProperties().get(FAIL_ON_INVALID_MODEL);
+        if (val == null) {
+            val = request.getSystemProperties().get(FAIL_ON_INVALID_MODEL);
+        }
+        if (val != null) {
+            return Boolean.parseBoolean(val);
+        }
+        return true;
+    }
 
     private static final String RAW = "raw";
     private static final String FILE = "file";
@@ -200,6 +223,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     protected ModelBuilderResult build(ModelBuilderRequest request, Collection<String> importIds)
             throws ModelBuilderException {
         // phase 1
+        boolean failOnInvalidModel = isFailOnInvalidModel(request);
         DefaultModelBuilderResult result = new DefaultModelBuilderResult();
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector(result);
@@ -208,7 +232,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         Model fileModel = readFileModel(request, problems);
         result.setFileModel(fileModel);
 
-        Model activatedFileModel = activateFileModel(fileModel, request, result, problems);
+        Model activatedFileModel = activateFileModel(fileModel, request, result, failOnInvalidModel, problems);
         result.setActivatedFileModel(activatedFileModel);
 
         if (!request.isTwoPhaseBuilding()) {
@@ -224,6 +248,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model inputModel,
             ModelBuilderRequest request,
             DefaultModelBuilderResult result,
+            boolean failOnInvalidModel,
             DefaultModelProblemCollector problems)
             throws ModelBuilderException {
         problems.setRootModel(inputModel);
@@ -255,7 +280,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         problems.setSource(inputModel);
         inputModel = modelNormalizer.mergeDuplicates(inputModel, request, problems);
 
-        Map<String, Activation> interpolatedActivations = getProfileActivations(inputModel);
+        Map<String, Activation> interpolatedActivations =
+                getProfileActivations(inputModel, failOnInvalidModel, problems);
         inputModel = injectProfileActivations(inputModel, interpolatedActivations);
 
         // profile injection
@@ -276,7 +302,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             throw problems.newModelBuilderException();
         }
 
-        inputModel = activateFileModel(inputModel, request, result, problems);
+        inputModel = activateFileModel(inputModel, request, result, false, problems);
 
         problems.setRootModel(inputModel);
 
@@ -843,10 +869,20 @@ public class DefaultModelBuilder implements ModelBuilder {
         return parent;
     }
 
-    private Map<String, Activation> getProfileActivations(Model model) {
-        return model.getProfiles().stream()
-                .filter(p -> p.getActivation() != null)
-                .collect(Collectors.toMap(Profile::getId, Profile::getActivation));
+    private Map<String, Activation> getProfileActivations(
+            Model model, boolean failOnInvalidModel, ModelProblemCollector problems) {
+        Map<String, Activation> result = new HashMap<>();
+        for (Profile profile : model.getProfiles()) {
+            if (profile.getActivation() != null) {
+                if (result.put(profile.getId(), profile.getActivation()) != null) {
+                    problems.add(
+                            failOnInvalidModel ? Severity.FATAL : Severity.WARNING,
+                            ModelProblem.Version.BASE,
+                            "Duplicate activation for profile " + profile.getId());
+                }
+            }
+        }
+        return result;
     }
 
     private Model injectProfileActivations(Model model, Map<String, Activation> activations) {
