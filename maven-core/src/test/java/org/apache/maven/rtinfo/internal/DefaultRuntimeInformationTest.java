@@ -57,7 +57,9 @@ public class DefaultRuntimeInformationTest extends PlexusTestCase {
         try {
             rtInfo.isMavenVersion(null);
             fail("Bad version range wasn't rejected");
-        } catch (NullPointerException e) {
+        } catch (IllegalArgumentException e) {
+            // distinction between IAEx and NPE makes no sense: argument is wrong
+            // moreover, the distinction does not give any benefit either
             assertTrue(true);
         }
     }

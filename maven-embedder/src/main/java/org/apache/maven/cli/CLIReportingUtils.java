@@ -25,8 +25,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.util.Os;
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;

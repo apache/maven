@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.versioning.VersionRange;
 
 /**
@@ -91,7 +90,9 @@ public final class ArtifactUtils {
     private static void notBlank(String str, String message) {
         int c = str != null && str.length() > 0 ? str.charAt(0) : 0;
         if ((c < '0' || c > '9') && (c < 'a' || c > 'z')) {
-            Validate.notBlank(str, message);
+            if (str == null || str.trim().isEmpty()) {
+                throw new IllegalArgumentException(message);
+            }
         }
     }
 

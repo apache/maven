@@ -18,7 +18,6 @@
  */
 package org.apache.maven.configuration;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -104,8 +103,12 @@ public class DefaultBeanConfigurationRequest implements BeanConfigurationRequest
     }
 
     private Plugin findPlugin(Model model, String groupId, String artifactId) {
-        Validate.notBlank(groupId, "groupId can neither be null, empty nor blank");
-        Validate.notBlank(artifactId, "artifactId can neither be null, empty nor blank");
+        if (groupId == null || groupId.trim().isEmpty()) {
+            throw new IllegalArgumentException("groupId can neither be null, empty nor blank");
+        }
+        if (artifactId == null || artifactId.trim().isEmpty()) {
+            throw new IllegalArgumentException("artifactId can neither be null, empty nor blank");
+        }
 
         if (model != null) {
             Build build = model.getBuild();

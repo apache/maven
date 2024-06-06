@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -80,9 +78,10 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
     }
 
     public boolean isMavenVersion(String versionRange) {
+        if (versionRange == null || versionRange.trim().isEmpty()) {
+            throw new IllegalArgumentException("versionRange can neither be null, empty nor blank");
+        }
         VersionScheme versionScheme = new GenericVersionScheme();
-
-        Validate.notBlank(versionRange, "versionRange can neither be null, empty nor blank");
 
         VersionConstraint constraint;
         try {
@@ -94,7 +93,9 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
         Version current;
         try {
             String mavenVersion = getMavenVersion();
-            Validate.validState(StringUtils.isNotEmpty(mavenVersion), "Could not determine current Maven version");
+            if (mavenVersion == null || mavenVersion.trim().isEmpty()) {
+                throw new IllegalStateException("Could not determine current Maven version");
+            }
 
             current = versionScheme.parseVersion(mavenVersion);
         } catch (InvalidVersionSpecificationException e) {
