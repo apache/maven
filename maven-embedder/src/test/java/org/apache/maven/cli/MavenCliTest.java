@@ -89,10 +89,6 @@ public class MavenCliTest {
         int cpus = Runtime.getRuntime().availableProcessors();
         assertEquals((int) (cpus * 2.2), cli.calculateDegreeOfConcurrency("2.2C"));
         assertEquals(1, cli.calculateDegreeOfConcurrency("0.0001C"));
-        // Note: this assertion below makes no sense, first Float.parseFloat("2.") DOES parse the string in 2.0.
-        // Second, the limitation to reject string "2." was actually commons-lang3 NumberUtils.isParsable limitation
-        // We should not "skew" our input validation by some utility, while using Java classes to perform actual parsing
-        // assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("2.C"));
         assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("-2.2C"));
         assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("0C"));
     }

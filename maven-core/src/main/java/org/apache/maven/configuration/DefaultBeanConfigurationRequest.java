@@ -104,16 +104,15 @@ public class DefaultBeanConfigurationRequest implements BeanConfigurationRequest
         return this;
     }
 
+    private static final String GROUP_ID_ERROR_MESSAGE = "groupId can neither be null, empty, nor blank";
+    private static final String ARTIFACT_ID_ERROR_MESSAGE = "artifactId can neither be null, empty, nor blank";
+
     private Plugin findPlugin(Model model, String groupId, String artifactId) {
-        if (Objects.requireNonNull(groupId, "groupId can neither be null, empty nor blank")
-                .trim()
-                .isEmpty()) {
-            throw new IllegalArgumentException("groupId can neither be null, empty nor blank");
+        if (Objects.requireNonNull(groupId, GROUP_ID_ERROR_MESSAGE).trim().isEmpty()) {
+            throw new IllegalArgumentException(GROUP_ID_ERROR_MESSAGE);
         }
-        if (Objects.requireNonNull(artifactId, "artifactId can neither be null, empty nor blank")
-                .trim()
-                .isEmpty()) {
-            throw new IllegalArgumentException("artifactId can neither be null, empty nor blank");
+        if (Objects.requireNonNull(artifactId, ARTIFACT_ID_ERROR_MESSAGE).trim().isEmpty()) {
+            throw new IllegalArgumentException(ARTIFACT_ID_ERROR_MESSAGE);
         }
 
         if (model != null) {

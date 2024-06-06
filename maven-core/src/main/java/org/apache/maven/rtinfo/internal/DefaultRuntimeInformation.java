@@ -78,11 +78,13 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
         return mavenVersion;
     }
 
+    private static final String VERSION_RANGE_ERROR_MESSAGE = "versionRange can neither be null, empty, nor blank";
+
     public boolean isMavenVersion(String versionRange) {
-        if (Objects.requireNonNull(versionRange, "versionRange can neither be null, empty nor blank")
+        if (Objects.requireNonNull(versionRange, VERSION_RANGE_ERROR_MESSAGE)
                 .trim()
                 .isEmpty()) {
-            throw new IllegalArgumentException("versionRange can neither be null, empty nor blank");
+            throw new IllegalArgumentException(VERSION_RANGE_ERROR_MESSAGE);
         }
         VersionScheme versionScheme = new GenericVersionScheme();
 
