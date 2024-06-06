@@ -99,8 +99,10 @@ import static org.apache.maven.model.building.Result.newResult;
 public class DefaultModelBuilder implements ModelBuilder {
     /**
      * Key for "fail on invalid model" property.
+     * <p>
+     * Visible for testing.
      */
-    private static final String FAIL_ON_INVALID_MODEL = "maven.modelBuilder.failOnInvalidModel";
+    static final String FAIL_ON_INVALID_MODEL = "maven.modelBuilder.failOnInvalidModel";
 
     /**
      * Checks user and system properties (in this order) for value of {@link #FAIL_ON_INVALID_MODEL} property key, if
