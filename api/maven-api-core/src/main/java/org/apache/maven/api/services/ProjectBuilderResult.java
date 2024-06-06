@@ -75,5 +75,5 @@ public interface ProjectBuilderResult {
      * @return the result of the dependency resolution for the project
      */
     @Nonnull
-    Optional<DependencyCollectorResult> getDependencyResolverResult();
+    Optional<DependencyResolverResult> getDependencyResolverResult();
 }

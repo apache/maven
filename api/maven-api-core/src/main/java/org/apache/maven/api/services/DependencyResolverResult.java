@@ -29,9 +29,32 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
+/**
+ * The result of a dependency resolution request.
+ *
+ * @since 4.0.0
+ * @see DependencyResolver#resolve(DependencyResolverRequest)
+ */
 @Experimental
-public interface DependencyResolverResult extends DependencyCollectorResult {
+public interface DependencyResolverResult {
+
+    /**
+     * Gets the exceptions that occurred while building the dependency graph.
+     *
+     * @return the exceptions that occurred, never {@code null}
+     */
+    @Nonnull
+    List<Exception> getExceptions();
+
+    /**
+     * Gets the root node of the dependency graph.
+     *
+     * @return the root node of the dependency graph or {@code null} if none
+     */
+    @Nullable
+    Node getRoot();
 
     /**
      * The ordered list of the flattened dependency nodes.

@@ -596,39 +596,41 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     /**
-     * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
+     * Shortcut for <code>getService(DependencyResolver.class).collect(...)</code>
      *
-     * @throws DependencyCollectorException if the dependency collection failed
-     * @see DependencyCollector#collect(Session, Artifact)
+     * @throws DependencyResolverException if the dependency collection failed
+     * @see DependencyResolver#collect(Session, Artifact)
      */
     @Nonnull
     @Override
     public Node collectDependencies(@Nonnull Artifact artifact) {
-        return getService(DependencyCollector.class).collect(this, artifact).getRoot();
+        return getService(DependencyResolver.class).collect(this, artifact).getRoot();
     }
 
     /**
-     * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
+     * Shortcut for <code>getService(DependencyResolver.class).collect(...)</code>
      *
-     * @throws DependencyCollectorException if the dependency collection failed
-     * @see DependencyCollector#collect(Session, Project)
+     * @throws DependencyResolverException if the dependency collection failed
+     * @see DependencyResolver#collect(Session, Project)
      */
     @Nonnull
     @Override
     public Node collectDependencies(@Nonnull Project project) {
-        return getService(DependencyCollector.class).collect(this, project).getRoot();
+        return getService(DependencyResolver.class).collect(this, project).getRoot();
     }
 
     /**
-     * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
+     * Shortcut for <code>getService(DependencyResolver.class).collect(...)</code>
      *
-     * @throws DependencyCollectorException if the dependency collection failed
-     * @see DependencyCollector#collect(Session, DependencyCoordinate)
+     * @throws DependencyResolverException if the dependency collection failed
+     * @see DependencyResolver#collect(Session, DependencyCoordinate)
      */
     @Nonnull
     @Override
     public Node collectDependencies(@Nonnull DependencyCoordinate dependency) {
-        return getService(DependencyCollector.class).collect(this, dependency).getRoot();
+        Node root =
+                getService(DependencyResolver.class).collect(this, dependency).getRoot();
+        return root.getChildren().iterator().next();
     }
 
     @Nonnull
@@ -662,6 +664,7 @@ public abstract class AbstractSession implements InternalSession {
         return getService(DependencyResolver.class)
                 .resolve(DependencyResolverRequest.builder()
                         .session(this)
+                        .requestType(DependencyResolverRequest.RequestType.RESOLVE)
                         .dependency(dependency)
                         .pathScope(scope)
                         .pathTypeFilter(desiredTypes)
@@ -675,6 +678,7 @@ public abstract class AbstractSession implements InternalSession {
         return getService(DependencyResolver.class)
                 .resolve(DependencyResolverRequest.builder()
                         .session(this)
+                        .requestType(DependencyResolverRequest.RequestType.RESOLVE)
                         .project(project)
                         .pathScope(scope)
                         .pathTypeFilter(desiredTypes)
