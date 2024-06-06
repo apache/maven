@@ -70,7 +70,17 @@ public class JdkVersionProfileActivator implements ProfileActivator {
                     activation.getLocation("jdk"));
             return false;
         }
-        return isJavaVersionCompatible(jdk, version);
+        try {
+            return isJavaVersionCompatible(jdk, version);
+        } catch (NumberFormatException e) {
+            problems.add(
+                    BuilderProblem.Severity.WARNING,
+                    ModelProblem.Version.BASE,
+                    "Failed to determine JDK activation for profile " + profile.getId() + " due invalid JDK version: '"
+                            + version + "'",
+                    profile.getLocation("jdk"));
+            return false;
+        }
     }
 
     public static boolean isJavaVersionCompatible(String requiredJdkRange, String currentJavaVersion) {

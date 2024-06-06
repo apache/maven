@@ -106,7 +106,7 @@ public class DefaultProfileSelector implements ProfileSelector {
                     problems.add(
                             Severity.ERROR,
                             Version.BASE,
-                            "Failed to determine activation for profile " + profile.getId(),
+                            "Failed to determine activation for profile " + profile.getId() + ": " + e.getMessage(),
                             profile.getLocation(""),
                             e);
                     return false;
