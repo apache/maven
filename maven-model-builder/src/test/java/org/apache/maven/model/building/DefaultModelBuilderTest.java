@@ -18,6 +18,8 @@
  */
 package org.apache.maven.model.building;
 
+import java.io.File;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
@@ -27,6 +29,8 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Guillaume Nodet
@@ -85,6 +89,38 @@ public class DefaultModelBuilderTest {
         request.setModelResolver(new CycleInImportsResolver());
 
         builder.build(request);
+    }
+
+    @Test
+    public void testBadProfiles() {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setModelSource(new FileModelSource(new File("src/test/resources/poms/building/badprofiles.xml")));
+        request.setModelResolver(new BaseModelResolver());
+
+        try {
+            builder.build(request); // throw, making "pom not available"
+            fail();
+        } catch (ModelBuildingException e) {
+            assertTrue(e.getMessage().contains("Duplicate activation for profile badprofile"));
+        }
+    }
+
+    @Test
+    public void testBadProfilesCheckDisabled() throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.getUserProperties().setProperty(DefaultModelBuilder.FAIL_ON_INVALID_MODEL, "false");
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setModelSource(new FileModelSource(new File("src/test/resources/poms/building/badprofiles.xml")));
+        request.setModelResolver(new BaseModelResolver());
+
+        builder.build(request); // does not throw, old behaviour (but result may be fully off)
     }
 
     static class CycleInImportsResolver extends BaseModelResolver {
