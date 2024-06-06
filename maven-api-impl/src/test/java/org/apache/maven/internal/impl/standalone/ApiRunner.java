@@ -85,7 +85,7 @@ public class ApiRunner {
         injector.bindImplicit(DefaultArtifactInstaller.class);
         injector.bindImplicit(DefaultArtifactResolver.class);
         injector.bindImplicit(DefaultChecksumAlgorithmService.class);
-        injector.bindImplicit(DefaultDependencyCollector.class);
+        injector.bindImplicit(DefaultDependencyResolver.class);
         injector.bindImplicit(DefaultDependencyCoordinateFactory.class);
         injector.bindImplicit(DefaultLocalRepositoryManager.class);
         injector.bindImplicit(DefaultMessageBuilderFactory.class);
