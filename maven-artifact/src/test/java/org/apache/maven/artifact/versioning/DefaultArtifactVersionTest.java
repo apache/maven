@@ -80,6 +80,15 @@ public class DefaultArtifactVersionTest extends TestCase {
         checkVersionParsing("1.2.3-200705301630", 1, 2, 3, 0, "200705301630");
     }
 
+    public void testVersionParsingNot09() {
+        String ver = "१.२.३";
+        assertTrue(Character.isDigit(ver.charAt(0)));
+        assertTrue(Character.isDigit(ver.charAt(2)));
+        assertTrue(Character.isDigit(ver.charAt(4)));
+        ArtifactVersion version = newArtifactVersion(ver);
+        assertEquals(ver, version.getQualifier());
+    }
+
     public void testVersionComparing() {
         assertVersionEqual("1", "1");
         assertVersionOlder("1", "2");

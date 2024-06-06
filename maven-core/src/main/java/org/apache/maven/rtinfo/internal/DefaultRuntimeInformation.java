@@ -20,10 +20,9 @@ package org.apache.maven.rtinfo.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -79,10 +78,15 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
         return mavenVersion;
     }
 
-    public boolean isMavenVersion(String versionRange) {
-        VersionScheme versionScheme = new GenericVersionScheme();
+    private static final String VERSION_RANGE_ERROR_MESSAGE = "versionRange can neither be null, empty, nor blank";
 
-        Validate.notBlank(versionRange, "versionRange can neither be null, empty nor blank");
+    public boolean isMavenVersion(String versionRange) {
+        if (Objects.requireNonNull(versionRange, VERSION_RANGE_ERROR_MESSAGE)
+                .trim()
+                .isEmpty()) {
+            throw new IllegalArgumentException(VERSION_RANGE_ERROR_MESSAGE);
+        }
+        VersionScheme versionScheme = new GenericVersionScheme();
 
         VersionConstraint constraint;
         try {
@@ -94,7 +98,9 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
         Version current;
         try {
             String mavenVersion = getMavenVersion();
-            Validate.validState(StringUtils.isNotEmpty(mavenVersion), "Could not determine current Maven version");
+            if (mavenVersion == null || mavenVersion.trim().isEmpty()) {
+                throw new IllegalStateException("Could not determine current Maven version");
+            }
 
             current = versionScheme.parseVersion(mavenVersion);
         } catch (InvalidVersionSpecificationException e) {

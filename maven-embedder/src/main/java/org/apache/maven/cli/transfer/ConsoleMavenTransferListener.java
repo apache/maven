@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
@@ -37,10 +36,10 @@ import org.eclipse.aether.transfer.TransferResource;
  */
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
-    private Map<TransferResource, Long> transfers =
+    private final Map<TransferResource, Long> transfers =
             Collections.synchronizedMap(new LinkedHashMap<TransferResource, Long>());
 
-    private boolean printResourceNames;
+    private final boolean printResourceNames;
     private int lastLength;
 
     public ConsoleMavenTransferListener(PrintStream out, boolean printResourceNames) {
@@ -97,7 +96,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         StringBuilder status = new StringBuilder();
 
         if (printResourceNames) {
-            status.append(StringUtils.substringAfterLast(resourceName, "/"));
+            status.append(resourceName(resourceName));
             status.append(" (");
         }
 
@@ -108,6 +107,17 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         }
 
         return status.toString();
+    }
+
+    private String resourceName(String resourceName) {
+        if (resourceName == null || resourceName.trim().isEmpty()) {
+            return "";
+        }
+        final int pos = resourceName.lastIndexOf("/");
+        if (pos == -1 || pos == resourceName.length() - 1) {
+            return "";
+        }
+        return resourceName.substring(pos + 1);
     }
 
     private void pad(StringBuilder buffer, int spaces) {
