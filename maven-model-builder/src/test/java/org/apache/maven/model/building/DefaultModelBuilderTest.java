@@ -19,6 +19,7 @@
 package org.apache.maven.model.building;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
@@ -26,7 +27,10 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.junit.Test;
 
+import java.io.File;
+
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Guillaume Nodet
@@ -85,6 +89,23 @@ public class DefaultModelBuilderTest {
         request.setModelResolver(new CycleInImportsResolver());
 
         builder.build(request);
+    }
+
+    @Test
+    public void testBadProfiles() {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setModelSource(new FileModelSource(new File("src/test/resources/poms/building/badprofiles.xml")));
+        request.setModelResolver(new BaseModelResolver());
+
+        try {
+            builder.build(request);
+        } catch (ModelBuildingException e) {
+            assertTrue(e.getMessage().contains("Duplicate activation for profile badprofile"));
+        }
     }
 
     static class CycleInImportsResolver extends BaseModelResolver {

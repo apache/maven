@@ -797,7 +797,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (activations.put(profile.getId(), activation) != null) {
                 problems.add(new ModelProblemCollectorRequest(
                                 failOnInvalidModel ? Severity.FATAL : Severity.WARNING, ModelProblem.Version.BASE)
-                        .setMessage("Duplicate activation for " + profile.getId()));
+                        .setMessage("Duplicate activation for profile " + profile.getId()));
             }
         }
 
