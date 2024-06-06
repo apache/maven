@@ -18,6 +18,8 @@
  */
 package org.apache.maven.configuration;
 
+import java.util.Objects;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -103,10 +105,14 @@ public class DefaultBeanConfigurationRequest implements BeanConfigurationRequest
     }
 
     private Plugin findPlugin(Model model, String groupId, String artifactId) {
-        if (groupId == null || groupId.trim().isEmpty()) {
+        if (Objects.requireNonNull(groupId, "groupId can neither be null, empty nor blank")
+                .trim()
+                .isEmpty()) {
             throw new IllegalArgumentException("groupId can neither be null, empty nor blank");
         }
-        if (artifactId == null || artifactId.trim().isEmpty()) {
+        if (Objects.requireNonNull(artifactId, "artifactId can neither be null, empty nor blank")
+                .trim()
+                .isEmpty()) {
             throw new IllegalArgumentException("artifactId can neither be null, empty nor blank");
         }
 

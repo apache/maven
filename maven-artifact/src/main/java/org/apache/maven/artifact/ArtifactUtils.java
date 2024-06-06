@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -88,9 +89,9 @@ public final class ArtifactUtils {
     }
 
     private static void notBlank(String str, String message) {
-        int c = str != null && str.length() > 0 ? str.charAt(0) : 0;
+        int c = str != null && !str.isEmpty() ? str.charAt(0) : 0;
         if ((c < '0' || c > '9') && (c < 'a' || c > 'z')) {
-            if (str == null || str.trim().isEmpty()) {
+            if (Objects.requireNonNull(str, message).trim().isEmpty()) {
                 throw new IllegalArgumentException(message);
             }
         }

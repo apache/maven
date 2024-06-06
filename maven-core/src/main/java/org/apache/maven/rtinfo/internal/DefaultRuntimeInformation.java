@@ -20,6 +20,7 @@ package org.apache.maven.rtinfo.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.rtinfo.RuntimeInformation;
@@ -78,7 +79,9 @@ public class DefaultRuntimeInformation implements RuntimeInformation {
     }
 
     public boolean isMavenVersion(String versionRange) {
-        if (versionRange == null || versionRange.trim().isEmpty()) {
+        if (Objects.requireNonNull(versionRange, "versionRange can neither be null, empty nor blank")
+                .trim()
+                .isEmpty()) {
             throw new IllegalArgumentException("versionRange can neither be null, empty nor blank");
         }
         VersionScheme versionScheme = new GenericVersionScheme();
