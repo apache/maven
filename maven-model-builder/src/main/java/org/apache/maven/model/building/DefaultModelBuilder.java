@@ -97,30 +97,6 @@ import static org.apache.maven.model.building.Result.newResult;
 @Named
 @Singleton
 public class DefaultModelBuilder implements ModelBuilder {
-    /**
-     * Key for "fail on invalid model" property.
-     * <p>
-     * Visible for testing.
-     */
-    static final String FAIL_ON_INVALID_MODEL = "maven.modelBuilder.failOnInvalidModel";
-
-    /**
-     * Checks user and system properties (in this order) for value of {@link #FAIL_ON_INVALID_MODEL} property key, if
-     * set and returns it. If not set, defaults to {@code true}.
-     * <p>
-     * This is only meant to provide "escape hatch" for those builds, that are for some reason stuck with invalid models.
-     */
-    private static boolean isFailOnInvalidModel(ModelBuildingRequest request) {
-        String val = request.getUserProperties().getProperty(FAIL_ON_INVALID_MODEL);
-        if (val == null) {
-            val = request.getSystemProperties().getProperty(FAIL_ON_INVALID_MODEL);
-        }
-        if (val != null) {
-            return Boolean.parseBoolean(val);
-        }
-        return true;
-    }
-
     @Inject
     private ModelProcessor modelProcessor;
 
@@ -277,7 +253,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     protected ModelBuildingResult build(ModelBuildingRequest request, Collection<String> importIds)
             throws ModelBuildingException {
         // phase 1
-        boolean failOnInvalidModel = isFailOnInvalidModel(request);
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector(result);
@@ -331,7 +306,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             profileActivationContext.setProjectProperties(tmpModel.getProperties());
 
             Map<String, Activation> interpolatedActivations =
-                    getInterpolatedActivations(rawModel, profileActivationContext, failOnInvalidModel, problems);
+                    getInterpolatedActivations(rawModel, profileActivationContext, problems);
             injectProfileActivations(tmpModel, interpolatedActivations);
 
             List<Profile> activePomProfiles =
@@ -455,12 +430,8 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private Map<String, Activation> getInterpolatedActivations(
-            Model rawModel,
-            DefaultProfileActivationContext context,
-            boolean failOnInvalidModel,
-            DefaultModelProblemCollector problems) {
-        Map<String, Activation> interpolatedActivations =
-                getProfileActivations(rawModel, true, failOnInvalidModel, problems);
+            Model rawModel, DefaultProfileActivationContext context, DefaultModelProblemCollector problems) {
+        Map<String, Activation> interpolatedActivations = getProfileActivations(rawModel, true);
 
         if (interpolatedActivations.isEmpty()) {
             return Collections.emptyMap();
@@ -782,8 +753,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    private Map<String, Activation> getProfileActivations(
-            Model model, boolean clone, boolean failOnInvalidModel, ModelProblemCollector problems) {
+    private Map<String, Activation> getProfileActivations(Model model, boolean clone) {
         Map<String, Activation> activations = new HashMap<>();
         for (Profile profile : model.getProfiles()) {
             Activation activation = profile.getActivation();
@@ -796,11 +766,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 activation = activation.clone();
             }
 
-            if (activations.put(profile.getId(), activation) != null) {
-                problems.add(new ModelProblemCollectorRequest(
-                                failOnInvalidModel ? Severity.FATAL : Severity.WARNING, ModelProblem.Version.BASE)
-                        .setMessage("Duplicate activation for profile " + profile.getId()));
-            }
+            activations.put(profile.getId(), activation);
         }
 
         return activations;
@@ -821,8 +787,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private Model interpolateModel(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
         // save profile activations before interpolation, since they are evaluated with limited scope
-        // at this stage we already failed if wanted to
-        Map<String, Activation> originalActivations = getProfileActivations(model, true, false, problems);
+        Map<String, Activation> originalActivations = getProfileActivations(model, true);
 
         Model interpolatedModel =
                 modelInterpolator.interpolateModel(model, model.getProjectDirectory(), request, problems);
