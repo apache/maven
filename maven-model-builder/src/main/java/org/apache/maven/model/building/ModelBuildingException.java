@@ -122,7 +122,7 @@ public class ModelBuildingException extends Exception {
         return Collections.unmodifiableList(result.getProblems());
     }
 
-    public static String toMessage(ModelBuildingResult result) {
+    private static String toMessage(ModelBuildingResult result) {
         if (result != null && !result.getModelIds().isEmpty()) {
             return toMessage(result.getModelIds().get(0), result.getProblems());
         }
@@ -137,7 +137,7 @@ public class ModelBuildingException extends Exception {
         writer.print(problems.size());
         writer.print((problems.size() == 1) ? " problem was " : " problems were ");
         writer.print("encountered while building the effective model");
-        if (modelId != null && !modelId.isEmpty()) {
+        if (modelId != null && modelId.length() > 0) {
             writer.print(" for ");
             writer.print(modelId);
         }

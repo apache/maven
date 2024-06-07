@@ -40,6 +40,7 @@ import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingResult;
 import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -291,18 +292,19 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 // ModelBuildingEx is thrown only on FATAL and ERROR severities, but we still can have WARNs
                 // that may lead to unexpected build failure, log them
                 if (!modelResult.getProblems().isEmpty()) {
+                    List<ModelProblem> problems = modelResult.getProblems();
+                    logger.warn(
+                            "{} {} encountered while building the effective model for {}",
+                            problems.size(),
+                            (problems.size() == 1) ? "problem was" : "problems were",
+                            request.getArtifact());
                     if (logger.isDebugEnabled()) {
-                        String message = ModelBuildingException.toMessage(modelResult);
-                        if (message != null) {
-                            logger.warn(message);
+                        for (ModelProblem problem : problems) {
+                            logger.warn(
+                                    "{} @ {}",
+                                    problem.getMessage(),
+                                    ModelProblemUtils.formatLocation(problem, null));
                         }
-                    } else {
-                        List<ModelProblem> problems = modelResult.getProblems();
-                        logger.warn(
-                                "{} {} encountered while building the effective model for {}",
-                                problems.size(),
-                                (problems.size() == 1) ? "problem was" : "problems were",
-                                request.getArtifact());
                     }
                 }
                 model = modelResult.getEffectiveModel();
