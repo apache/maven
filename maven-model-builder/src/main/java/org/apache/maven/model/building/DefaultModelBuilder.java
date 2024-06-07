@@ -35,9 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -305,18 +303,17 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             profileActivationContext.setProjectProperties(tmpModel.getProperties());
 
-            Map<String, Activation> interpolatedActivations =
-                    getInterpolatedActivations(rawModel, profileActivationContext, problems);
-            injectProfileActivations(tmpModel, interpolatedActivations);
+            List<Profile> interpolatedProfiles = getInterpolatedProfiles(rawModel, profileActivationContext, problems);
+            tmpModel.setProfiles(interpolatedProfiles);
 
             List<Profile> activePomProfiles =
                     profileSelector.getActiveProfiles(tmpModel.getProfiles(), profileActivationContext, problems);
 
-            Set<String> activeProfileIds =
-                    activePomProfiles.stream().map(Profile::getId).collect(Collectors.toSet());
-            currentData.setActiveProfiles(rawModel.getProfiles().stream()
-                    .filter(p -> activeProfileIds.contains(p.getId()))
-                    .collect(Collectors.toList()));
+            List<Profile> rawProfiles = new ArrayList<>();
+            for (Profile activePomProfile : activePomProfiles) {
+                rawProfiles.add(rawModel.getProfiles().get(interpolatedProfiles.indexOf(activePomProfile)));
+            }
+            currentData.setActiveProfiles(rawProfiles);
 
             // profile injection
             for (Profile activeProfile : activePomProfiles) {
@@ -429,12 +426,12 @@ public class DefaultModelBuilder implements ModelBuilder {
         String apply(String s) throws InterpolationException;
     }
 
-    private Map<String, Activation> getInterpolatedActivations(
+    private List<Profile> getInterpolatedProfiles(
             Model rawModel, DefaultProfileActivationContext context, DefaultModelProblemCollector problems) {
-        Map<String, Activation> interpolatedActivations = getProfileActivations(rawModel, true);
+        List<Profile> interpolatedActivations = getProfiles(rawModel, true);
 
         if (interpolatedActivations.isEmpty()) {
-            return Collections.emptyMap();
+            return Collections.emptyList();
         }
         RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
 
@@ -466,8 +463,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
         }
-        for (Activation activation : interpolatedActivations.values()) {
-            Optional<Activation> a = Optional.of(activation);
+        for (Profile profile : interpolatedActivations) {
+            Activation activation = profile.getActivation();
+            Optional<Activation> a = Optional.ofNullable(activation);
             a.map(Activation::getFile).ifPresent(fa -> {
                 Interpolation nt =
                         new Interpolation(fa, s -> profileActivationFilePathInterpolator.interpolate(s, context));
@@ -753,41 +751,20 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    private Map<String, Activation> getProfileActivations(Model model, boolean clone) {
-        Map<String, Activation> activations = new HashMap<>();
+    private List<Profile> getProfiles(Model model, boolean clone) {
+        ArrayList<Profile> profiles = new ArrayList<>();
         for (Profile profile : model.getProfiles()) {
-            Activation activation = profile.getActivation();
-
-            if (activation == null) {
-                continue;
-            }
-
             if (clone) {
-                activation = activation.clone();
+                profile = profile.clone();
             }
-
-            activations.put(profile.getId(), activation);
+            profiles.add(profile);
         }
-
-        return activations;
-    }
-
-    private void injectProfileActivations(Model model, Map<String, Activation> activations) {
-        for (Profile profile : model.getProfiles()) {
-            Activation activation = profile.getActivation();
-
-            if (activation == null) {
-                continue;
-            }
-
-            // restore activation
-            profile.setActivation(activations.get(profile.getId()));
-        }
+        return profiles;
     }
 
     private Model interpolateModel(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
         // save profile activations before interpolation, since they are evaluated with limited scope
-        Map<String, Activation> originalActivations = getProfileActivations(model, true);
+        List<Profile> originalActivations = getProfiles(model, true);
 
         Model interpolatedModel =
                 modelInterpolator.interpolateModel(model, model.getProjectDirectory(), request, problems);
@@ -815,7 +792,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         interpolatedModel.setPomFile(model.getPomFile());
 
         // restore profiles with file activation to their value before full interpolation
-        injectProfileActivations(model, originalActivations);
+        model.setProfiles(originalActivations);
 
         return interpolatedModel;
     }
