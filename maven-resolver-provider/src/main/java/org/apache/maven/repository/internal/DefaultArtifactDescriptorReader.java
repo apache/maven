@@ -301,10 +301,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         logger.warn(
                                 "{} {} encountered while building the effective model for {}",
                                 problems.size(),
-                                (problems.size() == 1) ? " problem was " : " problems were ",
-                                modelResult.getModelIds().isEmpty()
-                                        ? "n/a"
-                                        : modelResult.getModelIds().get(0));
+                                (problems.size() == 1) ? "problem was" : "problems were",
+                                request.getArtifact());
                     }
                 }
                 model = modelResult.getEffectiveModel();
