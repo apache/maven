@@ -431,7 +431,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private Map<String, Activation> getInterpolatedActivations(
             Model rawModel, DefaultProfileActivationContext context, DefaultModelProblemCollector problems) {
-        Map<String, Activation> interpolatedActivations = getProfileActivations(rawModel, true);
+        Map<String, Activation> interpolatedActivations = getProfileActivations(rawModel, true, problems);
 
         if (interpolatedActivations.isEmpty()) {
             return Collections.emptyMap();
@@ -753,7 +753,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    private Map<String, Activation> getProfileActivations(Model model, boolean clone) {
+    private Map<String, Activation> getProfileActivations(Model model, boolean clone, ModelProblemCollector problems) {
         Map<String, Activation> activations = new HashMap<>();
         for (Profile profile : model.getProfiles()) {
             Activation activation = profile.getActivation();
@@ -766,9 +766,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                 activation = activation.clone();
             }
 
-            activations.put(profile.getId(), activation);
+            if (activations.put(profile.getId(), activation) != null) {
+                problems.add(new ModelProblemCollectorRequest(Severity.WARNING, ModelProblem.Version.BASE)
+                        .setMessage("Duplicate activation for profile " + profile.getId()));
+            }
         }
-
         return activations;
     }
 
@@ -787,7 +789,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private Model interpolateModel(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
         // save profile activations before interpolation, since they are evaluated with limited scope
-        Map<String, Activation> originalActivations = getProfileActivations(model, true);
+        Map<String, Activation> originalActivations = getProfileActivations(model, true, problems);
 
         Model interpolatedModel =
                 modelInterpolator.interpolateModel(model, model.getProjectDirectory(), request, problems);
