@@ -44,26 +44,13 @@ import org.apache.maven.api.services.ModelTransformerContext;
 @Singleton
 public class BuildModelTransformer implements ModelTransformer {
 
-    public static final String NAMESPACE_PREFIX = "http://maven.apache.org/POM/";
-
     @Override
     public Model transform(ModelTransformerContext context, Model model, Path path) {
         Model.Builder builder = Model.newBuilder(model);
-        handleModelVersion(context, model, path, builder);
         handleParent(context, model, path, builder);
         handleReactorDependencies(context, model, path, builder);
         handleCiFriendlyVersion(context, model, path, builder);
         return builder.build();
-    }
-
-    //
-    // Infer modelVersion from namespace URI
-    //
-    void handleModelVersion(ModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
-        String namespace = model.getNamespaceUri();
-        if (model.getModelVersion() == null && namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
-            builder.modelVersion(namespace.substring(NAMESPACE_PREFIX.length()));
-        }
     }
 
     //

@@ -122,6 +122,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         return true;
     }
 
+    public static final String NAMESPACE_PREFIX = "http://maven.apache.org/POM/";
     private static final String RAW = "raw";
     private static final String FILE = "file";
     private static final String IMPORT = "import";
@@ -773,6 +774,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             } catch (ModelTransformerException e) {
                 problems.add(Severity.FATAL, ModelProblem.Version.V40, null, e);
             }
+        }
+
+        String namespace = rawModel.getNamespaceUri();
+        if (rawModel.getModelVersion() == null && namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
+            rawModel = rawModel.withModelVersion(namespace.substring(NAMESPACE_PREFIX.length()));
         }
 
         modelValidator.validateRawModel(rawModel, request, problems);
