@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -463,7 +464,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
         }
+        HashSet<String> profileIds = new HashSet<>();
         for (Profile profile : interpolatedActivations) {
+            if (!profileIds.add(profile.getId())) {
+                problems.add(new ModelProblemCollectorRequest(Severity.WARNING, ModelProblem.Version.BASE)
+                        .setMessage("Duplicate activation for profile " + profile.getId()));
+            }
             Activation activation = profile.getActivation();
             Optional<Activation> a = Optional.ofNullable(activation);
             a.map(Activation::getFile).ifPresent(fa -> {
