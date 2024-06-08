@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -815,6 +816,15 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // profile activation
             profileActivationContext.setProjectProperties(modelv4.getProperties());
+
+            // profile check
+            HashSet<String> profileIds = new HashSet<>();
+            for (org.apache.maven.api.model.Profile profile : modelv4.getProfiles()) {
+                if (!profileIds.add(profile.getId())) {
+                    problems.add(new ModelProblemCollectorRequest(Severity.WARNING, ModelProblem.Version.BASE)
+                            .setMessage("Duplicate activation for profile " + profile.getId()));
+                }
+            }
 
             List<org.apache.maven.api.model.Profile> interpolatedProfiles =
                     interpolateActivations(modelv4.getProfiles(), profileActivationContext, problems);
