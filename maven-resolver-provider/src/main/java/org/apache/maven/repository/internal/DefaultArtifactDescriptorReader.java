@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -37,7 +38,9 @@ import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingResult;
 import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -67,6 +70,8 @@ import org.eclipse.aether.resolution.VersionResult;
 import org.eclipse.aether.spi.locator.Service;
 import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Benjamin Bentmann
@@ -90,6 +95,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
     private final ArtifactDescriptorReaderDelegate artifactDescriptorReaderDelegate =
             new ArtifactDescriptorReaderDelegate();
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Deprecated
     public DefaultArtifactDescriptorReader() {
@@ -281,7 +288,26 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                     modelRequest.setModelSource(new FileModelSource(pomArtifact.getFile()));
                 }
 
-                model = modelBuilder.build(modelRequest).getEffectiveModel();
+                ModelBuildingResult modelResult = modelBuilder.build(modelRequest);
+                // ModelBuildingEx is thrown only on FATAL and ERROR severities, but we still can have WARNs
+                // that may lead to unexpected build failure, log them
+                if (!modelResult.getProblems().isEmpty()) {
+                    List<ModelProblem> problems = modelResult.getProblems();
+                    logger.warn(
+                            "{} {} encountered while building the effective model for {}",
+                            problems.size(),
+                            (problems.size() == 1) ? "problem was" : "problems were",
+                            request.getArtifact());
+                    if (logger.isDebugEnabled()) {
+                        for (ModelProblem problem : problems) {
+                            logger.warn(
+                                    "{} @ {}",
+                                    problem.getMessage(),
+                                    ModelProblemUtils.formatLocation(problem, null));
+                        }
+                    }
+                }
+                model = modelResult.getEffectiveModel();
             } catch (ModelBuildingException e) {
                 for (ModelProblem problem : e.getProblems()) {
                     if (problem.getException() instanceof UnresolvableModelException) {
