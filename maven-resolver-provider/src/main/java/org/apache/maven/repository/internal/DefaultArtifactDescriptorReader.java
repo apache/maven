@@ -301,9 +301,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                     if (logger.isDebugEnabled()) {
                         for (ModelProblem problem : problems) {
                             logger.warn(
-                                    "{} @ {}",
-                                    problem.getMessage(),
-                                    ModelProblemUtils.formatLocation(problem, null));
+                                    "{} @ {}", problem.getMessage(), ModelProblemUtils.formatLocation(problem, null));
                         }
                     }
                 }
