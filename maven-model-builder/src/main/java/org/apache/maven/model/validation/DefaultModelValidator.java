@@ -95,6 +95,7 @@ public class DefaultModelValidator implements ModelValidator {
         this.versionProcessor = versionProcessor;
     }
 
+    @SuppressWarnings("checkstyle:methodlength")
     @Override
     public void validateRawModel(Model m, ModelBuildingRequest request, ModelProblemCollector problems) {
         Parent parent = m.getParent();
@@ -132,7 +133,22 @@ public class DefaultModelValidator implements ModelValidator {
             }
         }
 
-        if (request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
+        if (request.getValidationLevel() == ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL) {
+            // profiles: they are essential for proper model building (may contribute profiles, dependencies...)
+            HashSet<String> minProfileIds = new HashSet<>();
+            for (Profile profile : m.getProfiles()) {
+                if (!minProfileIds.add(profile.getId())) {
+                    addViolation(
+                            problems,
+                            Severity.WARNING,
+                            Version.BASE,
+                            "profiles.profile.id",
+                            null,
+                            "Duplicate activation for profile " + profile.getId(),
+                            profile);
+                }
+            }
+        } else if (request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
             Severity errOn30 = getSeverity(request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
             // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an
