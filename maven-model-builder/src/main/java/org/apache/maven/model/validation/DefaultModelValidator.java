@@ -334,22 +334,22 @@ public class DefaultModelValidator implements ModelValidator {
             }
         }
 
-        // profiles: they are essential for proper model building (may contribute profiles, dependencies...)
-        HashSet<String> minProfileIds = new HashSet<>();
-        for (org.apache.maven.api.model.Profile profile : m.getProfiles()) {
-            if (!minProfileIds.add(profile.getId())) {
-                addViolation(
-                        problems,
-                        Severity.WARNING,
-                        ModelProblem.Version.BASE,
-                        "profiles.profile.id",
-                        null,
-                        "Duplicate activation for profile " + profile.getId(),
-                        profile);
+        if (request.getValidationLevel() == ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL) {
+            // profiles: they are essential for proper model building (may contribute profiles, dependencies...)
+            HashSet<String> minProfileIds = new HashSet<>();
+            for (org.apache.maven.api.model.Profile profile : m.getProfiles()) {
+                if (!minProfileIds.add(profile.getId())) {
+                    addViolation(
+                            problems,
+                            Severity.WARNING,
+                            ModelProblem.Version.BASE,
+                            "profiles.profile.id",
+                            null,
+                            "Duplicate activation for profile " + profile.getId(),
+                            profile);
+                }
             }
-        }
-
-        if (request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
+        } else if (request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
             Set<String> modules = new HashSet<>();
             for (int i = 0, n = m.getModules().size(); i < n; i++) {
                 String module = m.getModules().get(i);
