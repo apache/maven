@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl.resolver;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -31,12 +32,14 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelRepositoryHolder;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.model.ModelProblemUtils;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryException;
@@ -62,6 +65,8 @@ import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResolutionException;
 import org.eclipse.aether.resolution.VersionResult;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default artifact descriptor reader.
@@ -77,6 +82,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
     private final ModelBuilder modelBuilder;
     private final Map<String, MavenArtifactRelocationSource> artifactRelocationSources;
     private final ArtifactDescriptorReaderDelegate delegate;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
     public DefaultArtifactDescriptorReader(
@@ -216,7 +222,24 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         .modelCache(DefaultModelCache.newInstance(session, false))
                         .build();
 
-                model = modelBuilder.build(modelRequest).getEffectiveModel();
+                ModelBuilderResult modelResult = modelBuilder.build(modelRequest);
+                // ModelBuildingEx is thrown only on FATAL and ERROR severities, but we still can have WARNs
+                // that may lead to unexpected build failure, log them
+                if (!modelResult.getProblems().isEmpty()) {
+                    List<ModelProblem> problems = modelResult.getProblems();
+                    logger.warn(
+                            "{} {} encountered while building the effective model for {}",
+                            problems.size(),
+                            (problems.size() == 1) ? "problem was" : "problems were",
+                            request.getArtifact());
+                    if (logger.isDebugEnabled()) {
+                        for (ModelProblem problem : problems) {
+                            logger.warn(
+                                    "{} @ {}", problem.getMessage(), ModelProblemUtils.formatLocation(problem, null));
+                        }
+                    }
+                }
+                model = modelResult.getEffectiveModel();
             } catch (ModelBuilderException e) {
                 for (ModelProblem problem : e.getResult().getProblems()) {
                     if (problem.getException() instanceof ModelResolverException) {
