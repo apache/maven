@@ -41,13 +41,18 @@ import java.util.stream.Collectors;
 import com.google.inject.AbstractModule;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.name.Names;
+import org.apache.maven.api.di.MojoExecutionScoped;
+import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.Binding;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.di.impl.InjectorImpl;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 @Named
 class SisuDiBridgeModule extends AbstractModule {
@@ -121,6 +126,20 @@ class SisuDiBridgeModule extends AbstractModule {
                                 .collect(Collectors.joining("\n - ", " - ", "")));
             }
         };
+        injector.bindScope(SessionScoped.class, () -> {
+            try {
+                return containerProvider.get().lookup(SessionScope.class);
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        injector.bindScope(MojoExecutionScoped.class, () -> {
+            try {
+                return containerProvider.get().lookup(MojoExecutionScope.class);
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException(e);
+            }
+        });
         injector.bindInstance(Injector.class, injector);
         bind(Injector.class).toInstance(injector);
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
