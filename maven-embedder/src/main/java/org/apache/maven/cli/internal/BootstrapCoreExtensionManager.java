@@ -226,9 +226,7 @@ public class BootstrapCoreExtensionManager {
                     .filter(ArtifactResult::isResolved)
                     .map(ArtifactResult::getArtifact)
                     .collect(Collectors.toList());
-        } catch (PluginResolutionException e) {
-            throw new ExtensionResolutionException(extension, e.getCause());
-        } catch (InterpolationException e) {
+        } catch (PluginResolutionException | InterpolationException e) {
             throw new ExtensionResolutionException(extension, e);
         }
     }

@@ -132,7 +132,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 pluginArtifact = pluginArtifact.setProperties(props);
             }
         } catch (ArtifactDescriptorException e) {
-            throw new PluginResolutionException(plugin, e);
+            throw new PluginResolutionException(
+                    plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
         }
 
         try {
@@ -140,7 +141,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             request.setTrace(trace);
             pluginArtifact = repoSystem.resolveArtifact(session, request).getArtifact();
         } catch (ArtifactResolutionException e) {
-            throw new PluginResolutionException(plugin, e);
+            throw new PluginResolutionException(
+                    plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
         }
 
         return pluginArtifact;
@@ -229,9 +231,11 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             depRequest.setRoot(node);
             return repoSystem.resolveDependencies(session, depRequest);
         } catch (DependencyCollectionException e) {
-            throw new PluginResolutionException(plugin, e);
+            throw new PluginResolutionException(
+                    plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
         } catch (DependencyResolutionException e) {
-            throw new PluginResolutionException(plugin, e.getCause());
+            throw new PluginResolutionException(
+                    plugin, e.getResult().getCollectExceptions(), logger.isDebugEnabled() ? e : null);
         }
     }
 }
