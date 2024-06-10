@@ -44,7 +44,7 @@ import org.apache.maven.di.Scope;
 public class InjectorImpl implements Injector {
 
     private final Map<Key<?>, Set<Binding<?>>> bindings = new HashMap<>();
-    private final Map<Class<? extends Annotation>, Scope> scopes = new HashMap<>();
+    private final Map<Class<? extends Annotation>, Supplier<Scope>> scopes = new HashMap<>();
 
     public InjectorImpl() {
         bindScope(Singleton.class, new SingletonScope());
@@ -87,6 +87,10 @@ public class InjectorImpl implements Injector {
     }
 
     public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Scope scope) {
+        return bindScope(scopeAnnotation, () -> scope);
+    }
+
+    public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Supplier<Scope> scope) {
         if (scopes.put(scopeAnnotation, scope) != null) {
             throw new DIException(
                     "Cannot rebind scope annotation class to a different implementation: " + scopeAnnotation);
@@ -204,7 +208,8 @@ public class InjectorImpl implements Injector {
                     .map(Map.Entry::getValue)
                     .findFirst()
                     .orElseThrow(() -> new DIException("Scope not bound for annotation "
-                            + binding.getScope().getClass()));
+                            + binding.getScope().annotationType()))
+                    .get();
             compiled = scope.scope((Key<Q>) binding.getOriginalKey(), binding.getScope(), compiled);
         }
         return compiled;
