@@ -303,7 +303,8 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
 
         Object value = ee.evaluate("${PPEET_nonexisting_property}");
 
-        assertNull(value);
+        // as in cases above - with prefixed/suffixed property
+        assertEquals("${PPEET_nonexisting_property}", value);
     }
 
     public void testValueExtractionFromSystemPropertiesWithMissingProject_WithDotNotation() throws Exception {
