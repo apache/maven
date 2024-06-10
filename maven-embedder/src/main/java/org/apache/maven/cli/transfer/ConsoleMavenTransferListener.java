@@ -35,7 +35,7 @@ import org.eclipse.aether.transfer.TransferResource;
  */
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
-    private Map<TransferResource, Long> transfers = new LinkedHashMap<>();
+    private Map<TransferResourceIdentifier, TransferResourceAndSize> transfers = new LinkedHashMap<>();
     private FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH); // use in a synchronized fashion
     private StringBuilder buffer = new StringBuilder(128); // use in a synchronized fashion
 
@@ -65,18 +65,19 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     @Override
     public void transferProgressed(TransferEvent event) throws TransferCancelledException {
         TransferResource resource = event.getResource();
-        transfers.put(resource, event.getTransferredBytes());
+        transfers.put(
+                new TransferResourceIdentifier(resource),
+                new TransferResourceAndSize(resource, event.getTransferredBytes()));
 
         buffer.append("Progress (").append(transfers.size()).append("): ");
 
-        Iterator<Map.Entry<TransferResource, Long>> entries =
-                transfers.entrySet().iterator();
+        Iterator<TransferResourceAndSize> entries = transfers.values().iterator();
         while (entries.hasNext()) {
-            Map.Entry<TransferResource, Long> entry = entries.next();
-            long total = entry.getKey().getContentLength();
-            Long complete = entry.getValue();
+            TransferResourceAndSize entry = entries.next();
+            long total = entry.resource.getContentLength();
+            Long complete = entry.transferredBytes;
 
-            String resourceName = entry.getKey().getResourceName();
+            String resourceName = entry.resource.getResourceName();
 
             if (printResourceNames) {
                 int idx = resourceName.lastIndexOf('/');
@@ -120,7 +121,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     @Override
     public void transferSucceeded(TransferEvent event) {
-        transfers.remove(event.getResource());
+        transfers.remove(new TransferResourceIdentifier(event.getResource()));
         overridePreviousTransfer(event);
 
         super.transferSucceeded(event);
@@ -128,7 +129,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     @Override
     public void transferFailed(TransferEvent event) {
-        transfers.remove(event.getResource());
+        transfers.remove(new TransferResourceIdentifier(event.getResource()));
         overridePreviousTransfer(event);
 
         super.transferFailed(event);
@@ -144,4 +145,6 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
             buffer.setLength(0);
         }
     }
+
+    private record TransferResourceAndSize(TransferResource resource, long transferredBytes) {}
 }
