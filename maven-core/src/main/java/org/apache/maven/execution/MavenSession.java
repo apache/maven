@@ -21,6 +21,7 @@ package org.apache.maven.execution;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.internal.impl.SettingsUtilsV4;
+import org.apache.maven.model.Activation;
+import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -487,6 +490,44 @@ public class MavenSession implements Cloneable {
         return container.lookupMap(role);
     }
 
+    public void activateProfiles() {
+        Properties systemProperties = getSystemProperties();
+        Properties userProperties = getUserProperties();
+
+        List<Profile> activeProfiles = new ArrayList<>();
+
+        for (Profile profile : request.getProfiles()) {
+            Activation activation = profile.getActivation();
+            if (activation != null && activationPropertyMatches(activation, systemProperties, userContainer)) {
+                activeProfiles.add(profile);
+                applyProfile(profile);
+            }
+        }
+
+        request.setActiveProfiles(activeProfiles.stream().map(Profile::getId).collect(Collectors.toList()));
+    }
+
+    /**
+     * Check if the activation property of the profile matches any of the properties defined in system or user properties.
+     */
+    private boolean activationPropertyMatches(Activation activation, Properties systemProperties, Properties userProperties) {
+        if (activation.getProperty() != null) {
+            ActivationProperty property = activation.getProperty();
+            String key = property.getName();
+            String value = property.getValue();
+            return (systemProperties.containsKey(key) && systemProperties.get(key).equals(value)) ||
+                    (userProperties.containsKey(key) && userProperties.get(key).equals(value));
+        }
+        return false;
+    }
+
+    /**
+     * Apply the settings and configurations defined in the profile to the Maven execution environment.
+     */
+    private void applyProfile(Profile profile) {
+        System.out.println("Applying profile: " + profile.getId());
+    }
+
     public Session getSession() {
         return session;
     }
@@ -494,5 +535,6 @@ public class MavenSession implements Cloneable {
     public void setSession(Session session) {
         this.session = session;
     }
+
     /*end[MAVEN4]*/
 }

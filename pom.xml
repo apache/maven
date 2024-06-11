@@ -955,5 +955,85 @@ under the License.</licenseText>
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>development</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>development</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.1</version>
+            <configuration>
+              <source>1.8</source>
+              <target>1.8</target>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>production</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>production</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.1</version>
+            <configuration>
+              <source>11</source>
+              <target>11</target>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
+
+  <scm>
+    <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
+    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
+  </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>https://issues.apache.org/jira/browse/MNG</url>
+  </issueManagement>
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/</url>
+  </ciManagement>
+  <distributionManagement>
+    <site>
+      <id>apache.website</id>
+      <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
+    </site>
+    <downloadUrl>https://maven.apache.org/download.html</downloadUrl>
+  </distributionManagement>
+
+  <properties>
+    <javaVersion>17</javaVersion>
+    <maven.compiler.source>${javaVersion}</maven.compiler.source>
+    <maven.compiler.target>${javaVersion}</maven.compiler.target>
+    <maven.compiler.release>${javaVersion}</maven.compiler.release>
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <maven.baseline>3.8.8</maven.baseline>
+    <distributionId>apache-maven</distributionId>
+    <distributionShortName>Maven</distributionShortName>
+    <distributionName>Apache Maven</distributionName>
+    <maven.site.path>ref/4-LATEST</maven.site.path>
+    <project.build.outputTimestamp>2024-05-13T16:36:30Z</project.build.outputTimestamp>
+  </properties>
 </project>

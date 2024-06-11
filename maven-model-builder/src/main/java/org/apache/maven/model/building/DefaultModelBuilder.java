@@ -21,6 +21,7 @@ package org.apache.maven.model.building;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.lang.model.element.Element;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,6 +97,7 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.sisu.Nullable;
+import org.w3c.dom.NodeList;
 
 import static org.apache.maven.model.building.Result.error;
 import static org.apache.maven.model.building.Result.newResult;
@@ -2008,5 +2010,41 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     ModelProcessor getModelProcessor() {
         return modelProcessor;
+    }
+
+    public void parseProfiles(Model model, Element documentElement) {
+        List<Profile> profiles = new ArrayList<>();
+        NodeList profileNodes = documentArrayElement.getElementsByTagName("profile");
+        for (int i = 0; i < profileNodes.getLength(); i++) {
+            profiles.add(parseProfile((Element) profileNodes.item(i)));
+        }
+        model.setProfiles(profiles);
+    }
+
+    private Profile parseProfile(Element element) {
+        Profile profile = new Profile();
+        profile.setId(element.getAttribute("id"));
+        profile.setActivation(parseActivation(element.getElementsByTagName("activation").item(0)));
+        profile.setPlugins(parsePlugins(element.getElementsByTagName("plugins")));
+        return profile;
+    }
+
+    private Activation parseActivation(Element element) {
+        Activation activation = new Activation();
+        activation.setProperty(element.getElementsByTagName("property").item(0).getTextContent());
+        return activation;
+    }
+
+    private List<Plugin> parsePlugins(NodeList pluginNodes) {
+        List<Plugin> plugins = new ArrayList<>();
+        for (int i = 0; i < pluginNodes.getLength(); i++) {
+            plugins.add(parsePlugin((Element) pluginNodes.item(i)));
+        }
+        return plugins;
+    }
+
+    private Plugin parsePlugin(Element element) {
+        Plugin plugin = new Plugin();
+        return plugin;
     }
 }

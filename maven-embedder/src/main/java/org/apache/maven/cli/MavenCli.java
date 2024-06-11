@@ -36,13 +36,11 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.inject.AbstractModule;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.commons.cli.*;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
@@ -84,6 +82,7 @@ import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.project.MavenProject;
@@ -181,6 +180,33 @@ public class MavenCli {
 
     private static final Pattern NEXT_LINE = Pattern.compile("\r?\n");
 
+    private void customInitialization() {
+        CommandLine commandLine = parseCommandLineArguments();
+        activateProfiles(commandString, commandLine);
+    }
+
+    private void activateProfiles(CommandLine commandLine, MavenExecutionRequest request) {
+        if (commandFacehasOption("activate-profiles")) {
+            String[] profileIds = commandLine.getOptionValue("activate-profiles").split(",");
+            for (String profileId : profileIds) {
+                request.addActiveProfile(profileId.trim());
+            }
+        }
+    }
+
+    private CommandLine parseCommandLineArguments() {
+        Options options = setupOptions();
+        options.addOption(Option.builder()
+                .longOpt("activate-profiles")
+                .hasArg()
+                .argName("profiles")
+                .desc("Activate profiles by ID, separated by a comma")
+                .build());
+
+        CommandLineParser parser = new DefaultParser();
+        return parser.parse(options, args);
+    }
+
     public MavenCli() {
         this(null);
     }
@@ -192,9 +218,27 @@ public class MavenCli {
     }
 
     public static void main(String[] args) {
-        int result = main(args, null);
+        CommandLineParser parser = new DefaultParser();
+        Options options = setupOptions();
+        options.addOption(Option.builder()
+                .longOpt("activate-profiles")
+                .hasArg()
+                .argName("profiles")
+                .desc("Activate profiles by ID, separated by a comma")
+                .build());
 
-        System.exit(result);
+        try {
+            CommandLine commandLine = parser.parse(options, args);
+            MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+            activateProfiles(commandLine, request);
+
+            // Proceed with request which now includes the activated profiles
+            // This should be where you normally start your Maven build
+            Maven maven = new Maven();
+            maven.execute(request);
+        } catch (ParseException e) {
+            System.err.println("Parsing failed.  Reason: " + e.getMessage());
+        }
     }
 
     public static int main(String[] args, ClassWorld classWorld) {
