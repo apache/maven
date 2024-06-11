@@ -36,8 +36,8 @@ import org.eclipse.aether.transfer.TransferResource;
  */
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
-    private final Map<TransferResource, Long> transfers =
-            Collections.synchronizedMap(new LinkedHashMap<TransferResource, Long>());
+    private final Map<TransferResourceIdentifier, TransferResourceAndSize> transfers =
+            Collections.synchronizedMap(new LinkedHashMap<TransferResourceIdentifier, TransferResourceAndSize>());
 
     private final boolean printResourceNames;
     private int lastLength;
@@ -64,19 +64,20 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     @Override
     public void transferProgressed(TransferEvent event) throws TransferCancelledException {
         TransferResource resource = event.getResource();
-        transfers.put(resource, event.getTransferredBytes());
+        transfers.put(
+                new TransferResourceIdentifier(resource),
+                new TransferResourceAndSize(resource, event.getTransferredBytes()));
 
         StringBuilder buffer = new StringBuilder(128);
         buffer.append("Progress (").append(transfers.size()).append("): ");
 
         synchronized (transfers) {
-            Iterator<Map.Entry<TransferResource, Long>> entries =
-                    transfers.entrySet().iterator();
+            Iterator<TransferResourceAndSize> entries = transfers.values().iterator();
             while (entries.hasNext()) {
-                Map.Entry<TransferResource, Long> entry = entries.next();
-                long total = entry.getKey().getContentLength();
-                Long complete = entry.getValue();
-                buffer.append(getStatus(entry.getKey().getResourceName(), complete, total));
+                TransferResourceAndSize entry = entries.next();
+                long total = entry.resource.getContentLength();
+                Long complete = entry.transferredBytes;
+                buffer.append(getStatus(entry.resource.getResourceName(), complete, total));
                 if (entries.hasNext()) {
                     buffer.append(" | ");
                 }
@@ -131,7 +132,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     @Override
     public void transferSucceeded(TransferEvent event) {
-        transfers.remove(event.getResource());
+        transfers.remove(new TransferResourceIdentifier(event.getResource()));
         overridePreviousTransfer(event);
 
         super.transferSucceeded(event);
@@ -139,7 +140,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     @Override
     public void transferFailed(TransferEvent event) {
-        transfers.remove(event.getResource());
+        transfers.remove(new TransferResourceIdentifier(event.getResource()));
         overridePreviousTransfer(event);
 
         super.transferFailed(event);
@@ -153,6 +154,17 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
             out.print(buffer);
             out.flush();
             lastLength = 0;
+        }
+    }
+
+    private final class TransferResourceAndSize {
+
+        private final TransferResource resource;
+        private final long transferredBytes;
+
+        private TransferResourceAndSize(TransferResource resource, long transferredBytes) {
+            this.resource = resource;
+            this.transferredBytes = transferredBytes;
         }
     }
 }
