@@ -11,8 +11,8 @@ org.apache.maven.internal.impl.DefaultArtifactFactory
 org.apache.maven.internal.impl.DefaultArtifactInstaller
 org.apache.maven.internal.impl.DefaultArtifactResolver
 org.apache.maven.internal.impl.DefaultChecksumAlgorithmService
-org.apache.maven.internal.impl.DefaultDependencyCollector
 org.apache.maven.internal.impl.DefaultDependencyCoordinateFactory
+org.apache.maven.internal.impl.DefaultDependencyResolver
 org.apache.maven.internal.impl.DefaultLocalRepositoryManager
 org.apache.maven.internal.impl.DefaultMessageBuilderFactory
 org.apache.maven.internal.impl.DefaultModelUrlNormalizer

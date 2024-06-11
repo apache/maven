@@ -94,7 +94,7 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
 
     /**
      * Creates an initially empty result. Callers should add path elements by calls
-     * to {@link #addDependency(Node, Dependency, Predicate, Path, PathModularizationCache)}.
+     * to {@link #addDependency(Node, Dependency, Predicate, Path)}.
      *
      * @param cache cache of module information about each dependency
      * @param exceptions the exceptions that occurred while building the dependency graph
@@ -199,6 +199,15 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
                 addPathElement(JavaPathType.CLASSES, test);
             }
         }
+    }
+
+    /**
+     * Adds a dependency node to the result.
+     *
+     * @param node the dependency node
+     */
+    void addNode(Node node) {
+        nodes.add(node);
     }
 
     /**

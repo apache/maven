@@ -24,15 +24,27 @@ import javax.inject.Singleton;
 
 import java.io.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.Dependency;
+import org.apache.maven.api.Node;
+import org.apache.maven.api.PathScope;
+import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.plugin.descriptor.Resolution;
+import org.apache.maven.api.services.DependencyResolver;
+import org.apache.maven.api.services.DependencyResolverResult;
+import org.apache.maven.api.services.PathScopeRegistry;
 import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
@@ -575,6 +587,78 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 pomConfiguration,
                 expressionEvaluator);
 
+        for (Resolution resolution : mojoDescriptor.getMojoDescriptorV4().getResolutions()) {
+            Field field = null;
+            for (Class<?> clazz = mojo.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
+                try {
+                    field = clazz.getDeclaredField(resolution.getField());
+                    break;
+                } catch (NoSuchFieldException e) {
+                    // continue
+                }
+            }
+            if (field == null) {
+                throw new PluginConfigurationException(
+                        pluginDescriptor,
+                        "Unable to find field '" + resolution.getField() + "' annotated with @Resolution");
+            }
+            field.setAccessible(true);
+            String pathScope = resolution.getPathScope();
+            Object result = null;
+            if (pathScope != null && !pathScope.isEmpty()) {
+                // resolution
+                PathScope ps = sessionV4.getService(PathScopeRegistry.class).require(pathScope);
+                DependencyResolverResult res =
+                        sessionV4.getService(DependencyResolver.class).resolve(sessionV4, project, ps);
+                if (field.getType() == DependencyResolverResult.class) {
+                    result = res;
+                } else if (field.getType() == Node.class) {
+                    result = res.getRoot();
+                } else if (field.getType() == List.class && field.getGenericType() instanceof ParameterizedType pt) {
+                    Type t = pt.getActualTypeArguments()[0];
+                    if (t == Node.class) {
+                        result = res.getNodes();
+                    } else if (t == Path.class) {
+                        result = res.getPaths();
+                    }
+                } else if (field.getType() == Map.class && field.getGenericType() instanceof ParameterizedType pt) {
+                    Type k = pt.getActualTypeArguments()[0];
+                    Type v = pt.getActualTypeArguments()[1];
+                    if (k == PathType.class
+                            && v instanceof ParameterizedType ptv
+                            && ptv.getRawType() == List.class
+                            && ptv.getActualTypeArguments()[0] == Path.class) {
+                        result = res.getDispatchedPaths();
+                    } else if (k == Dependency.class && v == Path.class) {
+                        result = res.getDependencies();
+                    }
+                }
+            } else {
+                // collection
+                DependencyResolverResult res =
+                        sessionV4.getService(DependencyResolver.class).collect(sessionV4, project);
+                if (field.getType() == DependencyResolverResult.class) {
+                    result = res;
+                } else if (field.getType() == Node.class) {
+                    result = res.getRoot();
+                }
+            }
+            if (result == null) {
+                throw new PluginConfigurationException(
+                        pluginDescriptor,
+                        "Unable to inject field '" + resolution.getField()
+                                + "' annotated with @Dependencies. Unsupported type " + field.getGenericType());
+            }
+            try {
+                field.set(mojo, result);
+            } catch (IllegalAccessException e) {
+                throw new PluginConfigurationException(
+                        pluginDescriptor,
+                        "Unable to inject field '" + resolution.getField() + "' annotated with @Dependencies",
+                        e);
+            }
+        }
+
         return mojo;
     }
 
@@ -730,6 +814,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                     validateParameters(mojoDescriptor, configuration, expressionEvaluator);
                 }
             }
+
         } catch (ComponentConfigurationException e) {
             String message = "Unable to parse configuration of mojo " + mojoDescriptor.getId();
             if (e.getFailedConfiguration() != null) {

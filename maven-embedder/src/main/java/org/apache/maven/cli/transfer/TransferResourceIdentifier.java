@@ -16,28 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.cli.transfer;
 
-import org.apache.maven.api.annotations.Experimental;
+import java.io.File;
+
+import org.apache.maven.api.annotations.Nullable;
+import org.eclipse.aether.transfer.TransferResource;
 
 /**
- * Thrown in case of bad artifact descriptors, version ranges or other
- * issues encountered during calculation of the dependency graph.
- *
- * @since 4.0.0
+ * Immutable identifier of a {@link TransferResource}.
+ * The {@link TransferResource} is not immutable and does not implement {@code Objects#equals} and {@code Objects#hashCode} methods,
+ * making it not very suitable for usage in collections.
  */
-@Experimental
-public class DependencyCollectorException extends MavenException {
-    /**
-     *
-     */
-    private static final long serialVersionUID = -3134726259840210686L;
-
-    /**
-     * @param message the message you would give for the exception
-     * @param cause the cause which is related to the message
-     */
-    public DependencyCollectorException(String message, Throwable cause) {
-        super(message, cause);
+record TransferResourceIdentifier(String repositoryId, String repositoryUrl, String resourceName, @Nullable File file) {
+    TransferResourceIdentifier(TransferResource resource) {
+        this(resource.getRepositoryId(), resource.getRepositoryUrl(), resource.getResourceName(), resource.getFile());
     }
 }

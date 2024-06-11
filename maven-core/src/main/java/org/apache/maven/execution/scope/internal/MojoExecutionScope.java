@@ -18,16 +18,19 @@
  */
 package org.apache.maven.execution.scope.internal;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
+import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
@@ -37,7 +40,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 /**
  * MojoExecutionScope
  */
-public class MojoExecutionScope implements Scope, MojoExecutionListener {
+public class MojoExecutionScope implements Scope, org.apache.maven.di.Scope, MojoExecutionListener {
     private static final Provider<Object> SEEDED_KEY_PROVIDER = () -> {
         throw new IllegalStateException();
     };
@@ -111,6 +114,17 @@ public class MojoExecutionScope implements Scope, MojoExecutionListener {
 
             return provided;
         };
+    }
+
+    @Override
+    public <T> Supplier<T> scope(org.apache.maven.di.Key<T> key, Annotation scope, Supplier<T> unscoped) {
+        Object qualifier = key.getQualifier();
+        Key k = qualifier != null
+                ? Key.get(key.getType(), qualifier instanceof String s ? Names.named(s) : (Annotation) qualifier)
+                : Key.get(key.getType());
+        Provider<T> up = unscoped::get;
+        Provider<T> p = scope(k, up);
+        return p::get;
     }
 
     @SuppressWarnings({"unchecked"})

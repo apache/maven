@@ -496,25 +496,25 @@ public interface Session {
     boolean isVersionSnapshot(@Nonnull String version);
 
     /**
-     * Shortcut for {@code getService(DependencyCollector.class).collect(...)}
+     * Shortcut for {@code getService(DependencyResolver.class).collect(...)}
      *
      * @param artifact artifact for which to get the dependencies, including transitive ones
      * @return root node of the dependency graph for the given artifact
      *
-     * @see org.apache.maven.api.services.DependencyCollector#collect(Session, Artifact)
-     * @throws org.apache.maven.api.services.DependencyCollectorException if the dependency collection failed
+     * @see org.apache.maven.api.services.DependencyResolver#collect(Session, Artifact)
+     * @throws org.apache.maven.api.services.DependencyResolverException if the dependency collection failed
      */
     @Nonnull
     Node collectDependencies(@Nonnull Artifact artifact);
 
     /**
-     * Shortcut for {@code getService(DependencyCollector.class).collect(...)}
+     * Shortcut for {@code getService(DependencyResolver.class).collect(...)}
      *
      * @param project project for which to get the dependencies, including transitive ones
      * @return root node of the dependency graph for the given project
      *
-     * @see org.apache.maven.api.services.DependencyCollector#collect(Session, Project)
-     * @throws org.apache.maven.api.services.DependencyCollectorException if the dependency collection failed
+     * @see org.apache.maven.api.services.DependencyResolver#collect(Session, Project)
+     * @throws org.apache.maven.api.services.DependencyResolverException if the dependency collection failed
      */
     @Nonnull
     Node collectDependencies(@Nonnull Project project);
@@ -524,13 +524,13 @@ public interface Session {
      * only concerned about determining the coordinates of the transitive dependencies and does not actually resolve the
      * artifact files.
      * <p>
-     * Shortcut for {@code getService(DependencyCollector.class).resolve(...)}
+     * Shortcut for {@code getService(DependencyResolver.class).resolve(...)}
      *
      * @param dependency dependency for which to get transitive dependencies
      * @return root node of the dependency graph for the given artifact
      *
-     * @see org.apache.maven.api.services.DependencyCollector#collect(Session, DependencyCoordinate)
-     * @throws org.apache.maven.api.services.DependencyCollectorException if the dependency collection failed
+     * @see org.apache.maven.api.services.DependencyResolver#collect(Session, DependencyCoordinate)
+     * @throws org.apache.maven.api.services.DependencyResolverException if the dependency collection failed
      */
     @Nonnull
     Node collectDependencies(@Nonnull DependencyCoordinate dependency);
