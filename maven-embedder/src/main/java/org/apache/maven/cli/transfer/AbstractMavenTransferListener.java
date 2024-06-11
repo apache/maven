@@ -19,7 +19,6 @@
 package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
-import java.util.Locale;
 
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -72,7 +71,7 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        FileSizeFormat format = new FileSizeFormat();
 
         MessageBuilder message = messageBuilderFactory.builder();
         message.append(action).style(STYLE).append(' ').append(direction).append(' ');

@@ -18,8 +18,6 @@
  */
 package org.apache.maven.cli.transfer;
 
-import java.util.Locale;
-
 import org.apache.maven.cli.transfer.FileSizeFormat.ScaleUnit;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +28,7 @@ class FileSizeFormatTest {
 
     @Test
     void testNegativeSize() {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        FileSizeFormat format = new FileSizeFormat();
 
         long negativeSize = -100L;
         assertThrows(IllegalArgumentException.class, () -> format.format(negativeSize));
@@ -38,7 +36,7 @@ class FileSizeFormatTest {
 
     @Test
     void testSize() {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        FileSizeFormat format = new FileSizeFormat();
 
         long _0_bytes = 0L;
         assertEquals("0 B", format.format(_0_bytes));
@@ -103,7 +101,7 @@ class FileSizeFormatTest {
 
     @Test
     void testSizeWithSelectedScaleUnit() {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        FileSizeFormat format = new FileSizeFormat();
 
         long _0_bytes = 0L;
         assertEquals("0 B", format.format(_0_bytes));
@@ -206,7 +204,7 @@ class FileSizeFormatTest {
 
     @Test
     void testNegativeProgressedSize() {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        FileSizeFormat format = new FileSizeFormat();
 
         long negativeProgressedSize = -100L;
         assertThrows(IllegalArgumentException.class, () -> format.formatProgress(negativeProgressedSize, 10L));
@@ -214,14 +212,14 @@ class FileSizeFormatTest {
 
     @Test
     void testNegativeProgressedSizeBiggerThanSize() {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        FileSizeFormat format = new FileSizeFormat();
 
         assertThrows(IllegalArgumentException.class, () -> format.formatProgress(100L, 10L));
     }
 
     @Test
     void testProgressedSizeWithoutSize() {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        FileSizeFormat format = new FileSizeFormat();
 
         long _0_bytes = 0L;
         assertEquals("0 B", format.formatProgress(_0_bytes, -1L));
@@ -238,7 +236,7 @@ class FileSizeFormatTest {
 
     @Test
     void testProgressedBothZero() {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        FileSizeFormat format = new FileSizeFormat();
 
         long _0_bytes = 0L;
         assertEquals("0 B", format.formatProgress(_0_bytes, _0_bytes));
@@ -246,7 +244,7 @@ class FileSizeFormatTest {
 
     @Test
     void testProgressedSizeWithSize() {
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        FileSizeFormat format = new FileSizeFormat();
 
         long _0_bytes = 0L;
         long _400_bytes = 400L;
