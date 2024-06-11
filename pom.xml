@@ -166,7 +166,7 @@ under the License.
     <cipherVersion>2.0</cipherVersion>
     <classWorldsVersion>2.8.0</classWorldsVersion>
     <commonsCliVersion>1.8.0</commonsCliVersion>
-    <commonsIoVersion>2.11.0</commonsIoVersion>
+    <commonsIoVersion>2.16.1</commonsIoVersion>
     <guiceVersion>6.0.0</guiceVersion>
     <guavaVersion>33.2.0-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
