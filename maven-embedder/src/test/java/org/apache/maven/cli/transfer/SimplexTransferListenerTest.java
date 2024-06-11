@@ -21,11 +21,13 @@ package org.apache.maven.cli.transfer;
 import java.io.File;
 
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.aether.transfer.TransferResource;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -67,17 +69,44 @@ class SimplexTransferListenerTest {
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false); // no close handle
 
         // for technical reasons we cannot throw here, even if delegate does cancel transfer
-        listener.transferInitiated(new TransferEvent.Builder(session, resource)
-                .setType(TransferEvent.EventType.INITIATED)
-                .build());
+        listener.transferInitiated(event(session, resource, TransferEvent.EventType.INITIATED));
 
         Thread.sleep(500); // to make sure queue is processed, cancellation applied
 
         // subsequent call will cancel
         assertThrows(
                 TransferCancelledException.class,
-                () -> listener.transferStarted(new TransferEvent.Builder(session, resource)
-                        .resetType(TransferEvent.EventType.STARTED)
-                        .build()));
+                () -> listener.transferStarted(event(session, resource, TransferEvent.EventType.STARTED)));
+    }
+
+    @Test
+    void handlesAbsentTransferSource() throws InterruptedException, TransferCancelledException {
+        TransferResource resource = new TransferResource(null, null, "http://maven.org/test/test-resource", null, null);
+
+        RepositorySystemSession session = Mockito.mock(RepositorySystemSession.class);
+        TransferListener delegate = Mockito.mock(TransferListener.class);
+        SimplexTransferListener listener = new SimplexTransferListener(delegate);
+
+        TransferEvent transferInitiatedEvent = event(session, resource, TransferEvent.EventType.INITIATED);
+        TransferEvent transferStartedEvent = event(session, resource, TransferEvent.EventType.STARTED);
+        TransferEvent transferProgressedEvent = event(session, resource, TransferEvent.EventType.PROGRESSED);
+        TransferEvent transferSucceededEvent = event(session, resource, TransferEvent.EventType.SUCCEEDED);
+
+        listener.transferInitiated(transferInitiatedEvent);
+        listener.transferStarted(transferStartedEvent);
+        listener.transferProgressed(transferProgressedEvent);
+        listener.transferSucceeded(transferSucceededEvent);
+
+        Thread.sleep(500); // to make sure queue is processed, cancellation applied
+
+        Mockito.verify(delegate).transferInitiated(transferInitiatedEvent);
+        Mockito.verify(delegate).transferStarted(transferStartedEvent);
+        Mockito.verify(delegate).transferProgressed(transferProgressedEvent);
+        Mockito.verify(delegate).transferSucceeded(transferSucceededEvent);
+    }
+
+    private static TransferEvent event(
+            RepositorySystemSession session, TransferResource resource, TransferEvent.EventType type) {
+        return new TransferEvent.Builder(session, resource).setType(type).build();
     }
 }
