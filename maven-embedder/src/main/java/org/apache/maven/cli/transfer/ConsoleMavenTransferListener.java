@@ -21,7 +21,6 @@ package org.apache.maven.cli.transfer;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -37,7 +36,7 @@ import org.eclipse.aether.transfer.TransferResource;
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
     private final Map<TransferResourceIdentifier, TransferResourceAndSize> transfers = new LinkedHashMap<>();
-    private final FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH); // use in a synchronized fashion
+    private final FileSizeFormat format = new FileSizeFormat(); // use in a synchronized fashion
     private final StringBuilder buffer = new StringBuilder(128); // use in a synchronized fashion
 
     private final boolean printResourceNames;
