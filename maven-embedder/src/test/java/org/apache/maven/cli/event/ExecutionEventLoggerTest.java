@@ -19,9 +19,8 @@
 package org.apache.maven.cli.event;
 
 import java.io.File;
+import java.util.List;
 
-import com.google.common.collect.ImmutableList;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
@@ -203,8 +202,8 @@ class ExecutionEventLoggerTest {
         MavenProject project3 = generateMavenProject("Apache Maven Embedder 3");
 
         MavenSession session = mock(MavenSession.class);
-        when(session.getProjects()).thenReturn(ImmutableList.of(project1, project2, project3));
-        when(session.getAllProjects()).thenReturn(ImmutableList.of(project1, project2, project3));
+        when(session.getProjects()).thenReturn(List.of(project1, project2, project3));
+        when(session.getAllProjects()).thenReturn(List.of(project1, project2, project3));
 
         ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
         when(sessionStartedEvent.getSession()).thenReturn(session);
@@ -236,8 +235,8 @@ class ExecutionEventLoggerTest {
         MavenProject project3 = generateMavenProject("Apache Maven Embedder 3");
 
         MavenSession session = mock(MavenSession.class);
-        when(session.getProjects()).thenReturn(ImmutableList.of(project2, project3));
-        when(session.getAllProjects()).thenReturn(ImmutableList.of(project1, project2, project3));
+        when(session.getProjects()).thenReturn(List.of(project2, project3));
+        when(session.getAllProjects()).thenReturn(List.of(project1, project2, project3));
 
         ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
         when(sessionStartedEvent.getSession()).thenReturn(session);
@@ -267,6 +266,6 @@ class ExecutionEventLoggerTest {
     }
 
     private static String adaptDirSeparator(String path) {
-        return FilenameUtils.separatorsToSystem(path);
+        return path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
     }
 }
