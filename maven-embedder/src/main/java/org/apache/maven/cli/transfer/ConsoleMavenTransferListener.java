@@ -31,15 +31,16 @@ import org.eclipse.aether.transfer.TransferResource;
 
 /**
  * Console download progress meter.
- *
+ * <p>
+ * This listener is not thread-safe and should be wrapped in the {@link SimplexTransferListener} in a multi-threaded scenario.
  */
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
-    private Map<TransferResourceIdentifier, TransferResourceAndSize> transfers = new LinkedHashMap<>();
-    private FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH); // use in a synchronized fashion
-    private StringBuilder buffer = new StringBuilder(128); // use in a synchronized fashion
+    private final Map<TransferResourceIdentifier, TransferResourceAndSize> transfers = new LinkedHashMap<>();
+    private final FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH); // use in a synchronized fashion
+    private final StringBuilder buffer = new StringBuilder(128); // use in a synchronized fashion
 
-    private boolean printResourceNames;
+    private final boolean printResourceNames;
     private int lastLength;
 
     public ConsoleMavenTransferListener(
