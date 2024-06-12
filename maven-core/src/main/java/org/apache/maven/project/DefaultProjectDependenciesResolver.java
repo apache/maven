@@ -155,7 +155,9 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
             result.setCollectionErrors(e.getResult().getExceptions());
 
             throw new DependencyResolutionException(
-                    result, "Could not resolve dependencies for project " + project.getId() + ": " + e.getMessage(), e);
+                    result,
+                    "Could not collect dependencies for project " + project.getId(),
+                    logger.isDebugEnabled() ? e : null);
         }
 
         depRequest.setRoot(node);
@@ -184,7 +186,9 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
             process(result, e.getResult().getArtifactResults());
 
             throw new DependencyResolutionException(
-                    result, "Could not resolve dependencies for project " + project.getId() + ": " + e.getMessage(), e);
+                    result,
+                    "Could not resolve dependencies for project " + project.getId(),
+                    logger.isDebugEnabled() ? e : null);
         }
 
         return result;

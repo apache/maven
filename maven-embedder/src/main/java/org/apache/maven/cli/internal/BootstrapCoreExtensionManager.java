@@ -178,9 +178,7 @@ public class BootstrapCoreExtensionManager {
             List<Artifact> artifacts = nlg.getArtifacts(false);
 
             return artifacts;
-        } catch (PluginResolutionException e) {
-            throw new ExtensionResolutionException(extension, e.getCause());
-        } catch (InterpolationException e) {
+        } catch (PluginResolutionException | InterpolationException e) {
             throw new ExtensionResolutionException(extension, e);
         }
     }
