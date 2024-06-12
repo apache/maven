@@ -18,18 +18,52 @@
  */
 package org.apache.maven.project;
 
+import java.util.List;
+
+import org.eclipse.aether.graph.Dependency;
+
 /**
  */
 public class DependencyResolutionException extends Exception {
 
     private final transient DependencyResolutionResult result;
+    private final transient String detailMessage;
 
     public DependencyResolutionException(DependencyResolutionResult result, String message, Throwable cause) {
         super(message, cause);
         this.result = result;
+        this.detailMessage = prepareDetailMessage(message, result);
+    }
+
+    private static String prepareDetailMessage(String message, DependencyResolutionResult result) {
+        StringBuilder msg = new StringBuilder(message);
+        msg.append(System.lineSeparator());
+        for (Dependency dependency : result.getUnresolvedDependencies()) {
+            msg.append("dependency: ").append(dependency).append(System.lineSeparator());
+            List<Exception> exceptions = result.getResolutionErrors(dependency);
+            for (Exception e : exceptions) {
+                msg.append("\t").append(e.getMessage()).append(System.lineSeparator());
+            }
+        }
+
+        for (Exception exception : result.getCollectionErrors()) {
+            msg.append(exception.getMessage()).append(System.lineSeparator());
+            if (exception.getCause() != null) {
+                msg.append("\tCaused by: ")
+                        .append(exception.getCause().getMessage())
+                        .append(System.lineSeparator());
+            }
+        }
+
+        return msg.toString();
     }
 
     public DependencyResolutionResult getResult() {
         return result;
+    }
+
+    @Override
+    public String getMessage() {
+        return detailMessage;
     }
 }

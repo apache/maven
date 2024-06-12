@@ -18,6 +18,9 @@
  */
 package org.apache.maven.plugin;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.maven.model.Plugin;
 
 /**
@@ -31,6 +34,18 @@ public class PluginResolutionException extends Exception {
     public PluginResolutionException(Plugin plugin, Throwable cause) {
         super(
                 "Plugin " + plugin.getId() + " or one of its dependencies could not be resolved: " + cause.getMessage(),
+                cause);
+        this.plugin = plugin;
+    }
+
+    public PluginResolutionException(Plugin plugin, List<Exception> exceptions, Throwable cause) {
+        super(
+                "Plugin " + plugin.getId() + " or one of its dependencies could not be resolved:"
+                        + System.lineSeparator() + "\t"
+                        + exceptions.stream()
+                                .map(Throwable::getMessage)
+                                .collect(Collectors.joining(System.lineSeparator() + "\t"))
+                        + System.lineSeparator(),
                 cause);
         this.plugin = plugin;
     }
