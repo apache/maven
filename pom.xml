@@ -167,7 +167,7 @@ under the License.
     <classWorldsVersion>2.8.0</classWorldsVersion>
     <commonsCliVersion>1.8.0</commonsCliVersion>
     <guiceVersion>6.0.0</guiceVersion>
-    <guavaVersion>33.2.0-jre</guavaVersion>
+    <guavaVersion>33.2.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
     <hamcrestVersion>2.2</hamcrestVersion>
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
