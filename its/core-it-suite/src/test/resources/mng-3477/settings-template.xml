@@ -23,7 +23,7 @@ under the License.
   <mirrors>
     <mirror>
       <id>central</id>
-      <url>http://localhost:54312/repo</url>
+      <url>http://localhost:@port@/repo</url>
       <mirrorOf>central</mirrorOf>
     </mirror>
   </mirrors>
@@ -33,7 +33,7 @@ under the License.
       <repositories>
         <repository>
           <id>maven-core-it</id>
-          <url>http://localhost:54312/repo</url>
+          <url>http://localhost:@port@/repo</url>
           <releases>
             <checksumPolicy>ignore</checksumPolicy>
           </releases>
@@ -42,6 +42,18 @@ under the License.
           </snapshots>
         </repository>
       </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>maven-core-it</id>
+          <url>http://localhost:@port@/repo</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
     </profile>
   </profiles>
   <activeProfiles>
