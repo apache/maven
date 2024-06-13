@@ -421,7 +421,7 @@ public class ${className} {
 #else
     public ${root.name} read(Reader reader, boolean strict) throws XMLStreamException {
 #end
-        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+        XMLInputFactory factory = XMLInputFactory.newFactory();
         factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
 #if ( $locationTracking )
         StreamSource streamSource = new StreamSource(reader, source != null ? source.getLocation() : null);
@@ -458,7 +458,7 @@ public class ${className} {
 #else
     public ${root.name} read(InputStream in, boolean strict) throws XMLStreamException {
 #end
-        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+        XMLInputFactory factory = XMLInputFactory.newFactory();
         factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
 #if ( $locationTracking )
         StreamSource streamSource = new StreamSource(in, source != null ? source.getLocation() : null);

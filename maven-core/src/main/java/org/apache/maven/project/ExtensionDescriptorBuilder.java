@@ -18,6 +18,7 @@
  */
 package org.apache.maven.project;
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -30,7 +31,6 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import com.ctc.wstx.stax.WstxInputFactory;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
 
@@ -88,7 +88,7 @@ public class ExtensionDescriptorBuilder {
 
         XmlNode dom;
         try {
-            XMLStreamReader reader = WstxInputFactory.newFactory().createXMLStreamReader(is);
+            XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(is);
             dom = XmlNodeStaxBuilder.build(reader);
         } catch (XMLStreamException e) {
             throw new IOException(e.getMessage(), e);
