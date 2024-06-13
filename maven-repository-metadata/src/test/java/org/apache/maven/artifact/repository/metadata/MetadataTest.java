@@ -18,9 +18,6 @@
  */
 package org.apache.maven.artifact.repository.metadata;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
@@ -29,8 +26,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import com.ctc.wstx.stax.WstxInputFactory;
-import com.ctc.wstx.stax.WstxOutputFactory;
 import org.apache.maven.metadata.v4.MetadataStaxReader;
 import org.apache.maven.metadata.v4.MetadataStaxWriter;
 import org.eclipse.aether.artifact.Artifact;
@@ -221,9 +216,6 @@ class MetadataTest {
 
     @Test
     void testRoundtrip() throws Exception {
-        System.setProperty(XMLInputFactory.class.getName(), WstxInputFactory.class.getName());
-        System.setProperty(XMLOutputFactory.class.getName(), WstxOutputFactory.class.getName());
-
         Metadata source = new Metadata(org.apache.maven.api.metadata.Metadata.newBuilder(
                         createMetadataFromArtifact(artifact).getDelegate(), true)
                 .modelEncoding("UTF-16")

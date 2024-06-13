@@ -108,7 +108,7 @@ public class DefaultModelReader implements ModelReader {
 
     private Model read(InputStream input, Path pomFile, Map<String, ?> options) throws IOException {
         try {
-            XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+            XMLInputFactory factory = XMLInputFactory.newFactory();
             factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
             XMLStreamReader parser = factory.createXMLStreamReader(input);
 
@@ -132,7 +132,7 @@ public class DefaultModelReader implements ModelReader {
 
     private Model read(Reader reader, Path pomFile, Map<String, ?> options) throws IOException {
         try {
-            XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+            XMLInputFactory factory = XMLInputFactory.newFactory();
             factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
             XMLStreamReader parser = factory.createXMLStreamReader(reader);
 
