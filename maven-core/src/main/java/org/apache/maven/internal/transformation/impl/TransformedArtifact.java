@@ -114,7 +114,7 @@ class TransformedArtifact extends DefaultArtifact {
         } else {
             String current = sha1(src);
             String existing = sourceState.get();
-            if (!Objects.equals(current, existing)) {
+            if (!Files.exists(target) || !Objects.equals(current, existing)) {
                 defaultConsumerPomArtifactTransformer.transform(project, session, src, target);
                 Files.setLastModifiedTime(target, Files.getLastModifiedTime(src));
             }
