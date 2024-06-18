@@ -333,7 +333,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             @Singleton
             @Priority(-10)
             private InternalSession createSession() {
-                return SessionStub.getMockSession(getBasedir());
+                return SessionMock.getMockSession(getBasedir());
             }
 
             @Provides

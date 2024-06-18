@@ -23,7 +23,7 @@ import java.io.File;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Provides;
-import org.apache.maven.api.plugin.testing.stubs.SessionStub;
+import org.apache.maven.api.plugin.testing.stubs.SessionMock;
 import org.junit.jupiter.api.Test;
 
 import static org.apache.maven.api.di.testing.MavenDIExtension.getBasedir;
@@ -45,6 +45,6 @@ public class SimpleDITest {
 
     @Provides
     Session createSession() {
-        return SessionStub.getMockSession(LOCAL_REPO);
+        return SessionMock.getMockSession(LOCAL_REPO);
     }
 }

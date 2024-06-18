@@ -29,7 +29,7 @@ import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.plugin.MojoException;
 import org.apache.maven.api.plugin.annotations.Mojo;
 import org.apache.maven.api.plugin.testing.stubs.ProjectStub;
-import org.apache.maven.api.plugin.testing.stubs.SessionStub;
+import org.apache.maven.api.plugin.testing.stubs.SessionMock;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -123,7 +123,7 @@ public class ExpressionEvaluatorTest {
     @Provides
     @SuppressWarnings("unused")
     Session session() {
-        Session session = SessionStub.getMockSession(LOCAL_REPO);
+        Session session = SessionMock.getMockSession(LOCAL_REPO);
         doReturn(new Properties()).when(session).getSystemProperties();
         doReturn(new Properties()).when(session).getUserProperties();
         doAnswer(iom -> Paths.get(MojoExtension.getBasedir())).when(session).getRootDirectory();

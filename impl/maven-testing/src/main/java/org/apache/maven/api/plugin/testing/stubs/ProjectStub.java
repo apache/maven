@@ -25,9 +25,6 @@ import org.apache.maven.api.*;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.PluginContainer;
-import org.apache.maven.internal.impl.DefaultVersionParser;
-import org.apache.maven.repository.internal.DefaultModelVersionParser;
-import org.eclipse.aether.util.version.GenericVersionScheme;
 
 /**
  * @author Olivier Lamy
@@ -156,10 +153,6 @@ public class ProjectStub implements Project {
         return basedir;
     }
 
-    public void setBasedir(Path basedir) {
-        this.basedir = basedir;
-    }
-
     @Override
     public Optional<Project> getParent() {
         return Optional.empty();
@@ -180,90 +173,74 @@ public class ProjectStub implements Project {
         return rootDirectory;
     }
 
-    public void setGroupId(String groupId) {
+    //
+    // Setters
+    //
+
+    public ProjectStub setBasedir(Path basedir) {
+        this.basedir = basedir;
+        return this;
+    }
+
+    public ProjectStub setGroupId(String groupId) {
         model = model.withGroupId(groupId);
+        return this;
     }
 
-    public void setArtifactId(String artifactId) {
+    public ProjectStub setArtifactId(String artifactId) {
         model = model.withArtifactId(artifactId);
+        return this;
     }
 
-    public void setVersion(String version) {
+    public ProjectStub setVersion(String version) {
         model = model.withVersion(version);
+        return this;
     }
 
-    public void setName(String name) {
+    public ProjectStub setName(String name) {
         model = model.withName(name);
+        return this;
     }
 
-    public void setPackaging(String packaging) {
+    public ProjectStub setDescription(String desc) {
+        model = model.withDescription(desc);
+        return this;
+    }
+
+    public ProjectStub setPackaging(String packaging) {
         model = model.withPackaging(packaging);
+        return this;
     }
 
-    public void setMainArtifact(Artifact mainArtifact) {
+    public ProjectStub setMainArtifact(Artifact mainArtifact) {
         this.mainArtifact = mainArtifact;
+        return this;
     }
 
-    public void setPomPath(Path pomPath) {
+    public ProjectStub setPomPath(Path pomPath) {
         this.pomPath = pomPath;
+        return this;
     }
 
-    public void setTopProject(boolean topProject) {
+    public ProjectStub setTopProject(boolean topProject) {
         this.topProject = topProject;
+        return this;
     }
 
-    public void setMavenModel(org.apache.maven.model.Model model) {
+    public ProjectStub setMavenModel(org.apache.maven.model.Model model) {
         this.model = model.getDelegate();
+        return this;
     }
 
-    public void setRootDirectory(Path rootDirectory) {
+    public ProjectStub setRootDirectory(Path rootDirectory) {
         this.rootDirectory = rootDirectory;
+        return this;
     }
 
-    public void addProperty(String key, String value) {
-        properties.put(key, value);
-    }
-
-    class ProjectArtifact implements Artifact {
-        @Override
-        public String getGroupId() {
-            return ProjectStub.this.getGroupId();
-        }
-
-        @Override
-        public String getArtifactId() {
-            return ProjectStub.this.getArtifactId();
-        }
-
-        @Override
-        public Version getVersion() {
-            return new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme()))
-                    .parseVersion(ProjectStub.this.getVersion());
-        }
-
-        @Override
-        public Version getBaseVersion() {
-            return null;
-        }
-
-        @Override
-        public String getClassifier() {
-            return "";
-        }
-
-        @Override
-        public String getExtension() {
-            return "pom";
-        }
-
-        @Override
-        public boolean isSnapshot() {
-            return false;
-        }
-
-        @Override
-        public ArtifactCoordinate toCoordinate() {
-            return null;
-        }
+    public ProjectStub addProperty(String key, String value) {
+        Map<String, String> props = new HashMap<>(model.getProperties());
+        props.put(key, value);
+        model = model.withProperties(props);
+        return this;
     }
 }
