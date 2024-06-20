@@ -18,8 +18,11 @@
  */
 package org.apache.maven.plugin.internal;
 
+import java.util.List;
+
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
@@ -29,10 +32,20 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
  */
 interface MavenPluginDependenciesValidator {
     /**
-     * Checks mojo dependency issues.
+     * Checks mojo dependency issues by validating artifact descriptor (POM), hence, direct dependencies.
      */
     void validate(
             RepositorySystemSession session,
             Artifact pluginArtifact,
             ArtifactDescriptorResult artifactDescriptorResult);
+
+    /**
+     * Checks mojo dependency issues by validating transitive dependencies of plugin. The dependencies passed in here
+     * does NOT contain plugin, and it's direct dependencies, only the transitive dependencies beyond direct ones.
+     *
+     * @since 3.9.4
+     */
+    default void validate(RepositorySystemSession session, Artifact pluginArtifact, List<Dependency> dependencies) {
+        // nothing
+    }
 }
