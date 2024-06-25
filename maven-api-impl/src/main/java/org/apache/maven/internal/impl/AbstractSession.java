@@ -39,6 +39,7 @@ import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Listener;
 import org.apache.maven.api.LocalRepository;
@@ -278,12 +279,18 @@ public abstract class AbstractSession implements InternalSession {
                             dependency.getType().getExtension(),
                             dependency.getVersion().toString(),
                             null),
-                    dependency.getScope().id());
+                    dependency.getScope().id(),
+                    dependency.getOptional(),
+                    map(dependency.getExclusions(), this::toExclusion));
         }
         if (!managed && "".equals(dep.getScope())) {
             dep = dep.setScope(DependencyScope.COMPILE.id());
         }
         return dep;
+    }
+
+    private org.eclipse.aether.graph.Exclusion toExclusion(Exclusion exclusion) {
+        return new org.eclipse.aether.graph.Exclusion(exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*");
     }
 
     @Override
