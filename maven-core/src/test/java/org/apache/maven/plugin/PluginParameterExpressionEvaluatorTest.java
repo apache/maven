@@ -58,6 +58,8 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -289,6 +291,34 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         Object value = ee.evaluate("${" + sysprop + "}");
 
         assertEquals("value", value);
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                "prefix-${PPEET_nonexisting_ps_property}",
+                "${PPEET_nonexisting_ps_property}-suffix",
+                "prefix-${PPEET_nonexisting_ps_property}-suffix",
+            })
+    void testValueExtractionOfMissingPrefixedSuffixedProperty(String missingPropertyExpression) throws Exception {
+        Properties executionProperties = new Properties();
+
+        ExpressionEvaluator ee = createExpressionEvaluator(null, null, executionProperties);
+
+        Object value = ee.evaluate(missingPropertyExpression);
+
+        assertEquals(missingPropertyExpression, value);
+    }
+
+    @Test
+    void testValueExtractionOfMissingProperty() throws Exception {
+        Properties executionProperties = new Properties();
+
+        ExpressionEvaluator ee = createExpressionEvaluator(null, null, executionProperties);
+
+        Object value = ee.evaluate("${PPEET_nonexisting_property}");
+
+        assertNull(value);
     }
 
     @Test
