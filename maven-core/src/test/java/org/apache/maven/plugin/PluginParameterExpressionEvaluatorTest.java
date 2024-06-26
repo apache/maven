@@ -266,6 +266,46 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals("value", value);
     }
 
+    public void testValueExtractionOfMissingPrefixedProperty() throws Exception {
+        Properties executionProperties = new Properties();
+
+        ExpressionEvaluator ee = createExpressionEvaluator(null, null, executionProperties);
+
+        Object value = ee.evaluate("prefix-${PPEET_nonexisting_p_property}");
+
+        assertEquals("prefix-${PPEET_nonexisting_p_property}", value);
+    }
+
+    public void testValueExtractionOfMissingSuffixedProperty() throws Exception {
+        Properties executionProperties = new Properties();
+
+        ExpressionEvaluator ee = createExpressionEvaluator(null, null, executionProperties);
+
+        Object value = ee.evaluate("${PPEET_nonexisting_s_property}-suffix");
+
+        assertEquals("${PPEET_nonexisting_s_property}-suffix", value);
+    }
+
+    public void testValueExtractionOfMissingPrefixedSuffixedProperty() throws Exception {
+        Properties executionProperties = new Properties();
+
+        ExpressionEvaluator ee = createExpressionEvaluator(null, null, executionProperties);
+
+        Object value = ee.evaluate("prefix-${PPEET_nonexisting_ps_property}-suffix");
+
+        assertEquals("prefix-${PPEET_nonexisting_ps_property}-suffix", value);
+    }
+
+    public void testValueExtractionOfMissingProperty() throws Exception {
+        Properties executionProperties = new Properties();
+
+        ExpressionEvaluator ee = createExpressionEvaluator(null, null, executionProperties);
+
+        Object value = ee.evaluate("${PPEET_nonexisting_property}");
+
+        assertNull(value);
+    }
+
     public void testValueExtractionFromSystemPropertiesWithMissingProject_WithDotNotation() throws Exception {
         String sysprop = "PPEET.sysprop2";
 
