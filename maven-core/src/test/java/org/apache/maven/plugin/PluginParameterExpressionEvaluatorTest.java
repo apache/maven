@@ -296,11 +296,12 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     @ParameterizedTest
     @ValueSource(
             strings = {
+                "${PPEET_nonexisting_ps_property}",
                 "prefix-${PPEET_nonexisting_ps_property}",
                 "${PPEET_nonexisting_ps_property}-suffix",
                 "prefix-${PPEET_nonexisting_ps_property}-suffix",
             })
-    void testValueExtractionOfMissingPrefixedSuffixedProperty(String missingPropertyExpression) throws Exception {
+    void testValueExtractionOfMissingProperty(String missingPropertyExpression) throws Exception {
         Properties executionProperties = new Properties();
 
         ExpressionEvaluator ee = createExpressionEvaluator(null, null, executionProperties);
@@ -308,17 +309,6 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         Object value = ee.evaluate(missingPropertyExpression);
 
         assertEquals(missingPropertyExpression, value);
-    }
-
-    @Test
-    void testValueExtractionOfMissingProperty() throws Exception {
-        Properties executionProperties = new Properties();
-
-        ExpressionEvaluator ee = createExpressionEvaluator(null, null, executionProperties);
-
-        Object value = ee.evaluate("${PPEET_nonexisting_property}");
-
-        assertNull(value);
     }
 
     @Test
