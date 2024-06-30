@@ -16,3 +16,4 @@
 .vscode/
 repo/
 /*.svg
+**/.mvn/.develocity*
