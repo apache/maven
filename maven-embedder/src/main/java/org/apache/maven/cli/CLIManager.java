@@ -123,6 +123,8 @@ public class CLIManager {
 
     public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
 
+    public static final String INSTALLATION_STATUS = "status";
+
     /** This option is deprecated and may be repurposed as Java debug in a future version.
      * Use {@code -X/--verbose} instead. */
     @Deprecated
@@ -334,6 +336,10 @@ public class CLIManager {
         options.addOption(Option.builder("llr")
                 .longOpt("legacy-local-repository")
                 .desc("UNSUPPORTED: Use of this option will make Maven invocation fail.")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(INSTALLATION_STATUS)
+                .desc("Display Maven installation status")
                 .build());
 
         // Deprecated
