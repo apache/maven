@@ -19,11 +19,13 @@
 package org.apache.maven.artifact;
 
 import org.apache.maven.artifact.handler.ArtifactHandlerMock;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -151,5 +153,21 @@ class DefaultArtifactTest {
         DefaultArtifact nullVersionArtifact =
                 new DefaultArtifact(groupId, artifactId, vr, scope, type, null, artifactHandler);
         assertEquals(artifact, nullVersionArtifact);
+    }
+
+    @Test
+    public void testDefaultArtifact() {
+        DefaultArtifactHandler artifactHandler = new DefaultArtifactHandler("jar");
+        DefaultArtifact artifact =
+                new DefaultArtifact("groupId", "artifactId", "1.0", "compile", "jar", null, artifactHandler);
+
+        assertNotNull(artifact, "Artifact should not be null");
+        assertEquals("groupId", artifact.getGroupId());
+        assertEquals("artifactId", artifact.getArtifactId());
+        assertEquals("1.0", artifact.getVersion());
+        assertEquals("compile", artifact.getScope());
+        assertEquals("jar", artifact.getType());
+        assertNull(artifact.getClassifier());
+        assertEquals(artifactHandler, artifact.getArtifactHandler());
     }
 }
