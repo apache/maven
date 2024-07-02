@@ -107,5 +107,10 @@ public class DefaultToolchainManager implements ToolchainManager {
         public boolean matchesRequirements(Map<String, String> requirements) {
             return ((ToolchainPrivate) toolchain).matchesRequirements(requirements);
         }
+
+        @Override
+        public String toString() {
+            return toolchain.toString();
+        }
     }
 }
