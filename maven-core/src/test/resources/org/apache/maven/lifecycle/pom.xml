@@ -245,7 +245,6 @@ under the License.
     <module>maven-mercury</module>
     <module>maven-embedder</module>
     <module>maven-toolchain</module>
-    <module>maven-compat</module>
     <module>maven-repository</module>
     <module>maven-repository-mercury</module>
   </modules>
@@ -321,11 +320,6 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-repository</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-compat</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--end-->

@@ -48,8 +48,6 @@ public class DefaultLifecycles {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")
-
     private final Lookup lookup;
 
     private final LifecycleRegistry registry;
@@ -147,10 +145,9 @@ public class DefaultLifecycles {
     }
 
     private Map<String, Lifecycle> lookupLifecycles() {
-        // TODO: Remove the following code when maven-compat is gone
-        // This code is here to ensure maven-compat's EmptyLifecycleExecutor keeps on working.
         if (lookup == null) {
-            return customLifecycles != null ? customLifecycles : new HashMap<>();
+            throw new IllegalStateException(
+                    "Unable to lookup lifecycles from the plexus container, since lookup is not set");
         }
 
         // Lifecycles cannot be cached as extensions might add custom lifecycles later in the execution.

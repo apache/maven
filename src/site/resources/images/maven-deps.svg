@@ -707,6 +707,7 @@
    <path fill="none" stroke="#000" d="m7717 3201-5570 551"/>
    <path d="m2132 3634 20-34-402 191 432 108-26-28-21-34-16-38-9-42-1-43 9-41z"/>
   </g>
+  <!--  TODO: What about wagon-provider-api? -->
   <g>
    <path fill="none" d="M10000 3790h3235v811h-3235z"/>
    <a target="_parent" xlink:href="../maven-compat/">

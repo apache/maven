@@ -64,7 +64,6 @@ under the License.
   <dependencyManagement>
     <!-- Not included:
          - apache-maven, as it delivers the binaries
-         - maven-compat, only used by apache-maven distributions to support older releases
          - maven-slf4j-provider, only used by apache-maven distributions
          - maven-wrapper, only used by apache-maven-wrapper distributions -->
     <dependencies>
