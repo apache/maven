@@ -40,17 +40,19 @@ public class MojoExecutionScopeModule extends AbstractModule {
         // bindScope(org.apache.maven.api.di.MojoExecutionScoped.class, scope);
         bind(MojoExecutionScope.class).toInstance(scope);
         bind(MavenProject.class)
-                .toProvider(MojoExecutionScope.seededKeyProvider())
+                .toProvider(MojoExecutionScope.seededKeyProvider(MavenProject.class))
                 .in(scope);
         bind(MojoExecution.class)
-                .toProvider(MojoExecutionScope.seededKeyProvider())
+                .toProvider(MojoExecutionScope.seededKeyProvider(MojoExecution.class))
                 .in(scope);
-        bind(Log.class).toProvider(MojoExecutionScope.seededKeyProvider()).in(scope);
+        bind(Log.class)
+                .toProvider(MojoExecutionScope.seededKeyProvider(Log.class))
+                .in(scope);
         bind(org.apache.maven.api.Project.class)
-                .toProvider(MojoExecutionScope.seededKeyProvider())
+                .toProvider(MojoExecutionScope.seededKeyProvider(org.apache.maven.api.Project.class))
                 .in(scope);
         bind(org.apache.maven.api.MojoExecution.class)
-                .toProvider(MojoExecutionScope.seededKeyProvider())
+                .toProvider(MojoExecutionScope.seededKeyProvider(org.apache.maven.api.MojoExecution.class))
                 .in(scope);
     }
 }
