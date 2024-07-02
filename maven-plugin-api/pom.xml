@@ -117,7 +117,7 @@ under the License.
               <models>
                 <model>../api/maven-api-plugin/src/main/mdo/lifecycle.mdo</model>
               </models>
-              <version>1.0.0</version>
+              <version>2.0.0</version>
             </configuration>
           </execution>
           <execution>
