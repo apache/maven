@@ -52,6 +52,7 @@
     #set ( $dummy = $imports.add( "java.util.HashMap" ) )
     #set ( $dummy = $imports.add( "java.util.List" ) )
     #set ( $dummy = $imports.add( "java.util.Map" ) )
+    #set ( $dummy = $imports.add( "java.util.Set" ) )
     #set ( $dummy = $imports.add( "java.util.Objects" ) )
     #set ( $dummy = $imports.add( "java.util.stream.Collectors" ) )
     #set ( $dummy = $imports.add( "java.util.stream.Stream" ) )
@@ -280,6 +281,20 @@ public class ${class.name}
     public void setLocation(Object key, InputLocation location) {
         update(${packageModelV4}.${class.name}.newBuilder(getDelegate(), true)
                         .location(key, location.toApiLocation()).build());
+    }
+
+    public InputLocation getImportedFrom() {
+        ${packageModelV4}.InputLocation loc = getDelegate().getImportedFrom();
+        return loc != null ? new InputLocation(loc) : null;
+    }
+
+    public void setImportedFrom(InputLocation location) {
+        update(${packageModelV4}.${class.name}.newBuilder(getDelegate(), true)
+                        .importedFrom(location.toApiLocation()).build());
+    }
+
+    public Set<Object> getLocationKeys() {
+        return getDelegate().getLocationKeys();
     }
 
     #end

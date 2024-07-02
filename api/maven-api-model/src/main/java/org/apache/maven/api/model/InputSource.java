@@ -33,17 +33,24 @@ public class InputSource implements Serializable {
     private final String modelId;
     private final String location;
     private final List<InputSource> inputs;
+    private final InputLocation importedFrom;
 
     public InputSource(String modelId, String location) {
+        this(modelId, location, null);
+    }
+
+    public InputSource(String modelId, String location, InputLocation importedFrom) {
         this.modelId = modelId;
         this.location = location;
         this.inputs = null;
+        this.importedFrom = importedFrom;
     }
 
     public InputSource(Collection<InputSource> inputs) {
         this.modelId = null;
         this.location = null;
         this.inputs = ImmutableCollections.copy(inputs);
+        this.importedFrom = null;
     }
 
     /**
@@ -62,6 +69,17 @@ public class InputSource implements Serializable {
      */
     public String getModelId() {
         return this.modelId;
+    }
+
+    /**
+     * Gets the parent InputLocation where this InputLocation may have been imported from.
+     * Can return {@code null}.
+     *
+     * @return InputLocation
+     * @since 4.0.0
+     */
+    public InputLocation getImportedFrom() {
+        return importedFrom;
     }
 
     @Override
