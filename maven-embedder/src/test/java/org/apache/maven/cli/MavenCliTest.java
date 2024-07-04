@@ -22,12 +22,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -51,6 +55,7 @@ import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.transfer.TransferListener;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -578,6 +583,20 @@ class MavenCliTest {
 
     @Test
     public void testPropertiesInterpolation() throws Exception {
+        FileSystem fs = Jimfs.newFileSystem(Configuration.windows());
+
+        Path mavenHome = fs.getPath("C:\\maven");
+        Files.createDirectories(mavenHome);
+        Path mavenConf = mavenHome.resolve("conf");
+        Files.createDirectories(mavenConf);
+        Path mavenUserProps = mavenConf.resolve("maven.properties");
+        Files.writeString(mavenUserProps, "${optionals} = ${session.rootDirectory}/.mvn/maven.properties\n");
+        Path rootDirectory = fs.getPath("C:\\myRootDirectory");
+        Path topDirectory = rootDirectory.resolve("myTopDirectory");
+        Path mvn = rootDirectory.resolve(".mvn");
+        Files.createDirectories(mvn);
+        Files.writeString(mvn.resolve("maven.properties"), "fro = ${bar}z\n" + "bar = chti${java.version}\n");
+
         // Arrange
         CliRequest request = new CliRequest(
                 new String[] {
@@ -592,20 +611,28 @@ class MavenCliTest {
                     "validate"
                 },
                 null);
-        request.rootDirectory = Paths.get("myRootDirectory");
-        request.topDirectory = Paths.get("myTopDirectory");
+        request.rootDirectory = rootDirectory;
+        request.topDirectory = topDirectory;
+        System.setProperty("maven.conf", mavenConf.toString());
 
         // Act
+        cli.setFileSystem(fs);
         cli.cli(request);
         cli.properties(request);
 
         // Assert
+        assertThat(request.getUserProperties().getProperty("fro"), CoreMatchers.startsWith("chti"));
         assertThat(request.getUserProperties().getProperty("valFound"), is("sbari"));
         assertThat(request.getUserProperties().getProperty("valNotFound"), is("s${foz}i"));
-        assertThat(request.getUserProperties().getProperty("valRootDirectory"), is("myRootDirectory/.mvn/foo"));
-        assertThat(request.getUserProperties().getProperty("valTopDirectory"), is("myTopDirectory/pom.xml"));
-        assertThat(request.getCommandLine().getOptionValue('f'), is("myRootDirectory/my-child"));
+        assertThat(request.getUserProperties().getProperty("valRootDirectory"), is("C:\\myRootDirectory/.mvn/foo"));
+        assertThat(
+                request.getUserProperties().getProperty("valTopDirectory"),
+                is("C:\\myRootDirectory\\myTopDirectory/pom.xml"));
+        assertThat(request.getCommandLine().getOptionValue('f'), is("C:\\myRootDirectory/my-child"));
         assertThat(request.getCommandLine().getArgs(), equalTo(new String[] {"prefix:3.0.0:bar", "validate"}));
+
+        Path p = fs.getPath(request.getUserProperties().getProperty("valTopDirectory"));
+        assertThat(p.toString(), is("C:\\myRootDirectory\\myTopDirectory\\pom.xml"));
     }
 
     @ParameterizedTest

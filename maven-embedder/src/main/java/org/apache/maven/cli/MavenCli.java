@@ -28,9 +28,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
@@ -62,6 +63,8 @@ import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
 import org.apache.maven.cli.logging.Slf4jStdoutLogger;
+import org.apache.maven.cli.props.InterpolationHelper;
+import org.apache.maven.cli.props.PropertiesLoader;
 import org.apache.maven.cli.transfer.*;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
@@ -178,6 +181,8 @@ public class MavenCli {
     private CLIManager cliManager;
 
     private MessageBuilderFactory messageBuilderFactory;
+
+    private FileSystem fileSystem = FileSystems.getDefault();
 
     private static final Pattern NEXT_LINE = Pattern.compile("\r?\n");
 
@@ -328,7 +333,7 @@ public class MavenCli {
         // We need to locate the top level project which may be pointed at using
         // the -f/--file option.  However, the command line isn't parsed yet, so
         // we need to iterate through the args to find it and act upon it.
-        Path topDirectory = Paths.get(cliRequest.workingDirectory);
+        Path topDirectory = fileSystem.getPath(cliRequest.workingDirectory);
         boolean isAltFile = false;
         for (String arg : cliRequest.args) {
             if (isAltFile) {
@@ -371,7 +376,9 @@ public class MavenCli {
         String mavenHome = System.getProperty("maven.home");
 
         if (mavenHome != null) {
-            System.setProperty("maven.home", new File(mavenHome).getAbsolutePath());
+            System.setProperty(
+                    "maven.home",
+                    getCanonicalPath(fileSystem.getPath(mavenHome)).toString());
         }
     }
 
@@ -1581,20 +1588,15 @@ public class MavenCli {
     // Properties handling
     // ----------------------------------------------------------------------
 
-    static void populateProperties(
+    void populateProperties(
             CommandLine commandLine, Properties paths, Properties systemProperties, Properties userProperties)
             throws Exception {
+
+        // ----------------------------------------------------------------------
+        // Load environment and system properties
+        // ----------------------------------------------------------------------
+
         EnvironmentUtils.addEnvVars(systemProperties);
-
-        // ----------------------------------------------------------------------
-        // Options that are set on the command line become system properties
-        // and therefore are set in the session properties. System properties
-        // are most dominant.
-        // ----------------------------------------------------------------------
-
-        final Properties userSpecifiedProperties =
-                commandLine.getOptionProperties(String.valueOf(CLIManager.SET_USER_PROPERTY));
-
         SystemProperties.addSystemProperties(systemProperties);
 
         // ----------------------------------------------------------------------
@@ -1610,20 +1612,48 @@ public class MavenCli {
         String mavenBuildVersion = CLIReportingUtils.createMavenVersionString(buildProperties);
         systemProperties.setProperty("maven.build.version", mavenBuildVersion);
 
-        BasicInterpolator interpolator =
-                createInterpolator(paths, systemProperties, userProperties, userSpecifiedProperties);
-        for (Map.Entry<Object, Object> e : userSpecifiedProperties.entrySet()) {
-            String name = (String) e.getKey();
-            String value = interpolator.interpolate((String) e.getValue());
-            userProperties.setProperty(name, value);
-            // ----------------------------------------------------------------------
-            // I'm leaving the setting of system properties here as not to break
-            // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
-            // ----------------------------------------------------------------------
-            if (System.getProperty(name) == null) {
-                System.setProperty(name, value);
-            }
+        // ----------------------------------------------------------------------
+        // Options that are set on the command line become system properties
+        // and therefore are set in the session properties. System properties
+        // are most dominant.
+        // ----------------------------------------------------------------------
+
+        Properties userSpecifiedProperties =
+                commandLine.getOptionProperties(String.valueOf(CLIManager.SET_USER_PROPERTY));
+        userProperties.putAll(userSpecifiedProperties);
+
+        // ----------------------------------------------------------------------
+        // Load config files
+        // ----------------------------------------------------------------------
+        InterpolationHelper.SubstitutionCallback callback = or(paths::getProperty, systemProperties::getProperty);
+
+        if (systemProperties.getProperty("maven.conf") != null) {
+            Path mavenConf = fileSystem.getPath(systemProperties.getProperty("maven.conf"));
+
+            Path propertiesFile = mavenConf.resolve("maven.properties");
+            PropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
         }
+
+        // ----------------------------------------------------------------------
+        // I'm leaving the setting of system properties here as not to break
+        // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
+        // ----------------------------------------------------------------------
+        Set<String> sys = SystemProperties.getSystemProperties().stringPropertyNames();
+        userProperties.stringPropertyNames().stream()
+                .filter(k -> !sys.contains(k))
+                .forEach(k -> System.setProperty(k, userProperties.getProperty(k)));
+    }
+
+    private static InterpolationHelper.SubstitutionCallback or(InterpolationHelper.SubstitutionCallback... callbacks) {
+        return s -> {
+            for (InterpolationHelper.SubstitutionCallback cb : callbacks) {
+                String r = cb.getValue(s);
+                if (r != null) {
+                    return r;
+                }
+            }
+            return null;
+        };
     }
 
     private static BasicInterpolator createInterpolator(Properties... properties) {
@@ -1688,5 +1718,9 @@ public class MavenCli {
 
     protected ModelProcessor createModelProcessor(PlexusContainer container) throws ComponentLookupException {
         return container.lookup(ModelProcessor.class);
+    }
+
+    public void setFileSystem(FileSystem fileSystem) {
+        this.fileSystem = fileSystem;
     }
 }
