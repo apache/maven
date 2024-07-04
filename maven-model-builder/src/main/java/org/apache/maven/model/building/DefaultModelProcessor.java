@@ -37,7 +37,6 @@ import java.util.Optional;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.api.spi.ModelParserException;
-import org.apache.maven.building.Source;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.locator.ModelLocator;
@@ -133,10 +132,6 @@ public class DefaultModelProcessor implements ModelProcessor {
 
     protected org.apache.maven.api.model.Model read(
             Path pomFile, InputStream input, Reader reader, Map<String, ?> options) throws IOException {
-        Source source = (Source) options.get(ModelProcessor.SOURCE);
-        if (pomFile == null && source instanceof org.apache.maven.building.FileSource) {
-            pomFile = ((org.apache.maven.building.FileSource) source).getPath();
-        }
         if (pomFile != null) {
             Path projectDirectory = pomFile.getParent();
             List<ModelParserException> exceptions = new ArrayList<>();

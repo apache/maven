@@ -18,6 +18,9 @@
  */
 package org.apache.maven.internal.impl.resolver;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +36,7 @@ import org.apache.maven.api.services.ArtifactResolverException;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.VersionRangeResolverException;
 
 /**
@@ -74,7 +78,34 @@ public class DefaultModelResolver implements ModelResolver {
 
             Map.Entry<org.apache.maven.api.Artifact, Path> resolved =
                     session.resolveArtifact(session.createArtifactCoordinate(groupId, artifactId, newVersion, "pom"));
-            return ModelSource.fromPath(resolved.getValue(), groupId + ":" + artifactId + ":" + newVersion);
+            Path path = resolved.getValue();
+            String location = groupId + ":" + artifactId + ":" + newVersion;
+            return new ModelSource() {
+                @Override
+                public ModelSource resolve(ModelLocator modelLocator, String relative) {
+                    return null;
+                }
+
+                @Override
+                public Path getPath() {
+                    return null;
+                }
+
+                @Override
+                public InputStream openStream() throws IOException {
+                    return Files.newInputStream(path);
+                }
+
+                @Override
+                public String getLocation() {
+                    return location;
+                }
+
+                @Override
+                public Source resolve(String relative) {
+                    return null;
+                }
+            };
         } catch (VersionRangeResolverException | ArtifactResolverException e) {
             throw new ModelResolverException(
                     e.getMessage() + " (remote repositories: "
