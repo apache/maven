@@ -134,7 +134,7 @@ public final class Constants {
      * @since 4.0.0
      */
     @Config
-    public static final String MAVEN_VERSION_FILTERS = "maven.version.filters";
+    public static final String MAVEN_VERSION_FILTERS = "maven.versionFilters";
 
     /**
      * User property for chained LRM: list of "tail" local repository paths (separated by comma), to be used with
@@ -155,7 +155,7 @@ public final class Constants {
      * @since 3.9.0
      */
     @Config(defaultValue = "false")
-    public static final String MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE = "maven.repo.local.record.reverse.tree";
+    public static final String MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE = "maven.repo.local.recordReverseTree";
 
     /**
      * User property for selecting dependency manager behaviour regarding transitive dependencies and dependency
@@ -170,7 +170,7 @@ public final class Constants {
      */
     @Config(defaultValue = "true")
     public static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY =
-            "maven.resolver.dependency.manager.transitivity";
+            "maven.resolver.dependencyManagerTransitivity";
 
     /**
      * Resolver transport to use.
@@ -195,7 +195,7 @@ public final class Constants {
      * ProjectBuilder parallelism.
      */
     @Config(type = "java.lang.Integer", defaultValue = "cores/2 + 1")
-    public static final String MAVEN_PROJECT_BUILDER_PARALLELISM = "maven.project.builder.parallelism";
+    public static final String MAVEN_PROJECT_BUILDER_PARALLELISM = "maven.projectBuilder.parallelism";
 
     private Constants() {}
 }
