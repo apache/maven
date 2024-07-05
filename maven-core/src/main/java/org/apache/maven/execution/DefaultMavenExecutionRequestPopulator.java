@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -125,7 +126,11 @@ public class DefaultMavenExecutionRequestPopulator implements MavenExecutionRequ
         }
 
         if (localRepositoryPath == null || localRepositoryPath.isEmpty()) {
-            localRepositoryPath = new File(System.getProperty("user.home"), ".m2/repository").getAbsolutePath();
+            String path = request.getUserProperties().getProperty(Constants.MAVEN_USER_HOME);
+            if (path == null) {
+                path = System.getProperty("user.home") + File.separator + ".m2";
+            }
+            localRepositoryPath = new File(path, "repository").getAbsolutePath();
         }
 
         try {

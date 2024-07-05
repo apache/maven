@@ -26,14 +26,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import org.apache.maven.api.Constants;
+
 /**
  * MavenBuildTimestamp
  */
 public class MavenBuildTimestamp {
     // ISO 8601-compliant timestamp for machine readability
     public static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-
-    public static final String BUILD_TIMESTAMP_FORMAT_PROPERTY = "maven.build.timestamp.format";
 
     public static final TimeZone DEFAULT_BUILD_TIME_ZONE = TimeZone.getTimeZone("Etc/UTC");
 
@@ -48,7 +48,7 @@ public class MavenBuildTimestamp {
     }
 
     public MavenBuildTimestamp(Instant time, Map<String, String> properties) {
-        this(time, properties != null ? properties.get(BUILD_TIMESTAMP_FORMAT_PROPERTY) : null);
+        this(time, properties != null ? properties.get(Constants.MAVEN_BUILD_TIMESTAMP_FORMAT) : null);
     }
 
     /**
@@ -58,7 +58,7 @@ public class MavenBuildTimestamp {
      */
     @Deprecated
     public MavenBuildTimestamp(Instant time, Properties properties) {
-        this(time, properties != null ? properties.getProperty(BUILD_TIMESTAMP_FORMAT_PROPERTY) : null);
+        this(time, properties != null ? properties.getProperty(Constants.MAVEN_BUILD_TIMESTAMP_FORMAT) : null);
     }
 
     public MavenBuildTimestamp(Instant time, String timestampFormat) {

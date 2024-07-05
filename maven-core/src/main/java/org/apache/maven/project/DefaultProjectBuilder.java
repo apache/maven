@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.feature.Features;
@@ -92,7 +93,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultProjectBuilder implements ProjectBuilder {
-    public static final String BUILDER_PARALLELISM = "maven.projectBuilder.parallelism";
+
     public static final int DEFAULT_BUILDER_PARALLELISM = Runtime.getRuntime().availableProcessors() / 2 + 1;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -358,10 +359,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private int getParallelism(ProjectBuildingRequest request) {
             int parallelism = DEFAULT_BUILDER_PARALLELISM;
             try {
-                String str = request.getUserProperties().getProperty(BUILDER_PARALLELISM);
-                if (str == null) {
-                    str = request.getSystemProperties().getProperty(BUILDER_PARALLELISM);
-                }
+                String str = request.getUserProperties().getProperty(Constants.MAVEN_PROJECT_BUILDER_PARALLELISM);
                 if (str != null) {
                     parallelism = Integer.parseInt(str);
                 }
