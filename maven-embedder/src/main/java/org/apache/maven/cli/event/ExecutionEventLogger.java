@@ -295,9 +295,9 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             init();
             logger.info("");
             infoLine('-');
-
-            infoMain("Skipping " + event.getProject().getName());
-            logger.info("This project has been banned from the build due to previous failures.");
+            String name = event.getProject().getName();
+            infoMain("Skipping " + name);
+            logger.info(name + " was not built because a module it depends on failed to build.");
 
             infoLine('-');
         }
