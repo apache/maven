@@ -640,12 +640,18 @@ public class DefaultModelBuilder implements ModelBuilder {
         try {
             boolean strict = request.getValidationLevel() >= ModelBuilderRequest.VALIDATION_LEVEL_MAVEN_2_0;
 
+            Path rootDirectory;
+            try {
+                rootDirectory = request.getSession().getRootDirectory();
+            } catch (IllegalStateException ignore) {
+                rootDirectory = modelSource.getPath();
+            }
             try (InputStream is = modelSource.openStream()) {
                 model = modelProcessor.read(XmlReaderRequest.builder()
                         .strict(strict)
                         .location(modelSource.getLocation())
                         .path(modelSource.getPath())
-                        .rootDirectory(request.getSession().getRootDirectory())
+                        .rootDirectory(rootDirectory)
                         .inputStream(is)
                         .build());
             } catch (XmlReaderException e) {
@@ -657,7 +663,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             .strict(false)
                             .location(modelSource.getLocation())
                             .path(modelSource.getPath())
-                            .rootDirectory(request.getSession().getRootDirectory())
+                            .rootDirectory(rootDirectory)
                             .inputStream(is)
                             .build());
                 } catch (XmlReaderException ne) {
