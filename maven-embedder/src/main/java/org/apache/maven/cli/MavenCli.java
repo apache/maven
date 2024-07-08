@@ -677,6 +677,8 @@ public class MavenCli {
 
         final CoreExports exports = new CoreExports(containerRealm, exportedArtifacts, exportedPackages);
 
+        Thread.currentThread().setContextClassLoader(containerRealm);
+
         DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
             @Override
             protected void configure() {
