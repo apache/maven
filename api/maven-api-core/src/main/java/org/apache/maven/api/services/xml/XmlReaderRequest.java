@@ -42,6 +42,9 @@ public interface XmlReaderRequest {
     Path getPath();
 
     @Nullable
+    Path getRootDirectory();
+
+    @Nullable
     URL getURL();
 
     @Nullable
@@ -83,6 +86,7 @@ public interface XmlReaderRequest {
     @NotThreadSafe
     class XmlReaderRequestBuilder {
         Path path;
+        Path rootDirectory;
         URL url;
         InputStream inputStream;
         Reader reader;
@@ -94,6 +98,11 @@ public interface XmlReaderRequest {
 
         public XmlReaderRequestBuilder path(Path path) {
             this.path = path;
+            return this;
+        }
+
+        public XmlReaderRequestBuilder rootDirectory(Path rootDirectory) {
+            this.rootDirectory = rootDirectory;
             return this;
         }
 
@@ -139,11 +148,21 @@ public interface XmlReaderRequest {
 
         public XmlReaderRequest build() {
             return new DefaultXmlReaderRequest(
-                    path, url, inputStream, reader, transformer, strict, modelId, location, addDefaultEntities);
+                    path,
+                    rootDirectory,
+                    url,
+                    inputStream,
+                    reader,
+                    transformer,
+                    strict,
+                    modelId,
+                    location,
+                    addDefaultEntities);
         }
 
         private static class DefaultXmlReaderRequest implements XmlReaderRequest {
             final Path path;
+            final Path rootDirectory;
             final URL url;
             final InputStream inputStream;
             final Reader reader;
@@ -156,6 +175,7 @@ public interface XmlReaderRequest {
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultXmlReaderRequest(
                     Path path,
+                    Path rootDirectory,
                     URL url,
                     InputStream inputStream,
                     Reader reader,
@@ -165,6 +185,7 @@ public interface XmlReaderRequest {
                     String location,
                     boolean addDefaultEntities) {
                 this.path = path;
+                this.rootDirectory = rootDirectory;
                 this.url = url;
                 this.inputStream = inputStream;
                 this.reader = reader;
@@ -178,6 +199,11 @@ public interface XmlReaderRequest {
             @Override
             public Path getPath() {
                 return path;
+            }
+
+            @Override
+            public Path getRootDirectory() {
+                return rootDirectory;
             }
 
             @Override

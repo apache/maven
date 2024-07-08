@@ -645,6 +645,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .strict(strict)
                         .location(modelSource.getLocation())
                         .path(modelSource.getPath())
+                        .rootDirectory(request.getSession().getRootDirectory())
                         .inputStream(is)
                         .build());
             } catch (XmlReaderException e) {
@@ -656,6 +657,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             .strict(false)
                             .location(modelSource.getLocation())
                             .path(modelSource.getPath())
+                            .rootDirectory(request.getSession().getRootDirectory())
                             .inputStream(is)
                             .build());
                 } catch (XmlReaderException ne) {
