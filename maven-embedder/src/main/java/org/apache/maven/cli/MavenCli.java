@@ -30,6 +30,7 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -319,12 +320,13 @@ public class MavenCli {
         // We need to locate the top level project which may be pointed at using
         // the -f/--file option.  However, the command line isn't parsed yet, so
         // we need to iterate through the args to find it and act upon it.
+        Path cwd = Paths.get(cliRequest.workingDirectory);
         Path topDirectory = cliRequest.multiModuleProjectDirectory.toPath();
         boolean isAltFile = false;
         for (String arg : cliRequest.args) {
             if (isAltFile) {
                 // this is the argument following -f/--file
-                Path path = topDirectory.resolve(stripLeadingAndTrailingQuotes(arg));
+                Path path = cwd.resolve(stripLeadingAndTrailingQuotes(arg));
                 if (Files.isDirectory(path)) {
                     topDirectory = path;
                 } else if (Files.isRegularFile(path)) {
