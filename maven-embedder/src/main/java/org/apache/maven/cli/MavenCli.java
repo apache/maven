@@ -1335,7 +1335,7 @@ public class MavenCli {
                 .setUpdateSnapshots(updateSnapshots) // default: false
                 .setNoSnapshotUpdates(noSnapshotUpdates) // default: false
                 .setGlobalChecksumPolicy(globalChecksumPolicy) // default: warn
-                .setMultiModuleProjectDirectory(rootOrTopDirectory(cliRequest).toFile());
+                .setMultiModuleProjectDirectory(cliRequest.multiModuleProjectDirectory);
 
         if (alternatePomFile != null) {
             File pom = resolveFile(new File(alternatePomFile), workingDirectory);
@@ -1545,14 +1545,6 @@ public class MavenCli {
 
         String mavenBuildVersion = CLIReportingUtils.createMavenVersionString(buildProperties);
         systemProperties.setProperty("maven.build.version", mavenBuildVersion);
-    }
-
-    protected Path rootOrTopDirectory(CliRequest request) {
-        if (request.rootDirectory != null) {
-            return request.rootDirectory;
-        } else {
-            return request.topDirectory;
-        }
     }
 
     protected boolean isAcceptableRootDirectory(Path path) {
