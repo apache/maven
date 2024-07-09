@@ -50,10 +50,10 @@ public final class Constants {
     public static final String MAVEN_REPO_LOCAL = "maven.repo.local";
 
     /**
-     * Maven project-wide extensions.
+     * Maven system-wide extensions.
      */
-    @Config(defaultValue = "${session.rootDirectory}/.mvn/extensions.xml")
-    public static final String MAVEN_PROJECT_EXTENSIONS = "maven.project.extensions";
+    @Config(defaultValue = "${maven.conf}/extensions.xml")
+    public static final String MAVEN_SYSTEM_EXTENSIONS = "maven.system.extensions";
 
     /**
      * Maven user extensions.
@@ -62,10 +62,16 @@ public final class Constants {
     public static final String MAVEN_USER_EXTENSIONS = "maven.user.extensions";
 
     /**
-     * Maven global toolchains.
+     * Maven project-wide extensions.
+     */
+    @Config(defaultValue = "${session.rootDirectory}/.mvn/extensions.xml")
+    public static final String MAVEN_PROJECT_EXTENSIONS = "maven.project.extensions";
+
+    /**
+     * Maven system toolchains.
      */
     @Config(defaultValue = "${maven.conf}/toolchains.xml")
-    public static final String MAVEN_GLOBAL_TOOLCHAINS = "maven.global.toolchains";
+    public static final String MAVEN_SYSTEM_TOOLCHAINS = "maven.system.toolchains";
 
     /**
      * Maven user toolchains.

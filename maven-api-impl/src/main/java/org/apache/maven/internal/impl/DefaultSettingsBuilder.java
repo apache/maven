@@ -66,8 +66,8 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     public SettingsBuilderResult build(SettingsBuilderRequest request) throws SettingsBuilderException {
         List<BuilderProblem> problems = new ArrayList<>();
 
-        Source globalSource = request.getGlobalSettingsSource().orElse(null);
-        Settings global = readSettings(globalSource, false, request, problems);
+        Source systemSource = request.getSystemSettingsSource().orElse(null);
+        Settings system = readSettings(systemSource, false, request, problems);
 
         Source projectSource = request.getProjectSettingsSource().orElse(null);
         Settings project = readSettings(projectSource, true, request, problems);
@@ -76,7 +76,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         Settings user = readSettings(userSource, false, request, problems);
 
         Settings effective =
-                settingsMerger.merge(user, settingsMerger.merge(project, global, false, null), false, null);
+                settingsMerger.merge(user, settingsMerger.merge(project, system, false, null), false, null);
 
         // If no repository is defined in the user/global settings,
         // it means that we have "old" settings (as those are new in 4.0)

@@ -426,9 +426,15 @@ public interface MavenExecutionRequest {
 
     MavenExecutionRequest setProjectSettingsFile(File projectSettingsFile);
 
+    @Deprecated
     File getGlobalSettingsFile();
 
+    @Deprecated
     MavenExecutionRequest setGlobalSettingsFile(File globalSettingsFile);
+
+    File getSystemSettingsFile();
+
+    MavenExecutionRequest setSystemSettingsFile(File systemSettingsFile);
 
     MavenExecutionRequest addRemoteRepository(ArtifactRepository repository);
 
@@ -467,7 +473,9 @@ public interface MavenExecutionRequest {
      *
      * @return the global toolchains file
      * @since 3.3.0
+     * @deprecated use {@link #getSystemToolchainsFile()}
      */
+    @Deprecated
     File getGlobalToolchainsFile();
 
     /**
@@ -475,8 +483,26 @@ public interface MavenExecutionRequest {
      * @param globalToolchainsFile the global toolchains file
      * @return this request
      * @since 3.3.0
+     * @deprecated use {@link #setSystemToolchainsFile(File)}
      */
+    @Deprecated
     MavenExecutionRequest setGlobalToolchainsFile(File globalToolchainsFile);
+
+    /**
+     *
+     *
+     * @return the system toolchains file
+     * @since 4.0.0
+     */
+    File getSystemToolchainsFile();
+
+    /**
+     *
+     * @param systemToolchainsFile the global toolchains file
+     * @return this request
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setSystemToolchainsFile(File systemToolchainsFile);
 
     ExecutionListener getExecutionListener();
 

@@ -97,11 +97,11 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private File projectSettingsFile;
 
-    private File globalSettingsFile;
+    private File systemSettingsFile;
 
     private File userToolchainsFile;
 
-    private File globalToolchainsFile;
+    private File systemToolchainsFile;
 
     // ----------------------------------------------------------------------------
     // Request
@@ -190,9 +190,9 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setPluginGroups(original.getPluginGroups());
         copy.setProjectPresent(original.isProjectPresent());
         copy.setUserSettingsFile(original.getUserSettingsFile());
-        copy.setGlobalSettingsFile(original.getGlobalSettingsFile());
+        copy.setSystemSettingsFile(original.getSystemSettingsFile());
         copy.setUserToolchainsFile(original.getUserToolchainsFile());
-        copy.setGlobalToolchainsFile(original.getGlobalToolchainsFile());
+        copy.setSystemToolchainsFile(original.getSystemToolchainsFile());
         copy.setBaseDirectory((original.getBaseDirectory() != null) ? new File(original.getBaseDirectory()) : null);
         copy.setGoals(original.getGoals());
         copy.setRecursive(original.isRecursive());
@@ -866,13 +866,27 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     }
 
     @Override
+    @Deprecated
     public File getGlobalSettingsFile() {
-        return globalSettingsFile;
+        return systemSettingsFile;
     }
 
     @Override
-    public MavenExecutionRequest setGlobalSettingsFile(File globalSettingsFile) {
-        this.globalSettingsFile = globalSettingsFile;
+    @Deprecated
+    public MavenExecutionRequest setGlobalSettingsFile(File systemSettingsFile) {
+        this.systemSettingsFile = systemSettingsFile;
+
+        return this;
+    }
+
+    @Override
+    public File getSystemSettingsFile() {
+        return systemSettingsFile;
+    }
+
+    @Override
+    public MavenExecutionRequest setSystemSettingsFile(File systemSettingsFile) {
+        this.systemSettingsFile = systemSettingsFile;
 
         return this;
     }
@@ -890,13 +904,26 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     }
 
     @Override
+    @Deprecated
     public File getGlobalToolchainsFile() {
-        return globalToolchainsFile;
+        return systemToolchainsFile;
     }
 
     @Override
-    public MavenExecutionRequest setGlobalToolchainsFile(File globalToolchainsFile) {
-        this.globalToolchainsFile = globalToolchainsFile;
+    @Deprecated
+    public MavenExecutionRequest setGlobalToolchainsFile(File systemToolchainsFile) {
+        this.systemToolchainsFile = systemToolchainsFile;
+        return this;
+    }
+
+    @Override
+    public File getSystemToolchainsFile() {
+        return systemToolchainsFile;
+    }
+
+    @Override
+    public MavenExecutionRequest setSystemToolchainsFile(File systemToolchainsFile) {
+        this.systemToolchainsFile = systemToolchainsFile;
         return this;
     }
 

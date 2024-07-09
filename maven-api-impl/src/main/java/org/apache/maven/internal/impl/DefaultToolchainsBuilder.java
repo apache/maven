@@ -57,13 +57,13 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     public ToolchainsBuilderResult build(ToolchainsBuilderRequest request) throws ToolchainsBuilderException {
         List<BuilderProblem> problems = new ArrayList<>();
 
-        Source globalSource = request.getGlobalToolchainsSource().orElse(null);
-        PersistedToolchains global = readToolchains(globalSource, request, problems);
+        Source systemSource = request.getSystemToolchainsSource().orElse(null);
+        PersistedToolchains system = readToolchains(systemSource, request, problems);
 
         Source userSource = request.getUserToolchainsSource().orElse(null);
         PersistedToolchains user = readToolchains(userSource, request, problems);
 
-        PersistedToolchains effective = toolchainsMerger.merge(user, global, false, null);
+        PersistedToolchains effective = toolchainsMerger.merge(user, system, false, null);
 
         if (hasErrors(problems)) {
             throw new ToolchainsBuilderException("Error building toolchains", problems);

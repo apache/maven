@@ -1189,31 +1189,40 @@ public class MavenCli {
             }
         }
 
-        File globalToolchainsFile = null;
+        File systemToolchainsFile = null;
 
-        if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS)) {
-            globalToolchainsFile =
-                    new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS));
-            globalToolchainsFile = resolveFile(globalToolchainsFile, cliRequest.workingDirectory);
+        if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_SYSTEM_TOOLCHAINS)) {
+            systemToolchainsFile =
+                    new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_SYSTEM_TOOLCHAINS));
+            systemToolchainsFile = resolveFile(systemToolchainsFile, cliRequest.workingDirectory);
 
-            if (!globalToolchainsFile.isFile()) {
+            if (!systemToolchainsFile.isFile()) {
                 throw new FileNotFoundException(
-                        "The specified global toolchains file does not exist: " + globalToolchainsFile);
+                        "The specified global toolchains file does not exist: " + systemToolchainsFile);
+            }
+        } else if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS)) {
+            systemToolchainsFile =
+                    new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS));
+            systemToolchainsFile = resolveFile(systemToolchainsFile, cliRequest.workingDirectory);
+
+            if (!systemToolchainsFile.isFile()) {
+                throw new FileNotFoundException(
+                        "The specified global toolchains file does not exist: " + systemToolchainsFile);
             }
         } else {
-            String globalToolchainsFileStr =
-                    cliRequest.getUserProperties().getProperty(Constants.MAVEN_GLOBAL_TOOLCHAINS);
-            if (globalToolchainsFileStr != null) {
-                globalToolchainsFile = new File(globalToolchainsFileStr);
+            String systemToolchainsFileStr =
+                    cliRequest.getUserProperties().getProperty(Constants.MAVEN_SYSTEM_TOOLCHAINS);
+            if (systemToolchainsFileStr != null) {
+                systemToolchainsFile = new File(systemToolchainsFileStr);
             }
         }
 
-        cliRequest.request.setGlobalToolchainsFile(globalToolchainsFile);
+        cliRequest.request.setSystemToolchainsFile(systemToolchainsFile);
         cliRequest.request.setUserToolchainsFile(userToolchainsFile);
 
         DefaultToolchainsBuildingRequest toolchainsRequest = new DefaultToolchainsBuildingRequest();
-        if (globalToolchainsFile != null && globalToolchainsFile.isFile()) {
-            toolchainsRequest.setGlobalToolchainsSource(new FileSource(globalToolchainsFile));
+        if (systemToolchainsFile != null && systemToolchainsFile.isFile()) {
+            toolchainsRequest.setGlobalToolchainsSource(new FileSource(systemToolchainsFile));
         }
         if (userToolchainsFile != null && userToolchainsFile.isFile()) {
             toolchainsRequest.setUserToolchainsSource(new FileSource(userToolchainsFile));
@@ -1223,7 +1232,7 @@ public class MavenCli {
 
         slf4jLogger.debug(
                 "Reading global toolchains from '{}'",
-                getLocation(toolchainsRequest.getGlobalToolchainsSource(), globalToolchainsFile));
+                getLocation(toolchainsRequest.getGlobalToolchainsSource(), systemToolchainsFile));
         slf4jLogger.debug(
                 "Reading user toolchains from '{}'",
                 getLocation(toolchainsRequest.getUserToolchainsSource(), userToolchainsFile));
