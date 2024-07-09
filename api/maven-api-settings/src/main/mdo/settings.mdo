@@ -28,7 +28,7 @@
   <description>
     <![CDATA[
     <p>This is a reference for the user-specific configuration for Maven.</p>
-    <p>Includes things that should not be distributed with the pom.xml file, such as developer identity, along with
+    <p>Includes things that should not be distributed with the <code>pom.xml</code> file, such as developer identity, along with
     local settings, like proxy information.</p>
     <p>The default location for the settings file is {@code ~/.m2/settings.xml}.</p>
     ]]>
@@ -90,6 +90,7 @@
           <type>String</type>
           <defaultValue>default</defaultValue>
           <required>true</required>
+          <description>Item identifier.</description>
         </field>
       </fields>
     </class>
@@ -125,7 +126,7 @@
           <name>usePluginRegistry</name>
           <version>1.0.0+</version>
           <description>
-            Whether Maven should use the plugin-registry.xml file to manage plugin versions.
+            Whether Maven should use the {@code plugin-registry.xml} file to manage plugin versions.
           </description>
           <type>boolean</type>
           <defaultValue>false</defaultValue>
@@ -405,7 +406,7 @@
           <name>nonProxyHosts</name>
           <version>1.0.0+</version>
           <description>
-            The list of non-proxied hosts (delimited by |).
+            The list of non-proxied hosts (delimited by {@code |}).
           </description>
           <type>String</type>
         </field>
@@ -541,8 +542,12 @@
           <version>1.0.0+</version>
           <type>String</type>
           <description>
-            The server ID of the repository being mirrored, e.g.,
-            "central". This MUST NOT match the mirror id.
+            <![CDATA[
+            A repository id or (since Maven 2.0.9) an expression matching one or many repository ids to mirror, e.g.,
+            <code>central</code> or <code>*,!repo1</code>.
+            <code>*</code> (since Maven 2.0.5), <code>external:*</code> (since Maven 2.0.9) and <code>external:http:*</code> (since Maven 3.8.0) have
+            a special meaning: see <a href="/guides/mini/guide-mirror-settings.html">Mirror Settings</a> guide.
+            ]]>
           </description>
         </field>
         <field>
@@ -586,7 +591,11 @@
           <type>boolean</type>
           <defaultValue>false</defaultValue>
           <description>
+            <![CDATA[
             Whether this mirror should be blocked from any download request but fail the download process, explaining why.
+            <br><b>Default value is</b>: <code>false</code>
+            <br><b>Since</b>: Maven 3.8.0
+            ]]>
           </description>
         </field>
       </fields>
@@ -727,6 +736,14 @@
           <association>
             <type>ActivationFile</type>
           </association>
+        </field>
+        <field>
+          <name>packaging</name>
+          <version>1.2.0+</version>
+          <type>String</type>
+          <description>
+            Specifies that this profile will be activated based on the project's packaging.
+          </description>
         </field>
       </fields>
     </class>

@@ -20,11 +20,12 @@ package org.apache.maven.api.plugin;
 
 import java.util.function.Supplier;
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Provider;
 
 /**
- * This interface supplies the API for providing feedback to the user from the <code>Mojo</code>, using standard
- * <code>Maven</code> channels.<br>
+ * This interface supplies the API for providing feedback to the user from the {@code Mojo},
+ * using standard Maven channels.
  * There should be no big surprises here, although you may notice that the methods accept
  * <code>java.lang.CharSequence</code> rather than <code>java.lang.String</code>. This is provided mainly as a
  * convenience, to enable developers to pass things like <code>java.lang.StringBuffer</code> directly into the logger,
@@ -32,34 +33,35 @@ import org.apache.maven.api.annotations.Provider;
  *
  * @since 4.0.0
  */
+@Experimental
 @Provider
 public interface Log {
     /**
-     * @return true if the <b>debug</b> error level is enabled
+     * {@return true if the <b>debug</b> error level is enabled}.
      */
     boolean isDebugEnabled();
 
     /**
-     * Send a message to the user in the <b>debug</b> error level.
+     * Sends a message to the user in the <b>debug</b> error level.
      *
-     * @param content
+     * @param content the message to log
      */
     void debug(CharSequence content);
 
     /**
-     * Send a message (and accompanying exception) to the user in the <b>debug</b> error level.<br>
+     * Sends a message (and accompanying exception) to the user in the <b>debug</b> error level.
      * The error's stacktrace will be output when this error level is enabled.
      *
-     * @param content
-     * @param error
+     * @param content the message to log
+     * @param error the error that caused this log
      */
     void debug(CharSequence content, Throwable error);
 
     /**
-     * Send an exception to the user in the <b>debug</b> error level.<br>
+     * Sends an exception to the user in the <b>debug</b> error level.
      * The stack trace for this exception will be output when this error level is enabled.
      *
-     * @param error
+     * @param error the error that caused this log
      */
     void debug(Throwable error);
 
@@ -68,31 +70,31 @@ public interface Log {
     void debug(Supplier<String> content, Throwable error);
 
     /**
-     * @return true if the <b>info</b> error level is enabled
+     * {@return true if the <b>info</b> error level is enabled}.
      */
     boolean isInfoEnabled();
 
     /**
-     * Send a message to the user in the <b>info</b> error level.
+     * Sends a message to the user in the <b>info</b> error level.
      *
-     * @param content
+     * @param content the message to log
      */
     void info(CharSequence content);
 
     /**
-     * Send a message (and accompanying exception) to the user in the <b>info</b> error level.<br>
+     * Sends a message (and accompanying exception) to the user in the <b>info</b> error level.
      * The error's stacktrace will be output when this error level is enabled.
      *
-     * @param content
-     * @param error
+     * @param content the message to log
+     * @param error the error that caused this log
      */
     void info(CharSequence content, Throwable error);
 
     /**
-     * Send an exception to the user in the <b>info</b> error level.<br>
+     * Sends an exception to the user in the <b>info</b> error level.
      * The stack trace for this exception will be output when this error level is enabled.
      *
-     * @param error
+     * @param error the error that caused this log
      */
     void info(Throwable error);
 
@@ -101,31 +103,31 @@ public interface Log {
     void info(Supplier<String> content, Throwable error);
 
     /**
-     * @return true if the <b>warn</b> error level is enabled
+     * {@return true if the <b>warn</b> error level is enabled}.
      */
     boolean isWarnEnabled();
 
     /**
-     * Send a message to the user in the <b>warn</b> error level.
+     * Sends a message to the user in the <b>warn</b> error level.
      *
-     * @param content
+     * @param content the message to log
      */
     void warn(CharSequence content);
 
     /**
-     * Send a message (and accompanying exception) to the user in the <b>warn</b> error level.<br>
+     * Sends a message (and accompanying exception) to the user in the <b>warn</b> error level.
      * The error's stacktrace will be output when this error level is enabled.
      *
-     * @param content
-     * @param error
+     * @param content the message to log
+     * @param error the error that caused this log
      */
     void warn(CharSequence content, Throwable error);
 
     /**
-     * Send an exception to the user in the <b>warn</b> error level.<br>
+     * Sends an exception to the user in the <b>warn</b> error level.
      * The stack trace for this exception will be output when this error level is enabled.
      *
-     * @param error
+     * @param error the error that caused this log
      */
     void warn(Throwable error);
 
@@ -134,31 +136,31 @@ public interface Log {
     void warn(Supplier<String> content, Throwable error);
 
     /**
-     * @return true if the <b>error</b> error level is enabled
+     * {@return true if the <b>error</b> error level is enabled}.
      */
     boolean isErrorEnabled();
 
     /**
-     * Send a message to the user in the <b>error</b> error level.
+     * Sends a message to the user in the <b>error</b> error level.
      *
-     * @param content
+     * @param content the message to log
      */
     void error(CharSequence content);
 
     /**
-     * Send a message (and accompanying exception) to the user in the <b>error</b> error level.<br>
+     * Sends a message (and accompanying exception) to the user in the <b>error</b> error level.
      * The error's stacktrace will be output when this error level is enabled.
      *
-     * @param content
-     * @param error
+     * @param content the message to log
+     * @param error the error that caused this log
      */
     void error(CharSequence content, Throwable error);
 
     /**
-     * Send an exception to the user in the <b>error</b> error level.<br>
+     * Sends an exception to the user in the <b>error</b> error level.
      * The stack trace for this exception will be output when this error level is enabled.
      *
-     * @param error
+     * @param error the error that caused this log
      */
     void error(Throwable error);
 

@@ -19,10 +19,12 @@
 package org.apache.maven.api.services;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Repository;
@@ -43,4 +45,11 @@ public interface RepositoryFactory extends Service {
 
     @Nonnull
     RemoteRepository createRemote(@Nonnull Repository repository);
+
+    @Nonnull
+    List<RemoteRepository> aggregate(
+            @Nonnull Session session,
+            @Nonnull List<RemoteRepository> dominant,
+            @Nonnull List<RemoteRepository> recessive,
+            boolean processRecessive);
 }

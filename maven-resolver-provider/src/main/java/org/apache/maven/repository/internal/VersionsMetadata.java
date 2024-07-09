@@ -19,6 +19,7 @@
 package org.apache.maven.repository.internal;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -37,12 +38,12 @@ final class VersionsMetadata extends MavenMetadata {
     private final Artifact artifact;
 
     VersionsMetadata(Artifact artifact, Date timestamp) {
-        super(createRepositoryMetadata(artifact), null, timestamp);
+        super(createRepositoryMetadata(artifact), (Path) null, timestamp);
         this.artifact = artifact;
     }
 
-    VersionsMetadata(Artifact artifact, File file, Date timestamp) {
-        super(createRepositoryMetadata(artifact), file, timestamp);
+    VersionsMetadata(Artifact artifact, Path path, Date timestamp) {
+        super(createRepositoryMetadata(artifact), path, timestamp);
         this.artifact = artifact;
     }
 
@@ -83,6 +84,11 @@ final class VersionsMetadata extends MavenMetadata {
             versions.addAll(versioning.getVersions());
             versioning.setVersions(new ArrayList<>(versions));
         }
+
+        // just carry-on as-is
+        if (!recessive.getPlugins().isEmpty()) {
+            metadata.setPlugins(new ArrayList<>(recessive.getPlugins()));
+        }
     }
 
     public Object getKey() {
@@ -93,9 +99,15 @@ final class VersionsMetadata extends MavenMetadata {
         return artifact.getGroupId() + ':' + artifact.getArtifactId();
     }
 
+    @Deprecated
     @Override
     public MavenMetadata setFile(File file) {
-        return new VersionsMetadata(artifact, file, timestamp);
+        return new VersionsMetadata(artifact, file.toPath(), timestamp);
+    }
+
+    @Override
+    public MavenMetadata setPath(Path path) {
+        return new VersionsMetadata(artifact, path, timestamp);
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
  * Assists unit testing.
  *
  */
+@Deprecated
 class TestArtifactHandler implements ArtifactHandler {
 
     private String type;
@@ -39,30 +40,38 @@ class TestArtifactHandler implements ArtifactHandler {
         this.extension = extension;
     }
 
+    @Override
     public String getClassifier() {
         return null;
     }
 
+    @Override
     public String getDirectory() {
         return getPackaging() + "s";
     }
 
+    @Override
     public String getExtension() {
         return extension;
     }
 
+    @Override
     public String getLanguage() {
         return "java";
     }
 
+    @Override
     public String getPackaging() {
         return type;
     }
 
+    @Override
+    @Deprecated
     public boolean isAddedToClasspath() {
         return true;
     }
 
+    @Override
     public boolean isIncludesDependencies() {
         return false;
     }

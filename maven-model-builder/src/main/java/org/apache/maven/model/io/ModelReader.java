@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.maven.model.Model;
@@ -59,8 +60,21 @@ public interface ModelReader {
      * @return The deserialized model, never {@code null}.
      * @throws IOException If the model could not be deserialized.
      * @throws ModelParseException If the input format could not be parsed.
+     * @deprecated Use {@link #read(Path, Map)} instead.
      */
+    @Deprecated
     Model read(File input, Map<String, ?> options) throws IOException, ModelParseException;
+
+    /**
+     * Reads the model from the specified file.
+     *
+     * @param input The file to deserialize the model from, must not be {@code null}.
+     * @param options The options to use for deserialization, may be {@code null} to use the default values.
+     * @return The deserialized model, never {@code null}.
+     * @throws IOException If the model could not be deserialized.
+     * @throws ModelParseException If the input format could not be parsed.
+     */
+    Model read(Path input, Map<String, ?> options) throws IOException, ModelParseException;
 
     /**
      * Reads the model from the specified character reader. The reader will be automatically closed before the method

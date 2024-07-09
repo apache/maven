@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-13-SNAPSHOT</version>
+    <version>4.0.0-beta-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-builder-support</artifactId>
@@ -31,4 +31,11 @@ under the License.
   <name>Maven Builder Support</name>
   <description>Support for descriptor builders (model, setting, toolchains)</description>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

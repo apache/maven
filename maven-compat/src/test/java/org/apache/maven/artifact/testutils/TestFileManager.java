@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Deprecated
 public class TestFileManager {
 
     public static final String TEMP_DIR_PATH = System.getProperty("java.io.tmpdir");

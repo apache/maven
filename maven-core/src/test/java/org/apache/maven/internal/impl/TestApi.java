@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,9 +49,11 @@ import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +61,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PlexusTest
@@ -103,7 +107,7 @@ class TestApi {
         // create session with any local repo, is redefined anyway below
         RepositorySystemSession rss = new MavenSessionBuilderSupplier(repositorySystem)
                 .get()
-                .withLocalRepositoryBaseDirectories(new File("target"))
+                .withLocalRepositoryBaseDirectories(new File("target").toPath())
                 .build();
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
         DefaultMavenExecutionResult meres = new DefaultMavenExecutionResult();
@@ -121,9 +125,20 @@ class TestApi {
                 new RemoteRepository.Builder("mirror", "default", "file:target/test-classes/repo").build());
         this.session = session.withLocalRepository(localRepository)
                 .withRemoteRepositories(Collections.singletonList(remoteRepository));
-
+        InternalSession.associate(rss, this.session);
         sessionScope.enter();
-        sessionScope.seed(InternalSession.class, InternalSession.from(this.session));
+        sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(this.session));
+    }
+
+    private Project project(Artifact artifact) {
+        return session.getService(ProjectBuilder.class)
+                .build(ProjectBuilderRequest.builder()
+                        .session(session)
+                        .path(session.getPathForLocalArtifact(artifact))
+                        .processPlugins(false)
+                        .build())
+                .getProject()
+                .get();
     }
 
     @Test
@@ -144,14 +159,7 @@ class TestApi {
     void testBuildProject() {
         Artifact artifact = session.createArtifact("org.codehaus.plexus", "plexus-utils", "1.4.5", "pom");
 
-        Project project = session.getService(ProjectBuilder.class)
-                .build(ProjectBuilderRequest.builder()
-                        .session(session)
-                        .path(session.getPathForLocalArtifact(artifact))
-                        .processPlugins(false)
-                        .build())
-                .getProject()
-                .get();
+        Project project = project(artifact);
         assertNotNull(project);
     }
 
@@ -165,28 +173,57 @@ class TestApi {
 
     @Test
     void testResolveArtifactCoordinateDependencies() {
-        ArtifactCoordinate coord =
-                session.createArtifactCoordinate("org.apache.maven.core.test", "test-extension", "1", "jar");
+        DependencyCoordinate coord = session.createDependencyCoordinate(
+                session.createArtifactCoordinate("org.apache.maven.core.test", "test-extension", "1", "jar"));
 
-        List<Path> paths = session.resolveDependencies(session.createDependencyCoordinate(coord));
+        List<Path> paths = session.resolveDependencies(coord);
 
         assertNotNull(paths);
         assertEquals(10, paths.size());
-        assertTrue(paths.get(0).getFileName().toString().equals("test-extension-1.jar"));
+        assertEquals("test-extension-1.jar", paths.get(0).getFileName().toString());
+
+        // JUnit has an "Automatic-Module-Name", so it appears on the module path.
+        Map<PathType, List<Path>> dispatched = session.resolveDependencies(
+                coord, PathScope.TEST_COMPILE, Arrays.asList(JavaPathType.CLASSES, JavaPathType.MODULES));
+        List<Path> classes = dispatched.get(JavaPathType.CLASSES);
+        List<Path> modules = dispatched.get(JavaPathType.MODULES);
+        List<Path> unresolved = dispatched.get(PathType.UNRESOLVED);
+        assertEquals(3, dispatched.size());
+        assertEquals(1, unresolved.size());
+        assertEquals(8, classes.size()); // "plexus.pom" and "junit.jar" are excluded.
+        assertEquals(1, modules.size());
+        assertEquals("plexus-1.0.11.pom", unresolved.get(0).getFileName().toString());
+        assertEquals("test-extension-1.jar", classes.get(0).getFileName().toString());
+        assertEquals("junit-4.13.1.jar", modules.get(0).getFileName().toString());
+        assertTrue(paths.containsAll(classes));
+        assertTrue(paths.containsAll(modules));
+
+        // If caller wants only a classpath, JUnit shall move there.
+        dispatched = session.resolveDependencies(coord, PathScope.TEST_COMPILE, Arrays.asList(JavaPathType.CLASSES));
+        classes = dispatched.get(JavaPathType.CLASSES);
+        modules = dispatched.get(JavaPathType.MODULES);
+        unresolved = dispatched.get(PathType.UNRESOLVED);
+        assertEquals(2, dispatched.size());
+        assertEquals(1, unresolved.size());
+        assertEquals(9, classes.size());
+        assertNull(modules);
+        assertTrue(paths.containsAll(classes));
+        assertEquals("plexus-1.0.11.pom", unresolved.get(0).getFileName().toString());
+    }
+
+    @Test
+    void testMetadataGeneratorFactory() throws ComponentLookupException {
+        List<MetadataGeneratorFactory> factories = plexusContainer.lookupList(MetadataGeneratorFactory.class);
+        assertNotNull(factories);
+        factories.forEach(f -> System.out.println(f.getClass().getName()));
+        assertEquals(3, factories.size());
     }
 
     @Test
     void testProjectDependencies() {
         Artifact pom = session.createArtifact("org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "pom");
 
-        Project project = session.getService(ProjectBuilder.class)
-                .build(ProjectBuilderRequest.builder()
-                        .session(session)
-                        .path(session.getPathForLocalArtifact(pom))
-                        .processPlugins(false)
-                        .build())
-                .getProject()
-                .get();
+        Project project = project(pom);
         assertNotNull(project);
 
         Artifact artifact = session.createArtifact("org.apache.maven.core.test", "test-extension", "1", "jar");

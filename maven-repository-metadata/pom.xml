@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-13-SNAPSHOT</version>
+    <version>4.0.0-beta-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-repository-metadata</artifactId>
@@ -32,6 +32,18 @@ under the License.
   <description>Per-directory local and remote repository metadata.</description>
 
   <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-meta</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-metadata</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-impl</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
@@ -42,8 +54,18 @@ under the License.
     </dependency>
 
     <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -56,34 +78,17 @@ under the License.
         <configuration>
           <version>1.2.0</version>
           <models>
-            <model>src/main/mdo/metadata.mdo</model>
+            <model>../api/maven-api-metadata/src/main/mdo/metadata.mdo</model>
           </models>
           <params>
             <param>forcedIOModelVersion=1.1.0</param>
             <param>packageModelV3=org.apache.maven.artifact.repository.metadata</param>
-            <param>packageModelV4=org.apache.maven.artifact.repository.metadata.v4</param>
+            <param>packageModelV4=org.apache.maven.api.metadata</param>
             <param>packageToolV4=org.apache.maven.artifact.repository.metadata.io</param>
           </params>
           <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>
         </configuration>
         <executions>
-          <execution>
-            <id>modello</id>
-            <goals>
-              <goal>velocity</goal>
-            </goals>
-            <configuration>
-              <version>1.2.0</version>
-              <models>
-                <model>src/main/mdo/metadata.mdo</model>
-              </models>
-              <templates>
-                <template>model.vm</template>
-                <template>reader-stax.vm</template>
-                <template>writer-stax.vm</template>
-              </templates>
-            </configuration>
-          </execution>
           <execution>
             <id>modello-v3</id>
             <goals>
@@ -92,7 +97,7 @@ under the License.
             <configuration>
               <version>1.1.0</version>
               <models>
-                <model>src/main/mdo/metadata.mdo</model>
+                <model>../api/maven-api-metadata/src/main/mdo/metadata.mdo</model>
               </models>
               <templates>
                 <template>model-v3.vm</template>

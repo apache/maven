@@ -29,11 +29,18 @@ import org.apache.maven.api.services.MavenException;
 @Experimental
 public class XmlReaderException extends MavenException {
 
+    private final Location location;
+
     /**
      * @param message the message for the exception
      * @param e the exception itself
      */
-    public XmlReaderException(String message, Exception e) {
+    public XmlReaderException(String message, Location location, Exception e) {
         super(message, e);
+        this.location = location;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 }

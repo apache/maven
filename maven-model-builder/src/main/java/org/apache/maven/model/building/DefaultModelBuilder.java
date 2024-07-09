@@ -25,16 +25,30 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.feature.Features;
+import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.services.VersionParserException;
+import org.apache.maven.api.services.model.ModelVersionParser;
 import org.apache.maven.building.Source;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
@@ -47,6 +61,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
@@ -72,11 +87,13 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
+import org.apache.maven.model.v4.MavenTransformer;
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.model.version.ModelVersionParser;
 import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.sisu.Nullable;
 
@@ -737,6 +754,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             profileInjector.injectProfile(inputModel, activeProfile, request, problems);
         }
 
+        modelValidator.validateExternalProfiles(activeExternalProfiles, inputModel, request, problems);
         for (Profile activeProfile : activeExternalProfiles) {
             profileInjector.injectProfile(inputModel, activeProfile, request, problems);
         }
@@ -887,67 +905,87 @@ public class DefaultModelBuilder implements ModelBuilder {
             List<org.apache.maven.api.model.Profile> profiles,
             DefaultProfileActivationContext context,
             DefaultModelProblemCollector problems) {
-        List<org.apache.maven.api.model.Profile> newProfiles = null;
-        for (int index = 0; index < profiles.size(); index++) {
-            org.apache.maven.api.model.Profile profile = profiles.get(index);
-            org.apache.maven.api.model.Activation activation = profile.getActivation();
-            if (activation != null) {
-                org.apache.maven.api.model.ActivationFile file = activation.getFile();
-                if (file != null) {
-                    String oldExists = file.getExists();
-                    if (isNotEmpty(oldExists)) {
+        if (profiles.stream()
+                .map(org.apache.maven.api.model.Profile::getActivation)
+                .noneMatch(Objects::nonNull)) {
+            return profiles;
+        }
+        final Interpolator xform = new RegexBasedInterpolator();
+        xform.setCacheAnswers(true);
+        Stream.of(context.getUserProperties(), context.getSystemProperties())
+                .map(MapBasedValueSource::new)
+                .forEach(xform::addValueSource);
+
+        class ProfileInterpolator extends MavenTransformer
+                implements UnaryOperator<org.apache.maven.api.model.Profile> {
+            ProfileInterpolator() {
+                super(s -> {
+                    if (isNotEmpty(s)) {
                         try {
-                            String newExists = interpolate(oldExists, context);
-                            if (!Objects.equals(oldExists, newExists)) {
-                                if (newProfiles == null) {
-                                    newProfiles = new ArrayList<>(profiles);
-                                }
-                                newProfiles.set(
-                                        index, profile.withActivation(activation.withFile(file.withExists(newExists))));
-                            }
+                            return xform.interpolate(s);
                         } catch (InterpolationException e) {
-                            addInterpolationProblem(problems, file, oldExists, e, "exists");
-                        }
-                    } else {
-                        String oldMissing = file.getMissing();
-                        if (isNotEmpty(oldMissing)) {
-                            try {
-                                String newMissing = interpolate(oldMissing, context);
-                                if (!Objects.equals(oldMissing, newMissing)) {
-                                    if (newProfiles == null) {
-                                        newProfiles = new ArrayList<>(profiles);
-                                    }
-                                    newProfiles.set(
-                                            index,
-                                            profile.withActivation(activation.withFile(file.withMissing(newMissing))));
-                                }
-                            } catch (InterpolationException e) {
-                                addInterpolationProblem(problems, file, oldMissing, e, "missing");
-                            }
+                            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                                    .setMessage(e.getMessage())
+                                    .setException(e));
                         }
                     }
+                    return s;
+                });
+            }
+
+            @Override
+            public org.apache.maven.api.model.Profile apply(org.apache.maven.api.model.Profile p) {
+                return org.apache.maven.api.model.Profile.newBuilder(p)
+                        .activation(transformActivation(p.getActivation()))
+                        .build();
+            }
+
+            @Override
+            protected ActivationFile.Builder transformActivationFile_Missing(
+                    Supplier<? extends ActivationFile.Builder> creator,
+                    ActivationFile.Builder builder,
+                    ActivationFile target) {
+                final String path = target.getMissing();
+                final String xformed = transformPath(path, target, "missing");
+                return xformed != path ? (builder != null ? builder : creator.get()).missing(xformed) : builder;
+            }
+
+            @Override
+            protected ActivationFile.Builder transformActivationFile_Exists(
+                    Supplier<? extends ActivationFile.Builder> creator,
+                    ActivationFile.Builder builder,
+                    ActivationFile target) {
+                final String path = target.getExists();
+                final String xformed = transformPath(path, target, "exists");
+                return xformed != path ? (builder != null ? builder : creator.get()).exists(xformed) : builder;
+            }
+
+            private String transformPath(String path, ActivationFile target, String locationKey) {
+                if (isNotEmpty(path)) {
+                    try {
+                        return profileActivationFilePathInterpolator.interpolate(path, context);
+                    } catch (InterpolationException e) {
+                        addInterpolationProblem(problems, target, path, e, locationKey);
+                    }
                 }
+                return path;
             }
         }
-        return newProfiles != null ? newProfiles : profiles;
+        return profiles.stream().map(new ProfileInterpolator()).toList();
     }
 
     private static void addInterpolationProblem(
             DefaultModelProblemCollector problems,
-            org.apache.maven.api.model.ActivationFile file,
+            org.apache.maven.api.model.InputLocationTracker target,
             String path,
             InterpolationException e,
             String locationKey) {
         problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                 .setMessage("Failed to interpolate file location " + path + ": " + e.getMessage())
-                .setLocation(Optional.ofNullable(file.getLocation(locationKey))
+                .setLocation(Optional.ofNullable(target.getLocation(locationKey))
                         .map(InputLocation::new)
                         .orElse(null))
                 .setException(e));
-    }
-
-    private String interpolate(String path, ProfileActivationContext context) throws InterpolationException {
-        return isNotEmpty(path) ? profileActivationFilePathInterpolator.interpolate(path, context) : path;
     }
 
     private static boolean isNotEmpty(String string) {
@@ -982,7 +1020,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         problems.setRootModel(resultModel);
 
         // model path translation
-        modelPathTranslator.alignToBaseDirectory(resultModel, resultModel.getProjectDirectory(), request);
+        modelPathTranslator.alignToBaseDirectory(resultModel, resultModel.getProjectDirectoryPath(), request);
 
         // plugin management injection
         pluginManagementInjector.injectManagement(resultModel, request, problems);
@@ -1032,14 +1070,27 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
+    @Deprecated
     @Override
     public Result<? extends Model> buildRawModel(File pomFile, int validationLevel, boolean locationTracking) {
+        return buildRawModel(pomFile.toPath(), validationLevel, locationTracking, null);
+    }
+
+    @Override
+    public Result<? extends Model> buildRawModel(Path pomFile, int validationLevel, boolean locationTracking) {
         return buildRawModel(pomFile, validationLevel, locationTracking, null);
+    }
+
+    @Deprecated
+    @Override
+    public Result<? extends Model> buildRawModel(
+            File pomFile, int validationLevel, boolean locationTracking, TransformerContext context) {
+        return buildRawModel(pomFile.toPath(), validationLevel, locationTracking, context);
     }
 
     @Override
     public Result<? extends Model> buildRawModel(
-            File pomFile, int validationLevel, boolean locationTracking, TransformerContext context) {
+            Path pomFile, int validationLevel, boolean locationTracking, TransformerContext context) {
         final ModelBuildingRequest request = new DefaultModelBuildingRequest()
                 .setValidationLevel(validationLevel)
                 .setLocationTracking(locationTracking)
@@ -1050,7 +1101,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             try {
                 if (transformer != null && context != null) {
-                    transformer.transform(pomFile.toPath(), context, model);
+                    transformer.transform(pomFile, context, model);
                 }
             } catch (TransformerException e) {
                 problems.add(
@@ -1152,7 +1203,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             throw problems.newModelBuildingException();
         } catch (IOException e) {
             String msg = e.getMessage();
-            if (msg == null || msg.length() <= 0) {
+            if (msg == null || msg.isEmpty()) {
                 // NOTE: There's java.nio.charset.MalformedInputException and sun.io.MalformedInputException
                 if (e.getClass().getName().endsWith("MalformedInputException")) {
                     msg = "Some input bytes do not match the file encoding.";
@@ -1167,7 +1218,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         if (modelSource instanceof FileModelSource) {
-            model = model.withPomFile(((FileModelSource) modelSource).getFile().toPath());
+            model = model.withPomFile(((FileModelSource) modelSource).getPath());
         }
 
         Model retModel = new Model(model);
@@ -1381,7 +1432,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         Map<String, Activation> originalActivations = getProfileActivations(model, true);
 
         Model interpolatedModel = new Model(modelInterpolator.interpolateModel(
-                model.getDelegate(), model.getProjectDirectory(), request, problems));
+                model.getDelegate(), model.getProjectDirectoryPath(), request, problems));
         if (interpolatedModel.getParent() != null) {
             StringSearchInterpolator ssi = new StringSearchInterpolator();
             ssi.addValueSource(new MapBasedValueSource(request.getUserProperties()));
@@ -1404,7 +1455,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 problems.add(mpcr);
             }
         }
-        interpolatedModel.setPomFile(model.getPomFile());
+        interpolatedModel.setPomPath(model.getPomPath());
 
         // restore profiles with file activation to their value before full interpolation
         injectProfileActivations(model, originalActivations);
@@ -1468,7 +1519,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (candidateModel == null) {
                 return null;
             }
-            candidateSource = new FileModelSource(candidateModel.getPomFile());
+            candidateSource = new FileModelSource(candidateModel.getPomPath());
         }
 
         //
@@ -1560,7 +1611,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         String parentPath = childModel.getParent().getRelativePath();
 
-        if (parentPath == null || parentPath.length() <= 0) {
+        if (parentPath == null || parentPath.isEmpty()) {
             return null;
         }
 
@@ -1604,8 +1655,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 buffer.append(" for ").append(ModelProblemUtils.toId(childModel));
             }
             buffer.append(": ").append(e.getMessage());
-            if (childModel.getProjectDirectory() != null) {
-                if (parent.getRelativePath() == null || parent.getRelativePath().length() <= 0) {
+            if (childModel.getProjectDirectoryPath() != null) {
+                if (parent.getRelativePath() == null || parent.getRelativePath().isEmpty()) {
                     buffer.append(" and 'parent.relativePath' points at no local POM");
                 } else {
                     buffer.append(" and 'parent.relativePath' points at wrong local POM");
@@ -1717,21 +1768,21 @@ public class DefaultModelBuilder implements ModelBuilder {
         String artifactId = dependency.getArtifactId();
         String version = dependency.getVersion();
 
-        if (groupId == null || groupId.length() <= 0) {
+        if (groupId == null || groupId.isEmpty()) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                     .setMessage("'dependencyManagement.dependencies.dependency.groupId' for "
                             + dependency.getManagementKey() + " is missing.")
                     .setLocation(dependency.getLocation("")));
             return null;
         }
-        if (artifactId == null || artifactId.length() <= 0) {
+        if (artifactId == null || artifactId.isEmpty()) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                     .setMessage("'dependencyManagement.dependencies.dependency.artifactId' for "
                             + dependency.getManagementKey() + " is missing.")
                     .setLocation(dependency.getLocation("")));
             return null;
         }
-        if (version == null || version.length() <= 0) {
+        if (version == null || version.isEmpty()) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, ModelProblem.Version.BASE)
                     .setMessage("'dependencyManagement.dependencies.dependency.version' for "
                             + dependency.getManagementKey() + " is missing.")
@@ -1769,12 +1820,18 @@ public class DefaultModelBuilder implements ModelBuilder {
             // Dependency excluded from import.
             List<org.apache.maven.api.model.Dependency> dependencies = importMgmt.getDependencies().stream()
                     .filter(candidate -> exclusions.stream().noneMatch(exclusion -> match(exclusion, candidate)))
-                    .map(candidate -> candidate.withExclusions(exclusions))
+                    .map(candidate -> addExclusions(candidate, exclusions))
                     .collect(Collectors.toList());
             importMgmt = importMgmt.withDependencies(dependencies);
         }
 
         return importMgmt != null ? new DependencyManagement(importMgmt) : null;
+    }
+
+    private static org.apache.maven.api.model.Dependency addExclusions(
+            org.apache.maven.api.model.Dependency candidate, List<Exclusion> exclusions) {
+        return candidate.withExclusions(Stream.concat(candidate.getExclusions().stream(), exclusions.stream())
+                .toList());
     }
 
     private boolean match(Exclusion exclusion, org.apache.maven.api.model.Dependency candidate) {
@@ -1835,6 +1892,15 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .setLocation(dependency.getLocation(""))
                         .setException(e));
                 return null;
+            }
+
+            if (importSource instanceof FileModelSource && request.getRootDirectory() != null) {
+                Path sourcePath = ((FileModelSource) importSource).getPath();
+                if (sourcePath.startsWith(request.getRootDirectory())) {
+                    problems.add(new ModelProblemCollectorRequest(Severity.WARNING, ModelProblem.Version.BASE)
+                            .setMessage("BOM imports from within reactor should be avoided")
+                            .setLocation(dependency.getLocation("")));
+                }
             }
 
             final ModelBuildingResult importResult;

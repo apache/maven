@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,11 +34,12 @@ import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
+import com.google.inject.name.Names;
 
 /**
  * SessionScope
  */
-public class SessionScope implements Scope {
+public class SessionScope implements Scope, org.apache.maven.di.Scope {
 
     private static final Provider<Object> SEEDED_KEY_PROVIDER = () -> {
         throw new IllegalStateException();
@@ -104,10 +106,26 @@ public class SessionScope implements Scope {
     }
 
     @SuppressWarnings("unchecked")
+    @Override
+    public <T> Supplier<T> scope(org.apache.maven.di.Key<T> key, Annotation scope, Supplier<T> unscoped) {
+        Object qualifier = key.getQualifier();
+        Key<?> k = qualifier != null
+                ? Key.get(key.getType(), qualifier instanceof String s ? Names.named(s) : (Annotation) qualifier)
+                : Key.get(key.getType());
+        Provider<T> up = unscoped::get;
+        Provider<T> p = scope((Key<T>) k, up);
+        return p::get;
+    }
+
+    @SuppressWarnings("unchecked")
     private <T> T createProxy(Key<T> key, Provider<T> unscoped) {
         InvocationHandler dispatcher = (proxy, method, args) -> {
             method.setAccessible(true);
-            return method.invoke(getScopeState().scope(key, unscoped).get(), args);
+            try {
+                return method.invoke(getScopeState().scope(key, unscoped).get(), args);
+            } catch (InvocationTargetException e) {
+                throw e.getCause();
+            }
         };
         Class<T> superType = (Class<T>) key.getTypeLiteral().getRawType();
         Class<?>[] interfaces = getInterfaces(superType);

@@ -31,24 +31,28 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        java: [11, 17, 21]
+        java: [17, 21]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Set up Maven
+        run:
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=3.9.7"
+
       - name: Build with Maven
-        run: mvn install -e -B -V -DdistributionFileName=apache-maven
+        run: ./mvnw install -e -B -V -DdistributionFileName=apache-maven
 
       - name: Extract tarball
         shell: bash
@@ -73,7 +77,7 @@ jobs:
           TAR_BALL: apache-maven/target/apache-maven-bin.tar.gz
 
       - name: Clean with Maven
-        run: mvn clean
+        run: ./mvnw -e -B -V clean
 
       - name: Build again with Maven SNAPSHOT
         shell: bash

@@ -24,6 +24,8 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * A remote repository that can be used to download or upload artifacts.
+ *
+ * @since 4.0.0
  */
 @Experimental
 @Immutable

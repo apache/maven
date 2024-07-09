@@ -532,6 +532,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
     /**
      * ThreadCreator for creating daemon threads with fixed ThreadGroup-name.
      */
+    @Deprecated
     static final class DaemonThreadCreator implements ThreadFactory {
         static final String THREADGROUP_NAME = "org.apache.maven.artifact.resolver.DefaultArtifactResolver";
 

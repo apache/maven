@@ -18,9 +18,12 @@
  */
 package org.apache.maven.api;
 
+import java.util.Map;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.model.PluginContainer;
 
 /**
  * Interface representing a Maven project packaging.
@@ -44,12 +47,19 @@ public interface Packaging extends ExtensibleEnum {
      */
     @Nonnull
     default Language language() {
-        return getType().getLanguage();
+        return type().getLanguage();
     }
 
     /**
      * The type of main artifact produced by this packaging.
      */
     @Nonnull
-    Type getType();
+    Type type();
+
+    /**
+     * Returns the binding to use specifically for this packaging keyed by lifecycle id.
+     * This will be used instead of the default packaging definition.
+     */
+    @Nonnull
+    Map<String, PluginContainer> plugins();
 }

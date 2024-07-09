@@ -38,6 +38,7 @@ import static org.mockito.Mockito.mock;
 
 /**
  */
+@Deprecated
 class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
     @Inject
     private ArtifactDeployer artifactDeployer;

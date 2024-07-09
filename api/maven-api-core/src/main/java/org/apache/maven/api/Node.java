@@ -33,7 +33,7 @@ import org.apache.maven.api.annotations.Provider;
  * Represents a dependency node within a Maven project's dependency collector.
  *
  * @since 4.0.0
- * @see org.apache.maven.api.services.DependencyCollectorResult#getRoot()
+ * @see org.apache.maven.api.services.DependencyResolverResult#getRoot()
  */
 @Experimental
 @Immutable

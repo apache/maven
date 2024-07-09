@@ -31,8 +31,5 @@ under the License.
       <item name="Source Xref" href="xref/index.html"/>
       <!--item name="FAQ" href="faq.html"/-->
     </menu>
-
-    <menu ref="parent"/>
-    <menu ref="reports"/>
   </body>
 </project>

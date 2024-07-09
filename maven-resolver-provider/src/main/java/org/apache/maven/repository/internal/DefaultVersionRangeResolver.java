@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
+import org.apache.maven.metadata.v4.MetadataStaxReader;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositorySystemSession;
@@ -200,9 +200,8 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                 try (SyncContext syncContext = syncContextFactory.newInstance(session, true)) {
                     syncContext.acquire(null, Collections.singleton(metadata));
 
-                    if (metadata.getFile() != null && metadata.getFile().exists()) {
-                        try (InputStream in =
-                                Files.newInputStream(metadata.getFile().toPath())) {
+                    if (metadata.getPath() != null && Files.exists(metadata.getPath())) {
+                        try (InputStream in = Files.newInputStream(metadata.getPath())) {
                             versioning = new Versioning(
                                     new MetadataStaxReader().read(in, false).getVersioning());
                         }

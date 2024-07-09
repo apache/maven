@@ -37,3 +37,15 @@ Maven Settings Model
    * A {{{./settings.html}Descriptor Reference}}
 
    * An {{{https://maven.apache.org/xsd/settings-1.2.0.xsd}XSD}}
+
+* See Also User Documentation
+
+  * {{{https://maven.apache.org/settings.html} Settings Reference}},
+
+  * {{{https://maven.apache.org/guides/mini/guide-mirror-settings.html} Mirror Settings}},
+
+  * {{{https://maven.apache.org/guides/mini/guide-deployment-security-settings.html} Security and Deployment Settings}},
+
+  * {{{https://maven.apache.org/guides/mini/guide-encryption.html} Password Encryption}},
+
+  * {{{https://maven.apache.org/guides/mini/guide-proxies.html} Configuring a proxy}}.

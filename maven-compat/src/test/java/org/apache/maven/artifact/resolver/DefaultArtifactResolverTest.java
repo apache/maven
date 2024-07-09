@@ -24,12 +24,12 @@ import java.util.Collections;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.DefaultArtifactResolver.DaemonThreadCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Deprecated
 class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
     @Inject
     private ArtifactResolver artifactResolver;
@@ -67,7 +67,7 @@ class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
         boolean seen = false;
 
         for (ThreadGroup aTgList : tgList) {
-            if (!aTgList.getName().equals(DaemonThreadCreator.THREADGROUP_NAME)) {
+            if (!aTgList.getName().equals(DefaultArtifactResolver.DaemonThreadCreator.THREADGROUP_NAME)) {
                 continue;
             }
 
@@ -84,7 +84,7 @@ class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
             }
         }
 
-        assertTrue(seen, "Could not find ThreadGroup: " + DaemonThreadCreator.THREADGROUP_NAME);
+        assertTrue(seen, "Could not find ThreadGroup: " + DefaultArtifactResolver.DaemonThreadCreator.THREADGROUP_NAME);
     }
 
     @Test

@@ -71,7 +71,7 @@ public class DefaultModelWriter implements ModelWriter {
         Objects.requireNonNull(model, "model cannot be null");
 
         String encoding = model.getModelEncoding();
-        if (encoding == null || encoding.length() <= 0) {
+        if (encoding == null || encoding.isEmpty()) {
             encoding = "UTF-8";
         }
 

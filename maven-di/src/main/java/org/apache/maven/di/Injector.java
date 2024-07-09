@@ -19,6 +19,7 @@
 package org.apache.maven.di;
 
 import java.lang.annotation.Annotation;
+import java.util.function.Supplier;
 
 import org.apache.maven.di.impl.InjectorImpl;
 
@@ -32,7 +33,11 @@ public interface Injector {
         return new InjectorImpl();
     }
 
+    Injector discover(ClassLoader classLoader);
+
     Injector bindScope(Class<? extends Annotation> scopeAnnotation, Scope scope);
+
+    Injector bindScope(Class<? extends Annotation> scopeAnnotation, Supplier<Scope> scope);
 
     Injector bindImplicit(Class<?> cls);
 

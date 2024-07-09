@@ -18,7 +18,10 @@
  */
 package org.apache.maven.model.validation;
 
+import java.util.List;
+
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 
@@ -48,6 +51,24 @@ public interface ModelValidator {
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
     void validateRawModel(Model model, ModelBuildingRequest request, ModelProblemCollector problems);
+
+    /**
+     * Checks the specified (raw) model for clashes with the passed active external profiles. The raw model is the
+     * file model + buildpom filter transformation and has not been subjected to inheritance, interpolation or profile/default injection.
+     *
+     * @param activeExternalProfiles the active profiles coming from external sources (settings.xml), must not be {@code null}
+     * @param model The model to validate, must not be {@code null}.
+     * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     * @since 4.0.0
+     */
+    default void validateExternalProfiles(
+            List<Profile> activeExternalProfiles,
+            Model model,
+            ModelBuildingRequest request,
+            ModelProblemCollector problems) {
+        // do nothing
+    }
 
     /**
      * Checks the specified (effective) model for missing or invalid values. The effective model is fully assembled and

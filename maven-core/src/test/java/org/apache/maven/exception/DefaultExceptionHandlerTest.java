@@ -123,4 +123,20 @@ class DefaultExceptionHandlerTest {
         String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/PluginContainerException";
         assertEquals(expectedReference, summary.getReference());
     }
+
+    @Test
+    void testHandleExceptionSelfReferencing() {
+        RuntimeException boom3 = new RuntimeException("BOOM3");
+        RuntimeException boom2 = new RuntimeException("BOOM2", boom3);
+        RuntimeException boom1 = new RuntimeException("BOOM1", boom2);
+        boom3.initCause(boom1);
+
+        DefaultExceptionHandler handler = new DefaultExceptionHandler();
+        ExceptionSummary summary = handler.handleException(boom1);
+
+        assertEquals("BOOM1: BOOM2: BOOM3: [CIRCULAR REFERENCE]", summary.getMessage());
+        assertEquals("", summary.getReference());
+        assertEquals(0, summary.getChildren().size());
+        assertEquals(boom1, summary.getException());
+    }
 }

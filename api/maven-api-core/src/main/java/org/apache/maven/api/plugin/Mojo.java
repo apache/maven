@@ -22,10 +22,9 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * This interface forms the contract required for <code>Mojos</code> to interact with the <code>Maven</code>
- * infrastructure.<br>
- * It features an <code>execute()</code> method, which triggers the Mojo's build-process behavior, and can throw
- * a MojoException if error conditions occur.<br>
+ * This interface forms the contract required for Mojos to interact with the Maven infrastructure.
+ * It features an {@link #execute()} method, which triggers the Mojo's build-process behavior,
+ * and can throw a {@link MojoException} if error conditions occur.
  *
  * @since 4.0.0
  */
@@ -34,9 +33,9 @@ import org.apache.maven.api.annotations.Experimental;
 @Consumer
 public interface Mojo {
     /**
-     * Perform whatever build-process behavior this <code>Mojo</code> implements.<br>
-     * This is the main trigger for the <code>Mojo</code> inside the <code>Maven</code> system, and allows
-     * the <code>Mojo</code> to communicate errors.
+     * Perform whatever build-process behavior this {@code Mojo} implements.
+     * This is the main trigger for the {@code Mojo} inside the Maven system,
+     * and allows the {@code Mojo} to communicate errors.
      *
      * @throws MojoException if a problem occurs
      */

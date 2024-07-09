@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  *
  */
+@Deprecated
 class DefaultGraphConflictResolutionPolicyTest {
     GraphConflictResolutionPolicy policy;
     MetadataGraphEdge e1;

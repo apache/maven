@@ -46,6 +46,7 @@ import static org.apache.maven.api.ExtensibleEnums.pathScope;
 @Immutable
 public interface PathScope extends ExtensibleEnum {
 
+    // TODO: what if I simply want all dependencies ?
     @Nonnull
     ProjectScope projectScope();
 

@@ -90,14 +90,10 @@ class LoggingRepositoryListener extends AbstractRepositoryListener {
     @Override
     public void artifactDescriptorInvalid(RepositoryEvent event) {
         // The exception stack trace is not really interesting here
-        // but the message itself may be quite details and span multiple
-        // lines with errors in it, so only display it at debug level.
-        String msg = "The POM for {} is invalid, transitive dependencies (if any) will not be available: {}";
-        if (logger.isDebugEnabled()) {
-            logger.warn(msg, event.getArtifact(), event.getException().getMessage());
-        } else {
-            logger.warn(msg, event.getArtifact(), "enable verbose output (-X) for more details");
-        }
+        logger.warn(
+                "The POM for {} is invalid, transitive dependencies (if any) will not be available: {}",
+                event.getArtifact(),
+                event.getException().getMessage());
     }
 
     @Override

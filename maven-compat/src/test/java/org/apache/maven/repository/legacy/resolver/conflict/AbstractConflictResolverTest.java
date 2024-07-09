@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  */
 @PlexusTest
+@Deprecated
 public abstract class AbstractConflictResolverTest {
     // constants --------------------------------------------------------------
 

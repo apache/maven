@@ -35,17 +35,23 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultProject implements Project {
 
-    private final InternalSession session;
+    private final InternalMavenSession session;
     private final MavenProject project;
     private final Packaging packaging;
 
-    public DefaultProject(InternalSession session, MavenProject project) {
+    public DefaultProject(InternalMavenSession session, MavenProject project) {
         this.session = session;
         this.project = project;
-        this.packaging = session.requirePackaging(project.getPackaging());
+        ClassLoader ttcl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(project.getClassRealm());
+            this.packaging = session.requirePackaging(project.getPackaging());
+        } finally {
+            Thread.currentThread().setContextClassLoader(ttcl);
+        }
     }
 
-    public InternalSession getSession() {
+    public InternalMavenSession getSession() {
         return session;
     }
 
@@ -182,7 +188,8 @@ public class DefaultProject implements Project {
             @Nonnull
             @Override
             public DependencyScope getScope() {
-                return session.requireDependencyScope(dependency.getScope());
+                String scope = dependency.getScope() != null ? dependency.getScope() : "";
+                return session.requireDependencyScope(scope);
             }
 
             @Override

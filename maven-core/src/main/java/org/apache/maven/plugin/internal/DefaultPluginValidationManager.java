@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -222,7 +223,12 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
             logger.warn("");
             logger.warn("Plugin {} validation issues were detected in following plugin(s)", issueLocalitiesToReport);
             logger.warn("");
-            for (Map.Entry<String, PluginValidationIssues> entry : issuesMap.entrySet()) {
+
+            // Sorting the plugins
+            List<Map.Entry<String, PluginValidationIssues>> sortedEntries = new ArrayList<>(issuesMap.entrySet());
+            sortedEntries.sort(Map.Entry.comparingByKey(String.CASE_INSENSITIVE_ORDER));
+
+            for (Map.Entry<String, PluginValidationIssues> entry : sortedEntries) {
                 PluginValidationIssues issues = entry.getValue();
                 if (!hasAnythingToReport(issues, issueLocalitiesToReport)) {
                     continue;

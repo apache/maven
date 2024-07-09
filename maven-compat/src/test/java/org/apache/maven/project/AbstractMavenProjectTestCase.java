@@ -28,6 +28,12 @@ import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultLookup;
+import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
@@ -38,10 +44,12 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
 
 /**
  */
 @PlexusTest
+@Deprecated
 public abstract class AbstractMavenProjectTestCase {
     protected ProjectBuilder projectBuilder;
 
@@ -143,5 +151,17 @@ public abstract class AbstractMavenProjectTestCase {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
         session.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));
         request.setRepositorySession(session);
+
+        DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
+        MavenSession msession =
+                new MavenSession(getContainer(), session, mavenExecutionRequest, new DefaultMavenExecutionResult());
+        DefaultSession iSession = new DefaultSession(
+                msession,
+                mock(org.eclipse.aether.RepositorySystem.class),
+                null,
+                null,
+                new DefaultLookup(container),
+                null);
+        InternalSession.associate(session, iSession);
     }
 }

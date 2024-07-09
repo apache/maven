@@ -18,8 +18,6 @@
  */
 package org.apache.maven.cli.transfer;
 
-import java.util.Locale;
-
 import org.apache.maven.api.services.MessageBuilder;
 
 /**
@@ -100,8 +98,6 @@ public class FileSizeFormat {
             }
         }
     }
-
-    public FileSizeFormat(Locale locale) {}
 
     public String format(long size) {
         return format(size, null);

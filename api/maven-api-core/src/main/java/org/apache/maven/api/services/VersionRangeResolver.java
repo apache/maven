@@ -27,6 +27,8 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Parses and evaluates version ranges encountered in dependency declarations.
+ *
+ * @since 4.0.0
  */
 @Experimental
 @Consumer

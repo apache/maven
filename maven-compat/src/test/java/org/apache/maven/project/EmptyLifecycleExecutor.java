@@ -36,6 +36,7 @@ import org.apache.maven.plugin.MojoExecution;
  * plugin artifact resolution from repositories.
  *
  */
+@Deprecated
 public class EmptyLifecycleExecutor implements LifecycleExecutor {
 
     public MavenExecutionPlan calculateExecutionPlan(MavenSession session, String... tasks) {

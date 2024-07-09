@@ -89,13 +89,19 @@ under the License.
         <field>
           <name>requiredJavaVersion</name>
           <version>1.1.0+</version>
-          <description>A version range which specifies the supported Java versions. A version range can either use the usual mathematical syntax "[2.0.10,2.1.0),[3.0,)" or use a single version "2.2.1". The latter is a short form for "[2.2.1,)", i.e. denotes the minimum version required.</description>
+          <description>
+            A version range which specifies the supported Java versions. A version range can either use the usual mathematical syntax "[2.0.10,2.1.0),[3.0,)" or use a single version "2.2.1". The latter is a short form for "[2.2.1,)", i.e. denotes the minimum version required.
+            @since Maven 4.0.0-alpha-3
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>requiredMavenVersion</name>
           <version>1.1.0+</version>
-          <description>A version range which specifies the supported Maven versions. A version range can either use the usual mathematical syntax "[2.0.10,2.1.0),[3.0,)" or use a single version "2.2.1". The latter is a short form for "[2.2.1,)", i.e. denotes the minimum version required. This value takes precedence over the POMs Maven prerequisite.</description>
+          <description>
+            A version range which specifies the supported Maven versions. A version range can either use the usual mathematical syntax "[2.0.10,2.1.0),[3.0,)" or use a single version "2.2.1". The latter is a short form for "[2.2.1,)", i.e. denotes the minimum version required. This value takes precedence over the POMs Maven prerequisite.
+            @since Maven 4.0.0-alpha-3
+          </description>
           <type>String</type>
         </field>
         <field xdoc.separator="blank">
@@ -392,6 +398,15 @@ under the License.
           </association>
         </field>
         <field xdoc.separator="blank">
+          <name>resolutions</name>
+          <version>2.0.0+</version>
+          <description></description>
+          <association>
+            <type>Resolution</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field xdoc.separator="blank">
           <name>requirements</name>
           <version>1.0.0/1.1.0</version>
           <description></description>
@@ -571,6 +586,35 @@ under the License.
           <type>String</type>
           <defaultValue>jar</defaultValue>
           <description>The type of dependency.</description>
+        </field>
+      </fields>
+    </class>
+
+    <class xdoc.anchorName="resolution">
+      <name>Resolution</name>
+      <version>2.0.0+</version>
+      <description>Dependency collection or resolution injection.</description>
+      <fields>
+        <field>
+          <name>field</name>
+          <required>false</required>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>the name of the field to be injected</description>
+        </field>
+        <field>
+          <name>pathScope</name>
+          <required>false</required>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>pathScope used to flatten dependencies</description>
+        </field>
+        <field>
+          <name>requestType</name>
+          <required>false</required>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>either {@code collect}, {@code flatten}, or {@code resolve}</description>
         </field>
       </fields>
     </class>

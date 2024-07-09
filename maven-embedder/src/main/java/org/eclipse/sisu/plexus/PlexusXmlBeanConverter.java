@@ -339,7 +339,7 @@ public final class PlexusXmlBeanConverter implements PlexusBeanConverter {
      *
      * @param clazz The implementation type
      * @param value The string argument
-     * @return Instance of given implementation, constructed using the the given string
+     * @return Instance of given implementation, constructed using the given string
      */
     private static <T> T newImplementation(final Class<T> clazz, final String value) {
         try {

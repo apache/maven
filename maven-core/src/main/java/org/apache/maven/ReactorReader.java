@@ -34,14 +34,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Model;
+import org.apache.maven.internal.impl.resolver.MavenWorkspaceReader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
-import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
@@ -132,7 +132,7 @@ class ReactorReader implements MavenWorkspaceReader {
     @Override
     public Model findModel(Artifact artifact) {
         MavenProject project = getProject(artifact);
-        return project == null ? null : project.getModel();
+        return project == null ? null : project.getModel().getDelegate();
     }
 
     //
@@ -409,7 +409,7 @@ class ReactorReader implements MavenWorkspaceReader {
             LOGGER.info("Copying {} to project local repository", artifact);
             Files.createDirectories(target.getParent());
             Files.copy(
-                    artifact.getFile().toPath(),
+                    artifact.getPath(),
                     target,
                     StandardCopyOption.REPLACE_EXISTING,
                     StandardCopyOption.COPY_ATTRIBUTES);

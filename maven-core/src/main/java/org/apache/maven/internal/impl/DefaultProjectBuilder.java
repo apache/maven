@@ -31,11 +31,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.BuilderProblem;
-import org.apache.maven.api.services.DependencyCollectorResult;
+import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectBuilderException;
 import org.apache.maven.api.services.ProjectBuilderRequest;
@@ -65,7 +64,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     @Override
     public ProjectBuilderResult build(ProjectBuilderRequest request)
             throws ProjectBuilderException, IllegalArgumentException {
-        InternalSession session = InternalSession.from(request.getSession());
+        InternalMavenSession session = InternalMavenSession.from(request.getSession());
         try {
             List<ArtifactRepository> repositories = session.toArtifactRepositories(session.getRemoteRepositories());
             ProjectBuildingRequest req = new DefaultProjectBuildingRequest()
@@ -170,19 +169,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
                 @Nonnull
                 @Override
-                public Optional<DependencyCollectorResult> getDependencyResolverResult() {
+                public Optional<DependencyResolverResult> getDependencyResolverResult() {
                     return Optional.ofNullable(res.getDependencyResolutionResult())
-                            .map(r -> new DependencyCollectorResult() {
-                                @Override
-                                public List<Exception> getExceptions() {
-                                    return r.getCollectionErrors();
-                                }
-
-                                @Override
-                                public Node getRoot() {
-                                    return session.getNode(r.getDependencyGraph());
-                                }
-                            });
+                            .map(r -> new DefaultDependencyResolverResult(
+                                    null, r.getCollectionErrors(), session.getNode(r.getDependencyGraph()), 0));
                 }
             };
         } catch (ProjectBuildingException e) {

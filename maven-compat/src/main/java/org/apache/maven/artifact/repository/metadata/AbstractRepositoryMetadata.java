@@ -30,8 +30,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxWriter;
+import org.apache.maven.metadata.v4.MetadataStaxReader;
+import org.apache.maven.metadata.v4.MetadataStaxWriter;
 
 /**
  * Shared methods of the repository metadata handling.

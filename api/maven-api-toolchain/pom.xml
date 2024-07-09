@@ -22,7 +22,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-13-SNAPSHOT</version>
+    <version>4.0.0-beta-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-toolchain</artifactId>
@@ -31,6 +31,10 @@ under the License.
   <description>Maven 4 API - Immutable Toolchain model.</description>
 
   <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-meta</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-xml</artifactId>

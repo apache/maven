@@ -53,9 +53,9 @@ class LifecycleModuleBuilderTest {
         List<MavenProject> currentProjects = new ArrayList<>();
         MojoExecutorStub mojoExecutor = new MojoExecutorStub() {
             @Override
-            public void execute(MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex)
+            public void execute(MavenSession session, List<MojoExecution> mojoExecutions)
                     throws LifecycleExecutionException {
-                super.execute(session, mojoExecutions, projectIndex);
+                super.execute(session, mojoExecutions);
                 currentProjects.add(session.getCurrentProject());
             }
         };

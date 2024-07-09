@@ -18,6 +18,7 @@
  */
 package org.apache.maven.plugin.descriptor;
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -30,9 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.ctc.wstx.stax.WstxInputFactory;
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.internal.xml.XmlNodeBuilder;
+import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
 import org.codehaus.plexus.component.repository.ComponentDependency;
@@ -41,6 +41,9 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 /**
+ * Build plugin descriptor object from {@code plugin.xml}.
+ *
+ * @author Jason van Zyl
  */
 public class PluginDescriptorBuilder {
 
@@ -78,11 +81,11 @@ public class PluginDescriptorBuilder {
     public PluginDescriptor build(ReaderSupplier readerSupplier, String source) throws PlexusConfigurationException {
         try (BufferedReader br = new BufferedReader(readerSupplier.open(), BUFFER_SIZE)) {
             br.mark(BUFFER_SIZE);
-            XMLStreamReader xsr = WstxInputFactory.newFactory().createXMLStreamReader(br);
+            XMLStreamReader xsr = XMLInputFactory.newFactory().createXMLStreamReader(br);
             xsr.nextTag();
             String nsUri = xsr.getNamespaceURI();
             try (BufferedReader br2 = reset(readerSupplier, br)) {
-                xsr = WstxInputFactory.newFactory().createXMLStreamReader(br2);
+                xsr = XMLInputFactory.newFactory().createXMLStreamReader(br2);
                 return build(source, nsUri, xsr);
             }
         } catch (XMLStreamException | IOException e) {
@@ -105,11 +108,11 @@ public class PluginDescriptorBuilder {
     public PluginDescriptor build(StreamSupplier inputSupplier, String source) throws PlexusConfigurationException {
         try (BufferedInputStream bis = new BufferedInputStream(inputSupplier.open(), BUFFER_SIZE)) {
             bis.mark(BUFFER_SIZE);
-            XMLStreamReader xsr = WstxInputFactory.newFactory().createXMLStreamReader(bis);
+            XMLStreamReader xsr = XMLInputFactory.newFactory().createXMLStreamReader(bis);
             xsr.nextTag();
             String nsUri = xsr.getNamespaceURI();
             try (BufferedInputStream bis2 = reset(inputSupplier, bis)) {
-                xsr = WstxInputFactory.newFactory().createXMLStreamReader(bis2);
+                xsr = XMLInputFactory.newFactory().createXMLStreamReader(bis2);
                 return build(source, nsUri, xsr);
             }
         } catch (XMLStreamException | IOException e) {
@@ -142,7 +145,7 @@ public class PluginDescriptorBuilder {
                     new PluginDescriptorStaxReader().read(xsr, true);
             return new PluginDescriptor(pd);
         } else {
-            XmlNode node = XmlNodeBuilder.build(xsr, true, null);
+            XmlNode node = XmlNodeStaxBuilder.build(xsr, true, null);
             PlexusConfiguration cfg = XmlPlexusConfiguration.toPlexusConfiguration(node);
             return build(source, cfg);
         }
@@ -382,12 +385,6 @@ public class PluginDescriptorBuilder {
             mojo.setThreadSafe(Boolean.parseBoolean(threadSafe));
         }
 
-        String v4Api = c.getChild("v4Api").getValue();
-
-        if (v4Api != null) {
-            mojo.setV4Api(Boolean.parseBoolean(v4Api));
-        }
-
         // ----------------------------------------------------------------------
         // Configuration
         // ----------------------------------------------------------------------
@@ -473,8 +470,8 @@ public class PluginDescriptorBuilder {
 
     public PlexusConfiguration buildConfiguration(Reader configuration) throws PlexusConfigurationException {
         try {
-            XMLStreamReader reader = WstxInputFactory.newFactory().createXMLStreamReader(configuration);
-            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeBuilder.build(reader, true, null));
+            XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(configuration);
+            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeStaxBuilder.build(reader, true, null));
         } catch (XMLStreamException e) {
             throw new PlexusConfigurationException(e.getMessage(), e);
         }
@@ -482,8 +479,8 @@ public class PluginDescriptorBuilder {
 
     public PlexusConfiguration buildConfiguration(InputStream configuration) throws PlexusConfigurationException {
         try {
-            XMLStreamReader reader = WstxInputFactory.newFactory().createXMLStreamReader(configuration);
-            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeBuilder.build(reader, true, null));
+            XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(configuration);
+            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeStaxBuilder.build(reader, true, null));
         } catch (XMLStreamException e) {
             throw new PlexusConfigurationException(e.getMessage(), e);
         }

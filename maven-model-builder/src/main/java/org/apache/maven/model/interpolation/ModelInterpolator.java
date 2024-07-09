@@ -19,6 +19,7 @@
 package org.apache.maven.model.interpolation;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -42,12 +43,39 @@ public interface ModelInterpolator {
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      * @return The interpolated model, never {@code null}.
+     * @deprecated Use {@link #interpolateModel(Model, Path, ModelBuildingRequest, ModelProblemCollector)} instead.
      */
+    @Deprecated
     Model interpolateModel(Model model, File projectDir, ModelBuildingRequest request, ModelProblemCollector problems);
 
+    @Deprecated
     org.apache.maven.api.model.Model interpolateModel(
             org.apache.maven.api.model.Model model,
             File projectDir,
+            ModelBuildingRequest request,
+            ModelProblemCollector problems);
+
+    /**
+     * Interpolates expressions in the specified model. Note that implementations are free to either interpolate the
+     * provided model directly or to create a clone of the model and interpolate the clone. Callers should always use
+     * the returned model and must not rely on the input model being updated.
+     *
+     * @param model The model to interpolate, must not be {@code null}.
+     * @param projectDir The project directory, may be {@code null} if the model does not belong to a local project but
+     *            to some artifact's metadata.
+     * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     * @return The interpolated model, never {@code null}.
+     * @since 4.0.0
+     */
+    Model interpolateModel(Model model, Path projectDir, ModelBuildingRequest request, ModelProblemCollector problems);
+
+    /**
+     * @since 4.0.0
+     */
+    org.apache.maven.api.model.Model interpolateModel(
+            org.apache.maven.api.model.Model model,
+            Path projectDir,
             ModelBuildingRequest request,
             ModelProblemCollector problems);
 }

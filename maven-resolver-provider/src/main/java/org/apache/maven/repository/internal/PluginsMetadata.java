@@ -19,6 +19,7 @@
 package org.apache.maven.repository.internal;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -51,12 +52,12 @@ final class PluginsMetadata extends MavenMetadata {
     private final PluginInfo pluginInfo;
 
     PluginsMetadata(PluginInfo pluginInfo, Date timestamp) {
-        super(createRepositoryMetadata(pluginInfo), null, timestamp);
+        super(createRepositoryMetadata(pluginInfo), (Path) null, timestamp);
         this.pluginInfo = pluginInfo;
     }
 
-    PluginsMetadata(PluginInfo pluginInfo, File file, Date timestamp) {
-        super(createRepositoryMetadata(pluginInfo), file, timestamp);
+    PluginsMetadata(PluginInfo pluginInfo, Path path, Date timestamp) {
+        super(createRepositoryMetadata(pluginInfo), path, timestamp);
         this.pluginInfo = pluginInfo;
     }
 
@@ -74,17 +75,28 @@ final class PluginsMetadata extends MavenMetadata {
     protected void merge(Metadata recessive) {
         List<Plugin> recessivePlugins = recessive.getPlugins();
         List<Plugin> plugins = metadata.getPlugins();
-        if (!plugins.isEmpty()) {
+        if (!recessivePlugins.isEmpty() || !plugins.isEmpty()) {
             LinkedHashMap<String, Plugin> mergedPlugins = new LinkedHashMap<>();
             recessivePlugins.forEach(p -> mergedPlugins.put(p.getPrefix(), p));
             plugins.forEach(p -> mergedPlugins.put(p.getPrefix(), p));
             metadata.setPlugins(new ArrayList<>(mergedPlugins.values()));
         }
+
+        // just carry-on as-is
+        if (recessive.getVersioning() != null) {
+            metadata.setVersioning(recessive.getVersioning());
+        }
+    }
+
+    @Deprecated
+    @Override
+    public MavenMetadata setFile(File file) {
+        return new PluginsMetadata(pluginInfo, file.toPath(), timestamp);
     }
 
     @Override
-    public MavenMetadata setFile(File file) {
-        return new PluginsMetadata(pluginInfo, file, timestamp);
+    public MavenMetadata setPath(Path path) {
+        return new PluginsMetadata(pluginInfo, path, timestamp);
     }
 
     @Override

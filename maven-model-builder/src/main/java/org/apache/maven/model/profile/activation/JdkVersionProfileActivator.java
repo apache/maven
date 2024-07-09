@@ -63,13 +63,21 @@ public class JdkVersionProfileActivator implements ProfileActivator {
 
         String version = context.getSystemProperties().get("java.version");
 
-        if (version == null || version.length() <= 0) {
+        if (version == null || version.isEmpty()) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
                     .setMessage("Failed to determine Java version for profile " + profile.getId())
                     .setLocation(activation.getLocation("jdk")));
             return false;
         }
-        return isJavaVersionCompatible(jdk, version);
+        try {
+            return isJavaVersionCompatible(jdk, version);
+        } catch (NumberFormatException e) {
+            problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.BASE)
+                    .setMessage("Failed to determine JDK activation for profile " + profile.getId()
+                            + " due invalid JDK version: '" + version + "'")
+                    .setLocation(activation.getLocation("jdk")));
+            return false;
+        }
     }
 
     public static boolean isJavaVersionCompatible(String requiredJdkRange, String currentJavaVersion) {
@@ -110,7 +118,7 @@ public class JdkVersionProfileActivator implements ProfileActivator {
     }
 
     private static int getRelationOrder(String value, RangeValue rangeValue, boolean isLeft) {
-        if (rangeValue.value.length() <= 0) {
+        if (rangeValue.value.isEmpty()) {
             return isLeft ? 1 : -1;
         }
 
@@ -159,7 +167,7 @@ public class JdkVersionProfileActivator implements ProfileActivator {
                 ranges.add(new RangeValue(token.replace("]", ""), true));
             } else if (token.endsWith(")")) {
                 ranges.add(new RangeValue(token.replace(")", ""), false));
-            } else if (token.length() <= 0) {
+            } else if (token.isEmpty()) {
                 ranges.add(new RangeValue("", false));
             }
         }

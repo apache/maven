@@ -70,10 +70,10 @@ public class Types {
         Type result = types[0];
         for (int i = 1; i < types.length; i++) {
             Type type = types[i];
-            if (TypeUtils.isAssignable(type, result)) {
+            if (isAssignable(type, result)) {
                 result = type;
                 continue;
-            } else if (TypeUtils.isAssignable(result, type)) {
+            } else if (isAssignable(result, type)) {
                 continue;
             }
             throw new IllegalArgumentException("Unrelated types: " + result + " , " + type);
@@ -178,7 +178,7 @@ public class Types {
             TypeVariable<?> typeVariable = (TypeVariable<?>) type;
             Type actualType = bindings.apply(typeVariable);
             if (actualType == null) {
-                throw new IllegalArgumentException("Type variable not found: " + typeVariable + " ( "
+                throw new TypeNotBoundException("Type variable not found: " + typeVariable + " ( "
                         + typeVariable.getGenericDeclaration() + " ) ");
             }
             return actualType;
@@ -233,6 +233,249 @@ public class Types {
      */
     public static ParameterizedType parameterizedType(Class<?> rawType, Type... parameters) {
         return new ParameterizedTypeImpl(null, rawType, parameters);
+    }
+
+    /**
+     * Get all super classes and interface implemented by the given type.
+     */
+    public static Set<Type> getAllSuperTypes(Type original) {
+        Deque<Type> todo = new ArrayDeque<>();
+        todo.add(original);
+        Set<Type> done = new HashSet<>();
+        while (!todo.isEmpty()) {
+            Type type = todo.remove();
+            if (done.add(type)) {
+                Class<?> cls = getRawType(type);
+                Function<TypeVariable<?>, Type> bindings;
+                if (type instanceof ParameterizedType) {
+                    Type[] typeArguments = ((ParameterizedType) type).getActualTypeArguments();
+                    TypeVariable<? extends Class<?>>[] typeVariables = cls.getTypeParameters();
+                    bindings = v -> {
+                        for (int i = 0; i < typeArguments.length; i++) {
+                            Type typeArgument = typeArguments[i];
+                            if (v.equals(typeVariables[i])) {
+                                return typeArgument;
+                            }
+                        }
+                        return null;
+                    };
+                } else {
+                    bindings = v -> null;
+                }
+                Type[] interfaces = cls.getGenericInterfaces();
+                for (Type itf : interfaces) {
+                    try {
+                        todo.add(bind(itf, bindings));
+                    } catch (TypeNotBoundException e) {
+                        // ignore
+                    }
+                }
+                Type supercls = cls.getGenericSuperclass();
+                if (supercls != null) {
+                    try {
+                        todo.add(bind(supercls, bindings));
+                    } catch (TypeNotBoundException e) {
+                        // ignore
+                    }
+                }
+            }
+        }
+        return done;
+    }
+
+    public static Type simplifyType(Type original) {
+        if (original instanceof Class) {
+            return original;
+        }
+
+        if (original instanceof GenericArrayType) {
+            Type componentType = ((GenericArrayType) original).getGenericComponentType();
+            Type repackedComponentType = simplifyType(componentType);
+            if (componentType != repackedComponentType) {
+                return genericArrayType(repackedComponentType);
+            }
+            return original;
+        }
+
+        if (original instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) original;
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+            Type[] repackedTypeArguments = simplifyTypes(typeArguments);
+
+            if (isAllObjects(repackedTypeArguments)) {
+                return parameterizedType.getRawType();
+            }
+
+            if (typeArguments != repackedTypeArguments) {
+                return parameterizedType(
+                        parameterizedType.getOwnerType(), parameterizedType.getRawType(), repackedTypeArguments);
+            }
+            return original;
+        }
+
+        if (original instanceof TypeVariable) {
+            throw new IllegalArgumentException("Key should not contain a type variable: " + original);
+        }
+
+        if (original instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) original;
+            Type[] upperBounds = wildcardType.getUpperBounds();
+            if (upperBounds.length == 1) {
+                Type upperBound = upperBounds[0];
+                if (upperBound != Object.class) {
+                    return simplifyType(upperBound);
+                }
+            } else if (upperBounds.length > 1) {
+                throw new IllegalArgumentException("Multiple upper bounds not supported: " + original);
+            }
+
+            Type[] lowerBounds = wildcardType.getLowerBounds();
+            if (lowerBounds.length == 1) {
+                return simplifyType(lowerBounds[0]);
+            } else if (lowerBounds.length > 1) {
+                throw new IllegalArgumentException("Multiple lower bounds not supported: " + original);
+            }
+            return Object.class;
+        }
+
+        return original;
+    }
+
+    private static Type[] simplifyTypes(Type[] original) {
+        int length = original.length;
+        for (int i = 0; i < length; i++) {
+            Type typeArgument = original[i];
+            Type repackTypeArgument = simplifyType(typeArgument);
+            if (repackTypeArgument != typeArgument) {
+                Type[] repackedTypeArguments = new Type[length];
+                System.arraycopy(original, 0, repackedTypeArguments, 0, i);
+                repackedTypeArguments[i++] = repackTypeArgument;
+                for (; i < length; i++) {
+                    repackedTypeArguments[i] = simplifyType(original[i]);
+                }
+                return repackedTypeArguments;
+            }
+        }
+        return original;
+    }
+
+    private static boolean isAllObjects(Type[] types) {
+        for (Type type : types) {
+            if (type != Object.class) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Tests whether a {@code from} type is assignable to {@code to} type
+     *
+     * @param to   a 'to' type that should be checked for possible assignment
+     * @param from a 'from' type that should be checked for possible assignment
+     * @return whether an object of type {@code from} is assignable to an object of type {@code to}
+     */
+    public static boolean isAssignable(Type to, Type from) {
+        // shortcut
+        if (to instanceof Class && from instanceof Class) {
+            return ((Class<?>) to).isAssignableFrom((Class<?>) from);
+        }
+        return isAssignable(to, from, false);
+    }
+
+    private static boolean isAssignable(Type to, Type from, boolean strict) {
+        if (to instanceof WildcardType || from instanceof WildcardType) {
+            Type[] toUppers, toLowers;
+            if (to instanceof WildcardType) {
+                WildcardType wildcardTo = (WildcardType) to;
+                toUppers = wildcardTo.getUpperBounds();
+                toLowers = wildcardTo.getLowerBounds();
+            } else {
+                toUppers = new Type[] {to};
+                toLowers = strict ? toUppers : NO_TYPES;
+            }
+
+            Type[] fromUppers, fromLowers;
+            if (from instanceof WildcardType) {
+                WildcardType wildcardTo = (WildcardType) to;
+                fromUppers = wildcardTo.getUpperBounds();
+                fromLowers = wildcardTo.getLowerBounds();
+            } else {
+                fromUppers = new Type[] {from};
+                fromLowers = strict ? fromUppers : NO_TYPES;
+            }
+
+            for (Type toUpper : toUppers) {
+                for (Type fromUpper : fromUppers) {
+                    if (!isAssignable(toUpper, fromUpper, false)) {
+                        return false;
+                    }
+                }
+            }
+            if (toLowers.length == 0) {
+                return true;
+            }
+            if (fromLowers.length == 0) {
+                return false;
+            }
+            for (Type toLower : toLowers) {
+                for (Type fromLower : fromLowers) {
+                    if (!isAssignable(fromLower, toLower, false)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        if (to instanceof GenericArrayType) {
+            to = getRawType(to);
+        }
+        if (from instanceof GenericArrayType) {
+            from = getRawType(from);
+        }
+        if (!strict && to instanceof Class) {
+            return ((Class<?>) to).isAssignableFrom(getRawType(from));
+        }
+        Class<?> toRawClazz = getRawType(to);
+        Type[] toTypeArguments = getActualTypeArguments(to);
+        return isAssignable(toRawClazz, toTypeArguments, from, strict);
+    }
+
+    private static boolean isAssignable(Class<?> toRawClazz, Type[] toTypeArguments, Type from, boolean strict) {
+        Class<?> fromRawClazz = getRawType(from);
+        if (strict && !toRawClazz.equals(fromRawClazz)) {
+            return false;
+        }
+        if (!strict && !toRawClazz.isAssignableFrom(fromRawClazz)) {
+            return false;
+        }
+        if (toRawClazz.isArray()) {
+            return true;
+        }
+        Type[] fromTypeArguments = getActualTypeArguments(from);
+        if (toRawClazz == fromRawClazz) {
+            if (toTypeArguments.length > fromTypeArguments.length) {
+                return false;
+            }
+            for (int i = 0; i < toTypeArguments.length; i++) {
+                if (!isAssignable(toTypeArguments[i], fromTypeArguments[i], true)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        Map<TypeVariable<?>, Type> typeBindings = getTypeBindings(from);
+        for (Type anInterface : fromRawClazz.getGenericInterfaces()) {
+            if (isAssignable(
+                    toRawClazz,
+                    toTypeArguments,
+                    bind(anInterface, key -> typeBindings.getOrDefault(key, wildcardTypeAny())),
+                    false)) {
+                return true;
+            }
+        }
+        Type superclass = fromRawClazz.getGenericSuperclass();
+        return superclass != null && isAssignable(toRawClazz, toTypeArguments, bind(superclass, typeBindings), false);
     }
 
     public static final class ParameterizedTypeImpl implements ParameterizedType {
@@ -467,5 +710,11 @@ public class Types {
         }
 
         return type.getTypeName();
+    }
+
+    public static class TypeNotBoundException extends IllegalArgumentException {
+        public TypeNotBoundException(String s) {
+            super(s);
+        }
     }
 }

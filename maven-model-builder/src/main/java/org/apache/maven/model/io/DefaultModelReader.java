@@ -57,11 +57,17 @@ public class DefaultModelReader implements ModelReader {
     @Override
     public Model read(File input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
+        return read(input.toPath(), options);
+    }
 
-        try (InputStream in = Files.newInputStream(input.toPath())) {
-            Model model = read(in, input.toPath(), options);
+    @Override
+    public Model read(Path path, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(path, "path cannot be null");
 
-            model.setPomFile(input);
+        try (InputStream in = Files.newInputStream(path)) {
+            Model model = read(in, path, options);
+
+            model.setPomPath(path);
 
             return model;
         }
@@ -102,7 +108,7 @@ public class DefaultModelReader implements ModelReader {
 
     private Model read(InputStream input, Path pomFile, Map<String, ?> options) throws IOException {
         try {
-            XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+            XMLInputFactory factory = XMLInputFactory.newFactory();
             factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
             XMLStreamReader parser = factory.createXMLStreamReader(input);
 
@@ -126,7 +132,7 @@ public class DefaultModelReader implements ModelReader {
 
     private Model read(Reader reader, Path pomFile, Map<String, ?> options) throws IOException {
         try {
-            XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+            XMLInputFactory factory = XMLInputFactory.newFactory();
             factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
             XMLStreamReader parser = factory.createXMLStreamReader(reader);
 

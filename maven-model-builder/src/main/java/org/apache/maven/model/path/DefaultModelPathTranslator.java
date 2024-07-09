@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -49,8 +50,17 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
         this.pathTranslator = pathTranslator;
     }
 
+    @Deprecated
     @Override
     public void alignToBaseDirectory(org.apache.maven.model.Model modelV3, File basedir, ModelBuildingRequest request) {
+        if (modelV3 == null || basedir == null) {
+            return;
+        }
+        alignToBaseDirectory(modelV3, basedir.toPath(), request);
+    }
+
+    @Override
+    public void alignToBaseDirectory(org.apache.maven.model.Model modelV3, Path basedir, ModelBuildingRequest request) {
         if (modelV3 == null || basedir == null) {
             return;
         }
@@ -104,7 +114,7 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
         return newResources;
     }
 
-    private Resource alignToBaseDirectory(Resource resource, File basedir) {
+    private Resource alignToBaseDirectory(Resource resource, Path basedir) {
         if (resource != null) {
             String newDir = alignToBaseDirectory(resource.getDirectory(), basedir);
             if (newDir != null) {
@@ -114,7 +124,7 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
         return resource;
     }
 
-    private String alignToBaseDirectory(String path, File basedir) {
+    private String alignToBaseDirectory(String path, Path basedir) {
         String newPath = pathTranslator.alignToBaseDirectory(path, basedir);
         return Objects.equals(path, newPath) ? null : newPath;
     }

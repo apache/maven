@@ -23,18 +23,11 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-13-SNAPSHOT</version>
+    <version>4.0.0-beta-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-di</artifactId>
   <name>Maven 4 API :: Dependency Injection</name>
   <description>Maven 4 API - Dependency Injection</description>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-api-meta</artifactId>
-    </dependency>
-  </dependencies>
 
 </project>

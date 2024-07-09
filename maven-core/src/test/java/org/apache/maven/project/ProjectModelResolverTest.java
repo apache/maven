@@ -200,6 +200,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 getContainer().lookup(RemoteRepositoryManager.class),
                 this.getRemoteRepositories(),
                 ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT,
+                null,
                 null);
     }
 

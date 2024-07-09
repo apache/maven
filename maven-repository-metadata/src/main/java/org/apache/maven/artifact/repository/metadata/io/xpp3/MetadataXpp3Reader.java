@@ -26,7 +26,7 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
+import org.apache.maven.metadata.v4.MetadataStaxReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**

@@ -58,9 +58,9 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
     private final MessageBuilderFactory messageBuilderFactory;
     private final Logger logger;
-    private final int terminalWidth;
-    private final int lineLength;
-    private final int maxProjectNameLength;
+    private int terminalWidth;
+    private int lineLength;
+    private int maxProjectNameLength;
     private int totalProjects;
     private volatile int currentVisitedProjectCount;
 
@@ -69,17 +69,13 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     }
 
     public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory, Logger logger) {
-        this(messageBuilderFactory, logger, messageBuilderFactory.getTerminalWidth());
+        this(messageBuilderFactory, logger, -1);
     }
 
     public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory, Logger logger, int terminalWidth) {
         this.logger = Objects.requireNonNull(logger, "logger cannot be null");
         this.messageBuilderFactory = messageBuilderFactory;
-        this.terminalWidth = Math.min(
-                MAX_TERMINAL_WIDTH,
-                Math.max(terminalWidth < 0 ? DEFAULT_TERMINAL_WIDTH : terminalWidth, MIN_TERMINAL_WIDTH));
-        this.lineLength = this.terminalWidth - MAX_LOG_PREFIX_SIZE;
-        this.maxProjectNameLength = this.lineLength - PROJECT_STATUS_SUFFIX_SIZE;
+        this.terminalWidth = terminalWidth;
     }
 
     private static String chars(char c, int count) {
@@ -100,9 +96,23 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
         logger.info(builder().strong(msg).toString());
     }
 
+    private void init() {
+        if (maxProjectNameLength == 0) {
+            if (terminalWidth < 0) {
+                terminalWidth = messageBuilderFactory.getTerminalWidth();
+            }
+            terminalWidth = Math.min(
+                    MAX_TERMINAL_WIDTH,
+                    Math.max(terminalWidth < 0 ? DEFAULT_TERMINAL_WIDTH : terminalWidth, MIN_TERMINAL_WIDTH));
+            lineLength = terminalWidth - MAX_LOG_PREFIX_SIZE;
+            maxProjectNameLength = lineLength - PROJECT_STATUS_SUFFIX_SIZE;
+        }
+    }
+
     @Override
     public void projectDiscoveryStarted(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
+            init();
             logger.info("Scanning for projects...");
         }
     }
@@ -110,6 +120,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     @Override
     public void sessionStarted(ExecutionEvent event) {
         if (logger.isInfoEnabled() && event.getSession().getProjects().size() > 1) {
+            init();
             infoLine('-');
 
             infoMain("Reactor Build Order:");
@@ -136,6 +147,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     @Override
     public void sessionEnded(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
+            init();
             if (event.getSession().getProjects().size() > 1) {
                 logReactorSummary(event.getSession());
             }
@@ -280,11 +292,12 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     @Override
     public void projectSkipped(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
+            init();
             logger.info("");
             infoLine('-');
-
-            infoMain("Skipping " + event.getProject().getName());
-            logger.info("This project has been banned from the build due to previous failures.");
+            String name = event.getProject().getName();
+            infoMain("Skipping " + name);
+            logger.info(name + " was not built because a module it depends on failed to build.");
 
             infoLine('-');
         }
@@ -293,6 +306,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     @Override
     public void projectStarted(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
+            init();
             MavenProject project = event.getProject();
 
             logger.info("");
@@ -354,6 +368,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     @Override
     public void mojoSkipped(ExecutionEvent event) {
         if (logger.isWarnEnabled()) {
+            init();
             logger.warn(
                     "Goal '{}' requires online mode for execution but Maven is currently offline, skipping",
                     event.getMojoExecution().getGoal());
@@ -366,6 +381,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     @Override
     public void mojoStarted(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
+            init();
             logger.info("");
 
             MessageBuilder buffer = builder().strong("--- ");
@@ -386,6 +402,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     @Override
     public void forkStarted(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
+            init();
             logger.info("");
 
             MessageBuilder buffer = builder().strong(">>> ");
@@ -408,6 +425,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     @Override
     public void forkSucceeded(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
+            init();
             logger.info("");
 
             MessageBuilder buffer = builder().strong("<<< ");
@@ -460,6 +478,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     public void forkedProjectStarted(ExecutionEvent event) {
         if (logger.isInfoEnabled()
                 && event.getMojoExecution().getForkedExecutions().size() > 1) {
+            init();
             logger.info("");
             infoLine('>');
 

@@ -27,6 +27,11 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 public class LookupException extends MavenException {
+
+    public LookupException(String message) {
+        super(message);
+    }
+
     /**
      * @param message the message to give
      * @param e the {@link Exception}

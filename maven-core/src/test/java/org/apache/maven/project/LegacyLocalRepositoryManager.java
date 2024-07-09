@@ -56,7 +56,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
         path.append(artifact.getArtifactId()).append('-').append(artifact.getVersion());
 
-        if (artifact.getClassifier().length() > 0) {
+        if (!artifact.getClassifier().isEmpty()) {
             path.append('-').append(artifact.getClassifier());
         }
 
@@ -84,13 +84,13 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
     private String getPath(Metadata metadata, String repositoryKey) {
         StringBuilder path = new StringBuilder(128);
 
-        if (metadata.getGroupId().length() > 0) {
+        if (!metadata.getGroupId().isEmpty()) {
             path.append(metadata.getGroupId().replace('.', '/')).append('/');
 
-            if (metadata.getArtifactId().length() > 0) {
+            if (!metadata.getArtifactId().isEmpty()) {
                 path.append(metadata.getArtifactId()).append('/');
 
-                if (metadata.getVersion().length() > 0) {
+                if (!metadata.getVersion().isEmpty()) {
                     path.append(metadata.getVersion()).append('/');
                 }
             }

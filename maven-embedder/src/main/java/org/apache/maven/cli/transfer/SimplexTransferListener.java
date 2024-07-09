@@ -18,7 +18,6 @@
  */
 package org.apache.maven.cli.transfer;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -129,7 +128,7 @@ public final class SimplexTransferListener extends AbstractTransferListener {
                             LOGGER.warn("Invalid TransferEvent.EventType={}; ignoring it", type);
                     }
                 } catch (TransferCancelledException e) {
-                    ongoing.put(transferEvent.getResource().getFile(), Boolean.FALSE);
+                    ongoing.put(new TransferResourceIdentifier(transferEvent.getResource()), Boolean.FALSE);
                 }
             });
         }
@@ -150,17 +149,17 @@ public final class SimplexTransferListener extends AbstractTransferListener {
         }
     }
 
-    private final ConcurrentHashMap<File, Boolean> ongoing = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<TransferResourceIdentifier, Boolean> ongoing = new ConcurrentHashMap<>();
 
     @Override
     public void transferInitiated(TransferEvent event) {
-        ongoing.putIfAbsent(event.getResource().getFile(), Boolean.TRUE);
+        ongoing.putIfAbsent(new TransferResourceIdentifier(event.getResource()), Boolean.TRUE);
         put(event, false);
     }
 
     @Override
     public void transferStarted(TransferEvent event) throws TransferCancelledException {
-        if (ongoing.get(event.getResource().getFile()) == Boolean.FALSE) {
+        if (ongoing.get(new TransferResourceIdentifier(event.getResource())) == Boolean.FALSE) {
             throw new TransferCancelledException();
         }
         put(event, false);
@@ -168,7 +167,7 @@ public final class SimplexTransferListener extends AbstractTransferListener {
 
     @Override
     public void transferProgressed(TransferEvent event) throws TransferCancelledException {
-        if (ongoing.get(event.getResource().getFile()) == Boolean.FALSE) {
+        if (ongoing.get(new TransferResourceIdentifier(event.getResource())) == Boolean.FALSE) {
             throw new TransferCancelledException();
         }
         put(event, false);
@@ -176,7 +175,7 @@ public final class SimplexTransferListener extends AbstractTransferListener {
 
     @Override
     public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
-        if (ongoing.get(event.getResource().getFile()) == Boolean.FALSE) {
+        if (ongoing.get(new TransferResourceIdentifier(event.getResource())) == Boolean.FALSE) {
             throw new TransferCancelledException();
         }
         put(event, false);
@@ -184,13 +183,13 @@ public final class SimplexTransferListener extends AbstractTransferListener {
 
     @Override
     public void transferSucceeded(TransferEvent event) {
-        ongoing.remove(event.getResource().getFile());
+        ongoing.remove(new TransferResourceIdentifier(event.getResource()));
         put(event, ongoing.isEmpty());
     }
 
     @Override
     public void transferFailed(TransferEvent event) {
-        ongoing.remove(event.getResource().getFile());
+        ongoing.remove(new TransferResourceIdentifier(event.getResource()));
         put(event, ongoing.isEmpty());
     }
 

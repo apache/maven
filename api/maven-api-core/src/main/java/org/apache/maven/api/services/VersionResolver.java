@@ -27,6 +27,8 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Resolves artifact meta/pseudo versions.
+ *
+ * @since 4.0.0
  */
 @Experimental
 @Consumer

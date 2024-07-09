@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.SimpleLookup;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.SwitchableMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -33,6 +34,9 @@ import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultRepositoryFactory;
+import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
@@ -43,6 +47,9 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
+import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +65,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 @PlexusTest
+@Deprecated
 class LegacyRepositorySystemTest {
     @Inject
     private LegacyRepositorySystem repositorySystem;
@@ -115,8 +123,19 @@ class LegacyRepositorySystemTest {
                 new LocalRepository(request.getLocalRepository().getBasedir());
         session.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory().newInstance(session, localRepo));
         LegacySupport legacySupport = container.lookup(LegacySupport.class);
-        legacySupport.setSession(new MavenSession(
-                container, session, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult()));
+        DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
+        MavenSession mavenSession =
+                new MavenSession(container, session, mavenExecutionRequest, new DefaultMavenExecutionResult());
+        legacySupport.setSession(mavenSession);
+        InternalSession iSession = new DefaultSession(
+                mavenSession,
+                null,
+                null,
+                null,
+                new SimpleLookup(List.of(new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
+                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())))),
+                null);
+        InternalSession.associate(session, iSession);
 
         ArtifactResolutionResult result = repositorySystem.resolve(request);
         resolutionErrorHandler.throwErrors(request, result);

@@ -41,21 +41,10 @@ import org.apache.maven.api.annotations.Nonnull;
 public @interface Execute {
     /**
      * Lifecycle phase to fork. Note that specifying a phase overrides specifying a goal.
-     * For custom lifecycle phase ids use {@link #customPhase()} instead.
-     * Only one of {@link #customPhase()} and {@link #phase()} must be set.
      * @return the phase
      */
     @Nonnull
-    LifecyclePhase phase() default LifecyclePhase.NONE;
-
-    /**
-     * Custom lifecycle phase to fork. Note that specifying a phase overrides specifying a goal.
-     * This element should only be used for non-standard phases. For standard phases rather use {@link #phase()}.
-     * Only one of {@link #customPhase()} and {@link #phase()} must be set.
-     * @return the custom phase id
-     */
-    @Nonnull
-    String customPhase() default "";
+    String phase() default "";
 
     /**
      * Goal to fork. Note that specifying a phase overrides specifying a goal. The specified <code>goal</code> must be

@@ -115,8 +115,8 @@ class PluginsMetadataGenerator implements MetadataGenerator {
         if (artifact != null
                 && "jar".equals(artifact.getExtension())
                 && "".equals(artifact.getClassifier())
-                && artifact.getFile() != null) {
-            Path artifactPath = artifact.getFile().toPath();
+                && artifact.getPath() != null) {
+            Path artifactPath = artifact.getPath();
             if (Files.isRegularFile(artifactPath)) {
                 try (JarFile artifactJar = new JarFile(artifactPath.toFile(), false)) {
                     ZipEntry pluginDescriptorEntry = artifactJar.getEntry(PLUGIN_DESCRIPTOR_LOCATION);

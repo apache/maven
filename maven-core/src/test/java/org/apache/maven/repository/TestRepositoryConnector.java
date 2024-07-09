@@ -75,7 +75,7 @@ public class TestRepositoryConnector implements RepositoryConnector {
             for (ArtifactDownload download : artifactDownloads) {
                 File remoteFile = new File(basedir, path(download.getArtifact()));
                 try {
-                    Path dest = download.getFile().toPath();
+                    Path dest = download.getPath();
                     Files.createDirectories(dest.getParent());
                     Files.copy(remoteFile.toPath(), dest);
                 } catch (IOException e) {
@@ -91,7 +91,7 @@ public class TestRepositoryConnector implements RepositoryConnector {
             for (final MetadataDownload download : metadataDownloads) {
                 File remoteFile = new File(basedir, path(download.getMetadata()));
                 try {
-                    Path dest = download.getFile().toPath();
+                    Path dest = download.getPath();
                     Files.createDirectories(dest.getParent());
                     Files.copy(remoteFile.toPath(), dest);
                 } catch (IOException e) {
@@ -116,7 +116,7 @@ public class TestRepositoryConnector implements RepositoryConnector {
 
         path.append(artifact.getArtifactId()).append('-').append(artifact.getVersion());
 
-        if (artifact.getClassifier().length() > 0) {
+        if (!artifact.getClassifier().isEmpty()) {
             path.append('-').append(artifact.getClassifier());
         }
 

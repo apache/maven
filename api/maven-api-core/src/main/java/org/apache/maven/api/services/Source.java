@@ -27,6 +27,8 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
+import static org.apache.maven.api.services.BaseRequest.nonNull;
+
 /**
  * Provides access to the contents of a source independently of the
  * backing store (e.g. file system, database, memory).
@@ -85,5 +87,14 @@ public interface Source {
      * @param relative is the path of the requested source relative to this source
      * @return related source or <code>null</code> if no such source
      */
-    Source resolve(String relative);
+    @Nullable
+    Source resolve(@Nonnull String relative);
+
+    /**
+     * Creates a Source for the following Path
+     */
+    @Nonnull
+    static Source fromPath(@Nonnull Path path) {
+        return new PathSource(nonNull(path, "path cannot be null"));
+    }
 }

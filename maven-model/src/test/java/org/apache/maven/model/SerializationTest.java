@@ -54,4 +54,18 @@ class SerializationTest {
 
         assertNotNull(build2);
     }
+
+    @Test
+    void testModelPropertiesAndListSerialization() throws Exception {
+        Model model;
+        try (InputStream is = getClass().getResourceAsStream("/xml/pom.xml")) {
+            model = new MavenXpp3Reader().read(is);
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(model.getProperties());
+            oos.writeObject(model.getBuild().getPlugins());
+        }
+    }
 }

@@ -114,9 +114,10 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             pluginArtifact = result.getArtifact();
 
             if (logger.isWarnEnabled() && !result.getRelocations().isEmpty()) {
-                String message = pluginArtifact instanceof org.apache.maven.repository.internal.RelocatedArtifact
-                        ? ": " + ((org.apache.maven.repository.internal.RelocatedArtifact) pluginArtifact).getMessage()
-                        : "";
+                String message =
+                        pluginArtifact instanceof org.apache.maven.internal.impl.resolver.RelocatedArtifact relocated
+                                ? ": " + relocated.getMessage()
+                                : "";
                 logger.warn(
                         "The artifact {} has been relocated to {}{}",
                         result.getRelocations().get(0),
@@ -131,7 +132,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 pluginArtifact = pluginArtifact.setProperties(props);
             }
         } catch (ArtifactDescriptorException e) {
-            throw new PluginResolutionException(plugin, e);
+            throw new PluginResolutionException(
+                    plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
         }
 
         try {
@@ -139,7 +141,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             request.setTrace(trace);
             pluginArtifact = repoSystem.resolveArtifact(session, request).getArtifact();
         } catch (ArtifactResolutionException e) {
-            throw new PluginResolutionException(plugin, e);
+            throw new PluginResolutionException(
+                    plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
         }
 
         return pluginArtifact;
@@ -228,9 +231,11 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             depRequest.setRoot(node);
             return repoSystem.resolveDependencies(session, depRequest);
         } catch (DependencyCollectionException e) {
-            throw new PluginResolutionException(plugin, e);
+            throw new PluginResolutionException(
+                    plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
         } catch (DependencyResolutionException e) {
-            throw new PluginResolutionException(plugin, e.getCause());
+            throw new PluginResolutionException(
+                    plugin, e.getResult().getCollectExceptions(), logger.isDebugEnabled() ? e : null);
         }
     }
 }

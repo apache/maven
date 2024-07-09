@@ -22,8 +22,12 @@ import java.util.Properties;
 
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.model.building.SimpleProblemCollector;
+import org.apache.maven.model.profile.ProfileActivationContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@link JdkVersionProfileActivator}.
@@ -168,5 +172,26 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
         assertActivation(false, profile, newContext(null, newProperties("1.6.0")));
         assertActivation(false, profile, newContext(null, newProperties("1.6.0_09")));
         assertActivation(false, profile, newContext(null, newProperties("1.6.0_09-b03")));
+    }
+
+    @Test
+    void testRubbishJavaVersion() {
+        Profile profile = newProfile("[1.8,)");
+
+        assertActivationWithProblems(profile, newContext(null, newProperties("Pūteketeke")), "invalid JDK version");
+        assertActivationWithProblems(profile, newContext(null, newProperties("rubbish")), "invalid JDK version");
+        assertActivationWithProblems(profile, newContext(null, newProperties("1.a.0_09")), "invalid JDK version");
+        assertActivationWithProblems(profile, newContext(null, newProperties("1.a.2.b")), "invalid JDK version");
+    }
+
+    private void assertActivationWithProblems(
+            Profile profile, ProfileActivationContext context, String warningContains) {
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+
+        assertFalse(activator.isActive(new org.apache.maven.model.Profile(profile), context, problems));
+
+        assertEquals(0, problems.getErrors().size());
+        assertEquals(1, problems.getWarnings().size());
+        assertTrue(problems.getWarnings().get(0).contains(warningContains));
     }
 }

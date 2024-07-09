@@ -33,6 +33,7 @@ import static org.mockito.Mockito.mock;
 
 /**
  */
+@Deprecated
 class ArtifactInstallerTest extends AbstractArtifactComponentTestCase {
     @Inject
     private ArtifactInstaller artifactInstaller;

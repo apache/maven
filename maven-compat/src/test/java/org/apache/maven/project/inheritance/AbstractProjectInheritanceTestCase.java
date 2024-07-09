@@ -21,11 +21,14 @@ package org.apache.maven.project.inheritance;
 import java.io.File;
 
 import org.apache.maven.project.AbstractMavenProjectTestCase;
+import org.apache.maven.project.EmptyLifecycleBindingsInjector;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 
 /**
  */
+@Deprecated
 public abstract class AbstractProjectInheritanceTestCase extends AbstractMavenProjectTestCase {
     protected String getTestSeries() {
         String className = getClass().getPackage().getName();
@@ -47,5 +50,12 @@ public abstract class AbstractProjectInheritanceTestCase extends AbstractMavenPr
 
     protected File getLocalRepositoryPath() {
         return getTestFile("src/test/resources/inheritance-repo/" + getTestSeries());
+    }
+
+    @Override
+    @BeforeEach
+    public void setUp() throws Exception {
+        super.setUp();
+        EmptyLifecycleBindingsInjector.useEmpty();
     }
 }

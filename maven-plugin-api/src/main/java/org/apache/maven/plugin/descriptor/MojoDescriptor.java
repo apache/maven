@@ -166,7 +166,6 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
         this.setProjectRequired(md.isProjectRequired());
         this.setSince(md.getSince());
         this.setThreadSafe(true);
-        this.setV4Api(true);
         this.setImplementation(md.getImplementation());
         try {
             this.setParameters(md.getParameters().stream().map(Parameter::new).collect(Collectors.toList()));
@@ -174,6 +173,7 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
             throw new IllegalArgumentException(e);
         }
         this.mojoDescriptorV4 = md;
+        this.v4Api = true;
     }
     // ----------------------------------------------------------------------
     //
@@ -614,16 +614,12 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
      * @return {@code true} if this mojo forks either a goal or the lifecycle, {@code false} otherwise.
      */
     public boolean isForking() {
-        return (getExecuteGoal() != null && getExecuteGoal().length() > 0)
-                || (getExecutePhase() != null && getExecutePhase().length() > 0);
+        return (getExecuteGoal() != null && !getExecuteGoal().isEmpty())
+                || (getExecutePhase() != null && !getExecutePhase().isEmpty());
     }
 
     public boolean isV4Api() {
         return v4Api;
-    }
-
-    public void setV4Api(boolean v4Api) {
-        this.v4Api = v4Api;
     }
 
     /**

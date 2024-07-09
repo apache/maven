@@ -34,7 +34,9 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultRepositoryFactory;
 import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -51,6 +53,9 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
+import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
 
@@ -58,6 +63,7 @@ import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.mockito.Mockito.mock;
 
 @PlexusTest
+@Deprecated
 public abstract class AbstractCoreMavenComponentTestCase {
 
     @Inject
@@ -122,6 +128,21 @@ public abstract class AbstractCoreMavenComponentTestCase {
                 .setSystemProperties(executionProperties)
                 .setUserProperties(new Properties());
 
+        initRepoSession(configuration);
+
+        MavenSession session = new MavenSession(
+                getContainer(), configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());
+        DefaultSession iSession = new DefaultSession(
+                session,
+                mock(org.eclipse.aether.RepositorySystem.class),
+                null,
+                null,
+                new SimpleLookup(List.of(new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
+                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())))),
+                null);
+        InternalSession.associate(session.getRepositorySession(), iSession);
+        session.setSession(iSession);
+
         List<MavenProject> projects = new ArrayList<>();
 
         if (pom != null) {
@@ -144,14 +165,8 @@ public abstract class AbstractCoreMavenComponentTestCase {
             projects.add(project);
         }
 
-        initRepoSession(configuration);
-
-        MavenSession session = new MavenSession(
-                getContainer(), configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());
         session.setProjects(projects);
         session.setAllProjects(session.getProjects());
-        session.setSession(
-                new DefaultSession(session, mock(org.eclipse.aether.RepositorySystem.class), null, null, null, null));
 
         return session;
     }

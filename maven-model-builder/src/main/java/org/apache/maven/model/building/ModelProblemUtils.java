@@ -18,7 +18,7 @@
  */
 package org.apache.maven.model.building;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.maven.model.Model;
 
@@ -43,9 +43,9 @@ public class ModelProblemUtils {
 
         buffer.append(toId(model));
 
-        File pomFile = model.getPomFile();
-        if (pomFile != null) {
-            buffer.append(" (").append(pomFile).append(')');
+        Path pomPath = model.getPomPath();
+        if (pomPath != null) {
+            buffer.append(" (").append(pomPath).append(')');
         }
 
         return buffer.toString();
@@ -55,10 +55,10 @@ public class ModelProblemUtils {
         String path = "";
 
         if (model != null) {
-            File pomFile = model.getPomFile();
+            Path pomPath = model.getPomPath();
 
-            if (pomFile != null) {
-                path = pomFile.getAbsolutePath();
+            if (pomPath != null) {
+                path = pomPath.toAbsolutePath().toString();
             }
         }
 
@@ -102,11 +102,11 @@ public class ModelProblemUtils {
     static String toId(String groupId, String artifactId, String version) {
         StringBuilder buffer = new StringBuilder(128);
 
-        buffer.append((groupId != null && groupId.length() > 0) ? groupId : "[unknown-group-id]");
+        buffer.append((groupId != null && !groupId.isEmpty()) ? groupId : "[unknown-group-id]");
         buffer.append(':');
-        buffer.append((artifactId != null && artifactId.length() > 0) ? artifactId : "[unknown-artifact-id]");
+        buffer.append((artifactId != null && !artifactId.isEmpty()) ? artifactId : "[unknown-artifact-id]");
         buffer.append(':');
-        buffer.append((version != null && version.length() > 0) ? version : "[unknown-version]");
+        buffer.append((version != null && !version.isEmpty()) ? version : "[unknown-version]");
 
         return buffer.toString();
     }
@@ -127,7 +127,7 @@ public class ModelProblemUtils {
         if (!problem.getModelId().equals(projectId)) {
             buffer.append(problem.getModelId());
 
-            if (problem.getSource().length() > 0) {
+            if (!problem.getSource().isEmpty()) {
                 if (buffer.length() > 0) {
                     buffer.append(", ");
                 }

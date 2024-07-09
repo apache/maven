@@ -36,6 +36,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Deprecated
 class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private ProjectDependenciesResolver resolver;

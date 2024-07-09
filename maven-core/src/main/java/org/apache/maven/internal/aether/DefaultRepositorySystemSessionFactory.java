@@ -18,25 +18,29 @@
  */
 package org.apache.maven.internal.aether;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import java.io.File;
-import java.util.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.internal.impl.resolver.MavenSessionBuilderSupplier;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.ModelBase;
-import org.apache.maven.repository.internal.MavenSessionBuilderSupplier;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
@@ -47,17 +51,13 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.eclipse.aether.ConfigurationProperties;
-import org.eclipse.aether.RepositoryListener;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.*;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
-import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.version.*;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
@@ -81,7 +81,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Named
 @Singleton
-class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFactory {
+public class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFactory {
     /**
      * User property for version filters expression, a semicolon separated list of filters to apply. By default, no version
      * filter is applied (like in Maven 3).
@@ -165,8 +165,6 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ArtifactHandlerManager artifactHandlerManager;
-
     private final RepositorySystem repoSystem;
 
     private final SettingsDecrypter settingsDecrypter;
@@ -186,7 +184,6 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
     DefaultRepositorySystemSessionFactory(
-            ArtifactHandlerManager artifactHandlerManager,
             RepositorySystem repoSystem,
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
@@ -195,7 +192,6 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
             VersionScheme versionScheme,
             Map<String, MavenExecutionRequestExtender> requestExtenders,
             Map<String, RepositorySystemSessionExtender> sessionExtenders) {
-        this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.settingsDecrypter = settingsDecrypter;
         this.eventSpyDispatcher = eventSpyDispatcher;
@@ -220,8 +216,9 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
             requestExtender.extend(request);
         }
 
-        SessionBuilder sessionBuilder = new MavenSessionBuilderSupplier(repoSystem).get();
-        sessionBuilder.setArtifactTypeRegistry(new TypeRegistryAdapter(typeRegistry));
+        MavenSessionBuilderSupplier supplier = new MavenSessionBuilderSupplier(repoSystem);
+        SessionBuilder sessionBuilder = supplier.get();
+        sessionBuilder.setArtifactTypeRegistry(new TypeRegistryAdapter(typeRegistry)); // dynamic
         sessionBuilder.setCache(request.getRepositoryCache());
 
         // this map is read ONLY to get config from (profiles + env + system + user)
@@ -257,8 +254,6 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         if (versionFilter != null) {
             sessionBuilder.setVersionFilter(versionFilter);
         }
-
-        sessionBuilder.setArtifactTypeRegistry(RepositoryUtils.newArtifactTypeRegistry(artifactHandlerManager));
 
         DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
         decrypt.setProxies(request.getProxies());
@@ -429,18 +424,19 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         }
         sessionBuilder.setRepositoryListener(repositoryListener);
 
+        // may be overridden
         String resolverDependencyManagerTransitivity =
                 mergedProps.getOrDefault(MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY, Boolean.TRUE.toString());
         sessionBuilder.setDependencyManager(
-                new ClassicDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
+                supplier.getDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 
-        ArrayList<File> paths = new ArrayList<>();
-        paths.add(new File(request.getLocalRepository().getBasedir()));
+        ArrayList<Path> paths = new ArrayList<>();
+        paths.add(Paths.get(request.getLocalRepository().getBasedir()));
         String localRepoTail = mergedProps.get(MAVEN_REPO_LOCAL_TAIL);
         if (localRepoTail != null) {
             Arrays.stream(localRepoTail.split(","))
                     .filter(p -> p != null && !p.trim().isEmpty())
-                    .map(File::new)
+                    .map(Paths::get)
                     .forEach(paths::add);
         }
         sessionBuilder.withLocalRepositoryBaseDirectories(paths);
@@ -467,7 +463,7 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         if (filterExpression != null) {
             List<String> expressions = Arrays.stream(filterExpression.split(";"))
                     .filter(s -> s != null && !s.trim().isEmpty())
-                    .collect(Collectors.toList());
+                    .toList();
             for (String expression : expressions) {
                 if ("h".equals(expression)) {
                     filters.add(new HighestVersionFilter());

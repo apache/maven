@@ -119,7 +119,8 @@ public class DefaultProfileSelector implements ProfileSelector {
                     }
                 } catch (RuntimeException e) {
                     problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
-                            .setMessage("Failed to determine activation for profile " + profile.getId())
+                            .setMessage("Failed to determine activation for profile " + profile.getId() + ": "
+                                    + e.getMessage())
                             .setLocation(profile.getLocation(""))
                             .setException(e));
                     return false;

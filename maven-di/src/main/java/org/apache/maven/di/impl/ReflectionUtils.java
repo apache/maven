@@ -152,10 +152,6 @@ public final class ReflectionUtils {
     public static <T> @Nullable Binding<T> generateConstructorBinding(Key<T> key) {
         Class<?> cls = key.getRawType();
 
-        Annotation classInjectAnnotation = Stream.of(cls.getAnnotations())
-                .filter(a -> a.annotationType().isAnnotationPresent(Qualifier.class))
-                .findAny()
-                .orElse(null);
         List<Constructor<?>> constructors = Arrays.asList(cls.getDeclaredConstructors());
         List<Constructor<?>> injectConstructors = constructors.stream()
                 .filter(c -> c.isAnnotationPresent(Inject.class))
@@ -168,32 +164,6 @@ public final class ReflectionUtils {
                 .filter(method -> method.isAnnotationPresent(Inject.class))
                 .collect(toList());
 
-        if (classInjectAnnotation != null) {
-            if (!injectConstructors.isEmpty()) {
-                throw failedImplicitBinding(key, "inject annotation on class with inject constructor");
-            }
-            if (!factoryMethods.isEmpty()) {
-                throw failedImplicitBinding(key, "inject annotation on class with factory method");
-            }
-            if (constructors.isEmpty()) {
-                throw failedImplicitBinding(key, "inject annotation on interface");
-            }
-            if (constructors.size() > 1) {
-                throw failedImplicitBinding(key, "inject annotation on class with multiple constructors");
-            }
-            Constructor<T> declaredConstructor =
-                    (Constructor<T>) constructors.iterator().next();
-
-            Class<?> enclosingClass = cls.getEnclosingClass();
-            if (enclosingClass != null
-                    && !Modifier.isStatic(cls.getModifiers())
-                    && declaredConstructor.getParameterCount() != 1) {
-                throw failedImplicitBinding(
-                        key,
-                        "inject annotation on local class that closes over outside variables and/or has no default constructor");
-            }
-            return bindingFromConstructor(key, declaredConstructor);
-        }
         if (!injectConstructors.isEmpty()) {
             if (injectConstructors.size() > 1) {
                 throw failedImplicitBinding(key, "more than one inject constructor");
@@ -211,7 +181,25 @@ public final class ReflectionUtils {
             }
             return bindingFromMethod(injectFactoryMethods.iterator().next());
         }
-        return null;
+
+        if (constructors.isEmpty()) {
+            throw failedImplicitBinding(key, "inject annotation on interface");
+        }
+        if (constructors.size() > 1) {
+            throw failedImplicitBinding(key, "inject annotation on class with multiple constructors");
+        }
+        Constructor<T> declaredConstructor =
+                (Constructor<T>) constructors.iterator().next();
+
+        Class<?> enclosingClass = cls.getEnclosingClass();
+        if (enclosingClass != null
+                && !Modifier.isStatic(cls.getModifiers())
+                && declaredConstructor.getParameterCount() != 1) {
+            throw failedImplicitBinding(
+                    key,
+                    "inject annotation on local class that closes over outside variables and/or has no default constructor");
+        }
+        return bindingFromConstructor(key, declaredConstructor);
     }
 
     private static DIException failedImplicitBinding(Key<?> requestedKey, String message) {
@@ -312,6 +300,7 @@ public final class ReflectionUtils {
     public static <T> Binding<T> bindingFromMethod(Method method) {
         method.setAccessible(true);
         Binding<T> binding = Binding.to(
+                Key.ofType(method.getGenericReturnType(), ReflectionUtils.qualifierOf(method)),
                 args -> {
                     try {
                         Object instance;
@@ -351,6 +340,7 @@ public final class ReflectionUtils {
         Key<?>[] dependencies = toDependencies(key.getType(), constructor);
 
         Binding<T> binding = Binding.to(
+                key,
                 args -> {
                     try {
                         return constructor.newInstance(args);

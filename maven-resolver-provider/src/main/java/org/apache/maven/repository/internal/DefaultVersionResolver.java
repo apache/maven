@@ -22,10 +22,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ import java.util.Objects;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
+import org.apache.maven.metadata.v4.MetadataStaxReader;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -243,9 +243,8 @@ public class DefaultVersionResolver implements VersionResolver {
                 try (SyncContext syncContext = syncContextFactory.newInstance(session, true)) {
                     syncContext.acquire(null, Collections.singleton(metadata));
 
-                    if (metadata.getFile() != null && metadata.getFile().exists()) {
-                        try (InputStream in =
-                                Files.newInputStream(metadata.getFile().toPath())) {
+                    if (metadata.getPath() != null && Files.exists(metadata.getPath())) {
+                        try (InputStream in = Files.newInputStream(metadata.getPath())) {
                             versioning = new Versioning(
                                     new MetadataStaxReader().read(in, false).getVersioning());
 
@@ -422,7 +421,7 @@ public class DefaultVersionResolver implements VersionResolver {
 
         private final String context;
 
-        private final File localRepo;
+        private final Path localRepo;
 
         private final WorkspaceRepository workspace;
 
@@ -437,7 +436,7 @@ public class DefaultVersionResolver implements VersionResolver {
             classifier = artifact.getClassifier();
             extension = artifact.getExtension();
             version = artifact.getVersion();
-            localRepo = session.getLocalRepository().getBasedir();
+            localRepo = session.getLocalRepository().getBasePath();
             WorkspaceReader reader = session.getWorkspaceReader();
             workspace = (reader != null) ? reader.getRepository() : null;
             repositories = new ArrayList<>(request.getRepositories().size());
