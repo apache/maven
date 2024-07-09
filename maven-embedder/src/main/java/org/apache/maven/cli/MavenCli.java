@@ -321,7 +321,7 @@ public class MavenCli {
         // the -f/--file option.  However, the command line isn't parsed yet, so
         // we need to iterate through the args to find it and act upon it.
         Path cwd = Paths.get(cliRequest.workingDirectory);
-        // MavenCliTest extensively use MULTIMODULE_PROJECT_DIRECTORY
+        // MavenCliTest extensively uses MULTIMODULE_PROJECT_DIRECTORY
         Path topDirectory = cliRequest.multiModuleProjectDirectory.toPath();
         boolean isAltFile = false;
         for (String arg : cliRequest.args) {
