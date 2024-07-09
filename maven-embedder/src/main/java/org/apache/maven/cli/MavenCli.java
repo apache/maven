@@ -124,6 +124,8 @@ import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
 import static java.util.Comparator.comparing;
+import static org.apache.maven.api.Constants.MAVEN_CONF;
+import static org.apache.maven.api.Constants.MAVEN_HOME;
 import static org.apache.maven.cli.CLIManager.BATCH_MODE;
 import static org.apache.maven.cli.CLIManager.COLOR;
 import static org.apache.maven.cli.CLIManager.FORCE_INTERACTIVE;
@@ -1629,9 +1631,13 @@ public class MavenCli {
         // ----------------------------------------------------------------------
         InterpolationHelper.SubstitutionCallback callback = or(paths::getProperty, systemProperties::getProperty);
 
-        if (systemProperties.getProperty("maven.conf") != null) {
-            Path mavenConf = fileSystem.getPath(systemProperties.getProperty("maven.conf"));
-
+        Path mavenConf = null;
+        if (systemProperties.getProperty(MAVEN_CONF) != null) {
+            mavenConf = fileSystem.getPath(systemProperties.getProperty(MAVEN_CONF));
+        } else if (systemProperties.getProperty(MAVEN_HOME) != null) {
+            mavenConf = fileSystem.getPath(systemProperties.getProperty(MAVEN_HOME), "conf");
+        }
+        if (mavenConf != null) {
             Path propertiesFile = mavenConf.resolve("maven.properties");
             PropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
         }
