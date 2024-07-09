@@ -43,12 +43,20 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.repository.RepositoryPolicy;
-import org.eclipse.aether.util.graph.version.*;
+import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
+import org.eclipse.aether.util.graph.version.ContextualSnapshotVersionFilter;
+import org.eclipse.aether.util.graph.version.HighestVersionFilter;
+import org.eclipse.aether.util.graph.version.LowestVersionFilter;
+import org.eclipse.aether.util.graph.version.PredicateVersionFilter;
 import org.eclipse.aether.version.VersionScheme;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * UT for {@link DefaultRepositorySystemSessionFactory}.

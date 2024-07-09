@@ -32,7 +32,8 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Reporting;
 import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.ModelBuilderRequest;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.ModelPathTranslator;
+import org.apache.maven.api.services.model.PathTranslator;
 
 /**
  * Resolves relative paths within a model against a specific base directory.

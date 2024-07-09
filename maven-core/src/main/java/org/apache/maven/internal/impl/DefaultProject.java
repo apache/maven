@@ -19,10 +19,21 @@
 package org.apache.maven.internal.impl;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.*;
+import org.apache.maven.api.Artifact;
+import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyScope;
+import org.apache.maven.api.Exclusion;
+import org.apache.maven.api.Packaging;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Type;
+import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;

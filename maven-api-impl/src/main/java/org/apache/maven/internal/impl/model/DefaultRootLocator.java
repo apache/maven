@@ -28,7 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.maven.api.di.Named;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.RootLocator;
 
 @Named
 public class DefaultRootLocator implements RootLocator {

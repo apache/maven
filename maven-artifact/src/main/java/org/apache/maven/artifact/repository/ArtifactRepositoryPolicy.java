@@ -167,7 +167,6 @@ public class ArtifactRepositoryPolicy {
         }
     }
 
-    @SuppressWarnings("checkstyle:magicnumber")
     private int ordinalOfUpdatePolicy(String policy) {
         if (ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY.equals(policy)) {
             return 1440;

@@ -88,6 +88,7 @@ public class ProjectModelResolver implements ModelResolver {
 
     private final Map<String, Future<Result>> parentCache;
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public ProjectModelResolver(
             RepositorySystemSession session,
             RequestTrace trace,

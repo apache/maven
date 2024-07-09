@@ -31,7 +31,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.*;
+import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.Dependency;
+import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.JavaPathType;
+import org.apache.maven.api.Node;
+import org.apache.maven.api.PathScope;
+import org.apache.maven.api.PathType;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ProjectBuilder;

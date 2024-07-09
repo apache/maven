@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 @Singleton
 public final class EarLifecycleMappingProvider extends AbstractLifecycleMappingProvider {
     // START SNIPPET: ear
-    @SuppressWarnings("checkstyle:linelength")
     private static final String[] BINDINGS = {
         "generate-resources",
                 "org.apache.maven.plugins:maven-ear-plugin:" + EAR_PLUGIN_VERSION + ":generate-application-xml",

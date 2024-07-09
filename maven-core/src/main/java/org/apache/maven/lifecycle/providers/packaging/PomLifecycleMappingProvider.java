@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 @Singleton
 public final class PomLifecycleMappingProvider extends AbstractLifecycleMappingProvider {
     // START SNIPPET: pom
-    @SuppressWarnings("checkstyle:linelength")
     private static final String[] BINDINGS = {
         "install", "org.apache.maven.plugins:maven-install-plugin:" + INSTALL_PLUGIN_VERSION + ":install",
         "deploy", "org.apache.maven.plugins:maven-deploy-plugin:" + DEPLOY_PLUGIN_VERSION + ":deploy"

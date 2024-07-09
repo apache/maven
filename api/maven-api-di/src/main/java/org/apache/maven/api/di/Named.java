@@ -21,7 +21,6 @@ package org.apache.maven.api.di;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 
-import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Qualifier

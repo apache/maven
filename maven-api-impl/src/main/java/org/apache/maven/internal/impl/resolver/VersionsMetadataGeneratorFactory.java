@@ -44,7 +44,6 @@ public class VersionsMetadataGeneratorFactory implements MetadataGeneratorFactor
         return new VersionsMetadataGenerator(session, request);
     }
 
-    @SuppressWarnings("checkstyle:magicnumber")
     @Override
     public float getPriority() {
         return 20; // GA level metadata should be deployed 2nd MD
