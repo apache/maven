@@ -30,7 +30,6 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -320,7 +319,7 @@ public class MavenCli {
         // We need to locate the top level project which may be pointed at using
         // the -f/--file option.  However, the command line isn't parsed yet, so
         // we need to iterate through the args to find it and act upon it.
-        Path topDirectory = Paths.get(cliRequest.workingDirectory);
+        Path topDirectory = cliRequest.multiModuleProjectDirectory.toPath();
         boolean isAltFile = false;
         for (String arg : cliRequest.args) {
             if (isAltFile) {
@@ -374,25 +373,28 @@ public class MavenCli {
         cliManager = new CLIManager();
 
         CommandLine mavenConfig = null;
-        try {
-            File configFile = new File(cliRequest.multiModuleProjectDirectory, MVN_MAVEN_CONFIG);
+        if (cliRequest.rootDirectory != null) {
+            try {
+                File configFile =
+                        cliRequest.rootDirectory.resolve(MVN_MAVEN_CONFIG).toFile();
 
-            if (configFile.isFile()) {
-                try (Stream<String> lines = Files.lines(configFile.toPath(), Charset.defaultCharset())) {
-                    String[] args = lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#"))
-                            .toArray(String[]::new);
-                    mavenConfig = cliManager.parse(args);
-                    List<?> unrecognized = mavenConfig.getArgList();
-                    if (!unrecognized.isEmpty()) {
-                        // This file can only contain options, not args (goals or phases)
-                        throw new ParseException("Unrecognized maven.config file entries: " + unrecognized);
+                if (configFile.isFile()) {
+                    try (Stream<String> lines = Files.lines(configFile.toPath(), Charset.defaultCharset())) {
+                        String[] args = lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#"))
+                                .toArray(String[]::new);
+                        mavenConfig = cliManager.parse(args);
+                        List<?> unrecognized = mavenConfig.getArgList();
+                        if (!unrecognized.isEmpty()) {
+                            // This file can only contain options, not args (goals or phases)
+                            throw new ParseException("Unrecognized maven.config file entries: " + unrecognized);
+                        }
                     }
                 }
+            } catch (ParseException e) {
+                System.err.println("Unable to parse maven.config file options: " + e.getMessage());
+                cliManager.displayHelp(System.out);
+                throw e;
             }
-        } catch (ParseException e) {
-            System.err.println("Unable to parse maven.config file options: " + e.getMessage());
-            cliManager.displayHelp(System.out);
-            throw e;
         }
 
         try {
@@ -698,11 +700,12 @@ public class MavenCli {
 
     private List<CoreExtensionEntry> loadCoreExtensions(
             CliRequest cliRequest, ClassRealm containerRealm, Set<String> providedArtifacts) throws Exception {
-        if (cliRequest.multiModuleProjectDirectory == null) {
+        if (cliRequest.rootDirectory == null) {
             return Collections.emptyList();
         }
 
-        File extensionsFile = new File(cliRequest.multiModuleProjectDirectory, EXTENSIONS_FILENAME);
+        File extensionsFile =
+                cliRequest.rootDirectory.resolve(EXTENSIONS_FILENAME).toFile();
         if (!extensionsFile.isFile()) {
             return Collections.emptyList();
         }
@@ -1329,7 +1332,7 @@ public class MavenCli {
                 .setUpdateSnapshots(updateSnapshots) // default: false
                 .setNoSnapshotUpdates(noSnapshotUpdates) // default: false
                 .setGlobalChecksumPolicy(globalChecksumPolicy) // default: warn
-                .setMultiModuleProjectDirectory(cliRequest.multiModuleProjectDirectory);
+                .setMultiModuleProjectDirectory(rootOrTopDirectory(cliRequest).toFile());
 
         if (alternatePomFile != null) {
             File pom = resolveFile(new File(alternatePomFile), workingDirectory);
@@ -1539,6 +1542,14 @@ public class MavenCli {
 
         String mavenBuildVersion = CLIReportingUtils.createMavenVersionString(buildProperties);
         systemProperties.setProperty("maven.build.version", mavenBuildVersion);
+    }
+
+    protected Path rootOrTopDirectory(CliRequest request) {
+        if (request.rootDirectory != null) {
+            return request.rootDirectory;
+        } else {
+            return request.topDirectory;
+        }
     }
 
     protected boolean isAcceptableRootDirectory(Path path) {
