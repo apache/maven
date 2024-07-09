@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationOS;
@@ -42,6 +43,14 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
 
     private static final String REGEX_PREFIX = "regex:";
 
+    private static String systemProperty(Map<String, String> map, String key) {
+        String v = map.get(key);
+        if (v == null) {
+            v = System.getProperty(key, "");
+        }
+        return v;
+    }
+
     @Override
     public boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
         Activation activation = profile.getActivation();
@@ -58,9 +67,12 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
 
         boolean active = ensureAtLeastOneNonNull(os);
 
-        String actualOsName = context.getSystemProperties().get("os.name").toLowerCase(Locale.ENGLISH);
-        String actualOsArch = context.getSystemProperties().get("os.arch").toLowerCase(Locale.ENGLISH);
-        String actualOsVersion = context.getSystemProperties().get("os.version").toLowerCase(Locale.ENGLISH);
+        String actualOsName =
+                systemProperty(context.getSystemProperties(), "os.name").toLowerCase(Locale.ENGLISH);
+        String actualOsArch =
+                systemProperty(context.getSystemProperties(), "os.arch").toLowerCase(Locale.ENGLISH);
+        String actualOsVersion =
+                systemProperty(context.getSystemProperties(), "os.version").toLowerCase(Locale.ENGLISH);
 
         if (active && os.getFamily() != null) {
             active = determineFamilyMatch(os.getFamily(), actualOsName);
