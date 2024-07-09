@@ -485,8 +485,7 @@ public class ${class.name}
         }
 
         @Nonnull
-        public Builder importedFrom( InputLocation importedFrom )
-        {
+        public Builder importedFrom(InputLocation importedFrom) {
             this.importedFrom = importedFrom;
             return this;
         }
