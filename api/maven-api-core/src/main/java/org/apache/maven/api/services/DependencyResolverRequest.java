@@ -360,6 +360,7 @@ public interface DependencyResolverRequest {
              * @param rootArtifact The root dependency whose transitive dependencies should be collected, may be {@code
              *                     null}.
              */
+            @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultDependencyResolverRequest(
                     @Nonnull Session session,
                     @Nonnull RequestType requestType,

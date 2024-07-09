@@ -45,7 +45,6 @@ public class PluginsMetadataGeneratorFactory implements MetadataGeneratorFactory
         return new PluginsMetadataGenerator(session, request);
     }
 
-    @SuppressWarnings("checkstyle:magicnumber")
     @Override
     public float getPriority() {
         return 10; // G level MD should be deployed as 3rd MD

@@ -25,13 +25,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.maven.api.di.*;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Priority;
+import org.apache.maven.api.di.Provides;
+import org.apache.maven.api.di.Qualifier;
+import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.di.Typed;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.junit.jupiter.api.Test;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 @SuppressWarnings("unused")
 public class InjectorImplTest {

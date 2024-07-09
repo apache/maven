@@ -27,7 +27,6 @@ import org.apache.maven.api.services.ArtifactInstallerException;
 import org.apache.maven.api.services.ArtifactInstallerRequest;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.installation.InstallRequest;
-import org.eclipse.aether.installation.InstallResult;
 import org.eclipse.aether.installation.InstallationException;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -51,7 +50,7 @@ public class DefaultArtifactInstaller implements ArtifactInstaller {
             InstallRequest installRequest =
                     new InstallRequest().setArtifacts(session.toArtifacts(request.getArtifacts()));
 
-            InstallResult result = repositorySystem.install(session.getSession(), installRequest);
+            repositorySystem.install(session.getSession(), installRequest);
         } catch (InstallationException e) {
             throw new ArtifactInstallerException(e.getMessage(), e);
         }

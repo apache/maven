@@ -18,7 +18,11 @@
  */
 package org.apache.maven.api;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 abstract class ExtensibleEnums {
 

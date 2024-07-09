@@ -22,14 +22,23 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -749,7 +758,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             pomConfiguration = XmlPlexusConfiguration.toPlexusConfiguration(dom);
         }
 
-        InternalMavenSession sessionV4 = InternalMavenSession.from(session.getSession());
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(session, mojoExecution);
 
         for (MavenPluginConfigurationValidator validator : configurationValidators) {
@@ -1033,7 +1041,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             return this.value;
         }
 
-        @SuppressWarnings("checkstyle:MagicNumber")
         public int hashCode() {
             return 127 * "value".hashCode() ^ this.value.hashCode();
         }

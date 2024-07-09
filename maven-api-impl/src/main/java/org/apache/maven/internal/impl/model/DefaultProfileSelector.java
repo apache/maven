@@ -31,7 +31,9 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.ProfileActivationContext;
+import org.apache.maven.api.services.model.ProfileActivator;
+import org.apache.maven.api.services.model.ProfileSelector;
 
 /**
  * Calculates the active profiles among a given collection of profiles.

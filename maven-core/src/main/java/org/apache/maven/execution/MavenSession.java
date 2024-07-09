@@ -87,7 +87,6 @@ public class MavenSession implements Cloneable {
      * ({@link PluginDescriptor#getPluginLookupKey()}). Plugin contexts itself are mappings of {@link String} keys to
      * {@link Object} values.
      */
-    @SuppressWarnings("checkstyle:linelength")
     private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Object>>>
             pluginContextsByProjectAndPluginKey = new ConcurrentHashMap<>();
 

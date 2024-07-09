@@ -20,7 +20,8 @@ package org.apache.maven.repository.internal;
 
 import org.apache.maven.api.Version;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  */

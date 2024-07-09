@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 @Singleton
 public final class WarLifecycleMappingProvider extends AbstractLifecycleMappingProvider {
     // START SNIPPET: war
-    @SuppressWarnings("checkstyle:linelength")
     private static final String[] BINDINGS = {
         "process-resources",
                 "org.apache.maven.plugins:maven-resources-plugin:" + RESOURCES_PLUGIN_VERSION + ":resources",

@@ -68,7 +68,8 @@ import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.ModelValidator;
+import org.apache.maven.api.services.model.ModelVersionProcessor;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
 
@@ -294,6 +295,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:MethodLength")
     public void validateFileModel(Model m, ModelBuilderRequest request, ModelProblemCollector problems) {
 
         Parent parent = m.getParent();
@@ -632,6 +634,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:MethodLength")
     public void validateEffectiveModel(Model m, ModelBuilderRequest request, ModelProblemCollector problems) {
         validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.BASE, m.getModelVersion(), m);
 

@@ -32,7 +32,7 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParser;

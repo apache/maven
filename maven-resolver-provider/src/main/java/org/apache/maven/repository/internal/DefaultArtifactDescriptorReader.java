@@ -79,6 +79,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
     private final ArtifactDescriptorReaderDelegate delegate;
 
     @Inject
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultArtifactDescriptorReader(
             RemoteRepositoryManager remoteRepositoryManager,
             VersionResolver versionResolver,

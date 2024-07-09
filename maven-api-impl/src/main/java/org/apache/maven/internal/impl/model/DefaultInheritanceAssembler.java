@@ -35,7 +35,7 @@ import org.apache.maven.api.model.ReportPlugin;
 import org.apache.maven.api.model.Reporting;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.InheritanceAssembler;
 
 /**
  * Handles inheritance of model values.

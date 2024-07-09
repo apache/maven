@@ -19,7 +19,12 @@
 package org.apache.maven.artifact;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -90,6 +95,7 @@ public class DefaultArtifact implements Artifact {
                 false);
     }
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultArtifact(
             String groupId,
             String artifactId,

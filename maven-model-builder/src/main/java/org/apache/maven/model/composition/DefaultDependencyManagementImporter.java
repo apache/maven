@@ -21,7 +21,14 @@ package org.apache.maven.model.composition;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
