@@ -27,54 +27,72 @@ public final class Constants {
 
     /**
      * Maven home.
+     *
+     * @since 3.0.0
      */
     @Config(readOnly = true)
     public static final String MAVEN_HOME = "maven.home";
 
     /**
      * Maven configuration.
+     *
+     * @since 3.0.0
      */
     @Config(defaultValue = "${maven.home}/conf")
     public static final String MAVEN_CONF = "maven.conf";
 
     /**
      * Maven user home.
+     *
+     * @since 4.0.0
      */
     @Config(defaultValue = "${user.home}/.m2")
     public static final String MAVEN_USER_HOME = "maven.user.home";
 
     /**
      * Maven local repository.
+     *
+     * @since 3.0.0
      */
     @Config(defaultValue = "${maven.user.home}/repository")
     public static final String MAVEN_REPO_LOCAL = "maven.repo.local";
 
     /**
      * Maven system-wide extensions.
+     *
+     * @since 4.0.0
      */
     @Config(defaultValue = "${maven.conf}/extensions.xml")
     public static final String MAVEN_SYSTEM_EXTENSIONS = "maven.system.extensions";
 
     /**
      * Maven user extensions.
+     *
+     * @since 4.0.0
      */
     @Config(defaultValue = "${maven.user.home}/extensions.xml")
     public static final String MAVEN_USER_EXTENSIONS = "maven.user.extensions";
 
     /**
      * Maven project-wide extensions.
+     *
+     * @since 4.0.0
      */
     @Config(defaultValue = "${session.rootDirectory}/.mvn/extensions.xml")
     public static final String MAVEN_PROJECT_EXTENSIONS = "maven.project.extensions";
 
     /**
      * Maven system toolchains.
+     *
+     * @since 4.0.0
      */
     @Config(defaultValue = "${maven.conf}/toolchains.xml")
     public static final String MAVEN_SYSTEM_TOOLCHAINS = "maven.system.toolchains";
 
     /**
      * Maven user toolchains.
+     *
+     * @since 4.0.0
      */
     @Config(defaultValue = "${maven.user.home}/toolchains.xml")
     public static final String MAVEN_USER_TOOLCHAINS = "maven.user.toolchains";
@@ -88,12 +106,16 @@ public final class Constants {
     /**
      * Maven output color mode.
      * Allowed values are <code>auto</code>, <code>always</code>, <code>never</code>.
+     *
+     * @since 4.0.0
      */
     @Config(defaultValue = "auto")
     public static final String MAVEN_STYLE_COLOR_PROPERTY = "maven.style.color";
 
     /**
      * Build timestamp format.
+     *
+     * @since 3.0.0
      */
     @Config(source = Config.Source.MODEL, defaultValue = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     public static final String MAVEN_BUILD_TIMESTAMP_FORMAT = "maven.build.timestamp.format";
@@ -117,6 +139,8 @@ public final class Constants {
      * relocate <code>org.here</code> to <code>org.there</code> and finally globally relocate (see <code>&gt;&gt;</code> above)
      * <code>javax.inject:javax.inject:1</code> to <code>jakarta.inject:jakarta.inject:1.0.5</code>.
      * </p>
+     *
+     * @since 4.0.0
      */
     @Config
     public static final String MAVEN_RELOCATIONS_ENTRIES = "maven.relocations.entries";
@@ -181,24 +205,32 @@ public final class Constants {
     /**
      * Resolver transport to use.
      * Can be <code>default</code>, <code>wagon</code>, <code>apache</code>, <code>jdk</code> or <code>auto</code>.
+     *
+     * @since 4.0.0
      */
     @Config(defaultValue = "default")
     public static final String MAVEN_RESOLVER_TRANSPORT = "maven.resolver.transport";
 
     /**
      * Plugin validation level.
+     *
+     * @since 3.9.2
      */
     @Config(defaultValue = "inline")
     public static final String MAVEN_PLUGIN_VALIDATION = "maven.plugin.validation";
 
     /**
      * Plugin validation exclusions.
+     *
+     * @since 3.9.6
      */
     @Config
     public static final String MAVEN_PLUGIN_VALIDATION_EXCLUDES = "maven.plugin.validation.excludes";
 
     /**
      * ProjectBuilder parallelism.
+     *
+     * @since 4.0.0
      */
     @Config(type = "java.lang.Integer", defaultValue = "cores/2 + 1")
     public static final String MAVEN_PROJECT_BUILDER_PARALLELISM = "maven.projectBuilder.parallelism";
