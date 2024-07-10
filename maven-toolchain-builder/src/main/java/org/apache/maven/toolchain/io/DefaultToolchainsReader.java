@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.maven.api.toolchain.InputSource;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
 
@@ -47,7 +48,8 @@ public class DefaultToolchainsReader implements ToolchainsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = Files.newInputStream(input.toPath())) {
-            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options)));
+            InputSource source = new InputSource(input.toString());
+            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options), source));
         } catch (XMLStreamException e) {
             throw new ToolchainsParseException(
                     e.getMessage(),
@@ -62,7 +64,8 @@ public class DefaultToolchainsReader implements ToolchainsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (Reader in = input) {
-            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options)));
+            InputSource source = (InputSource) options.get(InputSource.class.getName());
+            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options), source));
         } catch (XMLStreamException e) {
             throw new ToolchainsParseException(
                     e.getMessage(),
@@ -77,7 +80,8 @@ public class DefaultToolchainsReader implements ToolchainsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = input) {
-            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options)));
+            InputSource source = (InputSource) options.get(InputSource.class.getName());
+            return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options), source));
         } catch (XMLStreamException e) {
             throw new ToolchainsParseException(
                     e.getMessage(),

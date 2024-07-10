@@ -27,12 +27,12 @@ import java.util.Objects;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.services.xml.ToolchainsXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
+import org.apache.maven.api.toolchain.InputSource;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
 import org.apache.maven.toolchain.v4.MavenToolchainsStaxWriter;
@@ -55,14 +55,14 @@ public class DefaultToolchainsXmlFactory implements ToolchainsXmlFactory {
         try {
             InputSource source = null;
             if (request.getModelId() != null || request.getLocation() != null) {
-                source = new InputSource(request.getModelId(), request.getLocation());
+                source = new InputSource(request.getLocation());
             }
             MavenToolchainsStaxReader xml = new MavenToolchainsStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
             if (reader != null) {
-                return xml.read(reader, request.isStrict());
+                return xml.read(reader, request.isStrict(), source);
             } else {
-                return xml.read(inputStream, request.isStrict());
+                return xml.read(inputStream, request.isStrict(), source);
             }
         } catch (Exception e) {
             throw new XmlReaderException("Unable to read toolchains: " + getMessage(e), getLocation(e), e);

@@ -662,7 +662,13 @@ public class ${className} {
         #end
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" && $Helper.isFlatItems( $field ) )
+        #if ( $locationTracking )
+                    ${field.name}.add(parse${field.toClass.name}(parser, strict, source));
+        #elseif ( $needXmlContext )
+                    ${field.name}.add(parse${field.toClass.name}(parser, strict, context));
+        #else
                     ${field.name}.add(parse${field.toClass.name}(parser, strict));
+        #end
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" )
                     List<$field.to> ${field.name} = new ArrayList<>();
