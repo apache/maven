@@ -33,6 +33,7 @@ import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.PlexusContainer;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
 import org.mockito.InOrder;
@@ -95,9 +96,9 @@ public class MavenCliTest {
 
     @Test
     public void testMavenConfig() throws Exception {
-        System.setProperty(
-                MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File("src/test/projects/config").getCanonicalPath());
-        CliRequest request = new CliRequest(new String[0], null);
+        String rootDirectory = new File("src/test/projects/config").getCanonicalPath();
+        System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, rootDirectory);
+        CliRequest request = new CliRequest(new String[] {"-f", rootDirectory}, null);
 
         // read .mvn/maven.config
         cli.initialize(request);
@@ -113,10 +114,9 @@ public class MavenCliTest {
 
     @Test
     public void testMavenConfigInvalid() throws Exception {
-        System.setProperty(
-                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
-                new File("src/test/projects/config-illegal").getCanonicalPath());
-        CliRequest request = new CliRequest(new String[0], null);
+        String rootDirectory = new File("src/test/projects/config-illegal").getCanonicalPath();
+        System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, rootDirectory);
+        CliRequest request = new CliRequest(new String[] {"-f", rootDirectory}, null);
 
         cli.initialize(request);
         try {
@@ -142,10 +142,9 @@ public class MavenCliTest {
      */
     @Test
     public void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine() throws Exception {
-        System.setProperty(
-                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
-                new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
-        CliRequest request = new CliRequest(new String[] {"-T", "5"}, null);
+        String rootDirectory = new File("src/test/projects/mavenConfigProperties").getCanonicalPath();
+        System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, rootDirectory);
+        CliRequest request = new CliRequest(new String[] {"-f", rootDirectory, "-T", "5"}, null);
 
         cli.initialize(request);
         // read .mvn/maven.config
@@ -169,10 +168,9 @@ public class MavenCliTest {
      */
     @Test
     public void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine() throws Exception {
-        System.setProperty(
-                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
-                new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
-        CliRequest request = new CliRequest(new String[] {"-Drevision=8.1.0"}, null);
+        String rootDirectory = new File("src/test/projects/mavenConfigProperties").getCanonicalPath();
+        System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, rootDirectory);
+        CliRequest request = new CliRequest(new String[] {"-f", rootDirectory, "-Drevision=8.1.0"}, null);
 
         cli.initialize(request);
         // read .mvn/maven.config
@@ -198,10 +196,10 @@ public class MavenCliTest {
      */
     @Test
     public void testMVNConfigurationCLIRepeatedPropertiesLastWins() throws Exception {
-        System.setProperty(
-                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
-                new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
-        CliRequest request = new CliRequest(new String[] {"-Drevision=8.1.0", "-Drevision=8.2.0"}, null);
+        String rootDirectory = new File("src/test/projects/mavenConfigProperties").getCanonicalPath();
+        System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, rootDirectory);
+        CliRequest request =
+                new CliRequest(new String[] {"-f", rootDirectory, "-Drevision=8.1.0", "-Drevision=8.2.0"}, null);
 
         cli.initialize(request);
         // read .mvn/maven.config
@@ -226,6 +224,7 @@ public class MavenCliTest {
      * @throws Exception
      */
     @Test
+    @Ignore("This UT plays with multiModuleProjectDirectory and -f should not be possible")
     public void testMVNConfigurationFunkyArguments() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,

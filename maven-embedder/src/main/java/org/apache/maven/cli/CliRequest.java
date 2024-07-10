@@ -39,6 +39,7 @@ public class CliRequest {
 
     String workingDirectory;
 
+    @Deprecated
     File multiModuleProjectDirectory;
 
     Path rootDirectory;

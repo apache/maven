@@ -433,12 +433,16 @@ public interface MavenExecutionRequest {
 
     /**
      * @since 3.3.0
+     * @deprecated
      */
+    @Deprecated
     void setMultiModuleProjectDirectory(File file);
 
     /**
      * @since 3.3.0
+     * @deprecated
      */
+    @Deprecated
     File getMultiModuleProjectDirectory();
 
     /**

@@ -130,6 +130,7 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 public class MavenCli {
     public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
 
+    @Deprecated
     public static final String MULTIMODULE_PROJECT_DIRECTORY = "maven.multiModuleProjectDirectory";
 
     public static final String USER_HOME = System.getProperty("user.home");
@@ -320,14 +321,12 @@ public class MavenCli {
         // We need to locate the top level project which may be pointed at using
         // the -f/--file option.  However, the command line isn't parsed yet, so
         // we need to iterate through the args to find it and act upon it.
-        Path cwd = Paths.get(cliRequest.workingDirectory);
-        // MavenCliTest extensively uses MULTIMODULE_PROJECT_DIRECTORY
-        Path topDirectory = cliRequest.multiModuleProjectDirectory.toPath();
+        Path topDirectory = Paths.get(cliRequest.workingDirectory);
         boolean isAltFile = false;
         for (String arg : cliRequest.args) {
             if (isAltFile) {
                 // this is the argument following -f/--file
-                Path path = cwd.resolve(stripLeadingAndTrailingQuotes(arg));
+                Path path = topDirectory.resolve(stripLeadingAndTrailingQuotes(arg));
                 if (Files.isDirectory(path)) {
                     topDirectory = path;
                 } else if (Files.isRegularFile(path)) {
