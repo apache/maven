@@ -136,7 +136,6 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
             return format(size, unit, false);
         }
 
-        @SuppressWarnings("checkstyle:magicnumber")
         public String format(long size, ScaleUnit unit, boolean omitSymbol) {
             if (size < 0L) {
                 throw new IllegalArgumentException("file size cannot be negative: " + size);

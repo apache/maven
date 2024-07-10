@@ -27,7 +27,21 @@ import java.util.Map;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
 
-import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.*;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.CLEAN;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.COMPILE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.INITIALIZE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.INSTALL;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.PACKAGE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.POST_CLEAN;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.POST_SITE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.PRE_CLEAN;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.PRE_SITE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.PROCESS_RESOURCES;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.PROCESS_TEST_RESOURCES;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.SITE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.SITE_DEPLOY;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.TEST;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.VALIDATE;
 
 /**
  * @author Kristian Rosenvold
