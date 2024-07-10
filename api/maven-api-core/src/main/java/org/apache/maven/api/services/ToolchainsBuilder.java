@@ -52,7 +52,9 @@ public interface ToolchainsBuilder extends Service {
      */
     @Nonnull
     default ToolchainsBuilderResult build(
-            @Nonnull Session session, @Nonnull Source installationToolchainsFile, @Nonnull Source userToolchainsSource) {
+            @Nonnull Session session,
+            @Nonnull Source installationToolchainsFile,
+            @Nonnull Source userToolchainsSource) {
         return build(ToolchainsBuilderRequest.build(session, installationToolchainsFile, userToolchainsSource));
     }
 }

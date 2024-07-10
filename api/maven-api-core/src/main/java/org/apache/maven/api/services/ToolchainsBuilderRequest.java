@@ -57,7 +57,9 @@ public interface ToolchainsBuilderRequest {
 
     @Nonnull
     static ToolchainsBuilderRequest build(
-            @Nonnull Session session, @Nullable Source installationToolchainsFile, @Nullable Source userToolchainsSource) {
+            @Nonnull Session session,
+            @Nullable Source installationToolchainsFile,
+            @Nullable Source userToolchainsSource) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
                 .installationToolchainsSource(installationToolchainsFile)

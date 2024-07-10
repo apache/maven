@@ -745,11 +745,15 @@ public class MavenCli {
 
         List<CoreExtension> extensions = new ArrayList<>();
 
-        String extensionsFile = cliRequest.getUserProperties().getProperty(Constants.MAVEN_PROJECT_SETTINGS);
-        extensions.addAll(readCoreExtensionsDescriptor(extensionsFile));
+        String installationExtensionsFile =
+                cliRequest.getUserProperties().getProperty(Constants.MAVEN_INSTALLATION_EXTENSIONS);
+        extensions.addAll(readCoreExtensionsDescriptor(installationExtensionsFile));
 
-        String userHomeExtensionsFile = cliRequest.getUserProperties().getProperty(Constants.MAVEN_USER_SETTINGS);
-        extensions.addAll(readCoreExtensionsDescriptor(userHomeExtensionsFile));
+        String projectExtensionsFile = cliRequest.getUserProperties().getProperty(Constants.MAVEN_PROJECT_EXTENSIONS);
+        extensions.addAll(readCoreExtensionsDescriptor(projectExtensionsFile));
+
+        String userExtensionsFile = cliRequest.getUserProperties().getProperty(Constants.MAVEN_USER_EXTENSIONS);
+        extensions.addAll(readCoreExtensionsDescriptor(userExtensionsFile));
 
         if (extensions.isEmpty()) {
             return Collections.emptyList();
