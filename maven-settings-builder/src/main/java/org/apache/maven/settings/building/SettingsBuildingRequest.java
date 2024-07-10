@@ -32,16 +32,18 @@ public interface SettingsBuildingRequest {
      *
      * @return The global settings file or {@code null} if none.
      */
+    @Deprecated
     File getGlobalSettingsFile();
 
     /**
      * Sets the global settings file. A non-existent settings file is equivalent to empty settings. If both user
      * settings and global settings are given, the user settings take precedence.
      *
-     * @param globalSettingsFile The global settings file, may be {@code null} to disable global settings.
+     * @param installationSettingsFile The global settings file, may be {@code null} to disable global settings.
      * @return This request, never {@code null}.
      */
-    SettingsBuildingRequest setGlobalSettingsFile(File globalSettingsFile);
+    @Deprecated
+    SettingsBuildingRequest setGlobalSettingsFile(File installationSettingsFile);
 
     /**
      * Gets the global settings source.
@@ -54,10 +56,42 @@ public interface SettingsBuildingRequest {
      * Sets the global settings source. If both user settings and a global settings are given, the user settings take
      * precedence.
      *
-     * @param globalSettingsSource The global settings source, may be {@code null} to disable global settings.
+     * @param installationSettingsSource The global settings source, may be {@code null} to disable global settings.
      * @return This request, never {@code null}.
      */
-    SettingsBuildingRequest setGlobalSettingsSource(SettingsSource globalSettingsSource);
+    SettingsBuildingRequest setGlobalSettingsSource(SettingsSource installationSettingsSource);
+
+    /**
+     * Gets the installation settings file.
+     *
+     * @return The installation settings file or {@code null} if none.
+     */
+    File getInstallationSettingsFile();
+
+    /**
+     * Sets the installation settings file. A non-existent settings file is equivalent to empty settings. If both user
+     * settings and installation settings are given, the user settings take precedence.
+     *
+     * @param installationSettingsFile The installation settings file, may be {@code null} to disable installation settings.
+     * @return This request, never {@code null}.
+     */
+    SettingsBuildingRequest setInstallationSettingsFile(File installationSettingsFile);
+
+    /**
+     * Gets the installation settings source.
+     *
+     * @return The installation settings source or {@code null} if none.
+     */
+    SettingsSource getInstallationSettingsSource();
+
+    /**
+     * Sets the installation settings source. If both user settings and am installation settings are given, the user settings take
+     * precedence.
+     *
+     * @param installationSettingsSource The installation settings source, may be {@code null} to disable installation settings.
+     * @return This request, never {@code null}.
+     */
+    SettingsBuildingRequest setInstallationSettingsSource(SettingsSource installationSettingsSource);
 
     /**
      * Gets the project settings file.

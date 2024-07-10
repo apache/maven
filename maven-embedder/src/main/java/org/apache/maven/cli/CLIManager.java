@@ -82,14 +82,14 @@ public class CLIManager {
     @Deprecated
     public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
 
-    public static final String ALTERNATE_INSTALL_SETTINGS = "is";
+    public static final String ALTERNATE_INSTALLATION_SETTINGS = "is";
 
     public static final char ALTERNATE_USER_TOOLCHAINS = 't';
 
     @Deprecated
     public static final String ALTERNATE_GLOBAL_TOOLCHAINS = "gt";
 
-    public static final String ALTERNATE_INSTALL_TOOLCHAINS = "it";
+    public static final String ALTERNATE_INSTALLATION_TOOLCHAINS = "it";
 
     public static final String FAIL_FAST = "ff";
 
@@ -228,9 +228,9 @@ public class CLIManager {
                 .desc("Alternate path for the global settings file")
                 .hasArg()
                 .build());
-        options.addOption(Option.builder(ALTERNATE_INSTALL_SETTINGS)
+        options.addOption(Option.builder(ALTERNATE_INSTALLATION_SETTINGS)
                 .longOpt("install-settings")
-                .desc("Alternate path for the install settings file")
+                .desc("Alternate path for the installation settings file")
                 .hasArg()
                 .deprecated()
                 .build());
@@ -244,9 +244,9 @@ public class CLIManager {
                 .desc("Alternate path for the global toolchains file")
                 .hasArg()
                 .build());
-        options.addOption(Option.builder(ALTERNATE_INSTALL_TOOLCHAINS)
+        options.addOption(Option.builder(ALTERNATE_INSTALLATION_TOOLCHAINS)
                 .longOpt("install-toolchains")
-                .desc("Alternate path for the install toolchains file")
+                .desc("Alternate path for the installation toolchains file")
                 .hasArg()
                 .deprecated()
                 .build());

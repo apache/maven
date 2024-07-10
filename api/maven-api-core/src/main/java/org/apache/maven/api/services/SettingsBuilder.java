@@ -53,8 +53,8 @@ public interface SettingsBuilder extends Service {
      */
     @Nonnull
     default SettingsBuilderResult build(
-            @Nonnull Session session, @Nonnull Source installSettingsSource, @Nonnull Source userSettingsSource) {
-        return build(session, installSettingsSource, null, userSettingsSource);
+            @Nonnull Session session, @Nonnull Source installationSettingsSource, @Nonnull Source userSettingsSource) {
+        return build(session, installationSettingsSource, null, userSettingsSource);
     }
 
     /**
@@ -65,8 +65,8 @@ public interface SettingsBuilder extends Service {
      */
     @Nonnull
     default SettingsBuilderResult build(
-            @Nonnull Session session, @Nonnull Path installSettingsPath, @Nonnull Path userSettingsPath) {
-        return build(session, installSettingsPath, null, userSettingsPath);
+            @Nonnull Session session, @Nonnull Path installationSettingsPath, @Nonnull Path userSettingsPath) {
+        return build(session, installationSettingsPath, null, userSettingsPath);
     }
 
     /**
@@ -78,11 +78,11 @@ public interface SettingsBuilder extends Service {
     @Nonnull
     default SettingsBuilderResult build(
             @Nonnull Session session,
-            @Nonnull Source installSettingsSource,
+            @Nonnull Source installationSettingsSource,
             @Nonnull Source projectSettingsSource,
             @Nonnull Source userSettingsSource) {
         return build(SettingsBuilderRequest.build(
-                session, installSettingsSource, projectSettingsSource, userSettingsSource));
+                session, installationSettingsSource, projectSettingsSource, userSettingsSource));
     }
 
     /**
@@ -94,10 +94,11 @@ public interface SettingsBuilder extends Service {
     @Nonnull
     default SettingsBuilderResult build(
             @Nonnull Session session,
-            @Nonnull Path installSettingsPath,
+            @Nonnull Path installationSettingsPath,
             @Nonnull Path projectSettingsPath,
             @Nonnull Path userSettingsPath) {
-        return build(SettingsBuilderRequest.build(session, installSettingsPath, projectSettingsPath, userSettingsPath));
+        return build(
+                SettingsBuilderRequest.build(session, installationSettingsPath, projectSettingsPath, userSettingsPath));
     }
 
     /**

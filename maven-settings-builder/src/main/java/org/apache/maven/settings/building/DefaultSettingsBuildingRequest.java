@@ -27,13 +27,13 @@ import java.util.Properties;
  */
 public class DefaultSettingsBuildingRequest implements SettingsBuildingRequest {
 
-    private File globalSettingsFile;
+    private File installationSettingsFile;
 
     private File projectSettingsFile;
 
     private File userSettingsFile;
 
-    private SettingsSource globalSettingsSource;
+    private SettingsSource installationSettingsSource;
 
     private SettingsSource projectSettingsSource;
 
@@ -44,25 +44,49 @@ public class DefaultSettingsBuildingRequest implements SettingsBuildingRequest {
     private Properties userProperties;
 
     @Override
+    @Deprecated
     public File getGlobalSettingsFile() {
-        return globalSettingsFile;
+        return getInstallationSettingsFile();
     }
 
     @Override
+    @Deprecated
     public DefaultSettingsBuildingRequest setGlobalSettingsFile(File globalSettingsFile) {
-        this.globalSettingsFile = globalSettingsFile;
+        return setInstallationSettingsFile(globalSettingsFile);
+    }
+
+    @Override
+    @Deprecated
+    public SettingsSource getGlobalSettingsSource() {
+        return getInstallationSettingsSource();
+    }
+
+    @Override
+    @Deprecated
+    public DefaultSettingsBuildingRequest setGlobalSettingsSource(SettingsSource globalSettingsSource) {
+        return setInstallationSettingsSource(globalSettingsSource);
+    }
+
+    @Override
+    public File getInstallationSettingsFile() {
+        return installationSettingsFile;
+    }
+
+    @Override
+    public DefaultSettingsBuildingRequest setInstallationSettingsFile(File installationSettingsFile) {
+        this.installationSettingsFile = installationSettingsFile;
 
         return this;
     }
 
     @Override
-    public SettingsSource getGlobalSettingsSource() {
-        return globalSettingsSource;
+    public SettingsSource getInstallationSettingsSource() {
+        return installationSettingsSource;
     }
 
     @Override
-    public DefaultSettingsBuildingRequest setGlobalSettingsSource(SettingsSource globalSettingsSource) {
-        this.globalSettingsSource = globalSettingsSource;
+    public DefaultSettingsBuildingRequest setInstallationSettingsSource(SettingsSource installationSettingsSource) {
+        this.installationSettingsSource = installationSettingsSource;
 
         return this;
     }

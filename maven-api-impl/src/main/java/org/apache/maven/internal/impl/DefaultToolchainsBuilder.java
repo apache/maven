@@ -57,7 +57,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     public ToolchainsBuilderResult build(ToolchainsBuilderRequest request) throws ToolchainsBuilderException {
         List<BuilderProblem> problems = new ArrayList<>();
 
-        Source installSource = request.getInstallToolchainsSource().orElse(null);
+        Source installSource = request.getInstallationToolchainsSource().orElse(null);
         PersistedToolchains install = readToolchains(installSource, request, problems);
 
         Source userSource = request.getUserToolchainsSource().orElse(null);

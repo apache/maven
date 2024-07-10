@@ -614,7 +614,7 @@ class MavenCliTest {
                 null);
         request.rootDirectory = rootDirectory;
         request.topDirectory = topDirectory;
-        System.setProperty("maven.install.conf", mavenConf.toString());
+        System.setProperty("maven.installation.conf", mavenConf.toString());
 
         // Act
         cli.setFileSystem(fs);

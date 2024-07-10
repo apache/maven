@@ -125,7 +125,7 @@ import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
 import static java.util.Comparator.comparing;
 import static org.apache.maven.api.Constants.MAVEN_HOME;
-import static org.apache.maven.api.Constants.MAVEN_INSTALL_CONF;
+import static org.apache.maven.api.Constants.MAVEN_INSTALLATION_CONF;
 import static org.apache.maven.cli.CLIManager.BATCH_MODE;
 import static org.apache.maven.cli.CLIManager.COLOR;
 import static org.apache.maven.cli.CLIManager.FORCE_INTERACTIVE;
@@ -1191,41 +1191,41 @@ public class MavenCli {
             }
         }
 
-        File installToolchainsFile = null;
+        File installationToolchainsFile = null;
 
-        if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_INSTALL_TOOLCHAINS)) {
-            installToolchainsFile =
-                    new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_INSTALL_TOOLCHAINS));
-            installToolchainsFile = resolveFile(installToolchainsFile, cliRequest.workingDirectory);
+        if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_INSTALLATION_TOOLCHAINS)) {
+            installationToolchainsFile =
+                    new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_INSTALLATION_TOOLCHAINS));
+            installationToolchainsFile = resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
 
-            if (!installToolchainsFile.isFile()) {
+            if (!installationToolchainsFile.isFile()) {
                 throw new FileNotFoundException(
-                        "The specified install toolchains file does not exist: " + installToolchainsFile);
+                        "The specified installation toolchains file does not exist: " + installationToolchainsFile);
             }
         } else if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS)) {
-            installToolchainsFile =
+            installationToolchainsFile =
                     new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS));
-            installToolchainsFile = resolveFile(installToolchainsFile, cliRequest.workingDirectory);
+            installationToolchainsFile = resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
 
-            if (!installToolchainsFile.isFile()) {
+            if (!installationToolchainsFile.isFile()) {
                 throw new FileNotFoundException(
-                        "The specified install toolchains file does not exist: " + installToolchainsFile);
+                        "The specified installation toolchains file does not exist: " + installationToolchainsFile);
             }
         } else {
-            String installToolchainsFileStr =
-                    cliRequest.getUserProperties().getProperty(Constants.MAVEN_INSTALL_TOOLCHAINS);
-            if (installToolchainsFileStr != null) {
-                installToolchainsFile = new File(installToolchainsFileStr);
-                installToolchainsFile = resolveFile(installToolchainsFile, cliRequest.workingDirectory);
+            String installationToolchainsFileStr =
+                    cliRequest.getUserProperties().getProperty(Constants.MAVEN_INSTALLATION_TOOLCHAINS);
+            if (installationToolchainsFileStr != null) {
+                installationToolchainsFile = new File(installationToolchainsFileStr);
+                installationToolchainsFile = resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
             }
         }
 
-        cliRequest.request.setInstallToolchainsFile(installToolchainsFile);
+        cliRequest.request.setInstallationToolchainsFile(installationToolchainsFile);
         cliRequest.request.setUserToolchainsFile(userToolchainsFile);
 
         DefaultToolchainsBuildingRequest toolchainsRequest = new DefaultToolchainsBuildingRequest();
-        if (installToolchainsFile != null && installToolchainsFile.isFile()) {
-            toolchainsRequest.setInstallToolchainsSource(new FileSource(installToolchainsFile));
+        if (installationToolchainsFile != null && installationToolchainsFile.isFile()) {
+            toolchainsRequest.setInstallationToolchainsSource(new FileSource(installationToolchainsFile));
         }
         if (userToolchainsFile != null && userToolchainsFile.isFile()) {
             toolchainsRequest.setUserToolchainsSource(new FileSource(userToolchainsFile));
@@ -1234,8 +1234,8 @@ public class MavenCli {
         eventSpyDispatcher.onEvent(toolchainsRequest);
 
         slf4jLogger.debug(
-                "Reading install toolchains from '{}'",
-                getLocation(toolchainsRequest.getInstallToolchainsSource(), installToolchainsFile));
+                "Reading installation toolchains from '{}'",
+                getLocation(toolchainsRequest.getInstallationToolchainsSource(), installationToolchainsFile));
         slf4jLogger.debug(
                 "Reading user toolchains from '{}'",
                 getLocation(toolchainsRequest.getUserToolchainsSource(), userToolchainsFile));
@@ -1634,8 +1634,8 @@ public class MavenCli {
                 or(paths::getProperty, prefix("cli:", commandLine::getOptionValue), systemProperties::getProperty);
 
         Path mavenConf = null;
-        if (systemProperties.getProperty(MAVEN_INSTALL_CONF) != null) {
-            mavenConf = fileSystem.getPath(systemProperties.getProperty(MAVEN_INSTALL_CONF));
+        if (systemProperties.getProperty(MAVEN_INSTALLATION_CONF) != null) {
+            mavenConf = fileSystem.getPath(systemProperties.getProperty(MAVEN_INSTALLATION_CONF));
         } else if (systemProperties.getProperty("maven.conf") != null) {
             mavenConf = fileSystem.getPath(systemProperties.getProperty("maven.conf"));
         } else if (systemProperties.getProperty(MAVEN_HOME) != null) {

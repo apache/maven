@@ -26,30 +26,30 @@ import org.apache.maven.building.Source;
  * @since 3.3.0
  */
 public class DefaultToolchainsBuildingRequest implements ToolchainsBuildingRequest {
-    private Source installToolchainsSource;
+    private Source installationToolchainsSource;
 
     private Source userToolchainsSource;
 
     @Override
     @Deprecated
     public Source getGlobalToolchainsSource() {
-        return getInstallToolchainsSource();
+        return getInstallationToolchainsSource();
     }
 
     @Override
     @Deprecated
     public ToolchainsBuildingRequest setGlobalToolchainsSource(Source globalToolchainsSource) {
-        return setInstallToolchainsSource(globalToolchainsSource);
+        return setInstallationToolchainsSource(globalToolchainsSource);
     }
 
     @Override
-    public Source getInstallToolchainsSource() {
-        return installToolchainsSource;
+    public Source getInstallationToolchainsSource() {
+        return installationToolchainsSource;
     }
 
     @Override
-    public ToolchainsBuildingRequest setInstallToolchainsSource(Source installToolchainsSource) {
-        this.installToolchainsSource = installToolchainsSource;
+    public ToolchainsBuildingRequest setInstallationToolchainsSource(Source installationToolchainsSource) {
+        this.installationToolchainsSource = installationToolchainsSource;
         return this;
     }
 

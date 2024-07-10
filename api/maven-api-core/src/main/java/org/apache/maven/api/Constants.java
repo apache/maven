@@ -34,12 +34,12 @@ public final class Constants {
     public static final String MAVEN_HOME = "maven.home";
 
     /**
-     * Maven install configuration directory.
+     * Maven installation configuration directory.
      *
      * @since 4.0.0
      */
     @Config(defaultValue = "${maven.home}/conf")
-    public static final String MAVEN_INSTALL_CONF = "maven.install.conf";
+    public static final String MAVEN_INSTALLATION_CONF = "maven.installation.conf";
 
     /**
      * Maven user configuration directory.
@@ -66,12 +66,12 @@ public final class Constants {
     public static final String MAVEN_REPO_LOCAL = "maven.repo.local";
 
     /**
-     * Maven install settings.
+     * Maven installation settings.
      *
      * @since 4.0.0
      */
-    @Config(defaultValue = "${maven.install.conf}/settings.xml")
-    public static final String MAVEN_INSTALL_SETTINGS = "maven.install.settings";
+    @Config(defaultValue = "${maven.installation.conf}/settings.xml")
+    public static final String MAVEN_INSTALLATION_SETTINGS = "maven.installation.settings";
 
     /**
      * Maven user settings.
@@ -90,12 +90,12 @@ public final class Constants {
     public static final String MAVEN_PROJECT_SETTINGS = "maven.project.settings";
 
     /**
-     * Maven install extensions.
+     * Maven installation extensions.
      *
      * @since 4.0.0
      */
-    @Config(defaultValue = "${maven.install.conf}/extensions.xml")
-    public static final String MAVEN_INSTALL_EXTENSIONS = "maven.install.extensions";
+    @Config(defaultValue = "${maven.installation.conf}/extensions.xml")
+    public static final String MAVEN_INSTALLATION_EXTENSIONS = "maven.installation.extensions";
 
     /**
      * Maven user extensions.
@@ -114,12 +114,12 @@ public final class Constants {
     public static final String MAVEN_PROJECT_EXTENSIONS = "maven.project.extensions";
 
     /**
-     * Maven install toolchains.
+     * Maven installation toolchains.
      *
      * @since 4.0.0
      */
-    @Config(defaultValue = "${maven.install.conf}/toolchains.xml")
-    public static final String MAVEN_INSTALL_TOOLCHAINS = "maven.install.toolchains";
+    @Config(defaultValue = "${maven.installation.conf}/toolchains.xml")
+    public static final String MAVEN_INSTALLATION_TOOLCHAINS = "maven.installation.toolchains";
 
     /**
      * Maven user toolchains.

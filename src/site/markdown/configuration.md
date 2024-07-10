@@ -28,10 +28,10 @@ under the License.
 | 1. | `maven.build.timestamp.format` | `String` | Build timestamp format. |  `yyyy-MM-dd'T'HH:mm:ssXXX`  | 3.0.0 | Model properties |
 | 2. | `maven.ext.class.path` | `String` | Extensions class path. |  -  |  | User properties |
 | 3. | `maven.home` | `String` | Maven home. |  -  | 3.0.0 | User properties |
-| 4. | `maven.install.conf` | `String` | Maven install configuration directory. |  `${maven.home}/conf`  | 4.0.0 | User properties |
-| 5. | `maven.install.extensions` | `String` | Maven install extensions. |  `${maven.install.conf}/extensions.xml`  | 4.0.0 | User properties |
-| 6. | `maven.install.settings` | `String` | Maven install settings. |  `${maven.install.conf}/settings.xml`  | 4.0.0 | User properties |
-| 7. | `maven.install.toolchains` | `String` | Maven install toolchains. |  `${maven.install.conf}/toolchains.xml`  | 4.0.0 | User properties |
+| 4. | `maven.installation.conf` | `String` | Maven installation configuration directory. |  `${maven.home}/conf`  | 4.0.0 | User properties |
+| 5. | `maven.installation.extensions` | `String` | Maven installation extensions. |  `${maven.installation.conf}/extensions.xml`  | 4.0.0 | User properties |
+| 6. | `maven.installation.settings` | `String` | Maven installation settings. |  `${maven.installation.conf}/settings.xml`  | 4.0.0 | User properties |
+| 7. | `maven.installation.toolchains` | `String` | Maven installation toolchains. |  `${maven.installation.conf}/toolchains.xml`  | 4.0.0 | User properties |
 | 8. | `maven.plugin.validation` | `String` | Plugin validation level. |  `inline`  | 3.9.2 | User properties |
 | 9. | `maven.plugin.validation.excludes` | `String` | Plugin validation exclusions. |  -  | 3.9.6 | User properties |
 | 10. | `maven.project.conf` | `String` | Maven project configuration directory. |  `${session.rootDirectory}/.mvn`  | 4.0.0 | User properties |

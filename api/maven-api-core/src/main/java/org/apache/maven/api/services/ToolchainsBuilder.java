@@ -24,7 +24,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Builds the effective toolchains from a user toolchains file and/or a system toolchains file.
+ * Builds the effective toolchains from a user toolchains file and/or an installation toolchains file.
  *
  * @since 4.0.0
  */
@@ -44,7 +44,7 @@ public interface ToolchainsBuilder extends Service {
      * Builds the effective toolchains for the specified toolchains sources.
      *
      * @param session the {@link Session}, must not be {@code null}
-     * @param systemToolchainsSource The {@link Source} pointing to the system toolchains, must not be {@code null}
+     * @param installationToolchainsFile The {@link Source} pointing to the installation toolchains, must not be {@code null}
      * @param userToolchainsSource The {@link Source} pointing to the user toolchains, must not be {@code null}
      * @throws ToolchainsBuilderException if the project cannot be created
      * @throws IllegalArgumentException if an argument is {@code null} or invalid
@@ -52,7 +52,7 @@ public interface ToolchainsBuilder extends Service {
      */
     @Nonnull
     default ToolchainsBuilderResult build(
-            @Nonnull Session session, @Nonnull Source systemToolchainsSource, @Nonnull Source userToolchainsSource) {
-        return build(ToolchainsBuilderRequest.build(session, systemToolchainsSource, userToolchainsSource));
+            @Nonnull Session session, @Nonnull Source installationToolchainsFile, @Nonnull Source userToolchainsSource) {
+        return build(ToolchainsBuilderRequest.build(session, installationToolchainsFile, userToolchainsSource));
     }
 }

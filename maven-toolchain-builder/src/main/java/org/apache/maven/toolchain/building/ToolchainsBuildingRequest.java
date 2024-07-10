@@ -46,20 +46,20 @@ public interface ToolchainsBuildingRequest {
     ToolchainsBuildingRequest setGlobalToolchainsSource(Source globalToolchainsSource);
 
     /**
-     * Gets the install toolchains source.
+     * Gets the installation toolchains source.
      *
-     * @return The install toolchains source or {@code null} if none.
+     * @return The installation toolchains source or {@code null} if none.
      */
-    Source getInstallToolchainsSource();
+    Source getInstallationToolchainsSource();
 
     /**
-     * Sets the install toolchains source. If both user toolchains and a install toolchains are given, the user toolchains
+     * Sets the installation toolchains source. If both user toolchains and an installation toolchains are given, the user toolchains
      * take precedence.
      *
-     * @param installToolchainsSource The install toolchains source, may be {@code null} to disable global toolchains.
+     * @param installationToolchainsSource The installation toolchains source, may be {@code null} to disable global toolchains.
      * @return This request, never {@code null}.
      */
-    ToolchainsBuildingRequest setInstallToolchainsSource(Source installToolchainsSource);
+    ToolchainsBuildingRequest setInstallationToolchainsSource(Source installationToolchainsSource);
 
     /**
      * Gets the user toolchains source.

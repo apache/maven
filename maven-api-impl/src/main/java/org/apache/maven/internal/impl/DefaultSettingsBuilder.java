@@ -66,7 +66,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     public SettingsBuilderResult build(SettingsBuilderRequest request) throws SettingsBuilderException {
         List<BuilderProblem> problems = new ArrayList<>();
 
-        Source installSource = request.getInstallSettingsSource().orElse(null);
+        Source installSource = request.getInstallationSettingsSource().orElse(null);
         Settings install = readSettings(installSource, false, request, problems);
 
         Source projectSource = request.getProjectSettingsSource().orElse(null);

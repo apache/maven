@@ -121,34 +121,34 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
             projectSettingsFile = null;
         }
 
-        File systemSettingsFile;
+        File installationSettingsFile;
 
-        if (commandLine.hasOption(CLIManager.ALTERNATE_INSTALL_SETTINGS)) {
-            systemSettingsFile = new File(commandLine.getOptionValue(CLIManager.ALTERNATE_INSTALL_SETTINGS));
-            systemSettingsFile = resolveFile(systemSettingsFile, workingDirectory);
+        if (commandLine.hasOption(CLIManager.ALTERNATE_INSTALLATION_SETTINGS)) {
+            installationSettingsFile = new File(commandLine.getOptionValue(CLIManager.ALTERNATE_INSTALLATION_SETTINGS));
+            installationSettingsFile = resolveFile(installationSettingsFile, workingDirectory);
 
-            if (!systemSettingsFile.isFile()) {
+            if (!installationSettingsFile.isFile()) {
                 throw new FileNotFoundException(
-                        "The specified system settings file does not exist: " + systemSettingsFile);
+                        "The specified system settings file does not exist: " + installationSettingsFile);
             }
         } else if (commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_SETTINGS)) {
-            systemSettingsFile = new File(commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_SETTINGS));
-            systemSettingsFile = resolveFile(systemSettingsFile, workingDirectory);
+            installationSettingsFile = new File(commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_SETTINGS));
+            installationSettingsFile = resolveFile(installationSettingsFile, workingDirectory);
 
-            if (!systemSettingsFile.isFile()) {
+            if (!installationSettingsFile.isFile()) {
                 throw new FileNotFoundException(
-                        "The specified global settings file does not exist: " + systemSettingsFile);
+                        "The specified global settings file does not exist: " + installationSettingsFile);
             }
         } else {
-            systemSettingsFile = DEFAULT_SYSTEM_SETTINGS_FILE;
+            installationSettingsFile = DEFAULT_SYSTEM_SETTINGS_FILE;
         }
 
-        request.setSystemSettingsFile(systemSettingsFile);
+        request.setInstallationSettingsFile(installationSettingsFile);
         request.setProjectSettingsFile(projectSettingsFile);
         request.setUserSettingsFile(userSettingsFile);
 
         SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
-        settingsRequest.setGlobalSettingsFile(systemSettingsFile);
+        settingsRequest.setInstallationSettingsFile(installationSettingsFile);
         settingsRequest.setProjectSettingsFile(projectSettingsFile);
         settingsRequest.setUserSettingsFile(userSettingsFile);
         settingsRequest.setSystemProperties(cliRequest.getSystemProperties());
