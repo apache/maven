@@ -36,6 +36,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -1634,7 +1635,7 @@ public class MavenCli {
         // ----------------------------------------------------------------------
         // Load config files
         // ----------------------------------------------------------------------
-        InterpolationHelper.SubstitutionCallback callback =
+        Function<String, String> callback =
                 or(paths::getProperty, prefix("cli:", commandLine::getOptionValue), systemProperties::getProperty);
 
         Path mavenConf = null;
@@ -1660,21 +1661,21 @@ public class MavenCli {
                 .forEach(k -> System.setProperty(k, userProperties.getProperty(k)));
     }
 
-    private static InterpolationHelper.SubstitutionCallback prefix(
-            String prefix, InterpolationHelper.SubstitutionCallback cb) {
+    private static Function<String, String> prefix(
+            String prefix, Function<String, String> cb) {
         return s -> {
             String v = null;
             if (s.startsWith(prefix)) {
-                v = cb.getValue(s.substring(prefix.length()));
+                v = cb.apply(s.substring(prefix.length()));
             }
             return v;
         };
     }
 
-    private static InterpolationHelper.SubstitutionCallback or(InterpolationHelper.SubstitutionCallback... callbacks) {
+    private static Function<String, String> or(Function<String, String>... callbacks) {
         return s -> {
-            for (InterpolationHelper.SubstitutionCallback cb : callbacks) {
-                String r = cb.getValue(s);
+            for (Function<String, String> cb : callbacks) {
+                String r = cb.apply(s);
                 if (r != null) {
                     return r;
                 }

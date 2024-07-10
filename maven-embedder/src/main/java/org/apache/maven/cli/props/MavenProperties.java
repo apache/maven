@@ -42,12 +42,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Enhancement of the standard <code>Properties</code>
  * managing the maintain of comments, etc.
  */
-public class Properties extends AbstractMap<String, String> {
+public class MavenProperties extends AbstractMap<String, String> {
 
     /** Constant for the supported comment characters.*/
     private static final String COMMENT_CHARS = "#!";
@@ -77,17 +78,17 @@ public class Properties extends AbstractMap<String, String> {
     private List<String> header;
     private List<String> footer;
     private Path location;
-    private InterpolationHelper.SubstitutionCallback callback;
+    private Function<String, String> callback;
     boolean substitute = true;
     boolean typed;
 
-    public Properties() {}
+    public MavenProperties() {}
 
-    public Properties(Path location) throws IOException {
+    public MavenProperties(Path location) throws IOException {
         this(location, null);
     }
 
-    public Properties(Path location, InterpolationHelper.SubstitutionCallback callback) throws IOException {
+    public MavenProperties(Path location, Function<String, String> callback) throws IOException {
         this.location = location;
         this.callback = callback;
         if (Files.exists(location)) {
@@ -95,11 +96,11 @@ public class Properties extends AbstractMap<String, String> {
         }
     }
 
-    public Properties(boolean substitute) {
+    public MavenProperties(boolean substitute) {
         this.substitute = substitute;
     }
 
-    public Properties(Path location, boolean substitute) {
+    public MavenProperties(Path location, boolean substitute) {
         this.location = location;
         this.substitute = substitute;
     }
@@ -312,17 +313,17 @@ public class Properties extends AbstractMap<String, String> {
     }
 
     public boolean update(Map<String, String> props) {
-        Properties properties;
-        if (props instanceof Properties) {
-            properties = (Properties) props;
+        MavenProperties properties;
+        if (props instanceof MavenProperties) {
+            properties = (MavenProperties) props;
         } else {
-            properties = new Properties();
+            properties = new MavenProperties();
             properties.putAll(props);
         }
         return update(properties);
     }
 
-    public boolean update(Properties properties) {
+    public boolean update(MavenProperties properties) {
         boolean modified = false;
         // Remove "removed" properties from the cfg file
         for (String key : new ArrayList<String>(this.keySet())) {
@@ -457,9 +458,9 @@ public class Properties extends AbstractMap<String, String> {
             }
         }
         if (hasProperty) {
-            footer = new ArrayList<String>(reader.getCommentLines());
+            footer = new ArrayList<>(reader.getCommentLines());
         } else {
-            header = new ArrayList<String>(reader.getCommentLines());
+            header = new ArrayList<>(reader.getCommentLines());
         }
         if (substitute) {
             substitute();
@@ -470,7 +471,7 @@ public class Properties extends AbstractMap<String, String> {
         substitute(callback);
     }
 
-    public void substitute(InterpolationHelper.SubstitutionCallback callback) {
+    public void substitute(Function<String, String> callback) {
         if (callback == null) {
             callback = new InterpolationHelper.DefaultSubstitutionCallback();
         }

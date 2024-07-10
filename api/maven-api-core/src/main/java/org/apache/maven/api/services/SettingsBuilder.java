@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.settings.Settings;
 
 /**
- * Builds the effective settings from a user settings file and/or a system settings file.
+ * Builds the effective settings from a user settings file and/or a installation settings file.
  *
  * @since 4.0.0
  */
@@ -116,7 +116,7 @@ public interface SettingsBuilder extends Service {
      * Validate the specified settings.
      *
      * @param settings The settings to validate, must not be {@code null}.
-     * @param isProjectSettings Boolean indicating if the validation is for project settings or user / system settings.
+     * @param isProjectSettings Boolean indicating if the validation is for project settings or user / installation settings.
      * @return The list of problems that were encountered, must not be {@code null}.
      */
     @Nonnull

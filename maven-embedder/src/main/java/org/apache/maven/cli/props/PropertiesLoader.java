@@ -22,6 +22,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
+import java.util.function.Function;
 
 import static org.apache.maven.cli.props.InterpolationHelper.substVars;
 
@@ -35,10 +36,10 @@ public class PropertiesLoader {
     public static void loadProperties(
             java.util.Properties properties,
             Path path,
-            InterpolationHelper.SubstitutionCallback callback,
+            Function<String, String> callback,
             boolean escape)
             throws Exception {
-        Properties sp = new Properties(false);
+        MavenProperties sp = new MavenProperties(false);
         try {
             sp.load(path);
         } catch (NoSuchFileException ex) {
@@ -52,12 +53,12 @@ public class PropertiesLoader {
         sp.forEach(properties::setProperty);
     }
 
-    public static void substitute(Properties props, InterpolationHelper.SubstitutionCallback callback) {
+    public static void substitute(MavenProperties props, Function<String, String> callback) {
         for (Enumeration<?> e = props.propertyNames(); e.hasMoreElements(); ) {
             String name = (String) e.nextElement();
             String value = props.getProperty(name);
             if (value == null) {
-                value = callback.getValue(name);
+                value = callback.apply(name);
             }
             if (name.startsWith(OVERRIDE_PREFIX)) {
                 String overrideName = name.substring(OVERRIDE_PREFIX.length());
@@ -69,18 +70,18 @@ public class PropertiesLoader {
         props.keySet().removeIf(k -> k.startsWith(OVERRIDE_PREFIX));
     }
 
-    private static void substitute(Properties props, InterpolationHelper.SubstitutionCallback callback, String name) {
+    private static void substitute(MavenProperties props, Function<String, String> callback, String name) {
         String value = props.getProperty(name);
         if (value == null) {
-            value = callback.getValue(name);
+            value = callback.apply(name);
         }
         if (value != null) {
             props.put(name, substVars(value, name, null, props, callback));
         }
     }
 
-    private static Properties loadPropertiesFile(Path path, boolean failIfNotFound) throws Exception {
-        Properties configProps = new Properties(null, false);
+    private static MavenProperties loadPropertiesFile(Path path, boolean failIfNotFound) throws Exception {
+        MavenProperties configProps = new MavenProperties(null, false);
         try {
             configProps.load(path);
         } catch (NoSuchFileException ex) {
@@ -97,7 +98,7 @@ public class PropertiesLoader {
         return configProps;
     }
 
-    private static void loadIncludes(String propertyName, Path configProp, Properties configProps) throws Exception {
+    private static void loadIncludes(String propertyName, Path configProp, MavenProperties configProps) throws Exception {
         String includes = configProps.get(propertyName);
         if (includes != null) {
             StringTokenizer st = new StringTokenizer(includes, "\" ", true);
@@ -112,7 +113,7 @@ public class PropertiesLoader {
                             location = location.substring(1);
                         }
                         Path path = configProp.resolve(location);
-                        Properties props = loadPropertiesFile(path, mandatory);
+                        MavenProperties props = loadPropertiesFile(path, mandatory);
                         configProps.putAll(props);
                     }
                 } while (location != null);
@@ -121,7 +122,7 @@ public class PropertiesLoader {
         configProps.remove(propertyName);
     }
 
-    private static void trimValues(Properties configProps) {
+    private static void trimValues(MavenProperties configProps) {
         configProps.replaceAll((k, v) -> v.trim());
     }
 

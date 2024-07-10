@@ -20,6 +20,7 @@ package org.apache.maven.cli.props;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class InterpolationHelper {
 
@@ -32,20 +33,12 @@ public class InterpolationHelper {
     private static final String ENV_PREFIX = "env:";
 
     /**
-     * Callback for substitution
-     */
-    public interface SubstitutionCallback {
-
-        String getValue(String key);
-    }
-
-    /**
      * Perform substitution on a property set
      *
      * @param properties the property set to perform substitution on
      * @param callback Callback for substitution
      */
-    public static void performSubstitution(Map<String, String> properties, SubstitutionCallback callback) {
+    public static void performSubstitution(Map<String, String> properties, Function<String, String> callback) {
         performSubstitution(properties, callback, true, true, true);
     }
 
@@ -60,7 +53,7 @@ public class InterpolationHelper {
      */
     public static void performSubstitution(
             Map<String, String> properties,
-            SubstitutionCallback callback,
+            Function<String, String> callback,
             boolean substituteFromConfig,
             boolean substituteFromSystemProperties,
             boolean defaultsToEmptyString) {
@@ -105,7 +98,7 @@ public class InterpolationHelper {
     public static String substVars(
             String val, String currentKey, Map<String, String> cycleMap, Map<String, String> configProps)
             throws IllegalArgumentException {
-        return substVars(val, currentKey, cycleMap, configProps, (SubstitutionCallback) null);
+        return substVars(val, currentKey, cycleMap, configProps, (Function<String, String>) null);
     }
 
     /**
@@ -136,7 +129,7 @@ public class InterpolationHelper {
             String currentKey,
             Map<String, String> cycleMap,
             Map<String, String> configProps,
-            SubstitutionCallback callback)
+            Function<String, String> callback)
             throws IllegalArgumentException {
         return substVars(val, currentKey, cycleMap, configProps, callback, true, true, false);
     }
@@ -172,7 +165,7 @@ public class InterpolationHelper {
             String currentKey,
             Map<String, String> cycleMap,
             Map<String, String> configProps,
-            SubstitutionCallback callback,
+            Function<String, String> callback,
             boolean substituteFromConfig,
             boolean substituteFromSystemProperties,
             boolean defaultsToEmptyString) {
@@ -192,7 +185,7 @@ public class InterpolationHelper {
             String currentKey,
             Map<String, String> cycleMap,
             Map<String, String> configProps,
-            SubstitutionCallback callback,
+            Function<String, String> callback,
             boolean substituteFromConfig,
             boolean substituteFromSystemProperties,
             boolean defaultsToEmptyString)
@@ -270,7 +263,7 @@ public class InterpolationHelper {
         if (substValue == null) {
             if (!variable.isEmpty()) {
                 if (callback != null) {
-                    substValue = callback.getValue(variable);
+                    substValue = callback.apply(variable);
                 }
                 if (substValue == null && substituteFromSystemProperties) {
                     substValue = System.getProperty(variable);
@@ -347,10 +340,10 @@ public class InterpolationHelper {
         return val;
     }
 
-    public static class DefaultSubstitutionCallback implements SubstitutionCallback {
+    public static class DefaultSubstitutionCallback implements Function<String, String> {
         public DefaultSubstitutionCallback() {}
 
-        public String getValue(String key) {
+        public String apply(String key) {
             String value = null;
             if (key.startsWith(ENV_PREFIX)) {
                 value = System.getenv(key.substring(ENV_PREFIX.length()));
