@@ -37,7 +37,7 @@ under the License.
  |
  |                 NOTE: This location can be overridden with the CLI option:
  |
- |                 -st /path/to/installation/toolchains.xml
+ |                 -it /path/to/installation/toolchains.xml
  |
  | The sections in this sample file are intended to give you a running start at
  | getting the most out of your Maven installation.
