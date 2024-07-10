@@ -43,7 +43,7 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.PackagingRegistry;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 
 /**
  * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.

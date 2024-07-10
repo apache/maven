@@ -44,6 +44,7 @@ public class DefaultArtifactInstaller implements ArtifactInstaller {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:UnusedLocalVariable")
     public void install(ArtifactInstallerRequest request) throws ArtifactInstallerException, IllegalArgumentException {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());

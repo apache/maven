@@ -23,7 +23,7 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.PathTranslator;
 
 /**
  * Resolves relative paths against a specific base directory.

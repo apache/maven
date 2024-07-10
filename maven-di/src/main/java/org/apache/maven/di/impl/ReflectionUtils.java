@@ -19,8 +19,21 @@
 package org.apache.maven.di.impl;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -28,7 +41,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.di.*;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Priority;
+import org.apache.maven.api.di.Qualifier;
 import org.apache.maven.di.Key;
 
 import static java.util.stream.Collectors.toList;

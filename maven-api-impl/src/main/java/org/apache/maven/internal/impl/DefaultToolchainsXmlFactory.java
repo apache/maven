@@ -45,6 +45,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 @Singleton
 public class DefaultToolchainsXmlFactory implements ToolchainsXmlFactory {
     @Override
+    @SuppressWarnings("checkstyle:UnusedLocalVariable")
     public PersistedToolchains read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
         Objects.requireNonNull(request, "request");
         Reader reader = request.getReader();

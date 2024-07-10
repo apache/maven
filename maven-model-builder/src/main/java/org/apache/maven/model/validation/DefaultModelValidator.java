@@ -296,6 +296,7 @@ public class DefaultModelValidator implements ModelValidator {
         this.versionProcessor = versionProcessor;
     }
 
+    @SuppressWarnings("checkstyle:MethodLength")
     @Override
     public void validateFileModel(Model ma, ModelBuildingRequest request, ModelProblemCollector problems) {
 
@@ -622,6 +623,7 @@ public class DefaultModelValidator implements ModelValidator {
         }
     }
 
+    @SuppressWarnings("checkstyle:MethodLength")
     @Override
     public void validateEffectiveModel(Model ma, ModelBuildingRequest request, ModelProblemCollector problems) {
         org.apache.maven.api.model.Model m = ma.getDelegate();

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.api;
 
-import java.util.*;
+import java.util.Set;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;

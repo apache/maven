@@ -42,6 +42,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 public class DefaultArtifactDeployer implements ArtifactDeployer {
 
     @Override
+    @SuppressWarnings("checkstyle:UnusedLocalVariable")
     public void deploy(@Nonnull ArtifactDeployerRequest request) {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());

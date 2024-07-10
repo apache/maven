@@ -40,6 +40,7 @@ public class DefaultSettingsValidator {
 
     private static final String ILLEGAL_REPO_ID_CHARS = "\\/:\"<>|?*"; // ILLEGAL_FS_CHARS
 
+    @SuppressWarnings("checkstyle:MethodLength")
     public void validate(Settings settings, boolean isProjectSettings, List<BuilderProblem> problems) {
         if (isProjectSettings) {
             String msgS = "is not supported on project settings.";

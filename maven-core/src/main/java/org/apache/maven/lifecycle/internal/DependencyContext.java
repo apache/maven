@@ -18,7 +18,9 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.TreeSet;
 
 import org.apache.maven.project.MavenProject;
 

@@ -41,7 +41,7 @@ import org.apache.maven.api.model.ReportSet;
 import org.apache.maven.api.model.Reporting;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.ProfileInjector;
 
 /**
  * Handles profile injection into the model.
