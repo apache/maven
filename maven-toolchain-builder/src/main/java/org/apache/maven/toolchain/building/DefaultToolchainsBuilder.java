@@ -85,7 +85,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
                                 }
                                 return null;
                             }))
-                    .systemToolchainsSource(convert(request.getGlobalToolchainsSource()))
+                    .installToolchainsSource(convert(request.getGlobalToolchainsSource()))
                     .userToolchainsSource(convert(request.getUserToolchainsSource()))
                     .build());
 

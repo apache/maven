@@ -18,11 +18,12 @@
  */
 package org.apache.maven.tools;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,6 +40,7 @@ import org.apache.maven.api.annotations.Config;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.codehaus.plexus.util.io.CachingWriter;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster._shade.org.eclipse.jdt.core.dom.AST;
 import org.jboss.forge.roaster._shade.org.eclipse.jdt.core.dom.ASTNode;
@@ -82,7 +84,7 @@ public class CollectConfiguration {
             VelocityContext context = new VelocityContext();
             context.put("keys", discoveredKeys.values());
 
-            try (BufferedWriter fileWriter = Files.newBufferedWriter(output)) {
+            try (Writer fileWriter = new CachingWriter(output, StandardCharsets.UTF_8)) {
                 velocityEngine.getTemplate("page.vm").merge(context, fileWriter);
             }
         } catch (Throwable t) {

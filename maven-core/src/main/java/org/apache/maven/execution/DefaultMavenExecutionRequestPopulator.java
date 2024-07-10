@@ -126,7 +126,7 @@ public class DefaultMavenExecutionRequestPopulator implements MavenExecutionRequ
         }
 
         if (localRepositoryPath == null || localRepositoryPath.isEmpty()) {
-            String path = request.getUserProperties().getProperty(Constants.MAVEN_USER_HOME);
+            String path = request.getUserProperties().getProperty(Constants.MAVEN_USER_CONF);
             if (path == null) {
                 path = System.getProperty("user.home") + File.separator + ".m2";
             }

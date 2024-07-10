@@ -32,6 +32,7 @@ public interface ToolchainsBuildingRequest {
      *
      * @return The global toolchains source or {@code null} if none.
      */
+    @Deprecated
     Source getGlobalToolchainsSource();
 
     /**
@@ -41,7 +42,24 @@ public interface ToolchainsBuildingRequest {
      * @param globalToolchainsSource The global toolchains source, may be {@code null} to disable global toolchains.
      * @return This request, never {@code null}.
      */
+    @Deprecated
     ToolchainsBuildingRequest setGlobalToolchainsSource(Source globalToolchainsSource);
+
+    /**
+     * Gets the install toolchains source.
+     *
+     * @return The install toolchains source or {@code null} if none.
+     */
+    Source getInstallToolchainsSource();
+
+    /**
+     * Sets the install toolchains source. If both user toolchains and a install toolchains are given, the user toolchains
+     * take precedence.
+     *
+     * @param installToolchainsSource The install toolchains source, may be {@code null} to disable global toolchains.
+     * @return This request, never {@code null}.
+     */
+    ToolchainsBuildingRequest setInstallToolchainsSource(Source installToolchainsSource);
 
     /**
      * Gets the user toolchains source.

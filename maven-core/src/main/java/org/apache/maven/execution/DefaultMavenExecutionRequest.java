@@ -192,7 +192,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setUserSettingsFile(original.getUserSettingsFile());
         copy.setSystemSettingsFile(original.getSystemSettingsFile());
         copy.setUserToolchainsFile(original.getUserToolchainsFile());
-        copy.setSystemToolchainsFile(original.getSystemToolchainsFile());
+        copy.setInstallToolchainsFile(original.getInstallToolchainsFile());
         copy.setBaseDirectory((original.getBaseDirectory() != null) ? new File(original.getBaseDirectory()) : null);
         copy.setGoals(original.getGoals());
         copy.setRecursive(original.isRecursive());
@@ -917,13 +917,13 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     }
 
     @Override
-    public File getSystemToolchainsFile() {
+    public File getInstallToolchainsFile() {
         return systemToolchainsFile;
     }
 
     @Override
-    public MavenExecutionRequest setSystemToolchainsFile(File systemToolchainsFile) {
-        this.systemToolchainsFile = systemToolchainsFile;
+    public MavenExecutionRequest setInstallToolchainsFile(File installToolchainsFile) {
+        this.systemToolchainsFile = installToolchainsFile;
         return this;
     }
 

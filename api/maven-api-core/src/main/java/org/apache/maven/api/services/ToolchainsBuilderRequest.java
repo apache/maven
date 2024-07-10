@@ -40,12 +40,12 @@ public interface ToolchainsBuilderRequest {
     Session getSession();
 
     /**
-     * Gets the system Toolchains source.
+     * Gets the install Toolchains source.
      *
-     * @return the system Toolchains source or {@code null} if none
+     * @return the install Toolchains source or {@code null} if none
      */
     @Nonnull
-    Optional<Source> getSystemToolchainsSource();
+    Optional<Source> getInstallToolchainsSource();
 
     /**
      * Gets the user Toolchains source.
@@ -60,7 +60,7 @@ public interface ToolchainsBuilderRequest {
             @Nonnull Session session, @Nullable Source systemToolchainsSource, @Nullable Source userToolchainsSource) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
-                .systemToolchainsSource(systemToolchainsSource)
+                .installToolchainsSource(systemToolchainsSource)
                 .userToolchainsSource(userToolchainsSource)
                 .build();
     }
@@ -70,7 +70,7 @@ public interface ToolchainsBuilderRequest {
             @Nonnull Session session, @Nullable Path systemToolchainsPath, @Nullable Path userToolchainsPath) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
-                .systemToolchainsSource(
+                .installToolchainsSource(
                         systemToolchainsPath != null && Files.exists(systemToolchainsPath)
                                 ? Source.fromPath(systemToolchainsPath)
                                 : null)
@@ -89,7 +89,7 @@ public interface ToolchainsBuilderRequest {
     @NotThreadSafe
     class ToolchainsBuilderRequestBuilder {
         Session session;
-        Source systemToolchainsSource;
+        Source installToolchainsSource;
         Source userToolchainsSource;
 
         public ToolchainsBuilderRequestBuilder session(Session session) {
@@ -97,8 +97,8 @@ public interface ToolchainsBuilderRequest {
             return this;
         }
 
-        public ToolchainsBuilderRequestBuilder systemToolchainsSource(Source systemToolchainsSource) {
-            this.systemToolchainsSource = systemToolchainsSource;
+        public ToolchainsBuilderRequestBuilder installToolchainsSource(Source installToolchainsSource) {
+            this.installToolchainsSource = installToolchainsSource;
             return this;
         }
 
@@ -109,27 +109,27 @@ public interface ToolchainsBuilderRequest {
 
         public ToolchainsBuilderRequest build() {
             return new ToolchainsBuilderRequestBuilder.DefaultToolchainsBuilderRequest(
-                    session, systemToolchainsSource, userToolchainsSource);
+                    session, installToolchainsSource, userToolchainsSource);
         }
 
         private static class DefaultToolchainsBuilderRequest extends BaseRequest implements ToolchainsBuilderRequest {
-            private final Source systemToolchainsSource;
+            private final Source installToolchainsSource;
             private final Source userToolchainsSource;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultToolchainsBuilderRequest(
                     @Nonnull Session session,
-                    @Nullable Source systemToolchainsSource,
+                    @Nullable Source installToolchainsSource,
                     @Nullable Source userToolchainsSource) {
                 super(session);
-                this.systemToolchainsSource = systemToolchainsSource;
+                this.installToolchainsSource = installToolchainsSource;
                 this.userToolchainsSource = userToolchainsSource;
             }
 
             @Nonnull
             @Override
-            public Optional<Source> getSystemToolchainsSource() {
-                return Optional.ofNullable(systemToolchainsSource);
+            public Optional<Source> getInstallToolchainsSource() {
+                return Optional.ofNullable(installToolchainsSource);
             }
 
             @Nonnull

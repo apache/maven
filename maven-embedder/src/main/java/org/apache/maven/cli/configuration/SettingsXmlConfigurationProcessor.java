@@ -123,8 +123,8 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
 
         File systemSettingsFile;
 
-        if (commandLine.hasOption(CLIManager.ALTERNATE_SYSTEM_SETTINGS)) {
-            systemSettingsFile = new File(commandLine.getOptionValue(CLIManager.ALTERNATE_SYSTEM_SETTINGS));
+        if (commandLine.hasOption(CLIManager.ALTERNATE_INSTALL_SETTINGS)) {
+            systemSettingsFile = new File(commandLine.getOptionValue(CLIManager.ALTERNATE_INSTALL_SETTINGS));
             systemSettingsFile = resolveFile(systemSettingsFile, workingDirectory);
 
             if (!systemSettingsFile.isFile()) {

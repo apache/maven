@@ -473,7 +473,7 @@ public interface MavenExecutionRequest {
      *
      * @return the global toolchains file
      * @since 3.3.0
-     * @deprecated use {@link #getSystemToolchainsFile()}
+     * @deprecated use {@link #getInstallToolchainsFile()}
      */
     @Deprecated
     File getGlobalToolchainsFile();
@@ -483,7 +483,7 @@ public interface MavenExecutionRequest {
      * @param globalToolchainsFile the global toolchains file
      * @return this request
      * @since 3.3.0
-     * @deprecated use {@link #setSystemToolchainsFile(File)}
+     * @deprecated use {@link #setInstallToolchainsFile(File)}
      */
     @Deprecated
     MavenExecutionRequest setGlobalToolchainsFile(File globalToolchainsFile);
@@ -491,18 +491,18 @@ public interface MavenExecutionRequest {
     /**
      *
      *
-     * @return the system toolchains file
+     * @return the install toolchains file
      * @since 4.0.0
      */
-    File getSystemToolchainsFile();
+    File getInstallToolchainsFile();
 
     /**
      *
-     * @param systemToolchainsFile the global toolchains file
+     * @param installToolchainsFile the install toolchains file
      * @return this request
      * @since 4.0.0
      */
-    MavenExecutionRequest setSystemToolchainsFile(File systemToolchainsFile);
+    MavenExecutionRequest setInstallToolchainsFile(File installToolchainsFile);
 
     ExecutionListener getExecutionListener();
 

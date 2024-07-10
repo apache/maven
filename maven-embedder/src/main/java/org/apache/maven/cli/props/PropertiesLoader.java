@@ -27,9 +27,7 @@ import static org.apache.maven.cli.props.InterpolationHelper.substVars;
 
 public class PropertiesLoader {
 
-    public static final String INCLUDES_PROPERTY = "${includes}"; // mandatory includes
-
-    public static final String OPTIONALS_PROPERTY = "${optionals}"; // optionals include
+    public static final String INCLUDES_PROPERTY = "${includes}"; // includes
 
     public static final String OVERRIDE_PREFIX =
             "maven.override."; // prefix that marks that system property should override defaults.
@@ -49,9 +47,7 @@ public class PropertiesLoader {
         properties.forEach(
                 (k, v) -> sp.put(k.toString(), escape ? InterpolationHelper.escape(v.toString()) : v.toString()));
         substitute(sp, callback, INCLUDES_PROPERTY);
-        substitute(sp, callback, OPTIONALS_PROPERTY);
-        loadIncludes(INCLUDES_PROPERTY, true, path, sp);
-        loadIncludes(OPTIONALS_PROPERTY, false, path, sp);
+        loadIncludes(INCLUDES_PROPERTY, path, sp);
         substitute(sp, callback);
         sp.forEach(properties::setProperty);
     }
@@ -96,14 +92,12 @@ public class PropertiesLoader {
             System.err.println("Main: " + ex);
             return configProps;
         }
-        loadIncludes(INCLUDES_PROPERTY, true, path, configProps);
-        loadIncludes(OPTIONALS_PROPERTY, false, path, configProps);
+        loadIncludes(INCLUDES_PROPERTY, path, configProps);
         trimValues(configProps);
         return configProps;
     }
 
-    private static void loadIncludes(String propertyName, boolean mandatory, Path configProp, Properties configProps)
-            throws Exception {
+    private static void loadIncludes(String propertyName, Path configProp, Properties configProps) throws Exception {
         String includes = configProps.get(propertyName);
         if (includes != null) {
             StringTokenizer st = new StringTokenizer(includes, "\" ", true);
@@ -112,6 +106,11 @@ public class PropertiesLoader {
                 do {
                     location = nextLocation(st);
                     if (location != null) {
+                        boolean mandatory = true;
+                        if (location.startsWith("?")) {
+                            mandatory = false;
+                            location = location.substring(1);
+                        }
                         Path path = configProp.resolve(location);
                         Properties props = loadPropertiesFile(path, mandatory);
                         configProps.putAll(props);

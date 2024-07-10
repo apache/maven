@@ -85,7 +85,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                                 }
                                 return null;
                             }))
-                    .systemSettingsSource(toSource(request.getGlobalSettingsFile(), request.getGlobalSettingsSource()))
+                    .installSettingsSource(toSource(request.getGlobalSettingsFile(), request.getGlobalSettingsSource()))
                     .projectSettingsSource(
                             toSource(request.getProjectSettingsFile(), request.getProjectSettingsSource()))
                     .userSettingsSource(toSource(request.getUserSettingsFile(), request.getUserSettingsSource()))

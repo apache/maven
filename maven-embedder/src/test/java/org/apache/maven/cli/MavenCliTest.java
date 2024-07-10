@@ -591,7 +591,7 @@ class MavenCliTest {
         Path mavenConf = mavenHome.resolve("conf");
         Files.createDirectories(mavenConf);
         Path mavenUserProps = mavenConf.resolve("maven.properties");
-        Files.writeString(mavenUserProps, "${optionals} = ${session.rootDirectory}/.mvn/maven.properties\n");
+        Files.writeString(mavenUserProps, "${includes} = ?${session.rootDirectory}/.mvn/maven.properties\n");
         Path rootDirectory = fs.getPath("C:\\myRootDirectory");
         Path topDirectory = rootDirectory.resolve("myTopDirectory");
         Path mvn = rootDirectory.resolve(".mvn");
@@ -614,7 +614,7 @@ class MavenCliTest {
                 null);
         request.rootDirectory = rootDirectory;
         request.topDirectory = topDirectory;
-        System.setProperty("maven.conf", mavenConf.toString());
+        System.setProperty("maven.install.conf", mavenConf.toString());
 
         // Act
         cli.setFileSystem(fs);

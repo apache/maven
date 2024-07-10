@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TimeZone;
 
 import org.apache.maven.api.Constants;
 
@@ -33,11 +32,9 @@ import org.apache.maven.api.Constants;
  */
 public class MavenBuildTimestamp {
     // ISO 8601-compliant timestamp for machine readability
-    public static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
 
-    public static final TimeZone DEFAULT_BUILD_TIME_ZONE = TimeZone.getTimeZone("Etc/UTC");
-
-    private String formattedTimestamp;
+    private final String formattedTimestamp;
 
     public MavenBuildTimestamp() {
         this(Instant.now());
@@ -70,7 +67,6 @@ public class MavenBuildTimestamp {
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat(timestampFormat);
         dateFormat.setCalendar(new GregorianCalendar());
-        dateFormat.setTimeZone(DEFAULT_BUILD_TIME_ZONE);
         formattedTimestamp = dateFormat.format(new Date(time.toEpochMilli()));
     }
 
