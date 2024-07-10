@@ -35,7 +35,13 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 
-import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.*;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.A;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.B;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.C;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.X;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.Y;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.Z;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.getProjectBuildList;
 
 /**
  * @author Kristian Rosenvold
@@ -57,7 +63,7 @@ public class ConcurrencyDependencyGraphTest extends junit.framework.TestCase {
 
         final List<MavenProject> subsequent = graph.markAsFinished(A);
         assertEquals(2, subsequent.size());
-        assertEquals(ProjectDependencyGraphStub.B, subsequent.get(0));
+        assertEquals(B, subsequent.get(0));
         assertEquals(C, subsequent.get(1));
 
         final List<MavenProject> bDescendants = graph.markAsFinished(B);

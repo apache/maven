@@ -37,7 +37,6 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
  * @author jdcasey
  */
 public final class CLIReportingUtils {
-    // CHECKSTYLE_OFF: MagicNumber
     public static final long MB = 1024 * 1024;
 
     private static final long ONE_SECOND = 1000L;
@@ -47,7 +46,6 @@ public final class CLIReportingUtils {
     private static final long ONE_HOUR = 60 * ONE_MINUTE;
 
     private static final long ONE_DAY = 24 * ONE_HOUR;
-    // CHECKSTYLE_ON: MagicNumber
 
     public static final String BUILD_VERSION_PROPERTY = "version";
 
@@ -159,13 +157,11 @@ public final class CLIReportingUtils {
     }
 
     public static String formatDuration(long duration) {
-        // CHECKSTYLE_OFF: MagicNumber
         long ms = duration % 1000;
         long s = (duration / ONE_SECOND) % 60;
         long m = (duration / ONE_MINUTE) % 60;
         long h = (duration / ONE_HOUR) % 24;
         long d = duration / ONE_DAY;
-        // CHECKSTYLE_ON: MagicNumber
 
         String format;
         if (d > 0) {
