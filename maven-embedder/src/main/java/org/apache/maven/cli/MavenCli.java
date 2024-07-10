@@ -57,6 +57,7 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.building.FileSource;
@@ -134,6 +135,8 @@ import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
 import static java.util.Comparator.comparing;
+import static org.apache.maven.api.Constants.MAVEN_HOME;
+import static org.apache.maven.api.Constants.MAVEN_INSTALLATION_CONF;
 import static org.apache.maven.cli.CLIManager.BATCH_MODE;
 import static org.apache.maven.cli.CLIManager.COLOR;
 import static org.apache.maven.cli.CLIManager.FORCE_INTERACTIVE;
@@ -145,28 +148,10 @@ import static org.apache.maven.cli.ResolveFile.resolveFile;
 /**
  */
 public class MavenCli {
-    public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
 
     public static final String MULTIMODULE_PROJECT_DIRECTORY = "maven.multiModuleProjectDirectory";
 
-    public static final String USER_HOME = System.getProperty("user.home");
-
-    public static final File USER_MAVEN_CONFIGURATION_HOME = new File(USER_HOME, ".m2");
-
-    public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File(USER_MAVEN_CONFIGURATION_HOME, "toolchains.xml");
-
-    public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE =
-            new File(System.getProperty("maven.conf"), "toolchains.xml");
-
-    private static final String EXT_CLASS_PATH = "maven.ext.class.path";
-
-    private static final String EXTENSIONS_FILENAME = "extensions.xml";
-
-    private static final String MVN_EXTENSIONS_FILENAME = ".mvn/" + EXTENSIONS_FILENAME;
-
     private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
-
-    public static final String STYLE_COLOR_PROPERTY = "style.color";
 
     private ClassWorld classWorld;
 
@@ -385,11 +370,11 @@ public class MavenCli {
         // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
         // Windows paths.
         //
-        String mavenHome = System.getProperty("maven.home");
+        String mavenHome = System.getProperty(Constants.MAVEN_HOME);
 
         if (mavenHome != null) {
             System.setProperty(
-                    "maven.home",
+                    Constants.MAVEN_HOME,
                     getCanonicalPath(fileSystem.getPath(mavenHome)).toString());
         }
     }
@@ -517,7 +502,8 @@ public class MavenCli {
         cliRequest.showErrors = cliRequest.verbose || commandLine.hasOption(CLIManager.ERRORS);
 
         // LOG COLOR
-        String styleColor = cliRequest.getUserProperties().getProperty(STYLE_COLOR_PROPERTY, "auto");
+        String styleColor = cliRequest.getUserProperties().getProperty("style.color", "auto");
+        styleColor = cliRequest.getUserProperties().getProperty(Constants.MAVEN_STYLE_COLOR_PROPERTY, styleColor);
         styleColor = commandLine.getOptionValue(COLOR, styleColor);
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
             MessageUtils.setColorEnabled(true);
@@ -770,16 +756,17 @@ public class MavenCli {
             return Collections.emptyList();
         }
 
-        File extensionsFile = new File(cliRequest.multiModuleProjectDirectory, MVN_EXTENSIONS_FILENAME);
-        File userHomeExtensionsFile = new File(USER_MAVEN_CONFIGURATION_HOME, EXTENSIONS_FILENAME);
-
         List<CoreExtension> extensions = new ArrayList<>();
-        if (extensionsFile.isFile()) {
-            extensions.addAll(readCoreExtensionsDescriptor(extensionsFile));
-        }
-        if (userHomeExtensionsFile.isFile()) {
-            extensions.addAll(readCoreExtensionsDescriptor(userHomeExtensionsFile));
-        }
+
+        String installationExtensionsFile =
+                cliRequest.getUserProperties().getProperty(Constants.MAVEN_INSTALLATION_EXTENSIONS);
+        extensions.addAll(readCoreExtensionsDescriptor(installationExtensionsFile));
+
+        String projectExtensionsFile = cliRequest.getUserProperties().getProperty(Constants.MAVEN_PROJECT_EXTENSIONS);
+        extensions.addAll(readCoreExtensionsDescriptor(projectExtensionsFile));
+
+        String userExtensionsFile = cliRequest.getUserProperties().getProperty(Constants.MAVEN_USER_EXTENSIONS);
+        extensions.addAll(readCoreExtensionsDescriptor(userExtensionsFile));
 
         if (extensions.isEmpty()) {
             return Collections.emptyList();
@@ -831,13 +818,17 @@ public class MavenCli {
         }
     }
 
-    private List<CoreExtension> readCoreExtensionsDescriptor(File extensionsFile)
+    private List<CoreExtension> readCoreExtensionsDescriptor(String extensionsFile)
             throws IOException, XMLStreamException {
-        CoreExtensionsStaxReader parser = new CoreExtensionsStaxReader();
-
-        try (InputStream is = Files.newInputStream(extensionsFile.toPath())) {
-            return parser.read(is, true).getExtensions();
+        if (extensionsFile != null) {
+            Path extensionsPath = Path.of(extensionsFile);
+            if (Files.exists(extensionsPath)) {
+                try (InputStream is = Files.newInputStream(extensionsPath)) {
+                    return new CoreExtensionsStaxReader().read(is, true).getExtensions();
+                }
+            }
         }
+        return List.of();
     }
 
     private ClassRealm setupContainerRealm(
@@ -881,15 +872,15 @@ public class MavenCli {
     }
 
     private List<File> parseExtClasspath(CliRequest cliRequest) {
-        String extClassPath = cliRequest.userProperties.getProperty(EXT_CLASS_PATH);
+        String extClassPath = cliRequest.userProperties.getProperty(Constants.MAVEN_EXT_CLASS_PATH);
         if (extClassPath == null) {
-            extClassPath = cliRequest.systemProperties.getProperty(EXT_CLASS_PATH);
+            extClassPath = cliRequest.systemProperties.getProperty(Constants.MAVEN_EXT_CLASS_PATH);
             if (extClassPath != null) {
                 slf4jLogger.warn(
                         "The property '{}' has been set using a JVM system property which is deprecated. "
                                 + "The property can be passed as a Maven argument or in the Maven project configuration file,"
                                 + "usually located at ${session.rootDirectory}/.mvn/maven.properties.",
-                        EXT_CLASS_PATH);
+                        Constants.MAVEN_EXT_CLASS_PATH);
             }
         }
 
@@ -1207,7 +1198,7 @@ public class MavenCli {
     }
 
     void toolchains(CliRequest cliRequest) throws Exception {
-        File userToolchainsFile;
+        File userToolchainsFile = null;
 
         if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_USER_TOOLCHAINS)) {
             userToolchainsFile = new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_USER_TOOLCHAINS));
@@ -1218,10 +1209,13 @@ public class MavenCli {
                         "The specified user toolchains file does not exist: " + userToolchainsFile);
             }
         } else {
-            userToolchainsFile = DEFAULT_USER_TOOLCHAINS_FILE;
+            String userToolchainsFileStr = cliRequest.getUserProperties().getProperty(Constants.MAVEN_USER_TOOLCHAINS);
+            if (userToolchainsFileStr != null) {
+                userToolchainsFile = new File(userToolchainsFileStr);
+            }
         }
 
-        File installationToolchainsFile;
+        File installationToolchainsFile = null;
 
         if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_INSTALLATION_TOOLCHAINS)) {
             installationToolchainsFile =
@@ -1241,19 +1235,23 @@ public class MavenCli {
                 throw new FileNotFoundException(
                         "The specified installation toolchains file does not exist: " + installationToolchainsFile);
             }
-
         } else {
-            installationToolchainsFile = DEFAULT_GLOBAL_TOOLCHAINS_FILE;
+            String installationToolchainsFileStr =
+                    cliRequest.getUserProperties().getProperty(Constants.MAVEN_INSTALLATION_TOOLCHAINS);
+            if (installationToolchainsFileStr != null) {
+                installationToolchainsFile = new File(installationToolchainsFileStr);
+                installationToolchainsFile = resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
+            }
         }
 
         cliRequest.request.setInstallationToolchainsFile(installationToolchainsFile);
         cliRequest.request.setUserToolchainsFile(userToolchainsFile);
 
         DefaultToolchainsBuildingRequest toolchainsRequest = new DefaultToolchainsBuildingRequest();
-        if (installationToolchainsFile.isFile()) {
+        if (installationToolchainsFile != null && installationToolchainsFile.isFile()) {
             toolchainsRequest.setGlobalToolchainsSource(new FileSource(installationToolchainsFile));
         }
-        if (userToolchainsFile.isFile()) {
+        if (userToolchainsFile != null && userToolchainsFile.isFile()) {
             toolchainsRequest.setUserToolchainsSource(new FileSource(userToolchainsFile));
         }
 
@@ -1404,15 +1402,15 @@ public class MavenCli {
     }
 
     private String determineLocalRepositoryPath(final MavenExecutionRequest request) {
-        String userDefinedLocalRepo = request.getUserProperties().getProperty(MavenCli.LOCAL_REPO_PROPERTY);
+        String userDefinedLocalRepo = request.getUserProperties().getProperty(Constants.MAVEN_REPO_LOCAL);
         if (userDefinedLocalRepo == null) {
-            userDefinedLocalRepo = request.getSystemProperties().getProperty(MavenCli.LOCAL_REPO_PROPERTY);
+            userDefinedLocalRepo = request.getSystemProperties().getProperty(Constants.MAVEN_REPO_LOCAL);
             if (userDefinedLocalRepo != null) {
                 slf4jLogger.warn(
                         "The property '{}' has been set using a JVM system property which is deprecated. "
                                 + "The property can be passed as a Maven argument or in the Maven project configuration file,"
                                 + "usually located at ${session.rootDirectory}/.mvn/maven.properties.",
-                        MavenCli.LOCAL_REPO_PROPERTY);
+                        Constants.MAVEN_REPO_LOCAL);
             }
         }
         return userDefinedLocalRepo;
@@ -1670,10 +1668,12 @@ public class MavenCli {
                 or(paths::getProperty, prefix("cli.", commandLine::getOptionValue), systemProperties::getProperty);
 
         Path mavenConf;
-        if (systemProperties.getProperty("maven.conf") != null) {
+        if (systemProperties.getProperty(MAVEN_INSTALLATION_CONF) != null) {
+            mavenConf = fileSystem.getPath(systemProperties.getProperty(MAVEN_INSTALLATION_CONF));
+        } else if (systemProperties.getProperty("maven.conf") != null) {
             mavenConf = fileSystem.getPath(systemProperties.getProperty("maven.conf"));
-        } else if (systemProperties.getProperty("maven.home") != null) {
-            mavenConf = fileSystem.getPath(systemProperties.getProperty("maven.home"), "conf");
+        } else if (systemProperties.getProperty(MAVEN_HOME) != null) {
+            mavenConf = fileSystem.getPath(systemProperties.getProperty(MAVEN_HOME), "conf");
         } else {
             mavenConf = fileSystem.getPath("");
         }

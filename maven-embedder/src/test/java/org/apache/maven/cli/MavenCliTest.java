@@ -39,6 +39,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
+import org.apache.maven.api.Constants;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.SimplexTransferListener;
@@ -470,13 +471,13 @@ class MavenCliTest {
         assertThat(executionRequest.getLocalRepositoryPath(), is(nullValue()));
 
         // System-properties override default
-        request.getSystemProperties().setProperty(MavenCli.LOCAL_REPO_PROPERTY, "." + File.separatorChar + "custom1");
+        request.getSystemProperties().setProperty(Constants.MAVEN_REPO_LOCAL, "." + File.separatorChar + "custom1");
         executionRequest = cli.populateRequest(request);
         assertThat(executionRequest.getLocalRepositoryPath(), is(notNullValue()));
         assertThat(executionRequest.getLocalRepositoryPath().toString(), is("." + File.separatorChar + "custom1"));
 
         // User-properties override system properties
-        request.getUserProperties().setProperty(MavenCli.LOCAL_REPO_PROPERTY, "." + File.separatorChar + "custom2");
+        request.getUserProperties().setProperty(Constants.MAVEN_REPO_LOCAL, "." + File.separatorChar + "custom2");
         executionRequest = cli.populateRequest(request);
         assertThat(executionRequest.getLocalRepositoryPath(), is(notNullValue()));
         assertThat(executionRequest.getLocalRepositoryPath().toString(), is("." + File.separatorChar + "custom2"));
@@ -618,7 +619,7 @@ class MavenCliTest {
                 null);
         request.rootDirectory = rootDirectory;
         request.topDirectory = topDirectory;
-        System.setProperty("maven.conf", mavenConf.toString());
+        System.setProperty("maven.installation.conf", mavenConf.toString());
 
         // Act
         cli.setFileSystem(fs);

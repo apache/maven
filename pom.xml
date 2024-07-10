@@ -123,6 +123,7 @@ under the License.
     <module>maven-toolchain-model</module>
     <module>maven-toolchain-builder</module>
     <module>maven-bom</module>
+    <module>maven-docgen</module>
   </modules>
 
   <scm>

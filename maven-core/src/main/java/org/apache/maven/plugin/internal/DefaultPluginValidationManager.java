@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -66,11 +67,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
 
     private static final String PLUGIN_EXCLUDES_KEY = DefaultPluginValidationManager.class.getName() + ".excludes";
 
-    private static final String MAVEN_PLUGIN_VALIDATION_KEY = "maven.plugin.validation";
-
-    private static final String MAVEN_PLUGIN_VALIDATION_EXCLUDES_KEY = "maven.plugin.validation.excludes";
-
-    private static final ValidationReportLevel DEFAULT_VALIDATION_LEVEL = ValidationReportLevel.INLINE;
+    public static final ValidationReportLevel DEFAULT_VALIDATION_LEVEL = ValidationReportLevel.INLINE;
 
     private static final Collection<ValidationReportLevel> INLINE_VALIDATION_LEVEL = Collections.unmodifiableCollection(
             Arrays.asList(ValidationReportLevel.INLINE, ValidationReportLevel.BRIEF));
@@ -106,7 +103,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
     }
 
     private List<String> parsePluginExcludes(RepositorySystemSession session) {
-        String excludes = ConfigUtils.getString(session, null, MAVEN_PLUGIN_VALIDATION_EXCLUDES_KEY);
+        String excludes = ConfigUtils.getString(session, null, Constants.MAVEN_PLUGIN_VALIDATION_EXCLUDES);
         if (excludes == null || excludes.isEmpty()) {
             return Collections.emptyList();
         }
@@ -122,7 +119,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
     }
 
     private ValidationReportLevel parseValidationReportLevel(RepositorySystemSession session) {
-        String level = ConfigUtils.getString(session, null, MAVEN_PLUGIN_VALIDATION_KEY);
+        String level = ConfigUtils.getString(session, null, Constants.MAVEN_PLUGIN_VALIDATION);
         if (level == null || level.isEmpty()) {
             return DEFAULT_VALIDATION_LEVEL;
         }
@@ -131,7 +128,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         } catch (IllegalArgumentException e) {
             logger.warn(
                     "Invalid value specified for property {}: '{}'. Supported values are (case insensitive): {}",
-                    MAVEN_PLUGIN_VALIDATION_KEY,
+                    Constants.MAVEN_PLUGIN_VALIDATION,
                     level,
                     Arrays.toString(ValidationReportLevel.values()));
             return DEFAULT_VALIDATION_LEVEL;
