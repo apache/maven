@@ -79,11 +79,17 @@ public class CLIManager {
 
     public static final String ALTERNATE_PROJECT_SETTINGS = "ps";
 
+    @Deprecated
     public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
+
+    public static final String ALTERNATE_INSTALLATION_SETTINGS = "is";
 
     public static final char ALTERNATE_USER_TOOLCHAINS = 't';
 
+    @Deprecated
     public static final String ALTERNATE_GLOBAL_TOOLCHAINS = "gt";
+
+    public static final String ALTERNATE_INSTALLATION_TOOLCHAINS = "it";
 
     public static final String FAIL_FAST = "ff";
 
@@ -222,6 +228,12 @@ public class CLIManager {
                 .desc("Alternate path for the global settings file")
                 .hasArg()
                 .build());
+        options.addOption(Option.builder(ALTERNATE_INSTALLATION_SETTINGS)
+                .longOpt("install-settings")
+                .desc("Alternate path for the installation settings file")
+                .hasArg()
+                .deprecated()
+                .build());
         options.addOption(Option.builder(Character.toString(ALTERNATE_USER_TOOLCHAINS))
                 .longOpt("toolchains")
                 .desc("Alternate path for the user toolchains file")
@@ -231,6 +243,12 @@ public class CLIManager {
                 .longOpt("global-toolchains")
                 .desc("Alternate path for the global toolchains file")
                 .hasArg()
+                .build());
+        options.addOption(Option.builder(ALTERNATE_INSTALLATION_TOOLCHAINS)
+                .longOpt("install-toolchains")
+                .desc("Alternate path for the installation toolchains file")
+                .hasArg()
+                .deprecated()
                 .build());
         options.addOption(Option.builder(FAIL_ON_SEVERITY)
                 .longOpt("fail-on-severity")

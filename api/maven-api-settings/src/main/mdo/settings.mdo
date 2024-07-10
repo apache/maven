@@ -44,8 +44,7 @@
       <name>TrackableBase</name>
       <version>1.0.0+</version>
       <description>
-        common base class that contains code to track the source for
-        this instance (USER|GLOBAL)
+        Common base class that contains code to track the source for this instance.
       </description>
       <codeSegments>
         <codeSegment>

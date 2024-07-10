@@ -29,14 +29,15 @@ under the License.
  |
  |                 -t /path/to/user/toolchains.xml
  |
- |  2. Global Level. This toolchains.xml file provides configuration for all Maven
+ |  2. Installation Level.
+ |                 This toolchains.xml file provides configuration for all Maven
  |                 users on a machine (assuming they're all using the same Maven
  |                 installation). It's normally provided in
- |                 ${maven.conf}/toolchains.xml.
+ |                 ${maven.installation.conf}/toolchains.xml.
  |
  |                 NOTE: This location can be overridden with the CLI option:
  |
- |                 -gt /path/to/global/toolchains.xml
+ |                 -it /path/to/installation/toolchains.xml
  |
  | The sections in this sample file are intended to give you a running start at
  | getting the most out of your Maven installation.

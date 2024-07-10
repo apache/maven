@@ -29,14 +29,15 @@ under the License.
  |
  |                 -s /path/to/user/settings.xml
  |
- |  2. Global Level. This settings.xml file provides configuration for all Maven
+ |  2. Installation Level.
+ |                 This settings.xml file provides configuration for all Maven
  |                 users on a machine (assuming they're all using the same Maven
  |                 installation). It's normally provided in
- |                 ${maven.conf}/settings.xml.
+ |                 ${maven.installation.conf}/settings.xml.
  |
  |                 NOTE: This location can be overridden with the CLI option:
  |
- |                 -gs /path/to/global/settings.xml
+ |                 -is /path/to/installation/settings.xml
  |
  | The sections in this sample file are intended to give you a running start at
  | getting the most out of your Maven installation. Where appropriate, the default

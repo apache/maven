@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.settings.Settings;
 
 /**
- * Builds the effective settings from a user settings file and/or a global settings file.
+ * Builds the effective settings from a user settings file and/or a installation settings file.
  *
  * @since 4.0.0
  */
@@ -53,8 +53,8 @@ public interface SettingsBuilder extends Service {
      */
     @Nonnull
     default SettingsBuilderResult build(
-            @Nonnull Session session, @Nonnull Source globalSettingsSource, @Nonnull Source userSettingsSource) {
-        return build(session, globalSettingsSource, null, userSettingsSource);
+            @Nonnull Session session, @Nonnull Source installationSettingsSource, @Nonnull Source userSettingsSource) {
+        return build(session, installationSettingsSource, null, userSettingsSource);
     }
 
     /**
@@ -65,8 +65,8 @@ public interface SettingsBuilder extends Service {
      */
     @Nonnull
     default SettingsBuilderResult build(
-            @Nonnull Session session, @Nonnull Path globalSettingsPath, @Nonnull Path userSettingsPath) {
-        return build(session, globalSettingsPath, null, userSettingsPath);
+            @Nonnull Session session, @Nonnull Path installationSettingsPath, @Nonnull Path userSettingsPath) {
+        return build(session, installationSettingsPath, null, userSettingsPath);
     }
 
     /**
@@ -78,11 +78,11 @@ public interface SettingsBuilder extends Service {
     @Nonnull
     default SettingsBuilderResult build(
             @Nonnull Session session,
-            @Nonnull Source globalSettingsSource,
+            @Nonnull Source installationSettingsSource,
             @Nonnull Source projectSettingsSource,
             @Nonnull Source userSettingsSource) {
-        return build(
-                SettingsBuilderRequest.build(session, globalSettingsSource, projectSettingsSource, userSettingsSource));
+        return build(SettingsBuilderRequest.build(
+                session, installationSettingsSource, projectSettingsSource, userSettingsSource));
     }
 
     /**
@@ -94,10 +94,11 @@ public interface SettingsBuilder extends Service {
     @Nonnull
     default SettingsBuilderResult build(
             @Nonnull Session session,
-            @Nonnull Path globalSettingsPath,
+            @Nonnull Path installationSettingsPath,
             @Nonnull Path projectSettingsPath,
             @Nonnull Path userSettingsPath) {
-        return build(SettingsBuilderRequest.build(session, globalSettingsPath, projectSettingsPath, userSettingsPath));
+        return build(
+                SettingsBuilderRequest.build(session, installationSettingsPath, projectSettingsPath, userSettingsPath));
     }
 
     /**
@@ -115,7 +116,7 @@ public interface SettingsBuilder extends Service {
      * Validate the specified settings.
      *
      * @param settings The settings to validate, must not be {@code null}.
-     * @param isProjectSettings Boolean indicating if the validation is for project settings or user / global settings.
+     * @param isProjectSettings Boolean indicating if the validation is for project settings or user / installation settings.
      * @return The list of problems that were encountered, must not be {@code null}.
      */
     @Nonnull

@@ -1221,27 +1221,37 @@ public class MavenCli {
             userToolchainsFile = DEFAULT_USER_TOOLCHAINS_FILE;
         }
 
-        File globalToolchainsFile;
+        File installationToolchainsFile;
 
-        if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS)) {
-            globalToolchainsFile =
-                    new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS));
-            globalToolchainsFile = resolveFile(globalToolchainsFile, cliRequest.workingDirectory);
+        if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_INSTALLATION_TOOLCHAINS)) {
+            installationToolchainsFile =
+                    new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_INSTALLATION_TOOLCHAINS));
+            installationToolchainsFile = resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
 
-            if (!globalToolchainsFile.isFile()) {
+            if (!installationToolchainsFile.isFile()) {
                 throw new FileNotFoundException(
-                        "The specified global toolchains file does not exist: " + globalToolchainsFile);
+                        "The specified installation toolchains file does not exist: " + installationToolchainsFile);
             }
+        } else if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS)) {
+            installationToolchainsFile =
+                    new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS));
+            installationToolchainsFile = resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
+
+            if (!installationToolchainsFile.isFile()) {
+                throw new FileNotFoundException(
+                        "The specified installation toolchains file does not exist: " + installationToolchainsFile);
+            }
+
         } else {
-            globalToolchainsFile = DEFAULT_GLOBAL_TOOLCHAINS_FILE;
+            installationToolchainsFile = DEFAULT_GLOBAL_TOOLCHAINS_FILE;
         }
 
-        cliRequest.request.setGlobalToolchainsFile(globalToolchainsFile);
+        cliRequest.request.setInstallationToolchainsFile(installationToolchainsFile);
         cliRequest.request.setUserToolchainsFile(userToolchainsFile);
 
         DefaultToolchainsBuildingRequest toolchainsRequest = new DefaultToolchainsBuildingRequest();
-        if (globalToolchainsFile.isFile()) {
-            toolchainsRequest.setGlobalToolchainsSource(new FileSource(globalToolchainsFile));
+        if (installationToolchainsFile.isFile()) {
+            toolchainsRequest.setGlobalToolchainsSource(new FileSource(installationToolchainsFile));
         }
         if (userToolchainsFile.isFile()) {
             toolchainsRequest.setUserToolchainsSource(new FileSource(userToolchainsFile));
@@ -1250,8 +1260,8 @@ public class MavenCli {
         eventSpyDispatcher.onEvent(toolchainsRequest);
 
         slf4jLogger.debug(
-                "Reading global toolchains from '{}'",
-                getLocation(toolchainsRequest.getGlobalToolchainsSource(), globalToolchainsFile));
+                "Reading installation toolchains from '{}'",
+                getLocation(toolchainsRequest.getGlobalToolchainsSource(), installationToolchainsFile));
         slf4jLogger.debug(
                 "Reading user toolchains from '{}'",
                 getLocation(toolchainsRequest.getUserToolchainsSource(), userToolchainsFile));
@@ -1662,8 +1672,10 @@ public class MavenCli {
         Path mavenConf;
         if (systemProperties.getProperty("maven.conf") != null) {
             mavenConf = fileSystem.getPath(systemProperties.getProperty("maven.conf"));
-        } else {
+        } else if (systemProperties.getProperty("maven.home") != null) {
             mavenConf = fileSystem.getPath(systemProperties.getProperty("maven.home"), "conf");
+        } else {
+            mavenConf = fileSystem.getPath("");
         }
         Path propertiesFile = mavenConf.resolve("maven.properties");
         MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);

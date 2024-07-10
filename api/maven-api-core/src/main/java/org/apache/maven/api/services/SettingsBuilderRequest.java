@@ -42,12 +42,12 @@ public interface SettingsBuilderRequest {
     Session getSession();
 
     /**
-     * Gets the global settings source.
+     * Gets the installation settings source.
      *
-     * @return the global settings source or {@code null} if none
+     * @return the installation settings source or {@code null} if none
      */
     @Nonnull
-    Optional<Source> getGlobalSettingsSource();
+    Optional<Source> getInstallationSettingsSource();
 
     /**
      * Gets the project settings source.
@@ -67,25 +67,25 @@ public interface SettingsBuilderRequest {
 
     @Nonnull
     static SettingsBuilderRequest build(
-            @Nonnull Session session, @Nonnull Source globalSettingsSource, @Nonnull Source userSettingsSource) {
-        return build(session, globalSettingsSource, null, userSettingsSource);
+            @Nonnull Session session, @Nonnull Source installationSettingsSource, @Nonnull Source userSettingsSource) {
+        return build(session, installationSettingsSource, null, userSettingsSource);
     }
 
     @Nonnull
     static SettingsBuilderRequest build(
-            @Nonnull Session session, @Nonnull Path globalSettingsPath, @Nonnull Path userSettingsPath) {
-        return build(session, Source.fromPath(globalSettingsPath), null, Source.fromPath(userSettingsPath));
+            @Nonnull Session session, @Nonnull Path installationSettingsPath, @Nonnull Path userSettingsPath) {
+        return build(session, Source.fromPath(installationSettingsPath), null, Source.fromPath(userSettingsPath));
     }
 
     @Nonnull
     static SettingsBuilderRequest build(
             @Nonnull Session session,
-            @Nullable Source globalSettingsSource,
+            @Nullable Source installationSettingsSource,
             @Nullable Source projectSettingsSource,
             @Nullable Source userSettingsSource) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
-                .globalSettingsSource(globalSettingsSource)
+                .installationSettingsSource(installationSettingsSource)
                 .projectSettingsSource(projectSettingsSource)
                 .userSettingsSource(userSettingsSource)
                 .build();
@@ -94,14 +94,14 @@ public interface SettingsBuilderRequest {
     @Nonnull
     static SettingsBuilderRequest build(
             @Nonnull Session session,
-            @Nullable Path globalSettingsPath,
+            @Nullable Path installationSettingsPath,
             @Nullable Path projectSettingsPath,
             @Nullable Path userSettingsPath) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
-                .globalSettingsSource(
-                        globalSettingsPath != null && Files.exists(globalSettingsPath)
-                                ? Source.fromPath(globalSettingsPath)
+                .installationSettingsSource(
+                        installationSettingsPath != null && Files.exists(installationSettingsPath)
+                                ? Source.fromPath(installationSettingsPath)
                                 : null)
                 .projectSettingsSource(
                         projectSettingsPath != null && Files.exists(projectSettingsPath)
@@ -122,7 +122,7 @@ public interface SettingsBuilderRequest {
     @NotThreadSafe
     class SettingsBuilderRequestBuilder {
         Session session;
-        Source globalSettingsSource;
+        Source installationSettingsSource;
         Source projectSettingsSource;
         Source userSettingsSource;
 
@@ -131,8 +131,8 @@ public interface SettingsBuilderRequest {
             return this;
         }
 
-        public SettingsBuilderRequestBuilder globalSettingsSource(Source globalSettingsSource) {
-            this.globalSettingsSource = globalSettingsSource;
+        public SettingsBuilderRequestBuilder installationSettingsSource(Source installationSettingsSource) {
+            this.installationSettingsSource = installationSettingsSource;
             return this;
         }
 
@@ -148,30 +148,30 @@ public interface SettingsBuilderRequest {
 
         public SettingsBuilderRequest build() {
             return new DefaultSettingsBuilderRequest(
-                    session, globalSettingsSource, projectSettingsSource, userSettingsSource);
+                    session, installationSettingsSource, projectSettingsSource, userSettingsSource);
         }
 
         private static class DefaultSettingsBuilderRequest extends BaseRequest implements SettingsBuilderRequest {
-            private final Source globalSettingsSource;
+            private final Source installationSettingsSource;
             private final Source projectSettingsSource;
             private final Source userSettingsSource;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultSettingsBuilderRequest(
                     @Nonnull Session session,
-                    @Nullable Source globalSettingsSource,
+                    @Nullable Source installationSettingsSource,
                     @Nullable Source projectSettingsSource,
                     @Nullable Source userSettingsSource) {
                 super(session);
-                this.globalSettingsSource = globalSettingsSource;
+                this.installationSettingsSource = installationSettingsSource;
                 this.projectSettingsSource = projectSettingsSource;
                 this.userSettingsSource = userSettingsSource;
             }
 
             @Nonnull
             @Override
-            public Optional<Source> getGlobalSettingsSource() {
-                return Optional.ofNullable(globalSettingsSource);
+            public Optional<Source> getInstallationSettingsSource() {
+                return Optional.ofNullable(installationSettingsSource);
             }
 
             @Nonnull
