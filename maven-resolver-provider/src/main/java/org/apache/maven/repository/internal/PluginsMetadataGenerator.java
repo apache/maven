@@ -146,8 +146,11 @@ class PluginsMetadataGenerator implements MetadataGenerator {
                                                 + groupId + ":" + artifactId + "; coordinates are conflicting. "
                                                 + "Most probably your JAR contains rogue Maven Plugin metadata, "
                                                 + "possible causes may be: shaded in Maven Plugin or some rogue resource)");
-                            }                        }
+                            }
+                        }
                     }
+                } catch (RuntimeException e) {
+                    throw e;
                 } catch (Exception e) {
                     // here we can have: IO. ZIP or Plexus Conf Ex: but we should not interfere with user intent
                 }

@@ -227,8 +227,8 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
         installRequest.addArtifact(artifactResult.getArtifact());
 
         DefaultRepositorySystemSession loc = new DefaultRepositorySystemSession(session);
-        loc.setLocalRepositoryManager(system.newLocalRepositoryManager(
-                session, new LocalRepository(Files.createTempDirectory("local"))));
+        loc.setLocalRepositoryManager(
+                system.newLocalRepositoryManager(session, new LocalRepository(Files.createTempDirectory("local"))));
         try {
             system.install(loc, installRequest);
             fail("install should fail");
