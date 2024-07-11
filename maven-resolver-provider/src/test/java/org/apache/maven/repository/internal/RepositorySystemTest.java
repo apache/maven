@@ -18,26 +18,26 @@
  */
 package org.apache.maven.repository.internal;
 
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.installation.InstallRequest;
+import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class RepositorySystemTest extends AbstractRepositoryTestCase {
     @Test
@@ -210,5 +210,31 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
     @Test
     void testNewSyncContext() throws Exception {
         // SyncContext newSyncContext( RepositorySystemSession session, boolean shared );
+    }
+
+    @Test
+    void testRoguePlugin() throws Exception {
+        Artifact artifact = new DefaultArtifact("ut.simple:rogue-plugin:1.0");
+
+        ArtifactRequest artifactRequest = new ArtifactRequest();
+        artifactRequest.setArtifact(artifact);
+        artifactRequest.addRepository(newTestRepository());
+
+        ArtifactResult artifactResult = system.resolveArtifact(session, artifactRequest);
+        checkArtifactResult(artifactResult, "rogue-plugin-1.0.jar");
+
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.addArtifact(artifactResult.getArtifact());
+
+        DefaultRepositorySystemSession loc = new DefaultRepositorySystemSession(session);
+        loc.setLocalRepositoryManager(
+                system.newLocalRepositoryManager(session, new LocalRepository(Files.createTempDirectory("local"))));
+        try {
+            system.install(loc, installRequest);
+            fail("install should fail");
+        } catch (Exception e) {
+            assertInstanceOf(PluginsMetadataGenerator.InvalidArtifactPluginMetadataException.class, e);
+            assertTrue(e.getMessage().contains("coordinates are conflicting"));
+        }
     }
 }

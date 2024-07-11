@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -133,14 +134,34 @@ class PluginsMetadataGenerator implements MetadataGenerator {
                             String artifactId = root.getChild("artifactId").getValue();
                             String goalPrefix = root.getChild("goalPrefix").getValue();
                             String name = root.getChild("name").getValue();
-                            return new PluginInfo(groupId, artifactId, goalPrefix, name);
+                            // sanity check: plugin descriptor extracted from artifact must have same GA
+                            if (Objects.equals(artifact.getGroupId(), groupId)
+                                    && Objects.equals(artifact.getArtifactId(), artifactId)) {
+                                return new PluginInfo(groupId, artifactId, goalPrefix, name);
+                            } else {
+                                throw new InvalidArtifactPluginMetadataException(
+                                        "Artifact " + artifact.getGroupId() + ":"
+                                                + artifact.getArtifactId()
+                                                + " JAR (to be installed/deployed) contains Maven Plugin metadata for plugin "
+                                                + groupId + ":" + artifactId + "; coordinates are conflicting. "
+                                                + "Most probably your JAR contains rogue Maven Plugin metadata, "
+                                                + "possible causes may be: shaded in Maven Plugin or some rogue resource)");
+                            }
                         }
                     }
+                } catch (RuntimeException e) {
+                    throw e;
                 } catch (Exception e) {
                     // here we can have: IO. ZIP or Plexus Conf Ex: but we should not interfere with user intent
                 }
             }
         }
         return null;
+    }
+
+    public static final class InvalidArtifactPluginMetadataException extends IllegalArgumentException {
+        InvalidArtifactPluginMetadataException(String s) {
+            super(s);
+        }
     }
 }
