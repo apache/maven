@@ -21,6 +21,7 @@ package org.apache.maven.repository.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,14 +59,18 @@ public class ArtifactDescriptorReaderDelegate {
             result.addRepository(ArtifactDescriptorUtils.toRemoteRepository(r));
         }
 
+        HashSet<String> dependencyKeys = new HashSet<>(model.getDependencies().size());
         for (org.apache.maven.model.Dependency dependency : model.getDependencies()) {
             result.addDependency(convert(dependency, stereotypes));
+            dependencyKeys.add(dependency.getManagementKey());
         }
 
         DependencyManagement mgmt = model.getDependencyManagement();
         if (mgmt != null) {
             for (org.apache.maven.model.Dependency dependency : mgmt.getDependencies()) {
-                result.addManagedDependency(convert(dependency, stereotypes));
+                if (!dependencyKeys.contains(dependency.getManagementKey())) {
+                    result.addManagedDependency(convert(dependency, stereotypes));
+                }
             }
         }
 
