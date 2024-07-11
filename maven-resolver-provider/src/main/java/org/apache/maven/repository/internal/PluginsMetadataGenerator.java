@@ -141,20 +141,29 @@ class PluginsMetadataGenerator implements MetadataGenerator {
                                     && Objects.equals(artifact.getArtifactId(), artifactId)) {
                                 return new PluginInfo(groupId, artifactId, goalPrefix, name);
                             } else {
-                                throw new IllegalArgumentException("Artifact " + artifact.getGroupId() + ":"
-                                        + artifact.getArtifactId()
-                                        + " JAR (to be installed/deployed) contains Maven Plugin metadata for plugin "
-                                        + groupId + ":" + artifactId + "; coordinates are conflicting. "
-                                        + "Most probably your JAR contains rogue Maven Plugin metadata, "
-                                        + "possible causes may be: shaded in Maven Plugin or some rogue resource)");
+                                throw new InvalidArtifactPluginMetadataException(
+                                        "Artifact " + artifact.getGroupId() + ":"
+                                                + artifact.getArtifactId()
+                                                + " JAR (to be installed/deployed) contains Maven Plugin metadata for plugin "
+                                                + groupId + ":" + artifactId + "; coordinates are conflicting. "
+                                                + "Most probably your JAR contains rogue Maven Plugin metadata, "
+                                                + "possible causes may be: shaded in Maven Plugin or some rogue resource)");
                             }
                         }
                     }
+                } catch (RuntimeException e) {
+                    throw e;
                 } catch (Exception e) {
                     // here we can have: IO. ZIP or Plexus Conf Ex: but we should not interfere with user intent
                 }
             }
         }
         return null;
+    }
+
+    public static final class InvalidArtifactPluginMetadataException extends IllegalArgumentException {
+        InvalidArtifactPluginMetadataException(String s) {
+            super(s);
+        }
     }
 }
