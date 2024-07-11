@@ -218,6 +218,7 @@ public class RepositorySystemTest extends AbstractRepositoryTestCase {
             system.install(loc, installRequest);
             fail("install should fail");
         } catch (Exception e) {
+            assertTrue(e instanceof PluginsMetadataGenerator.InvalidArtifactPluginMetadataException);
             assertTrue(e.getMessage().contains("coordinates are conflicting"));
         }
     }
