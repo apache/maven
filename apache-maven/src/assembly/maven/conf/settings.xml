@@ -174,7 +174,7 @@ under the License.
     <repository>
       <id>central</id>
       <name>Central Repository</name>
-      <url>https://repo.maven.apache.org/maven2</url>
+      <url>${maven.repo.central}</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -188,7 +188,7 @@ under the License.
     <pluginRepository>
       <id>central</id>
       <name>Central Repository</name>
-      <url>https://repo.maven.apache.org/maven2</url>
+      <url>${maven.repo.central}</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>

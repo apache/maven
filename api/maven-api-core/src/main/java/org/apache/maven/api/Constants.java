@@ -66,6 +66,16 @@ public final class Constants {
     public static final String MAVEN_REPO_LOCAL = "maven.repo.local";
 
     /**
+     * Maven central repository URL.
+     * The property will have the value of the <code>MAVEN_REPO_CENTRAL</code>
+     * environment variable if it is defined.
+     *
+     * @since 4.0.0
+     */
+    @Config(defaultValue = "https://repo.maven.apache.org/maven2")
+    public static final String MAVEN_REPO_CENTRAL = "maven.repo.central";
+
+    /**
      * Maven installation settings.
      *
      * @since 4.0.0
