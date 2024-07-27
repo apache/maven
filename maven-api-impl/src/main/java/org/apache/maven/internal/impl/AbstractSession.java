@@ -281,19 +281,22 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Nonnull
+    @Override
     public RepositorySystemSession getSession() {
         return session;
     }
 
     @Nonnull
+    @Override
     public RepositorySystem getRepositorySystem() {
         return repositorySystem;
     }
 
+    @Override
     public org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency, boolean managed) {
         org.eclipse.aether.graph.Dependency dep;
-        if (dependency instanceof DefaultDependencyCoordinate) {
-            dep = ((DefaultDependencyCoordinate) dependency).getDependency();
+        if (dependency instanceof AetherDependencyWrapper wrapper) {
+            dep = wrapper.dependency;
         } else {
             dep = new org.eclipse.aether.graph.Dependency(
                     new org.eclipse.aether.artifact.DefaultArtifact(
