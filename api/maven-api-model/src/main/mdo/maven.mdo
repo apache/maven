@@ -528,10 +528,10 @@
         <field xdoc.separator="blank">
           <name>modules</name>
           <version>4.0.0+</version>
-          <description>The modules (sometimes called subprojects) to build as a part of this
-            project. Each module listed is a relative path to the directory containing the module.
-            To be consistent with the way default urls are calculated from parent, it is recommended
-            to have module names match artifact ids.</description>
+          <description>The subprojects (formerly called modules) to build as a part of this
+            project. Each subproject listed is a relative path to the directory containing the subproject.
+            To be consistent with the way default URLs are calculated from parent, it is recommended
+            to have subproject names match artifact ids.</description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -755,8 +755,8 @@
           <name>defaultGoal</name>
           <version>3.0.0+</version>
           <description>The default goal (or phase in Maven 2) to execute when none is specified for
-            the project. Note that in case of a multi-module build, only the default goal of the top-level
-            project is relevant, i.e. the default goals of child modules are ignored. Since Maven 3,
+            the project. Note that in case of a build with subprojects, only the default goal of the top-level
+            project is relevant, i.e. the default goals of subprojects are ignored. Since Maven 3,
             multiple goals/phases can be separated by whitespace.</description>
           <type>String</type>
         </field>

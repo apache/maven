@@ -76,8 +76,8 @@ public @interface Mojo {
     boolean projectRequired() default true;
 
     /**
-     * if the Mojo uses the Maven project and its child modules.
-     * @return uses the Maven project and its child modules
+     * if the Mojo uses the Maven project and its subprojects.
+     * @return uses the Maven project and its subprojectss
      */
     boolean aggregator() default false;
 
