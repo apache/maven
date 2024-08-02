@@ -88,6 +88,7 @@ import org.apache.maven.api.services.VersionResolver;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.ArtifactType;
 
 import static org.apache.maven.internal.impl.Utils.map;
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -298,14 +299,16 @@ public abstract class AbstractSession implements InternalSession {
         if (dependency instanceof AetherDependencyWrapper wrapper) {
             dep = wrapper.dependency;
         } else {
+            Type type = dependency.getType();
             dep = new org.eclipse.aether.graph.Dependency(
                     new org.eclipse.aether.artifact.DefaultArtifact(
                             dependency.getGroupId(),
                             dependency.getArtifactId(),
                             dependency.getClassifier(),
-                            dependency.getType().getExtension(),
+                            type.getExtension(),
                             dependency.getVersion().toString(),
-                            null),
+                            Map.of("type", type.id()),
+                            (ArtifactType) null),
                     dependency.getScope().id(),
                     dependency.getOptional(),
                     map(dependency.getExclusions(), this::toExclusion));
