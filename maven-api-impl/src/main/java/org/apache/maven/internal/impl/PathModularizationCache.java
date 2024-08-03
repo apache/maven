@@ -178,10 +178,11 @@ class PathModularizationCache {
         if (automodulesDetected.isEmpty()) {
             return Optional.empty();
         }
+        String lineSeparator = System.lineSeparator();
         var joiner = new StringJoiner(
-                ", ",
-                "Filename-based automodules detected on the module-path: ",
-                "Please don't publish this project to a public artifact repository.");
+                lineSeparator + "  - ",
+                "Filename-based automodules detected on the module-path: " + lineSeparator + "  - ",
+                lineSeparator + "Please don't publish this project to a public artifact repository.");
         automodulesDetected.forEach(joiner::add);
         return Optional.of(joiner.toString());
     }
