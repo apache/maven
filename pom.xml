@@ -144,7 +144,7 @@ under the License.
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <resolverVersion>1.9.21</resolverVersion>
+    <resolverVersion>1.9.22</resolverVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
     <xmlunitVersion>2.10.0</xmlunitVersion>
     <powermockVersion>2.0.9</powermockVersion>
@@ -542,6 +542,21 @@ under the License.
   </dependencies>
   <!--bootstrap-end-comment-->
 
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>maven-2177</id>
+      <url>https://repository.apache.org/content/repositories/maven-2177/</url>
+    </repository>
+  </repositories>
+  
   <build>
     <pluginManagement>
       <plugins>
