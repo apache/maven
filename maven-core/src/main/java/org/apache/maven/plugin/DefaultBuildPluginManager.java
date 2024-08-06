@@ -143,7 +143,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
                 mojoExecutionListener.beforeMojoExecution(mojoExecutionEvent);
                 mojo.execute();
                 mojoExecutionListener.afterMojoExecutionSuccess(mojoExecutionEvent);
-            } catch (ClassCastException e) {
+            } catch (ClassCastException | MojoException e) {
                 // to be processed in the outer catch block
                 throw e;
             } catch (RuntimeException e) {
@@ -226,12 +226,8 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
         }
 
         @Override
-        public void execute() throws MojoExecutionException, MojoFailureException {
-            try {
-                mojoV4.execute();
-            } catch (MojoException e) {
-                throw new MojoExecutionException(e.getMessage(), e);
-            }
+        public void execute() {
+            mojoV4.execute();
         }
 
         @Override
