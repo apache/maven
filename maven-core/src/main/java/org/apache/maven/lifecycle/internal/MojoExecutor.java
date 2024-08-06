@@ -37,6 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.maven.api.SessionData;
+import org.apache.maven.api.plugin.MojoException;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -324,7 +325,8 @@ public class MojoExecutor {
             } catch (MojoFailureException
                     | PluginManagerException
                     | PluginConfigurationException
-                    | MojoExecutionException e) {
+                    | MojoExecutionException
+                    | MojoException e) {
                 throw new LifecycleExecutionException(
                         messageBuilderFactory, mojoExecution, session.getCurrentProject(), e);
             }

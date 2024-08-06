@@ -27,7 +27,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.maven.api.Project;
-import org.apache.maven.api.plugin.MojoException;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
@@ -143,12 +143,14 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
                 mojoExecutionListener.beforeMojoExecution(mojoExecutionEvent);
                 mojo.execute();
                 mojoExecutionListener.afterMojoExecutionSuccess(mojoExecutionEvent);
-            } catch (ClassCastException e) {
+            } catch (ClassCastException | MavenException e) {
                 // to be processed in the outer catch block
                 throw e;
             } catch (RuntimeException e) {
                 throw new PluginExecutionException(mojoExecution, project, e);
             }
+        } catch (MavenException e) {
+            throw e;
         } catch (PluginContainerException e) {
             mojoExecutionListener.afterExecutionFailure(
                     new MojoExecutionEvent(session, project, mojoExecution, mojo, e));
@@ -226,12 +228,8 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
         }
 
         @Override
-        public void execute() throws MojoExecutionException, MojoFailureException {
-            try {
-                mojoV4.execute();
-            } catch (MojoException e) {
-                throw new MojoExecutionException(e.getMessage(), e);
-            }
+        public void execute() {
+            mojoV4.execute();
         }
 
         @Override

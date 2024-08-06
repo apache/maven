@@ -30,6 +30,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.api.plugin.MojoException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemUtils;
@@ -232,16 +233,20 @@ public class DefaultExceptionHandler implements ExceptionHandler {
         Set<Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
         for (Throwable t = exception; t != null && t != t.getCause(); t = t.getCause()) {
             String exceptionMessage = t.getMessage();
+            String longMessage = null;
 
             if (t instanceof AbstractMojoExecutionException) {
-                String longMessage = ((AbstractMojoExecutionException) t).getLongMessage();
-                if (longMessage != null && !longMessage.isEmpty()) {
-                    if ((exceptionMessage == null || exceptionMessage.isEmpty())
-                            || longMessage.contains(exceptionMessage)) {
-                        exceptionMessage = longMessage;
-                    } else if (!exceptionMessage.contains(longMessage)) {
-                        exceptionMessage = join(exceptionMessage, System.lineSeparator() + longMessage);
-                    }
+                longMessage = ((AbstractMojoExecutionException) t).getLongMessage();
+            } else if (t instanceof MojoException) {
+                longMessage = ((MojoException) t).getLongMessage();
+            }
+
+            if (longMessage != null && !longMessage.isEmpty()) {
+                if ((exceptionMessage == null || exceptionMessage.isEmpty())
+                        || longMessage.contains(exceptionMessage)) {
+                    exceptionMessage = longMessage;
+                } else if (!exceptionMessage.contains(longMessage)) {
+                    exceptionMessage = join(exceptionMessage, System.lineSeparator() + longMessage);
                 }
             }
 
