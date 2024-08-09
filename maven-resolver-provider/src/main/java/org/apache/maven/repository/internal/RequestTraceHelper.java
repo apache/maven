@@ -39,28 +39,35 @@ public final class RequestTraceHelper {
      * Method that creates some informational string based on passed in {@link RequestTrace}. The contents of request
      * trace can literally be anything, but this class tries to cover "most common" cases that are happening in Maven.
      */
-    public static String interpretTrace(boolean explain, RequestTrace requestTrace) {
+    public static String interpretTrace(boolean detailed, RequestTrace requestTrace) {
         while (requestTrace != null) {
             Object data = requestTrace.getData();
             if (data instanceof DependencyRequest) {
                 DependencyRequest request = (DependencyRequest) data;
-                return (explain ? "dependency request for " : "") + request;
+                return "dependency resolution for " + request;
             } else if (data instanceof CollectRequest) {
                 CollectRequest request = (CollectRequest) data;
-                return (explain ? "collect request for " : "") + request;
+                return "dependency collection for " + request;
             } else if (data instanceof CollectStepData) {
                 CollectStepData stepData = (CollectStepData) data;
-                return (explain ? "collect path " : "")
-                        + stepData.getPath().stream().map(Object::toString).collect(Collectors.joining(" -> "));
+                String msg = "dependency collection step for " + stepData.getContext();
+                if (detailed) {
+                    msg += "\n";
+                    msg += "Path to offending node from root:\n";
+                    msg += stepData.getPath().stream()
+                            .map(n -> " -> " + n.toString())
+                            .collect(Collectors.joining("\n"));
+                }
+                return msg;
             } else if (data instanceof ArtifactDescriptorRequest) {
                 ArtifactDescriptorRequest request = (ArtifactDescriptorRequest) data;
-                return (explain ? "artifact descriptor request for " : "") + request.getArtifact();
+                return "artifact descriptor request for " + request.getArtifact();
             } else if (data instanceof ArtifactRequest) {
                 ArtifactRequest request = (ArtifactRequest) data;
-                return (explain ? "artifact request for " : "") + request.getArtifact();
+                return "artifact request for " + request.getArtifact();
             } else if (data instanceof Plugin) {
                 Plugin plugin = (Plugin) data;
-                return (explain ? "plugin " : "") + plugin.getId();
+                return "plugin request " + plugin.getId();
             }
             requestTrace = requestTrace.getParent();
         }
