@@ -763,9 +763,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private Model interpolateModel(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
-        // save profile activations before interpolation, since they are evaluated with limited scope
-        List<Profile> originalActivations = getProfiles(model, true);
-
         Model interpolatedModel =
                 modelInterpolator.interpolateModel(model, model.getProjectDirectory(), request, problems);
         if (interpolatedModel.getParent() != null) {
@@ -790,9 +787,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
         interpolatedModel.setPomFile(model.getPomFile());
-
-        // restore profiles with file activation to their value before full interpolation
-        model.setProfiles(originalActivations);
 
         return interpolatedModel;
     }
