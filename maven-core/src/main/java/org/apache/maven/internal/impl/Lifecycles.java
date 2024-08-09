@@ -18,21 +18,52 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginExecution;
 
+import static java.util.Arrays.asList;
+
 public class Lifecycles {
 
     static Lifecycle.Phase phase(String name) {
-        return new DefaultPhase(name, Collections.emptyList(), Collections.emptyList());
+        return new DefaultPhase(name, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+    }
+
+    static Lifecycle.Phase phase(String name, Lifecycle.Phase... phases) {
+        return new DefaultPhase(name, Collections.emptyList(), Collections.emptyList(), asList(phases));
+    }
+
+    static Lifecycle.Phase phase(String name, Lifecycle.Link link, Lifecycle.Phase... phases) {
+        return new DefaultPhase(name, Collections.emptyList(), Collections.singletonList(link), asList(phases));
     }
 
     static Lifecycle.Phase phase(String name, Plugin plugin) {
-        return new DefaultPhase(name, Collections.singletonList(plugin), Collections.emptyList());
+        return new DefaultPhase(
+                name, Collections.singletonList(plugin), Collections.emptyList(), Collections.emptyList());
+    }
+
+    static Lifecycle.Phase phase(String name, Lifecycle.Link link, Plugin plugin) {
+        return new DefaultPhase(
+                name, Collections.singletonList(plugin), Collections.singletonList(link), Collections.emptyList());
+    }
+
+    static Lifecycle.Phase phase(String name, Lifecycle.Link link1, Lifecycle.Link link2, Lifecycle.Phase... phases) {
+        return new DefaultPhase(name, Collections.emptyList(), asList(link1, link2), asList(phases));
+    }
+
+    static Lifecycle.Phase phase(
+            String name, Lifecycle.Link link1, Lifecycle.Link link2, Lifecycle.Link link3, Lifecycle.Phase... phases) {
+        return new DefaultPhase(name, Collections.emptyList(), asList(link1, link2, link3), asList(phases));
+    }
+
+    static Lifecycle.Phase phase(String name, Collection<Lifecycle.Link> links, Lifecycle.Phase... phases) {
+        return new DefaultPhase(name, Collections.emptyList(), links, asList(phases));
     }
 
     static Plugin plugin(String coord, String phase) {
@@ -49,14 +80,66 @@ public class Lifecycles {
                 .build();
     }
 
+    /** Indicates the phase is after the phases given in arguments */
+    static Lifecycle.Link after(String b) {
+        return new Lifecycle.Link() {
+            @Override
+            public Kind kind() {
+                return Kind.AFTER;
+            }
+
+            @Override
+            public Lifecycle.Pointer pointer() {
+                return new Lifecycle.PhasePointer() {
+                    @Override
+                    public String phase() {
+                        return b;
+                    }
+                };
+            }
+        };
+    }
+
+    /** Indicates the phase is after the phases for the dependencies in the given scope */
+    static Lifecycle.Link dependencies(String scope, String phase) {
+        return new Lifecycle.Link() {
+            @Override
+            public Kind kind() {
+                return Kind.AFTER;
+            }
+
+            @Override
+            public Lifecycle.Pointer pointer() {
+                return new Lifecycle.DependenciesPointer() {
+                    @Override
+                    public String phase() {
+                        return phase;
+                    }
+
+                    @Override
+                    public String scope() {
+                        return scope;
+                    }
+                };
+            }
+        };
+    }
+
+    static Lifecycle.Alias alias(String v3Phase, String v4Phase) {
+        return new DefaultAlias(v3Phase, v4Phase);
+    }
+
     static class DefaultPhase implements Lifecycle.Phase {
         private final String name;
         private final List<Plugin> plugins;
+        private final Collection<Lifecycle.Link> links;
         private final List<Lifecycle.Phase> phases;
 
-        DefaultPhase(String name, List<Plugin> plugins, List<Lifecycle.Phase> phases) {
+        DefaultPhase(
+                String name, List<Plugin> plugins, Collection<Lifecycle.Link> links, List<Lifecycle.Phase> phases) {
             this.name = name;
             this.plugins = plugins;
+            this.links = links;
             this.phases = phases;
         }
 
@@ -68,6 +151,41 @@ public class Lifecycles {
         @Override
         public List<Plugin> plugins() {
             return plugins;
+        }
+
+        @Override
+        public Collection<Lifecycle.Link> links() {
+            return links;
+        }
+
+        @Override
+        public List<Lifecycle.Phase> phases() {
+            return phases;
+        }
+
+        @Override
+        public Stream<Lifecycle.Phase> allPhases() {
+            return Stream.concat(Stream.of(this), phases().stream().flatMap(Lifecycle.Phase::allPhases));
+        }
+    }
+
+    static class DefaultAlias implements Lifecycle.Alias {
+        private final String v3Phase;
+        private final String v4Phase;
+
+        DefaultAlias(String v3Phase, String v4Phase) {
+            this.v3Phase = v3Phase;
+            this.v4Phase = v4Phase;
+        }
+
+        @Override
+        public String v3Phase() {
+            return v3Phase;
+        }
+
+        @Override
+        public String v4Phase() {
+            return v4Phase;
         }
     }
 }

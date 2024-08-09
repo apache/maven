@@ -61,6 +61,11 @@ public class EmptyLifecycleBindingsInjector extends DefaultLifecycleBindingsInje
         public Optional<Lifecycle> lookup(String id) {
             return Optional.empty();
         }
+
+        @Override
+        public List<String> computePhases(Lifecycle lifecycle) {
+            return List.of();
+        }
     };
 
     private static final PackagingRegistry emptyPackagingRegistry = new PackagingRegistry() {
@@ -138,6 +143,11 @@ public class EmptyLifecycleBindingsInjector extends DefaultLifecycleBindingsInje
 
         protected LifecycleRegistry getDelegate() {
             return lifecycleRegistry;
+        }
+
+        @Override
+        public List<String> computePhases(Lifecycle lifecycle) {
+            return List.of();
         }
     }
 

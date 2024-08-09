@@ -363,6 +363,11 @@ public class ApiRunner {
             public Optional<Lifecycle> lookup(String id) {
                 return Optional.empty();
             }
+
+            @Override
+            public List<String> computePhases(Lifecycle lifecycle) {
+                return List.of();
+            }
         };
     }
 
