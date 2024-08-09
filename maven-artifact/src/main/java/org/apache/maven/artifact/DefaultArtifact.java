@@ -168,22 +168,22 @@ public class DefaultArtifact implements Artifact {
                     groupId, artifactId, getVersion(), type, "The groupId cannot be empty.");
         }
 
-        if (artifactId == null) {
+        if (empty(artifactId)) {
             throw new InvalidArtifactRTException(
                     groupId, artifactId, getVersion(), type, "The artifactId cannot be empty.");
         }
 
-        if (type == null) {
+        if (empty(type)) {
             throw new InvalidArtifactRTException(groupId, artifactId, getVersion(), type, "The type cannot be empty.");
         }
 
-        if ((version == null) && (versionRange == null)) {
+        if ((empty(version)) && (versionRange == null)) {
             throw new InvalidArtifactRTException(
                     groupId, artifactId, getVersion(), type, "The version cannot be empty.");
         }
     }
 
-    private boolean empty(String value) {
+    public static boolean empty(String value) {
         return (value == null) || (value.trim().length() < 1);
     }
 

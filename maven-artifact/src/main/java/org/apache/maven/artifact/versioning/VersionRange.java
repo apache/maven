@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 
 /**
  * Construct a version range from a specification.
@@ -202,6 +203,9 @@ public class VersionRange {
     }
 
     public static VersionRange createFromVersion(String version) {
+        if (DefaultArtifact.empty(version)) {
+            return null;
+        }
         VersionRange cached = CACHE_VERSION.get(version);
         if (cached == null) {
             List<Restriction> restrictions = Collections.emptyList();
