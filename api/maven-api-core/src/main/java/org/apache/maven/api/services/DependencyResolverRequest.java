@@ -323,7 +323,7 @@ public interface DependencyResolverRequest {
          * @return {@code this} for method call chaining
          */
         @Nonnull
-        public DependencyResolverRequestBuilder pathTypeFilter(@Nonnull Collection<PathType> desiredTypes) {
+        public DependencyResolverRequestBuilder pathTypeFilter(@Nonnull Collection<? extends PathType> desiredTypes) {
             return pathTypeFilter(desiredTypes::contains);
         }
 

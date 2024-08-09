@@ -21,68 +21,20 @@ package org.apache.maven.internal.impl;
 import java.util.Collection;
 
 import org.apache.maven.api.DependencyCoordinate;
-import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Exclusion;
-import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.eclipse.aether.artifact.ArtifactProperties;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
-public class DefaultDependencyCoordinate implements DependencyCoordinate {
-    private final InternalSession session;
-    private final org.eclipse.aether.graph.Dependency dependency;
-
+public class DefaultDependencyCoordinate extends AetherDependencyWrapper implements DependencyCoordinate {
     public DefaultDependencyCoordinate(
             @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency) {
-        this.session = nonNull(session, "session");
-        this.dependency = nonNull(dependency, "dependency");
-    }
-
-    @Nonnull
-    public org.eclipse.aether.graph.Dependency getDependency() {
-        return dependency;
-    }
-
-    @Override
-    public String getGroupId() {
-        return dependency.getArtifact().getGroupId();
-    }
-
-    @Override
-    public String getArtifactId() {
-        return dependency.getArtifact().getArtifactId();
-    }
-
-    @Override
-    public String getClassifier() {
-        return dependency.getArtifact().getClassifier();
+        super(session, dependency);
     }
 
     @Override
     public VersionConstraint getVersion() {
         return session.parseVersionConstraint(dependency.getArtifact().getVersion());
-    }
-
-    @Override
-    public String getExtension() {
-        return dependency.getArtifact().getExtension();
-    }
-
-    @Override
-    public Type getType() {
-        String type = dependency
-                .getArtifact()
-                .getProperty(ArtifactProperties.TYPE, dependency.getArtifact().getExtension());
-        return session.requireType(type);
-    }
-
-    @Nonnull
-    @Override
-    public DependencyScope getScope() {
-        return session.requireDependencyScope(dependency.getScope());
     }
 
     @Nullable

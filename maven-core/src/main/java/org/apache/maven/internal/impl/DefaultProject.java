@@ -177,7 +177,14 @@ public class DefaultProject implements Project {
 
             @Override
             public String getClassifier() {
-                return dependency.getClassifier();
+                String classifier = dependency.getClassifier();
+                if (classifier == null || classifier.isEmpty()) {
+                    classifier = getType().getClassifier();
+                    if (classifier == null) {
+                        classifier = "";
+                    }
+                }
+                return classifier;
             }
 
             @Override
