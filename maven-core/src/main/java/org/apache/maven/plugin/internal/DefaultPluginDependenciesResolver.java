@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import com.google.common.collect.Streams;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -225,7 +225,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             throw new PluginResolutionException(
                     plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
         } catch (DependencyResolutionException e) {
-            List<Exception> exceptions = Streams.concat(
+            List<Exception> exceptions = Stream.concat(
                             e.getResult().getCollectExceptions().stream(),
                             e.getResult().getArtifactResults().stream()
                                     .filter(r -> !r.isResolved())
