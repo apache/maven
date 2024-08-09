@@ -25,6 +25,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
@@ -89,17 +90,22 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         Path path = request.getPath();
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();
+        Function<Object, String> inputLocationFormatter = request.getInputLocationFormatter();
         if (writer == null && outputStream == null && path == null) {
             throw new IllegalArgumentException("writer, outputStream or path must be non null");
         }
         try {
+            MavenStaxWriter w = new MavenStaxWriter();
+            if (inputLocationFormatter != null) {
+                w.setStringFormatter((Function) inputLocationFormatter);
+            }
             if (writer != null) {
-                new MavenStaxWriter().write(writer, content);
+                w.write(writer, content);
             } else if (outputStream != null) {
-                new MavenStaxWriter().write(outputStream, content);
+                w.write(outputStream, content);
             } else {
                 try (OutputStream os = Files.newOutputStream(path)) {
-                    new MavenStaxWriter().write(outputStream, content);
+                    w.write(outputStream, content);
                 }
             }
         } catch (Exception e) {
