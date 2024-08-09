@@ -16,60 +16,22 @@
   Release Notes
   -------------
 
-  The full list of changes can be found at https://maven.apache.org/docs/history.html.
-
-  System Requirements
-  -------------------
-
-  JDK:
-    8 or above (this is to execute Maven - it still allows you to build against 1.3
-    and prior JDK's).
-  Memory:
-    No minimum requirement.
-  Disk:
-    Approximately 10MB is required for the Maven installation itself. In addition to
-    that, additional disk space will be used for your local Maven repository. The size
-    of your local repository will vary depending on usage but expect at least 500MB.
-  Operating System:
-    Windows:
-      Windows 2000 or above.
-    Unix based systems (Linux, Solaris and Mac OS X) and others:
-      No minimum requirement.
+  The full list of changes, system requirements and related can be found at https://maven.apache.org/docs/history.html.
 
   Installing Maven
   ----------------
 
-  1) Unpack the archive where you would like to store the binaries, e.g.:
-
-    Unix-based operating systems (Linux, Solaris and Mac OS X)
-      tar zxvf apache-maven-4.x.y.tar.gz
-    Windows
-      unzip apache-maven-4.x.y.zip
-
-  2) A directory called "apache-maven-4.x.y" will be created.
-
-  3) Add the bin directory to your PATH, e.g.:
-
-    Unix-based operating systems (Linux, Solaris and Mac OS X)
-      export PATH=/usr/local/apache-maven-4.x.y/bin:$PATH
-    Windows
-      set PATH="c:\program files\apache-maven-4.x.y\bin";%PATH%
-
-  4) Make sure JAVA_HOME is set to the location of your JDK
-
-  5) Run "mvn --version" to verify that it is correctly installed.
-
-  For complete documentation, see https://maven.apache.org/download.html#Installation
+  For complete documentation see https://maven.apache.org/download.html#Installation
 
   Licensing
   ---------
 
   Please see the file called LICENSE.
 
-  Maven URLs
+  Maven URLS
   ----------
 
-  Home Page:          https://maven.apache.org/
+  Home Page:          https://maven.apache.org
   Downloads:          https://maven.apache.org/download.html
   Release Notes:      https://maven.apache.org/docs/history.html
   Mailing Lists:      https://maven.apache.org/mailing-lists.html
