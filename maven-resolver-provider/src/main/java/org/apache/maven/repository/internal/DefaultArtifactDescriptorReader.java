@@ -294,10 +294,11 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 if (!modelResult.getProblems().isEmpty()) {
                     List<ModelProblem> problems = modelResult.getProblems();
                     logger.warn(
-                            "{} {} encountered while building the effective model for {}",
+                            "{} {} encountered while building the effective model for {}; trace: {}",
                             problems.size(),
                             (problems.size() == 1) ? "problem was" : "problems were",
-                            request.getArtifact());
+                            request.getArtifact(),
+                            RequestTraceHelper.interpretTrace(true, request.getTrace()));
                     if (logger.isDebugEnabled()) {
                         for (ModelProblem problem : problems) {
                             logger.warn(
