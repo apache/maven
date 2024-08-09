@@ -650,21 +650,6 @@ under the License.
   </dependencies>
   -->
 
-  <repositories>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-        <checksumPolicy>fail</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>maven-2176</id>
-      <url>https://repository.apache.org/content/repositories/maven-2176/</url>
-    </repository>
-  </repositories>
-
   <build>
     <pluginManagement>
       <plugins>
