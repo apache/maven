@@ -130,7 +130,7 @@ under the License.
     <commonsCliVersion>1.8.0</commonsCliVersion>
     <commonsIoVersion>2.16.1</commonsIoVersion>
     <junitVersion>4.13.2</junitVersion>
-    <hamcrestVersion>2.2</hamcrestVersion>
+    <hamcrestVersion>3.0</hamcrestVersion>
     <mockitoVersion>4.11.0</mockitoVersion>
     <!-- plexus 2.1.1 is broken -->
     <plexusVersion>2.1.0</plexusVersion>
