@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
@@ -57,6 +58,7 @@ import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 /**
@@ -215,6 +217,17 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
             if (logger.isDebugEnabled()) {
                 node.accept(new GraphLogger());
+            }
+
+            PreorderNodeListGenerator pnl = new PreorderNodeListGenerator();
+            node.accept(pnl);
+            List<org.eclipse.aether.graph.Dependency> dependencies = pnl.getDependencies(true);
+            dependencies.remove(node.getDependency());
+            dependencies.removeAll(node.getChildren().stream()
+                    .map((DependencyNode::getDependency))
+                    .collect(Collectors.toList()));
+            for (MavenPluginDependenciesValidator dependenciesValidator : dependenciesValidators) {
+                dependenciesValidator.validate(session, node.getArtifact(), dependencies);
             }
 
             depRequest.setRoot(node);
