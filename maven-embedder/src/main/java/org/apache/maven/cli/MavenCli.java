@@ -1421,16 +1421,19 @@ public class MavenCli {
                 for (String token : optionValue.split(",")) {
                     String selector = token.trim();
                     boolean active = true;
-                    if (selector.charAt(0) == '-' || selector.charAt(0) == '!') {
-                        active = false;
-                        selector = selector.substring(1);
-                    } else if (token.charAt(0) == '+') {
+                    if (!selector.isEmpty()) {
+                        if (selector.charAt(0) == '-' || selector.charAt(0) == '!') {
+                            active = false;
+                            selector = selector.substring(1);
+                        } else if (token.charAt(0) == '+') {
+                            selector = selector.substring(1);
+                        }
+                    }
+                    boolean optional = false;
+                    if (!selector.isEmpty() && selector.charAt(0) == '?') {
+                        optional = true;
                         selector = selector.substring(1);
                     }
-
-                    boolean optional = selector.charAt(0) == '?';
-                    selector = selector.substring(optional ? 1 : 0);
-
                     projectActivation.addProjectActivation(selector, active, optional);
                 }
             }
@@ -1450,16 +1453,19 @@ public class MavenCli {
                 for (String token : optionValue.split(",")) {
                     String profileId = token.trim();
                     boolean active = true;
-                    if (profileId.charAt(0) == '-' || profileId.charAt(0) == '!') {
-                        active = false;
-                        profileId = profileId.substring(1);
-                    } else if (token.charAt(0) == '+') {
+                    if (!profileId.isEmpty()) {
+                        if (profileId.charAt(0) == '-' || profileId.charAt(0) == '!') {
+                            active = false;
+                            profileId = profileId.substring(1);
+                        } else if (token.charAt(0) == '+') {
+                            profileId = profileId.substring(1);
+                        }
+                    }
+                    boolean optional = false;
+                    if (!profileId.isEmpty() && profileId.charAt(0) == '?') {
+                        optional = true;
                         profileId = profileId.substring(1);
                     }
-
-                    boolean optional = profileId.charAt(0) == '?';
-                    profileId = profileId.substring(optional ? 1 : 0);
-
                     profileActivation.addProfileActivation(profileId, active, optional);
                 }
             }
