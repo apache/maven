@@ -195,6 +195,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         return result;
     }
 
+    @SuppressWarnings("MethodLength")
     private Model loadPom(
             RepositorySystemSession session, ArtifactDescriptorRequest request, ArtifactDescriptorResult result)
             throws ArtifactDescriptorException {
@@ -293,17 +294,27 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 // that may lead to unexpected build failure, log them
                 if (!modelResult.getProblems().isEmpty()) {
                     List<ModelProblem> problems = modelResult.getProblems();
-                    logger.warn(
-                            "{} {} encountered while building the effective model for {} during {}",
-                            problems.size(),
-                            (problems.size() == 1) ? "problem was" : "problems were",
-                            request.getArtifact(),
-                            RequestTraceHelper.interpretTrace(logger.isDebugEnabled(), request.getTrace()));
                     if (logger.isDebugEnabled()) {
+                        logger.warn(
+                                "{} {} encountered while building the effective model for {} during {}",
+                                problems.size(),
+                                (problems.size() == 1) ? "problem was" : "problems were",
+                                request.getArtifact(),
+                                RequestTraceHelper.interpretTrace(true, request.getTrace()));
+                        logger.warn("Problems encountered:");
                         for (ModelProblem problem : problems) {
                             logger.warn(
-                                    "{} @ {}", problem.getMessage(), ModelProblemUtils.formatLocation(problem, null));
+                                    "* {} @ {}",
+                                    problem.getMessage(),
+                                    ModelProblemUtils.formatLocation(problem, null));
                         }
+                    } else {
+                        logger.warn(
+                                "{} {} encountered while building the effective model for {} during {} (use -X to see details)",
+                                problems.size(),
+                                (problems.size() == 1) ? "problem was" : "problems were",
+                                request.getArtifact(),
+                                RequestTraceHelper.interpretTrace(false, request.getTrace()));
                     }
                 }
                 model = modelResult.getEffectiveModel();

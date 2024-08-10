@@ -52,11 +52,11 @@ public final class RequestTraceHelper {
                 CollectStepData stepData = (CollectStepData) data;
                 String msg = "dependency collection step for " + stepData.getContext();
                 if (detailed) {
-                    msg += "\n";
-                    msg += "Path to offending node from root:\n";
+                    msg += ". Path to offending node from root:\n";
                     msg += stepData.getPath().stream()
                             .map(n -> " -> " + n.toString())
                             .collect(Collectors.joining("\n"));
+                    msg += "\n => " + stepData.getNode();
                 }
                 return msg;
             } else if (data instanceof ArtifactDescriptorRequest) {
