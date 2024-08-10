@@ -42,6 +42,7 @@ import org.apache.maven.model.building.ModelBuildingResult;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.model.resolution.UnresolvableModelException;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryException;
@@ -295,19 +296,21 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 if (!modelResult.getProblems().isEmpty()) {
                     List<ModelProblem> problems = modelResult.getProblems();
                     if (logger.isDebugEnabled()) {
-                        logger.warn(
-                                "{} {} encountered while building the effective model for {} during {}",
+                        String problem = (problems.size() == 1) ? "problem" : "problems";
+                        String problemPredicate = problem + ((problems.size() == 1) ? " was" : " were");
+                        String message = String.format(
+                                "%s %s encountered while building the effective model for %s during %s\n",
                                 problems.size(),
-                                (problems.size() == 1) ? "problem was" : "problems were",
+                                problemPredicate,
                                 request.getArtifact(),
                                 RequestTraceHelper.interpretTrace(true, request.getTrace()));
-                        logger.warn("Problems encountered:");
-                        for (ModelProblem problem : problems) {
-                            logger.warn(
-                                    "* {} @ {}",
-                                    problem.getMessage(),
-                                    ModelProblemUtils.formatLocation(problem, null));
+                        message += StringUtils.capitalizeFirstLetter(problem);
+                        for (ModelProblem modelProblem : problems) {
+                            message += String.format(
+                                    "\n* %s @ %s",
+                                    modelProblem.getMessage(), ModelProblemUtils.formatLocation(modelProblem, null));
                         }
+                        logger.warn(message);
                     } else {
                         logger.warn(
                                 "{} {} encountered while building the effective model for {} during {} (use -X to see details)",
