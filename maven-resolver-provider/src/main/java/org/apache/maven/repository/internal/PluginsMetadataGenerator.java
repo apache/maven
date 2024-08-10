@@ -130,13 +130,14 @@ class PluginsMetadataGenerator implements MetadataGenerator {
                             // - maven-plugin-api (for model)
                             // - Plexus Container (for model supporting classes and exceptions)
                             XmlNode root = XmlNodeBuilder.build(is, null);
-                            String groupId = root.getChild("groupId").getValue();
-                            String artifactId = root.getChild("artifactId").getValue();
-                            String goalPrefix = root.getChild("goalPrefix").getValue();
-                            String name = root.getChild("name").getValue();
+                            String groupId = mayGetChild(root, "groupId");
+                            String artifactId = mayGetChild(root, "artifactId");
+                            String goalPrefix = mayGetChild(root, "goalPrefix");
+                            String name = mayGetChild(root, "name");
                             // sanity check: plugin descriptor extracted from artifact must have same GA
                             if (Objects.equals(artifact.getGroupId(), groupId)
                                     && Objects.equals(artifact.getArtifactId(), artifactId)) {
+                                // here groupId and artifactId cannot be null
                                 return new PluginInfo(groupId, artifactId, goalPrefix, name);
                             } else {
                                 throw new InvalidArtifactPluginMetadataException(
@@ -155,6 +156,14 @@ class PluginsMetadataGenerator implements MetadataGenerator {
                     // here we can have: IO. ZIP or Plexus Conf Ex: but we should not interfere with user intent
                 }
             }
+        }
+        return null;
+    }
+
+    private static String mayGetChild(XmlNode node, String child) {
+        XmlNode c = node.getChild(child);
+        if (c != null) {
+            return c.getValue();
         }
         return null;
     }
