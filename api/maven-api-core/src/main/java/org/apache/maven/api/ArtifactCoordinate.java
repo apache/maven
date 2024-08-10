@@ -23,33 +23,29 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * The {@code Coordinate} object is used to point to an {@link Artifact}
- * but the version may be specified as a range instead of an exact version.
+ * Point to an {@link Artifact} but with the version specified as a range instead of an exact version.
+ * Each {@code ArtifactCoordinate} instance is basically a pointer to a file in the Maven repository,
+ * except that the version may not be defined precisely.
  *
  * @since 4.0.0
  */
 @Experimental
 @Immutable
 public interface ArtifactCoordinate {
-
     /**
-     * The groupId of the artifact.
-     *
-     * @return the groupId
+     * {@return the group identifier of the artifact}.
      */
     @Nonnull
     String getGroupId();
 
     /**
-     * The artifactId of the artifact.
-     *
-     * @return the artifactId
+     * {@return the identifier of the artifact}.
      */
     @Nonnull
     String getArtifactId();
 
     /**
-     * The classifier of the artifact.
+     * Returns the classifier of the artifact.
      *
      * @return the classifier or an empty string if none, never {@code null}
      */
@@ -57,30 +53,38 @@ public interface ArtifactCoordinate {
     String getClassifier();
 
     /**
-     * The version of the artifact.
-     *
-     * @return the version
+     * {@return the range of versions of the artifact}.
      */
     @Nonnull
-    VersionConstraint getVersion();
+    VersionConstraint getVersionConstraint();
 
     /**
-     * The extension of the artifact.
+     * Returns the file extension of the artifact.
+     * The dot separator is <em>not</em> included in the returned string.
      *
-     * @return the extension or an empty string if none, never {@code null}
+     * @return the file extension or an empty string if none, never {@code null}
      */
     @Nonnull
     String getExtension();
 
     /**
-     * Unique id identifying this artifact
+     * {@return a unique string representation identifying this artifact}.
+     * The default implementation returns a colon-separated list of group
+     * identifier, artifact identifier, extension, classifier and version.
+     *
+     * @see Artifact#key()
      */
     @Nonnull
     default String getId() {
+        String c = getClassifier();
         return getGroupId()
-                + ":" + getArtifactId()
-                + ":" + getExtension()
-                + (getClassifier().isEmpty() ? "" : ":" + getClassifier())
-                + ":" + getVersion();
+                + ':'
+                + getArtifactId()
+                + ':'
+                + getExtension()
+                + ':'
+                + c
+                + (c.isEmpty() ? "" : ":")
+                + getVersionConstraint();
     }
 }

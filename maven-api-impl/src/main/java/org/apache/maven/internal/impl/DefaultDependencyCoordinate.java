@@ -33,7 +33,7 @@ public class DefaultDependencyCoordinate extends AetherDependencyWrapper impleme
     }
 
     @Override
-    public VersionConstraint getVersion() {
+    public VersionConstraint getVersionConstraint() {
         return session.parseVersionConstraint(dependency.getArtifact().getVersion());
     }
 

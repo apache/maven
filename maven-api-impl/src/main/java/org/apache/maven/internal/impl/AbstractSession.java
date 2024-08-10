@@ -306,7 +306,7 @@ public abstract class AbstractSession implements InternalSession {
                             dependency.getArtifactId(),
                             dependency.getClassifier(),
                             type.getExtension(),
-                            dependency.getVersion().toString(),
+                            dependency.getVersionConstraint().toString(),
                             Map.of("type", type.id()),
                             (ArtifactType) null),
                     dependency.getScope().id(),
@@ -357,7 +357,7 @@ public abstract class AbstractSession implements InternalSession {
                 coord.getArtifactId(),
                 coord.getClassifier(),
                 coord.getExtension(),
-                coord.getVersion().toString(),
+                coord.getVersionConstraint().toString(),
                 null,
                 (File) null);
     }

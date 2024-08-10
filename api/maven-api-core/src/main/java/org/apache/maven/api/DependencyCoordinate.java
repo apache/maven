@@ -26,6 +26,11 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
+ * {@code ArtifactCoordinate} completed with information about how the artifact will be used.
+ * Those information include the dependency type (main classes, test classes, <i>etc.</i>),
+ * a scope (compile-time, run-time <i>etc.</i>), and an obligation (whether the dependency
+ * is optional or mandatory). The {@linkplain #getVersionConstraint() version}
+ * and the {@linkplain #getOptional() obligation} may not be defined precisely.
  *
  * @since 4.0.0
  */
@@ -33,19 +38,31 @@ import org.apache.maven.api.annotations.Nullable;
 @Immutable
 public interface DependencyCoordinate extends ArtifactCoordinate {
     /**
-     * The type of the artifact.
-     *
-     * @return the type
+     * {@return the type of the dependency}. A dependency can be a <abbr>JAR</abbr> file,
+     * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module-path,
+     * a <abbr>JAR</abbr> containing test classes, <i>etc.</i>
      */
     @Nonnull
     Type getType();
 
+    /**
+     * {@return the time at which the dependency will be used}.
+     * If may be, for example, at compile time only, at run time or at test time.
+     */
     @Nonnull
     DependencyScope getScope();
 
+    /**
+     * Returns whether the dependency is optional, mandatory or of unspecified obligation.
+     *
+     * @return the obligation, or {@code null} if unspecified
+     */
     @Nullable
     Boolean getOptional();
 
+    /**
+     * {@return transitive dependencies to exclude}.
+     */
     @Nonnull
     Collection<Exclusion> getExclusions();
 }

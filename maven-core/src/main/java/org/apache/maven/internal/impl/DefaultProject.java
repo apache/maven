@@ -188,7 +188,7 @@ public class DefaultProject implements Project {
             }
 
             @Override
-            public VersionConstraint getVersion() {
+            public VersionConstraint getVersionConstraint() {
                 return session.parseVersionConstraint(dependency.getVersion());
             }
 
