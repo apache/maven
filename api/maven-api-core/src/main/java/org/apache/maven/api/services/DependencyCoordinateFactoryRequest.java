@@ -74,7 +74,7 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
                 .session(nonNull(session, "session cannot be null"))
                 .groupId(nonNull(coordinate, "coordinate cannot be null").getGroupId())
                 .artifactId(coordinate.getArtifactId())
-                .version(coordinate.getVersion().asString())
+                .version(coordinate.getVersionConstraint().asString())
                 .classifier(coordinate.getClassifier())
                 .extension(coordinate.getExtension())
                 .build();

@@ -23,30 +23,45 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
+ * Result of resolving a {@code DependencyCoordinate}.
+ * Resolving is the process that clarifies the obligation (optional or mandatory status),
+ * selects a particular version and downloads the artifact in the local repository.
  *
  * @since 4.0.0
  */
 @Experimental
 @Immutable
 public interface Dependency extends Artifact {
-
     /**
-     * The dependency type.
+     * {@return the type of the dependency}. A dependency can be a <abbr>JAR</abbr> file,
+     * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module-path,
+     * a <abbr>JAR</abbr> containing test classes, <i>etc.</i>
      *
-     * @return the dependency type, never {@code null}
+     * @see DependencyCoordinate#getType()
      */
     @Nonnull
     Type getType();
 
+    /**
+     * {@return the time at which the dependency will be used}.
+     * If may be, for example, at compile time only, at run time or at test time.
+     *
+     * @see DependencyCoordinate#getScope()
+     */
     @Nonnull
     DependencyScope getScope();
 
+    /**
+     * Returns whether the dependency is optional or mandatory.
+     * Contrarily to {@link DependencyCoordinate}, the obligation of a dependency cannot be unspecified.
+     *
+     * @return {@code true} if the dependency is optional, or {@code false} if mandatory
+     * @see DependencyCoordinate#getOptional()
+     */
     boolean isOptional();
 
     /**
-     * Creates a {@code DependencyCoordinate} based on this {@code Dependency}.
-     *
-     * @return a {@link DependencyCoordinate}
+     * {@return coordinate with the same identifiers as this dependency}.
      */
     @Nonnull
     @Override

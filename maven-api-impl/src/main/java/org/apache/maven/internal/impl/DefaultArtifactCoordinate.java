@@ -57,7 +57,7 @@ public class DefaultArtifactCoordinate implements ArtifactCoordinate {
 
     @Nonnull
     @Override
-    public VersionConstraint getVersion() {
+    public VersionConstraint getVersionConstraint() {
         return session.parseVersionConstraint(coordinate.getVersion());
     }
 
@@ -83,13 +83,13 @@ public class DefaultArtifactCoordinate implements ArtifactCoordinate {
         DefaultArtifactCoordinate that = (DefaultArtifactCoordinate) o;
         return Objects.equals(this.getGroupId(), that.getGroupId())
                 && Objects.equals(this.getArtifactId(), that.getArtifactId())
-                && Objects.equals(this.getVersion(), that.getVersion())
+                && Objects.equals(this.getVersionConstraint(), that.getVersionConstraint())
                 && Objects.equals(this.getClassifier(), that.getClassifier());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getGroupId(), getArtifactId(), getVersion(), getClassifier());
+        return Objects.hash(getGroupId(), getArtifactId(), getVersionConstraint(), getClassifier());
     }
 
     @Override

@@ -54,8 +54,8 @@ public class DefaultModelResolver implements ModelResolver {
             throws ModelResolverException {
         try {
             ArtifactCoordinate coord = session.createArtifactCoordinate(groupId, artifactId, version, "pom");
-            if (coord.getVersion().getVersionRange() != null
-                    && coord.getVersion().getVersionRange().getUpperBoundary() == null) {
+            if (coord.getVersionConstraint().getVersionRange() != null
+                    && coord.getVersionConstraint().getVersionRange().getUpperBoundary() == null) {
                 // Message below is checked for in the MNG-2199 core IT.
                 throw new ModelResolverException(
                         String.format("The requested version range '%s' does not specify an upper bound", version),

@@ -100,7 +100,7 @@ public interface ArtifactCoordinateFactoryRequest {
                 .groupId(nonNull(coordinate, "coordinate").getGroupId())
                 .artifactId(coordinate.getArtifactId())
                 .classifier(coordinate.getClassifier())
-                .version(coordinate.getVersion().asString())
+                .version(coordinate.getVersionConstraint().asString())
                 .extension(coordinate.getExtension())
                 .build();
     }

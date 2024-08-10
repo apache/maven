@@ -23,76 +23,83 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * An artifact points to a resource such as a jar file or war application.
+ * Pointer to a resolved resource such as a <abbr>JAR</abbr> file or <abbr>WAE</abbr> application.
+ * {@code Artifact} instances are created when <dfn>resolving</dfn> {@link Artifact} instances.
+ * Resolving is the process that selects a {@linkplain #getVersion() particular version}
+ * and downloads the artifact in the local repository.
+ * The download may be deferred to the first time that the file is needed.
  *
  * @since 4.0.0
  */
 @Experimental
 @Immutable
 public interface Artifact {
-
     /**
-     * Returns a unique identifier for this artifact.
+     * {@return a unique identifier for this artifact}.
      * The identifier is composed of groupId, artifactId, extension, classifier, and version.
      *
-     * @return the unique identifier
+     * @see ArtifactCoordinate#getId()
      */
     @Nonnull
     default String key() {
+        String c = getClassifier();
         return getGroupId()
                 + ':'
                 + getArtifactId()
                 + ':'
                 + getExtension()
-                + (getClassifier().isEmpty() ? "" : ":" + getClassifier())
+                + (c.isEmpty() ? "" : ":" + c)
                 + ':'
                 + getVersion();
     }
 
     /**
-     * The groupId of the artifact.
+     * {@return the group identifier of the artifact}.
      *
-     * @return the groupId
+     * @see ArtifactCoordinate#getGroupId()
      */
     @Nonnull
     String getGroupId();
 
     /**
-     * The artifactId of the artifact.
+     * {@return the identifier of the artifact}.
      *
-     * @return the artifactId
+     * @see ArtifactCoordinate#getArtifactId()
      */
     @Nonnull
     String getArtifactId();
 
     /**
-     * The version of the artifact.
+     * {@return the version of the artifact}. Contrarily to {@link ArtifactCoordinate},
+     * each {@code Artifact} is associated to a specific version instead of a range of versions.
      *
-     * @return the version
+     * @see ArtifactCoordinate#getVersionConstraint()
      */
     @Nonnull
     Version getVersion();
 
     /**
-     * The base version of the artifact.
-     *
-     * @return the version
+     * {@return the base version of the artifact}.
+     * TODO: this javadoc is not helpful.
      */
     @Nonnull
     Version getBaseVersion();
 
     /**
-     * The classifier of the artifact.
+     * Returns the classifier of the artifact.
      *
      * @return the classifier or an empty string if none, never {@code null}
+     * @see ArtifactCoordinate#getClassifier()
      */
     @Nonnull
     String getClassifier();
 
     /**
-     * The file extension of the artifact.
+     * Returns the file extension of the artifact.
+     * The dot separator is <em>not</em> included in the returned string.
      *
-     * @return the extension
+     * @return the file extension or an empty string if none, never {@code null}
+     * @see ArtifactCoordinate#getExtension()
      */
     @Nonnull
     String getExtension();
@@ -106,9 +113,9 @@ public interface Artifact {
     boolean isSnapshot();
 
     /**
-     * Shortcut for {@code session.createArtifactCoordinate(artifact)}
+     * {@return coordinate with the same identifiers as this artifact}.
+     * This is a shortcut for {@code session.createArtifactCoordinate(artifact)}.
      *
-     * @return an {@link ArtifactCoordinate}
      * @see org.apache.maven.api.Session#createArtifactCoordinate(Artifact)
      */
     @Nonnull
