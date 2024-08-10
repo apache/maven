@@ -150,8 +150,6 @@ class PluginsMetadataGenerator implements MetadataGenerator {
                             }
                         }
                     }
-                } catch (RuntimeException e) {
-                    throw e;
                 } catch (Exception e) {
                     // here we can have: IO. ZIP or Plexus Conf Ex: but we should not interfere with user intent
                 }
