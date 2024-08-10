@@ -36,23 +36,30 @@ public final class RequestTraceHelper {
      * Method that creates some informational string based on passed in {@link RequestTrace}. The contents of request
      * trace can literally be anything, but this class tries to cover "most common" cases that are happening in Maven.
      */
-    public static String interpretTrace(boolean explain, RequestTrace requestTrace) {
+    public static String interpretTrace(boolean detailed, RequestTrace requestTrace) {
         while (requestTrace != null) {
             Object data = requestTrace.getData();
             if (data instanceof DependencyRequest request) {
-                return (explain ? "dependency request for " : "") + request;
+                return "dependency resolution for " + request;
             } else if (data instanceof CollectRequest request) {
-                return (explain ? "collect request for " : "") + request;
+                return "dependency collection for " + request;
             } else if (data instanceof CollectStepData stepData) {
-                return (explain ? "collect path " : "")
-                        + stepData.getPath().stream().map(Object::toString).collect(Collectors.joining(" -> "));
+                String msg = "dependency collection step for " + stepData.getContext();
+                if (detailed) {
+                    msg += ". Path to offending node from root:\n";
+                    msg += stepData.getPath().stream()
+                            .map(n -> " -> " + n.toString())
+                            .collect(Collectors.joining("\n"));
+                    msg += "\n => " + stepData.getNode();
+                }
+                return msg;
             } else if (data instanceof ArtifactDescriptorRequest request) {
-                return (explain ? "artifact descriptor request for " : "") + request.getArtifact();
+                return "artifact descriptor request for " + request.getArtifact();
             } else if (data instanceof ArtifactRequest request) {
-                return (explain ? "artifact request for " : "") + request.getArtifact();
+                return "artifact request for " + request.getArtifact();
                 // TODO: this class is not reachable here!
                 // } else if (data instanceof org.apache.maven.model.Plugin plugin) {
-                //    return (explain ? "plugin " : "") + plugin.getId();
+                //    return "plugin " + plugin.getId();
             }
             requestTrace = requestTrace.getParent();
         }
