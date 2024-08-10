@@ -152,21 +152,4 @@ public class InputLocation implements Serializable, InputLocationTracker {
 
         return new InputLocation(-1, -1, InputSource.merge(source.getSource(), target.getSource()), locations);
     } // -- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
-
-    /**
-     * Class StringFormatter.
-     *
-     * @version $Revision$ $Date$
-     */
-    public interface StringFormatter {
-
-        // -----------/
-        // - Methods -/
-        // -----------/
-
-        /**
-         * Method toString.
-         */
-        String toString(InputLocation location);
-    }
 }

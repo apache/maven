@@ -67,14 +67,7 @@ public class MavenXpp3Writer {
      */
     public void setStringFormatter(InputLocation.StringFormatter stringFormatter) {
         delegate.setStringFormatter(
-                stringFormatter != null
-                        ? new org.apache.maven.api.model.InputLocation.StringFormatter() {
-                            @Override
-                            public String toString(org.apache.maven.api.model.InputLocation location) {
-                                return stringFormatter.toString(new InputLocation(location));
-                            }
-                        }
-                        : null);
+                stringFormatter != null ? location -> stringFormatter.toString(new InputLocation(location)) : null);
     } // -- void setStringFormatter( InputLocation.StringFormatter )
 
     /**
