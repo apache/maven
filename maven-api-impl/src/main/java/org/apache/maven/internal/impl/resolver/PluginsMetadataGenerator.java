@@ -150,6 +150,9 @@ class PluginsMetadataGenerator implements MetadataGenerator {
                         }
                     }
                 } catch (Exception e) {
+                    if (e instanceof InvalidArtifactPluginMetadataException iapme) {
+                        throw iapme;
+                    }
                     // here we can have: IO. ZIP or Plexus Conf Ex: but we should not interfere with user intent
                 }
             }
