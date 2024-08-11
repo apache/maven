@@ -1,0 +1,8 @@
+<project xmlns="http://maven.apache.org/POM/4.1.0">
+  <parent>
+    <groupId>subprojects-discover</groupId>
+    <artifactId>parent</artifactId>
+  </parent>
+  <artifactId>child</artifactId>
+  <packaging>jar</packaging>
+</project>

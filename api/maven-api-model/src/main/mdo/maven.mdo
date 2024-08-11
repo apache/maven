@@ -527,7 +527,18 @@
       <fields>
         <field xdoc.separator="blank">
           <name>modules</name>
-          <version>4.0.0+</version>
+          <version>4.0.0/4.1.0</version>
+          <description>
+            @deprecated Use {@link #subprojects} instead.
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field xdoc.separator="blank">
+          <name>subprojects</name>
+          <version>4.1.0</version>
           <description>The subprojects (formerly called modules) to build as a part of this
             project. Each subproject listed is a relative path to the directory containing the subproject.
             To be consistent with the way default URLs are calculated from parent, it is recommended

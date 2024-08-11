@@ -294,6 +294,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                         || profile.getDependencyManagement().getDependencies().isEmpty())
                 && profile.getDistributionManagement() == null
                 && profile.getModules().isEmpty()
+                && profile.getSubprojects().isEmpty()
                 && profile.getProperties().isEmpty()
                 && profile.getRepositories().isEmpty()
                 && profile.getPluginRepositories().isEmpty()

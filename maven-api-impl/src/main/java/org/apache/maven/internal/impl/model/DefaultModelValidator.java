@@ -644,6 +644,10 @@ public class DefaultModelValidator implements ModelValidator {
 
         validateStringNotEmpty("packaging", problems, Severity.ERROR, Version.BASE, m.getPackaging(), m);
 
+        // TODO: if the model is a 4.1.0:
+        //   * modules should be empty, else issue a warning
+        //   * validate subprojects
+
         if (!m.getModules().isEmpty()) {
             if (!"pom".equals(m.getPackaging())) {
                 addViolation(

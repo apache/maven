@@ -35,7 +35,8 @@ public interface ModelProblem extends BuilderProblem {
         V20,
         V30,
         V31,
-        V40
+        V40,
+        V41
     }
 
     /**
