@@ -42,6 +42,8 @@ import org.eclipse.aether.impl.MetadataGenerator;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.util.ConfigUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maven G level metadata generator.
@@ -50,6 +52,8 @@ import org.eclipse.aether.util.ConfigUtils;
  */
 class PluginsMetadataGenerator implements MetadataGenerator {
     private static final String PLUGIN_DESCRIPTOR_LOCATION = "META-INF/maven/plugin.xml";
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Map<Object, PluginsMetadata> processedPlugins;
 
@@ -142,20 +146,20 @@ class PluginsMetadataGenerator implements MetadataGenerator {
                                 // here groupId and artifactId cannot be null
                                 return new PluginInfo(groupId, artifactId, goalPrefix, name);
                             } else {
-                                throw new InvalidArtifactPluginMetadataException(
-                                        "Artifact " + artifact.getGroupId() + ":"
-                                                + artifact.getArtifactId()
-                                                + " JAR (to be installed/deployed) contains Maven Plugin metadata for plugin "
-                                                + groupId + ":" + artifactId + "; coordinates are conflicting. "
-                                                + "Most probably your JAR contains rogue Maven Plugin metadata, "
-                                                + "possible causes may be: shaded in Maven Plugin or some rogue resource)");
+                                logger.warn(
+                                        "Artifact {}:{}"
+                                                + " JAR (about to be installed/deployed) contains Maven Plugin metadata for"
+                                                + " conflicting coordinates: {}:{}."
+                                                + " Your JAR contains rogue Maven Plugin metadata."
+                                                + " Possible causes may be: shaded into this JAR some Maven Plugin or some rogue resource.",
+                                        artifact.getGroupId(),
+                                        artifact.getArtifactId(),
+                                        groupId,
+                                        artifactId);
                             }
                         }
                     }
                 } catch (Exception e) {
-                    if (e instanceof InvalidArtifactPluginMetadataException) {
-                        throw (InvalidArtifactPluginMetadataException) e;
-                    }
                     // here we can have: IO. ZIP or Plexus Conf Ex: but we should not interfere with user intent
                 }
             }
@@ -169,11 +173,5 @@ class PluginsMetadataGenerator implements MetadataGenerator {
             return c.getValue();
         }
         return null;
-    }
-
-    public static final class InvalidArtifactPluginMetadataException extends IllegalArgumentException {
-        InvalidArtifactPluginMetadataException(String s) {
-            super(s);
-        }
     }
 }
