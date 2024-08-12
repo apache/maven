@@ -42,6 +42,7 @@ import org.apache.maven.model.building.ModelBuildingResult;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.model.resolution.UnresolvableModelException;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryException;
@@ -195,6 +196,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         return result;
     }
 
+    @SuppressWarnings("MethodLength")
     private Model loadPom(
             RepositorySystemSession session, ArtifactDescriptorRequest request, ArtifactDescriptorResult result)
             throws ArtifactDescriptorException {
@@ -293,16 +295,29 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 // that may lead to unexpected build failure, log them
                 if (!modelResult.getProblems().isEmpty()) {
                     List<ModelProblem> problems = modelResult.getProblems();
-                    logger.warn(
-                            "{} {} encountered while building the effective model for {}",
-                            problems.size(),
-                            (problems.size() == 1) ? "problem was" : "problems were",
-                            request.getArtifact());
                     if (logger.isDebugEnabled()) {
-                        for (ModelProblem problem : problems) {
-                            logger.warn(
-                                    "{} @ {}", problem.getMessage(), ModelProblemUtils.formatLocation(problem, null));
+                        String problem = (problems.size() == 1) ? "problem" : "problems";
+                        String problemPredicate = problem + ((problems.size() == 1) ? " was" : " were");
+                        String message = String.format(
+                                "%s %s encountered while building the effective model for %s during %s\n",
+                                problems.size(),
+                                problemPredicate,
+                                request.getArtifact(),
+                                RequestTraceHelper.interpretTrace(true, request.getTrace()));
+                        message += StringUtils.capitalizeFirstLetter(problem);
+                        for (ModelProblem modelProblem : problems) {
+                            message += String.format(
+                                    "\n* %s @ %s",
+                                    modelProblem.getMessage(), ModelProblemUtils.formatLocation(modelProblem, null));
                         }
+                        logger.warn(message);
+                    } else {
+                        logger.warn(
+                                "{} {} encountered while building the effective model for {} during {} (use -X to see details)",
+                                problems.size(),
+                                (problems.size() == 1) ? "problem was" : "problems were",
+                                request.getArtifact(),
+                                RequestTraceHelper.interpretTrace(false, request.getTrace()));
                     }
                 }
                 model = modelResult.getEffectiveModel();
