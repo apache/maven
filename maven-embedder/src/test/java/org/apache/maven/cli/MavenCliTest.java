@@ -610,14 +610,14 @@ class MavenCliTest {
 
     @Test
     public void testEmptyProfile() throws Exception {
-        CliRequest request = new CliRequest(new String[] { "-P", ""}, null);
+        CliRequest request = new CliRequest(new String[] {"-P", ""}, null);
         cli.cli(request);
         cli.populateRequest(request);
     }
 
     @Test
     public void testEmptyProject() throws Exception {
-        CliRequest request = new CliRequest(new String[] { "-pl", ""}, null);
+        CliRequest request = new CliRequest(new String[] {"-pl", ""}, null);
         cli.cli(request);
         cli.populateRequest(request);
     }
@@ -686,7 +686,6 @@ class MavenCliTest {
                 Arguments.of(
                         false, new String[] {"--non-interactive", "--batch-mode"}, Slf4jMavenTransferListener.class));
     }
-
 
     private MavenProject createMavenProject(String groupId, String artifactId) {
         MavenProject project = new MavenProject();
