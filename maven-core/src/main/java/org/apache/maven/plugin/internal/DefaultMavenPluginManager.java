@@ -363,7 +363,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             pluginDescriptor.setClassRealm(pluginRealm);
             pluginDescriptor.setArtifacts(pluginArtifacts);
         } else {
-            Map<String, ClassLoader> foreignImports = calcImports(project, parent, imports);
+            boolean v4api = pluginDescriptor.getMojos().stream().anyMatch(MojoDescriptor::isV4Api);
+            Map<String, ClassLoader> foreignImports = calcImports(project, parent, imports, v4api);
 
             PluginRealmCache.Key cacheKey = pluginRealmCache.createKey(
                     plugin,
@@ -471,14 +472,16 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         return Collections.unmodifiableList(artifacts);
     }
 
-    private Map<String, ClassLoader> calcImports(MavenProject project, ClassLoader parent, List<String> imports) {
+    private Map<String, ClassLoader> calcImports(
+            MavenProject project, ClassLoader parent, List<String> imports, boolean v4api) {
         Map<String, ClassLoader> foreignImports = new HashMap<>();
 
         ClassLoader projectRealm = project.getClassRealm();
         if (projectRealm != null) {
             foreignImports.put("", projectRealm);
         } else {
-            foreignImports.put("", classRealmManager.getMavenApiRealm());
+            foreignImports.put(
+                    "", v4api ? classRealmManager.getMaven4ApiRealm() : classRealmManager.getMavenApiRealm());
         }
 
         if (parent != null && imports != null) {
