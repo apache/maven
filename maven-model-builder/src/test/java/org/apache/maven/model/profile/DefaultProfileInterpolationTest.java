@@ -72,6 +72,7 @@ public class DefaultProfileInterpolationTest {
         assertEquals("3.3.1", interpolatedPlugin.getVersion());
 
         // profiles/foo/build/pluginManagement
+        interpolatedPlugin = null;
         for (Plugin plugin : effectiveModel
                 .getProfiles()
                 .get(0)
