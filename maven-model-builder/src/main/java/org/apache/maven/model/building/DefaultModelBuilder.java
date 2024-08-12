@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -764,7 +765,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private Model interpolateModel(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
         // save profile activations before interpolation, since they are evaluated with limited scope
-        List<Profile> originalActivations = getProfiles(model, true);
+        List<Profile> originalProfiles = getProfiles(model, true);
 
         Model interpolatedModel =
                 modelInterpolator.interpolateModel(model, model.getProjectDirectory(), request, problems);
@@ -791,8 +792,11 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
         interpolatedModel.setPomFile(model.getPomFile());
 
-        // restore profiles with file activation to their value before full interpolation
-        model.setProfiles(originalActivations);
+        // restore profiles with any activation to their value before full interpolation
+        List<Profile> interpolatedProfiles = model.getProfiles();
+        IntStream.range(0, interpolatedProfiles.size()).forEach(i -> interpolatedProfiles
+                .get(i)
+                .setActivation(originalProfiles.get(i).getActivation()));
 
         return interpolatedModel;
     }
