@@ -23,9 +23,9 @@ under the License.
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>foo</groupId>
-  <artifactId>foo</artifactId>
-  <version>foo</version>
+  <groupId>profile</groupId>
+  <artifactId>mng8188</artifactId>
+  <version>1.0</version>
 
   <properties>
     <version.spring-boot>3.3.1</version.spring-boot>
