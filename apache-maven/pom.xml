@@ -93,8 +93,8 @@ under the License.
       <artifactId>maven-slf4j-provider</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.fusesource.jansi</groupId>
-      <artifactId>jansi</artifactId>
+      <groupId>org.jline</groupId>
+      <artifactId>jansi-core</artifactId>
     </dependency>
   </dependencies>
 
@@ -137,8 +137,8 @@ under the License.
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>jansi</includeArtifactIds>
-              <includes>org/fusesource/jansi/internal/native/Windows/**</includes>
+              <includeArtifactIds>jline-native</includeArtifactIds>
+              <includes>org/jline/nativ/Windows/**</includes>
             </configuration>
           </execution>
         </executions>
