@@ -24,7 +24,8 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Pointer to a resolved resource such as a <abbr>JAR</abbr> file or <abbr>WAE</abbr> application.
- * {@code Artifact} instances are created when <dfn>resolving</dfn> {@link Artifact} instances.
+ * Each {@code Artifact} instance is basically a pointer to a file in the Maven repository.
+ * {@code Artifact} instances are created when <dfn>resolving</dfn> {@link ArtifactCoordinate} instances.
  * Resolving is the process that selects a {@linkplain #getVersion() particular version}
  * and downloads the artifact in the local repository.
  * The download may be deferred to the first time that the file is needed.
@@ -72,6 +73,8 @@ public interface Artifact {
     /**
      * {@return the version of the artifact}. Contrarily to {@link ArtifactCoordinate},
      * each {@code Artifact} is associated to a specific version instead of a range of versions.
+     * If the {@linkplain #getBaseVersion() base version} contains a meta-version such as {@code LATEST},
+     * {@code RELEASE} or {@code SNAPSHOT}, those keywords are replaced by, for example, the actual timestamp.
      *
      * @see ArtifactCoordinate#getVersionConstraint()
      */
@@ -79,8 +82,10 @@ public interface Artifact {
     Version getVersion();
 
     /**
-     * {@return the base version of the artifact}.
-     * TODO: this javadoc is not helpful.
+     * {@return the version or meta-version of the artifact}.
+     * A meta-version is a version suffixed with {@code LATEST}, {@code RELEASE} or {@code SNAPSHOT} keyword.
+     * Meta-versions are represented in a base version by their symbols (e.g., {@code SNAPSHOT}),
+     * while they are replaced by, for example, the actual timestamp in the {@linkplain #getVersion() version}.
      */
     @Nonnull
     Version getBaseVersion();

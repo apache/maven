@@ -22,7 +22,9 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * A version usually parsed using the {@link org.apache.maven.api.services.VersionParser} service.
+ * A version or meta-version of an artifact or a dependency.
+ * A meta-version is a version suffixed with {@code LATEST}, {@code RELEASE} or {@code SNAPSHOT} keyword.
+ * Version is usually parsed using the {@link org.apache.maven.api.services.VersionParser} service.
  *
  * @since 4.0.0
  * @see org.apache.maven.api.services.VersionParser#parseVersion(String)

@@ -20,6 +20,14 @@
 /**
  * Core API for Maven plugins.
  *
+ * <h2>Definitions of terms</h2>
+ * <p><dfn>Artifact resolution</dfn> is the process of {@linkplain org.apache.maven.api.services.VersionResolver
+ * resolving the version} and then downloading the file.</p>
+ *
+ * <p><dfn>Dependency resolution</dfn> is the process of collecting dependencies, flattening the graph,
+ * and then downloading the file. The flattening phase removes branches of the graph so that one artifact
+ * per ({@code groupId}, {@code artifactId}) pair is present.</p>
+ *
  * <h2>Dependency management</h2>
  * <p>{@link org.apache.maven.api.ArtifactCoordinate} instances are used to locate artifacts in a repository.
  * Each instance is basically a pointer to a file in the Maven repository, except that the version may not be

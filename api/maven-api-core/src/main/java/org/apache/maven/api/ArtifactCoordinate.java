@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Point to an {@link Artifact} but with the version specified as a range instead of an exact version.
+ * Identification of an ensemble of {@code Artifact}s in a range of versions.
  * Each {@code ArtifactCoordinate} instance is basically a pointer to a file in the Maven repository,
  * except that the version may not be defined precisely.
  *
@@ -53,7 +53,8 @@ public interface ArtifactCoordinate {
     String getClassifier();
 
     /**
-     * {@return the range of versions of the artifact}.
+     * {@return the specific version, range of versions or meta-version of the artifact}.
+     * A meta-version is a version suffixed with {@code LATEST}, {@code RELEASE} or {@code SNAPSHOT} keyword.
      */
     @Nonnull
     VersionConstraint getVersionConstraint();
