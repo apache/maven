@@ -23,9 +23,12 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Result of resolving a {@code DependencyCoordinate}.
- * Resolving is the process that clarifies the obligation (optional or mandatory status),
- * selects a particular version and downloads the artifact in the local repository.
+ * A result of collecting, flattening and resolving {@code DependencyCoordinate}s.
+ * Dependency is the output of the <dfn>collection</dfn> process, which builds the graph of dependencies,
+ * followed by <dfn>flattening</dfn> and <dfn>resolution</dfn>.
+ * The version selection is done for each dependency during the collection phase.
+ * The flatten phase will keep only a single version per ({@code groupId}, {@code artifactId}) pair.
+ * The resolution will actually download the dependencies (or artifacts) that have been computed.
  *
  * @since 4.0.0
  */
@@ -53,7 +56,8 @@ public interface Dependency extends Artifact {
 
     /**
      * Returns whether the dependency is optional or mandatory.
-     * Contrarily to {@link DependencyCoordinate}, the obligation of a dependency cannot be unspecified.
+     * Contrarily to {@link DependencyCoordinate}, the obligation of a {@code Dependency} is always present.
+     * The value is computed during the dependencies collection phase.
      *
      * @return {@code true} if the dependency is optional, or {@code false} if mandatory
      * @see DependencyCoordinate#getOptional()

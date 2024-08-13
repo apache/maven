@@ -28,8 +28,8 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Represents at which time the dependency will be used.
- * If may be, for example, at compile time only, at run time or at test time.
+ * Indicates when the dependency will be used.
+ * For example, it may be at compile time only, at runtime, or at test time.
  * For a given dependency, the scope is directly derived from the
  * {@link org.apache.maven.api.model.Dependency#getScope()} and will be used when using {@link PathScope}
  * and the {@link org.apache.maven.api.services.DependencyResolver}.
