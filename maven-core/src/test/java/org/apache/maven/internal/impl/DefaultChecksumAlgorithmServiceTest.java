@@ -28,11 +28,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.maven.api.services.ChecksumAlgorithmService;
-import org.eclipse.aether.internal.impl.checksum.*;
+import org.eclipse.aether.internal.impl.checksum.DefaultChecksumAlgorithmFactorySelector;
+import org.eclipse.aether.internal.impl.checksum.Md5ChecksumAlgorithmFactory;
+import org.eclipse.aether.internal.impl.checksum.Sha1ChecksumAlgorithmFactory;
+import org.eclipse.aether.internal.impl.checksum.Sha256ChecksumAlgorithmFactory;
+import org.eclipse.aether.internal.impl.checksum.Sha512ChecksumAlgorithmFactory;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactory;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class DefaultChecksumAlgorithmServiceTest {
     private static Map<String, ChecksumAlgorithmFactory> getChecksumAlgorithmFactories() {

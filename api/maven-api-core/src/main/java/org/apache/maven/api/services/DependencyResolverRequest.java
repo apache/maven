@@ -323,7 +323,7 @@ public interface DependencyResolverRequest {
          * @return {@code this} for method call chaining
          */
         @Nonnull
-        public DependencyResolverRequestBuilder pathTypeFilter(@Nonnull Collection<PathType> desiredTypes) {
+        public DependencyResolverRequestBuilder pathTypeFilter(@Nonnull Collection<? extends PathType> desiredTypes) {
             return pathTypeFilter(desiredTypes::contains);
         }
 
@@ -360,6 +360,7 @@ public interface DependencyResolverRequest {
              * @param rootArtifact The root dependency whose transitive dependencies should be collected, may be {@code
              *                     null}.
              */
+            @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultDependencyResolverRequest(
                     @Nonnull Session session,
                     @Nonnull RequestType requestType,

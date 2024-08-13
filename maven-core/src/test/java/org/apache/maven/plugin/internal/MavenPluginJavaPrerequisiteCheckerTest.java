@@ -21,7 +21,9 @@ package org.apache.maven.plugin.internal;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MavenPluginJavaPrerequisiteCheckerTest {
 

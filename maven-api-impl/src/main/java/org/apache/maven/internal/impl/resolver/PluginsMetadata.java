@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.metadata.Metadata;
 import org.apache.maven.api.metadata.Plugin;
 
@@ -32,12 +34,16 @@ import org.apache.maven.api.metadata.Plugin;
  */
 final class PluginsMetadata extends MavenMetadata {
     static final class PluginInfo {
+        @Nonnull
         final String groupId;
 
+        @Nonnull
         private final String artifactId;
 
+        @Nullable
         private final String goalPrefix;
 
+        @Nullable
         private final String name;
 
         PluginInfo(String groupId, String artifactId, String goalPrefix, String name) {

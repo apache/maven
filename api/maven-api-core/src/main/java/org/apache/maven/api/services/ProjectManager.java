@@ -19,9 +19,17 @@
 package org.apache.maven.api.services;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import org.apache.maven.api.*;
+import org.apache.maven.api.Artifact;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.ProjectScope;
+import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Service;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;

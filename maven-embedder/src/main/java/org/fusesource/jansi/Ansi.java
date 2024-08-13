@@ -28,7 +28,7 @@ import java.util.ArrayList;
  * with maven-shared-utils, while Maven has migrated to JLine (into which Jansi has been merged
  * since JLine 3.25.0).
  */
-@SuppressWarnings({"checkstyle:MagicNumber", "unused"})
+@SuppressWarnings("unused")
 public class Ansi implements Appendable {
 
     private static final char FIRST_ESC_CHAR = 27;

@@ -18,9 +18,14 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.util.*;
-
-import org.apache.maven.project.CycleDetectedException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 class Graph {
     private enum DfsState {

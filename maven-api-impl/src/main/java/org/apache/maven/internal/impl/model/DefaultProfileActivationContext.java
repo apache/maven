@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.ProfileActivationContext;
 
 /**
  * Describes the environmental context used to determine the activation status of profiles.

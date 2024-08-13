@@ -26,12 +26,14 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
@@ -57,6 +59,8 @@ import org.slf4j.LoggerFactory;
 public class DefaultClassRealmManager implements ClassRealmManager {
     public static final String API_REALMID = "maven.api";
 
+    public static final String API_V4_REALMID = "maven.api.v4";
+
     /**
      * During normal command line build, ClassWorld is loaded by jvm system classloader, which only includes
      * plexus-classworlds jar and possibly javaagent classes, see https://issues.apache.org/jira/browse/MNG-4747.
@@ -78,11 +82,15 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
     private final ClassRealm mavenApiRealm;
 
+    private final ClassRealm maven4ApiRealm;
+
     /**
      * Patterns of artifacts provided by maven core and exported via maven api realm. These artifacts are filtered from
      * plugin and build extensions realms to avoid presence of duplicate and possibly conflicting classes on classpath.
      */
     private final Set<String> providedArtifacts;
+
+    private final Set<String> providedArtifactsV4;
 
     @Inject
     public DefaultClassRealmManager(
@@ -101,7 +109,16 @@ public class DefaultClassRealmManager implements ClassRealmManager {
                 foreignImports,
                 null /* artifacts */);
 
+        Map<String, ClassLoader> apiV4Imports = new HashMap<>();
+        apiV4Imports.put("org.apache.maven.api", containerRealm);
+        apiV4Imports.put("org.slf4j", containerRealm);
+        this.maven4ApiRealm = createRealm(API_V4_REALMID, RealmType.Core, null, null, apiV4Imports, null);
+
         this.providedArtifacts = exports.getExportedArtifacts();
+
+        this.providedArtifactsV4 = providedArtifacts.stream()
+                .filter(ga -> ga.startsWith("org.apache.maven:maven-api-"))
+                .collect(Collectors.toSet());
     }
 
     private ClassRealm newRealm(String id) {
@@ -128,6 +145,11 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         return mavenApiRealm;
     }
 
+    @Override
+    public ClassRealm getMaven4ApiRealm() {
+        return maven4ApiRealm;
+    }
+
     /**
      * Creates a new class realm with the specified parent and imports.
      *
@@ -150,8 +172,9 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         List<ClassRealmConstituent> constituents = new ArrayList<>(artifacts == null ? 0 : artifacts.size());
 
         if (artifacts != null && !artifacts.isEmpty()) {
+            boolean v4api = foreignImports != null && foreignImports.containsValue(maven4ApiRealm);
             for (Artifact artifact : artifacts) {
-                if (!isProvidedArtifact(artifact) && artifact.getFile() != null) {
+                if (!isProvidedArtifact(artifact, v4api) && artifact.getFile() != null) {
                     constituents.add(new ArtifactClassRealmConstituent(artifact));
                 } else if (logger.isDebugEnabled()) {
                     logger.debug("  Excluded: {}", getId(artifact));
@@ -211,8 +234,9 @@ public class DefaultClassRealmManager implements ClassRealmManager {
                 getKey(plugin, true), RealmType.Extension, PARENT_CLASSLOADER, null, foreignImports, artifacts);
     }
 
-    private boolean isProvidedArtifact(Artifact artifact) {
-        return providedArtifacts.contains(artifact.getGroupId() + ":" + artifact.getArtifactId());
+    private boolean isProvidedArtifact(Artifact artifact, boolean v4api) {
+        Set<String> provided = v4api ? providedArtifactsV4 : providedArtifacts;
+        return provided.contains(artifact.getGroupId() + ":" + artifact.getArtifactId());
     }
 
     public ClassRealm createPluginRealm(

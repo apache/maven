@@ -24,7 +24,7 @@ import java.util.Properties;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.ModelBuilderRequest;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.ModelVersionProcessor;
 
 /**
  * Maven default implementation of the {@link ModelVersionProcessor} to support

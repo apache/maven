@@ -25,7 +25,10 @@ import org.apache.maven.api.services.model.ModelVersionParser;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class VersionRangeTest {
 

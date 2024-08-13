@@ -18,7 +18,8 @@
  */
 package org.apache.maven.api.services;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.Collection;

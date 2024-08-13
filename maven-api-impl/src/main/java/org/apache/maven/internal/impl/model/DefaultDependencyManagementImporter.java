@@ -39,7 +39,7 @@ import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.DependencyManagementImporter;
 
 /**
  * Handles the import of dependency management from other models into the target model.

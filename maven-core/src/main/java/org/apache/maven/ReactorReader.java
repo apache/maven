@@ -29,7 +29,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -515,7 +524,6 @@ class ReactorReader implements MavenWorkspaceReader {
         public void init(Context context) throws Exception {}
 
         @Override
-        @SuppressWarnings("checkstyle:MissingSwitchDefault")
         public void onEvent(Object event) throws Exception {
             if (event instanceof ExecutionEvent) {
                 ReactorReader reactorReader = lookup.lookup(ReactorReader.class);
