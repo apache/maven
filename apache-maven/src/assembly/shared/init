@@ -40,7 +40,7 @@ find_maven_basedir() {
       basedir=$wdir
       break
     fi
-    if [ "$wdir" == '/' ] ; then
+    if [ "$wdir" = '/' ] ; then
       break
     fi
     wdir=`cd "$wdir/.."; pwd`
