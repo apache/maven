@@ -161,6 +161,7 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2024-05-22T14:07:09Z</project.build.outputTimestamp>
     <!-- various versions -->
+    <assertjVersion>3.26.0</assertjVersion>
     <asmVersion>9.7</asmVersion>
     <byteBuddyVersion>1.14.18</byteBuddyVersion>
     <cipherVersion>2.0</cipherVersion>
@@ -605,6 +606,11 @@ under the License.
         <artifactId>hamcrest</artifactId>
         <version>${hamcrestVersion}</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertjVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
