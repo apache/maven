@@ -30,7 +30,9 @@ import java.util.Properties;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -158,6 +160,16 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
         // Overwrite existing values in model properties. Otherwise it's not possible
         // to define them via command line e.g.: mvn -Drevision=6.5.7 ...
         versionProcessor.overwriteModelProperties(modelProperties, config);
+        String version = model.getVersion();
+        if (version != null && version.startsWith("${") && version.endsWith("}")) {
+            String property = version.substring(2, version.length() - 1);
+            if (!modelProperties.containsKey(property)) {
+                problems.add(new ModelProblemCollectorRequest(ModelProblem.Severity.FATAL, ModelProblem.Version.BASE)
+                        .setMessage("Model '" + model.getId() + "' uses CI Friendly Versions expression '${" + property
+                                + "}' without value being set")
+                        .setLocation(model.getLocation("")));
+            }
+        }
         valueSources.add(new MapBasedValueSource(modelProperties));
 
         valueSources.add(new MapBasedValueSource(config.getSystemProperties()));
