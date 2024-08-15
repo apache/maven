@@ -173,7 +173,7 @@ under the License.
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
     <jlineVersion>3.26.3</jlineVersion>
-    <junitVersion>5.10.3</junitVersion>
+    <junitVersion>5.11.0</junitVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <logbackClassicVersion>1.5.6</logbackClassicVersion>
     <mockitoVersion>5.12.0</mockitoVersion>
