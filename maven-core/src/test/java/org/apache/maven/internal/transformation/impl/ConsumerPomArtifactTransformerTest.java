@@ -65,7 +65,7 @@ class ConsumerPomArtifactTransformerTest {
 
             t.transform(project, systemSessionMock, beforePomFile, tempFile);
         }
-        XmlAssert.assertThat(afterPomFile.toFile()).and(tempFile.toFile()).areIdentical();
+        XmlAssert.assertThat(tempFile.toFile()).and(afterPomFile.toFile()).areIdentical();
     }
 
     @Test

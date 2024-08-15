@@ -225,7 +225,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         String packaging = model.getPackaging();
         if (POM_PACKAGING.equals(packaging)) {
             // raw to consumer transform
-            model = model.withRoot(false).withModules(null);
+            model = model.withRoot(false).withModules(null).withSubprojects(null);
             if (model.getParent() != null) {
                 model = model.withParent(model.getParent().withRelativePath(null));
             }

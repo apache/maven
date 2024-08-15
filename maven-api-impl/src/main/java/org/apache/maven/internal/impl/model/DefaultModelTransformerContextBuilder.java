@@ -151,12 +151,16 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
                         ModelBuilderRequest gaBuildingRequest =
                                 ModelBuilderRequest.build(request, ModelSource.fromPath(pom));
                         Model rawModel = defaultModelBuilder.readFileModel(gaBuildingRequest, problems);
-                        for (String module : rawModel.getModules()) {
-                            Path moduleFile = defaultModelBuilder
+                        List<String> subprojects = rawModel.getSubprojects();
+                        if (subprojects == null) {
+                            subprojects = rawModel.getModules();
+                        }
+                        for (String subproject : subprojects) {
+                            Path subprojectFile = defaultModelBuilder
                                     .getModelProcessor()
-                                    .locateExistingPom(pom.getParent().resolve(module));
-                            if (moduleFile != null) {
-                                toLoad.add(moduleFile);
+                                    .locateExistingPom(pom.getParent().resolve(subproject));
+                            if (subprojectFile != null) {
+                                toLoad.add(subprojectFile);
                             }
                         }
                     } catch (ModelBuilderException e) {

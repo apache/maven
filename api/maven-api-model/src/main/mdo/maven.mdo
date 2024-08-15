@@ -313,7 +313,7 @@
         <!-- SCM                                                                    -->
         <!-- ====================================================================== -->
 
-        <field xdoc.separator="blank" xml.insertParentFieldsUpTo="modules">
+        <field xdoc.separator="blank" xml.insertParentFieldsUpTo="subprojects">
           <name>scm</name>
           <version>4.0.0+</version>
           <description>Specification for the SCM used by the project, such as CVS, Subversion, etc.</description>
@@ -535,6 +535,9 @@
             <type>String</type>
             <multiplicity>*</multiplicity>
           </association>
+          <annotations>
+            <annotation>@Deprecated</annotation>
+          </annotations>
         </field>
         <field xdoc.separator="blank">
           <name>subprojects</name>
