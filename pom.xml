@@ -165,7 +165,7 @@ under the License.
     <byteBuddyVersion>1.14.18</byteBuddyVersion>
     <cipherVersion>2.0</cipherVersion>
     <classWorldsVersion>2.8.0</classWorldsVersion>
-    <commonsCliVersion>1.8.0</commonsCliVersion>
+    <commonsCliVersion>1.9.0</commonsCliVersion>
     <guiceVersion>6.0.0</guiceVersion>
     <guavaVersion>33.2.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
