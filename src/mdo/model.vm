@@ -145,55 +145,39 @@ public class ${class.name}
     #end
 
     /**
-      * Constructor for this class, package protected.
+      * Constructor for this class, to be called from its subclasses and {@link Builder}.
       * @see Builder#build()
       */
-    ${class.name}(
-    #if ( $class == $root )
-        String namespaceUri,
-        String modelEncoding,
-    #end
-    #foreach ( $field in $allFields )
-      #set ( $sep = "#if(${locationTracking}||$field!=${allFields[${allFields.size()} - 1]}),#end" )
-      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
-      #if ( $type.startsWith("List<") )
-        #set ( $type = ${type.replace('List<','Collection<')} )
-      #end
-        $type $field.name${sep}
-    #end
-    #if ( $locationTracking )
-        Map<Object, InputLocation> locations,
-        InputLocation importedFrom
-    #end
-    ) {
+    protected ${class.name}(Builder builder) {
     #if ( $class.superClass )
-        super(
-      #foreach ( $field in $inheritedFields )
-        #set ( $sep = "#if(${locationTracking}||$field!=${inheritedFields[${inheritedFields.size()} - 1]}),#end" )
-            ${field.name}${sep}
-      #end
-      #if ( $locationTracking )
-            locations,
-            importedFrom
-      #end
-        );
+        super(builder);
     #end
     #if ( $class == $root )
-        this.namespaceUri = namespaceUri;
-        this.modelEncoding = modelEncoding;
+        this.namespaceUri = builder.namespaceUri != null ? builder.namespaceUri : (builder.base != null ? builder.base.namespaceUri : null);
+        this.modelEncoding = builder.modelEncoding != null ? builder.modelEncoding : (builder.base != null ? builder.base.modelEncoding :  "UTF-8");
     #end
     #foreach ( $field in $class.getFields($version) )
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" || $field.type == "java.util.Map" )
-        this.${field.name} = ImmutableCollections.copy(${field.name});
+        this.${field.name} = ImmutableCollections.copy(builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : null));
       #else
-        this.${field.name} = ${field.name};
+        #if ( $field.type == "boolean" || $field.type == "int" )
+        this.${field.name} = builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : ${field.defaultValue});
+        #else
+        this.${field.name} = builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : null);
+        #end
       #end
     #end
     #if ( $locationTracking )
+        Map<Object, InputLocation> newlocs = builder.locations != null ? builder.locations : Collections.emptyMap();
+        Map<Object, InputLocation> oldlocs = builder.base != null && builder.base.locations != null ? builder.base.locations : Collections.emptyMap();
       #if ( ! $class.superClass )
-        this.locations = ImmutableCollections.copy(locations);
-        this.importedFrom = importedFrom;
+        this.locations = new HashMap<>();
+        this.importedFrom = builder.importedFrom;
+        this.locations.put("", newlocs.containsKey("") ? newlocs.get("") : oldlocs.get(""));
       #end
+        #foreach ( $field in $class.getFields($version) )
+        this.locations.put("${field.name}", newlocs.containsKey("${field.name}") ? newlocs.get("${field.name}") : oldlocs.get("${field.name}"));
+        #end
     #end
     }
 
@@ -406,7 +390,7 @@ public class ${class.name}
         InputLocation importedFrom;
     #end
 
-        Builder(boolean withDefaults) {
+        protected Builder(boolean withDefaults) {
     #if ( $class.superClass )
             super(withDefaults);
     #end
@@ -424,7 +408,7 @@ public class ${class.name}
             }
         }
 
-        Builder(${class.name} base, boolean forceCopy) {
+        protected Builder(${class.name} base, boolean forceCopy) {
     #if ( $class.superClass )
             super(base, forceCopy);
     #end
@@ -493,6 +477,7 @@ public class ${class.name}
     #end
         @Nonnull
         public ${class.name} build() {
+            // this method should not contain any logic other than creating the object in order to ease subclassing
             if (base != null
     #foreach ( $field in $allFields )
                     && (${field.name} == null || ${field.name} == base.${field.name})
@@ -500,33 +485,7 @@ public class ${class.name}
             ) {
                 return base;
             }
-    #if ( $locationTracking )
-            Map<Object, InputLocation> newlocs = this.locations != null ? this.locations : Collections.emptyMap();
-            Map<Object, InputLocation> oldlocs = this.base != null && this.base.locations != null ? this.base.locations : Collections.emptyMap();
-            Map<Object, InputLocation> locations = new HashMap<>();
-            locations.put("", newlocs.containsKey("") ? newlocs.get("") : oldlocs.get(""));
-      #foreach ( $field in $allFields )
-            locations.put("${field.name}", newlocs.containsKey("${field.name}") ? newlocs.get("${field.name}") : oldlocs.get("${field.name}"));
-      #end
-    #end
-            return new ${class.name}(
-    #if ( $class == $root )
-                namespaceUri != null ? namespaceUri : (base != null ? base.namespaceUri : ""),
-                modelEncoding != null ? modelEncoding : (base != null ? base.modelEncoding : "UTF-8"),
-    #end
-    #foreach ( $field in $allFields )
-      #set ( $sep = "#if(${locationTracking}||$field!=${allFields[${allFields.size()} - 1]}),#end" )
-      #if ( $field.type == "boolean" || $field.type == "int" )
-                ${field.name} != null ? ${field.name} : (base != null ? base.${field.name} : ${field.defaultValue})${sep}
-      #else
-                ${field.name} != null ? ${field.name} : (base != null ? base.${field.name} : null)${sep}
-      #end
-    #end
-    #if ( $locationTracking )
-                locations,
-                importedFrom
-    #end
-            );
+            return new ${class.name}(this);
         }
     }
 
