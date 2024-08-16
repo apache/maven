@@ -16,33 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.internal.impl;
 
-import java.nio.file.Path;
-import java.util.Optional;
-
-import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ProducedArtifact;
-import org.apache.maven.api.Service;
-import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- *
- * @since 4.0.0
+ * A wrapper class around a maven resolver artifact.
  */
-@Experimental
-public interface ArtifactManager extends Service {
+public class DefaultProducedArtifact extends DefaultArtifact implements ProducedArtifact {
 
-    /**
-     * Returns the path of the file previously associated to this artifact
-     * or {@code Optional.empty()} if no path has been associated.
-     */
-    @Nonnull
-    Optional<Path> getPath(@Nonnull Artifact artifact);
-
-    /**
-     * Associates the given file path to the artifact.
-     */
-    void setPath(@Nonnull ProducedArtifact artifact, Path path);
+    public DefaultProducedArtifact(
+            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
+        super(session, artifact);
+    }
 }

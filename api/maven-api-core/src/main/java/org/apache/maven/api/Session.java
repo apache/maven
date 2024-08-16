@@ -340,6 +340,37 @@ public interface Session {
             String groupId, String artifactId, String version, String classifier, String extension, String type);
 
     /**
+     * Shortcut for {@code getService(ArtifactFactory.class).createProduced(...)}.
+     *
+     * @param groupId the group identifier, or {@code null} is unspecified
+     * @param artifactId the artifact identifier, or {@code null} is unspecified
+     * @param version the artifact version, or {@code null} is unspecified
+     * @param extension the artifact extension, or {@code null} is unspecified
+     * @return artifact with the given coordinates
+     *
+     * @see org.apache.maven.api.services.ArtifactFactory#createProduced(Session, String, String, String, String)
+     */
+    @Nonnull
+    ProducedArtifact createProducedArtifact(String groupId, String artifactId, String version, String extension);
+
+    /**
+     * Shortcut for {@code getService(ArtifactFactory.class).createProduced(...)}.
+     *
+     * @param groupId the group identifier, or {@code null} is unspecified
+     * @param artifactId the artifact identifier, or {@code null} is unspecified
+     * @param version the artifact version, or {@code null} is unspecified
+     * @param classifier the artifact classifier, or {@code null} is unspecified
+     * @param extension the artifact extension, or {@code null} is unspecified
+     * @param type the artifact type, or {@code null} is unspecified
+     * @return artifact with the given coordinates
+     *
+     * @see org.apache.maven.api.services.ArtifactFactory#createProduced(Session, String, String, String, String, String, String)
+     */
+    @Nonnull
+    ProducedArtifact createProducedArtifact(
+            String groupId, String artifactId, String version, String classifier, String extension, String type);
+
+    /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
      *
      * @param coordinate coordinates of the artifact to resolve
@@ -349,7 +380,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
     @Nonnull
-    Map.Entry<Artifact, Path> resolveArtifact(@Nonnull ArtifactCoordinate coordinate);
+    ResolvedArtifact resolveArtifact(@Nonnull ArtifactCoordinate coordinate);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -361,7 +392,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
     @Nonnull
-    Map<Artifact, Path> resolveArtifacts(@Nonnull ArtifactCoordinate... coordinates);
+    Collection<ResolvedArtifact> resolveArtifacts(@Nonnull ArtifactCoordinate... coordinates);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -373,7 +404,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
     @Nonnull
-    Map<Artifact, Path> resolveArtifacts(@Nonnull Collection<? extends ArtifactCoordinate> coordinates);
+    Collection<ResolvedArtifact> resolveArtifacts(@Nonnull Collection<? extends ArtifactCoordinate> coordinates);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -385,7 +416,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
     @Nonnull
-    Map.Entry<Artifact, Path> resolveArtifact(@Nonnull Artifact artifact);
+    ResolvedArtifact resolveArtifact(@Nonnull Artifact artifact);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -397,7 +428,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
     @Nonnull
-    Map<Artifact, Path> resolveArtifacts(@Nonnull Artifact... artifacts);
+    Collection<ResolvedArtifact> resolveArtifacts(@Nonnull Artifact... artifacts);
 
     /**
      * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}.
@@ -436,9 +467,9 @@ public interface Session {
      * @param artifact the artifact for which to associate a path
      * @param path path to associate to the given artifact
      *
-     * @see org.apache.maven.api.services.ArtifactManager#setPath(Artifact, Path)
+     * @see org.apache.maven.api.services.ArtifactManager#setPath(ProducedArtifact, Path)
      */
-    void setArtifactPath(@Nonnull Artifact artifact, @Nonnull Path path);
+    void setArtifactPath(@Nonnull ProducedArtifact artifact, @Nonnull Path path);
 
     /**
      * Shortcut for {@code getService(ArtifactManager.class).getPath(...)}.

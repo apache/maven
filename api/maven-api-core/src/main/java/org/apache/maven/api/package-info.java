@@ -18,14 +18,20 @@
  */
 
 /**
- * Core API for Maven plugins.
+ * Core Maven API.
  *
  * <h2>Definitions of terms</h2>
+ * <p><dfn>Version resolution</dfn> is the process of finding, for a given artifact, a list of
+ * versions that match the input {@linkplain org.apache.maven.api.VersionConstraint version constraint}
+ * in the list of remote repositories. This is done either explicitly using the
+ * {@link org.apache.maven.api.services.VersionResolver} service, or implicitly when resolving
+ * an </p>
+ *
  * <p><dfn>Artifact resolution</dfn> is the process of {@linkplain org.apache.maven.api.services.VersionResolver
  * resolving the version} and then downloading the file.</p>
  *
  * <p><dfn>Dependency resolution</dfn> is the process of collecting dependencies, flattening the graph,
- * and then downloading the file. The flattening phase removes branches of the graph so that one artifact
+ * and then downloading the files. The flattening phase removes branches of the graph so that only one artifact
  * per ({@code groupId}, {@code artifactId}) pair is present.</p>
  *
  * <h2>Dependency management</h2>
@@ -36,7 +42,8 @@
  * <p>{@link org.apache.maven.api.Artifact} instances are the pointed artifacts in the repository.
  * They are created when <dfn>resolving</dfn> an {@code ArtifactCoordinate}. Resolving is the process
  * that selects a particular version and downloads the artifact in the local repository.
- * The download may be deferred to the first time that the file is needed.</p>
+ * There are two sub-interfaces, {@link org.apache.maven.api.ResolvedArtifact} which is used when
+ * an artifact has been resolved</p>
  *
  * <p>{@link org.apache.maven.api.DependencyCoordinate} instances are used to express a dependency.
  * They are an {@code ArtifactCoordinate} completed with information about how the artifact will be used:

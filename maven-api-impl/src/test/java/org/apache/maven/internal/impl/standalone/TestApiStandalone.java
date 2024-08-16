@@ -19,13 +19,11 @@
 package org.apache.maven.internal.impl.standalone;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 
-import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Node;
+import org.apache.maven.api.ResolvedArtifact;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
@@ -52,10 +50,10 @@ class TestApiStandalone {
         assertNotNull(result.getEffectiveModel());
 
         ArtifactCoordinate coord = session.createArtifactCoordinate("org.apache.maven:maven-api-core:4.0.0-alpha-13");
-        Map.Entry<Artifact, Path> res = session.resolveArtifact(coord);
+        ResolvedArtifact res = session.resolveArtifact(coord);
         assertNotNull(res);
-        assertNotNull(res.getValue());
-        assertTrue(Files.exists(res.getValue()));
+        assertNotNull(res.getPath());
+        assertTrue(Files.exists(res.getPath()));
 
         Node node = session.collectDependencies(session.createDependencyCoordinate(coord));
         assertNotNull(node);

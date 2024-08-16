@@ -23,9 +23,9 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Identification of an ensemble of {@code Artifact}s in a range of versions.
+ * Partial identification of an {@code Artifact}s in a Maven repository.
  * Each {@code ArtifactCoordinate} instance is basically a pointer to a file in the Maven repository,
- * except that the version may not be defined precisely.
+ * except that the exact version may not be known yet.
  *
  * @since 4.0.0
  */
@@ -69,7 +69,8 @@ public interface ArtifactCoordinate {
     String getExtension();
 
     /**
-     * {@return a unique string representation identifying this artifact}.
+     * {@return a unique string representation identifying this artifact}
+     *
      * The default implementation returns a colon-separated list of group
      * identifier, artifact identifier, extension, classifier and version.
      *

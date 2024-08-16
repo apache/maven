@@ -20,12 +20,14 @@ package org.apache.maven.internal.impl;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ResolvedArtifact;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.ArtifactManager;
@@ -50,7 +52,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
         try {
-            Map<Artifact, Path> paths = new HashMap<>();
+            Map<ResolvedArtifact, Path> paths = new HashMap<>();
             ArtifactManager artifactManager = session.getService(ArtifactManager.class);
             List<RemoteRepository> repositories = session.toRepositories(session.getRemoteRepositories());
             List<ArtifactRequest> requests = new ArrayList<>();
@@ -59,7 +61,11 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                 Artifact artifact = session.getArtifact(aetherArtifact);
                 Path path = artifactManager.getPath(artifact).orElse(null);
                 if (path != null) {
-                    paths.put(artifact, path);
+                    if (aetherArtifact.getPath() == null) {
+                        aetherArtifact = aetherArtifact.setPath(path);
+                    }
+                    ResolvedArtifact resolved = session.getArtifact(ResolvedArtifact.class, aetherArtifact);
+                    paths.put(resolved, path);
                 } else {
                     requests.add(new ArtifactRequest(aetherArtifact, repositories, null));
                 }
@@ -68,15 +74,32 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                 List<ArtifactResult> results =
                         session.getRepositorySystem().resolveArtifacts(session.getSession(), requests);
                 for (ArtifactResult result : results) {
-                    Artifact artifact = session.getArtifact(result.getArtifact());
+                    ResolvedArtifact artifact = session.getArtifact(ResolvedArtifact.class, result.getArtifact());
                     Path path = result.getArtifact().getPath();
-                    artifactManager.setPath(artifact, path);
                     paths.put(artifact, path);
                 }
             }
-            return () -> paths;
+            return new DefaultArtifactResolverResult(paths);
         } catch (ArtifactResolutionException e) {
             throw new ArtifactResolverException("Unable to resolve artifact: " + e.getMessage(), e);
+        }
+    }
+
+    static class DefaultArtifactResolverResult implements ArtifactResolverResult {
+        final Map<ResolvedArtifact, Path> paths;
+
+        DefaultArtifactResolverResult(Map<ResolvedArtifact, Path> paths) {
+            this.paths = paths;
+        }
+
+        @Override
+        public Collection<ResolvedArtifact> getArtifacts() {
+            return paths.keySet();
+        }
+
+        @Override
+        public Path getPath(Artifact artifact) {
+            return paths.get(artifact);
         }
     }
 }

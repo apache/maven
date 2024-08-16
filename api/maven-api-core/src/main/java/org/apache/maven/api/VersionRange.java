@@ -25,6 +25,13 @@ import org.apache.maven.api.annotations.Nullable;
 /**
  * A range of versions.
  *
+ * {@code VersionConstraint} objects are created using the
+ * {@linkplain org.apache.maven.api.services.VersionParser} service.
+ *
+ * @see Version
+ * @see VersionConstraint
+ * @see org.apache.maven.api.services.VersionParser#parseVersionRange(String)
+ * @see org.apache.maven.api.Session#parseVersionRange(String)
  * @since 4.0.0
  */
 @Experimental
