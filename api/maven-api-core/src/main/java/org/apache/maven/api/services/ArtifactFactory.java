@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -58,5 +59,34 @@ public interface ArtifactFactory extends Service {
             String extension,
             String type) {
         return create(ArtifactFactoryRequest.build(session, groupId, artifactId, version, classifier, extension, type));
+    }
+
+    /**
+     * Creates an artifact.
+     *
+     * @param request the request holding artifact creation parameters
+     * @return an {@code Artifact}, never {@code null}
+     * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
+     */
+    @Nonnull
+    ProducedArtifact createProduced(@Nonnull ArtifactFactoryRequest request);
+
+    @Nonnull
+    default ProducedArtifact createProduced(
+            @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
+        return createProduced(ArtifactFactoryRequest.build(session, groupId, artifactId, version, extension));
+    }
+
+    @Nonnull
+    default ProducedArtifact createProduced(
+            @Nonnull Session session,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String extension,
+            String type) {
+        return createProduced(
+                ArtifactFactoryRequest.build(session, groupId, artifactId, version, classifier, extension, type));
     }
 }

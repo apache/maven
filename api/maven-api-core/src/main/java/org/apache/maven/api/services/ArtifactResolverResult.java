@@ -19,11 +19,13 @@
 package org.apache.maven.api.services;
 
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.Collection;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ResolvedArtifact;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * The Artifact Result
@@ -36,5 +38,8 @@ public interface ArtifactResolverResult {
      * @return {@link Artifact}
      */
     @Nonnull
-    Map<Artifact, Path> getArtifacts();
+    Collection<ResolvedArtifact> getArtifacts();
+
+    @Nullable
+    Path getPath(Artifact artifact);
 }

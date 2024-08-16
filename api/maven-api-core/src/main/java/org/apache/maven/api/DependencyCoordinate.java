@@ -27,10 +27,11 @@ import org.apache.maven.api.annotations.Nullable;
 
 /**
  * {@code ArtifactCoordinate} completed with information about how the artifact will be used.
- * Those information include the dependency type (main classes, test classes, <i>etc.</i>),
- * a scope (compile-time, run-time <i>etc.</i>), and an obligation (whether the dependency
- * is optional or mandatory). The {@linkplain #getVersionConstraint() version}
- * and the {@linkplain #getOptional() obligation} may not be defined precisely.
+ * This information include the dependency type (main classes, test classes, <i>etc.</i>),
+ * a scope (compile-time, run-time <i>etc.</i>), an obligation (whether the dependency
+ * is optional or mandatory), and possible exclusions for transitive dependencies.
+ * The {@linkplain #getVersionConstraint() version} and the {@linkplain #getOptional() obligation}
+ * may not be defined precisely.
  *
  * @since 4.0.0
  */

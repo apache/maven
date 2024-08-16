@@ -31,9 +31,9 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
  * A wrapper class around a maven resolver artifact.
  */
 public class DefaultArtifact implements Artifact {
-    private final @Nonnull InternalSession session;
-    private final @Nonnull org.eclipse.aether.artifact.Artifact artifact;
-    private final String key;
+    protected final @Nonnull InternalSession session;
+    protected final @Nonnull org.eclipse.aether.artifact.Artifact artifact;
+    protected final String key;
 
     public DefaultArtifact(@Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
         this.session = nonNull(session, "session");

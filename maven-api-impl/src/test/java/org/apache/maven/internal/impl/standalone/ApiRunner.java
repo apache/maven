@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.Packaging;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
@@ -326,7 +327,7 @@ public class ApiRunner {
             }
 
             @Override
-            public void setPath(Artifact artifact, Path path) {
+            public void setPath(ProducedArtifact artifact, Path path) {
                 paths.put(artifact, path);
             }
         };

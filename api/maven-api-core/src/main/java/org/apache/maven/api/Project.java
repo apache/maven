@@ -95,7 +95,7 @@ public interface Project {
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
     @Nonnull
-    default Artifact getPomArtifact() {
+    default ProducedArtifact getPomArtifact() {
         return getArtifacts().get(0);
     }
 
@@ -107,8 +107,8 @@ public interface Project {
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
     @Nonnull
-    default Optional<Artifact> getMainArtifact() {
-        List<Artifact> artifacts = getArtifacts();
+    default Optional<ProducedArtifact> getMainArtifact() {
+        List<ProducedArtifact> artifacts = getArtifacts();
         return artifacts.size() == 2 ? Optional.of(artifacts.get(1)) : Optional.empty();
     }
 
@@ -126,7 +126,7 @@ public interface Project {
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
     @Nonnull
-    List<Artifact> getArtifacts();
+    List<ProducedArtifact> getArtifacts();
 
     /**
      * Returns the project model.

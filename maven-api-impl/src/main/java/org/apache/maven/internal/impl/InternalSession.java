@@ -61,6 +61,9 @@ public interface InternalSession extends Session {
     Artifact getArtifact(@Nonnull org.eclipse.aether.artifact.Artifact artifact);
 
     @Nonnull
+    <T extends Artifact> T getArtifact(@Nonnull Class<T> clazz, @Nonnull org.eclipse.aether.artifact.Artifact artifact);
+
+    @Nonnull
     Dependency getDependency(@Nonnull org.eclipse.aether.graph.Dependency dependency);
 
     List<org.eclipse.aether.repository.RemoteRepository> toRepositories(List<RemoteRepository> repositories);

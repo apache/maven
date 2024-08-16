@@ -16,33 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.api;
 
 import java.nio.file.Path;
-import java.util.Optional;
-
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ProducedArtifact;
-import org.apache.maven.api.Service;
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
 
 /**
+ * An {@link Artifact} that has been resolved, i.e. downloaded to the local repository.
  *
  * @since 4.0.0
  */
-@Experimental
-public interface ArtifactManager extends Service {
+public interface ResolvedArtifact extends Artifact {
 
     /**
-     * Returns the path of the file previously associated to this artifact
-     * or {@code Optional.empty()} if no path has been associated.
+     * {@return the actual file that has been downloaded in the file system}
      */
-    @Nonnull
-    Optional<Path> getPath(@Nonnull Artifact artifact);
-
-    /**
-     * Associates the given file path to the artifact.
-     */
-    void setPath(@Nonnull ProducedArtifact artifact, Path path);
+    Path getPath();
 }

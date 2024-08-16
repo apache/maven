@@ -18,13 +18,12 @@
  */
 package org.apache.maven.internal.impl.resolver;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ResolvedArtifact;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.di.Named;
@@ -72,9 +71,9 @@ public class DefaultModelResolver implements ModelResolver {
                 resolvedVersion.accept(newVersion);
             }
 
-            Map.Entry<org.apache.maven.api.Artifact, Path> resolved =
+            ResolvedArtifact resolved =
                     session.resolveArtifact(session.createArtifactCoordinate(groupId, artifactId, newVersion, "pom"));
-            return ModelSource.fromPath(resolved.getValue(), groupId + ":" + artifactId + ":" + newVersion);
+            return ModelSource.fromPath(resolved.getPath(), groupId + ":" + artifactId + ":" + newVersion);
         } catch (VersionRangeResolverException | ArtifactResolverException e) {
             throw new ModelResolverException(
                     e.getMessage() + " (remote repositories: "

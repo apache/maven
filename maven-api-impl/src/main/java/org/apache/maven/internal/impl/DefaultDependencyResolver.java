@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -42,7 +41,9 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
+import org.apache.maven.api.services.ArtifactResolverResult;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverException;
 import org.apache.maven.api.services.DependencyResolverRequest;
@@ -169,10 +170,11 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 PathModularizationCache cache = new PathModularizationCache(); // TODO: should be project-wide cache.
                 DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
                         cache, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
-                Map<Artifact, Path> artifacts = session.resolveArtifacts(coordinates);
+                ArtifactResolverResult artifactResolverResult =
+                        session.getService(ArtifactResolver.class).resolve(session, coordinates);
                 for (Node node : nodes) {
                     Dependency d = node.getDependency();
-                    Path path = (d != null) ? artifacts.get(d) : null;
+                    Path path = (d != null) ? artifactResolverResult.getPath(d) : null;
                     try {
                         resolverResult.addDependency(node, d, filter, path);
                     } catch (IOException e) {

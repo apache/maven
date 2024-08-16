@@ -47,9 +47,11 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.PathType;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.ResolvedArtifact;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
@@ -103,8 +105,8 @@ public abstract class AbstractSession implements InternalSession {
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
     private final Map<org.eclipse.aether.graph.DependencyNode, Node> allNodes =
             Collections.synchronizedMap(new WeakHashMap<>());
-    private final Map<org.eclipse.aether.artifact.Artifact, Artifact> allArtifacts =
-            Collections.synchronizedMap(new WeakHashMap<>());
+    private final Map<Class<? extends Artifact>, Map<org.eclipse.aether.artifact.Artifact, Artifact>> allArtifacts =
+            new ConcurrentHashMap<>();
     private final Map<org.eclipse.aether.repository.RemoteRepository, RemoteRepository> allRepositories =
             Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<org.eclipse.aether.graph.Dependency, Dependency> allDependencies =
@@ -140,7 +142,27 @@ public abstract class AbstractSession implements InternalSession {
     @Nonnull
     @Override
     public Artifact getArtifact(@Nonnull org.eclipse.aether.artifact.Artifact artifact) {
-        return allArtifacts.computeIfAbsent(artifact, a -> new DefaultArtifact(this, a));
+        return getArtifact(Artifact.class, artifact);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Artifact> T getArtifact(Class<T> clazz, org.eclipse.aether.artifact.Artifact artifact) {
+        Map<org.eclipse.aether.artifact.Artifact, Artifact> map =
+                allArtifacts.computeIfAbsent(clazz, c -> Collections.synchronizedMap(new WeakHashMap<>()));
+        if (clazz == Artifact.class) {
+            return (T) map.computeIfAbsent(artifact, a -> new DefaultArtifact(this, a));
+        } else if (clazz == ResolvedArtifact.class) {
+            if (artifact.getPath() == null) {
+                throw new IllegalArgumentException("The given artifact is not resolved");
+            } else {
+                return (T) map.computeIfAbsent(artifact, a -> new DefaultResolvedArtifact(this, a));
+            }
+        } else if (clazz == ProducedArtifact.class) {
+            return (T) map.computeIfAbsent(artifact, a -> new DefaultProducedArtifact(this, a));
+        } else {
+            throw new IllegalArgumentException("Unsupported Artifact class: " + clazz);
+        }
     }
 
     @Nonnull
@@ -488,17 +510,39 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     /**
+     * Shortcut for <code>getService(ArtifactFactory.class).createProduced(...)</code>
+     *
+     * @see ArtifactFactory#createProduced(Session, String, String, String, String)
+     */
+    @Override
+    public ProducedArtifact createProducedArtifact(
+            String groupId, String artifactId, String version, String extension) {
+        return getService(ArtifactFactory.class).createProduced(this, groupId, artifactId, version, extension);
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactFactory.class).createProduced(...)</code>
+     *
+     * @see ArtifactFactory#createProduced(Session, String, String, String, String, String, String)
+     */
+    @Override
+    public ProducedArtifact createProducedArtifact(
+            String groupId, String artifactId, String version, String classifier, String extension, String type) {
+        return getService(ArtifactFactory.class)
+                .createProduced(this, groupId, artifactId, version, classifier, extension, type);
+    }
+
+    /**
      * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
      *
      * @throws ArtifactResolverException if the artifact resolution failed
      * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
-    public Map.Entry<Artifact, Path> resolveArtifact(ArtifactCoordinate coordinate) {
+    public ResolvedArtifact resolveArtifact(ArtifactCoordinate coordinate) {
         return getService(ArtifactResolver.class)
                 .resolve(this, Collections.singletonList(coordinate))
                 .getArtifacts()
-                .entrySet()
                 .iterator()
                 .next();
     }
@@ -510,7 +554,7 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
-    public Map<Artifact, Path> resolveArtifacts(ArtifactCoordinate... coordinates) {
+    public Collection<ResolvedArtifact> resolveArtifacts(ArtifactCoordinate... coordinates) {
         return resolveArtifacts(Arrays.asList(coordinates));
     }
 
@@ -521,7 +565,7 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
-    public Map<Artifact, Path> resolveArtifacts(Collection<? extends ArtifactCoordinate> coordinates) {
+    public Collection<ResolvedArtifact> resolveArtifacts(Collection<? extends ArtifactCoordinate> coordinates) {
         return getService(ArtifactResolver.class).resolve(this, coordinates).getArtifacts();
     }
 
@@ -532,14 +576,14 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
-    public Map.Entry<Artifact, Path> resolveArtifact(Artifact artifact) {
+    public ResolvedArtifact resolveArtifact(Artifact artifact) {
         ArtifactCoordinate coordinate =
                 getService(ArtifactCoordinateFactory.class).create(this, artifact);
         return resolveArtifact(coordinate);
     }
 
     @Override
-    public Map<Artifact, Path> resolveArtifacts(Artifact... artifacts) {
+    public Collection<ResolvedArtifact> resolveArtifacts(Artifact... artifacts) {
         ArtifactCoordinateFactory acf = getService(ArtifactCoordinateFactory.class);
         List<ArtifactCoordinate> coords =
                 Arrays.stream(artifacts).map(a -> acf.create(this, a)).collect(Collectors.toList());
@@ -582,10 +626,10 @@ public abstract class AbstractSession implements InternalSession {
     /**
      * Shortcut for <code>getService(ArtifactManager.class).setPath(...)</code>
      *
-     * @see ArtifactManager#setPath(Artifact, Path)
+     * @see ArtifactManager#setPath(ProducedArtifact, Path)
      */
     @Override
-    public void setArtifactPath(@Nonnull Artifact artifact, @Nonnull Path path) {
+    public void setArtifactPath(@Nonnull ProducedArtifact artifact, @Nonnull Path path) {
         getService(ArtifactManager.class).setPath(artifact, path);
     }
 

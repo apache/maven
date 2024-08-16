@@ -24,11 +24,10 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Pointer to a resolved resource such as a <abbr>JAR</abbr> file or <abbr>WAE</abbr> application.
- * Each {@code Artifact} instance is basically a pointer to a file in the Maven repository.
+ * Each {@code Artifact} instance is basically an exact pointer to a file in a Maven repository.
  * {@code Artifact} instances are created when <dfn>resolving</dfn> {@link ArtifactCoordinate} instances.
  * Resolving is the process that selects a {@linkplain #getVersion() particular version}
- * and downloads the artifact in the local repository.
- * The download may be deferred to the first time that the file is needed.
+ * and downloads the artifact in the local repository.  This operation returns a {@link ResolvedArtifact}.
  *
  * @since 4.0.0
  */

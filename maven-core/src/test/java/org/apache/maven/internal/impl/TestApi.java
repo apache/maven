@@ -40,6 +40,7 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.ResolvedArtifact;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -155,13 +156,12 @@ class TestApi {
         ArtifactCoordinate coord =
                 session.createArtifactCoordinate("org.codehaus.plexus", "plexus-utils", "1.4.5", "pom");
 
-        Map.Entry<Artifact, Path> resolved = session.resolveArtifact(coord);
+        ResolvedArtifact resolved = session.resolveArtifact(coord);
         assertNotNull(resolved);
-        assertNotNull(resolved.getKey());
-        assertNotNull(resolved.getValue());
-        Optional<Path> op = session.getArtifactPath(resolved.getKey());
+        assertNotNull(resolved.getPath());
+        Optional<Path> op = session.getArtifactPath(resolved);
         assertTrue(op.isPresent());
-        assertEquals(resolved.getValue(), op.get());
+        assertEquals(resolved.getPath(), op.get());
     }
 
     @Test

@@ -33,7 +33,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.RemoteRepository;
@@ -66,7 +66,7 @@ public class DefaultProjectManager implements ProjectManager {
     @Nonnull
     @Override
     public Optional<Path> getPath(Project project) {
-        Optional<Artifact> mainArtifact = project.getMainArtifact();
+        Optional<ProducedArtifact> mainArtifact = project.getMainArtifact();
         if (mainArtifact.isPresent()) {
             return artifactManager.getPath(mainArtifact.get());
         }
@@ -75,24 +75,24 @@ public class DefaultProjectManager implements ProjectManager {
 
     @Nonnull
     @Override
-    public Collection<Artifact> getAttachedArtifacts(Project project) {
+    public Collection<ProducedArtifact> getAttachedArtifacts(Project project) {
         InternalMavenSession session = ((DefaultProject) project).getSession();
-        Collection<Artifact> attached = map(
+        Collection<ProducedArtifact> attached = map(
                 getMavenProject(project).getAttachedArtifacts(),
-                a -> session.getArtifact(RepositoryUtils.toArtifact(a)));
+                a -> session.getArtifact(ProducedArtifact.class, RepositoryUtils.toArtifact(a)));
         return Collections.unmodifiableCollection(attached);
     }
 
     @Override
-    public Collection<Artifact> getAllArtifacts(Project project) {
-        ArrayList<Artifact> result = new ArrayList<>(2);
+    public Collection<ProducedArtifact> getAllArtifacts(Project project) {
+        ArrayList<ProducedArtifact> result = new ArrayList<>(2);
         result.addAll(project.getArtifacts());
         result.addAll(getAttachedArtifacts(project));
         return Collections.unmodifiableCollection(result);
     }
 
     @Override
-    public void attachArtifact(Project project, Artifact artifact, Path path) {
+    public void attachArtifact(Project project, ProducedArtifact artifact, Path path) {
         getMavenProject(project)
                 .addAttachedArtifact(RepositoryUtils.toArtifact(
                         ((DefaultProject) project).getSession().toArtifact(artifact)));
