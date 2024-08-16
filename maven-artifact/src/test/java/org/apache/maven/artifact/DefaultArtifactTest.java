@@ -18,13 +18,19 @@
  */
 package org.apache.maven.artifact;
 
+import java.util.stream.Stream;
+
 import org.apache.maven.artifact.handler.ArtifactHandlerMock;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DefaultArtifactTest {
@@ -151,5 +157,32 @@ class DefaultArtifactTest {
         DefaultArtifact nullVersionArtifact =
                 new DefaultArtifact(groupId, artifactId, vr, scope, type, null, artifactHandler);
         assertEquals(artifact, nullVersionArtifact);
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidMavenCoordinates")
+    void testIllegalCoordinatesInConstructor(String groupId, String artifactId, String version) {
+        assertThrows(
+                InvalidArtifactRTException.class,
+                () -> new DefaultArtifact(
+                        groupId, artifactId, version, scope, type, classifier, artifactHandler, false));
+        if (version == null) {
+            assertThrows(
+                    InvalidArtifactRTException.class,
+                    () -> new DefaultArtifact(
+                            groupId, artifactId, (VersionRange) null, scope, type, classifier, artifactHandler, false));
+        }
+    }
+
+    static Stream<Arguments> invalidMavenCoordinates() {
+        return Stream.of(
+                Arguments.of(null, null, null),
+                Arguments.of("", "", ""),
+                Arguments.of(null, "artifactId", "1.0"),
+                Arguments.of("", "artifactId", "1.0"),
+                Arguments.of("groupId", null, "1.0"),
+                Arguments.of("groupId", "", "1.0"),
+                Arguments.of("groupId", "artifactId", null),
+                Arguments.of("groupId", "artifactId", ""));
     }
 }

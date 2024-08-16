@@ -32,12 +32,14 @@ public class InputLocation implements Serializable, InputLocationTracker {
     private final int columnNumber;
     private final InputSource source;
     private final Map<Object, InputLocation> locations;
+    private final InputLocation importedFrom;
 
     public InputLocation(InputSource source) {
         this.lineNumber = -1;
         this.columnNumber = -1;
         this.source = source;
         this.locations = Collections.singletonMap(0, this);
+        this.importedFrom = null;
     }
 
     public InputLocation(int lineNumber, int columnNumber) {
@@ -54,6 +56,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.source = source;
         this.locations =
                 selfLocationKey != null ? Collections.singletonMap(selfLocationKey, this) : Collections.emptyMap();
+        this.importedFrom = null;
     }
 
     public InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
@@ -61,6 +64,15 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.columnNumber = columnNumber;
         this.source = source;
         this.locations = ImmutableCollections.copy(locations);
+        this.importedFrom = null;
+    }
+
+    public InputLocation(InputLocation original) {
+        this.lineNumber = original.lineNumber;
+        this.columnNumber = original.columnNumber;
+        this.source = original.source;
+        this.locations = original.locations;
+        this.importedFrom = original.importedFrom;
     }
 
     public int getLineNumber() {
@@ -81,6 +93,17 @@ public class InputLocation implements Serializable, InputLocationTracker {
 
     public Map<Object, InputLocation> getLocations() {
         return locations;
+    }
+
+    /**
+     * Gets the parent InputLocation where this InputLocation may have been imported from.
+     * Can return {@code null}.
+     *
+     * @return InputLocation
+     * @since 4.0.0
+     */
+    public InputLocation getImportedFrom() {
+        return importedFrom;
     }
 
     /**
@@ -168,5 +191,10 @@ public class InputLocation implements Serializable, InputLocationTracker {
          * Method toString.
          */
         String toString(InputLocation location);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s @ %d:%d", source.getLocation(), lineNumber, columnNumber);
     }
 }

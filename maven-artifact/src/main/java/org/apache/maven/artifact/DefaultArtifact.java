@@ -19,7 +19,12 @@
 package org.apache.maven.artifact;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -90,6 +95,7 @@ public class DefaultArtifact implements Artifact {
                 false);
     }
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultArtifact(
             String groupId,
             String artifactId,
@@ -162,22 +168,22 @@ public class DefaultArtifact implements Artifact {
                     groupId, artifactId, getVersion(), type, "The groupId cannot be empty.");
         }
 
-        if (artifactId == null) {
+        if (empty(artifactId)) {
             throw new InvalidArtifactRTException(
                     groupId, artifactId, getVersion(), type, "The artifactId cannot be empty.");
         }
 
-        if (type == null) {
+        if (empty(type)) {
             throw new InvalidArtifactRTException(groupId, artifactId, getVersion(), type, "The type cannot be empty.");
         }
 
-        if ((version == null) && (versionRange == null)) {
+        if ((empty(version)) && (versionRange == null)) {
             throw new InvalidArtifactRTException(
                     groupId, artifactId, getVersion(), type, "The version cannot be empty.");
         }
     }
 
-    private boolean empty(String value) {
+    public static boolean empty(String value) {
         return (value == null) || (value.trim().length() < 1);
     }
 

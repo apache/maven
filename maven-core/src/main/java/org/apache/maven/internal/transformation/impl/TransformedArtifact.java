@@ -52,6 +52,7 @@ class TransformedArtifact extends DefaultArtifact {
     private final RepositorySystemSession session;
     private final AtomicReference<String> sourceState;
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     TransformedArtifact(
             DefaultConsumerPomArtifactTransformer defaultConsumerPomArtifactTransformer,
             MavenProject project,

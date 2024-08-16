@@ -78,7 +78,25 @@ import org.apache.maven.api.services.ModelTransformerException;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.VersionParserException;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.DependencyManagementImporter;
+import org.apache.maven.api.services.model.DependencyManagementInjector;
+import org.apache.maven.api.services.model.InheritanceAssembler;
+import org.apache.maven.api.services.model.LifecycleBindingsInjector;
+import org.apache.maven.api.services.model.ModelBuildingEvent;
+import org.apache.maven.api.services.model.ModelBuildingListener;
+import org.apache.maven.api.services.model.ModelInterpolator;
+import org.apache.maven.api.services.model.ModelNormalizer;
+import org.apache.maven.api.services.model.ModelPathTranslator;
+import org.apache.maven.api.services.model.ModelProcessor;
+import org.apache.maven.api.services.model.ModelUrlNormalizer;
+import org.apache.maven.api.services.model.ModelValidator;
+import org.apache.maven.api.services.model.ModelVersionParser;
+import org.apache.maven.api.services.model.PluginConfigurationExpander;
+import org.apache.maven.api.services.model.PluginManagementInjector;
+import org.apache.maven.api.services.model.ProfileActivationContext;
+import org.apache.maven.api.services.model.ProfileInjector;
+import org.apache.maven.api.services.model.ProfileSelector;
+import org.apache.maven.api.services.model.WorkspaceModelResolver;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.internal.impl.resolver.DefaultModelCache;
@@ -1270,12 +1288,18 @@ public class DefaultModelBuilder implements ModelBuilder {
             // Dependency excluded from import.
             List<Dependency> dependencies = importMgmt.getDependencies().stream()
                     .filter(candidate -> exclusions.stream().noneMatch(exclusion -> match(exclusion, candidate)))
-                    .map(candidate -> candidate.withExclusions(exclusions))
+                    .map(candidate -> addExclusions(candidate, exclusions))
                     .collect(Collectors.toList());
             importMgmt = importMgmt.withDependencies(dependencies);
         }
 
         return importMgmt;
+    }
+
+    private static org.apache.maven.api.model.Dependency addExclusions(
+            org.apache.maven.api.model.Dependency candidate, List<Exclusion> exclusions) {
+        return candidate.withExclusions(Stream.concat(candidate.getExclusions().stream(), exclusions.stream())
+                .toList());
     }
 
     private boolean match(Exclusion exclusion, Dependency candidate) {

@@ -409,7 +409,7 @@ under the License.
         <field xdoc.separator="blank">
           <name>requirements</name>
           <version>1.0.0/1.1.0</version>
-          <description></description>
+          <description>Use Maven 4 Dependency Injection (for v4 plugins) or JSR 330 annotations (for v3 plugins) to inject dependencies instead.</description>
           <association>
             <type>Requirement</type>
             <multiplicity>*</multiplicity>
@@ -535,20 +535,17 @@ under the License.
         <field>
           <name>role</name>
           <required>true</required>
-          <version>1.0.0+</version>
           <type>String</type>
           <description></description>
         </field>
         <field xml.tagName="role-hint">
           <name>roleHint</name>
-          <version>1.0.0+</version>
           <type>String</type>
           <description></description>
         </field>
         <field xml.tagName="field-name">
           <name>fieldName</name>
           <required>true</required>
-          <version>1.0.0+</version>
           <type>String</type>
           <description>The field name which has this requirement.</description>
         </field>

@@ -130,7 +130,7 @@ public class CLIManager {
 
     protected Options options;
 
-    @SuppressWarnings("checkstyle:linelength")
+    @SuppressWarnings("checkstyle:MethodLength")
     public CLIManager() {
         options = new Options();
         options.addOption(Option.builder(Character.toString(HELP))

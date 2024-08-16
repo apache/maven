@@ -24,7 +24,7 @@ under the License.
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
     <!-- when upgrading parent, also upgrade maven-bom's parent -->
-    <version>42</version>
+    <version>43</version>
     <relativePath />
   </parent>
 
@@ -161,30 +161,31 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2024-05-22T14:07:09Z</project.build.outputTimestamp>
     <!-- various versions -->
+    <assertjVersion>3.26.3</assertjVersion>
     <asmVersion>9.7</asmVersion>
-    <byteBuddyVersion>1.14.18</byteBuddyVersion>
+    <byteBuddyVersion>1.14.19</byteBuddyVersion>
     <cipherVersion>2.0</cipherVersion>
     <classWorldsVersion>2.8.0</classWorldsVersion>
-    <commonsCliVersion>1.8.0</commonsCliVersion>
+    <commonsCliVersion>1.9.0</commonsCliVersion>
     <guiceVersion>6.0.0</guiceVersion>
     <guavaVersion>33.2.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
-    <hamcrestVersion>2.2</hamcrestVersion>
+    <hamcrestVersion>3.0</hamcrestVersion>
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
-    <jlineVersion>3.26.2</jlineVersion>
-    <junitVersion>5.10.3</junitVersion>
+    <jlineVersion>3.26.3</jlineVersion>
+    <junitVersion>5.11.0</junitVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <logbackClassicVersion>1.5.6</logbackClassicVersion>
+    <logbackClassicVersion>1.5.7</logbackClassicVersion>
     <mockitoVersion>5.12.0</mockitoVersion>
     <plexusInteractivityVersion>1.3</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.27</plexusInterpolationVersion>
     <plexusTestingVersion>1.4.0</plexusTestingVersion>
     <plexusXmlVersion>4.0.4</plexusXmlVersion>
-    <resolverVersion>2.0.0</resolverVersion>
+    <resolverVersion>2.0.1</resolverVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <sisuVersion>0.9.0.M3</sisuVersion>
-    <slf4jVersion>2.0.13</slf4jVersion>
+    <slf4jVersion>2.0.16</slf4jVersion>
     <stax2ApiVersion>4.2.2</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <woodstoxVersion>7.0.0</woodstoxVersion>
@@ -607,6 +608,11 @@ under the License.
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertjVersion}</version>
+      </dependency>
+      <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-testing</artifactId>
         <version>${plexusTestingVersion}</version>
@@ -663,8 +669,6 @@ under the License.
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
-          <!-- TODO: Remove with parent 43 -->
-          <version>2.4.0</version>
           <configuration>
             <licenseText>Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -698,7 +702,7 @@ under the License.</licenseText>
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
           <artifactId>japicmp-maven-plugin</artifactId>
-          <version>0.21.2</version>
+          <version>0.22.0</version>
           <executions>
             <execution>
               <goals>

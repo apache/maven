@@ -31,7 +31,11 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.api.services.xml.*;
+import org.apache.maven.api.services.xml.PluginXmlFactory;
+import org.apache.maven.api.services.xml.XmlReaderException;
+import org.apache.maven.api.services.xml.XmlReaderRequest;
+import org.apache.maven.api.services.xml.XmlWriterException;
+import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxWriter;
 

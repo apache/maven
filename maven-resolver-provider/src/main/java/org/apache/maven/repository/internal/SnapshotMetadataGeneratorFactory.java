@@ -45,7 +45,6 @@ public class SnapshotMetadataGeneratorFactory implements MetadataGeneratorFactor
         return new RemoteSnapshotMetadataGenerator(session, request);
     }
 
-    @SuppressWarnings("checkstyle:magicnumber")
     @Override
     public float getPriority() {
         return 30; // GAV level metadata should be deployed 1st MD

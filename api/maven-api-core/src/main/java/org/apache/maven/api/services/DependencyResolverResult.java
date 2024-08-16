@@ -18,12 +18,15 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.IOException;
+import java.lang.module.ModuleDescriptor;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.Dependency;
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathType;
@@ -99,6 +102,38 @@ public interface DependencyResolverResult {
      */
     @Nonnull
     Map<Dependency, Path> getDependencies();
+
+    /**
+     * Returns the Java module name of the dependency at the given path.
+     * The given dependency should be one of the paths returned by {@link #getDependencies()}.
+     * The module name is extracted from the {@code module-info.class} file if present, otherwise from
+     * the {@code "Automatic-Module-Name"} attribute of the {@code META-INF/MANIFEST.MF} file if present.
+     *
+     * <p>A typical usage is to invoke this method for all dependencies having a
+     * {@link DependencyScope#TEST TEST} or {@link DependencyScope#TEST_ONLY TEST_ONLY}
+     * {@linkplain Dependency#getScope() scope}. An {@code --add-reads} option may need
+     * to be generated for compiling and running the test classes that use such dependencies.</p>
+     *
+     * @param dependency path to the dependency for which to get the module name
+     * @return module name of the dependency at the given path, or empty if the dependency is not modular
+     * @throws IOException if the module information of the specified dependency cannot be read
+     */
+    Optional<String> getModuleName(@Nonnull Path dependency) throws IOException;
+
+    /**
+     * Returns the Java module descriptor of the dependency at the given path.
+     * The given dependency should be one of the paths returned by {@link #getDependencies()}.
+     * The module descriptor is extracted from the {@code module-info.class} file if present.
+     *
+     * <p>{@link #getModuleName(Path)} is preferred when only the module name is desired,
+     * because a name may be present even if the descriptor is absent. This method is for
+     * cases when more information is desired, such as the set of exported packages.</p>
+     *
+     * @param dependency path to the dependency for which to get the module name
+     * @return module name of the dependency at the given path, or empty if the dependency is not modular
+     * @throws IOException if the module information of the specified dependency cannot be read
+     */
+    Optional<ModuleDescriptor> getModuleDescriptor(@Nonnull Path dependency) throws IOException;
 
     /**
      * If the module-path contains at least one filename-based auto-module, prepares a warning message.

@@ -25,6 +25,8 @@ import javax.inject.Singleton;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
@@ -234,8 +236,13 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             throw new PluginResolutionException(
                     plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
         } catch (DependencyResolutionException e) {
-            throw new PluginResolutionException(
-                    plugin, e.getResult().getCollectExceptions(), logger.isDebugEnabled() ? e : null);
+            List<Exception> exceptions = Stream.concat(
+                            e.getResult().getCollectExceptions().stream(),
+                            e.getResult().getArtifactResults().stream()
+                                    .filter(r -> !r.isResolved())
+                                    .flatMap(r -> r.getExceptions().stream()))
+                    .collect(Collectors.toList());
+            throw new PluginResolutionException(plugin, exceptions, logger.isDebugEnabled() ? e : null);
         }
     }
 }

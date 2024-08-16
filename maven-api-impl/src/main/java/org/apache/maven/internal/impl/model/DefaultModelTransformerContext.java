@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelTransformerContext;
-import org.apache.maven.api.services.model.*;
+import org.apache.maven.api.services.model.ModelProcessor;
 
 /**
  *

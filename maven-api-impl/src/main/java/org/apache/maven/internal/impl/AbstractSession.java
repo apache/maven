@@ -60,10 +60,35 @@ import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Repository;
-import org.apache.maven.api.services.*;
+import org.apache.maven.api.services.ArtifactCoordinateFactory;
+import org.apache.maven.api.services.ArtifactDeployer;
+import org.apache.maven.api.services.ArtifactDeployerException;
+import org.apache.maven.api.services.ArtifactFactory;
+import org.apache.maven.api.services.ArtifactInstaller;
+import org.apache.maven.api.services.ArtifactInstallerException;
+import org.apache.maven.api.services.ArtifactManager;
+import org.apache.maven.api.services.ArtifactResolver;
+import org.apache.maven.api.services.ArtifactResolverException;
+import org.apache.maven.api.services.DependencyCoordinateFactory;
+import org.apache.maven.api.services.DependencyResolver;
+import org.apache.maven.api.services.DependencyResolverException;
+import org.apache.maven.api.services.DependencyResolverRequest;
+import org.apache.maven.api.services.LanguageRegistry;
+import org.apache.maven.api.services.LocalRepositoryManager;
+import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.LookupException;
+import org.apache.maven.api.services.PackagingRegistry;
+import org.apache.maven.api.services.PathScopeRegistry;
+import org.apache.maven.api.services.ProjectScopeRegistry;
+import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.TypeRegistry;
+import org.apache.maven.api.services.VersionParser;
+import org.apache.maven.api.services.VersionRangeResolver;
+import org.apache.maven.api.services.VersionResolver;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.ArtifactType;
 
 import static org.apache.maven.internal.impl.Utils.map;
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -257,28 +282,33 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Nonnull
+    @Override
     public RepositorySystemSession getSession() {
         return session;
     }
 
     @Nonnull
+    @Override
     public RepositorySystem getRepositorySystem() {
         return repositorySystem;
     }
 
+    @Override
     public org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency, boolean managed) {
         org.eclipse.aether.graph.Dependency dep;
-        if (dependency instanceof DefaultDependencyCoordinate) {
-            dep = ((DefaultDependencyCoordinate) dependency).getDependency();
+        if (dependency instanceof AetherDependencyWrapper wrapper) {
+            dep = wrapper.dependency;
         } else {
+            Type type = dependency.getType();
             dep = new org.eclipse.aether.graph.Dependency(
                     new org.eclipse.aether.artifact.DefaultArtifact(
                             dependency.getGroupId(),
                             dependency.getArtifactId(),
                             dependency.getClassifier(),
-                            dependency.getType().getExtension(),
+                            type.getExtension(),
                             dependency.getVersion().toString(),
-                            null),
+                            Map.of("type", type.id()),
+                            (ArtifactType) null),
                     dependency.getScope().id(),
                     dependency.getOptional(),
                     map(dependency.getExclusions(), this::toExclusion));

@@ -19,6 +19,7 @@
 package org.apache.maven.internal.impl;
 
 import java.io.IOException;
+import java.lang.module.ModuleDescriptor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -154,7 +155,7 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
      * @param test the test output directory, or {@code null} if none
      * @throws IOException if an error occurred while reading module information
      *
-     * TODO: this is currently not called
+     * TODO: this is currently not called. This is intended for use by Surefire and may move there.
      */
     void addOutputDirectory(Path main, Path test) throws IOException {
         if (outputModules != null) {
@@ -169,8 +170,9 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
         if (test != null) {
             boolean addToClasspath = true;
             PathModularization testModules = cache.getModuleInfo(test);
-            boolean isModuleHierarchy = outputModules.isModuleHierarchy() || testModules.isModuleHierarchy();
-            for (String moduleName : outputModules.getModuleNames().values()) {
+            boolean isModuleHierarchy = outputModules.isModuleHierarchy || testModules.isModuleHierarchy;
+            for (Object value : outputModules.descriptors.values()) {
+                String moduleName = name(value);
                 Path subdir = test;
                 if (isModuleHierarchy) {
                     // If module hierarchy is used, the directory names shall be the module names.
@@ -189,8 +191,8 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
              * If the test output directory provides some modules of its own, add them.
              * Except for this unusual case, tests should never be added to the module-path.
              */
-            for (Map.Entry<Path, String> entry : testModules.getModuleNames().entrySet()) {
-                if (!outputModules.containsModule(entry.getValue())) {
+            for (Map.Entry<Path, Object> entry : testModules.descriptors.entrySet()) {
+                if (!outputModules.containsModule(name(entry.getValue()))) {
                     addPathElement(JavaPathType.MODULES, entry.getKey());
                     addToClasspath = false;
                 }
@@ -246,9 +248,9 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
                 outputModules = PathModularization.NONE;
             }
             PathType type = null;
-            for (Map.Entry<Path, String> info :
-                    cache.getModuleInfo(path).getModuleNames().entrySet()) {
-                String moduleName = info.getValue();
+            for (Map.Entry<Path, Object> info :
+                    cache.getModuleInfo(path).descriptors.entrySet()) {
+                String moduleName = name(info.getValue());
                 type = JavaPathType.patchModule(moduleName);
                 if (!containsModule(moduleName)) {
                     /*
@@ -269,9 +271,9 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
             if (type == null) {
                 Path main = findArtifactPath(dep.getGroupId(), dep.getArtifactId());
                 if (main != null) {
-                    for (Map.Entry<Path, String> info :
-                            cache.getModuleInfo(main).getModuleNames().entrySet()) {
-                        type = JavaPathType.patchModule(info.getValue());
+                    for (Map.Entry<Path, Object> info :
+                            cache.getModuleInfo(main).descriptors.entrySet()) {
+                        type = JavaPathType.patchModule(name(info.getValue()));
                         addPathElement(type, info.getKey());
                         // There is usually no more than one element, but nevertheless allow multi-modules.
                     }
@@ -358,6 +360,31 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
     @Override
     public Map<Dependency, Path> getDependencies() {
         return dependencies;
+    }
+
+    @Override
+    public Optional<ModuleDescriptor> getModuleDescriptor(Path dependency) throws IOException {
+        Object value = cache.getModuleInfo(dependency).descriptors.get(dependency);
+        return (value instanceof ModuleDescriptor) ? Optional.of((ModuleDescriptor) value) : Optional.empty();
+    }
+
+    @Override
+    public Optional<String> getModuleName(Path dependency) throws IOException {
+        return Optional.ofNullable(
+                name(cache.getModuleInfo(dependency).descriptors.get(dependency)));
+    }
+
+    /**
+     * Returns the module name for the given value of the {@link PathModularization#descriptors} map.
+     */
+    private static String name(final Object value) {
+        if (value instanceof String) {
+            return (String) value;
+        } else if (value instanceof ModuleDescriptor) {
+            return ((ModuleDescriptor) value).name();
+        } else {
+            return null;
+        }
     }
 
     @Override

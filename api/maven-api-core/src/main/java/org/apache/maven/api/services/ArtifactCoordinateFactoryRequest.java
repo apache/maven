@@ -177,6 +177,7 @@ public interface ArtifactCoordinateFactoryRequest {
             private final String type;
             private final String coordinateString;
 
+            @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultArtifactFactoryRequestArtifact(
                     @Nonnull Session session,
                     String groupId,

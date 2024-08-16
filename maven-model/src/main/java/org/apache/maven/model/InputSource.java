@@ -50,6 +50,14 @@ public class InputSource implements java.io.Serializable, Cloneable {
      */
     private String location;
 
+    /**
+     *
+     *
+     *             The location of the POM from which this POM was
+     * imported from or {@code null} if unknown.
+     */
+    private InputLocation importedFrom;
+
     // ----------------/
     // - Constructors -/
     // ----------------/
@@ -59,6 +67,7 @@ public class InputSource implements java.io.Serializable, Cloneable {
     public InputSource(org.apache.maven.api.model.InputSource source) {
         this.modelId = source.getModelId();
         this.location = source.getLocation();
+        this.importedFrom = source.getImportedFrom() != null ? new InputLocation(source.getImportedFrom()) : null;
     }
 
     // -----------/
@@ -118,6 +127,24 @@ public class InputSource implements java.io.Serializable, Cloneable {
     public void setModelId(String modelId) {
         this.modelId = modelId;
     } // -- void setModelId( String )
+
+    /**
+     * Get the location of the POM from which this POM was
+     *
+     * @return
+     */
+    public InputLocation getImportedFrom() {
+        return importedFrom;
+    }
+
+    /**
+     * Set the location of the POM from which this POM was imported from.
+     *
+     * @param importedFrom
+     */
+    public void setImportedFrom(InputLocation importedFrom) {
+        this.importedFrom = importedFrom;
+    }
 
     @Override
     public String toString() {
