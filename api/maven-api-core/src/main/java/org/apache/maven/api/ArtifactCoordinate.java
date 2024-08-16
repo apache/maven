@@ -54,7 +54,7 @@ public interface ArtifactCoordinate {
 
     /**
      * {@return the specific version, range of versions or meta-version of the artifact}.
-     * A meta-version is a version suffixed with {@code LATEST}, {@code RELEASE} or {@code SNAPSHOT} keyword.
+     * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
      */
     @Nonnull
     VersionConstraint getVersionConstraint();

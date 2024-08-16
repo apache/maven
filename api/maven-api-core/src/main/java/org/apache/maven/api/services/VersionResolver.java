@@ -35,8 +35,8 @@ import org.apache.maven.api.annotations.Nonnull;
 public interface VersionResolver extends Service {
 
     /**
-     * Resolves an artifact's meta version (if any) to a concrete version. For example, resolves "1.0-SNAPSHOT"
-     * to "1.0-20090208.132618-23" or "RELEASE"/"LATEST" to "2.0".
+     * Resolves an artifact's meta version (if any) to a concrete version.
+     * For example, resolves "1.0-SNAPSHOT" to "1.0-20090208.132618-23".
      *
      * @param session The repository session, must not be {@code null}.
      * @param artifactCoordinate The artifact coordinate for which the version needs to be resolved, must not be {@code null}
@@ -50,8 +50,8 @@ public interface VersionResolver extends Service {
     }
 
     /**
-     * Resolves an artifact's meta version (if any) to a concrete version. For example, resolves "1.0-SNAPSHOT"
-     * to "1.0-20090208.132618-23" or "RELEASE"/"LATEST" to "2.0".
+     * Resolves an artifact's meta version (if any) to a concrete version.
+     * For example, resolves "1.0-SNAPSHOT" to "1.0-20090208.132618-23".
      *
      * @param request The version request, must not be {@code null}.
      * @return The version result, never {@code null}.
