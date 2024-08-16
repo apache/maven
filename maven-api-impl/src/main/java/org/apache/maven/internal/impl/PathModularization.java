@@ -70,23 +70,24 @@ class PathModularization {
      * It may however contain more than one entry if module hierarchy was detected,
      * in which case there is one key per sub-directory.
      *
+     * <p>Values are instances of either {@link ModuleDescriptor} or {@link String}.
+     * The latter case happens when a JAR file has no {@code module-info.class} entry
+     * but has an automatic name declared in {@code META-INF/MANIFEST.MF}.</p>
+     *
      * <p>This map may contain null values if the constructor was invoked with {@code resolve}
      * parameter set to false. This is more efficient when only the module existence needs to
      * be tested, and module descriptors are not needed.</p>
-     *
-     * @see #getModuleNames()
      */
-    private final Map<Path, String> descriptors;
+    @Nonnull
+    final Map<Path, Object> descriptors;
 
     /**
      * Whether module hierarchy was detected. If false, then package hierarchy is assumed.
      * In a package hierarchy, the {@linkplain #descriptors} map has either zero or one entry.
      * In a module hierarchy, the descriptors map may have an arbitrary number of entries,
      * including one (so the map size cannot be used as a criterion).
-     *
-     * @see #isModuleHierarchy()
      */
-    private final boolean isModuleHierarchy;
+    final boolean isModuleHierarchy;
 
     /**
      * Constructs an empty instance for non-modular dependencies.
@@ -144,13 +145,13 @@ class PathModularization {
              */
             Path file = path.resolve(MODULE_INFO);
             if (Files.isRegularFile(file)) {
-                String name = null;
+                ModuleDescriptor descriptor = null;
                 if (resolve) {
                     try (InputStream in = Files.newInputStream(file)) {
-                        name = getModuleName(in);
+                        descriptor = ModuleDescriptor.read(in);
                     }
                 }
-                descriptors = Collections.singletonMap(file, name);
+                descriptors = Collections.singletonMap(file, descriptor);
                 isModuleHierarchy = false;
                 return;
             }
@@ -160,27 +161,27 @@ class PathModularization {
              * source files.
              */
             if (Files.isDirectory(file)) {
-                Map<Path, String> names = new HashMap<>();
+                var multi = new HashMap<Path, ModuleDescriptor>();
                 try (Stream<Path> subdirs = Files.list(file)) {
                     subdirs.filter(Files::isDirectory).forEach((subdir) -> {
                         Path mf = subdir.resolve(MODULE_INFO);
                         if (Files.isRegularFile(mf)) {
-                            String name = null;
+                            ModuleDescriptor descriptor = null;
                             if (resolve) {
                                 try (InputStream in = Files.newInputStream(mf)) {
-                                    name = getModuleName(in);
+                                    descriptor = ModuleDescriptor.read(in);
                                 } catch (IOException e) {
                                     throw new UncheckedIOException(e);
                                 }
                             }
-                            names.put(mf, name);
+                            multi.put(mf, descriptor);
                         }
                     });
                 } catch (UncheckedIOException e) {
                     throw e.getCause();
                 }
-                if (!names.isEmpty()) {
-                    descriptors = Collections.unmodifiableMap(names);
+                if (!multi.isEmpty()) {
+                    descriptors = Collections.unmodifiableMap(multi);
                     isModuleHierarchy = true;
                     return;
                 }
@@ -194,13 +195,13 @@ class PathModularization {
             try (JarFile jar = new JarFile(path.toFile())) {
                 ZipEntry entry = jar.getEntry(MODULE_INFO);
                 if (entry != null) {
-                    String name = null;
+                    ModuleDescriptor descriptor = null;
                     if (resolve) {
                         try (InputStream in = jar.getInputStream(entry)) {
-                            name = getModuleName(in);
+                            descriptor = ModuleDescriptor.read(in);
                         }
                     }
-                    descriptors = Collections.singletonMap(path, name);
+                    descriptors = Collections.singletonMap(path, descriptor);
                     isModuleHierarchy = false;
                     return;
                 }
@@ -209,7 +210,7 @@ class PathModularization {
                 if (mf != null) {
                     Object name = mf.getMainAttributes().get(AUTO_MODULE_NAME);
                     if (name instanceof String) {
-                        descriptors = Collections.singletonMap(path, (String) name);
+                        descriptors = Collections.singletonMap(path, name);
                         isModuleHierarchy = false;
                         return;
                     }
@@ -218,15 +219,6 @@ class PathModularization {
         }
         descriptors = Collections.emptyMap();
         isModuleHierarchy = false;
-    }
-
-    /**
-     * {@return the module name declared in the given {@code module-info} descriptor}.
-     * The input stream may be for a file or for an entry in a JAR file.
-     */
-    @Nonnull
-    private static String getModuleName(InputStream in) throws IOException {
-        return ModuleDescriptor.read(in).name();
     }
 
     /**
@@ -251,31 +243,6 @@ class PathModularization {
         if (descriptors.isEmpty()) {
             automodulesDetected.add(filename);
         }
-    }
-
-    /**
-     * {@return whether module hierarchy was detected}. If {@code false}, then package hierarchy is assumed.
-     * In a package hierarchy, the {@linkplain #getModuleNames()} map of modules has either zero or one entry.
-     * In a module hierarchy, the descriptors map may have an arbitrary number of entries,
-     * including one (so the map size cannot be used as a criterion).
-     */
-    public boolean isModuleHierarchy() {
-        return isModuleHierarchy;
-    }
-
-    /**
-     * {@return the module names for the path specified at construction time}.
-     * This map is usually either empty if no module was found, or a singleton map.
-     * It may however contain more than one entry if module hierarchy was detected,
-     * in which case there is one key per sub-directory.
-     *
-     * <p>This map may contain null values if the constructor was invoked with {@code resolve}
-     * parameter set to false. This is more efficient when only the module existence needs to
-     * be tested, and module descriptors are not needed.</p>
-     */
-    @Nonnull
-    public Map<Path, String> getModuleNames() {
-        return descriptors;
     }
 
     /**
