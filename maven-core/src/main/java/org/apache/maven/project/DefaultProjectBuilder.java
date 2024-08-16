@@ -92,7 +92,6 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.resolver.DefaultModelCache;
 import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
-import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource2;
@@ -177,8 +176,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     static ModelSource toSource(org.apache.maven.model.building.ModelSource modelSource) {
         if (modelSource instanceof FileModelSource fms) {
             return ModelSource.fromPath(fms.getPath());
-        } else if (modelSource instanceof ArtifactModelSource ams) {
-            return ModelSource.fromPath(ams.getPath(), ams.toString());
         } else {
             return new ModelSource() {
                 @Override
