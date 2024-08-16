@@ -613,8 +613,8 @@ public interface Session {
             @Nonnull Project project, @Nonnull PathScope scope, @Nonnull Collection<PathType> desiredTypes);
 
     /**
-     * Resolves an artifact's meta version (if any) to a concrete version. For example, resolves "1.0-SNAPSHOT"
-     * to "1.0-20090208.132618-23" or "RELEASE"/"LATEST" to "2.0".
+     * Resolves an artifact's meta version (if any) to a concrete version.
+     * For example, resolves "1.0-SNAPSHOT" to "1.0-20090208.132618-23".
      * <p>
      * Shortcut for {@code getService(VersionResolver.class).resolve(...)}
      *

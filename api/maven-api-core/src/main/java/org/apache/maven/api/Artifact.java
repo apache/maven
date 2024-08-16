@@ -73,8 +73,8 @@ public interface Artifact {
     /**
      * {@return the version of the artifact}. Contrarily to {@link ArtifactCoordinate},
      * each {@code Artifact} is associated to a specific version instead of a range of versions.
-     * If the {@linkplain #getBaseVersion() base version} contains a meta-version such as {@code LATEST},
-     * {@code RELEASE} or {@code SNAPSHOT}, those keywords are replaced by, for example, the actual timestamp.
+     * If the {@linkplain #getBaseVersion() base version} contains a meta-version such as {@code SNAPSHOT},
+     * those keywords are replaced by, for example, the actual timestamp.
      *
      * @see ArtifactCoordinate#getVersionConstraint()
      */
@@ -83,7 +83,7 @@ public interface Artifact {
 
     /**
      * {@return the version or meta-version of the artifact}.
-     * A meta-version is a version suffixed with {@code LATEST}, {@code RELEASE} or {@code SNAPSHOT} keyword.
+     * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
      * Meta-versions are represented in a base version by their symbols (e.g., {@code SNAPSHOT}),
      * while they are replaced by, for example, the actual timestamp in the {@linkplain #getVersion() version}.
      */
