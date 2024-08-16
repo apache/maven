@@ -433,7 +433,7 @@ under the License.
     <class xdoc.anchorName="parameter">
       <name>Parameter</name>
       <version>1.0.0+</version>
-      <description>A phase mapping definition.</description>
+      <description>A parameter description.</description>
       <!-- see o.a.m.plugin.descriptor.Parameter -->
       <fields>
         <field>
