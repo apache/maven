@@ -18,23 +18,10 @@
  */
 
 /**
- * Core Maven API.
- *
- * <h2>Definitions of terms</h2>
- * <p><dfn>Version resolution</dfn> is the process of finding, for a given artifact, a list of
- * versions that match the input {@linkplain org.apache.maven.api.VersionConstraint version constraint}
- * in the list of remote repositories. This is done either explicitly using the
- * {@link org.apache.maven.api.services.VersionResolver} service, or implicitly when resolving
- * an </p>
- *
- * <p><dfn>Artifact resolution</dfn> is the process of {@linkplain org.apache.maven.api.services.VersionResolver
- * resolving the version} and then downloading the file.</p>
- *
- * <p><dfn>Dependency resolution</dfn> is the process of collecting dependencies, flattening the graph,
- * and then downloading the files. The flattening phase removes branches of the graph so that only one artifact
- * per ({@code groupId}, {@code artifactId}) pair is present.</p>
+ * <h1>Core Maven API</h1>.
  *
  * <h2>Dependency management</h2>
+ *
  * <p>{@link org.apache.maven.api.ArtifactCoordinate} instances are used to locate artifacts in a repository.
  * Each instance is basically a pointer to a file in the Maven repository, except that the version may not be
  * defined precisely.</p>
@@ -58,5 +45,70 @@
  * <p>{@link org.apache.maven.api.Node} is the main output of the <dfn>dependency collection</dfn> process.
  * it's the graph of dependencies. The above-cited {@code Dependency} instances are the outputs of the
  * collection process, part of the graph computed from one or more {@code DependencyCoordinate}s.</p>
+ *
+ * <p>{@link org.apache.maven.api.DependencyScope} defines when/how a given dependency will be used by the
+ * project.  This includes compile-time only, runtime, test time and various other combinations.</p>
+ *
+ * <h2>Resolution</h2>
+ *
+ * <p><dfn>Version resolution</dfn> is the process of finding, for a given artifact, a list of
+ * versions that match the input {@linkplain org.apache.maven.api.VersionConstraint version constraint}
+ * in the list of remote repositories. This is done either explicitly using the
+ * {@link org.apache.maven.api.services.VersionResolver VersionResolver} service, or implicitly when resolving
+ * an artifact.</p>
+ *
+ * <p><dfn>Artifact resolution</dfn> is the process of {@linkplain org.apache.maven.api.services.VersionResolver
+ * resolving the version} and then downloading the file.</p>
+ *
+ * <p><dfn>Dependency collection</dfn> builds a graph of {@link org.apache.maven.api.Node} objects representing
+ * all the dependencies.</p>
+ *
+ * <p>The <dfn>Dependency graph flattening</dfn> process in Maven involves reducing a complex,
+ * multi-level dependency graph to a simpler list where only the most relevant version of each artifact
+ * (based on groupId and artifactId) is retained, resolving conflicts and eliminating duplicates to ensure
+ * that each dependency is included only once in the final build.</p>
+ *
+ * <p><dfn>Dependency resolution</dfn> is the process of collecting dependencies, flattening the result graph,
+ * and then resolving the artifacts.</p>
+ *
+ * <h2>Repositories</h2>
+ * <p>In Maven, <dfn>{@linkplain org.apache.maven.api.Repository repositories}</dfn> are locations where project artifacts (such as JAR files, POM files, and other
+ * resources) are stored and retrieved. There are two primary types of repositories:<ul>
+ *     <li><dfn>{@linkplain org.apache.maven.api.LocalRepository local repository}</dfn>: A directory on the developer's machine where Maven caches
+ *     downloaded artifacts.</li>
+ *     <li><dfn>{@linkplain org.apache.maven.api.RemoteRepository remote repository}</dfn>: A central or distributed location from which Maven can download artifacts
+ *     when they are not available locally.</li>
+ * </ul>
+ *
+ * <p>When resolving artifacts, Maven follows this order:<ol>
+ * <li>Check Local Repository: Maven first checks if the artifact is available in the local repository.</li>
+ * <li>Check Remote Repositories: If the artifact is not found locally, Maven queries the configured remote repositories in the order they are listed.</li>
+ * <li>Download and Cache: If Maven finds the artifact in a remote repository, it downloads it and stores it in the local repository for future use.</li>
+ * </ol></p>
+ * <p>By caching artifacts in the local repository, Maven minimizes the need to repeatedly download the same artifacts, thus optimizing the build process.</p>
+ *
+ * <h2>Projects</h2>
+ *
+ * <p>{@link org.apache.maven.api.Project} instances are loaded by Maven from the local
+ * file system (those projects are usually about to be built) or from the local repository
+ * (they are usually downloaded during dependency collection). Those projects are loaded
+ * from a Project Object Model (POM).</p>
+ *
+ * <p><dfn>Project Object Model</dfn> or <dfn>POM</dfn> refers to the information describing
+ * all the information needed to build or consume a project.  Those are usually loaded from
+ * a file named <tt>pom.xml</tt> and loaded into a {@link org.apache.maven.api.model.Model Model}
+ * instances.</p>
+ *
+ * <p><dfn>Project aggregation</dfn> allows building several projects together. This is only
+ * for projects that are built, hence available on the file system. One project,
+ * called the <dfn>aggregator project</dfn> will list one or more <dfn>modules</dfn>
+ * which are relative pointers on the file system to other projects.  This is done using
+ * the {@code /project/modules/module} elements of the POM in the aggregator project.
+ * Note that the aggregator project is required to have a {@code pom} packaging.</p>
+ *
+ * <p><dfn>Project inheritance</dfn> defines a parent-child relationship between projects.
+ * The <dfn>child project</dfn> will inherit all the information from the <dfn>parent project</dfn>
+ * POM.</p>
+ *
  */
 package org.apache.maven.api;

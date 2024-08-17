@@ -26,7 +26,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * Resolves the artifact, i.e download the file when required and attach it to the artifact
+ * Resolves the artifact, i.e. download the file when required and attach it to the artifact
  *
  * @since 4.0.0
  */
@@ -43,6 +43,8 @@ public interface ArtifactResolver extends Service {
     ArtifactResolverResult resolve(ArtifactResolverRequest request);
 
     /**
+     * Resolves several artifacts from their coordinates.
+     *
      * @param session {@link Session}
      * @param coordinates array of {@link ArtifactCoordinate}
      * @return {@link ArtifactResolverResult}
