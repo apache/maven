@@ -1684,7 +1684,6 @@ public class MavenCli {
         // and therefore are set in the session properties. System properties
         // are most dominant.
         // ----------------------------------------------------------------------
-
         Properties userSpecifiedProperties =
                 commandLine.getOptionProperties(String.valueOf(CLIManager.SET_USER_PROPERTY));
         userProperties.putAll(userSpecifiedProperties);
@@ -1709,15 +1708,6 @@ public class MavenCli {
         MavenPropertiesLoader.loadProperties(systemProperties, systemPropertiesFile, callback, false);
         Path userPropertiesFile = mavenConf.resolve("maven-user.properties");
         MavenPropertiesLoader.loadProperties(userProperties, userPropertiesFile, callback, false);
-
-        // ----------------------------------------------------------------------
-        // I'm leaving the setting of system properties here as not to break
-        // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
-        // ----------------------------------------------------------------------
-        Set<String> sys = SystemProperties.getSystemProperties().stringPropertyNames();
-        userProperties.stringPropertyNames().stream()
-                .filter(k -> !sys.contains(k))
-                .forEach(k -> System.setProperty(k, userProperties.getProperty(k)));
     }
 
     private static UnaryOperator<String> prefix(String prefix, UnaryOperator<String> cb) {
