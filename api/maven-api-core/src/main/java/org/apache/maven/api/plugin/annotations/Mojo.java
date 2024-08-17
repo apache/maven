@@ -77,7 +77,7 @@ public @interface Mojo {
 
     /**
      * if the Mojo uses the Maven project and its subprojects.
-     * @return uses the Maven project and its subprojectss
+     * @return uses the Maven project and its subprojects
      */
     boolean aggregator() default false;
 

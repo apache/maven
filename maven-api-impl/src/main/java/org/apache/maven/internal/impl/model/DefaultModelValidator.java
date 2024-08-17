@@ -406,7 +406,7 @@ public class DefaultModelValidator implements ModelValidator {
                     } else {
                         addViolation(
                                 problems,
-                                Severity.WARNING,
+                                Severity.ERROR,
                                 Version.V41,
                                 "modules",
                                 null,

@@ -121,7 +121,6 @@ import org.slf4j.LoggerFactory;
 public class DefaultProjectBuilder implements ProjectBuilder {
     public static final String BUILDER_PARALLELISM = "maven.projectBuilder.parallelism";
     public static final int DEFAULT_BUILDER_PARALLELISM = Runtime.getRuntime().availableProcessors() / 2 + 1;
-    private static final String POM_4_0_0 = "4.0.0";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ModelBuilder modelBuilder;
