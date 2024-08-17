@@ -1636,13 +1636,6 @@ public class MavenCli {
             String name = (String) e.getKey();
             String value = interpolator.interpolate((String) e.getValue());
             userProperties.setProperty(name, value);
-            // ----------------------------------------------------------------------
-            // I'm leaving the setting of system properties here as not to break
-            // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
-            // ----------------------------------------------------------------------
-            if (System.getProperty(name) == null) {
-                System.setProperty(name, value);
-            }
         }
     }
 
