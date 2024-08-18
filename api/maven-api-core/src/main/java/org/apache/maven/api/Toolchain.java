@@ -43,20 +43,19 @@ import org.apache.maven.api.annotations.Experimental;
  * </p>
  *
  * <p>
- * The following are key functionalities provided by the Toolchain interface: <ul>
+ * The following are key functionalities provided by the Toolchain interface:</p><ul>
  *   <li>Access to the type of the toolchain (e.g., JDK, compiler).</li>
  *   <li>Retrieval of the specific version of the toolchain.</li>
  *   <li>Configuration of toolchain properties to match the project's requirements.</li>
- * </ul></p>
+ * </ul>
  *
- * <p>
- * Example usage:
+ * <p>Example usage:</p>
  * <pre>
  * Toolchain toolchain = ...; // Obtain a Toolchain instance
  * String type = toolchain.getType(); // Get the type of the toolchain
  * String version = toolchain.getVersion(); // Get the version of the toolchain
  * </pre>
- * </p>
+ *
  *
  * @since 4.0.0
  * @see JavaToolchain

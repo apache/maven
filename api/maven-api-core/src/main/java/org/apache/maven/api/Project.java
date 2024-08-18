@@ -29,10 +29,10 @@ import org.apache.maven.api.model.Model;
 
 /**
  * Interface representing a Maven project which can be created using the
- * {@link org.apache.maven.api.services.ProjectBuilder} service.
+ * {@link org.apache.maven.api.services.ProjectBuilder ProjectBuilder} service.
  * Such objects are immutable and plugin that wish to modify such objects
- * need to do so using the {@link org.apache.maven.api.services.ProjectManager}
- * service.
+ * need to do so using the {@link org.apache.maven.api.services.ProjectManager
+ * ProjectManager} service.
  * <p>
  * Projects are created using the {@code ProjectBuilder} from a POM file
  * (usually named {@code pom.xml}) on the file system.

@@ -65,7 +65,7 @@ public interface Dependency extends Artifact {
     boolean isOptional();
 
     /**
-     * {@return coordinate with the same identifiers as this dependency}.
+     * {@return coordinate with the same identifiers as this dependency}
      */
     @Nonnull
     @Override
