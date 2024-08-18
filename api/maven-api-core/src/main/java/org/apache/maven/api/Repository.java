@@ -24,36 +24,20 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * <p>In Maven, repositories are locations where project artifacts (such as JAR files, POM files, and other
- * resources) are stored and retrieved. There are two primary types of repositories: local repositories and
- * remote repositories.</p>
+ * resources) are stored and retrieved. There are two primary types of repositories:
+ * {@linkplain LocalRepository local repositories} and
+ * {@linkplain RemoteRepository remote repositories}.</p>
  *
- * <h3>Local Repository</h3>
+ * <h2>Repository Resolution Process</h2>
  *
- *
- * <h3>Remote Repository</h3>
- *
- * <p>A <dfn>remote repository</dfn> is a central or distributed location
- * from which Maven can download project dependencies, plugins, and other
- * build artifacts. When Maven cannot find an artifact in the local
- * repository, it attempts to retrieve it from one or more remote
- * repositories.</p>
- *
- * <p>There are several types of remote repositories:<ul>
- * <li><dfn>Central Repository</dfn>: The default remote repository used by Maven. It is a large, publicly accessible repository maintained by the Maven community at https://repo.maven.apache.org/maven2. Most common Java libraries and frameworks are hosted here.</li>
- * <li><dfn>Private Remote Repository</dfn>: Organizations often maintain their own private remote repositories, which may host proprietary or custom-built artifacts that are not available in the central repository. These repositories can be managed using tools like Apache Archiva, Sonatype Nexus, or JFrog Artifactory.</li>
- * <li><dfn>Third-Party Repositories</dfn>: Some projects or organizations host their own remote repositories for distributing specific artifacts that are not available in the central repository. These repositories must be explicitly added to the Maven pom.xml or settings.xml files for Maven to access them.</li></ul>
- * </p>
- *
- * <h3>Repository Resolution Process</h3>
- *
- * <p>When resolving dependencies, Maven follows this order:<ol>
+ * <p>When resolving dependencies, Maven follows this order:</p><ol>
  * <li>Check Local Repository: Maven first checks if the artifact is available in the local repository.</li>
  * <li>Check Remote Repositories: If the artifact is not found locally, Maven queries the configured remote repositories in the order they are listed.</li>
  * <li>Download and Cache: If Maven finds the artifact in a remote repository, it downloads it and stores it in the local repository for future use.</li>
- * </ol></p>
+ * </ol>
  * <p>By caching artifacts in the local repository, Maven minimizes the need to repeatedly download the same artifacts, thus optimizing the build process.</p>
  *
- * <h3>Repository Configuration</h3>
+ * <h2>Repository Configuration</h2>
  *
  * <p>Repositories can be configured at various levels:<ol>
  * <li>POM: Repositories can be specified in the {@code pom.xml} file under the {@code <repositories>} and {@code <pluginRepositories>} sections.</li>

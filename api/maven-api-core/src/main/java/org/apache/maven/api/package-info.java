@@ -18,9 +18,9 @@
  */
 
 /**
- * <h1>Core Maven API</h1>.
+ * <h2>Maven Core API</h2>
  *
- * <h2>Dependency management</h2>
+ * <h3>Dependency management</h3>
  *
  * <p>{@link org.apache.maven.api.ArtifactCoordinate} instances are used to locate artifacts in a repository.
  * Each instance is basically a pointer to a file in the Maven repository, except that the version may not be
@@ -49,7 +49,7 @@
  * <p>{@link org.apache.maven.api.DependencyScope} defines when/how a given dependency will be used by the
  * project.  This includes compile-time only, runtime, test time and various other combinations.</p>
  *
- * <h2>Resolution</h2>
+ * <h3>Resolution</h3>
  *
  * <p><dfn>Version resolution</dfn> is the process of finding, for a given artifact, a list of
  * versions that match the input {@linkplain org.apache.maven.api.VersionConstraint version constraint}
@@ -71,7 +71,8 @@
  * <p><dfn>Dependency resolution</dfn> is the process of collecting dependencies, flattening the result graph,
  * and then resolving the artifacts.</p>
  *
- * <h2>Repositories</h2>
+ * <h3>Repositories</h3>
+ *
  * <p>In Maven, <dfn>{@linkplain org.apache.maven.api.Repository repositories}</dfn> are locations where project artifacts (such as JAR files, POM files, and other
  * resources) are stored and retrieved. There are two primary types of repositories:<ul>
  *     <li><dfn>{@linkplain org.apache.maven.api.LocalRepository local repository}</dfn>: A directory on the developer's machine where Maven caches
@@ -80,14 +81,14 @@
  *     when they are not available locally.</li>
  * </ul>
  *
- * <p>When resolving artifacts, Maven follows this order:<ol>
+ * <p>When resolving artifacts, Maven follows this order:</p><ol>
  * <li>Check Local Repository: Maven first checks if the artifact is available in the local repository.</li>
  * <li>Check Remote Repositories: If the artifact is not found locally, Maven queries the configured remote repositories in the order they are listed.</li>
  * <li>Download and Cache: If Maven finds the artifact in a remote repository, it downloads it and stores it in the local repository for future use.</li>
- * </ol></p>
+ * </ol>
  * <p>By caching artifacts in the local repository, Maven minimizes the need to repeatedly download the same artifacts, thus optimizing the build process.</p>
  *
- * <h2>Projects</h2>
+ * <h3>Projects</h3>
  *
  * <p>{@link org.apache.maven.api.Project} instances are loaded by Maven from the local
  * file system (those projects are usually about to be built) or from the local repository
@@ -96,7 +97,7 @@
  *
  * <p><dfn>Project Object Model</dfn> or <dfn>POM</dfn> refers to the information describing
  * all the information needed to build or consume a project.  Those are usually loaded from
- * a file named <tt>pom.xml</tt> and loaded into a {@link org.apache.maven.api.model.Model Model}
+ * a file named {@code pom.xml} and loaded into a {@link org.apache.maven.api.model.Model Model}
  * instances.</p>
  *
  * <p><dfn>Project aggregation</dfn> allows building several projects together. This is only
