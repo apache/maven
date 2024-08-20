@@ -476,7 +476,14 @@ public class DefaultModelValidator implements ModelValidator {
 
         validateStringNotEmpty("version", problems, Severity.ERROR, Version.BASE, m.getVersion(), m);
         if (hasExpression(m.getVersion())) {
-            addViolation(problems, Severity.ERROR, Version.BASE, "version", null, "must be a constant version but is '" + m.getVersion() + "'.", m);
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.BASE,
+                    "version",
+                    null,
+                    "must be a constant version but is '" + m.getVersion() + "'.",
+                    m);
         }
 
         Severity errOn30 = getSeverity(request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
