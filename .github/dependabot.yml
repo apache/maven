@@ -17,12 +17,21 @@
 version: 2
 updates:
 
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+
   - package-ecosystem: maven
     directory: "/"
     schedule:
-      interval: daily
+      interval: "daily"
+    target-branch: "maven-3.9.x"
+    labels:
+      - "mvn3"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+
