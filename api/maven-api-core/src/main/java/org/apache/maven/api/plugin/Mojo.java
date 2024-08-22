@@ -20,6 +20,7 @@ package org.apache.maven.api.plugin;
 
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.ThreadSafe;
 
 /**
  * This interface forms the contract required for Mojos to interact with the Maven infrastructure.
@@ -31,6 +32,7 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 @FunctionalInterface
 @Consumer
+@ThreadSafe
 public interface Mojo {
     /**
      * Perform whatever build-process behavior this {@code Mojo} implements.
