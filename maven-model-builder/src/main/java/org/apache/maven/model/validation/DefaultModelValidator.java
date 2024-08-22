@@ -691,6 +691,16 @@ public class DefaultModelValidator implements ModelValidator {
             validateBannedCharacters(
                     EMPTY, "version", problems, errOn31, Version.V20, m.getVersion(), null, m, ILLEGAL_VERSION_CHARS);
             validate20ProperSnapshotVersion("version", problems, errOn31, Version.V20, m.getVersion(), null, m);
+            if (hasExpression(m.getVersion())) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V20,
+                        "version",
+                        null,
+                        "must be a constant version but is '" + m.getVersion() + "'.",
+                        m);
+            }
 
             Build build = m.getBuild();
             if (build != null) {
