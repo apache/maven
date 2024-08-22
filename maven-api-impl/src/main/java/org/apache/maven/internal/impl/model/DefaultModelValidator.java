@@ -704,10 +704,8 @@ public class DefaultModelValidator implements ModelValidator {
             if (hasExpression(m.getVersion())) {
                 Severity versionExpressionSeverity = Severity.ERROR;
                 if (m.getProperties() != null
-                        && Boolean.parseBoolean(m.getProperties()
-                                .getOrDefault(
-                                        BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION,
-                                        Boolean.FALSE.toString()))) {
+                        && Boolean.parseBoolean(
+                                m.getProperties().get(BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION))) {
                     versionExpressionSeverity = Severity.WARNING;
                 }
                 addViolation(
