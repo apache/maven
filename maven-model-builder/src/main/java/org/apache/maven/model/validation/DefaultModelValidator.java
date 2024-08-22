@@ -510,8 +510,8 @@ public class DefaultModelValidator implements ModelValidator {
             validate20ProperSnapshotVersion("version", problems, errOn31, Version.V20, m.getVersion(), null, m);
             if (hasExpression(m.getVersion())) {
                 Severity versionExpressionSeverity = Severity.ERROR;
-                if (Boolean.parseBoolean(m.getProperties()
-                        .getProperty(BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION, Boolean.FALSE.toString()))) {
+                if (Boolean.parseBoolean(
+                        m.getProperties().getProperty(BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION))) {
                     versionExpressionSeverity = Severity.WARNING;
                 }
                 addViolation(
