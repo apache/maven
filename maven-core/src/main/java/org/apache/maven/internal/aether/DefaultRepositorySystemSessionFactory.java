@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -68,7 +69,6 @@ import org.eclipse.aether.util.graph.version.LowestVersionFilter;
 import org.eclipse.aether.util.graph.version.PredicateVersionFilter;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
-import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
@@ -89,66 +89,14 @@ import static java.util.Objects.requireNonNull;
 @Named
 @Singleton
 public class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFactory {
-    /**
-     * User property for version filters expression, a semicolon separated list of filters to apply. By default, no version
-     * filter is applied (like in Maven 3).
-     * <p>
-     * Supported filters:
-     * <ul>
-     *     <li>"h" or "h(num)" - highest version or top list of highest ones filter</li>
-     *     <li>"l" or "l(num)" - lowest version or bottom list of lowest ones filter</li>
-     *     <li>"s" - contextual snapshot filter</li>
-     *     <li>"e(G:A:V)" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li>
-     * </ul>
-     * Example filter expression: {@code "h(5);s;e(org.foo:bar:1)} will cause: ranges are filtered for "top 5" (instead
-     * full range), snapshots are banned if root project is not a snapshot, and if range for {@code org.foo:bar} is
-     * being processed, version 1 is omitted.
-     *
-     * @since 4.0.0
-     */
-    private static final String MAVEN_VERSION_FILTERS = "maven.versionFilters";
 
-    /**
-     * User property for chained LRM: list of "tail" local repository paths (separated by comma), to be used with
-     * {@link ChainedLocalRepositoryManager}.
-     * Default value: {@code null}, no chained LRM is used.
-     *
-     * @since 3.9.0
-     */
-    private static final String MAVEN_REPO_LOCAL_TAIL = "maven.repo.local.tail";
+    public static final String MAVEN_RESOLVER_TRANSPORT_DEFAULT = "default";
 
-    /**
-     * User property for reverse dependency tree. If enabled, Maven will record ".tracking" directory into local
-     * repository with "reverse dependency tree", essentially explaining WHY given artifact is present in local
-     * repository.
-     * Default: {@code false}, will not record anything.
-     *
-     * @since 3.9.0
-     */
-    private static final String MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE = "maven.repo.local.recordReverseTree";
+    public static final String MAVEN_RESOLVER_TRANSPORT_WAGON = "wagon";
 
-    /**
-     * User property for selecting dependency manager behaviour regarding transitive dependencies and dependency
-     * management entries in their POMs. Maven 3 targeted full backward compatibility with Maven2, hence it ignored
-     * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default, hence
-     * unlike Maven2, obeys dependency management entries deep in dependency graph as well.
-     * <p>
-     * Default: {@code "true"}.
-     *
-     * @since 4.0.0
-     */
-    private static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY =
-            "maven.resolver.dependencyManagerTransitivity";
+    public static final String MAVEN_RESOLVER_TRANSPORT_APACHE = "apache";
 
-    private static final String MAVEN_RESOLVER_TRANSPORT_KEY = "maven.resolver.transport";
-
-    private static final String MAVEN_RESOLVER_TRANSPORT_DEFAULT = "default";
-
-    private static final String MAVEN_RESOLVER_TRANSPORT_WAGON = "wagon";
-
-    private static final String MAVEN_RESOLVER_TRANSPORT_APACHE = "apache";
-
-    private static final String MAVEN_RESOLVER_TRANSPORT_JDK = "jdk";
+    public static final String MAVEN_RESOLVER_TRANSPORT_JDK = "jdk";
 
     /**
      * This name for Apache HttpClient transport is deprecated.
@@ -158,7 +106,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
     @Deprecated
     private static final String MAVEN_RESOLVER_TRANSPORT_NATIVE = "native";
 
-    private static final String MAVEN_RESOLVER_TRANSPORT_AUTO = "auto";
+    public static final String MAVEN_RESOLVER_TRANSPORT_AUTO = "auto";
 
     private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
 
@@ -257,7 +205,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         sessionBuilder.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
                 request.isIgnoreMissingArtifactDescriptor(), request.isIgnoreInvalidArtifactDescriptor()));
 
-        VersionFilter versionFilter = buildVersionFilter(mergedProps.get(MAVEN_VERSION_FILTERS));
+        VersionFilter versionFilter = buildVersionFilter(mergedProps.get(Constants.MAVEN_VERSION_FILTERS));
         if (versionFilter != null) {
             sessionBuilder.setVersionFilter(versionFilter);
         }
@@ -390,7 +338,8 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         }
         sessionBuilder.setAuthenticationSelector(authSelector);
 
-        Object transport = mergedProps.getOrDefault(MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
+        Object transport =
+                mergedProps.getOrDefault(Constants.MAVEN_RESOLVER_TRANSPORT, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
         if (MAVEN_RESOLVER_TRANSPORT_DEFAULT.equals(transport)) {
             // The "default" mode (user did not set anything) from now on defaults to AUTO
         } else if (MAVEN_RESOLVER_TRANSPORT_JDK.equals(transport)) {
@@ -425,21 +374,21 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         RepositoryListener repositoryListener = eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger));
 
         boolean recordReverseTree = Boolean.parseBoolean(
-                mergedProps.getOrDefault(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE, Boolean.FALSE.toString()));
+                mergedProps.getOrDefault(Constants.MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE, Boolean.FALSE.toString()));
         if (recordReverseTree) {
             repositoryListener = new ChainedRepositoryListener(repositoryListener, new ReverseTreeRepositoryListener());
         }
         sessionBuilder.setRepositoryListener(repositoryListener);
 
         // may be overridden
-        String resolverDependencyManagerTransitivity =
-                mergedProps.getOrDefault(MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY, Boolean.TRUE.toString());
+        String resolverDependencyManagerTransitivity = mergedProps.getOrDefault(
+                Constants.MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY, Boolean.TRUE.toString());
         sessionBuilder.setDependencyManager(
                 supplier.getDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 
         ArrayList<Path> paths = new ArrayList<>();
         paths.add(Paths.get(request.getLocalRepository().getBasedir()));
-        String localRepoTail = mergedProps.get(MAVEN_REPO_LOCAL_TAIL);
+        String localRepoTail = mergedProps.get(Constants.MAVEN_REPO_LOCAL_TAIL);
         if (localRepoTail != null) {
             Arrays.stream(localRepoTail.split(","))
                     .filter(p -> p != null && !p.trim().isEmpty())

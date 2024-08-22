@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests that the global settings.xml shipped with the distribution is in good state.
+ * Tests that the installation settings.xml shipped with the distribution is in good state.
  *
  */
-class GlobalSettingsTest {
+class InstallationSettingsTest {
 
     @Test
     void testValidGlobalSettings() throws Exception {

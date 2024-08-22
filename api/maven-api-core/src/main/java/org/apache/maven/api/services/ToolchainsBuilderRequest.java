@@ -40,12 +40,12 @@ public interface ToolchainsBuilderRequest {
     Session getSession();
 
     /**
-     * Gets the global Toolchains source.
+     * Gets the installation Toolchains source.
      *
-     * @return the global Toolchains source or {@code null} if none
+     * @return the installation Toolchains source or {@code null} if none
      */
     @Nonnull
-    Optional<Source> getGlobalToolchainsSource();
+    Optional<Source> getInstallationToolchainsSource();
 
     /**
      * Gets the user Toolchains source.
@@ -57,22 +57,24 @@ public interface ToolchainsBuilderRequest {
 
     @Nonnull
     static ToolchainsBuilderRequest build(
-            @Nonnull Session session, @Nullable Source globalToolchainsSource, @Nullable Source userToolchainsSource) {
+            @Nonnull Session session,
+            @Nullable Source installationToolchainsFile,
+            @Nullable Source userToolchainsSource) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
-                .globalToolchainsSource(globalToolchainsSource)
+                .installationToolchainsSource(installationToolchainsFile)
                 .userToolchainsSource(userToolchainsSource)
                 .build();
     }
 
     @Nonnull
     static ToolchainsBuilderRequest build(
-            @Nonnull Session session, @Nullable Path globalToolchainsPath, @Nullable Path userToolchainsPath) {
+            @Nonnull Session session, @Nullable Path installationToolchainsFile, @Nullable Path userToolchainsPath) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
-                .globalToolchainsSource(
-                        globalToolchainsPath != null && Files.exists(globalToolchainsPath)
-                                ? Source.fromPath(globalToolchainsPath)
+                .installationToolchainsSource(
+                        installationToolchainsFile != null && Files.exists(installationToolchainsFile)
+                                ? Source.fromPath(installationToolchainsFile)
                                 : null)
                 .userToolchainsSource(
                         userToolchainsPath != null && Files.exists(userToolchainsPath)
@@ -89,7 +91,7 @@ public interface ToolchainsBuilderRequest {
     @NotThreadSafe
     class ToolchainsBuilderRequestBuilder {
         Session session;
-        Source globalToolchainsSource;
+        Source installationToolchainsSource;
         Source userToolchainsSource;
 
         public ToolchainsBuilderRequestBuilder session(Session session) {
@@ -97,8 +99,8 @@ public interface ToolchainsBuilderRequest {
             return this;
         }
 
-        public ToolchainsBuilderRequestBuilder globalToolchainsSource(Source globalToolchainsSource) {
-            this.globalToolchainsSource = globalToolchainsSource;
+        public ToolchainsBuilderRequestBuilder installationToolchainsSource(Source installationToolchainsSource) {
+            this.installationToolchainsSource = installationToolchainsSource;
             return this;
         }
 
@@ -109,27 +111,27 @@ public interface ToolchainsBuilderRequest {
 
         public ToolchainsBuilderRequest build() {
             return new ToolchainsBuilderRequestBuilder.DefaultToolchainsBuilderRequest(
-                    session, globalToolchainsSource, userToolchainsSource);
+                    session, installationToolchainsSource, userToolchainsSource);
         }
 
         private static class DefaultToolchainsBuilderRequest extends BaseRequest implements ToolchainsBuilderRequest {
-            private final Source globalToolchainsSource;
+            private final Source installationToolchainsSource;
             private final Source userToolchainsSource;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultToolchainsBuilderRequest(
                     @Nonnull Session session,
-                    @Nullable Source globalToolchainsSource,
+                    @Nullable Source installationToolchainsSource,
                     @Nullable Source userToolchainsSource) {
                 super(session);
-                this.globalToolchainsSource = globalToolchainsSource;
+                this.installationToolchainsSource = installationToolchainsSource;
                 this.userToolchainsSource = userToolchainsSource;
             }
 
             @Nonnull
             @Override
-            public Optional<Source> getGlobalToolchainsSource() {
-                return Optional.ofNullable(globalToolchainsSource);
+            public Optional<Source> getInstallationToolchainsSource() {
+                return Optional.ofNullable(installationToolchainsSource);
             }
 
             @Nonnull

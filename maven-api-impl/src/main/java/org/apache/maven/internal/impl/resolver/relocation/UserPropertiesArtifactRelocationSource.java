@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
@@ -50,8 +51,6 @@ import org.slf4j.LoggerFactory;
 public final class UserPropertiesArtifactRelocationSource implements MavenArtifactRelocationSource {
     public static final String NAME = "userProperties";
     private static final Logger LOGGER = LoggerFactory.getLogger(UserPropertiesArtifactRelocationSource.class);
-
-    private static final String CONFIG_PROP_RELOCATIONS_ENTRIES = "maven.relocations.entries";
 
     private static final Artifact SENTINEL = new DefaultArtifact("org.apache.maven.banned:user-relocation:1.0");
 
@@ -153,7 +152,7 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
     }
 
     private Relocations parseRelocations(RepositorySystemSession session) {
-        String relocationsEntries = (String) session.getConfigProperties().get(CONFIG_PROP_RELOCATIONS_ENTRIES);
+        String relocationsEntries = (String) session.getConfigProperties().get(Constants.MAVEN_RELOCATIONS_ENTRIES);
         if (relocationsEntries == null) {
             return null;
         }

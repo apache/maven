@@ -69,7 +69,8 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
 
     public static final File DEFAULT_PROJECT_SETTINGS_FILE = new File(".mvn", "settings.xml");
 
-    public static final File DEFAULT_GLOBAL_SETTINGS_FILE = new File(System.getProperty("maven.conf"), "settings.xml");
+    public static final File DEFAULT_INSTALLATION_SETTINGS_FILE =
+            new File(System.getProperty("maven.conf"), "settings.xml");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsXmlConfigurationProcessor.class);
 
@@ -119,26 +120,34 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
             projectSettingsFile = null;
         }
 
-        File globalSettingsFile;
+        File installationSettingsFile;
 
-        if (commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_SETTINGS)) {
-            globalSettingsFile = new File(commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_SETTINGS));
-            globalSettingsFile = resolveFile(globalSettingsFile, workingDirectory);
+        if (commandLine.hasOption(CLIManager.ALTERNATE_INSTALLATION_SETTINGS)) {
+            installationSettingsFile = new File(commandLine.getOptionValue(CLIManager.ALTERNATE_INSTALLATION_SETTINGS));
+            installationSettingsFile = resolveFile(installationSettingsFile, workingDirectory);
 
-            if (!globalSettingsFile.isFile()) {
+            if (!installationSettingsFile.isFile()) {
                 throw new FileNotFoundException(
-                        "The specified global settings file does not exist: " + globalSettingsFile);
+                        "The specified installation settings file does not exist: " + installationSettingsFile);
+            }
+        } else if (commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_SETTINGS)) {
+            installationSettingsFile = new File(commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_SETTINGS));
+            installationSettingsFile = resolveFile(installationSettingsFile, workingDirectory);
+
+            if (!installationSettingsFile.isFile()) {
+                throw new FileNotFoundException(
+                        "The specified installation settings file does not exist: " + installationSettingsFile);
             }
         } else {
-            globalSettingsFile = DEFAULT_GLOBAL_SETTINGS_FILE;
+            installationSettingsFile = DEFAULT_INSTALLATION_SETTINGS_FILE;
         }
 
-        request.setGlobalSettingsFile(globalSettingsFile);
+        request.setInstallationSettingsFile(installationSettingsFile);
         request.setProjectSettingsFile(projectSettingsFile);
         request.setUserSettingsFile(userSettingsFile);
 
         SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
-        settingsRequest.setGlobalSettingsFile(globalSettingsFile);
+        settingsRequest.setGlobalSettingsFile(installationSettingsFile);
         settingsRequest.setProjectSettingsFile(projectSettingsFile);
         settingsRequest.setUserSettingsFile(userSettingsFile);
         settingsRequest.setSystemProperties(cliRequest.getSystemProperties());
@@ -155,7 +164,7 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
         }
 
         LOGGER.debug(
-                "Reading global settings from '{}'",
+                "Reading installation settings from '{}'",
                 getLocation(settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile()));
         LOGGER.debug(
                 "Reading project settings from '{}'",
