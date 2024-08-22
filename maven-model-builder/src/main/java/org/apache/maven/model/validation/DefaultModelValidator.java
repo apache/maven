@@ -80,6 +80,8 @@ import org.apache.maven.model.v4.MavenTransformer;
 @Named
 @Singleton
 public class DefaultModelValidator implements ModelValidator {
+    public static final String BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION =
+            "maven.build.allowExpressionInEffectiveProjectVersion";
 
     public static final List<String> VALID_MODEL_VERSIONS =
             Collections.unmodifiableList(Arrays.asList("4.0.0", "4.1.0"));
@@ -692,9 +694,17 @@ public class DefaultModelValidator implements ModelValidator {
                     EMPTY, "version", problems, errOn31, Version.V20, m.getVersion(), null, m, ILLEGAL_VERSION_CHARS);
             validate20ProperSnapshotVersion("version", problems, errOn31, Version.V20, m.getVersion(), null, m);
             if (hasExpression(m.getVersion())) {
+                Severity versionExpressionSeverity = Severity.ERROR;
+                if (m.getProperties() != null
+                        && Boolean.parseBoolean(m.getProperties()
+                                .getOrDefault(
+                                        BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION,
+                                        Boolean.FALSE.toString()))) {
+                    versionExpressionSeverity = Severity.WARNING;
+                }
                 addViolation(
                         problems,
-                        Severity.ERROR,
+                        versionExpressionSeverity,
                         Version.V20,
                         "version",
                         null,
