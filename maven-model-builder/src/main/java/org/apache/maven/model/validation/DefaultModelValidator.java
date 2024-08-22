@@ -74,6 +74,8 @@ import org.codehaus.plexus.util.StringUtils;
 @Named
 @Singleton
 public class DefaultModelValidator implements ModelValidator {
+    public static final String BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION =
+            "maven.build.allowExpressionInEffectiveProjectVersion";
 
     private static final Pattern CI_FRIENDLY_EXPRESSION = Pattern.compile("\\$\\{(.+?)}");
     private static final Pattern EXPRESSION_PROJECT_NAME_PATTERN = Pattern.compile("\\$\\{(project.+?)}");
@@ -507,9 +509,14 @@ public class DefaultModelValidator implements ModelValidator {
                     EMPTY, "version", problems, errOn31, Version.V20, m.getVersion(), null, m, ILLEGAL_VERSION_CHARS);
             validate20ProperSnapshotVersion("version", problems, errOn31, Version.V20, m.getVersion(), null, m);
             if (hasExpression(m.getVersion())) {
+                Severity versionExpressionSeverity = Severity.ERROR;
+                if (Boolean.parseBoolean(m.getProperties()
+                        .getProperty(BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION, Boolean.FALSE.toString()))) {
+                    versionExpressionSeverity = Severity.WARNING;
+                }
                 addViolation(
                         problems,
-                        Severity.ERROR,
+                        versionExpressionSeverity,
                         Version.V20,
                         "version",
                         null,
