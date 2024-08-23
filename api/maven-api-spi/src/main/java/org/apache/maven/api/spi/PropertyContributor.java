@@ -34,9 +34,11 @@ import org.apache.maven.api.annotations.Experimental;
 @Consumer
 public interface PropertyContributor extends SpiService {
     /**
-     * Invoked just before session is created with a mutable map that carries collected user properties so far.
+     * Invoked just before session is created.
      *
-     * @param userProperties The mutable user properties, never {@code null}.
+     * @param systemProperties Immutable map of system properties, never {@code null}.
+     * @param userProperties Immutable map of user properties, never {@code null}.
+     * @param topDirectory The path of top directory, never {@code null}.
      */
     Map<String, String> contribute(
             Map<String, String> systemProperties, Map<String, String> userProperties, Path topDirectory);
