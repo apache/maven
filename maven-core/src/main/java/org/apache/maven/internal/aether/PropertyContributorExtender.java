@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.HashMap;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
 
@@ -50,13 +50,25 @@ class PropertyContributorExtender implements MavenExecutionRequestExtender {
     public void extend(MavenExecutionRequest mavenExecutionRequest) {
         Map<String, PropertyContributor> effectivePropertyContributors = lookup.lookupMap(PropertyContributor.class);
         if (!effectivePropertyContributors.isEmpty()) {
-            HashMap<String, String> userPropertiesMap = new HashMap<>((Map) mavenExecutionRequest.getUserProperties());
+            final Map<String, String> systemPropertiesMap = Map.copyOf((Map) mavenExecutionRequest.getSystemProperties());
+            final Map<String, String> userPropertiesMap = Map.copyOf((Map) mavenExecutionRequest.getUserProperties());
+            final Path topDirectory = mavenExecutionRequest.getTopDirectory();
+            final Properties newProperties = new Properties();
+
             for (PropertyContributor contributor : effectivePropertyContributors.values()) {
-                contributor.contribute(userPropertiesMap);
+                Map<String, String> contribution =
+                        contributor.contribute(systemPropertiesMap, userPropertiesMap, topDirectory);
+                if (contribution != null && !contribution.isEmpty()) {
+                    newProperties.putAll(contribution);
+                }
             }
-            Properties newProperties = new Properties();
-            newProperties.putAll(userPropertiesMap);
-            mavenExecutionRequest.setUserProperties(newProperties);
+
+            if (!newProperties.isEmpty()) {
+                Properties newUserProperties = new Properties();
+                newUserProperties.putAll(userPropertiesMap);
+                newUserProperties.putAll(newProperties);
+                mavenExecutionRequest.setUserProperties(newUserProperties);
+            }
         }
     }
 }

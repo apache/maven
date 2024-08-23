@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api.spi;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Consumer;
@@ -37,5 +38,6 @@ public interface PropertyContributor extends SpiService {
      *
      * @param userProperties The mutable user properties, never {@code null}.
      */
-    void contribute(Map<String, String> userProperties);
+    Map<String, String> contribute(
+            Map<String, String> systemProperties, Map<String, String> userProperties, Path topDirectory);
 }
