@@ -26,9 +26,13 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.api.ProtoSession;
+import org.apache.maven.api.Version;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.spi.PropertyContributor;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.rtinfo.RuntimeInformation;
 
 /**
  * Extender that manages {@link PropertyContributor}.
@@ -50,15 +54,42 @@ class PropertyContributorExtender implements MavenExecutionRequestExtender {
     public void extend(MavenExecutionRequest mavenExecutionRequest) {
         Map<String, PropertyContributor> effectivePropertyContributors = lookup.lookupMap(PropertyContributor.class);
         if (!effectivePropertyContributors.isEmpty()) {
+            final Version mavenVersion = lookup.lookup(VersionParser.class)
+                    .parseVersion(lookup.lookup(RuntimeInformation.class).getMavenVersion());
             final Map<String, String> systemPropertiesMap =
                     Map.copyOf((Map) mavenExecutionRequest.getSystemProperties());
             final Map<String, String> userPropertiesMap = Map.copyOf((Map) mavenExecutionRequest.getUserProperties());
-            final Path topDirectory = mavenExecutionRequest.getTopDirectory();
+            final ProtoSession protoSession = new ProtoSession() {
+                @Override
+                public Version getMavenVersion() {
+                    return mavenVersion;
+                }
+
+                @Override
+                public Map<String, String> getUserProperties() {
+                    return userPropertiesMap;
+                }
+
+                @Override
+                public Map<String, String> getSystemProperties() {
+                    return systemPropertiesMap;
+                }
+
+                @Override
+                public Path getTopDirectory() {
+                    return mavenExecutionRequest.getTopDirectory();
+                }
+
+                @Override
+                public Path getRootDirectory() {
+                    return mavenExecutionRequest.getRootDirectory();
+                }
+            };
+
             final Properties newProperties = new Properties();
 
             for (PropertyContributor contributor : effectivePropertyContributors.values()) {
-                Map<String, String> contribution =
-                        contributor.contribute(systemPropertiesMap, userPropertiesMap, topDirectory);
+                Map<String, String> contribution = contributor.contribute(protoSession);
                 if (contribution != null && !contribution.isEmpty()) {
                     newProperties.putAll(contribution);
                 }

@@ -18,9 +18,9 @@
  */
 package org.apache.maven.api.spi;
 
-import java.nio.file.Path;
 import java.util.Map;
 
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 
@@ -36,10 +36,7 @@ public interface PropertyContributor extends SpiService {
     /**
      * Invoked just before session is created.
      *
-     * @param systemProperties Immutable map of system properties, never {@code null}.
-     * @param userProperties Immutable map of user properties, never {@code null}.
-     * @param topDirectory The path of top directory, never {@code null}.
+     * @param protoSession the proto-session, never {@code null}.
      */
-    Map<String, String> contribute(
-            Map<String, String> systemProperties, Map<String, String> userProperties, Path topDirectory);
+    Map<String, String> contribute(ProtoSession protoSession);
 }
