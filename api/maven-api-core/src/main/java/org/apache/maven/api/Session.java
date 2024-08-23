@@ -19,7 +19,6 @@
 package org.apache.maven.api;
 
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,7 @@ import org.apache.maven.api.settings.Settings;
  */
 @Experimental
 @ThreadSafe
-public interface Session {
+public interface Session extends ProtoSession {
 
     @Nonnull
     Settings getSettings();
@@ -58,25 +57,6 @@ public interface Session {
 
     @Nonnull
     SessionData getData();
-
-    /**
-     * Returns immutable user properties to use for interpolation. The user properties have been configured directly
-     * by the user, e.g. via the {@code -Dkey=value} parameter on the command line.
-     *
-     * @return the user properties, never {@code null}
-     */
-    @Nonnull
-    Map<String, String> getUserProperties();
-
-    /**
-     * Returns immutable system properties to use for interpolation. The system properties are collected from the
-     * runtime environment such as {@link System#getProperties()} and environment variables
-     * (prefixed with {@code env.}).
-     *
-     * @return the system properties, never {@code null}
-     */
-    @Nonnull
-    Map<String, String> getSystemProperties();
 
     /**
      * Each invocation computes a new map of effective properties. To be used in interpolation.
@@ -100,34 +80,7 @@ public interface Session {
     @Nonnull
     Map<String, String> getEffectiveProperties(@Nullable Project project);
 
-    /**
-     * Returns the current maven version
-     * @return the maven version, never {@code null}
-     */
-    @Nonnull
-    Version getMavenVersion();
-
     int getDegreeOfConcurrency();
-
-    @Nonnull
-    Instant getStartTime();
-
-    /**
-     * Gets the directory of the topmost project being built, usually the current directory or the
-     * directory pointed at by the {@code -f/--file} command line argument.
-     */
-    @Nonnull
-    Path getTopDirectory();
-
-    /**
-     * Gets the root directory of the session, which is the root directory for the top directory project.
-     *
-     * @throws IllegalStateException if the root directory could not be found
-     * @see #getTopDirectory()
-     * @see Project#getRootDirectory()
-     */
-    @Nonnull
-    Path getRootDirectory();
 
     @Nonnull
     List<Project> getProjects();

@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Properties;
 
@@ -63,6 +64,11 @@ class PropertyContributorExtender implements MavenExecutionRequestExtender {
                 @Override
                 public Version getMavenVersion() {
                     return mavenVersion;
+                }
+
+                @Override
+                public Instant getStartTime() {
+                    return mavenExecutionRequest.getStartTime().toInstant();
                 }
 
                 @Override

@@ -19,6 +19,7 @@
 package org.apache.maven.api;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -35,40 +36,38 @@ import org.apache.maven.api.annotations.ThreadSafe;
 public interface ProtoSession {
 
     /**
-     * The Maven version.
-     *
-     * @return the maven version, never {@code null}
+     * The Maven version, never {@code null}.
      */
     @Nonnull
     Version getMavenVersion();
 
     /**
-     * User properties as immutable map.
-     *
-     * @return the user properties, never {@code null}
+     * The instant when session creation started, never {@code null}.
+     */
+    @Nonnull
+    Instant getStartTime();
+
+    /**
+     * User properties as immutable map, never {@code null}.
      */
     @Nonnull
     Map<String, String> getUserProperties();
 
     /**
-     * System properties as immutable map.
-     *
-     * @return the system properties, never {@code null}
+     * System properties as immutable map, never {@code null}.
      */
     @Nonnull
     Map<String, String> getSystemProperties();
 
     /**
      * Gets the directory of the topmost project being built, usually the current directory or the
-     * directory pointed at by the {@code -f/--file} command line argument.
-     *
-     * @return the top directory, never {@code null}.
+     * directory pointed at by the {@code -f/--file} command line argument, never {@code null}.
      */
     @Nonnull
     Path getTopDirectory();
 
     /**
-     * Gets the root directory of the session, which is the root directory for the top directory project.
+     * Gets the root directory of the session, which is the root directory for the top directory project, never {@code null}.
      *
      * @throws IllegalStateException if the root directory could not be found
      * @see #getTopDirectory()
