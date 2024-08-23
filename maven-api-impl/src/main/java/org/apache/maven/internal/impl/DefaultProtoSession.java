@@ -136,7 +136,6 @@ public class DefaultProtoSession implements ProtoSession {
             requireNonNull(userProperties);
             this.userProperties = new HashMap<>(this.userProperties);
             this.userProperties.putAll(userProperties);
-            this.userProperties = userProperties;
             return this;
         }
 
