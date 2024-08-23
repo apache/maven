@@ -50,7 +50,8 @@ class PropertyContributorExtender implements MavenExecutionRequestExtender {
     public void extend(MavenExecutionRequest mavenExecutionRequest) {
         Map<String, PropertyContributor> effectivePropertyContributors = lookup.lookupMap(PropertyContributor.class);
         if (!effectivePropertyContributors.isEmpty()) {
-            final Map<String, String> systemPropertiesMap = Map.copyOf((Map) mavenExecutionRequest.getSystemProperties());
+            final Map<String, String> systemPropertiesMap =
+                    Map.copyOf((Map) mavenExecutionRequest.getSystemProperties());
             final Map<String, String> userPropertiesMap = Map.copyOf((Map) mavenExecutionRequest.getUserProperties());
             final Path topDirectory = mavenExecutionRequest.getTopDirectory();
             final Properties newProperties = new Properties();
