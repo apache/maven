@@ -136,9 +136,9 @@ public class ${class.name}
     final ${type} $field.name;
     #end
     #if ( $locationTracking )
-      #if ( ! $class.superClass )
-    /** Locations */
+    /** Locations (this potentially hides the same name field from the super class) */
     final Map<Object, InputLocation> locations;
+      #if ( ! $class.superClass )
     /** Location tracking */
     final InputLocation importedFrom;
       #end
@@ -171,13 +171,16 @@ public class ${class.name}
         Map<Object, InputLocation> newlocs = builder.locations != null ? builder.locations : Collections.emptyMap();
         Map<Object, InputLocation> oldlocs = builder.base != null && builder.base.locations != null ? builder.base.locations : Collections.emptyMap();
       #if ( ! $class.superClass )
-        this.locations = new HashMap<>();
+        Map<Object, InputLocation> mutableLocations = new HashMap<>();
         this.importedFrom = builder.importedFrom;
-        this.locations.put("", newlocs.containsKey("") ? newlocs.get("") : oldlocs.get(""));
+        mutableLocations.put("", newlocs.containsKey("") ? newlocs.get("") : oldlocs.get(""));
+      #else
+        Map<Object, InputLocation> mutableLocations = new HashMap<>(super.locations);
       #end
         #foreach ( $field in $class.getFields($version) )
-        this.locations.put("${field.name}", newlocs.containsKey("${field.name}") ? newlocs.get("${field.name}") : oldlocs.get("${field.name}"));
+        mutableLocations.put("${field.name}", newlocs.containsKey("${field.name}") ? newlocs.get("${field.name}") : oldlocs.get("${field.name}"));
         #end
+        this.locations = Collections.unmodifiableMap(mutableLocations);
     #end
     }
 
@@ -234,7 +237,7 @@ public class ${class.name}
     }
 
     #end
-    #if ( $locationTracking && !$class.superClass )
+    #if ( $locationTracking )
     /**
      * Gets the location of the specified field in the input source.
      */
@@ -249,6 +252,7 @@ public class ${class.name}
         return locations != null ? locations.keySet() : null;
     }
 
+    #if ( !$class.superClass )
     /**
      * Gets the input location that caused this model to be read.
      */
@@ -257,6 +261,7 @@ public class ${class.name}
         return importedFrom;
     }
 
+    #end
     #end
     /**
      * Creates a new builder with this object as the basis.
