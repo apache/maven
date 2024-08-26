@@ -25,6 +25,8 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 /**
  * Allows a fixed set of properties that are valid inside a version and that could be overwritten for example on the
  * commandline
+ *
+ * @since 3.8.5
  */
 public interface ModelVersionProcessor {
 
