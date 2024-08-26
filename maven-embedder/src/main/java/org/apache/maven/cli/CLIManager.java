@@ -227,12 +227,12 @@ public class CLIManager {
                 .longOpt("global-settings")
                 .desc("Alternate path for the global settings file")
                 .hasArg()
+                .deprecated()
                 .build());
         options.addOption(Option.builder(ALTERNATE_INSTALLATION_SETTINGS)
                 .longOpt("install-settings")
                 .desc("Alternate path for the installation settings file")
                 .hasArg()
-                .deprecated()
                 .build());
         options.addOption(Option.builder(Character.toString(ALTERNATE_USER_TOOLCHAINS))
                 .longOpt("toolchains")
@@ -243,12 +243,12 @@ public class CLIManager {
                 .longOpt("global-toolchains")
                 .desc("Alternate path for the global toolchains file")
                 .hasArg()
+                .deprecated()
                 .build());
         options.addOption(Option.builder(ALTERNATE_INSTALLATION_TOOLCHAINS)
                 .longOpt("install-toolchains")
                 .desc("Alternate path for the installation toolchains file")
                 .hasArg()
-                .deprecated()
                 .build());
         options.addOption(Option.builder(FAIL_ON_SEVERITY)
                 .longOpt("fail-on-severity")
