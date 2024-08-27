@@ -35,8 +35,8 @@ class PathSource implements ModelSource {
     }
 
     PathSource(Path path, String location) {
-        this.path = path;
-        this.location = location != null ? location : path.toString();
+        this.path = path.normalize();
+        this.location = location != null ? location : this.path.toString();
     }
 
     @Override
@@ -65,7 +65,7 @@ class PathSource implements ModelSource {
         Path path = getPath().getParent().resolve(norm);
         Path relatedPom = locator.locateExistingPom(path);
         if (relatedPom != null) {
-            return new PathSource(relatedPom.normalize(), null);
+            return new PathSource(relatedPom);
         }
         return null;
     }
