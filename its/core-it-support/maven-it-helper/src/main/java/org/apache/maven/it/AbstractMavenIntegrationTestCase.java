@@ -128,7 +128,7 @@ public abstract class AbstractMavenIntegrationTestCase {
             }
 
             // NOTE: If the version looks like "${...}" it has been configured from an undefined expression
-            if (version != null && version.length() > 0 && !version.startsWith("${")) {
+            if (!version.isEmpty() && !version.startsWith("${")) {
                 mavenVersion = new DefaultArtifactVersion(version);
             }
         }
@@ -259,7 +259,7 @@ public abstract class AbstractMavenIntegrationTestCase {
 
         if (settings != null) {
             File settingsFile;
-            if (settings.length() > 0) {
+            if (!settings.isEmpty()) {
                 settingsFile = new File("settings-" + settings + ".xml");
             } else {
                 settingsFile = new File("settings.xml");
@@ -267,7 +267,7 @@ public abstract class AbstractMavenIntegrationTestCase {
 
             if (!settingsFile.isAbsolute()) {
                 String settingsDir = System.getProperty("maven.it.global-settings.dir", "");
-                if (settingsDir.length() > 0) {
+                if (!settingsDir.isEmpty()) {
                     settingsFile = new File(settingsDir, settingsFile.getPath());
                 } else {
                     //
@@ -280,41 +280,18 @@ public abstract class AbstractMavenIntegrationTestCase {
 
             String path = settingsFile.getAbsolutePath();
 
-            // dedicated CLI option only available since MNG-3914
-            if (matchesVersionRange("[2.1.0,)")) {
-                verifier.addCliArgument("--global-settings");
-                if (path.indexOf(' ') < 0) {
-                    verifier.addCliArgument(path);
-                } else {
-                    verifier.addCliArgument('"' + path + '"');
-                }
+            verifier.addCliArgument("--global-settings");
+            if (path.indexOf(' ') < 0) {
+                verifier.addCliArgument(path);
             } else {
-                verifier.getSystemProperties().put("org.apache.maven.global-settings", path);
+                verifier.addCliArgument('"' + path + '"');
             }
         }
 
-        try {
-            // Java7 TLS protocol
-            if (VersionRange.createFromVersionSpec("(,1.8.0)").containsVersion(getJavaVersion())) {
-                verifier.addCliArgument("-Dhttps.protocols=TLSv1.2");
-            }
-
-            // auto set source+target to lowest reasonable java version
-            // Java9 requires at least 1.6
-            if (VersionRange.createFromVersionSpec("[9,12)").containsVersion(getJavaVersion())) {
-                verifier.getSystemProperties().put("maven.compiler.source", "1.8");
-                verifier.getSystemProperties().put("maven.compiler.target", "1.8");
-                verifier.getSystemProperties().put("maven.compiler.release", "8");
-            }
-            // Java12 requires at least 7
-            if (VersionRange.createFromVersionSpec("[12,)").containsVersion(getJavaVersion())) {
-                verifier.getSystemProperties().put("maven.compiler.source", "8");
-                verifier.getSystemProperties().put("maven.compiler.target", "8");
-                verifier.getSystemProperties().put("maven.compiler.release", "8");
-            }
-        } catch (InvalidVersionSpecificationException e) {
-            // noop
-        }
+        // auto set source+target to lowest reasonable java version
+        verifier.getSystemProperties().put("maven.compiler.source", "8");
+        verifier.getSystemProperties().put("maven.compiler.target", "8");
+        verifier.getSystemProperties().put("maven.compiler.release", "8");
 
         return verifier;
     }
