@@ -280,7 +280,11 @@ public abstract class AbstractMavenIntegrationTestCase {
 
             String path = settingsFile.getAbsolutePath();
 
-            verifier.addCliArgument("--global-settings");
+            if (matchesVersionRange("[4.0.0-beta-4,)")) {
+                verifier.addCliArgument("--install-settings");
+            } else {
+                verifier.addCliArgument("--global-settings");
+            }
             if (path.indexOf(' ') < 0) {
                 verifier.addCliArgument(path);
             } else {
