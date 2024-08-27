@@ -482,7 +482,7 @@ public class ${class.name}
     #end
         @Nonnull
         public ${class.name} build() {
-            // this method should not contain any logic other than creating the object in order to ease subclassing
+            // this method should not contain any logic other than creating (or reusing) an object in order to ease subclassing
             if (base != null
     #foreach ( $field in $allFields )
                     && (${field.name} == null || ${field.name} == base.${field.name})
