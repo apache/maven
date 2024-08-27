@@ -54,10 +54,10 @@ _Maven properties files_ and are Java properties files with a
 few enhancements. Contrary to standard properties file, those files 
 are UTF-8 encoded.
  
-### File inclusion
+### File Inclusion
 
 Additional files can be loaded using the special `${includes}` key. 
-The associated value is a comma separated list of additional files to 
+The associated value is a comma-separated list of additional files to 
 include. Each item may be enclosed in quotes to gracefully include spaces. 
 Items are trimmed before being loaded.  If the first character of an item 
 is a question mark, the load will silently fail if the file does not exist.
@@ -66,7 +66,7 @@ ${includes} = ?"${maven.user.conf}/maven.properties", \
               ?"${maven.project.conf}/maven.properties"
 ```
 
-### Property substitution
+### Property Substitution
 
 Properties undergo the _property substitution_ process, so that any 
 value containing a `${xxx}` placeholder will be substituted with the value 
@@ -93,7 +93,7 @@ and the _project_ specific properties from `${session.rootDirectory}/.mvn/maven.
 Maven is a command line tool, and, as such, accepts various command
 line arguments.  The `MAVEN_ARGS` environment value is used to
 provide additional arguments to Maven.  Those arguments will be
-pre-pended to the actual list of command line arguments.
+prepended to the actual list of command line arguments.
 
 For example, options and goals could be defined with the value
 `-B -V checkstyle:checkstyle`.
