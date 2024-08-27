@@ -16,45 +16,109 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.logging;
+package org.apache.maven.cling.invoker;
 
 import java.io.PrintStream;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
-
-import static java.util.Objects.requireNonNull;
+import org.slf4j.helpers.FormattingTuple;
+import org.slf4j.helpers.MessageFormatter;
 
 /**
- * @since 3.1.0
+ * Proto {@link Logger}. Uses provided {@link PrintStream}s or {@link System} ones as fallback.
+ * Supports only two levels: ERROR and WARNING, that is emitted to STDERR and STDOUT.
  */
-public class Slf4jStdoutLogger implements Logger {
-    private static final String ERROR = "[ERROR] ";
-
-    private final PrintStream out;
-
-    public Slf4jStdoutLogger() {
-        this(System.out);
+public class ProtoLogger implements Logger {
+    /**
+     * The only supported logging levels.
+     */
+    private enum Level {
+        WARNING,
+        ERROR
     }
 
-    public Slf4jStdoutLogger(PrintStream out) {
-        this.out = requireNonNull(out);
+    private final PrintStream out;
+    private final PrintStream err;
+
+    public ProtoLogger() {
+        this(null, null);
+    }
+
+    public ProtoLogger(@Nullable PrintStream out, @Nullable PrintStream err) {
+        this.out = nvl(out, System.out);
+        this.err = nvl(err, System.err);
+    }
+
+    private PrintStream nvl(PrintStream ps, PrintStream def) {
+        if (ps != null) {
+            return ps;
+        }
+        return def;
     }
 
     //
     // These are the only methods we need in our primordial logger
     //
+
+    private void doHandle(Level level, String message, Object... params) {
+        PrintStream ps = level == Level.ERROR ? err : out;
+        FormattingTuple tuple = MessageFormatter.arrayFormat(message, params);
+        ps.print(level.name());
+        ps.println(" ");
+        ps.println(tuple.getMessage());
+        if (tuple.getThrowable() != null) {
+            tuple.getThrowable().printStackTrace(ps);
+        }
+    }
+
+    public boolean isErrorEnabled() {
+        return true;
+    }
+
     public void error(String msg) {
-        out.print(ERROR);
-        out.println(msg);
+        doHandle(Level.ERROR, msg);
+    }
+
+    public void error(String format, Object arg) {
+        doHandle(Level.ERROR, format, arg);
+    }
+
+    public void error(String format, Object... arguments) {
+        doHandle(Level.ERROR, format, arguments);
+    }
+
+    public void error(String format, Object arg1, Object arg2) {
+        doHandle(Level.ERROR, format, arg1, arg2);
     }
 
     public void error(String msg, Throwable t) {
-        error(msg);
+        doHandle(Level.ERROR, msg, t);
+    }
 
-        if (null != t) {
-            t.printStackTrace(out);
-        }
+    public boolean isWarnEnabled() {
+        return true;
+    }
+
+    public void warn(String msg) {
+        doHandle(Level.WARNING, msg);
+    }
+
+    public void warn(String format, Object arg) {
+        doHandle(Level.WARNING, format, arg);
+    }
+
+    public void warn(String format, Object... arguments) {
+        doHandle(Level.WARNING, format, arguments);
+    }
+
+    public void warn(String format, Object arg1, Object arg2) {
+        doHandle(Level.WARNING, format, arg1, arg2);
+    }
+
+    public void warn(String msg, Throwable t) {
+        doHandle(Level.WARNING, msg, t);
     }
 
     //
@@ -148,20 +212,6 @@ public class Slf4jStdoutLogger implements Logger {
 
     public void info(Marker marker, String msg, Throwable t) {}
 
-    public boolean isWarnEnabled() {
-        return false;
-    }
-
-    public void warn(String msg) {}
-
-    public void warn(String format, Object arg) {}
-
-    public void warn(String format, Object... arguments) {}
-
-    public void warn(String format, Object arg1, Object arg2) {}
-
-    public void warn(String msg, Throwable t) {}
-
     public boolean isWarnEnabled(Marker marker) {
         return false;
     }
@@ -175,16 +225,6 @@ public class Slf4jStdoutLogger implements Logger {
     public void warn(Marker marker, String format, Object... arguments) {}
 
     public void warn(Marker marker, String msg, Throwable t) {}
-
-    public boolean isErrorEnabled() {
-        return false;
-    }
-
-    public void error(String format, Object arg) {}
-
-    public void error(String format, Object arg1, Object arg2) {}
-
-    public void error(String format, Object... arguments) {}
 
     public boolean isErrorEnabled(Marker marker) {
         return false;

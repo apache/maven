@@ -389,7 +389,10 @@ public class CLIManager {
                 .setDeprecatedHandler(usedDeprecatedOptions::add)
                 .build();
 
-        return parser.parse(options, cleanArgs);
+        CommandLine commandLine = parser.parse(options, cleanArgs);
+        // to trigger deprecation handler, so we can report deprecation BEFORE we actually use options
+        options.getOptions().forEach(commandLine::hasOption);
+        return commandLine;
     }
 
     public Set<Option> getUsedDeprecatedOptions() {
