@@ -37,8 +37,10 @@ import org.apache.maven.artifact.versioning.VersionRange;
  */
 public interface Artifact extends Comparable<Artifact> {
 
+    @Deprecated(since = "4.0.0")
     String RELEASE_VERSION = "RELEASE";
 
+    @Deprecated(since = "4.0.0")
     String LATEST_VERSION = "LATEST";
 
     String SNAPSHOT_VERSION = "SNAPSHOT";

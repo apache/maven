@@ -21,10 +21,9 @@ package org.apache.maven.model;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code Model}.
@@ -52,7 +51,7 @@ class ModelTest {
 
     @Test
     void testEqualsNullSafe() {
-        assertFalse(new Model().equals(null));
+        assertNotEquals(null, new Model());
 
         new Model().equals(new Model());
     }
@@ -60,7 +59,7 @@ class ModelTest {
     @Test
     void testEqualsIdentity() {
         Model thing = new Model();
-        assertTrue(thing.equals(thing));
+        assertEquals(thing, thing);
     }
 
     @Test

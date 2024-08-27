@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.services.ArtifactManager;
@@ -72,7 +73,7 @@ public class DefaultArtifactManager implements ArtifactManager {
     }
 
     @Override
-    public void setPath(@Nonnull Artifact artifact, Path path) {
+    public void setPath(@Nonnull ProducedArtifact artifact, Path path) {
         String id = id(nonNull(artifact, "artifact"));
         if (session.getMavenSession().getAllProjects() != null) {
             session.getMavenSession().getAllProjects().stream()

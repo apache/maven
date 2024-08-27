@@ -16,30 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.internal.impl;
 
 import java.nio.file.Path;
-import java.util.Collection;
 
-import org.apache.maven.api.Artifact;
 import org.apache.maven.api.DownloadedArtifact;
-import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 
 /**
- * The Artifact Result
- *
- * @since 4.0.0
+ * A wrapper class around a maven resolver artifact.
  */
-@Experimental
-public interface ArtifactResolverResult {
-    /**
-     * @return {@link Artifact}
-     */
-    @Nonnull
-    Collection<DownloadedArtifact> getArtifacts();
+public class DefaultDownloadedArtifact extends DefaultArtifact implements DownloadedArtifact {
 
-    @Nullable
-    Path getPath(Artifact artifact);
+    public DefaultDownloadedArtifact(
+            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
+        super(session, artifact);
+    }
+
+    @Override
+    public Path getPath() {
+        return artifact.getPath();
+    }
 }

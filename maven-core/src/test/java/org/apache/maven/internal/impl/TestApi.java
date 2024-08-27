@@ -32,9 +32,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Dependency;
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyCoordinates;
+import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
@@ -152,16 +153,15 @@ class TestApi {
 
     @Test
     void testCreateAndResolveArtifact() {
-        ArtifactCoordinate coord =
-                session.createArtifactCoordinate("org.codehaus.plexus", "plexus-utils", "1.4.5", "pom");
+        ArtifactCoordinates coords =
+                session.createArtifactCoordinates("org.codehaus.plexus", "plexus-utils", "1.4.5", "pom");
 
-        Map.Entry<Artifact, Path> resolved = session.resolveArtifact(coord);
+        DownloadedArtifact resolved = session.resolveArtifact(coords);
         assertNotNull(resolved);
-        assertNotNull(resolved.getKey());
-        assertNotNull(resolved.getValue());
-        Optional<Path> op = session.getArtifactPath(resolved.getKey());
+        assertNotNull(resolved.getPath());
+        Optional<Path> op = session.getArtifactPath(resolved);
         assertTrue(op.isPresent());
-        assertEquals(resolved.getValue(), op.get());
+        assertEquals(resolved.getPath(), op.get());
     }
 
     @Test
@@ -181,11 +181,11 @@ class TestApi {
     }
 
     @Test
-    void testResolveArtifactCoordinateDependencies() {
-        DependencyCoordinate coord = session.createDependencyCoordinate(
-                session.createArtifactCoordinate("org.apache.maven.core.test", "test-extension", "1", "jar"));
+    void testResolveArtifactCoordinatesDependencies() {
+        DependencyCoordinates coords = session.createDependencyCoordinates(
+                session.createArtifactCoordinates("org.apache.maven.core.test", "test-extension", "1", "jar"));
 
-        List<Path> paths = session.resolveDependencies(coord);
+        List<Path> paths = session.resolveDependencies(coords);
 
         assertNotNull(paths);
         assertEquals(10, paths.size());
@@ -193,7 +193,7 @@ class TestApi {
 
         // JUnit has an "Automatic-Module-Name", so it appears on the module path.
         Map<PathType, List<Path>> dispatched = session.resolveDependencies(
-                coord, PathScope.TEST_COMPILE, Arrays.asList(JavaPathType.CLASSES, JavaPathType.MODULES));
+                coords, PathScope.TEST_COMPILE, Arrays.asList(JavaPathType.CLASSES, JavaPathType.MODULES));
         List<Path> classes = dispatched.get(JavaPathType.CLASSES);
         List<Path> modules = dispatched.get(JavaPathType.MODULES);
         List<Path> unresolved = dispatched.get(PathType.UNRESOLVED);
@@ -208,7 +208,7 @@ class TestApi {
         assertTrue(paths.containsAll(modules));
 
         // If caller wants only a classpath, JUnit shall move there.
-        dispatched = session.resolveDependencies(coord, PathScope.TEST_COMPILE, Arrays.asList(JavaPathType.CLASSES));
+        dispatched = session.resolveDependencies(coords, PathScope.TEST_COMPILE, Arrays.asList(JavaPathType.CLASSES));
         classes = dispatched.get(JavaPathType.CLASSES);
         modules = dispatched.get(JavaPathType.MODULES);
         unresolved = dispatched.get(PathType.UNRESOLVED);

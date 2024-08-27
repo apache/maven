@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.Packaging;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionConstraint;
@@ -90,14 +90,14 @@ public class DefaultProject implements Project {
 
     @Nonnull
     @Override
-    public List<Artifact> getArtifacts() {
+    public List<ProducedArtifact> getArtifacts() {
         org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(new ProjectArtifact(project));
         org.eclipse.aether.artifact.Artifact projectArtifact = RepositoryUtils.toArtifact(project.getArtifact());
 
-        ArrayList<Artifact> result = new ArrayList<>(2);
-        result.add(session.getArtifact(pomArtifact));
+        ArrayList<ProducedArtifact> result = new ArrayList<>(2);
+        result.add(session.getArtifact(ProducedArtifact.class, pomArtifact));
         if (!ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
-            result.add(session.getArtifact(projectArtifact));
+            result.add(session.getArtifact(ProducedArtifact.class, projectArtifact));
         }
         return Collections.unmodifiableList(result);
     }
@@ -127,13 +127,13 @@ public class DefaultProject implements Project {
 
     @Nonnull
     @Override
-    public List<DependencyCoordinate> getDependencies() {
+    public List<DependencyCoordinates> getDependencies() {
         return new MappedList<>(getModel().getDependencies(), this::toDependency);
     }
 
     @Nonnull
     @Override
-    public List<DependencyCoordinate> getManagedDependencies() {
+    public List<DependencyCoordinates> getManagedDependencies() {
         DependencyManagement dependencyManagement = getModel().getDependencyManagement();
         if (dependencyManagement != null) {
             return new MappedList<>(dependencyManagement.getDependencies(), this::toDependency);
@@ -163,8 +163,8 @@ public class DefaultProject implements Project {
     }
 
     @Nonnull
-    private DependencyCoordinate toDependency(org.apache.maven.api.model.Dependency dependency) {
-        return new DependencyCoordinate() {
+    private DependencyCoordinates toDependency(org.apache.maven.api.model.Dependency dependency) {
+        return new DependencyCoordinates() {
             @Override
             public String getGroupId() {
                 return dependency.getGroupId();
@@ -188,7 +188,7 @@ public class DefaultProject implements Project {
             }
 
             @Override
-            public VersionConstraint getVersion() {
+            public VersionConstraint getVersionConstraint() {
                 return session.parseVersionConstraint(dependency.getVersion());
             }
 

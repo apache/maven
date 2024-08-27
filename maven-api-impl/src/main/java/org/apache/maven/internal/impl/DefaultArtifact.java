@@ -21,7 +21,7 @@ package org.apache.maven.internal.impl;
 import java.util.Objects;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -31,9 +31,9 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
  * A wrapper class around a maven resolver artifact.
  */
 public class DefaultArtifact implements Artifact {
-    private final @Nonnull InternalSession session;
-    private final @Nonnull org.eclipse.aether.artifact.Artifact artifact;
-    private final String key;
+    protected final @Nonnull InternalSession session;
+    protected final @Nonnull org.eclipse.aether.artifact.Artifact artifact;
+    protected final String key;
 
     public DefaultArtifact(@Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
         this.session = nonNull(session, "session");
@@ -99,8 +99,8 @@ public class DefaultArtifact implements Artifact {
 
     @Nonnull
     @Override
-    public ArtifactCoordinate toCoordinate() {
-        return session.createArtifactCoordinate(this);
+    public ArtifactCoordinates toCoordinates() {
+        return session.createArtifactCoordinates(this);
     }
 
     @Override

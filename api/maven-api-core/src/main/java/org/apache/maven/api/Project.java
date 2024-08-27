@@ -29,10 +29,10 @@ import org.apache.maven.api.model.Model;
 
 /**
  * Interface representing a Maven project which can be created using the
- * {@link org.apache.maven.api.services.ProjectBuilder} service.
+ * {@link org.apache.maven.api.services.ProjectBuilder ProjectBuilder} service.
  * Such objects are immutable and plugin that wish to modify such objects
- * need to do so using the {@link org.apache.maven.api.services.ProjectManager}
- * service.
+ * need to do so using the {@link org.apache.maven.api.services.ProjectManager
+ * ProjectManager} service.
  * <p>
  * Projects are created using the {@code ProjectBuilder} from a POM file
  * (usually named {@code pom.xml}) on the file system.
@@ -95,7 +95,7 @@ public interface Project {
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
     @Nonnull
-    default Artifact getPomArtifact() {
+    default ProducedArtifact getPomArtifact() {
         return getArtifacts().get(0);
     }
 
@@ -107,8 +107,8 @@ public interface Project {
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
     @Nonnull
-    default Optional<Artifact> getMainArtifact() {
-        List<Artifact> artifacts = getArtifacts();
+    default Optional<ProducedArtifact> getMainArtifact() {
+        List<ProducedArtifact> artifacts = getArtifacts();
         return artifacts.size() == 2 ? Optional.of(artifacts.get(1)) : Optional.empty();
     }
 
@@ -126,7 +126,7 @@ public interface Project {
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
     @Nonnull
-    List<Artifact> getArtifacts();
+    List<ProducedArtifact> getArtifacts();
 
     /**
      * Returns the project model.
@@ -173,13 +173,13 @@ public interface Project {
      * Returns the project direct dependencies (directly specified or inherited).
      */
     @Nonnull
-    List<DependencyCoordinate> getDependencies();
+    List<DependencyCoordinates> getDependencies();
 
     /**
      * Returns the project managed dependencies (directly specified or inherited).
      */
     @Nonnull
-    List<DependencyCoordinate> getManagedDependencies();
+    List<DependencyCoordinates> getManagedDependencies();
 
     /**
      * Returns the project ID, usable as key.

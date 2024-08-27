@@ -19,6 +19,7 @@
 package org.apache.maven.internal.impl;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -46,6 +47,31 @@ public class DefaultArtifactFactory implements ArtifactFactory {
         String extension =
                 str != null && !str.isEmpty() ? request.getExtension() : type != null ? type.getExtension() : null;
         return new DefaultArtifact(
+                session,
+                new org.eclipse.aether.artifact.DefaultArtifact(
+                        request.getGroupId(),
+                        request.getArtifactId(),
+                        classifier,
+                        extension,
+                        request.getVersion(),
+                        type));
+    }
+
+    @Override
+    public ProducedArtifact createProduced(@Nonnull ArtifactFactoryRequest request) {
+        nonNull(request, "request");
+        InternalSession session = InternalSession.from(request.getSession());
+        ArtifactType type = null;
+        if (request.getType() != null) {
+            type = session.getSession().getArtifactTypeRegistry().get(request.getType());
+        }
+        String str1 = request.getClassifier();
+        String classifier =
+                str1 != null && !str1.isEmpty() ? request.getClassifier() : type != null ? type.getClassifier() : null;
+        String str = request.getExtension();
+        String extension =
+                str != null && !str.isEmpty() ? request.getExtension() : type != null ? type.getExtension() : null;
+        return new DefaultProducedArtifact(
                 session,
                 new org.eclipse.aether.artifact.DefaultArtifact(
                         request.getGroupId(),

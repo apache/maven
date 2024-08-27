@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.PathType;
@@ -70,13 +70,13 @@ public interface DependencyResolverRequest {
     Optional<Artifact> getRootArtifact();
 
     @Nonnull
-    Optional<DependencyCoordinate> getRoot();
+    Optional<DependencyCoordinates> getRoot();
 
     @Nonnull
-    Collection<DependencyCoordinate> getDependencies();
+    Collection<DependencyCoordinates> getDependencies();
 
     @Nonnull
-    Collection<DependencyCoordinate> getManagedDependencies();
+    Collection<DependencyCoordinates> getManagedDependencies();
 
     boolean getVerbose();
 
@@ -125,13 +125,13 @@ public interface DependencyResolverRequest {
     }
 
     @Nonnull
-    static DependencyResolverRequest build(Session session, RequestType requestType, DependencyCoordinate dependency) {
+    static DependencyResolverRequest build(Session session, RequestType requestType, DependencyCoordinates dependency) {
         return build(session, requestType, dependency, PathScope.MAIN_RUNTIME);
     }
 
     @Nonnull
     static DependencyResolverRequest build(
-            Session session, RequestType requestType, DependencyCoordinate dependency, PathScope scope) {
+            Session session, RequestType requestType, DependencyCoordinates dependency, PathScope scope) {
         return new DependencyResolverRequestBuilder()
                 .session(session)
                 .requestType(requestType)
@@ -142,13 +142,13 @@ public interface DependencyResolverRequest {
 
     @Nonnull
     static DependencyResolverRequest build(
-            Session session, RequestType requestType, List<DependencyCoordinate> dependencies) {
+            Session session, RequestType requestType, List<DependencyCoordinates> dependencies) {
         return build(session, requestType, dependencies, PathScope.MAIN_RUNTIME);
     }
 
     @Nonnull
     static DependencyResolverRequest build(
-            Session session, RequestType requestType, List<DependencyCoordinate> dependencies, PathScope scope) {
+            Session session, RequestType requestType, List<DependencyCoordinates> dependencies, PathScope scope) {
         return new DependencyResolverRequestBuilder()
                 .session(session)
                 .requestType(requestType)
@@ -164,9 +164,9 @@ public interface DependencyResolverRequest {
         RequestType requestType;
         Project project;
         Artifact rootArtifact;
-        DependencyCoordinate root;
-        List<DependencyCoordinate> dependencies = Collections.emptyList();
-        List<DependencyCoordinate> managedDependencies = Collections.emptyList();
+        DependencyCoordinates root;
+        List<DependencyCoordinates> dependencies = Collections.emptyList();
+        List<DependencyCoordinates> managedDependencies = Collections.emptyList();
         boolean verbose;
         PathScope pathScope;
         Predicate<PathType> pathTypeFilter;
@@ -193,11 +193,11 @@ public interface DependencyResolverRequest {
 
         /**
          * Sets the root artifact for the dependency graph.
-         * This must not be confused with {@link #root(DependencyCoordinate)}: The root <em>dependency</em>, like any
+         * This must not be confused with {@link #root(DependencyCoordinates)}: The root <em>dependency</em>, like any
          * other specified dependency, will be subject to dependency collection/resolution, i.e. should have an artifact
          * descriptor and a corresponding artifact file. The root <em>artifact</em> on the other hand is only used
          * as a label for the root node of the graph in case no root dependency was specified. As such, the configured
-         * root artifact is ignored if {@link #root(DependencyCoordinate)} has been set.
+         * root artifact is ignored if {@link #root(DependencyCoordinates)} has been set.
          *
          * @param rootArtifact the root artifact for the dependency graph, may be {@code null}
          * @return this request for chaining, never {@code null}
@@ -213,7 +213,7 @@ public interface DependencyResolverRequest {
          * @return this request for chaining, never {@code null}
          */
         @Nonnull
-        public DependencyResolverRequestBuilder root(@Nonnull DependencyCoordinate root) {
+        public DependencyResolverRequestBuilder root(@Nonnull DependencyCoordinates root) {
             this.root = root;
             return this;
         }
@@ -227,7 +227,7 @@ public interface DependencyResolverRequest {
          * @return this request for chaining, never {@code null}
          */
         @Nonnull
-        public DependencyResolverRequestBuilder dependencies(@Nullable List<DependencyCoordinate> dependencies) {
+        public DependencyResolverRequestBuilder dependencies(@Nullable List<DependencyCoordinates> dependencies) {
             this.dependencies = (dependencies != null) ? dependencies : Collections.emptyList();
             return this;
         }
@@ -239,7 +239,7 @@ public interface DependencyResolverRequest {
          * @return this request for chaining, never {@code null}
          */
         @Nonnull
-        public DependencyResolverRequestBuilder dependency(@Nullable DependencyCoordinate dependency) {
+        public DependencyResolverRequestBuilder dependency(@Nullable DependencyCoordinates dependency) {
             if (dependency != null) {
                 if (this.dependencies.isEmpty()) {
                     this.dependencies = new ArrayList<>();
@@ -259,7 +259,7 @@ public interface DependencyResolverRequest {
          */
         @Nonnull
         public DependencyResolverRequestBuilder managedDependencies(
-                @Nullable List<DependencyCoordinate> managedDependencies) {
+                @Nullable List<DependencyCoordinates> managedDependencies) {
             this.managedDependencies = (managedDependencies != null) ? managedDependencies : Collections.emptyList();
             return this;
         }
@@ -272,7 +272,7 @@ public interface DependencyResolverRequest {
          * @return this request for chaining, never {@code null}
          */
         @Nonnull
-        public DependencyResolverRequestBuilder managedDependency(@Nullable DependencyCoordinate managedDependency) {
+        public DependencyResolverRequestBuilder managedDependency(@Nullable DependencyCoordinates managedDependency) {
             if (managedDependency != null) {
                 if (this.managedDependencies.isEmpty()) {
                     this.managedDependencies = new ArrayList<>();
@@ -346,9 +346,9 @@ public interface DependencyResolverRequest {
             private final RequestType requestType;
             private final Project project;
             private final Artifact rootArtifact;
-            private final DependencyCoordinate root;
-            private final Collection<DependencyCoordinate> dependencies;
-            private final Collection<DependencyCoordinate> managedDependencies;
+            private final DependencyCoordinates root;
+            private final Collection<DependencyCoordinates> dependencies;
+            private final Collection<DependencyCoordinates> managedDependencies;
             private final boolean verbose;
             private final PathScope pathScope;
             private final Predicate<PathType> pathTypeFilter;
@@ -366,9 +366,9 @@ public interface DependencyResolverRequest {
                     @Nonnull RequestType requestType,
                     @Nullable Project project,
                     @Nullable Artifact rootArtifact,
-                    @Nullable DependencyCoordinate root,
-                    @Nonnull Collection<DependencyCoordinate> dependencies,
-                    @Nonnull Collection<DependencyCoordinate> managedDependencies,
+                    @Nullable DependencyCoordinates root,
+                    @Nonnull Collection<DependencyCoordinates> dependencies,
+                    @Nonnull Collection<DependencyCoordinates> managedDependencies,
                     boolean verbose,
                     @Nullable PathScope pathScope,
                     @Nullable Predicate<PathType> pathTypeFilter) {
@@ -408,19 +408,19 @@ public interface DependencyResolverRequest {
 
             @Nonnull
             @Override
-            public Optional<DependencyCoordinate> getRoot() {
+            public Optional<DependencyCoordinates> getRoot() {
                 return Optional.ofNullable(root);
             }
 
             @Nonnull
             @Override
-            public Collection<DependencyCoordinate> getDependencies() {
+            public Collection<DependencyCoordinates> getDependencies() {
                 return dependencies;
             }
 
             @Nonnull
             @Override
-            public Collection<DependencyCoordinate> getManagedDependencies() {
+            public Collection<DependencyCoordinates> getManagedDependencies() {
                 return managedDependencies;
             }
 

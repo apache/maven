@@ -18,29 +18,30 @@
  */
 package org.apache.maven.api;
 
+import java.util.Collection;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
- * A result of collecting, flattening and resolving {@link DependencyCoordinates}s.
- * Dependency is the output of the <dfn>collection</dfn> process, which builds the graph of dependencies,
- * followed by <dfn>flattening</dfn> and <dfn>resolution</dfn>.
- * The version selection is done for each dependency during the collection phase.
- * The flatten phase will keep only a single version per ({@code groupId}, {@code artifactId}) pair.
- * The resolution will actually download the dependencies (or artifacts) that have been computed.
+ * {@code ArtifactCoordinates} completed with information about how the artifact will be used.
+ * This information include the dependency type (main classes, test classes, <i>etc.</i>),
+ * a scope (compile-time, run-time <i>etc.</i>), an obligation (whether the dependency
+ * is optional or mandatory), and possible exclusions for transitive dependencies.
+ * The {@linkplain #getVersionConstraint() version} and the {@linkplain #getOptional() obligation}
+ * may not be defined precisely.
  *
  * @since 4.0.0
  */
 @Experimental
 @Immutable
-public interface Dependency extends Artifact {
+public interface DependencyCoordinates extends ArtifactCoordinates {
     /**
      * {@return the type of the dependency}. A dependency can be a <abbr>JAR</abbr> file,
      * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module-path,
      * a <abbr>JAR</abbr> containing test classes, <i>etc.</i>
-     *
-     * @see DependencyCoordinates#getType()
      */
     @Nonnull
     Type getType();
@@ -48,26 +49,21 @@ public interface Dependency extends Artifact {
     /**
      * {@return the time at which the dependency will be used}.
      * If may be, for example, at compile time only, at run time or at test time.
-     *
-     * @see DependencyCoordinates#getScope()
      */
     @Nonnull
     DependencyScope getScope();
 
     /**
-     * Returns whether the dependency is optional or mandatory.
-     * Contrarily to {@link DependencyCoordinates}, the obligation of a {@code Dependency} is always present.
-     * The value is computed during the dependencies collection phase.
+     * Returns whether the dependency is optional, mandatory or of unspecified obligation.
      *
-     * @return {@code true} if the dependency is optional, or {@code false} if mandatory
-     * @see DependencyCoordinates#getOptional()
+     * @return the obligation, or {@code null} if unspecified
      */
-    boolean isOptional();
+    @Nullable
+    Boolean getOptional();
 
     /**
-     * {@return coordinates with the same identifiers as this dependency}
+     * {@return transitive dependencies to exclude}.
      */
     @Nonnull
-    @Override
-    DependencyCoordinates toCoordinates();
+    Collection<Exclusion> getExclusions();
 }

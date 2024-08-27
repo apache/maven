@@ -16,30 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.api;
 
 import java.nio.file.Path;
-import java.util.Collection;
 
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.annotations.Immutable;
 
 /**
- * The Artifact Result
+ * An {@link Artifact} that has been resolved, i.e. downloaded to the local repository.
  *
  * @since 4.0.0
  */
 @Experimental
-public interface ArtifactResolverResult {
-    /**
-     * @return {@link Artifact}
-     */
-    @Nonnull
-    Collection<DownloadedArtifact> getArtifacts();
+@Immutable
+public interface DownloadedArtifact extends Artifact {
 
-    @Nullable
-    Path getPath(Artifact artifact);
+    /**
+     * {@return the actual file that has been downloaded in the file system}
+     */
+    Path getPath();
 }

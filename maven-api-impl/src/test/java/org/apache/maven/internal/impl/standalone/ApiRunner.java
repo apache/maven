@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.Packaging;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
@@ -58,13 +59,13 @@ import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.internal.impl.AbstractSession;
-import org.apache.maven.internal.impl.DefaultArtifactCoordinateFactory;
+import org.apache.maven.internal.impl.DefaultArtifactCoordinatesFactory;
 import org.apache.maven.internal.impl.DefaultArtifactDeployer;
 import org.apache.maven.internal.impl.DefaultArtifactFactory;
 import org.apache.maven.internal.impl.DefaultArtifactInstaller;
 import org.apache.maven.internal.impl.DefaultArtifactResolver;
 import org.apache.maven.internal.impl.DefaultChecksumAlgorithmService;
-import org.apache.maven.internal.impl.DefaultDependencyCoordinateFactory;
+import org.apache.maven.internal.impl.DefaultDependencyCoordinatesFactory;
 import org.apache.maven.internal.impl.DefaultDependencyResolver;
 import org.apache.maven.internal.impl.DefaultLocalRepositoryManager;
 import org.apache.maven.internal.impl.DefaultMessageBuilderFactory;
@@ -121,14 +122,14 @@ public class ApiRunner {
         Injector injector = Injector.create();
         injector.bindInstance(Injector.class, injector);
         injector.bindImplicit(ApiRunner.class);
-        injector.bindImplicit(DefaultArtifactCoordinateFactory.class);
+        injector.bindImplicit(DefaultArtifactCoordinatesFactory.class);
         injector.bindImplicit(DefaultArtifactDeployer.class);
         injector.bindImplicit(DefaultArtifactFactory.class);
         injector.bindImplicit(DefaultArtifactInstaller.class);
         injector.bindImplicit(DefaultArtifactResolver.class);
         injector.bindImplicit(DefaultChecksumAlgorithmService.class);
         injector.bindImplicit(DefaultDependencyResolver.class);
-        injector.bindImplicit(DefaultDependencyCoordinateFactory.class);
+        injector.bindImplicit(DefaultDependencyCoordinatesFactory.class);
         injector.bindImplicit(DefaultLocalRepositoryManager.class);
         injector.bindImplicit(DefaultMessageBuilderFactory.class);
         injector.bindImplicit(DefaultModelXmlFactory.class);
@@ -326,7 +327,7 @@ public class ApiRunner {
             }
 
             @Override
-            public void setPath(Artifact artifact, Path path) {
+            public void setPath(ProducedArtifact artifact, Path path) {
                 paths.put(artifact, path);
             }
         };

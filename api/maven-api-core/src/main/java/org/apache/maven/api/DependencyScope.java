@@ -28,9 +28,9 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Dependency scope.
- * This represents at which time the dependency will be used, for example, at compile time only,
- * at run time or at test time.  For a given dependency, the scope is directly derived from the
+ * Indicates when the dependency will be used.
+ * For example, it may be at compile time only, at runtime, or at test time.
+ * For a given dependency, the scope is directly derived from the
  * {@link org.apache.maven.api.model.Dependency#getScope()} and will be used when using {@link PathScope}
  * and the {@link org.apache.maven.api.services.DependencyResolver}.
  *
@@ -50,7 +50,7 @@ public enum DependencyScope {
 
     /**
      * Undefined. When no scope is explicitly given, UNDEFINED will be used, but its meaning will depend on
-     * whether the DependencyCoordinate is used in dependency management, in which case it means the scope is not
+     * whether the DependencyCoordinates is used in dependency management, in which case it means the scope is not
      * explicitly managed by this managed dependency, or as a real dependency, in which case, the scope
      * will default to {@link #COMPILE}.
      */

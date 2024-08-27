@@ -18,6 +18,7 @@
  */
 package org.apache.maven.plugin;
 
+import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.plugin.logging.Log;
 
 /**
@@ -29,6 +30,7 @@ import org.apache.maven.plugin.logging.Log;
  * will allow the Mojo to communicate to the outside world through standard Maven channels.
  *
  */
+@ThreadSafe
 public interface Mojo {
     /** The component <code>role</code> hint for Plexus container */
     String ROLE = Mojo.class.getName();

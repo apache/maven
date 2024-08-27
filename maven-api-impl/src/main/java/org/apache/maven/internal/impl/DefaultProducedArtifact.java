@@ -16,36 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api;
+package org.apache.maven.internal.impl;
 
-import java.util.Collection;
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 
 /**
- *
- * @since 4.0.0
+ * A wrapper class around a maven resolver artifact.
  */
-@Experimental
-@Immutable
-public interface DependencyCoordinate extends ArtifactCoordinate {
-    /**
-     * The type of the artifact.
-     *
-     * @return the type
-     */
-    @Nonnull
-    Type getType();
+public class DefaultProducedArtifact extends DefaultArtifact implements ProducedArtifact {
 
-    @Nonnull
-    DependencyScope getScope();
-
-    @Nullable
-    Boolean getOptional();
-
-    @Nonnull
-    Collection<Exclusion> getExclusions();
+    public DefaultProducedArtifact(
+            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
+        super(session, artifact);
+    }
 }

@@ -60,6 +60,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
 
     private static final String TOUCHFILE_NAME = "resolver-status.properties";
 
+    @Override
     public boolean isUpdateRequired(Artifact artifact, ArtifactRepository repository) {
         File file = artifact.getFile();
 
@@ -98,6 +99,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
         return (lastCheckDate == null) || policy.checkOutOfDate(lastCheckDate);
     }
 
+    @Override
     public boolean isUpdateRequired(RepositoryMetadata metadata, ArtifactRepository repository, File file) {
         // Here, we need to determine which policy to use. Release updateInterval will be used when
         // the metadata refers to a release artifact or meta-version, and snapshot updateInterval will be used when
@@ -141,11 +143,13 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
         return readLastUpdated(touchfile, key);
     }
 
+    @Override
     public String getError(Artifact artifact, ArtifactRepository repository) {
         File touchFile = getTouchfile(artifact);
         return getError(touchFile, getRepositoryKey(repository));
     }
 
+    @Override
     public void touch(Artifact artifact, ArtifactRepository repository, String error) {
         File file = artifact.getFile();
 
@@ -158,6 +162,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
         }
     }
 
+    @Override
     public void touch(RepositoryMetadata metadata, ArtifactRepository repository, File file) {
         File touchfile = getTouchfile(metadata, file);
 

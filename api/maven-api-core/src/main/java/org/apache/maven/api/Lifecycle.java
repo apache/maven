@@ -27,7 +27,13 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.model.Plugin;
 
 /**
- * Lifecycle definition
+ * A Maven lifecycle is a sequence of predefined phases that govern the build process
+ * of a Maven project. Each phase represents a specific step, such as compiling the
+ * code, running tests, packaging the project, and deploying it. Executing a phase
+ * triggers all preceding phases, ensuring that each step of the build process is
+ * completed in the correct order. The three main lifecycles in Maven are
+ * {@link #DEFAULT default}, {@link #CLEAN clean}, and {@link #SITE site}, with the
+ * {@code default} lifecycle being the most commonly used for project builds.
  *
  * @since 4.0.0
  */

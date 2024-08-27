@@ -22,16 +22,15 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Dependency;
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
@@ -42,7 +41,9 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
+import org.apache.maven.api.services.ArtifactResolverResult;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverException;
 import org.apache.maven.api.services.DependencyResolverRequest;
@@ -74,9 +75,9 @@ public class DefaultDependencyResolver implements DependencyResolver {
         InternalSession session = InternalSession.from(request.getSession());
 
         Artifact rootArtifact;
-        DependencyCoordinate root;
-        Collection<DependencyCoordinate> dependencies;
-        Collection<DependencyCoordinate> managedDependencies;
+        DependencyCoordinates root;
+        Collection<DependencyCoordinates> dependencies;
+        Collection<DependencyCoordinates> managedDependencies;
         List<RemoteRepository> remoteRepositories;
         if (request.getProject().isPresent()) {
             Project project = request.getProject().get();
@@ -152,10 +153,10 @@ public class DefaultDependencyResolver implements DependencyResolver {
             result = collectorResult;
         } else {
             List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getPathScope());
-            List<ArtifactCoordinate> coordinates = nodes.stream()
+            List<ArtifactCoordinates> coordinates = nodes.stream()
                     .map(Node::getDependency)
                     .filter(Objects::nonNull)
-                    .map(Artifact::toCoordinate)
+                    .map(Artifact::toCoordinates)
                     .collect(Collectors.toList());
             Predicate<PathType> filter = request.getPathTypeFilter();
             if (request.getRequestType() == DependencyResolverRequest.RequestType.FLATTEN) {
@@ -169,10 +170,11 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 PathModularizationCache cache = new PathModularizationCache(); // TODO: should be project-wide cache.
                 DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
                         cache, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
-                Map<Artifact, Path> artifacts = session.resolveArtifacts(coordinates);
+                ArtifactResolverResult artifactResolverResult =
+                        session.getService(ArtifactResolver.class).resolve(session, coordinates);
                 for (Node node : nodes) {
                     Dependency d = node.getDependency();
-                    Path path = (d != null) ? artifacts.get(d) : null;
+                    Path path = (d != null) ? artifactResolverResult.getPath(d) : null;
                     try {
                         resolverResult.addDependency(node, d, filter, path);
                     } catch (IOException e) {

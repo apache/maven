@@ -62,7 +62,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             VersionRangeResult res = repositorySystem.resolveVersionRange(
                     session.getSession(),
                     new VersionRangeRequest(
-                            session.toArtifact(request.getArtifactCoordinate()),
+                            session.toArtifact(request.getArtifactCoordinates()),
                             session.toRepositories(session.getRemoteRepositories()),
                             null));
 

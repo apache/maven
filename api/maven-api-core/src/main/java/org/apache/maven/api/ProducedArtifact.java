@@ -22,30 +22,26 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
-import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * <p>The <dfn>local repository</dfn> is a directory on the developer's machine where
- * Maven stores all the downloaded artifacts (such as dependencies, plugins,
- * and project artifacts). When Maven builds a project, it first checks the
- * local repository to see if the required artifacts are already available.
- * If the artifacts are found locally, Maven uses them directly, which speeds
- * up the build process by avoiding unnecessary downloads.</p>
+ * An {@link Artifact} that is being produced by a {@link Project} during the build.
  *
- * <p>By default, the local repository is located in the {@code .m2/repository}
- * directory within the user's home directory ({@code ~/.m2/repository} on
- * Unix-like systems or {@code C:\Users\YourName\.m2\repository} on Windows).
- * The location of the local repository can be customized in the
- * {@code settings.xml} file.</p>
+ * <p>Produced artifacts includes:</p><ul>
+ *     <li>{@linkplain Project#getPomArtifact() the project POM artifact}</li>
+ *     <li>{@linkplain Project#getMainArtifact() the main artifact}</li>
+ *     <li>{@linkplain org.apache.maven.api.services.ProjectManager#attachArtifact(Session, Project, Path) artifacts to be attached to a project}</li>
+ * </ul>
+ *
+ * <p>For the main artifact and attached artifacts, the
+ * {@link org.apache.maven.api.services.ArtifactManager ArtifactManager} service must be used
+ * to point the artifact to a {@link Path} during the packaging phase.</p>
  *
  * @since 4.0.0
- * @see Repository
- * @see org.apache.maven.api.settings.Settings
+ * @see Project#getMainArtifact()
+ * @see Project#getPomArtifact()
+ * @see org.apache.maven.api.services.ProjectManager#attachArtifact(Session, Project, Path)
+ * @see org.apache.maven.api.services.ArtifactManager#setPath(ProducedArtifact, Path)
  */
 @Experimental
 @Immutable
-public interface LocalRepository extends Repository {
-
-    @Nonnull
-    Path getPath();
-}
+public interface ProducedArtifact extends Artifact {}

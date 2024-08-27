@@ -27,9 +27,9 @@ import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.graph.Dependency;
 
 /**
- * Base class of {@code Dependency} or {@code DependencyCoordinate} implementations as a wrapper around
+ * Base class of {@code Dependency} or {@code DependencyCoordinates} implementations as a wrapper around
  * an Eclipse Aether object. This class implements the methods that are common to {@code Dependency} and
- * {@code DependencyCoordinate}, even if this class does not implement directly any of those interfaces.
+ * {@code DependencyCoordinates}, even if this class does not implement directly any of those interfaces.
  * Having matching method signatures is sufficient, even if there is no {@code @Override} annotations.
  *
  * <p>The fact that this class is wrapping an Eclipse Aether object is an implementation details that may

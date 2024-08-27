@@ -18,13 +18,13 @@
  */
 package org.apache.maven.internal.impl;
 
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.services.DependencyCoordinateFactory;
-import org.apache.maven.api.services.DependencyCoordinateFactoryRequest;
+import org.apache.maven.api.services.DependencyCoordinatesFactory;
+import org.apache.maven.api.services.DependencyCoordinatesFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
 import static org.apache.maven.internal.impl.Utils.map;
@@ -32,11 +32,11 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton
-public class DefaultDependencyCoordinateFactory implements DependencyCoordinateFactory {
+public class DefaultDependencyCoordinatesFactory implements DependencyCoordinatesFactory {
 
     @Nonnull
     @Override
-    public DependencyCoordinate create(@Nonnull DependencyCoordinateFactoryRequest request) {
+    public DependencyCoordinates create(@Nonnull DependencyCoordinatesFactoryRequest request) {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
 
@@ -44,16 +44,16 @@ public class DefaultDependencyCoordinateFactory implements DependencyCoordinateF
         if (request.getType() != null) {
             type = session.getSession().getArtifactTypeRegistry().get(request.getType());
         }
-        if (request.getCoordinateString() != null) {
-            return new DefaultDependencyCoordinate(
+        if (request.getCoordinatesString() != null) {
+            return new DefaultDependencyCoordinates(
                     session,
                     new org.eclipse.aether.graph.Dependency(
-                            new org.eclipse.aether.artifact.DefaultArtifact(request.getCoordinateString()),
+                            new org.eclipse.aether.artifact.DefaultArtifact(request.getCoordinatesString()),
                             request.getScope(),
                             request.isOptional(),
                             map(request.getExclusions(), this::toExclusion)));
         } else {
-            return new DefaultDependencyCoordinate(
+            return new DefaultDependencyCoordinates(
                     session,
                     new org.eclipse.aether.graph.Dependency(
                             new org.eclipse.aether.artifact.DefaultArtifact(

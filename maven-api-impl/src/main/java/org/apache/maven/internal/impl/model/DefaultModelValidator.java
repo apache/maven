@@ -285,7 +285,7 @@ public class DefaultModelValidator implements ModelValidator {
         }
     }
 
-    private final Set<String> validCoordinateIds = new HashSet<>();
+    private final Set<String> validCoordinatesIds = new HashSet<>();
 
     private final Set<String> validProfileIds = new HashSet<>();
 
@@ -640,9 +640,9 @@ public class DefaultModelValidator implements ModelValidator {
     public void validateEffectiveModel(Model m, ModelBuilderRequest request, ModelProblemCollector problems) {
         validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.BASE, m.getModelVersion(), m);
 
-        validateCoordinateId("groupId", problems, m.getGroupId(), m);
+        validateCoordinatesId("groupId", problems, m.getGroupId(), m);
 
-        validateCoordinateId("artifactId", problems, m.getArtifactId(), m);
+        validateCoordinatesId("artifactId", problems, m.getArtifactId(), m);
 
         validateStringNotEmpty("packaging", problems, Severity.ERROR, Version.BASE, m.getPackaging(), m);
 
@@ -1074,7 +1074,7 @@ public class DefaultModelValidator implements ModelValidator {
             boolean management,
             String prefix,
             ModelBuilderRequest request) {
-        validateCoordinateId(
+        validateCoordinatesId(
                 prefix,
                 "artifactId",
                 problems,
@@ -1084,7 +1084,7 @@ public class DefaultModelValidator implements ModelValidator {
                 d.getManagementKey(),
                 d);
 
-        validateCoordinateId(
+        validateCoordinatesId(
                 prefix, "groupId", problems, Severity.ERROR, Version.BASE, d.getGroupId(), d.getManagementKey(), d);
 
         if (!management) {
@@ -1148,7 +1148,7 @@ public class DefaultModelValidator implements ModelValidator {
         if (request.getValidationLevel() >= ModelBuilderRequest.VALIDATION_LEVEL_MAVEN_2_0) {
             for (Exclusion exclusion : d.getExclusions()) {
                 if (request.getValidationLevel() < ModelBuilderRequest.VALIDATION_LEVEL_MAVEN_3_0) {
-                    validateCoordinateId(
+                    validateCoordinatesId(
                             prefix,
                             "exclusions.exclusion.groupId",
                             problems,
@@ -1158,7 +1158,7 @@ public class DefaultModelValidator implements ModelValidator {
                             d.getManagementKey(),
                             exclusion);
 
-                    validateCoordinateId(
+                    validateCoordinatesId(
                             prefix,
                             "exclusions.exclusion.artifactId",
                             problems,
@@ -1168,7 +1168,7 @@ public class DefaultModelValidator implements ModelValidator {
                             d.getManagementKey(),
                             exclusion);
                 } else {
-                    validateCoordinateIdWithWildcards(
+                    validateCoordinatesIdWithWildcards(
                             prefix,
                             "exclusions.exclusion.groupId",
                             problems,
@@ -1178,7 +1178,7 @@ public class DefaultModelValidator implements ModelValidator {
                             d.getManagementKey(),
                             exclusion);
 
-                    validateCoordinateIdWithWildcards(
+                    validateCoordinatesIdWithWildcards(
                             prefix,
                             "exclusions.exclusion.artifactId",
                             problems,
@@ -1332,13 +1332,13 @@ public class DefaultModelValidator implements ModelValidator {
     // Field validation
     // ----------------------------------------------------------------------
 
-    private boolean validateCoordinateId(
+    private boolean validateCoordinatesId(
             String fieldName, ModelProblemCollector problems, String id, InputLocationTracker tracker) {
-        return validateCoordinateId(EMPTY, fieldName, problems, Severity.ERROR, Version.BASE, id, null, tracker);
+        return validateCoordinatesId(EMPTY, fieldName, problems, Severity.ERROR, Version.BASE, id, null, tracker);
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
-    private boolean validateCoordinateId(
+    private boolean validateCoordinatesId(
             String prefix,
             String fieldName,
             ModelProblemCollector problems,
@@ -1347,13 +1347,13 @@ public class DefaultModelValidator implements ModelValidator {
             String id,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (validCoordinateIds.contains(id)) {
+        if (validCoordinatesIds.contains(id)) {
             return true;
         }
         if (!validateStringNotEmpty(prefix, fieldName, problems, severity, version, id, sourceHint, tracker)) {
             return false;
         } else {
-            if (!isValidCoordinateId(id)) {
+            if (!isValidCoordinatesId(id)) {
                 addViolation(
                         problems,
                         severity,
@@ -1364,22 +1364,22 @@ public class DefaultModelValidator implements ModelValidator {
                         tracker);
                 return false;
             }
-            validCoordinateIds.add(id);
+            validCoordinatesIds.add(id);
             return true;
         }
     }
 
-    private boolean isValidCoordinateId(String id) {
+    private boolean isValidCoordinatesId(String id) {
         for (int i = 0; i < id.length(); i++) {
             char c = id.charAt(i);
-            if (!isValidCoordinateIdCharacter(c)) {
+            if (!isValidCoordinatesIdCharacter(c)) {
                 return false;
             }
         }
         return true;
     }
 
-    private boolean isValidCoordinateIdCharacter(char c) {
+    private boolean isValidCoordinatesIdCharacter(char c) {
         return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-' || c == '_' || c == '.';
     }
 
@@ -1428,7 +1428,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
-    private boolean validateCoordinateIdWithWildcards(
+    private boolean validateCoordinatesIdWithWildcards(
             String prefix,
             String fieldName,
             ModelProblemCollector problems,
@@ -1440,7 +1440,7 @@ public class DefaultModelValidator implements ModelValidator {
         if (!validateStringNotEmpty(prefix, fieldName, problems, severity, version, id, sourceHint, tracker)) {
             return false;
         } else {
-            if (!isValidCoordinateIdWithWildCards(id)) {
+            if (!isValidCoordinatesIdWithWildCards(id)) {
                 addViolation(
                         problems,
                         severity,
@@ -1455,18 +1455,18 @@ public class DefaultModelValidator implements ModelValidator {
         }
     }
 
-    private boolean isValidCoordinateIdWithWildCards(String id) {
+    private boolean isValidCoordinatesIdWithWildCards(String id) {
         for (int i = 0; i < id.length(); i++) {
             char c = id.charAt(i);
-            if (!isValidCoordinateIdWithWildCardCharacter(c)) {
+            if (!isValidCoordinatesIdWithWildCardCharacter(c)) {
                 return false;
             }
         }
         return true;
     }
 
-    private boolean isValidCoordinateIdWithWildCardCharacter(char c) {
-        return isValidCoordinateIdCharacter(c) || c == '?' || c == '*';
+    private boolean isValidCoordinatesIdWithWildCardCharacter(char c) {
+        return isValidCoordinatesIdCharacter(c) || c == '?' || c == '*';
     }
 
     private boolean validateStringNoExpression(

@@ -5,13 +5,13 @@ org.apache.maven.api.spi.ModelParser
 org.apache.maven.api.spi.PackagingProvider
 org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory
 org.apache.maven.internal.aether.LegacyRepositorySystemSessionExtender
-org.apache.maven.internal.impl.DefaultArtifactCoordinateFactory
+org.apache.maven.internal.impl.DefaultArtifactCoordinatesFactory
 org.apache.maven.internal.impl.DefaultArtifactDeployer
 org.apache.maven.internal.impl.DefaultArtifactFactory
 org.apache.maven.internal.impl.DefaultArtifactInstaller
 org.apache.maven.internal.impl.DefaultArtifactResolver
 org.apache.maven.internal.impl.DefaultChecksumAlgorithmService
-org.apache.maven.internal.impl.DefaultDependencyCoordinateFactory
+org.apache.maven.internal.impl.DefaultDependencyCoordinatesFactory
 org.apache.maven.internal.impl.DefaultDependencyResolver
 org.apache.maven.internal.impl.DefaultLocalRepositoryManager
 org.apache.maven.internal.impl.DefaultMessageBuilderFactory

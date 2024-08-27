@@ -18,26 +18,26 @@
  */
 package org.apache.maven.internal.impl;
 
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.services.ArtifactCoordinateFactory;
-import org.apache.maven.api.services.ArtifactCoordinateFactoryRequest;
+import org.apache.maven.api.services.ArtifactCoordinatesFactory;
+import org.apache.maven.api.services.ArtifactCoordinatesFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton
-public class DefaultArtifactCoordinateFactory implements ArtifactCoordinateFactory {
+public class DefaultArtifactCoordinatesFactory implements ArtifactCoordinatesFactory {
     @Override
-    public ArtifactCoordinate create(@Nonnull ArtifactCoordinateFactoryRequest request) {
+    public ArtifactCoordinates create(@Nonnull ArtifactCoordinatesFactoryRequest request) {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
-        if (request.getCoordinateString() != null) {
-            return new DefaultArtifactCoordinate(
-                    session, new org.eclipse.aether.artifact.DefaultArtifact(request.getCoordinateString()));
+        if (request.getCoordinatesString() != null) {
+            return new DefaultArtifactCoordinates(
+                    session, new org.eclipse.aether.artifact.DefaultArtifact(request.getCoordinatesString()));
         } else {
             ArtifactType type = null;
             if (request.getType() != null) {
@@ -50,7 +50,7 @@ public class DefaultArtifactCoordinateFactory implements ArtifactCoordinateFacto
             String str = request.getExtension();
             String extension =
                     str != null && !str.isEmpty() ? request.getExtension() : type != null ? type.getExtension() : "";
-            return new DefaultArtifactCoordinate(
+            return new DefaultArtifactCoordinates(
                     session,
                     new org.eclipse.aether.artifact.DefaultArtifact(
                             request.getGroupId(),

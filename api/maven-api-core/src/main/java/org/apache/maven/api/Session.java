@@ -31,7 +31,8 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Repository;
-import org.apache.maven.api.services.DependencyCoordinateFactory;
+import org.apache.maven.api.services.ArtifactCoordinatesFactory;
+import org.apache.maven.api.services.DependencyCoordinatesFactory;
 import org.apache.maven.api.settings.Settings;
 
 /**
@@ -47,15 +48,35 @@ import org.apache.maven.api.settings.Settings;
 @ThreadSafe
 public interface Session {
 
+    /**
+     * Retrieves the settings for the current session.
+     *
+     * @return the settings instance
+     */
     @Nonnull
     Settings getSettings();
 
+    /**
+     * Retrieves the local repository associated with this session.
+     *
+     * @return the local repository instance
+     */
     @Nonnull
     LocalRepository getLocalRepository();
 
+    /**
+     * Retrieves a list of remote repositories associated with this session.
+     *
+     * @return a list of remote repositories
+     */
     @Nonnull
     List<RemoteRepository> getRemoteRepositories();
 
+    /**
+     * Retrieves the session data associated with this session.
+     *
+     * @return the session data, never {@code null}
+     */
     @Nonnull
     SessionData getData();
 
@@ -101,20 +122,35 @@ public interface Session {
     Map<String, String> getEffectiveProperties(@Nullable Project project);
 
     /**
-     * Returns the current maven version
+     * Returns the current maven version.
+     *
      * @return the maven version, never {@code null}
      */
     @Nonnull
     Version getMavenVersion();
 
+    /**
+     * Returns the degree of concurrency for the build.
+     *
+     * @return  the degree of concurrency
+     */
     int getDegreeOfConcurrency();
 
+    /**
+     * Returns the start time of the session.
+     *
+     * @return the start time as an Instant object, never {@code null}
+     */
     @Nonnull
     Instant getStartTime();
 
     /**
      * Gets the directory of the topmost project being built, usually the current directory or the
      * directory pointed at by the {@code -f/--file} command line argument.
+     *
+     * @return the directory of the topmost project, never {@code null}
+     * @see Project#isTopProject()
+     * @see #getRootDirectory()
      */
     @Nonnull
     Path getTopDirectory();
@@ -122,13 +158,20 @@ public interface Session {
     /**
      * Gets the root directory of the session, which is the root directory for the top directory project.
      *
+     * @return the root directory, never {@code null}
      * @throws IllegalStateException if the root directory could not be found
      * @see #getTopDirectory()
      * @see Project#getRootDirectory()
+     * @see Project#isRootProject()
      */
     @Nonnull
     Path getRootDirectory();
 
+    /**
+     * Retrieves a list of projects associated with the session.
+     *
+     * @return a list of projects, never {@code null}
+     */
     @Nonnull
     List<Project> getProjects();
 
@@ -231,18 +274,18 @@ public interface Session {
     RemoteRepository createRemoteRepository(@Nonnull Repository repository);
 
     /**
-     * Creates a coordinate out of string that is formatted like:
+     * Creates a coordinates out of string that is formatted like:
      * {@code <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>}.
      * <p>
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
      *
-     * @param coordString the string having "standard" coordinate.
-     * @return coordinate used to point to the artifact
+     * @param coordsString the string having "standard" coordinates.
+     * @return coordinates used to point to the artifact
      *
-     * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String)
+     * @see ArtifactCoordinatesFactory#create(Session, String)
      */
     @Nonnull
-    ArtifactCoordinate createArtifactCoordinate(@Nonnull String coordString);
+    ArtifactCoordinates createArtifactCoordinates(@Nonnull String coordsString);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
@@ -251,12 +294,12 @@ public interface Session {
      * @param artifactId the artifact identifier, or {@code null} is unspecified
      * @param version the artifact version, or {@code null} is unspecified
      * @param extension the artifact extension, or {@code null} is unspecified
-     * @return coordinate used to point to the artifact
+     * @return coordinates used to point to the artifact
      *
-     * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String, String, String, String)
+     * @see ArtifactCoordinatesFactory#create(Session, String, String, String, String)
      */
     @Nonnull
-    ArtifactCoordinate createArtifactCoordinate(String groupId, String artifactId, String version, String extension);
+    ArtifactCoordinates createArtifactCoordinates(String groupId, String artifactId, String version, String extension);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
@@ -267,46 +310,46 @@ public interface Session {
      * @param classifier the artifact classifier, or {@code null} is unspecified
      * @param extension the artifact extension, or {@code null} is unspecified
      * @param type the artifact type, or {@code null} is unspecified
-     * @return coordinate used to point to the artifact
+     * @return coordinates used to point to the artifact
      *
-     * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String, String, String, String, String, String)
+     * @see ArtifactCoordinatesFactory#create(Session, String, String, String, String, String, String)
      */
     @Nonnull
-    ArtifactCoordinate createArtifactCoordinate(
+    ArtifactCoordinates createArtifactCoordinates(
             String groupId, String artifactId, String version, String classifier, String extension, String type);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
      *
      * @param artifact artifact from which to get coordinates
-     * @return coordinate used to point to the artifact
+     * @return coordinates used to point to the artifact
      *
-     * @see org.apache.maven.api.services.ArtifactCoordinateFactory#create(Session, String, String, String, String, String, String)
+     * @see ArtifactCoordinatesFactory#create(Session, String, String, String, String, String, String)
      */
     @Nonnull
-    ArtifactCoordinate createArtifactCoordinate(@Nonnull Artifact artifact);
+    ArtifactCoordinates createArtifactCoordinates(@Nonnull Artifact artifact);
 
     /**
      * Shortcut for {@code getService(DependencyFactory.class).create(...)}.
      *
-     * @param coordinate artifact coordinate to get as a dependency coordinate
-     * @return dependency coordinate for the given artifact
+     * @param coordinates artifact coordinates to get as a dependency coordinates
+     * @return dependency coordinates for the given artifact
      *
-     * @see DependencyCoordinateFactory#create(Session, ArtifactCoordinate)
+     * @see DependencyCoordinatesFactory#create(Session, ArtifactCoordinates)
      */
     @Nonnull
-    DependencyCoordinate createDependencyCoordinate(@Nonnull ArtifactCoordinate coordinate);
+    DependencyCoordinates createDependencyCoordinates(@Nonnull ArtifactCoordinates coordinates);
 
     /**
      * Shortcut for {@code getService(DependencyFactory.class).create(...)}.
      *
-     * @param dependency dependency for which to get the coordinate
-     * @return coordinate for the given dependency
+     * @param dependency dependency for which to get the coordinates
+     * @return coordinates for the given dependency
      *
-     * @see DependencyCoordinateFactory#create(Session, Dependency)
+     * @see DependencyCoordinatesFactory#create(Session, Dependency)
      */
     @Nonnull
-    DependencyCoordinate createDependencyCoordinate(@Nonnull Dependency dependency);
+    DependencyCoordinates createDependencyCoordinates(@Nonnull Dependency dependency);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
@@ -340,16 +383,47 @@ public interface Session {
             String groupId, String artifactId, String version, String classifier, String extension, String type);
 
     /**
+     * Shortcut for {@code getService(ArtifactFactory.class).createProduced(...)}.
+     *
+     * @param groupId the group identifier, or {@code null} is unspecified
+     * @param artifactId the artifact identifier, or {@code null} is unspecified
+     * @param version the artifact version, or {@code null} is unspecified
+     * @param extension the artifact extension, or {@code null} is unspecified
+     * @return artifact with the given coordinates
+     *
+     * @see org.apache.maven.api.services.ArtifactFactory#createProduced(Session, String, String, String, String)
+     */
+    @Nonnull
+    ProducedArtifact createProducedArtifact(String groupId, String artifactId, String version, String extension);
+
+    /**
+     * Shortcut for {@code getService(ArtifactFactory.class).createProduced(...)}.
+     *
+     * @param groupId the group identifier, or {@code null} is unspecified
+     * @param artifactId the artifact identifier, or {@code null} is unspecified
+     * @param version the artifact version, or {@code null} is unspecified
+     * @param classifier the artifact classifier, or {@code null} is unspecified
+     * @param extension the artifact extension, or {@code null} is unspecified
+     * @param type the artifact type, or {@code null} is unspecified
+     * @return artifact with the given coordinates
+     *
+     * @see org.apache.maven.api.services.ArtifactFactory#createProduced(Session, String, String, String, String, String, String)
+     */
+    @Nonnull
+    ProducedArtifact createProducedArtifact(
+            String groupId, String artifactId, String version, String classifier, String extension, String type);
+
+    /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
      *
-     * @param coordinate coordinates of the artifact to resolve
+     * @param coordinates coordinates of the artifact to resolve
      * @return requested artifact together with the path to its file
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
      *
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
     @Nonnull
-    Map.Entry<Artifact, Path> resolveArtifact(@Nonnull ArtifactCoordinate coordinate);
+    DownloadedArtifact resolveArtifact(@Nonnull ArtifactCoordinates coordinates);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -361,7 +435,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
     @Nonnull
-    Map<Artifact, Path> resolveArtifacts(@Nonnull ArtifactCoordinate... coordinates);
+    Collection<DownloadedArtifact> resolveArtifacts(@Nonnull ArtifactCoordinates... coordinates);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -373,7 +447,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
     @Nonnull
-    Map<Artifact, Path> resolveArtifacts(@Nonnull Collection<? extends ArtifactCoordinate> coordinates);
+    Collection<DownloadedArtifact> resolveArtifacts(@Nonnull Collection<? extends ArtifactCoordinates> coordinates);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -385,7 +459,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
     @Nonnull
-    Map.Entry<Artifact, Path> resolveArtifact(@Nonnull Artifact artifact);
+    DownloadedArtifact resolveArtifact(@Nonnull Artifact artifact);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -397,7 +471,7 @@ public interface Session {
      * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      */
     @Nonnull
-    Map<Artifact, Path> resolveArtifacts(@Nonnull Artifact... artifacts);
+    Collection<DownloadedArtifact> resolveArtifacts(@Nonnull Artifact... artifacts);
 
     /**
      * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}.
@@ -436,9 +510,9 @@ public interface Session {
      * @param artifact the artifact for which to associate a path
      * @param path path to associate to the given artifact
      *
-     * @see org.apache.maven.api.services.ArtifactManager#setPath(Artifact, Path)
+     * @see org.apache.maven.api.services.ArtifactManager#setPath(ProducedArtifact, Path)
      */
-    void setArtifactPath(@Nonnull Artifact artifact, @Nonnull Path path);
+    void setArtifactPath(@Nonnull ProducedArtifact artifact, @Nonnull Path path);
 
     /**
      * Shortcut for {@code getService(ArtifactManager.class).getPath(...)}.
@@ -529,11 +603,11 @@ public interface Session {
      * @param dependency dependency for which to get transitive dependencies
      * @return root node of the dependency graph for the given artifact
      *
-     * @see org.apache.maven.api.services.DependencyResolver#collect(Session, DependencyCoordinate)
+     * @see org.apache.maven.api.services.DependencyResolver#collect(Session, DependencyCoordinates)
      * @throws org.apache.maven.api.services.DependencyResolverException if the dependency collection failed
      */
     @Nonnull
-    Node collectDependencies(@Nonnull DependencyCoordinate dependency);
+    Node collectDependencies(@Nonnull DependencyCoordinates dependency);
 
     /**
      * Shortcut for {@code getService(DependencyResolver.class).flatten(...)}.
@@ -551,13 +625,13 @@ public interface Session {
     /**
      * Shortcut for {@code getService(DependencyResolver.class).resolve(...).getPaths()}.
      *
-     * @param dependencyCoordinate coordinate of the dependency for which to get the paths
+     * @param dependencyCoordinates coordinates of the dependency for which to get the paths
      * @return paths to the transitive dependencies of the given dependency
      *
-     * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, DependencyCoordinate)
+     * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, DependencyCoordinates)
      */
     @Nonnull
-    List<Path> resolveDependencies(@Nonnull DependencyCoordinate dependencyCoordinate);
+    List<Path> resolveDependencies(@Nonnull DependencyCoordinates dependencyCoordinates);
 
     /**
      * Shortcut for {@code getService(DependencyResolver.class).resolve(...).getPaths()}.
@@ -568,7 +642,7 @@ public interface Session {
      * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, List)
      */
     @Nonnull
-    List<Path> resolveDependencies(@Nonnull List<DependencyCoordinate> dependencyCoordinates);
+    List<Path> resolveDependencies(@Nonnull List<DependencyCoordinates> dependencyCoordinates);
 
     /**
      * Shortcut for {@code getService(DependencyResolver.class).resolve(...).getPaths()}.
@@ -585,7 +659,7 @@ public interface Session {
     /**
      * Shortcut for {@code getService(DependencyResolver.class).resolve(...).getDispatchedPaths()}.
      *
-     * @param dependencyCoordinate coordinate of the dependency for which to get the paths
+     * @param dependencyCoordinates coordinates of the dependency for which to get the paths
      * @param scope build path scope (main compile, test compile, etc.) of desired paths
      * @param desiredTypes the type of paths to include in the result
      * @return paths to the transitive dependencies of the given project
@@ -594,7 +668,7 @@ public interface Session {
      */
     @Nonnull
     Map<PathType, List<Path>> resolveDependencies(
-            @Nonnull DependencyCoordinate dependencyCoordinate,
+            @Nonnull DependencyCoordinates dependencyCoordinates,
             @Nonnull PathScope scope,
             @Nonnull Collection<PathType> desiredTypes);
 
@@ -613,8 +687,8 @@ public interface Session {
             @Nonnull Project project, @Nonnull PathScope scope, @Nonnull Collection<PathType> desiredTypes);
 
     /**
-     * Resolves an artifact's meta version (if any) to a concrete version. For example, resolves "1.0-SNAPSHOT"
-     * to "1.0-20090208.132618-23" or "RELEASE"/"LATEST" to "2.0".
+     * Resolves an artifact's meta version (if any) to a concrete version.
+     * For example, resolves "1.0-SNAPSHOT" to "1.0-20090208.132618-23".
      * <p>
      * Shortcut for {@code getService(VersionResolver.class).resolve(...)}
      *
@@ -622,10 +696,10 @@ public interface Session {
      * @return resolved version of the given artifact
      * @throws org.apache.maven.api.services.VersionResolverException if the resolution failed
      *
-     * @see org.apache.maven.api.services.VersionResolver#resolve(Session, ArtifactCoordinate) (String)
+     * @see org.apache.maven.api.services.VersionResolver#resolve(Session, ArtifactCoordinates) (String)
      */
     @Nonnull
-    Version resolveVersion(@Nonnull ArtifactCoordinate artifact);
+    Version resolveVersion(@Nonnull ArtifactCoordinates artifact);
 
     /**
      * Expands a version range to a list of matching versions, in ascending order.
@@ -638,10 +712,10 @@ public interface Session {
      * @param artifact the artifact for which to resolve the versions
      * @return a list of resolved {@code Version}s.
      * @throws org.apache.maven.api.services.VersionRangeResolverException if the resolution failed
-     * @see org.apache.maven.api.services.VersionRangeResolver#resolve(Session, ArtifactCoordinate) (String)
+     * @see org.apache.maven.api.services.VersionRangeResolver#resolve(Session, ArtifactCoordinates) (String)
      */
     @Nonnull
-    List<Version> resolveVersionRange(@Nonnull ArtifactCoordinate artifact);
+    List<Version> resolveVersionRange(@Nonnull ArtifactCoordinates artifact);
 
     /**
      * Parses the specified version string, for example "1.0".
