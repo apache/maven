@@ -20,14 +20,14 @@ package org.apache.maven.internal.impl;
 
 import java.util.Collection;
 
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
-public class DefaultDependencyCoordinate extends AetherDependencyWrapper implements DependencyCoordinate {
-    public DefaultDependencyCoordinate(
+public class DefaultDependencyCoordinates extends AetherDependencyWrapper implements DependencyCoordinates {
+    public DefaultDependencyCoordinates(
             @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency) {
         super(session, dependency);
     }

@@ -22,9 +22,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Dependency;
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.RemoteRepository;
@@ -73,15 +73,15 @@ public interface InternalSession extends Session {
     org.eclipse.aether.repository.LocalRepository toRepository(LocalRepository repository);
 
     List<org.eclipse.aether.graph.Dependency> toDependencies(
-            Collection<DependencyCoordinate> dependencies, boolean managed);
+            Collection<DependencyCoordinates> dependencies, boolean managed);
 
-    org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency, boolean managed);
+    org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinates dependency, boolean managed);
 
     List<org.eclipse.aether.artifact.Artifact> toArtifacts(Collection<Artifact> artifacts);
 
     org.eclipse.aether.artifact.Artifact toArtifact(Artifact artifact);
 
-    org.eclipse.aether.artifact.Artifact toArtifact(ArtifactCoordinate coord);
+    org.eclipse.aether.artifact.Artifact toArtifact(ArtifactCoordinates coords);
 
     RepositorySystemSession getSession();
 

@@ -22,7 +22,7 @@ import java.util.Objects;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -70,8 +70,8 @@ public class DefaultDependency extends AetherDependencyWrapper implements Depend
 
     @Nonnull
     @Override
-    public DependencyCoordinate toCoordinate() {
-        return session.createDependencyCoordinate(this);
+    public DependencyCoordinates toCoordinates() {
+        return session.createDependencyCoordinates(this);
     }
 
     @Override

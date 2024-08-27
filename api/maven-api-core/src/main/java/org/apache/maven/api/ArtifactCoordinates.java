@@ -23,15 +23,15 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Partial identification of an {@code Artifact} in a Maven repository.
- * Each {@code ArtifactCoordinate} instance is basically a pointer to a file in the Maven repository,
+ * Partial identification of an {@link Artifact} in a Maven repository.
+ * Each {@code ArtifactCoordinates} instance is basically a pointer to a file in the Maven repository,
  * except that the exact version may not be known yet.
  *
  * @since 4.0.0
  */
 @Experimental
 @Immutable
-public interface ArtifactCoordinate {
+public interface ArtifactCoordinates {
     /**
      * {@return the group identifier of the artifact}.
      */

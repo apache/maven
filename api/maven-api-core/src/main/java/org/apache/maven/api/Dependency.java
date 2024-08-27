@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * A result of collecting, flattening and resolving {@code DependencyCoordinate}s.
+ * A result of collecting, flattening and resolving {@link DependencyCoordinates}s.
  * Dependency is the output of the <dfn>collection</dfn> process, which builds the graph of dependencies,
  * followed by <dfn>flattening</dfn> and <dfn>resolution</dfn>.
  * The version selection is done for each dependency during the collection phase.
@@ -40,7 +40,7 @@ public interface Dependency extends Artifact {
      * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module-path,
      * a <abbr>JAR</abbr> containing test classes, <i>etc.</i>
      *
-     * @see DependencyCoordinate#getType()
+     * @see DependencyCoordinates#getType()
      */
     @Nonnull
     Type getType();
@@ -49,25 +49,25 @@ public interface Dependency extends Artifact {
      * {@return the time at which the dependency will be used}.
      * If may be, for example, at compile time only, at run time or at test time.
      *
-     * @see DependencyCoordinate#getScope()
+     * @see DependencyCoordinates#getScope()
      */
     @Nonnull
     DependencyScope getScope();
 
     /**
      * Returns whether the dependency is optional or mandatory.
-     * Contrarily to {@link DependencyCoordinate}, the obligation of a {@code Dependency} is always present.
+     * Contrarily to {@link DependencyCoordinates}, the obligation of a {@code Dependency} is always present.
      * The value is computed during the dependencies collection phase.
      *
      * @return {@code true} if the dependency is optional, or {@code false} if mandatory
-     * @see DependencyCoordinate#getOptional()
+     * @see DependencyCoordinates#getOptional()
      */
     boolean isOptional();
 
     /**
-     * {@return coordinate with the same identifiers as this dependency}
+     * {@return coordinates with the same identifiers as this dependency}
      */
     @Nonnull
     @Override
-    DependencyCoordinate toCoordinate();
+    DependencyCoordinates toCoordinates();
 }

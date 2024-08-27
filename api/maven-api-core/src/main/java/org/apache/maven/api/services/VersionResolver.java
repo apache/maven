@@ -18,7 +18,7 @@
  */
 package org.apache.maven.api.services;
 
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Consumer;
@@ -39,14 +39,14 @@ public interface VersionResolver extends Service {
      * For example, resolves "1.0-SNAPSHOT" to "1.0-20090208.132618-23".
      *
      * @param session The repository session, must not be {@code null}.
-     * @param artifactCoordinate The artifact coordinate for which the version needs to be resolved, must not be {@code null}
+     * @param artifactCoordinates The artifact coordinates for which the version needs to be resolved, must not be {@code null}
      * @return The version result, never {@code null}.
      * @throws VersionResolverException If the metaversion could not be resolved.
      */
     @Nonnull
-    default VersionResolverResult resolve(@Nonnull Session session, @Nonnull ArtifactCoordinate artifactCoordinate)
+    default VersionResolverResult resolve(@Nonnull Session session, @Nonnull ArtifactCoordinates artifactCoordinates)
             throws VersionResolverException {
-        return resolve(VersionResolverRequest.build(session, artifactCoordinate));
+        return resolve(VersionResolverRequest.build(session, artifactCoordinates));
     }
 
     /**

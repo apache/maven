@@ -18,8 +18,8 @@
  */
 package org.apache.maven.api.services;
 
-import org.apache.maven.api.ArtifactCoordinate;
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -33,33 +33,34 @@ import org.apache.maven.api.model.ReportPlugin;
  * @since 4.0.0
  */
 @Experimental
-public interface DependencyCoordinateFactory extends Service {
+public interface DependencyCoordinatesFactory extends Service {
 
     /**
-     * Creates a new {@link DependencyCoordinate} object from the request.
+     * Creates a new {@link DependencyCoordinates} object from the request.
      *
      * @param request the request containing the various data
-     * @return a new {@link DependencyCoordinate} object
+     * @return a new {@link DependencyCoordinates} object
      *
      * @throws IllegalArgumentException if {@code request} is null or
      *         if {@code request.getSession()} is null or invalid
      */
     @Nonnull
-    DependencyCoordinate create(@Nonnull DependencyCoordinateFactoryRequest request);
+    DependencyCoordinates create(@Nonnull DependencyCoordinatesFactoryRequest request);
 
     @Nonnull
-    default DependencyCoordinate create(@Nonnull Session session, @Nonnull ArtifactCoordinate coordinate) {
-        return create(DependencyCoordinateFactoryRequest.build(session, coordinate));
+    default DependencyCoordinates create(@Nonnull Session session, @Nonnull ArtifactCoordinates coordinates) {
+        return create(DependencyCoordinatesFactoryRequest.build(session, coordinates));
     }
 
     @Nonnull
-    default DependencyCoordinate create(@Nonnull Session session, @Nonnull org.apache.maven.api.Dependency dependency) {
-        return create(DependencyCoordinateFactoryRequest.build(session, dependency));
+    default DependencyCoordinates create(
+            @Nonnull Session session, @Nonnull org.apache.maven.api.Dependency dependency) {
+        return create(DependencyCoordinatesFactoryRequest.build(session, dependency));
     }
 
     @Nonnull
-    default DependencyCoordinate create(@Nonnull Session session, Dependency dependency) {
-        return create(DependencyCoordinateFactoryRequest.build(
+    default DependencyCoordinates create(@Nonnull Session session, Dependency dependency) {
+        return create(DependencyCoordinatesFactoryRequest.build(
                 session,
                 dependency.getGroupId(),
                 dependency.getArtifactId(),
@@ -70,16 +71,16 @@ public interface DependencyCoordinateFactory extends Service {
     }
 
     @Nonnull
-    default DependencyCoordinate create(@Nonnull Session session, Plugin plugin) {
+    default DependencyCoordinates create(@Nonnull Session session, Plugin plugin) {
         // TODO: hard coded string
-        return create(DependencyCoordinateFactoryRequest.build(
+        return create(DependencyCoordinatesFactoryRequest.build(
                 session, plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null, null, "maven-plugin"));
     }
 
     @Nonnull
-    default DependencyCoordinate create(@Nonnull Session session, ReportPlugin reportPlugin) {
+    default DependencyCoordinates create(@Nonnull Session session, ReportPlugin reportPlugin) {
         // TODO: hard coded string
-        return create(DependencyCoordinateFactoryRequest.build(
+        return create(DependencyCoordinatesFactoryRequest.build(
                 session,
                 reportPlugin.getGroupId(),
                 reportPlugin.getArtifactId(),

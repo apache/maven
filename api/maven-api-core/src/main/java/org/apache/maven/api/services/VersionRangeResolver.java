@@ -18,7 +18,7 @@
  */
 package org.apache.maven.api.services;
 
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Consumer;
@@ -43,14 +43,15 @@ public interface VersionRangeResolver extends Service {
      * repositories and their contents.
      *
      * @param session the session to use
-     * @param artifactCoordinate t
+     * @param artifactCoordinates t
      * @return the version range resolution result
      * @throws VersionResolverException if an errors occurs
      */
     @Nonnull
-    default VersionRangeResolverResult resolve(@Nonnull Session session, @Nonnull ArtifactCoordinate artifactCoordinate)
+    default VersionRangeResolverResult resolve(
+            @Nonnull Session session, @Nonnull ArtifactCoordinates artifactCoordinates)
             throws VersionResolverException {
-        return resolve(VersionRangeResolverRequest.build(session, artifactCoordinate));
+        return resolve(VersionRangeResolverRequest.build(session, artifactCoordinates));
     }
 
     @Nonnull
