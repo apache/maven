@@ -138,7 +138,8 @@ public class SessionScope implements Scope, org.apache.maven.di.Scope {
         } else {
             for (Annotation a : superType.getAnnotations()) {
                 Class<? extends Annotation> annotationType = a.annotationType();
-                if ("org.eclipse.sisu.Typed".equals(annotationType.getName())
+                if ("org.apache.maven.api.di.Typed".equals(annotationType.getName())
+                        || "org.eclipse.sisu.Typed".equals(annotationType.getName())
                         || "javax.enterprise.inject.Typed".equals(annotationType.getName())
                         || "jakarta.enterprise.inject.Typed".equals(annotationType.getName())) {
                     try {

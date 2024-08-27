@@ -128,8 +128,15 @@ public abstract class Key<T> {
      * and prepended qualifier display string if this key has a qualifier.
      */
     public String getDisplayString() {
-        return (qualifier != null ? Utils.getDisplayString(qualifier) + " " : "")
-                + ReflectionUtils.getDisplayName(type);
+        return (qualifier != null ? getQualifierDisplayString() + " " : "") + ReflectionUtils.getDisplayName(type);
+    }
+
+    private String getQualifierDisplayString() {
+        if (qualifier instanceof String s) {
+            return s.isEmpty() ? "@Named" : "@Named(\"" + s + "\")";
+        }
+        String s = Utils.getDisplayString(qualifier);
+        return s;
     }
 
     @Override
@@ -155,6 +162,6 @@ public abstract class Key<T> {
 
     @Override
     public String toString() {
-        return (qualifier != null ? qualifier + " " : "") + type.getTypeName();
+        return getDisplayString();
     }
 }

@@ -55,13 +55,16 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 @Named
-class SisuDiBridgeModule extends AbstractModule {
+public class SisuDiBridgeModule extends AbstractModule {
+
+    InjectorImpl injector;
+    final Set<String> loaded = new HashSet<>();
 
     @Override
     protected void configure() {
         Provider<PlexusContainer> containerProvider = getProvider(PlexusContainer.class);
 
-        InjectorImpl injector = new InjectorImpl() {
+        injector = new InjectorImpl() {
             @Override
             public <Q> Supplier<Q> getCompiledBinding(Key<Q> key) {
                 Set<Binding<Q>> res = getBindings(key);
@@ -142,38 +145,12 @@ class SisuDiBridgeModule extends AbstractModule {
         });
         injector.bindInstance(Injector.class, injector);
         bind(Injector.class).toInstance(injector);
+        bind(SisuDiBridgeModule.class).toInstance(this);
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         if (classLoader == null) {
             classLoader = getClass().getClassLoader();
         }
-        try {
-            for (Iterator<URL> it = classLoader
-                            .getResources("META-INF/maven/org.apache.maven.api.di.Inject")
-                            .asIterator();
-                    it.hasNext(); ) {
-                URL url = it.next();
-                List<String> lines;
-                try (InputStream is = url.openStream();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                    lines = reader.lines()
-                            .map(String::trim)
-                            .filter(s -> !s.isEmpty() && !s.startsWith("#"))
-                            .toList();
-                }
-                for (String className : lines) {
-                    try {
-                        Class<?> clazz = classLoader.loadClass(className);
-                        injector.bindImplicit(clazz);
-                    } catch (ClassNotFoundException e) {
-                        // ignore
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-        } catch (IOException e) {
-            throw new MavenException(e);
-        }
+        loadFromClassLoader(classLoader);
         injector.getBindings().keySet().stream()
                 .filter(k -> k.getQualifier() != null)
                 .sorted(Comparator.comparing(k -> k.getRawType().getName()))
@@ -185,7 +162,7 @@ class SisuDiBridgeModule extends AbstractModule {
                             : (Class<Object>) (clazz.getInterfaces().length > 0 ? clazz.getInterfaces()[0] : clazz));
                     if (itf != null) {
                         AnnotatedBindingBuilder<Object> binder = bind(itf);
-                        if (key.getQualifier() instanceof String s) {
+                        if (key.getQualifier() instanceof String s && !s.isEmpty()) {
                             binder.annotatedWith(Names.named(s));
                         } else if (key.getQualifier() instanceof Annotation a) {
                             binder.annotatedWith(a);
@@ -193,5 +170,38 @@ class SisuDiBridgeModule extends AbstractModule {
                         binder.toProvider(() -> injector.getInstance(clazz));
                     }
                 });
+    }
+
+    public void loadFromClassLoader(ClassLoader classLoader) {
+        try {
+            for (Iterator<URL> it = classLoader
+                            .getResources("META-INF/maven/org.apache.maven.api.di.Inject")
+                            .asIterator();
+                    it.hasNext(); ) {
+                URL url = it.next();
+                if (loaded.add(url.toExternalForm())) {
+                    List<String> lines;
+                    try (InputStream is = url.openStream();
+                            BufferedReader reader =
+                                    new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                        lines = reader.lines()
+                                .map(String::trim)
+                                .filter(s -> !s.isEmpty() && !s.startsWith("#"))
+                                .toList();
+                    }
+                    for (String className : lines) {
+                        try {
+                            Class<?> clazz = classLoader.loadClass(className);
+                            injector.bindImplicit(clazz);
+                        } catch (ClassNotFoundException e) {
+                            // ignore
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new MavenException(e);
+        }
     }
 }
