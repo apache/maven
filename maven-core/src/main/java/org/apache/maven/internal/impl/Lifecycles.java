@@ -35,8 +35,8 @@ public class Lifecycles {
         return new DefaultPhase(name, Collections.singletonList(plugin), Collections.emptyList());
     }
 
-    static Plugin plugin(String coord, String phase) {
-        String[] c = coord.split(":");
+    static Plugin plugin(String coords, String phase) {
+        String[] c = coords.split(":");
         return Plugin.newBuilder()
                 .groupId(c[0])
                 .artifactId(c[1])

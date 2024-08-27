@@ -16,25 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.api;
 
 import java.nio.file.Path;
 
-import org.apache.maven.api.ResolvedArtifact;
-import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 
 /**
- * A wrapper class around a maven resolver artifact.
+ * An {@link Artifact} that has been resolved, i.e. downloaded to the local repository.
+ *
+ * @since 4.0.0
  */
-public class DefaultResolvedArtifact extends DefaultArtifact implements ResolvedArtifact {
+@Experimental
+@Immutable
+public interface DownloadedArtifact extends Artifact {
 
-    public DefaultResolvedArtifact(
-            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
-        super(session, artifact);
-    }
-
-    @Override
-    public Path getPath() {
-        return artifact.getPath();
-    }
+    /**
+     * {@return the actual file that has been downloaded in the file system}
+     */
+    Path getPath();
 }

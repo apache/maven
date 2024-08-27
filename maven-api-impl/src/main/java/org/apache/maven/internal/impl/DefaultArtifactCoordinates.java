@@ -20,7 +20,7 @@ package org.apache.maven.internal.impl;
 
 import java.util.Objects;
 
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -29,47 +29,47 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 /**
  * A wrapper class around a maven resolver artifact.
  */
-public class DefaultArtifactCoordinate implements ArtifactCoordinate {
+public class DefaultArtifactCoordinates implements ArtifactCoordinates {
     private final @Nonnull InternalSession session;
-    private final @Nonnull org.eclipse.aether.artifact.Artifact coordinate;
+    private final @Nonnull org.eclipse.aether.artifact.Artifact coordinates;
 
-    public DefaultArtifactCoordinate(
-            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact coordinate) {
+    public DefaultArtifactCoordinates(
+            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact coordinates) {
         this.session = nonNull(session, "session");
-        this.coordinate = nonNull(coordinate, "coordinate");
+        this.coordinates = nonNull(coordinates, "coordinates");
     }
 
-    public org.eclipse.aether.artifact.Artifact getCoordinate() {
-        return coordinate;
+    public org.eclipse.aether.artifact.Artifact getCoordinates() {
+        return coordinates;
     }
 
     @Nonnull
     @Override
     public String getGroupId() {
-        return coordinate.getGroupId();
+        return coordinates.getGroupId();
     }
 
     @Nonnull
     @Override
     public String getArtifactId() {
-        return coordinate.getArtifactId();
+        return coordinates.getArtifactId();
     }
 
     @Nonnull
     @Override
     public VersionConstraint getVersionConstraint() {
-        return session.parseVersionConstraint(coordinate.getVersion());
+        return session.parseVersionConstraint(coordinates.getVersion());
     }
 
     @Override
     public String getExtension() {
-        return coordinate.getExtension();
+        return coordinates.getExtension();
     }
 
     @Nonnull
     @Override
     public String getClassifier() {
-        return coordinate.getClassifier();
+        return coordinates.getClassifier();
     }
 
     @Override
@@ -80,7 +80,7 @@ public class DefaultArtifactCoordinate implements ArtifactCoordinate {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DefaultArtifactCoordinate that = (DefaultArtifactCoordinate) o;
+        DefaultArtifactCoordinates that = (DefaultArtifactCoordinates) o;
         return Objects.equals(this.getGroupId(), that.getGroupId())
                 && Objects.equals(this.getArtifactId(), that.getArtifactId())
                 && Objects.equals(this.getVersionConstraint(), that.getVersionConstraint())
@@ -94,6 +94,6 @@ public class DefaultArtifactCoordinate implements ArtifactCoordinate {
 
     @Override
     public String toString() {
-        return coordinate.toString();
+        return coordinates.toString();
     }
 }

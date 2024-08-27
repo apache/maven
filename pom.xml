@@ -745,7 +745,7 @@ under the License.</licenseText>
             <charter>The mission of the Apache Maven project is to create and maintain software
             libraries that provide a widely-used project build tool, targeting mainly Java
             development. Apache Maven promotes the use of dependencies via a
-            standardized coordinate system, binary plugins, and a standard build
+            standardized coordinates system, binary plugins, and a standard build
             lifecycle.</charter>
           </asfExtOptions>
         </configuration>

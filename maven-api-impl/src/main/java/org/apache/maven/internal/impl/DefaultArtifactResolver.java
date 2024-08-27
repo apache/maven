@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
-import org.apache.maven.api.ResolvedArtifact;
+import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.ArtifactManager;
@@ -52,19 +52,19 @@ public class DefaultArtifactResolver implements ArtifactResolver {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
         try {
-            Map<ResolvedArtifact, Path> paths = new HashMap<>();
+            Map<DownloadedArtifact, Path> paths = new HashMap<>();
             ArtifactManager artifactManager = session.getService(ArtifactManager.class);
             List<RemoteRepository> repositories = session.toRepositories(session.getRemoteRepositories());
             List<ArtifactRequest> requests = new ArrayList<>();
-            for (ArtifactCoordinate coord : request.getCoordinates()) {
-                org.eclipse.aether.artifact.Artifact aetherArtifact = session.toArtifact(coord);
+            for (ArtifactCoordinates coords : request.getCoordinates()) {
+                org.eclipse.aether.artifact.Artifact aetherArtifact = session.toArtifact(coords);
                 Artifact artifact = session.getArtifact(aetherArtifact);
                 Path path = artifactManager.getPath(artifact).orElse(null);
                 if (path != null) {
                     if (aetherArtifact.getPath() == null) {
                         aetherArtifact = aetherArtifact.setPath(path);
                     }
-                    ResolvedArtifact resolved = session.getArtifact(ResolvedArtifact.class, aetherArtifact);
+                    DownloadedArtifact resolved = session.getArtifact(DownloadedArtifact.class, aetherArtifact);
                     paths.put(resolved, path);
                 } else {
                     requests.add(new ArtifactRequest(aetherArtifact, repositories, null));
@@ -74,7 +74,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                 List<ArtifactResult> results =
                         session.getRepositorySystem().resolveArtifacts(session.getSession(), requests);
                 for (ArtifactResult result : results) {
-                    ResolvedArtifact artifact = session.getArtifact(ResolvedArtifact.class, result.getArtifact());
+                    DownloadedArtifact artifact = session.getArtifact(DownloadedArtifact.class, result.getArtifact());
                     Path path = result.getArtifact().getPath();
                     paths.put(artifact, path);
                 }
@@ -86,14 +86,14 @@ public class DefaultArtifactResolver implements ArtifactResolver {
     }
 
     static class DefaultArtifactResolverResult implements ArtifactResolverResult {
-        final Map<ResolvedArtifact, Path> paths;
+        final Map<DownloadedArtifact, Path> paths;
 
-        DefaultArtifactResolverResult(Map<ResolvedArtifact, Path> paths) {
+        DefaultArtifactResolverResult(Map<DownloadedArtifact, Path> paths) {
             this.paths = paths;
         }
 
         @Override
-        public Collection<ResolvedArtifact> getArtifacts() {
+        public Collection<DownloadedArtifact> getArtifacts() {
             return paths.keySet();
         }
 

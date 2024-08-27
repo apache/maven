@@ -26,7 +26,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
- * {@code ArtifactCoordinate} completed with information about how the artifact will be used.
+ * {@code ArtifactCoordinates} completed with information about how the artifact will be used.
  * This information include the dependency type (main classes, test classes, <i>etc.</i>),
  * a scope (compile-time, run-time <i>etc.</i>), an obligation (whether the dependency
  * is optional or mandatory), and possible exclusions for transitive dependencies.
@@ -37,7 +37,7 @@ import org.apache.maven.api.annotations.Nullable;
  */
 @Experimental
 @Immutable
-public interface DependencyCoordinate extends ArtifactCoordinate {
+public interface DependencyCoordinates extends ArtifactCoordinates {
     /**
      * {@return the type of the dependency}. A dependency can be a <abbr>JAR</abbr> file,
      * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module-path,

@@ -22,29 +22,29 @@
  *
  * <h3>Dependency management</h3>
  *
- * <p>{@link org.apache.maven.api.ArtifactCoordinate} instances are used to locate artifacts in a repository.
+ * <p>{@link org.apache.maven.api.ArtifactCoordinates} instances are used to locate artifacts in a repository.
  * Each instance is basically a pointer to a file in the Maven repository, except that the version may not be
  * defined precisely.</p>
  *
  * <p>{@link org.apache.maven.api.Artifact} instances are the pointed artifacts in the repository.
- * They are created when <dfn>resolving</dfn> an {@code ArtifactCoordinate}. Resolving is the process
+ * They are created when <dfn>resolving</dfn> an {@code ArtifactCoordinates}. Resolving is the process
  * that selects a particular version and downloads the artifact in the local repository.
- * There are two sub-interfaces, {@link org.apache.maven.api.ResolvedArtifact} which is used when
+ * There are two sub-interfaces, {@link org.apache.maven.api.DownloadedArtifact} which is used when
  * an artifact has been resolved</p>
  *
- * <p>{@link org.apache.maven.api.DependencyCoordinate} instances are used to express a dependency.
- * They are an {@code ArtifactCoordinate} completed with information about how the artifact will be used:
+ * <p>{@link org.apache.maven.api.DependencyCoordinates} instances are used to express a dependency.
+ * They are a {@code ArtifactCoordinates} completed with information about how the artifact will be used:
  * type, scope and obligation (whether the dependency is optional or mandatory).
  * The version and the obligation may not be defined precisely.</p>
  *
  * <p>{@link org.apache.maven.api.Dependency} instances are the pointed dependencies in the repository.
- * They are created when <dfn>resolving</dfn> a {@code DependencyCoordinate}.
+ * They are created when <dfn>resolving</dfn> a {@code DependencyCoordinates}.
  * Resolving is the process that clarifies the obligation (optional or mandatory status),
  * selects a particular version and downloads the artifact in the local repository.</p>
  *
  * <p>{@link org.apache.maven.api.Node} is the main output of the <dfn>dependency collection</dfn> process.
  * it's the graph of dependencies. The above-cited {@code Dependency} instances are the outputs of the
- * collection process, part of the graph computed from one or more {@code DependencyCoordinate}s.</p>
+ * collection process, part of the graph computed from one or more {@code DependencyCoordinates}.</p>
  *
  * <p>{@link org.apache.maven.api.DependencyScope} defines when/how a given dependency will be used by the
  * project.  This includes compile-time only, runtime, test time and various other combinations.</p>

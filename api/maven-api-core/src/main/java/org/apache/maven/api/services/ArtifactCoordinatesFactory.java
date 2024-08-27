@@ -19,52 +19,52 @@
 package org.apache.maven.api.services;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Service used to create {@link ArtifactCoordinate} objects.
+ * Service used to create {@link ArtifactCoordinates} objects.
  *
  * @since 4.0.0
  */
 @Experimental
-public interface ArtifactCoordinateFactory extends Service {
+public interface ArtifactCoordinatesFactory extends Service {
 
     /**
-     * Creates a coordinate.
+     * Creates artifact coordinates.
      *
-     * @param request the request holding coordinate creation parameters
-     * @return an {@code ArtifactCoordinate}, never {@code null}
+     * @param request the request holding coordinates creation parameters
+     * @return an {@code ArtifactCoordinates}, never {@code null}
      * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
      */
     @Nonnull
-    ArtifactCoordinate create(@Nonnull ArtifactCoordinateFactoryRequest request);
+    ArtifactCoordinates create(@Nonnull ArtifactCoordinatesFactoryRequest request);
 
     /**
-     * Creates a coordinate out of string that is formatted like:
+     * Creates coordinates out of string that is formatted like:
      * {@code <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>}
      *
      * @param session the session.
-     * @param coordinateString the string having "standard" coordinate.
-     * @return an {@code ArtifactCoordinate}, never {@code null}
+     * @param coordinatesString the string having "standard" coordinates.
+     * @return an {@code ArtifactCoordinates}, never {@code null}
      * @throws IllegalArgumentException if {@code session} is null or invalid
      */
     @Nonnull
-    default ArtifactCoordinate create(@Nonnull Session session, @Nonnull String coordinateString) {
-        return create(ArtifactCoordinateFactoryRequest.build(session, coordinateString));
+    default ArtifactCoordinates create(@Nonnull Session session, @Nonnull String coordinatesString) {
+        return create(ArtifactCoordinatesFactoryRequest.build(session, coordinatesString));
     }
 
     @Nonnull
-    default ArtifactCoordinate create(
+    default ArtifactCoordinates create(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
-        return create(ArtifactCoordinateFactoryRequest.build(session, groupId, artifactId, version, extension));
+        return create(ArtifactCoordinatesFactoryRequest.build(session, groupId, artifactId, version, extension));
     }
 
     @Nonnull
-    default ArtifactCoordinate create(
+    default ArtifactCoordinates create(
             @Nonnull Session session,
             String groupId,
             String artifactId,
@@ -72,13 +72,13 @@ public interface ArtifactCoordinateFactory extends Service {
             String classifier,
             String extension,
             String type) {
-        return create(ArtifactCoordinateFactoryRequest.build(
+        return create(ArtifactCoordinatesFactoryRequest.build(
                 session, groupId, artifactId, version, classifier, extension, type));
     }
 
     @Nonnull
-    default ArtifactCoordinate create(@Nonnull Session session, Artifact artifact) {
-        return create(ArtifactCoordinateFactoryRequest.build(
+    default ArtifactCoordinates create(@Nonnull Session session, Artifact artifact) {
+        return create(ArtifactCoordinatesFactoryRequest.build(
                 session,
                 artifact.getGroupId(),
                 artifact.getArtifactId(),

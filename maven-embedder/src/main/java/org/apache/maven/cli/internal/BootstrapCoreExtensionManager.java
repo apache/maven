@@ -33,7 +33,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Plugin;
-import org.apache.maven.api.services.ArtifactCoordinateFactory;
+import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.RepositoryFactory;
@@ -45,7 +45,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
-import org.apache.maven.internal.impl.DefaultArtifactCoordinateFactory;
+import org.apache.maven.internal.impl.DefaultArtifactCoordinatesFactory;
 import org.apache.maven.internal.impl.DefaultArtifactManager;
 import org.apache.maven.internal.impl.DefaultArtifactResolver;
 import org.apache.maven.internal.impl.DefaultModelVersionParser;
@@ -254,8 +254,8 @@ public class BootstrapCoreExtensionManager {
 
         @Override
         public <T extends Service> T getService(Class<T> clazz) throws NoSuchElementException {
-            if (clazz == ArtifactCoordinateFactory.class) {
-                return (T) new DefaultArtifactCoordinateFactory();
+            if (clazz == ArtifactCoordinatesFactory.class) {
+                return (T) new DefaultArtifactCoordinatesFactory();
             } else if (clazz == VersionParser.class) {
                 return (T) new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme()));
             } else if (clazz == VersionRangeResolver.class) {

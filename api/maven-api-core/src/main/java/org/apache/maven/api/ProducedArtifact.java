@@ -21,6 +21,7 @@ package org.apache.maven.api;
 import java.nio.file.Path;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 
 /**
  * An {@link Artifact} that is being produced by a {@link Project} during the build.
@@ -42,4 +43,5 @@ import org.apache.maven.api.annotations.Experimental;
  * @see org.apache.maven.api.services.ArtifactManager#setPath(ProducedArtifact, Path)
  */
 @Experimental
+@Immutable
 public interface ProducedArtifact extends Artifact {}

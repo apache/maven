@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ResolvedArtifact;
+import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
@@ -38,7 +38,7 @@ public interface ArtifactResolverResult {
      * @return {@link Artifact}
      */
     @Nonnull
-    Collection<ResolvedArtifact> getArtifacts();
+    Collection<DownloadedArtifact> getArtifacts();
 
     @Nullable
     Path getPath(Artifact artifact);

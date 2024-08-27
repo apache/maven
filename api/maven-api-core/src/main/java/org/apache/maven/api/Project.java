@@ -173,13 +173,13 @@ public interface Project {
      * Returns the project direct dependencies (directly specified or inherited).
      */
     @Nonnull
-    List<DependencyCoordinate> getDependencies();
+    List<DependencyCoordinates> getDependencies();
 
     /**
      * Returns the project managed dependencies (directly specified or inherited).
      */
     @Nonnull
-    List<DependencyCoordinate> getManagedDependencies();
+    List<DependencyCoordinates> getManagedDependencies();
 
     /**
      * Returns the project ID, usable as key.

@@ -18,4 +18,14 @@
  */
 package org.apache.maven.api;
 
-public interface ResolvedDependency extends Dependency, ResolvedArtifact {}
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+
+/**
+ * A {@link Dependency} that has been resolved, i.e. downloaded to the local repository.
+ *
+ * @since 4.0.0
+ */
+@Experimental
+@Immutable
+public interface DownloadedDependency extends Dependency, DownloadedArtifact {}

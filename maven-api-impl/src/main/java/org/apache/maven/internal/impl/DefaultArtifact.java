@@ -21,7 +21,7 @@ package org.apache.maven.internal.impl;
 import java.util.Objects;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -99,8 +99,8 @@ public class DefaultArtifact implements Artifact {
 
     @Nonnull
     @Override
-    public ArtifactCoordinate toCoordinate() {
-        return session.createArtifactCoordinate(this);
+    public ArtifactCoordinates toCoordinates() {
+        return session.createArtifactCoordinates(this);
     }
 
     @Override

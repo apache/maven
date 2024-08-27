@@ -23,11 +23,15 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Pointer to a resolved resource such as a <abbr>JAR</abbr> file or <abbr>WAE</abbr> application.
- * Each {@code Artifact} instance is basically an exact pointer to a file in a Maven repository.
- * {@code Artifact} instances are created when <dfn>resolving</dfn> {@link ArtifactCoordinate} instances.
+ * A Maven artifact is a file, typically a JAR, that is produced and used by Maven projects.
+ * It is identified by a unique combination of a group ID, artifact ID, version, classifier,
+ * and extension, and it is stored in a repository for dependency management and build purposes.
+ *
+ * <p>Each {@code Artifact} instance is basically an exact pointer to a file in a Maven repository.
+ * {@code Artifact} instances are created when <dfn>resolving</dfn> {@link ArtifactCoordinates} instances.
  * Resolving is the process that selects a {@linkplain #getVersion() particular version}
- * and downloads the artifact in the local repository.  This operation returns a {@link ResolvedArtifact}.
+ * and downloads the artifact in the local repository.  This operation returns a {@link DownloadedArtifact}.
+ * </p>
  *
  * @since 4.0.0
  */
@@ -38,7 +42,7 @@ public interface Artifact {
      * {@return a unique identifier for this artifact}.
      * The identifier is composed of groupId, artifactId, extension, classifier, and version.
      *
-     * @see ArtifactCoordinate#getId()
+     * @see ArtifactCoordinates#getId()
      */
     @Nonnull
     default String key() {
@@ -56,7 +60,7 @@ public interface Artifact {
     /**
      * {@return the group identifier of the artifact}.
      *
-     * @see ArtifactCoordinate#getGroupId()
+     * @see ArtifactCoordinates#getGroupId()
      */
     @Nonnull
     String getGroupId();
@@ -64,18 +68,18 @@ public interface Artifact {
     /**
      * {@return the identifier of the artifact}.
      *
-     * @see ArtifactCoordinate#getArtifactId()
+     * @see ArtifactCoordinates#getArtifactId()
      */
     @Nonnull
     String getArtifactId();
 
     /**
-     * {@return the version of the artifact}. Contrarily to {@link ArtifactCoordinate},
+     * {@return the version of the artifact}. Contrarily to {@link ArtifactCoordinates},
      * each {@code Artifact} is associated to a specific version instead of a range of versions.
      * If the {@linkplain #getBaseVersion() base version} contains a meta-version such as {@code SNAPSHOT},
      * those keywords are replaced by, for example, the actual timestamp.
      *
-     * @see ArtifactCoordinate#getVersionConstraint()
+     * @see ArtifactCoordinates#getVersionConstraint()
      */
     @Nonnull
     Version getVersion();
@@ -93,7 +97,7 @@ public interface Artifact {
      * Returns the classifier of the artifact.
      *
      * @return the classifier or an empty string if none, never {@code null}
-     * @see ArtifactCoordinate#getClassifier()
+     * @see ArtifactCoordinates#getClassifier()
      */
     @Nonnull
     String getClassifier();
@@ -103,7 +107,7 @@ public interface Artifact {
      * The dot separator is <em>not</em> included in the returned string.
      *
      * @return the file extension or an empty string if none, never {@code null}
-     * @see ArtifactCoordinate#getExtension()
+     * @see ArtifactCoordinates#getExtension()
      */
     @Nonnull
     String getExtension();
@@ -117,11 +121,11 @@ public interface Artifact {
     boolean isSnapshot();
 
     /**
-     * {@return coordinate with the same identifiers as this artifact}.
-     * This is a shortcut for {@code session.createArtifactCoordinate(artifact)}.
+     * {@return coordinates with the same identifiers as this artifact}.
+     * This is a shortcut for {@code session.createArtifactCoordinates(artifact)}.
      *
-     * @see org.apache.maven.api.Session#createArtifactCoordinate(Artifact)
+     * @see org.apache.maven.api.Session#createArtifactCoordinates(Artifact)
      */
     @Nonnull
-    ArtifactCoordinate toCoordinate();
+    ArtifactCoordinates toCoordinates();
 }

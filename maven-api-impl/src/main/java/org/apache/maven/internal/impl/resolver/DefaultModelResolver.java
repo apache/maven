@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.ArtifactCoordinate;
-import org.apache.maven.api.ResolvedArtifact;
+import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.di.Named;
@@ -53,9 +53,9 @@ public class DefaultModelResolver implements ModelResolver {
             Session session, String groupId, String artifactId, String version, Consumer<String> resolvedVersion)
             throws ModelResolverException {
         try {
-            ArtifactCoordinate coord = session.createArtifactCoordinate(groupId, artifactId, version, "pom");
-            if (coord.getVersionConstraint().getVersionRange() != null
-                    && coord.getVersionConstraint().getVersionRange().getUpperBoundary() == null) {
+            ArtifactCoordinates coords = session.createArtifactCoordinates(groupId, artifactId, version, "pom");
+            if (coords.getVersionConstraint().getVersionRange() != null
+                    && coords.getVersionConstraint().getVersionRange().getUpperBoundary() == null) {
                 // Message below is checked for in the MNG-2199 core IT.
                 throw new ModelResolverException(
                         String.format("The requested version range '%s' does not specify an upper bound", version),
@@ -63,7 +63,7 @@ public class DefaultModelResolver implements ModelResolver {
                         artifactId,
                         version);
             }
-            List<Version> versions = session.resolveVersionRange(coord);
+            List<Version> versions = session.resolveVersionRange(coords);
             if (versions.isEmpty()) {
                 throw new ModelResolverException(
                         String.format("No versions matched the requested version range '%s'", version),
@@ -76,8 +76,8 @@ public class DefaultModelResolver implements ModelResolver {
                 resolvedVersion.accept(newVersion);
             }
 
-            ResolvedArtifact resolved =
-                    session.resolveArtifact(session.createArtifactCoordinate(groupId, artifactId, newVersion, "pom"));
+            DownloadedArtifact resolved =
+                    session.resolveArtifact(session.createArtifactCoordinates(groupId, artifactId, newVersion, "pom"));
             Path path = resolved.getPath();
             String location = groupId + ":" + artifactId + ":" + newVersion;
             return new ModelSource() {

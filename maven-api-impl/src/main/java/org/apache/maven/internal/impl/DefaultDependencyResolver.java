@@ -28,9 +28,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Dependency;
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
@@ -75,9 +75,9 @@ public class DefaultDependencyResolver implements DependencyResolver {
         InternalSession session = InternalSession.from(request.getSession());
 
         Artifact rootArtifact;
-        DependencyCoordinate root;
-        Collection<DependencyCoordinate> dependencies;
-        Collection<DependencyCoordinate> managedDependencies;
+        DependencyCoordinates root;
+        Collection<DependencyCoordinates> dependencies;
+        Collection<DependencyCoordinates> managedDependencies;
         List<RemoteRepository> remoteRepositories;
         if (request.getProject().isPresent()) {
             Project project = request.getProject().get();
@@ -153,10 +153,10 @@ public class DefaultDependencyResolver implements DependencyResolver {
             result = collectorResult;
         } else {
             List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getPathScope());
-            List<ArtifactCoordinate> coordinates = nodes.stream()
+            List<ArtifactCoordinates> coordinates = nodes.stream()
                     .map(Node::getDependency)
                     .filter(Objects::nonNull)
-                    .map(Artifact::toCoordinate)
+                    .map(Artifact::toCoordinates)
                     .collect(Collectors.toList());
             Predicate<PathType> filter = request.getPathTypeFilter();
             if (request.getRequestType() == DependencyResolverRequest.RequestType.FLATTEN) {

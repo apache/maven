@@ -35,10 +35,11 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Dependency;
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Listener;
@@ -51,7 +52,6 @@ import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.ResolvedArtifact;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
@@ -62,7 +62,7 @@ import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Repository;
-import org.apache.maven.api.services.ArtifactCoordinateFactory;
+import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactDeployerException;
 import org.apache.maven.api.services.ArtifactFactory;
@@ -71,7 +71,7 @@ import org.apache.maven.api.services.ArtifactInstallerException;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
-import org.apache.maven.api.services.DependencyCoordinateFactory;
+import org.apache.maven.api.services.DependencyCoordinatesFactory;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverException;
 import org.apache.maven.api.services.DependencyResolverRequest;
@@ -152,11 +152,11 @@ public abstract class AbstractSession implements InternalSession {
                 allArtifacts.computeIfAbsent(clazz, c -> Collections.synchronizedMap(new WeakHashMap<>()));
         if (clazz == Artifact.class) {
             return (T) map.computeIfAbsent(artifact, a -> new DefaultArtifact(this, a));
-        } else if (clazz == ResolvedArtifact.class) {
+        } else if (clazz == DownloadedArtifact.class) {
             if (artifact.getPath() == null) {
                 throw new IllegalArgumentException("The given artifact is not resolved");
             } else {
-                return (T) map.computeIfAbsent(artifact, a -> new DefaultResolvedArtifact(this, a));
+                return (T) map.computeIfAbsent(artifact, a -> new DefaultDownloadedArtifact(this, a));
             }
         } else if (clazz == ProducedArtifact.class) {
             return (T) map.computeIfAbsent(artifact, a -> new DefaultProducedArtifact(this, a));
@@ -198,7 +198,7 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public List<org.eclipse.aether.graph.Dependency> toDependencies(
-            Collection<DependencyCoordinate> dependencies, boolean managed) {
+            Collection<DependencyCoordinates> dependencies, boolean managed) {
         return dependencies == null ? null : map(dependencies, d -> toDependency(d, managed));
     }
 
@@ -316,7 +316,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency, boolean managed) {
+    public org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinates dependency, boolean managed) {
         org.eclipse.aether.graph.Dependency dep;
         if (dependency instanceof AetherDependencyWrapper wrapper) {
             dep = wrapper.dependency;
@@ -370,16 +370,16 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public org.eclipse.aether.artifact.Artifact toArtifact(ArtifactCoordinate coord) {
-        if (coord instanceof DefaultArtifactCoordinate) {
-            return ((DefaultArtifactCoordinate) coord).getCoordinate();
+    public org.eclipse.aether.artifact.Artifact toArtifact(ArtifactCoordinates coords) {
+        if (coords instanceof DefaultArtifactCoordinates) {
+            return ((DefaultArtifactCoordinates) coords).getCoordinates();
         }
         return new org.eclipse.aether.artifact.DefaultArtifact(
-                coord.getGroupId(),
-                coord.getArtifactId(),
-                coord.getClassifier(),
-                coord.getExtension(),
-                coord.getVersionConstraint().toString(),
+                coords.getGroupId(),
+                coords.getArtifactId(),
+                coords.getClassifier(),
+                coords.getExtension(),
+                coords.getVersionConstraint().toString(),
                 null,
                 (File) null);
     }
@@ -437,46 +437,46 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     /**
-     * Shortcut for <code>getService(CoordinateFactory.class).create(...)</code>
+     * Shortcut for <code>getService(ArtifactCoordinatesFactory.class).create(...)</code>
      *
      * @see ArtifactFactory#create(Session, String, String, String, String)
      */
     @Override
-    public ArtifactCoordinate createArtifactCoordinate(
+    public ArtifactCoordinates createArtifactCoordinates(
             String groupId, String artifactId, String version, String extension) {
-        return getService(ArtifactCoordinateFactory.class).create(this, groupId, artifactId, version, extension);
+        return getService(ArtifactCoordinatesFactory.class).create(this, groupId, artifactId, version, extension);
     }
 
     /**
-     * Shortcut for <code>getService(CoordinateFactory.class).create(...)</code>
+     * Shortcut for <code>getService(ArtifactCoordinatesFactory.class).create(...)</code>
      *
-     * @see ArtifactCoordinateFactory#create(Session, String)
+     * @see ArtifactCoordinatesFactory#create(Session, String)
      */
     @Override
-    public ArtifactCoordinate createArtifactCoordinate(String coordString) {
-        return getService(ArtifactCoordinateFactory.class).create(this, coordString);
+    public ArtifactCoordinates createArtifactCoordinates(String coordString) {
+        return getService(ArtifactCoordinatesFactory.class).create(this, coordString);
     }
 
     /**
-     * Shortcut for <code>getService(CoordinateFactory.class).create(...)</code>
+     * Shortcut for <code>getService(ArtifactCoordinatesFactory.class).create(...)</code>
      *
-     * @see ArtifactCoordinateFactory#create(Session, String, String, String, String, String, String)
+     * @see ArtifactCoordinatesFactory#create(Session, String, String, String, String, String, String)
      */
     @Override
-    public ArtifactCoordinate createArtifactCoordinate(
+    public ArtifactCoordinates createArtifactCoordinates(
             String groupId, String artifactId, String version, String classifier, String extension, String type) {
-        return getService(ArtifactCoordinateFactory.class)
+        return getService(ArtifactCoordinatesFactory.class)
                 .create(this, groupId, artifactId, version, classifier, extension, type);
     }
 
     /**
-     * Shortcut for <code>getService(CoordinateFactory.class).create(...)</code>
+     * Shortcut for <code>getService(ArtifactCoordinatesFactory.class).create(...)</code>
      *
-     * @see ArtifactCoordinateFactory#create(Session, String, String, String, String, String, String)
+     * @see ArtifactCoordinatesFactory#create(Session, String, String, String, String, String, String)
      */
     @Override
-    public ArtifactCoordinate createArtifactCoordinate(Artifact artifact) {
-        return getService(ArtifactCoordinateFactory.class)
+    public ArtifactCoordinates createArtifactCoordinates(Artifact artifact) {
+        return getService(ArtifactCoordinatesFactory.class)
                 .create(
                         this,
                         artifact.getGroupId(),
@@ -539,9 +539,9 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
-    public ResolvedArtifact resolveArtifact(ArtifactCoordinate coordinate) {
+    public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinates) {
         return getService(ArtifactResolver.class)
-                .resolve(this, Collections.singletonList(coordinate))
+                .resolve(this, Collections.singletonList(coordinates))
                 .getArtifacts()
                 .iterator()
                 .next();
@@ -554,7 +554,7 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
-    public Collection<ResolvedArtifact> resolveArtifacts(ArtifactCoordinate... coordinates) {
+    public Collection<DownloadedArtifact> resolveArtifacts(ArtifactCoordinates... coordinates) {
         return resolveArtifacts(Arrays.asList(coordinates));
     }
 
@@ -565,7 +565,7 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
-    public Collection<ResolvedArtifact> resolveArtifacts(Collection<? extends ArtifactCoordinate> coordinates) {
+    public Collection<DownloadedArtifact> resolveArtifacts(Collection<? extends ArtifactCoordinates> coordinates) {
         return getService(ArtifactResolver.class).resolve(this, coordinates).getArtifacts();
     }
 
@@ -576,16 +576,16 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
-    public ResolvedArtifact resolveArtifact(Artifact artifact) {
-        ArtifactCoordinate coordinate =
-                getService(ArtifactCoordinateFactory.class).create(this, artifact);
-        return resolveArtifact(coordinate);
+    public DownloadedArtifact resolveArtifact(Artifact artifact) {
+        ArtifactCoordinates coordinates =
+                getService(ArtifactCoordinatesFactory.class).create(this, artifact);
+        return resolveArtifact(coordinates);
     }
 
     @Override
-    public Collection<ResolvedArtifact> resolveArtifacts(Artifact... artifacts) {
-        ArtifactCoordinateFactory acf = getService(ArtifactCoordinateFactory.class);
-        List<ArtifactCoordinate> coords =
+    public Collection<DownloadedArtifact> resolveArtifacts(Artifact... artifacts) {
+        ArtifactCoordinatesFactory acf = getService(ArtifactCoordinatesFactory.class);
+        List<ArtifactCoordinates> coords =
                 Arrays.stream(artifacts).map(a -> acf.create(this, a)).collect(Collectors.toList());
         return resolveArtifacts(coords);
     }
@@ -657,23 +657,23 @@ public abstract class AbstractSession implements InternalSession {
     /**
      * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
      *
-     * @see DependencyCoordinateFactory#create(Session, ArtifactCoordinate)
+     * @see DependencyCoordinatesFactory#create(Session, ArtifactCoordinates)
      */
     @Nonnull
     @Override
-    public DependencyCoordinate createDependencyCoordinate(@Nonnull ArtifactCoordinate coordinate) {
-        return getService(DependencyCoordinateFactory.class).create(this, coordinate);
+    public DependencyCoordinates createDependencyCoordinates(@Nonnull ArtifactCoordinates coordinates) {
+        return getService(DependencyCoordinatesFactory.class).create(this, coordinates);
     }
 
     /**
      * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
      *
-     * @see DependencyCoordinateFactory#create(Session, ArtifactCoordinate)
+     * @see DependencyCoordinatesFactory#create(Session, ArtifactCoordinates)
      */
     @Nonnull
     @Override
-    public DependencyCoordinate createDependencyCoordinate(@Nonnull Dependency dependency) {
-        return getService(DependencyCoordinateFactory.class).create(this, dependency);
+    public DependencyCoordinates createDependencyCoordinates(@Nonnull Dependency dependency) {
+        return getService(DependencyCoordinatesFactory.class).create(this, dependency);
     }
 
     /**
@@ -704,11 +704,11 @@ public abstract class AbstractSession implements InternalSession {
      * Shortcut for <code>getService(DependencyResolver.class).collect(...)</code>
      *
      * @throws DependencyResolverException if the dependency collection failed
-     * @see DependencyResolver#collect(Session, DependencyCoordinate)
+     * @see DependencyResolver#collect(Session, DependencyCoordinates)
      */
     @Nonnull
     @Override
-    public Node collectDependencies(@Nonnull DependencyCoordinate dependency) {
+    public Node collectDependencies(@Nonnull DependencyCoordinates dependency) {
         Node root =
                 getService(DependencyResolver.class).collect(this, dependency).getRoot();
         return root.getChildren().iterator().next();
@@ -721,12 +721,12 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public List<Path> resolveDependencies(DependencyCoordinate dependency) {
+    public List<Path> resolveDependencies(DependencyCoordinates dependency) {
         return getService(DependencyResolver.class).resolve(this, dependency).getPaths();
     }
 
     @Override
-    public List<Path> resolveDependencies(List<DependencyCoordinate> dependencies) {
+    public List<Path> resolveDependencies(List<DependencyCoordinates> dependencies) {
         return getService(DependencyResolver.class).resolve(this, dependencies).getPaths();
     }
 
@@ -739,7 +739,7 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public Map<PathType, List<Path>> resolveDependencies(
-            @Nonnull DependencyCoordinate dependency,
+            @Nonnull DependencyCoordinates dependency,
             @Nonnull PathScope scope,
             @Nonnull Collection<PathType> desiredTypes) {
         return getService(DependencyResolver.class)
@@ -794,12 +794,12 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public Version resolveVersion(ArtifactCoordinate artifact) {
+    public Version resolveVersion(ArtifactCoordinates artifact) {
         return getService(VersionResolver.class).resolve(this, artifact).getVersion();
     }
 
     @Override
-    public List<Version> resolveVersionRange(ArtifactCoordinate artifact) {
+    public List<Version> resolveVersionRange(ArtifactCoordinates artifact) {
         return getService(VersionRangeResolver.class).resolve(this, artifact).getVersions();
     }
 

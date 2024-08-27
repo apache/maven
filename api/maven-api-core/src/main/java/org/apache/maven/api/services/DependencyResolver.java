@@ -21,7 +21,7 @@ package org.apache.maven.api.services;
 import java.util.List;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.DependencyCoordinate;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Project;
@@ -49,7 +49,7 @@ public interface DependencyResolver extends Service {
      * @see #collect(DependencyResolverRequest)
      */
     @Nonnull
-    default DependencyResolverResult collect(@Nonnull Session session, @Nonnull DependencyCoordinate root) {
+    default DependencyResolverResult collect(@Nonnull Session session, @Nonnull DependencyCoordinates root) {
         return collect(DependencyResolverRequest.build(session, DependencyResolverRequest.RequestType.COLLECT, root));
     }
 
@@ -100,7 +100,7 @@ public interface DependencyResolver extends Service {
      * @throws IllegalArgumentException if an argument is null or invalid
      *
      * @see DependencyResolver#collect(Session, Project)
-     * @see DependencyResolver#collect(Session, DependencyCoordinate)
+     * @see DependencyResolver#collect(Session, DependencyCoordinates)
      * @see DependencyResolver#collect(Session, Artifact)
      */
     @Nonnull
@@ -157,28 +157,28 @@ public interface DependencyResolver extends Service {
     }
 
     @Nonnull
-    default DependencyResolverResult resolve(@Nonnull Session session, @Nonnull DependencyCoordinate dependency) {
+    default DependencyResolverResult resolve(@Nonnull Session session, @Nonnull DependencyCoordinates dependency) {
         return resolve(
                 DependencyResolverRequest.build(session, DependencyResolverRequest.RequestType.RESOLVE, dependency));
     }
 
     @Nonnull
     default DependencyResolverResult resolve(
-            @Nonnull Session session, @Nonnull DependencyCoordinate dependency, @Nonnull PathScope scope) {
+            @Nonnull Session session, @Nonnull DependencyCoordinates dependency, @Nonnull PathScope scope) {
         return resolve(DependencyResolverRequest.build(
                 session, DependencyResolverRequest.RequestType.RESOLVE, dependency, scope));
     }
 
     @Nonnull
     default DependencyResolverResult resolve(
-            @Nonnull Session session, @Nonnull List<DependencyCoordinate> dependencies) {
+            @Nonnull Session session, @Nonnull List<DependencyCoordinates> dependencies) {
         return resolve(
                 DependencyResolverRequest.build(session, DependencyResolverRequest.RequestType.RESOLVE, dependencies));
     }
 
     @Nonnull
     default DependencyResolverResult resolve(
-            @Nonnull Session session, @Nonnull List<DependencyCoordinate> dependencies, @Nonnull PathScope scope) {
+            @Nonnull Session session, @Nonnull List<DependencyCoordinates> dependencies, @Nonnull PathScope scope) {
         return resolve(DependencyResolverRequest.build(
                 session, DependencyResolverRequest.RequestType.RESOLVE, dependencies, scope));
     }
