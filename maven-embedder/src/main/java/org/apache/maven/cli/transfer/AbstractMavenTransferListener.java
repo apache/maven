@@ -19,6 +19,7 @@
 package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -34,9 +35,13 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
     public static final String STYLE = ".transfer:-faint";
 
     protected final MessageBuilderFactory messageBuilderFactory;
-    protected final PrintStream out;
+    protected final PrintWriter out;
 
     protected AbstractMavenTransferListener(MessageBuilderFactory messageBuilderFactory, PrintStream out) {
+        this(messageBuilderFactory, new PrintWriter(out));
+    }
+
+    protected AbstractMavenTransferListener(MessageBuilderFactory messageBuilderFactory, PrintWriter out) {
         this.messageBuilderFactory = messageBuilderFactory;
         this.out = out;
     }

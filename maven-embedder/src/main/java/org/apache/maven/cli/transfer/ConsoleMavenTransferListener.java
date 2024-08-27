@@ -19,6 +19,7 @@
 package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -44,6 +45,11 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     public ConsoleMavenTransferListener(
             MessageBuilderFactory messageBuilderFactory, PrintStream out, boolean printResourceNames) {
+        this(messageBuilderFactory, new PrintWriter(out), printResourceNames);
+    }
+
+    public ConsoleMavenTransferListener(
+            MessageBuilderFactory messageBuilderFactory, PrintWriter out, boolean printResourceNames) {
         super(messageBuilderFactory, out);
         this.printResourceNames = printResourceNames;
     }

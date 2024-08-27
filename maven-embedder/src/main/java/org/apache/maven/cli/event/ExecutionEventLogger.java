@@ -103,7 +103,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             }
             terminalWidth = Math.min(
                     MAX_TERMINAL_WIDTH,
-                    Math.max(terminalWidth < 0 ? DEFAULT_TERMINAL_WIDTH : terminalWidth, MIN_TERMINAL_WIDTH));
+                    Math.max(terminalWidth <= 0 ? DEFAULT_TERMINAL_WIDTH : terminalWidth, MIN_TERMINAL_WIDTH));
             lineLength = terminalWidth - MAX_LOG_PREFIX_SIZE;
             maxProjectNameLength = lineLength - PROJECT_STATUS_SUFFIX_SIZE;
         }

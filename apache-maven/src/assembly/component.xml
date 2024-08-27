@@ -83,6 +83,7 @@ under the License.
       <outputDirectory>bin</outputDirectory>
       <includes>
         <include>mvn</include>
+        <include>mvnenc</include>
         <include>mvnDebug</include>
         <!-- This is so that CI systems can periodically run the profiler -->
         <include>mvnyjp</include>
