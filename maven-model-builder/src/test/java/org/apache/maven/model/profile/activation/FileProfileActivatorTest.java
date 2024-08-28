@@ -67,40 +67,40 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
 
         IllegalStateException e = assertThrows(
                 IllegalStateException.class,
-                () -> assertActivation(false, newExistsProfile("${rootDirectory}"), context));
+                () -> assertActivation(false, newExistsProfile("${project.rootDirectory}"), context));
         assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
     }
 
     @Test
     void testRootDirectory() {
-        assertActivation(false, newExistsProfile("${rootDirectory}/someFile.txt"), context);
-        assertActivation(true, newMissingProfile("${rootDirectory}/someFile.txt"), context);
-        assertActivation(true, newExistsProfile("${rootDirectory}"), context);
-        assertActivation(true, newExistsProfile("${rootDirectory}/" + "file.txt"), context);
-        assertActivation(false, newMissingProfile("${rootDirectory}"), context);
-        assertActivation(false, newMissingProfile("${rootDirectory}/" + "file.txt"), context);
+        assertActivation(false, newExistsProfile("${project.rootDirectory}/someFile.txt"), context);
+        assertActivation(true, newMissingProfile("${project.rootDirectory}/someFile.txt"), context);
+        assertActivation(true, newExistsProfile("${project.rootDirectory}"), context);
+        assertActivation(true, newExistsProfile("${project.rootDirectory}/" + "file.txt"), context);
+        assertActivation(false, newMissingProfile("${project.rootDirectory}"), context);
+        assertActivation(false, newMissingProfile("${project.rootDirectory}/" + "file.txt"), context);
     }
 
     @Test
     void testIsActiveNoFile() {
         assertActivation(false, newExistsProfile(null), context);
         assertActivation(false, newExistsProfile("someFile.txt"), context);
-        assertActivation(false, newExistsProfile("${basedir}/someFile.txt"), context);
+        assertActivation(false, newExistsProfile("${project.basedir}/someFile.txt"), context);
 
         assertActivation(false, newMissingProfile(null), context);
         assertActivation(true, newMissingProfile("someFile.txt"), context);
-        assertActivation(true, newMissingProfile("${basedir}/someFile.txt"), context);
+        assertActivation(true, newMissingProfile("${project.basedir}/someFile.txt"), context);
     }
 
     @Test
     void testIsActiveExistsFileExists() {
         assertActivation(true, newExistsProfile("file.txt"), context);
-        assertActivation(true, newExistsProfile("${basedir}"), context);
-        assertActivation(true, newExistsProfile("${basedir}/" + "file.txt"), context);
+        assertActivation(true, newExistsProfile("${project.basedir}"), context);
+        assertActivation(true, newExistsProfile("${project.basedir}/" + "file.txt"), context);
 
         assertActivation(false, newMissingProfile("file.txt"), context);
-        assertActivation(false, newMissingProfile("${basedir}"), context);
-        assertActivation(false, newMissingProfile("${basedir}/" + "file.txt"), context);
+        assertActivation(false, newMissingProfile("${project.basedir}"), context);
+        assertActivation(false, newMissingProfile("${project.basedir}/" + "file.txt"), context);
     }
 
     @Test

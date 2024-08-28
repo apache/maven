@@ -82,7 +82,7 @@ public class ProfileActivationFilePathInterpolator {
         interpolator.addValueSource(new AbstractValueSource(false) {
             @Override
             public Object getValue(String expression) {
-                if ("rootDirectory".equals(expression)) {
+                if ("project.rootDirectory".equals(expression)) {
                     Path base = basedir != null ? basedir.toPath() : null;
                     Path root = rootLocator.findMandatoryRoot(base);
                     return root.toFile().getAbsolutePath();
