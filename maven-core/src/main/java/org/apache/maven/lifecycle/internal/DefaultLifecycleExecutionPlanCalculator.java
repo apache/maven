@@ -475,7 +475,14 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         }
 
         for (Phase phase : lifecycleOverlay.getPhases()) {
-            List<MojoExecution> forkedExecutions = lifecycleMappings.get(phase.getId());
+            String phaseId = defaultLifecycles.getLifeCycles().stream()
+                    .flatMap(l -> l.getDelegate().aliases().stream())
+                    .filter(a -> phase.getId().equals(a.v3Phase()))
+                    .findFirst()
+                    .map(a -> a.v4Phase())
+                    .orElse(phase.getId());
+
+            List<MojoExecution> forkedExecutions = lifecycleMappings.get(phaseId);
 
             if (forkedExecutions != null) {
                 for (Execution execution : phase.getExecutions()) {

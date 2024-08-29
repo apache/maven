@@ -59,7 +59,7 @@ class DefaultLifecyclesTest {
     void testDefaultLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("default");
         assertThat(lifecycle.getId(), is("default"));
-        assertThat(lifecycle.getPhases(), hasSize(23));
+        assertThat(lifecycle.getPhases(), hasSize(54));
     }
 
     @Test
@@ -73,14 +73,14 @@ class DefaultLifecyclesTest {
     void testSiteLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("site");
         assertThat(lifecycle.getId(), is("site"));
-        assertThat(lifecycle.getPhases(), hasSize(4));
+        assertThat(lifecycle.getPhases(), hasSize(6));
     }
 
     @Test
     void testWrapperLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("wrapper");
         assertThat(lifecycle.getId(), is("wrapper"));
-        assertThat(lifecycle.getPhases(), hasSize(1));
+        assertThat(lifecycle.getPhases(), hasSize(3));
     }
 
     @Test

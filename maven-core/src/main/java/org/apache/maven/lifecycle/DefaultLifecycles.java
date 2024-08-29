@@ -56,6 +56,8 @@ public class DefaultLifecycles {
 
     private Map<String, Lifecycle> customLifecycles;
 
+    private boolean lifecyclesPrinted;
+
     public DefaultLifecycles() {
         this.lookup = null;
         this.registry = null;
@@ -94,25 +96,41 @@ public class DefaultLifecycles {
      * @return A map of lifecycles, indexed on id
      */
     public Map<String, Lifecycle> getPhaseToLifecycleMap() {
+        if (logger.isDebugEnabled() && !lifecyclesPrinted) {
+            for (Lifecycle lifecycle : getLifeCycles()) {
+                logger.debug("Lifecycle {}", lifecycle);
+            }
+            lifecyclesPrinted = true;
+        }
+
         // If people are going to make their own lifecycles then we need to tell people how to namespace them correctly
         // so that they don't interfere with internally defined lifecycles.
 
         Map<String, Lifecycle> phaseToLifecycleMap = new HashMap<>();
 
         for (Lifecycle lifecycle : getLifeCycles()) {
-            logger.debug("Lifecycle {}", lifecycle);
-
             for (String phase : lifecycle.getPhases()) {
                 // The first definition wins.
-                if (!phaseToLifecycleMap.containsKey(phase)) {
-                    phaseToLifecycleMap.put(phase, lifecycle);
-                } else if (logger.isWarnEnabled()) {
-                    Lifecycle original = phaseToLifecycleMap.get(phase);
+                Lifecycle original = phaseToLifecycleMap.put(phase, lifecycle);
+                if (original != null && logger.isWarnEnabled()) {
                     logger.warn(
                             "Duplicated lifecycle phase {}. Defined in {} but also in {}",
                             phase,
                             original.getId(),
                             lifecycle.getId());
+                }
+            }
+            if (lifecycle.getDelegate() != null) {
+                for (org.apache.maven.api.Lifecycle.Alias alias :
+                        lifecycle.getDelegate().aliases()) {
+                    Lifecycle original = phaseToLifecycleMap.put(alias.v3Phase(), lifecycle);
+                    if (original != null && logger.isWarnEnabled()) {
+                        logger.warn(
+                                "Duplicated lifecycle phase {}. Defined in {} but also in {}",
+                                alias.v3Phase(),
+                                original.getId(),
+                                lifecycle.getId());
+                    }
                 }
             }
         }
@@ -156,7 +174,7 @@ public class DefaultLifecycles {
         // Lifecycles cannot be cached as extensions might add custom lifecycles later in the execution.
         try {
             return registry != null
-                    ? registry.stream().collect(Collectors.toMap(lf -> lf.id(), lf -> new Lifecycle(lf)))
+                    ? registry.stream().collect(Collectors.toMap(lf -> lf.id(), lf -> new Lifecycle(registry, lf)))
                     : Map.of();
         } catch (LookupException e) {
             throw new IllegalStateException("Unable to lookup lifecycles from the plexus container", e);

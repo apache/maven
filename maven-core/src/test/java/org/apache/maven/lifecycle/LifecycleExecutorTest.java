@@ -152,6 +152,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     // We need to take in multiple lifecycles
+    @Test
     public void testCalculationOfBuildPlanTasksOfTheCleanLifecycleAndTheInstallLifecycle() throws Exception {
         File pom = getProject("project-with-additional-lifecycle-elements");
         MavenSession session = createMavenSession(pom);
@@ -195,6 +196,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     // We need to take in multiple lifecycles
+    @Test
     public void testCalculationOfBuildPlanWithMultipleExecutionsOfModello() throws Exception {
         File pom = getProject("project-with-multiple-executions");
         MavenSession session = createMavenSession(pom);

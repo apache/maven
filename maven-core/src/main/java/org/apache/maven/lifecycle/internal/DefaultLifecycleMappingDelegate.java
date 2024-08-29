@@ -23,10 +23,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
@@ -70,10 +72,19 @@ public class DefaultLifecycleMappingDelegate implements LifecycleMappingDelegate
          * is interested in, i.e. all phases up to and including the specified phase.
          */
 
-        Map<String, Map<Integer, List<MojoExecution>>> mappings = new LinkedHashMap<>();
+        Map<String, Map<PhaseId, List<MojoExecution>>> mappings =
+                new TreeMap<>(new PhaseComparator(lifecycle.getPhases()));
+
+        Map<String, String> aliases = lifecycle.getDelegate().aliases().stream()
+                .collect(Collectors.toMap(a -> a.v3Phase(), a -> a.v4Phase()));
+
+        if (aliases.containsKey(lifecyclePhase)) {
+            lifecyclePhase = PhaseId.of(aliases.get(lifecyclePhase)).phase();
+        }
 
         for (String phase : lifecycle.getPhases()) {
-            Map<Integer, List<MojoExecution>> phaseBindings = new TreeMap<>();
+            Map<PhaseId, List<MojoExecution>> phaseBindings =
+                    new TreeMap<>(Comparator.comparing(PhaseId::toString, new PhaseComparator(lifecycle.getPhases())));
 
             mappings.put(phase, phaseBindings);
 
@@ -93,13 +104,21 @@ public class DefaultLifecycleMappingDelegate implements LifecycleMappingDelegate
             for (PluginExecution execution : plugin.getExecutions()) {
                 // if the phase is specified then I don't have to go fetch the plugin yet and pull it down
                 // to examine the phase it is associated to.
-                if (execution.getPhase() != null) {
-                    Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(execution.getPhase());
+                String phase = execution.getPhase();
+                if (aliases.containsKey(phase)) {
+                    phase = aliases.get(phase);
+                }
+                if (phase != null) {
+                    Map<PhaseId, List<MojoExecution>> phaseBindings = getPhaseBindings(mappings, phase);
                     if (phaseBindings != null) {
                         for (String goal : execution.getGoals()) {
                             MojoExecution mojoExecution = new MojoExecution(plugin, goal, execution.getId());
-                            mojoExecution.setLifecyclePhase(execution.getPhase());
-                            addMojoExecution(phaseBindings, mojoExecution, execution.getPriority());
+                            mojoExecution.setLifecyclePhase(phase);
+                            PhaseId phaseId = PhaseId.of(phase);
+                            if (phaseId.priority() == 0) {
+                                phaseId = PhaseId.of(phase + "[" + execution.getPriority() + "]");
+                            }
+                            addMojoExecution(phaseBindings, mojoExecution, phaseId);
                         }
                     }
                 }
@@ -109,11 +128,16 @@ public class DefaultLifecycleMappingDelegate implements LifecycleMappingDelegate
                         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(
                                 plugin, goal, project.getRemotePluginRepositories(), session.getRepositorySession());
 
-                        Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(mojoDescriptor.getPhase());
+                        phase = mojoDescriptor.getPhase();
+                        if (aliases.containsKey(phase)) {
+                            phase = aliases.get(phase);
+                        }
+                        Map<PhaseId, List<MojoExecution>> phaseBindings = getPhaseBindings(mappings, phase);
                         if (phaseBindings != null) {
                             MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
-                            mojoExecution.setLifecyclePhase(mojoDescriptor.getPhase());
-                            addMojoExecution(phaseBindings, mojoExecution, execution.getPriority());
+                            mojoExecution.setLifecyclePhase(phase);
+                            PhaseId phaseId = PhaseId.of(phase + "[" + execution.getPriority() + "]");
+                            addMojoExecution(phaseBindings, mojoExecution, phaseId);
                         }
                     }
                 }
@@ -122,7 +146,7 @@ public class DefaultLifecycleMappingDelegate implements LifecycleMappingDelegate
 
         Map<String, List<MojoExecution>> lifecycleMappings = new LinkedHashMap<>();
 
-        for (Map.Entry<String, Map<Integer, List<MojoExecution>>> entry : mappings.entrySet()) {
+        for (Map.Entry<String, Map<PhaseId, List<MojoExecution>>> entry : mappings.entrySet()) {
             List<MojoExecution> mojoExecutions = new ArrayList<>();
 
             for (List<MojoExecution> executions : entry.getValue().values()) {
@@ -135,9 +159,18 @@ public class DefaultLifecycleMappingDelegate implements LifecycleMappingDelegate
         return lifecycleMappings;
     }
 
+    private Map<PhaseId, List<MojoExecution>> getPhaseBindings(
+            Map<String, Map<PhaseId, List<MojoExecution>>> mappings, String phase) {
+        if (phase != null) {
+            PhaseId id = PhaseId.of(phase);
+            return mappings.get(id.phase());
+        }
+        return null;
+    }
+
     private void addMojoExecution(
-            Map<Integer, List<MojoExecution>> phaseBindings, MojoExecution mojoExecution, int priority) {
-        List<MojoExecution> mojoExecutions = phaseBindings.computeIfAbsent(priority, k -> new ArrayList<>());
+            Map<PhaseId, List<MojoExecution>> phaseBindings, MojoExecution mojoExecution, PhaseId phaseId) {
+        List<MojoExecution> mojoExecutions = phaseBindings.computeIfAbsent(phaseId, k -> new ArrayList<>());
 
         mojoExecutions.add(mojoExecution);
     }

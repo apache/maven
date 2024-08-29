@@ -38,11 +38,12 @@ public class PhaseRecorder {
         String lifecyclePhase = mojoExecution.getLifecyclePhase();
 
         if (lifecyclePhase != null) {
+            PhaseId phaseId = PhaseId.of(lifecyclePhase);
             if (lastLifecyclePhase == null) {
-                lastLifecyclePhase = lifecyclePhase;
-            } else if (!lifecyclePhase.equals(lastLifecyclePhase)) {
+                lastLifecyclePhase = phaseId.phase();
+            } else if (!phaseId.phase().equals(lastLifecyclePhase)) {
                 project.addLifecyclePhase(lastLifecyclePhase);
-                lastLifecyclePhase = lifecyclePhase;
+                lastLifecyclePhase = phaseId.phase();
             }
         }
 
@@ -56,6 +57,6 @@ public class PhaseRecorder {
         if (lifecyclePhase == null) {
             return lastLifecyclePhase != null;
         }
-        return !lifecyclePhase.equals(lastLifecyclePhase);
+        return !PhaseId.of(lifecyclePhase).phase().equals(lastLifecyclePhase);
     }
 }
