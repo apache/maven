@@ -19,6 +19,7 @@
 package org.apache.maven.project;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -48,13 +49,20 @@ class ReactorModelPool {
      * @throws IllegalStateException if version was null and multiple modules share the same groupId + artifactId
      */
     public Model get(String groupId, String artifactId, String version) {
-        return modelsByGa.getOrDefault(new GAKey(groupId, artifactId), Collections.emptySet()).stream()
-                .filter(m -> version == null || version.equals(getVersion(m)))
-                .reduce((a, b) -> {
-                    throw new IllegalStateException(
-                            "Multiple modules with key " + a.getGroupId() + ':' + a.getArtifactId());
-                })
-                .orElse(null);
+        Collection<Model> models = modelsByGa.getOrDefault(new GAKey(groupId, artifactId), Collections.emptySet());
+        if (models.isEmpty()) {
+            return null;
+        } else if (models.size() == 1) {
+            return models.iterator().next();
+        } else {
+            return models.stream()
+                    .filter(m -> version == null || version.equals(getVersion(m)))
+                    .reduce((a, b) -> {
+                        throw new IllegalStateException(
+                                "Multiple modules with key " + a.getGroupId() + ':' + a.getArtifactId());
+                    })
+                    .orElse(null);
+        }
     }
 
     private String getVersion(Model model) {
