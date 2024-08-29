@@ -117,7 +117,74 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        String prefix = matchesVersionRange("[4.0.0-alpha-4,)") ? "dependency-0.1-SNAPSHOT-" : "";
+        String prefix = "";
+
+        List<String> classpath;
+
+        classpath = verifier.loadLines("consumer-a/target/compile.txt", "UTF-8");
+        assertContains(classpath, new String[] {prefix + "tests.jar"});
+        assertNotContains(classpath, new String[] {prefix + "client.jar"});
+        classpath = verifier.loadLines("consumer-a/target/runtime.txt", "UTF-8");
+        assertContains(classpath, new String[] {prefix + "tests.jar"});
+        assertNotContains(classpath, new String[] {prefix + "client.jar"});
+        classpath = verifier.loadLines("consumer-a/target/test.txt", "UTF-8");
+        assertContains(classpath, new String[] {prefix + "tests.jar"});
+        assertNotContains(classpath, new String[] {prefix + "client.jar"});
+
+        classpath = verifier.loadLines("consumer-b/target/compile.txt", "UTF-8");
+        assertContains(classpath, new String[] {prefix + "client.jar"});
+        assertNotContains(classpath, new String[] {prefix + "tests.jar"});
+        classpath = verifier.loadLines("consumer-b/target/runtime.txt", "UTF-8");
+        assertContains(classpath, new String[] {prefix + "client.jar"});
+        assertNotContains(classpath, new String[] {prefix + "tests.jar"});
+        classpath = verifier.loadLines("consumer-b/target/test.txt", "UTF-8");
+        assertContains(classpath, new String[] {prefix + "client.jar"});
+        assertNotContains(classpath, new String[] {prefix + "tests.jar"});
+
+        classpath = verifier.loadLines("consumer-c/target/compile.txt", "UTF-8");
+        assertContains(classpath, new String[] {prefix + "client.jar"});
+        assertContains(classpath, new String[] {prefix + "tests.jar"});
+        classpath = verifier.loadLines("consumer-c/target/runtime.txt", "UTF-8");
+        assertContains(classpath, new String[] {prefix + "client.jar"});
+        assertContains(classpath, new String[] {prefix + "tests.jar"});
+        classpath = verifier.loadLines("consumer-c/target/test.txt", "UTF-8");
+        assertContains(classpath, new String[] {prefix + "client.jar"});
+        assertContains(classpath, new String[] {prefix + "tests.jar"});
+    }
+
+    /**
+     * Test that dependency resolution still uses the actual artifact files once these have been
+     * assembled/attached in the "package" phase. This ensures the class path is accurate and not locked to
+     * the output directories of the best effort model from above.
+     *
+     * @throws Exception in case of failure
+     */
+    @Test
+    public void testitPackagePhasesSlitted() throws Exception {
+        requiresMavenVersion("[4.0.0-beta-4,)");
+
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3043");
+
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteDirectory("consumer-a/target");
+        verifier.deleteDirectory("consumer-b/target");
+        verifier.deleteDirectory("consumer-c/target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3043");
+        verifier.setLogFileName("log-package-pre.txt");
+        verifier.addCliArguments("--also-make", "--projects", ":dependency", "package");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.setLogFileName("log-package-pre.txt");
+        verifier.addCliArguments("--projects", ":consumer-a,:consumer-b,:consumer-c", "package");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        String prefix = "dependency-0.1-SNAPSHOT-";
 
         List<String> classpath;
 
