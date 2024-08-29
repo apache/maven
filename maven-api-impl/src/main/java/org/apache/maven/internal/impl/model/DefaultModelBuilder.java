@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
@@ -305,7 +307,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // Maven 3.x is always using 4.0.0 version to load the supermodel, so
             // do the same when loading a dependency.  The model validator will also
             // check that field later.
-            superModelVersion = "4.0.0";
+            superModelVersion = MODEL_VERSION_4_0_0;
         }
         ModelData superData = new ModelData(null, getSuperModel(superModelVersion));
 
@@ -737,6 +739,32 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         if (modelSource.getPath() != null) {
             model = model.withPomFile(modelSource.getPath());
+
+            // subprojects discovery
+            if (model.getSubprojects().isEmpty()
+                    && model.getModules().isEmpty()
+                    // only discover subprojects if POM > 4.0.0
+                    && !MODEL_VERSION_4_0_0.equals(model.getModelVersion())
+                    // and if packaging is POM (we check type, but the session is not yet available,
+                    // we would require the project realm if we want to support extensions
+                    && Type.POM.equals(model.getPackaging())) {
+                List<String> subprojects = new ArrayList<>();
+                try (Stream<Path> files = Files.list(model.getProjectDirectory())) {
+                    for (Path f : files.toList()) {
+                        if (Files.isDirectory(f)) {
+                            Path subproject = modelProcessor.locateExistingPom(f);
+                            if (subproject != null) {
+                                subprojects.add(f.getFileName().toString());
+                            }
+                        }
+                    }
+                    if (!subprojects.isEmpty()) {
+                        model = model.withSubprojects(subprojects);
+                    }
+                } catch (IOException e) {
+                    problems.add(Severity.FATAL, ModelProblem.Version.V41, "Error discovering subprojects", e);
+                }
+            }
         }
 
         problems.setSource(model);

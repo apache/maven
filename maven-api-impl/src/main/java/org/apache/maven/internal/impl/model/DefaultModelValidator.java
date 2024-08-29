@@ -20,7 +20,6 @@ package org.apache.maven.internal.impl.model;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,6 +64,7 @@ import org.apache.maven.api.model.Reporting;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.BuilderProblem.Severity;
+import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
@@ -72,6 +72,8 @@ import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.api.services.model.ModelVersionProcessor;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
+
+import static org.apache.maven.internal.impl.model.DefaultModelBuilder.NAMESPACE_PREFIX;
 
 /**
  */
@@ -81,8 +83,7 @@ public class DefaultModelValidator implements ModelValidator {
     public static final String BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION =
             "maven.build.allowExpressionInEffectiveProjectVersion";
 
-    public static final List<String> VALID_MODEL_VERSIONS =
-            Collections.unmodifiableList(Arrays.asList("4.0.0", "4.1.0"));
+    public static final List<String> VALID_MODEL_VERSIONS = ModelBuilder.VALID_MODEL_VERSIONS;
 
     private static final Pattern EXPRESSION_NAME_PATTERN = Pattern.compile("\\$\\{(.+?)}");
     private static final Pattern EXPRESSION_PROJECT_NAME_PATTERN = Pattern.compile("\\$\\{(project.+?)}");
@@ -136,7 +137,6 @@ public class DefaultModelValidator implements ModelValidator {
         protected Activation.Builder transformActivation_File(
                 Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
             stk.push(nextFrame("file", Activation::getFile));
-            Optional.ofNullable(target.getFile());
             try {
                 return super.transformActivation_File(creator, builder, target);
             } finally {
@@ -335,7 +335,7 @@ public class DefaultModelValidator implements ModelValidator {
         if (request.getValidationLevel() == ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL) {
             // profiles: they are essential for proper model building (may contribute profiles, dependencies...)
             HashSet<String> minProfileIds = new HashSet<>();
-            for (org.apache.maven.api.model.Profile profile : m.getProfiles()) {
+            for (Profile profile : m.getProfiles()) {
                 if (!minProfileIds.add(profile.getId())) {
                     addViolation(
                             problems,
@@ -360,6 +360,61 @@ public class DefaultModelValidator implements ModelValidator {
                             null,
                             "specifies duplicate child module " + module,
                             m.getLocation("modules"));
+                }
+            }
+            String modelVersion = m.getModelVersion();
+            if (modelVersion == null) {
+                String namespace = m.getNamespaceUri();
+                if (namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
+                    modelVersion = namespace.substring(NAMESPACE_PREFIX.length());
+                }
+            }
+            if (Objects.equals(modelVersion, ModelBuilder.MODEL_VERSION_4_0_0)) {
+                if (!m.getSubprojects().isEmpty()) {
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            Version.V40,
+                            "subprojects",
+                            null,
+                            "unexpected subprojects element",
+                            m.getLocation("subprojects"));
+                }
+            } else {
+                Set<String> subprojects = new HashSet<>();
+                for (int i = 0, n = m.getSubprojects().size(); i < n; i++) {
+                    String subproject = m.getSubprojects().get(i);
+                    if (!subprojects.add(subproject)) {
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V41,
+                                "subprojects.subproject[" + i + "]",
+                                null,
+                                "specifies duplicate subproject " + subproject,
+                                m.getLocation("subprojects"));
+                    }
+                }
+                if (!modules.isEmpty()) {
+                    if (subprojects.isEmpty()) {
+                        addViolation(
+                                problems,
+                                Severity.WARNING,
+                                Version.V41,
+                                "modules",
+                                null,
+                                "deprecated modules element, use subprojects instead",
+                                m.getLocation("modules"));
+                    } else {
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V41,
+                                "modules",
+                                null,
+                                "cannot use both modules and subprojects element",
+                                m.getLocation("modules"));
+                    }
                 }
             }
 
@@ -928,7 +983,7 @@ public class DefaultModelValidator implements ModelValidator {
 
     private void validate20RawDependenciesSelfReferencing(
             ModelProblemCollector problems,
-            org.apache.maven.api.model.Model m,
+            Model m,
             List<Dependency> dependencies,
             String prefix,
             ModelBuilderRequest request) {
@@ -959,7 +1014,7 @@ public class DefaultModelValidator implements ModelValidator {
 
     private void validateEffectiveDependencies(
             ModelProblemCollector problems,
-            org.apache.maven.api.model.Model m,
+            Model m,
             List<Dependency> dependencies,
             boolean management,
             ModelBuilderRequest request) {
@@ -1020,11 +1075,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validateEffectiveModelAgainstDependency(
-            String prefix,
-            ModelProblemCollector problems,
-            org.apache.maven.api.model.Model m,
-            Dependency d,
-            ModelBuilderRequest request) {
+            String prefix, ModelProblemCollector problems, Model m, Dependency d, ModelBuilderRequest request) {
         String key = d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion()
                 + (d.getClassifier() != null ? ":" + d.getClassifier() : EMPTY);
         String mKey = m.getGroupId() + ":" + m.getArtifactId() + ":" + m.getVersion();

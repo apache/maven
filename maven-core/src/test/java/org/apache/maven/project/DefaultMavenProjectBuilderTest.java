@@ -405,4 +405,18 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         assertEquals("1.0-SNAPSHOT", mp.getVersion());
     }
+
+    @Test
+    public void testSubprojectDiscovery() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/subprojects-discover/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        assertEquals(2, results.size());
+        MavenProject p1 = results.get(0).getProject();
+        MavenProject p2 = results.get(1).getProject();
+        MavenProject parent = p1.getArtifactId().equals("parent") ? p1 : p2;
+        MavenProject child = p1.getArtifactId().equals("parent") ? p2 : p1;
+        assertEquals(List.of("child"), parent.getModel().getDelegate().getSubprojects());
+    }
 }

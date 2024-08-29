@@ -708,6 +708,9 @@ public class MavenProject implements Cloneable {
     }
 
     public List<String> getModules() {
+        if (!getModel().getDelegate().getSubprojects().isEmpty()) {
+            return getModel().getDelegate().getSubprojects();
+        }
         return getModel().getModules();
     }
 

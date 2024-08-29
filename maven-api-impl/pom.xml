@@ -29,6 +29,11 @@ under the License.
   <name>Maven API Implementation</name>
   <description>Provides the implementation classes for the Maven API</description>
 
+  <properties>
+    <!-- in: DefaultModelValidator, DefaultModelBuilder -->
+    <checkstyle.violation.ignore>FileLength</checkstyle.violation.ignore>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

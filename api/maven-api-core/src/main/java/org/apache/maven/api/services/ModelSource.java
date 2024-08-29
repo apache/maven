@@ -27,7 +27,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * A Source specific to load POMs.  The {@link #resolve(ModelLocator, String)} method
- * will be used to find POMs for children modules.
+ * will be used to find POMs for subprojects.
  *
  * @since 4.0.0
  */

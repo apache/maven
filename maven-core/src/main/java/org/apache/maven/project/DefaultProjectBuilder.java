@@ -273,7 +273,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
         boolean root;
 
-        List<InterimResult> modules = Collections.emptyList();
+        List<InterimResult> subprojects = Collections.emptyList();
 
         ProjectBuildingResult projectBuildingResult;
 
@@ -624,20 +624,24 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             if (recursive) {
                 File basedir = pomFile.getParentFile();
-                List<File> moduleFiles = new ArrayList<>();
-                for (String module : model.getModules()) {
-                    if (module == null || module.isEmpty()) {
+                List<String> subprojects = model.getSubprojects();
+                if (subprojects.isEmpty()) {
+                    subprojects = model.getModules();
+                }
+                List<File> subprojectFiles = new ArrayList<>();
+                for (String subproject : subprojects) {
+                    if (subproject == null || subproject.isEmpty()) {
                         continue;
                     }
 
-                    module = module.replace('\\', File.separatorChar).replace('/', File.separatorChar);
+                    subproject = subproject.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-                    Path modulePath = modelProcessor.locateExistingPom(new File(basedir, module).toPath());
-                    File moduleFile = modulePath != null ? modulePath.toFile() : null;
+                    Path subprojectPath = modelProcessor.locateExistingPom(new File(basedir, subproject).toPath());
+                    File subprojectFile = subprojectPath != null ? subprojectPath.toFile() : null;
 
-                    if (moduleFile == null) {
+                    if (subprojectFile == null) {
                         ModelProblem problem = new org.apache.maven.internal.impl.model.DefaultModelProblem(
-                                "Child module " + moduleFile + " of " + pomFile + " does not exist",
+                                "Child subproject " + subprojectFile + " of " + pomFile + " does not exist",
                                 ModelProblem.Severity.ERROR,
                                 ModelProblem.Version.BASE,
                                 model,
@@ -651,23 +655,24 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     if (Os.IS_WINDOWS) {
                         // we don't canonicalize on unix to avoid interfering with symlinks
                         try {
-                            moduleFile = moduleFile.getCanonicalFile();
+                            subprojectFile = subprojectFile.getCanonicalFile();
                         } catch (IOException e) {
-                            moduleFile = moduleFile.getAbsoluteFile();
+                            subprojectFile = subprojectFile.getAbsoluteFile();
                         }
                     } else {
-                        moduleFile = new File(moduleFile.toURI().normalize());
+                        subprojectFile = new File(subprojectFile.toURI().normalize());
                     }
 
-                    if (aggregatorFiles.contains(moduleFile)) {
+                    if (aggregatorFiles.contains(subprojectFile)) {
                         StringBuilder buffer = new StringBuilder(256);
                         for (File aggregatorFile : aggregatorFiles) {
                             buffer.append(aggregatorFile).append(" -> ");
                         }
-                        buffer.append(moduleFile);
+                        buffer.append(subprojectFile);
 
                         ModelProblem problem = new org.apache.maven.internal.impl.model.DefaultModelProblem(
-                                "Child module " + moduleFile + " of " + pomFile + " forms aggregation cycle " + buffer,
+                                "Child subproject " + subprojectFile + " of " + pomFile + " forms aggregation cycle "
+                                        + buffer,
                                 ModelProblem.Severity.ERROR,
                                 ModelProblem.Version.BASE,
                                 model,
@@ -679,11 +684,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         continue;
                     }
 
-                    moduleFiles.add(moduleFile);
+                    subprojectFiles.add(subprojectFile);
                 }
 
-                if (!moduleFiles.isEmpty()) {
-                    interimResult.modules = build(projectIndex, moduleFiles, aggregatorFiles, false, recursive);
+                if (!subprojectFiles.isEmpty()) {
+                    interimResult.subprojects = build(projectIndex, subprojectFiles, aggregatorFiles, false, recursive);
                 }
             }
 
@@ -775,7 +780,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             iarte));
                 }
 
-                List<ProjectBuildingResult> results = build(projectIndex, interimResult.modules);
+                List<ProjectBuildingResult> results = build(projectIndex, interimResult.subprojects);
 
                 project.setExecutionRoot(interimResult.root);
                 project.setCollectedProjects(

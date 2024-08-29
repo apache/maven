@@ -30,10 +30,10 @@ under the License.
   <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>lib</module> <!-- the library -->
-    <module>app</module> <!-- the application -->
-  </modules>
+  <subprojects>
+    <subproject>lib</subproject> <!-- the library -->
+    <subproject>app</subproject> <!-- the application -->
+  </subprojects>
 
   <build>
     <pluginManagement>
