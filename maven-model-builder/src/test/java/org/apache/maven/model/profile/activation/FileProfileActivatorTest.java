@@ -82,6 +82,17 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
+    void testIsActiveNoFileWithShortBasedir() {
+        assertActivation(false, newExistsProfile(null), context);
+        assertActivation(false, newExistsProfile("someFile.txt"), context);
+        assertActivation(false, newExistsProfile("${basedir}/someFile.txt"), context);
+
+        assertActivation(false, newMissingProfile(null), context);
+        assertActivation(true, newMissingProfile("someFile.txt"), context);
+        assertActivation(true, newMissingProfile("${basedir}/someFile.txt"), context);
+    }
+
+    @Test
     void testIsActiveNoFile() {
         assertActivation(false, newExistsProfile(null), context);
         assertActivation(false, newExistsProfile("someFile.txt"), context);
