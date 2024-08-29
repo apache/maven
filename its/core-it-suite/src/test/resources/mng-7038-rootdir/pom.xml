@@ -74,7 +74,7 @@ under the License.
       <id>rootdir-profile-activation</id>
       <activation>
         <file>
-          <exists>${rootDirectory}/.mvn/.gitkeep</exists>
+          <exists>${project.rootDirectory}/.mvn/.gitkeep</exists>
         </file>
       </activation>
       <properties>
