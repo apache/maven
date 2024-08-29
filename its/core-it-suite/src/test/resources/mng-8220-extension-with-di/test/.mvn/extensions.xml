@@ -1,0 +1,7 @@
+<extensions>
+    <extension>
+        <groupId>org.apache.maven.its.mng8220</groupId>
+        <artifactId>extension</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </extension>
+</extensions>
