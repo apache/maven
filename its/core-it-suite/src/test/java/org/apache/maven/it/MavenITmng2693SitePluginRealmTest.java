@@ -48,6 +48,7 @@ public class MavenITmng2693SitePluginRealmTest extends AbstractMavenIntegrationT
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("pre-site");
+        verifier.addCliArgument("-Dmaven.site.skip=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
