@@ -137,15 +137,18 @@ public class InjectorImpl implements Injector {
             current.add(key);
             throw new DIException("Circular references: " + current);
         }
-        doBindImplicit(key, binding);
-        Class<?> cls = key.getRawType().getSuperclass();
-        while (cls != Object.class && cls != null) {
-            key = Key.of(cls, key.getQualifier());
+        try {
             doBindImplicit(key, binding);
-            cls = cls.getSuperclass();
+            Class<?> cls = key.getRawType().getSuperclass();
+            while (cls != Object.class && cls != null) {
+                key = Key.of(cls, key.getQualifier());
+                doBindImplicit(key, binding);
+                cls = cls.getSuperclass();
+            }
+            return this;
+        } finally {
+            current.remove(key);
         }
-        current.remove(key);
-        return this;
     }
 
     protected <U> Injector bind(Key<U> key, Binding<U> b) {

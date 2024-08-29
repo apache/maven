@@ -95,6 +95,7 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
+import org.apache.maven.internal.impl.SisuDiBridgeModule;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -715,6 +716,7 @@ public class MavenCli {
                     new SessionScopeModule(container.lookup(SessionScope.class)),
                     new MojoExecutionScopeModule(container.lookup(MojoExecutionScope.class)),
                     new ExtensionConfigurationModule(extension, extensionSource));
+            container.lookup(SisuDiBridgeModule.class).loadFromClassLoader(extension.getClassRealm());
         }
 
         customizeContainer(container);
