@@ -24,9 +24,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Dependency;
@@ -43,6 +45,12 @@ import org.apache.maven.api.services.ModelTransformerContext;
 @Named
 @Singleton
 public class BuildModelTransformer implements ModelTransformer {
+    private final Map<String, org.apache.maven.api.spi.ModelTransformer> modelTransformers;
+
+    @Inject
+    public BuildModelTransformer(Map<String, org.apache.maven.api.spi.ModelTransformer> modelTransformers) {
+        this.modelTransformers = modelTransformers;
+    }
 
     @Override
     public Model transform(ModelTransformerContext context, Model model, Path path) {
@@ -50,7 +58,14 @@ public class BuildModelTransformer implements ModelTransformer {
         handleParent(context, model, path, builder);
         handleReactorDependencies(context, model, path, builder);
         handleCiFriendlyVersion(context, model, path, builder);
+        handleSpiModelTransformers(context, model, path, builder);
         return builder.build();
+    }
+
+    void handleSpiModelTransformers(ModelTransformerContext context, Model model, Path path, Model.Builder builder) {
+        for (Map.Entry<String, org.apache.maven.api.spi.ModelTransformer> entry : modelTransformers.entrySet()) {
+            entry.getValue().transformFileModel(context, model, path, builder);
+        }
     }
 
     //
