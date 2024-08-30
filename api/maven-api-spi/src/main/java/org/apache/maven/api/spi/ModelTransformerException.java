@@ -16,23 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.api.spi;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.services.MavenException;
 
-/**
- * Exception thrown when a {@link ModelTransformer} fails.
- *
- * @since 4.0.0
- */
 @Experimental
 public class ModelTransformerException extends MavenException {
 
-    public ModelTransformerException(Exception e) {
-        super(e);
+    public ModelTransformerException() {
+        this(null, null);
     }
 
-    public ModelTransformerException(String message, Throwable exception) {
-        super(message, exception);
+    public ModelTransformerException(String message) {
+        this(message, null);
+    }
+
+    public ModelTransformerException(Throwable cause) {
+        this(null, cause);
+    }
+
+    public ModelTransformerException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
