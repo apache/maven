@@ -476,7 +476,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             try {
                 ArtifactRequest pomRequest = new ArtifactRequest();
                 pomRequest.setArtifact(pomArtifact);
-                pomRequest.setRepositories(repositories);
+                pomRequest.setRepositories(RepositoryUtils.toRepos(request.getRemoteRepositories()));
                 ArtifactResult pomResult = repoSystem.resolveArtifact(session, pomRequest);
 
                 pomArtifact = pomResult.getArtifact();
