@@ -395,7 +395,15 @@ public class MavenCli {
 
             if (configFile.isFile()) {
                 try (Stream<String> lines = Files.lines(configFile.toPath(), Charset.defaultCharset())) {
-                    String[] args = lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#"))
+                    String[] args = lines.map(String::trim)
+                            .filter(arg -> !arg.isEmpty())
+                            .filter(arg -> !arg.startsWith("#"))
+                            .flatMap(arg -> {
+                                if (arg.startsWith("\"")) {
+                                    return Stream.of(arg);
+                                }
+                                return Stream.of(arg.split(" "));
+                            })
                             .toArray(String[]::new);
                     mavenConfig = cliManager.parse(args);
                     List<?> unrecognized = mavenConfig.getArgList();
