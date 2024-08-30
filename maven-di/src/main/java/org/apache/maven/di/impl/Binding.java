@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import org.apache.maven.di.Key;
 
 import static java.util.stream.Collectors.joining;
+import static org.apache.maven.di.impl.ReflectionUtils.named;
 
 public abstract class Binding<T> {
     private final Set<Key<?>> dependencies;
@@ -97,11 +98,13 @@ public abstract class Binding<T> {
             public Supplier<T> compile(Function<Key<?>, Supplier<?>> compiler) {
                 final Supplier<T> compiledBinding = Binding.this.compile(compiler);
                 final Consumer<T> consumer = bindingInitializer.compile(compiler);
-                return () -> {
-                    T instance = compiledBinding.get();
-                    consumer.accept(instance);
-                    return instance;
-                };
+                return named(
+                        () -> {
+                            T instance = compiledBinding.get();
+                            consumer.accept(instance);
+                            return instance;
+                        },
+                        "InitializedWith[" + compiledBinding + "]");
             }
 
             @Override
@@ -153,7 +156,7 @@ public abstract class Binding<T> {
 
         @Override
         public Supplier<T> compile(Function<Key<?>, Supplier<?>> compiler) {
-            return () -> instance;
+            return named(() -> instance, "BindingToInstance.Supplier[" + instance + "]");
         }
 
         @Override
@@ -175,11 +178,15 @@ public abstract class Binding<T> {
 
         @Override
         public Supplier<T> compile(Function<Key<?>, Supplier<?>> compiler) {
-            return () -> {
-                Object[] args =
-                        Stream.of(this.args).map(compiler).map(Supplier::get).toArray();
-                return constructor.create(args);
-            };
+            return named(
+                    () -> {
+                        Object[] args = Stream.of(BindingToConstructor.this.args)
+                                .map(compiler)
+                                .map(Supplier::get)
+                                .toArray();
+                        return constructor.create(args);
+                    },
+                    "BindingToConstructor.Supplier[" + constructor + "]");
         }
 
         @Override

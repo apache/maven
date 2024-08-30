@@ -141,8 +141,8 @@ public class InjectorImpl implements Injector {
             doBindImplicit(key, binding);
             Class<?> cls = key.getRawType().getSuperclass();
             while (cls != Object.class && cls != null) {
-                key = Key.of(cls, key.getQualifier());
-                doBindImplicit(key, binding);
+                Key<?> curKey = Key.of(cls, key.getQualifier());
+                doBindImplicit(curKey, binding);
                 cls = cls.getSuperclass();
             }
             return this;
@@ -382,6 +382,11 @@ public class InjectorImpl implements Injector {
                                 }
                             }
                             return instance;
+                        }
+
+                        @Override
+                        public String toString() {
+                            return "SingletonScopeSupplier[" + unscoped + ']';
                         }
                     });
         }

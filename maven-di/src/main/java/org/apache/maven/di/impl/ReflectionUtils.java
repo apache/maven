@@ -357,24 +357,28 @@ public final class ReflectionUtils {
 
         Binding<T> binding = Binding.to(
                 key,
-                args -> {
-                    try {
-                        return constructor.newInstance(args);
-                    } catch (InstantiationException e) {
-                        throw new DIException(
-                                "Cannot instantiate object from the constructor " + constructor
-                                        + " to provide requested key " + key,
-                                e);
-                    } catch (IllegalAccessException e) {
-                        throw new DIException(
-                                "Not allowed to call constructor " + constructor + " to provide requested key " + key,
-                                e);
-                    } catch (InvocationTargetException e) {
-                        throw new DIException(
-                                "Failed to call constructor " + constructor + " to provide requested key " + key,
-                                e.getCause());
-                    }
-                },
+                named(
+                        args -> {
+                            try {
+                                return constructor.newInstance(args);
+                            } catch (InstantiationException e) {
+                                throw new DIException(
+                                        "Cannot instantiate object from the constructor " + constructor
+                                                + " to provide requested key " + key,
+                                        e);
+                            } catch (IllegalAccessException e) {
+                                throw new DIException(
+                                        "Not allowed to call constructor " + constructor + " to provide requested key "
+                                                + key,
+                                        e);
+                            } catch (InvocationTargetException e) {
+                                throw new DIException(
+                                        "Failed to call constructor " + constructor + " to provide requested key "
+                                                + key,
+                                        e.getCause());
+                            }
+                        },
+                        "Constructor[" + constructor + "]"),
                 dependencies);
 
         Priority priority = constructor.getDeclaringClass().getAnnotation(Priority.class);
@@ -383,5 +387,33 @@ public final class ReflectionUtils {
         }
 
         return binding.withKey(key);
+    }
+
+    static <T> Supplier<T> named(Supplier<T> supplier, String name) {
+        return new Supplier<T>() {
+            @Override
+            public T get() {
+                return supplier.get();
+            }
+
+            @Override
+            public String toString() {
+                return name;
+            }
+        };
+    }
+
+    static <T> Binding.TupleConstructorN<T> named(Binding.TupleConstructorN<T> cns, String name) {
+        return new Binding.TupleConstructorN<T>() {
+            @Override
+            public T create(Object... args) {
+                return cns.create(args);
+            }
+
+            @Override
+            public String toString() {
+                return name;
+            }
+        };
     }
 }
