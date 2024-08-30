@@ -71,6 +71,7 @@ import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.ReportPlugin;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
@@ -101,6 +102,9 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.utils.Os;
+import org.codehaus.plexus.interpolation.AbstractValueSource;
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
@@ -308,6 +312,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private final ExecutorService executor;
         private final ModelCache modelCache;
         private final ModelResolver modelResolver;
+        private final Map<String, String> ciFriendlyVersions = new ConcurrentHashMap<>();
 
         BuildSession(ProjectBuildingRequest request, boolean localProjects) {
             this.request = request;
@@ -618,7 +623,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             Model model = result.getActivatedFileModel();
 
-            modelPool.put(model.getPomFile(), model);
+            // In case the model is using CI friendly versions, at this point, it will contain uninterpolated version
+            // such as ${revision}${changelist}, so we need to take care of it now
+            Model modelWithVersion = getModelWithInterpolatedVersion(model, result.getProblems()::add);
+            modelPool.put(model.getPomFile(), modelWithVersion);
 
             InterimResult interimResult = new InterimResult(pomFile, modelBuildingRequest, result, project, isRoot);
 
@@ -695,6 +703,59 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             projectIndex.put(pomFile, project);
 
             return interimResult;
+        }
+
+        private Model getModelWithInterpolatedVersion(
+                Model model, Consumer<org.apache.maven.api.services.ModelProblem> problems) {
+            String version = model.getVersion();
+            if (version == null && model.getParent() != null) {
+                version = model.getParent().getVersion();
+            }
+            if (version != null && version.contains("${")) {
+                try {
+                    StringSearchInterpolator interpolator = new StringSearchInterpolator();
+                    interpolator.addValueSource(new AbstractValueSource(false) {
+                        @Override
+                        public String getValue(String key) {
+                            String val = request.getUserProperties().getProperty(key);
+                            if (val == null) {
+                                val = model.getProperties().get(key);
+                                if (val == null) {
+                                    val = request.getSystemProperties().getProperty(key);
+                                    if (val == null) {
+                                        val = ciFriendlyVersions.get(key);
+                                    }
+                                }
+                            }
+                            if (val != null) {
+                                String oldVal = ciFriendlyVersions.put(key, val);
+                                if (oldVal != null && !val.equals(oldVal)) {
+                                    throw new MavenException("Non unique property value detected for key '" + key
+                                            + "' which is bound to '" + oldVal + "' and '" + val + "'");
+                                }
+                            }
+                            return val;
+                        }
+                    });
+                    version = interpolator.interpolate(version);
+                } catch (InterpolationException | MavenException e) {
+                    ModelProblem problem = new org.apache.maven.internal.impl.model.DefaultModelProblem(
+                            "Unable to interpolate ",
+                            ModelProblem.Severity.ERROR,
+                            ModelProblem.Version.BASE,
+                            model,
+                            -1,
+                            -1,
+                            null);
+                    problems.accept(problem);
+                }
+                if (model.getVersion() != null) {
+                    return model.withVersion(version);
+                } else {
+                    return model.withParent(model.getParent().withVersion(version));
+                }
+            }
+            return model;
         }
 
         private List<ProjectBuildingResult> build(
