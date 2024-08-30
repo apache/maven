@@ -138,6 +138,9 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     @Inject
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
 
+    @Inject
+    private List<org.apache.maven.api.spi.ModelTransformer> transformers;
+
     Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -193,7 +196,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 pluginConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 modelTransformer,
-                versionParser);
+                versionParser,
+                transformers);
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
         request.projectBuild(true);

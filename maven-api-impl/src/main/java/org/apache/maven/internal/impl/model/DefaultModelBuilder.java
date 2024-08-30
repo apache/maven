@@ -143,6 +143,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final ModelTransformer transformer;
     private final ModelVersionParser versionParser;
+    private final List<org.apache.maven.api.spi.ModelTransformer> transformers;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -164,7 +165,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             PluginConfigurationExpander pluginConfigurationExpander,
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             ModelTransformer transformer,
-            ModelVersionParser versionParser) {
+            ModelVersionParser versionParser,
+            List<org.apache.maven.api.spi.ModelTransformer> transformers) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
         this.modelNormalizer = modelNormalizer;
@@ -183,6 +185,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.transformer = transformer;
         this.versionParser = versionParser;
+        this.transformers = transformers;
     }
 
     @Override
@@ -587,6 +590,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             resultModel = pluginConfigurationExpander.expandPluginConfiguration(resultModel, request, problems);
         }
 
+        for (var transformer : transformers) {
+            resultModel = transformer.transformEffectiveModel(resultModel);
+        }
+
         result.setEffectiveModel(resultModel);
 
         // effective model validation
@@ -766,6 +773,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        for (var transformer : transformers) {
+            model = transformer.transformFileModel(model);
+        }
+
         problems.setSource(model);
         modelValidator.validateFileModel(model, request, problems);
         if (hasFatalErrors(problems)) {
@@ -806,6 +817,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         String namespace = rawModel.getNamespaceUri();
         if (rawModel.getModelVersion() == null && namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
             rawModel = rawModel.withModelVersion(namespace.substring(NAMESPACE_PREFIX.length()));
+        }
+
+        for (var transformer : transformers) {
+            rawModel = transformer.transformRawModel(rawModel);
         }
 
         modelValidator.validateRawModel(rawModel, request, problems);

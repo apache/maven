@@ -1059,7 +1059,8 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 new DefaultPluginConfigurationExpander(),
                 new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), new DefaultRootLocator()),
                 new BuildModelTransformer(),
-                new DefaultModelVersionParser(getVersionScheme()));
+                new DefaultModelVersionParser(getVersionScheme()),
+                List.of());
     }
 
     private RepositorySystem repositorySystem;

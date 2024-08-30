@@ -1,6 +1,7 @@
 org.apache.maven.api.spi.LanguageProvider
 org.apache.maven.api.spi.LifecycleProvider
 org.apache.maven.api.spi.ModelParser
+org.apache.maven.api.spi.ModelTransformer
 org.apache.maven.api.spi.PackagingProvider
 org.apache.maven.api.spi.PathScopeProvider
 org.apache.maven.api.spi.ProjectScopeProvider
