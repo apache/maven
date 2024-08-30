@@ -402,7 +402,7 @@ public class MavenCli {
                                 if (arg.startsWith("\"")) {
                                     return Stream.of(arg);
                                 }
-                                return Stream.of(arg.split(" "));
+                                return Stream.of(arg.split("\\s"));
                             })
                             .toArray(String[]::new);
                     mavenConfig = cliManager.parse(args);
