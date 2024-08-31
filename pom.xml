@@ -132,8 +132,7 @@ under the License.
     <junitVersion>4.13.2</junitVersion>
     <hamcrestVersion>3.0</hamcrestVersion>
     <mockitoVersion>4.11.0</mockitoVersion>
-    <!-- plexus 2.1.1 is broken -->
-    <plexusVersion>2.1.0</plexusVersion>
+    <plexusVersion>2.2.0</plexusVersion>
     <plexusInterpolationVersion>1.27</plexusInterpolationVersion>
     <!-- Blocked by 3.4.0+ changes, see MNG-7710, downgrade from parent 4.0.1 -->
     <version.plexus-utils>3.5.1</version.plexus-utils>
