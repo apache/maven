@@ -100,7 +100,6 @@ import org.apache.maven.api.services.model.PluginManagementInjector;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileInjector;
 import org.apache.maven.api.services.model.ProfileSelector;
-import org.apache.maven.api.services.model.WorkspaceModelResolver;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
@@ -1038,33 +1037,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             ModelBuilderRequest request,
             DefaultModelProblemCollector problems)
             throws ModelBuilderException {
-        final Parent parent = childModel.getParent();
-        final ModelSource candidateSource;
-        final Model candidateModel;
-        final WorkspaceModelResolver resolver = getWorkspaceModelResolver(request);
-        if (resolver == null) {
-            candidateSource = getParentPomFile(childModel, childSource);
-
-            if (candidateSource == null) {
-                return null;
-            }
-
-            ModelBuilderRequest candidateBuildRequest = ModelBuilderRequest.build(request, candidateSource);
-
-            candidateModel = readRawModel(candidateBuildRequest, problems);
-        } else {
-            try {
-                candidateModel =
-                        resolver.resolveRawModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
-            } catch (ModelBuilderException e) {
-                problems.add(Severity.FATAL, ModelProblem.Version.BASE, e.getMessage(), parent.getLocation(""), e);
-                throw problems.newModelBuilderException();
-            }
-            if (candidateModel == null) {
-                return null;
-            }
-            candidateSource = ModelSource.fromPath(candidateModel.getPomFile());
+        ModelSource candidateSource = getParentPomFile(childModel, childSource);
+        if (candidateSource == null) {
+            return null;
         }
+
+        ModelBuilderRequest candidateBuildRequest = ModelBuilderRequest.build(request, candidateSource);
+
+        Model candidateModel = readRawModel(candidateBuildRequest, problems);
 
         //
         // TODO jvz Why isn't all this checking the job of the duty of the workspace resolver, we know that we
@@ -1075,6 +1055,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         String groupId = getGroupId(candidateModel);
         String artifactId = candidateModel.getArtifactId();
 
+        Parent parent = childModel.getParent();
         if (groupId == null
                 || !groupId.equals(parent.getGroupId())
                 || artifactId == null
@@ -1427,87 +1408,73 @@ public class DefaultModelBuilder implements ModelBuilder {
             String artifactId,
             String version,
             Collection<String> importIds) {
-        final WorkspaceModelResolver workspaceResolver = getWorkspaceModelResolver(request);
         final ModelResolver modelResolver = getModelResolver(request);
-        if (workspaceResolver == null && modelResolver == null) {
+        if (modelResolver == null) {
             throw new NullPointerException(String.format(
                     "request.workspaceModelResolver and request.modelResolver cannot be null (parent POM %s and POM %s)",
                     ModelProblemUtils.toId(groupId, artifactId, version), ModelProblemUtils.toSourceHint(model)));
         }
 
-        Model importModel = null;
-        if (workspaceResolver != null) {
-            try {
-                importModel = workspaceResolver.resolveEffectiveModel(groupId, artifactId, version);
-            } catch (ModelBuilderException e) {
-                problems.add(Severity.FATAL, ModelProblem.Version.BASE, null, e);
-                return null;
-            }
-        }
-
+        Model importModel;
         // no workspace resolver or workspace resolver returned null (i.e. model not in workspace)
-        if (importModel == null) {
-            final ModelSource importSource;
-            try {
-                importSource = modelResolver.resolveModel(
-                        request.getSession(),
-                        request.getModelRepositoryHolder().getRepositories(),
-                        dependency,
-                        new AtomicReference<>());
-            } catch (ModelBuilderException e) {
-                StringBuilder buffer = new StringBuilder(256);
-                buffer.append("Non-resolvable import POM");
-                if (!containsCoordinates(e.getMessage(), groupId, artifactId, version)) {
-                    buffer.append(' ').append(ModelProblemUtils.toId(groupId, artifactId, version));
-                }
-                buffer.append(": ").append(e.getMessage());
-
-                problems.add(
-                        Severity.ERROR, ModelProblem.Version.BASE, buffer.toString(), dependency.getLocation(""), e);
-                return null;
+        final ModelSource importSource;
+        try {
+            importSource = modelResolver.resolveModel(
+                    request.getSession(),
+                    request.getModelRepositoryHolder().getRepositories(),
+                    dependency,
+                    new AtomicReference<>());
+        } catch (ModelBuilderException e) {
+            StringBuilder buffer = new StringBuilder(256);
+            buffer.append("Non-resolvable import POM");
+            if (!containsCoordinates(e.getMessage(), groupId, artifactId, version)) {
+                buffer.append(' ').append(ModelProblemUtils.toId(groupId, artifactId, version));
             }
+            buffer.append(": ").append(e.getMessage());
 
-            Path rootDirectory;
-            try {
-                rootDirectory = request.getSession().getRootDirectory();
-            } catch (IllegalStateException e) {
-                rootDirectory = null;
-            }
-            if (importSource.getPath() != null && rootDirectory != null) {
-                Path sourcePath = importSource.getPath();
-                if (sourcePath.startsWith(rootDirectory)) {
-                    problems.add(
-                            Severity.WARNING,
-                            ModelProblem.Version.BASE,
-                            "BOM imports from within reactor should be avoided",
-                            dependency.getLocation(""));
-                }
-            }
-
-            final ModelBuilderResult importResult;
-            try {
-                ModelBuilderRequest importRequest = ModelBuilderRequest.builder()
-                        .session(request.getSession())
-                        .repositories(request.getModelRepositoryHolder().getRepositories())
-                        .validationLevel(ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL)
-                        .systemProperties(request.getSystemProperties())
-                        .userProperties(request.getUserProperties())
-                        .source(importSource)
-                        .modelResolver(modelResolver)
-                        .modelRepositoryHolder(
-                                request.getModelRepositoryHolder().copy())
-                        .twoPhaseBuilding(false)
-                        .build();
-                importResult = build(importRequest, importIds);
-            } catch (ModelBuilderException e) {
-                e.getResult().getProblems().forEach(problems::add);
-                return null;
-            }
-
-            importResult.getProblems().forEach(problems::add);
-
-            importModel = importResult.getEffectiveModel();
+            problems.add(Severity.ERROR, ModelProblem.Version.BASE, buffer.toString(), dependency.getLocation(""), e);
+            return null;
         }
+
+        Path rootDirectory;
+        try {
+            rootDirectory = request.getSession().getRootDirectory();
+        } catch (IllegalStateException e) {
+            rootDirectory = null;
+        }
+        if (importSource.getPath() != null && rootDirectory != null) {
+            Path sourcePath = importSource.getPath();
+            if (sourcePath.startsWith(rootDirectory)) {
+                problems.add(
+                        Severity.WARNING,
+                        ModelProblem.Version.BASE,
+                        "BOM imports from within reactor should be avoided",
+                        dependency.getLocation(""));
+            }
+        }
+
+        final ModelBuilderResult importResult;
+        try {
+            ModelBuilderRequest importRequest = ModelBuilderRequest.builder()
+                    .session(request.getSession())
+                    .repositories(request.getModelRepositoryHolder().getRepositories())
+                    .validationLevel(ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL)
+                    .systemProperties(request.getSystemProperties())
+                    .userProperties(request.getUserProperties())
+                    .source(importSource)
+                    .modelResolver(modelResolver)
+                    .modelRepositoryHolder(request.getModelRepositoryHolder().copy())
+                    .twoPhaseBuilding(false)
+                    .build();
+            importResult = build(importRequest, importIds);
+        } catch (ModelBuilderException e) {
+            e.getResult().getProblems().forEach(problems::add);
+            return null;
+        }
+
+        importResult.getProblems().forEach(problems::add);
+
+        importModel = importResult.getEffectiveModel();
 
         return importModel;
     }
@@ -1583,10 +1550,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private static ModelBuildingListener getModelBuildingListener(ModelBuilderRequest request) {
         return (ModelBuildingListener) request.getListener();
-    }
-
-    private static WorkspaceModelResolver getWorkspaceModelResolver(ModelBuilderRequest request) {
-        return null; // request.getWorkspaceModelResolver();
     }
 
     private static ModelResolver getModelResolver(ModelBuilderRequest request) {
