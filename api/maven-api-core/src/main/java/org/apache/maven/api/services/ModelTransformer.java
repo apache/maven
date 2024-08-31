@@ -30,7 +30,10 @@ import org.apache.maven.api.model.Model;
  * local pom is the original source.
  *
  * @since 4.0.0
+ * @deprecated this should not be exposed
+ * TODO refactor in MNG-8120
  */
+@Deprecated
 public interface ModelTransformer {
     /**
      * @param context the context, cannot be null

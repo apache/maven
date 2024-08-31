@@ -23,6 +23,11 @@ import java.util.List;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.model.Repository;
 
+/**
+ * @deprecated this should not be exposed
+ * TODO refactor in MNG-8120
+ */
+@Deprecated
 public interface ModelRepositoryHolder {
 
     void merge(List<Repository> repos, boolean replace);

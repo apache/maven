@@ -25,8 +25,11 @@ import org.apache.maven.api.model.Model;
 /**
  * Context used to transform a pom file.
  *
+ * @deprecated this should not be exposed
  * @since 4.0.0
+ * TODO refactor in MNG-8120
  */
+@Deprecated
 public interface ModelTransformerContext {
 
     /**

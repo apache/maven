@@ -23,7 +23,10 @@ package org.apache.maven.api.services;
  * In case rawModels are missing, it could do new buildingRequests on the ModelBuilder.
  *
  * @since 4.0.0
+ * @deprecated this should not be exposed
+ * TODO refactor in MNG-8120
  */
+@Deprecated
 public interface ModelTransformerContextBuilder {
     /**
      * This method is used to initialize the TransformerContext
