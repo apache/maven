@@ -58,6 +58,7 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
 import org.apache.maven.resolver.MavenChainedWorkspaceReader;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -101,6 +102,8 @@ public class BootstrapCoreExtensionManager {
 
     private final CoreExports coreExports;
 
+    private final PlexusContainer container;
+
     private final ClassWorld classWorld;
 
     private final ClassRealm parentRealm;
@@ -120,6 +123,7 @@ public class BootstrapCoreExtensionManager {
         this.pluginDependenciesResolver = pluginDependenciesResolver;
         this.repositorySystemSessionFactory = repositorySystemSessionFactory;
         this.coreExports = coreExports;
+        this.container = container;
         this.classWorld = ((DefaultPlexusContainer) container).getClassWorld();
         this.parentRealm = container.getContainerRealm();
         this.ideWorkspaceReader = ideWorkspaceReader;
@@ -137,10 +141,19 @@ public class BootstrapCoreExtensionManager {
             InternalSession iSession = new SimpleSession(mSession, repoSystem, null);
             InternalSession.associate(repoSession, iSession);
 
+            SessionScope scope = container.lookup(SessionScope.class);
+            scope.enter();
+            scope.seed(Session.class, iSession);
+
             List<RemoteRepository> repositories = RepositoryUtils.toRepos(request.getPluginArtifactRepositories());
             Interpolator interpolator = createInterpolator(request);
 
-            return resolveCoreExtensions(repoSession, repositories, providedArtifacts, extensions, interpolator);
+            List<CoreExtensionEntry> entries =
+                    resolveCoreExtensions(repoSession, repositories, providedArtifacts, extensions, interpolator);
+
+            scope.exit();
+
+            return entries;
         }
     }
 

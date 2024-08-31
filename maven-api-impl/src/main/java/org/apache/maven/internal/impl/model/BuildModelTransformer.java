@@ -22,7 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,7 +48,6 @@ public class BuildModelTransformer implements ModelTransformer {
         Model.Builder builder = Model.newBuilder(model);
         handleParent(context, model, path, builder);
         handleReactorDependencies(context, model, path, builder);
-        handleCiFriendlyVersion(context, model, path, builder);
         return builder.build();
     }
 
@@ -68,19 +66,8 @@ public class BuildModelTransformer implements ModelTransformer {
                     version = resolvedParent.get().getVersion();
                 }
             }
-            // CI Friendly version for parent
-            String modVersion = replaceCiFriendlyVersion(context, version);
-            builder.parent(parent.withVersion(modVersion));
+            builder.parent(parent.withVersion(version));
         }
-    }
-
-    //
-    // CI friendly versions
-    //
-    void handleCiFriendlyVersion(ModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
-        String version = model.getVersion();
-        String modVersion = replaceCiFriendlyVersion(context, version);
-        builder.version(modVersion);
     }
 
     //
@@ -106,18 +93,6 @@ public class BuildModelTransformer implements ModelTransformer {
         if (modified) {
             builder.dependencies(newDeps);
         }
-    }
-
-    protected String replaceCiFriendlyVersion(ModelTransformerContext context, String version) {
-        if (version != null) {
-            for (String key : Arrays.asList("changelist", "revision", "sha1")) {
-                String val = context.getUserProperty(key);
-                if (val != null) {
-                    version = version.replace("${" + key + "}", val);
-                }
-            }
-        }
-        return version;
     }
 
     protected Optional<RelativeProject> resolveRelativePath(

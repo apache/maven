@@ -108,6 +108,7 @@ under the License.
     <module>maven-model-builder</module>
     <module>maven-di</module>
     <module>maven-xml-impl</module>
+    <module>maven-ci-friendly-versions</module>
     <module>maven-jline</module>
     <module>maven-core</module>
     <module>maven-settings</module>
@@ -342,6 +343,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-compat</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-ci-friendly-versions</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

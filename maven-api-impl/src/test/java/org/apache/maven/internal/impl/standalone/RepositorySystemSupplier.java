@@ -42,7 +42,6 @@ import org.apache.maven.internal.impl.model.DefaultModelNormalizer;
 import org.apache.maven.internal.impl.model.DefaultModelPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultModelProcessor;
 import org.apache.maven.internal.impl.model.DefaultModelValidator;
-import org.apache.maven.internal.impl.model.DefaultModelVersionProcessor;
 import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultPluginManagementInjector;
 import org.apache.maven.internal.impl.model.DefaultProfileInjector;
@@ -1042,7 +1041,7 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
         DefaultModelProcessor modelProcessor = new DefaultModelProcessor(new DefaultModelXmlFactory(), List.of());
         return new DefaultModelBuilder(
                 modelProcessor,
-                new DefaultModelValidator(new DefaultModelVersionProcessor()),
+                new DefaultModelValidator(),
                 new DefaultModelNormalizer(),
                 new DefaultModelInterpolator(
                         new DefaultPathTranslator(), new DefaultUrlNormalizer(), new DefaultRootLocator()),

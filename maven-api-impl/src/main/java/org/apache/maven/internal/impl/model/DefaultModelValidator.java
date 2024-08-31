@@ -38,7 +38,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Activation;
@@ -69,7 +68,6 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ModelValidator;
-import org.apache.maven.api.services.model.ModelVersionProcessor;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
 
@@ -288,13 +286,6 @@ public class DefaultModelValidator implements ModelValidator {
     private final Set<String> validCoordinatesIds = new HashSet<>();
 
     private final Set<String> validProfileIds = new HashSet<>();
-
-    private final ModelVersionProcessor versionProcessor;
-
-    @Inject
-    public DefaultModelValidator(ModelVersionProcessor versionProcessor) {
-        this.versionProcessor = versionProcessor;
-    }
 
     @Override
     @SuppressWarnings("checkstyle:MethodLength")
@@ -1556,19 +1547,16 @@ public class DefaultModelValidator implements ModelValidator {
 
         Matcher m = EXPRESSION_NAME_PATTERN.matcher(string.trim());
         while (m.find()) {
-            String property = m.group(1);
-            if (!versionProcessor.isValidProperty(property)) {
-                addViolation(
-                        problems,
-                        severity,
-                        version,
-                        fieldName,
-                        null,
-                        "contains an expression but should be a constant.",
-                        tracker);
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    fieldName,
+                    null,
+                    "contains an expression but should be a constant.",
+                    tracker);
 
-                return false;
-            }
+            return false;
         }
 
         return true;

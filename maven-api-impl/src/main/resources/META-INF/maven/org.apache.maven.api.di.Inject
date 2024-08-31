@@ -37,7 +37,6 @@ org.apache.maven.internal.impl.model.DefaultModelNormalizer
 org.apache.maven.internal.impl.model.DefaultModelPathTranslator
 org.apache.maven.internal.impl.model.DefaultModelProcessor
 org.apache.maven.internal.impl.model.DefaultModelValidator
-org.apache.maven.internal.impl.model.DefaultModelVersionProcessor
 org.apache.maven.internal.impl.model.DefaultPathTranslator
 org.apache.maven.internal.impl.model.DefaultPluginManagementInjector
 org.apache.maven.internal.impl.model.DefaultProfileInjector
