@@ -66,7 +66,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             throws ProjectBuilderException, IllegalArgumentException {
         InternalMavenSession session = InternalMavenSession.from(request.getSession());
         try {
-            List<ArtifactRepository> repositories = session.toArtifactRepositories(session.getRemoteRepositories());
+            List<ArtifactRepository> repositories = session.toArtifactRepositories(
+                    request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories());
             ProjectBuildingRequest req = new DefaultProjectBuildingRequest()
                     .setRepositorySession(session.getSession())
                     .setRemoteRepositories(repositories)
@@ -134,14 +135,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             }
 
                             if (getLineNumber() > 0) {
-                                if (buffer.length() > 0) {
+                                if (!buffer.isEmpty()) {
                                     buffer.append(", ");
                                 }
                                 buffer.append("line ").append(getLineNumber());
                             }
 
                             if (getColumnNumber() > 0) {
-                                if (buffer.length() > 0) {
+                                if (!buffer.isEmpty()) {
                                     buffer.append(", ");
                                 }
                                 buffer.append("column ").append(getColumnNumber());

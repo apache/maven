@@ -554,6 +554,21 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
+    public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinates, List<RemoteRepository> repositories) {
+        return getService(ArtifactResolver.class)
+                .resolve(this, Collections.singletonList(coordinates), repositories)
+                .getArtifacts()
+                .iterator()
+                .next();
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     *
+     * @throws ArtifactResolverException if the artifact resolution failed
+     * @see ArtifactResolver#resolve(Session, Collection)
+     */
+    @Override
     public Collection<DownloadedArtifact> resolveArtifacts(ArtifactCoordinates... coordinates) {
         return resolveArtifacts(Arrays.asList(coordinates));
     }
@@ -576,10 +591,37 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
+    public Collection<DownloadedArtifact> resolveArtifacts(
+            Collection<? extends ArtifactCoordinates> coordinates, List<RemoteRepository> repositories) {
+        return getService(ArtifactResolver.class)
+                .resolve(this, coordinates, repositories)
+                .getArtifacts();
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     *
+     * @throws ArtifactResolverException if the artifact resolution failed
+     * @see ArtifactResolver#resolve(Session, Collection)
+     */
+    @Override
     public DownloadedArtifact resolveArtifact(Artifact artifact) {
         ArtifactCoordinates coordinates =
                 getService(ArtifactCoordinatesFactory.class).create(this, artifact);
         return resolveArtifact(coordinates);
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     *
+     * @throws ArtifactResolverException if the artifact resolution failed
+     * @see ArtifactResolver#resolve(Session, Collection)
+     */
+    @Override
+    public DownloadedArtifact resolveArtifact(Artifact artifact, List<RemoteRepository> repositories) {
+        ArtifactCoordinates coordinates =
+                getService(ArtifactCoordinatesFactory.class).create(this, artifact);
+        return resolveArtifact(coordinates, repositories);
     }
 
     @Override
@@ -801,6 +843,13 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public List<Version> resolveVersionRange(ArtifactCoordinates artifact) {
         return getService(VersionRangeResolver.class).resolve(this, artifact).getVersions();
+    }
+
+    @Override
+    public List<Version> resolveVersionRange(ArtifactCoordinates artifact, List<RemoteRepository> repositories) {
+        return getService(VersionRangeResolver.class)
+                .resolve(this, artifact, repositories)
+                .getVersions();
     }
 
     @Override

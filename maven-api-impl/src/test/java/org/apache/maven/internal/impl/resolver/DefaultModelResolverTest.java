@@ -69,7 +69,7 @@ class DefaultModelResolverTest {
 
         ModelResolverException e = assertThrows(
                 ModelResolverException.class,
-                () -> newModelResolver().resolveModel(session, parent, new AtomicReference<>()),
+                () -> newModelResolver().resolveModel(session, null, parent, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
         assertNotNull(e.getMessage());
         assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
@@ -85,7 +85,7 @@ class DefaultModelResolverTest {
 
         ModelResolverException e = assertThrows(
                 ModelResolverException.class,
-                () -> newModelResolver().resolveModel(session, parent, new AtomicReference<>()),
+                () -> newModelResolver().resolveModel(session, null, parent, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
         assertEquals("No versions matched the requested version range '[2.0,2.1)'", e.getMessage());
     }
@@ -100,7 +100,7 @@ class DefaultModelResolverTest {
 
         ModelResolverException e = assertThrows(
                 ModelResolverException.class,
-                () -> newModelResolver().resolveModel(session, parent, new AtomicReference<>()),
+                () -> newModelResolver().resolveModel(session, null, parent, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
         assertEquals("The requested version range '[1,)' does not specify an upper bound", e.getMessage());
     }
@@ -113,7 +113,7 @@ class DefaultModelResolverTest {
                 .version("1")
                 .build();
 
-        assertNotNull(this.newModelResolver().resolveModel(session, parent, new AtomicReference<>()));
+        assertNotNull(this.newModelResolver().resolveModel(session, null, parent, new AtomicReference<>()));
         assertEquals("1", parent.getVersion());
     }
 
@@ -126,7 +126,7 @@ class DefaultModelResolverTest {
                 .build();
 
         AtomicReference<org.apache.maven.api.model.Parent> modified = new AtomicReference<>();
-        assertNotNull(this.newModelResolver().resolveModel(session, parent, modified));
+        assertNotNull(this.newModelResolver().resolveModel(session, null, parent, modified));
         assertEquals("1", modified.get().getVersion());
     }
 
@@ -140,7 +140,7 @@ class DefaultModelResolverTest {
 
         ModelResolverException e = assertThrows(
                 ModelResolverException.class,
-                () -> newModelResolver().resolveModel(session, dependency, new AtomicReference<>()),
+                () -> newModelResolver().resolveModel(session, null, dependency, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
         assertNotNull(e.getMessage());
         assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
@@ -156,7 +156,7 @@ class DefaultModelResolverTest {
 
         ModelResolverException e = assertThrows(
                 ModelResolverException.class,
-                () -> newModelResolver().resolveModel(session, dependency, new AtomicReference<>()),
+                () -> newModelResolver().resolveModel(session, null, dependency, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
         assertEquals("No versions matched the requested version range '[2.0,2.1)'", e.getMessage());
     }
@@ -171,7 +171,7 @@ class DefaultModelResolverTest {
 
         ModelResolverException e = assertThrows(
                 ModelResolverException.class,
-                () -> newModelResolver().resolveModel(session, dependency, new AtomicReference<>()),
+                () -> newModelResolver().resolveModel(session, null, dependency, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
         assertEquals("The requested version range '[1,)' does not specify an upper bound", e.getMessage());
     }
@@ -184,7 +184,7 @@ class DefaultModelResolverTest {
                 .version("1")
                 .build();
 
-        assertNotNull(this.newModelResolver().resolveModel(session, dependency, new AtomicReference<>()));
+        assertNotNull(this.newModelResolver().resolveModel(session, null, dependency, new AtomicReference<>()));
         assertEquals("1", dependency.getVersion());
     }
 
@@ -197,7 +197,7 @@ class DefaultModelResolverTest {
                 .build();
 
         AtomicReference<org.apache.maven.api.model.Dependency> modified = new AtomicReference<>();
-        assertNotNull(this.newModelResolver().resolveModel(session, dependency, modified));
+        assertNotNull(this.newModelResolver().resolveModel(session, null, dependency, modified));
         assertEquals("1", modified.get().getVersion());
     }
 

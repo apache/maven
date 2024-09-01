@@ -31,6 +31,7 @@ import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -93,6 +94,9 @@ public interface DependencyResolverRequest {
      */
     @Nullable
     Predicate<PathType> getPathTypeFilter();
+
+    @Nullable
+    List<RemoteRepository> getRepositories();
 
     @Nonnull
     static DependencyResolverRequestBuilder builder() {
@@ -170,6 +174,7 @@ public interface DependencyResolverRequest {
         boolean verbose;
         PathScope pathScope;
         Predicate<PathType> pathTypeFilter;
+        List<RemoteRepository> repositories;
 
         DependencyResolverRequestBuilder() {}
 
@@ -328,6 +333,12 @@ public interface DependencyResolverRequest {
         }
 
         @Nonnull
+        public DependencyResolverRequestBuilder repositories(@Nonnull List<RemoteRepository> repositories) {
+            this.repositories = repositories;
+            return this;
+        }
+
+        @Nonnull
         public DependencyResolverRequest build() {
             return new DefaultDependencyResolverRequest(
                     session,
@@ -339,7 +350,8 @@ public interface DependencyResolverRequest {
                     managedDependencies,
                     verbose,
                     pathScope,
-                    pathTypeFilter);
+                    pathTypeFilter,
+                    repositories);
         }
 
         static class DefaultDependencyResolverRequest extends BaseRequest implements DependencyResolverRequest {
@@ -352,6 +364,7 @@ public interface DependencyResolverRequest {
             private final boolean verbose;
             private final PathScope pathScope;
             private final Predicate<PathType> pathTypeFilter;
+            private final List<RemoteRepository> repositories;
 
             /**
              * Creates a request with the specified properties.
@@ -371,7 +384,8 @@ public interface DependencyResolverRequest {
                     @Nonnull Collection<DependencyCoordinates> managedDependencies,
                     boolean verbose,
                     @Nullable PathScope pathScope,
-                    @Nullable Predicate<PathType> pathTypeFilter) {
+                    @Nullable Predicate<PathType> pathTypeFilter,
+                    @Nullable List<RemoteRepository> repositories) {
                 super(session);
                 this.requestType = nonNull(requestType, "requestType cannot be null");
                 this.project = project;
@@ -383,6 +397,7 @@ public interface DependencyResolverRequest {
                 this.verbose = verbose;
                 this.pathScope = pathScope;
                 this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : (t) -> true;
+                this.repositories = repositories;
                 if (verbose && requestType != RequestType.COLLECT) {
                     throw new IllegalArgumentException("verbose cannot only be true when collecting dependencies");
                 }
@@ -437,6 +452,11 @@ public interface DependencyResolverRequest {
             @Override
             public Predicate<PathType> getPathTypeFilter() {
                 return pathTypeFilter;
+            }
+
+            @Override
+            public List<RemoteRepository> getRepositories() {
+                return repositories;
             }
 
             @Nonnull

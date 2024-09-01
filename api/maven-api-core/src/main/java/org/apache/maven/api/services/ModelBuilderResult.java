@@ -119,7 +119,7 @@ public interface ModelBuilderResult {
     List<ModelProblem> getProblems();
 
     /**
-     * Creates a human readable representation of these errors.
+     * Creates a human-readable representation of these errors.
      */
     String toString();
 }
