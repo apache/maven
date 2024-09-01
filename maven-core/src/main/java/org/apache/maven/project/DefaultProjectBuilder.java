@@ -1111,9 +1111,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             ModelBuilderRequest.ModelBuilderRequestBuilder modelBuildingRequest = ModelBuilderRequest.builder();
 
             InternalSession internalSession = InternalSession.from(session);
-            modelBuildingRequest.session(internalSession.withRemoteRepositories(request.getRemoteRepositories().stream()
-                    .map(r -> internalSession.getRemoteRepository(RepositoryUtils.toRepo(r)))
-                    .toList()));
+            modelBuildingRequest.session(internalSession);
             modelBuildingRequest.validationLevel(request.getValidationLevel());
             modelBuildingRequest.processPlugins(request.isProcessPlugins());
             modelBuildingRequest.profiles(
@@ -1138,6 +1136,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             modelBuildingRequest.modelRepositoryHolder(holder);
             modelBuildingRequest.modelCache(modelCache);
             modelBuildingRequest.transformerContextBuilder(transformerContextBuilder);
+            modelBuildingRequest.repositories(request.getRemoteRepositories().stream()
+                    .map(r -> internalSession.getRemoteRepository(RepositoryUtils.toRepo(r)))
+                    .toList());
             /* TODO: bv4
             InternalMavenSession session =
                     (InternalMavenSession) this.session.getData().get(InternalMavenSession.class);
@@ -1303,12 +1304,17 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
         @Override
         public ModelSource resolveModel(
-                Session session, String groupId, String artifactId, String version, Consumer<String> resolved)
+                Session session,
+                List<org.apache.maven.api.RemoteRepository> repositories,
+                String groupId,
+                String artifactId,
+                String version,
+                Consumer<String> resolved)
                 throws ModelResolverException {
             try {
                 InternalSession internalSession = InternalSession.from(session);
-                org.apache.maven.model.resolution.ModelResolver resolver =
-                        getResolver(internalSession.toRepositories(internalSession.getRemoteRepositories()));
+                org.apache.maven.model.resolution.ModelResolver resolver = getResolver(internalSession.toRepositories(
+                        repositories != null ? repositories : internalSession.getRemoteRepositories()));
                 org.apache.maven.model.Parent p = new org.apache.maven.model.Parent(Parent.newBuilder()
                         .groupId(groupId)
                         .artifactId(artifactId)
@@ -1325,13 +1331,17 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
 
         @Override
-        public ModelSource resolveModel(Session session, Parent parent, AtomicReference<Parent> modified)
+        public ModelSource resolveModel(
+                Session session,
+                List<org.apache.maven.api.RemoteRepository> repositories,
+                Parent parent,
+                AtomicReference<Parent> modified)
                 throws ModelResolverException {
             try {
                 org.apache.maven.model.Parent p = new org.apache.maven.model.Parent(parent);
                 InternalSession internalSession = InternalSession.from(session);
-                org.apache.maven.model.resolution.ModelResolver resolver =
-                        getResolver(internalSession.toRepositories(internalSession.getRemoteRepositories()));
+                org.apache.maven.model.resolution.ModelResolver resolver = getResolver(internalSession.toRepositories(
+                        repositories != null ? repositories : internalSession.getRemoteRepositories()));
                 ModelSource source = toSource(resolver.resolveModel(p));
                 if (p.getDelegate() != parent) {
                     modified.set(p.getDelegate());
@@ -1343,13 +1353,17 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
 
         @Override
-        public ModelSource resolveModel(Session session, Dependency dependency, AtomicReference<Dependency> modified)
+        public ModelSource resolveModel(
+                Session session,
+                List<org.apache.maven.api.RemoteRepository> repositories,
+                Dependency dependency,
+                AtomicReference<Dependency> modified)
                 throws ModelResolverException {
             try {
                 org.apache.maven.model.Dependency d = new org.apache.maven.model.Dependency(dependency);
                 InternalSession internalSession = InternalSession.from(session);
-                org.apache.maven.model.resolution.ModelResolver resolver =
-                        getResolver(internalSession.toRepositories(internalSession.getRemoteRepositories()));
+                org.apache.maven.model.resolution.ModelResolver resolver = getResolver(internalSession.toRepositories(
+                        repositories != null ? repositories : internalSession.getRemoteRepositories()));
                 ModelSource source = toSource(resolver.resolveModel(d));
                 if (d.getDelegate() != dependency) {
                     modified.set(d.getDelegate());

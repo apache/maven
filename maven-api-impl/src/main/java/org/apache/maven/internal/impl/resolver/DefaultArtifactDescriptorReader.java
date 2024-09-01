@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.maven.api.Session;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -40,7 +40,6 @@ import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.model.ModelProblemUtils;
-import org.codehaus.plexus.interpolation.util.StringUtils;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryException;
@@ -199,18 +198,16 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
             try {
                 InternalSession iSession = InternalSession.from(session);
-                Session iSessionWithRepos = iSession.withRemoteRepositories(request.getRepositories().stream()
+                List<RemoteRepository> repositories = request.getRepositories().stream()
                         .map(iSession::getRemoteRepository)
-                        .toList());
+                        .toList();
                 String gav =
                         pomArtifact.getGroupId() + ":" + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion();
                 ModelResolver modelResolver = new DefaultModelResolver();
                 ModelRepositoryHolder modelRepositoryHolder = new DefaultModelRepositoryHolder(
-                        iSessionWithRepos,
-                        DefaultModelRepositoryHolder.RepositoryMerging.REQUEST_DOMINANT,
-                        iSessionWithRepos.getRemoteRepositories());
+                        iSession, DefaultModelRepositoryHolder.RepositoryMerging.REQUEST_DOMINANT, repositories);
                 ModelBuilderRequest modelRequest = ModelBuilderRequest.builder()
-                        .session(iSessionWithRepos)
+                        .session(iSession)
                         .projectBuild(false)
                         .processPlugins(false)
                         .twoPhaseBuilding(false)
@@ -222,6 +219,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         .modelResolver(modelResolver)
                         .modelRepositoryHolder(modelRepositoryHolder)
                         .modelCache(DefaultModelCache.newInstance(session, false))
+                        .repositories(repositories)
                         .build();
 
                 ModelBuilderResult modelResult = modelBuilder.build(modelRequest);
@@ -230,21 +228,23 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 if (!modelResult.getProblems().isEmpty()) {
                     List<ModelProblem> problems = modelResult.getProblems();
                     if (logger.isDebugEnabled()) {
-                        String problem = (problems.size() == 1) ? "problem" : "problems";
-                        String problemPredicate = problem + ((problems.size() == 1) ? " was" : " were");
-                        String message = String.format(
-                                "%s %s encountered while building the effective model for %s during %s\n",
-                                problems.size(),
-                                problemPredicate,
-                                request.getArtifact(),
-                                RequestTraceHelper.interpretTrace(true, request.getTrace()));
-                        message += StringUtils.capitalizeFirstLetter(problem);
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(problems.size())
+                                .append(" ")
+                                .append((problems.size() == 1) ? "problem was" : "problems were")
+                                .append(" encountered while building the effective model for ")
+                                .append(request.getArtifact())
+                                .append(" during ")
+                                .append(RequestTraceHelper.interpretTrace(true, request.getTrace()))
+                                .append("\n")
+                                .append((problems.size() == 1) ? "Problem" : "Problems");
                         for (ModelProblem modelProblem : problems) {
-                            message += String.format(
-                                    "\n* %s @ %s",
-                                    modelProblem.getMessage(), ModelProblemUtils.formatLocation(modelProblem, null));
+                            sb.append("\n* ")
+                                    .append(modelProblem.getMessage())
+                                    .append(" @ ")
+                                    .append(ModelProblemUtils.formatLocation(modelProblem, null));
                         }
-                        logger.warn(message);
+                        logger.warn(sb.toString());
                     } else {
                         logger.warn(
                                 "{} {} encountered while building the effective model for {} during {} (use -X to see details)",

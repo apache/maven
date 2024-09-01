@@ -85,13 +85,16 @@ public class DefaultDependencyResolver implements DependencyResolver {
             root = null;
             dependencies = project.getDependencies();
             managedDependencies = project.getManagedDependencies();
-            remoteRepositories = session.getService(ProjectManager.class).getRemoteProjectRepositories(project);
+            remoteRepositories = request.getRepositories() != null
+                    ? request.getRepositories()
+                    : session.getService(ProjectManager.class).getRemoteProjectRepositories(project);
         } else {
             rootArtifact = request.getRootArtifact().orElse(null);
             root = request.getRoot().orElse(null);
             dependencies = request.getDependencies();
             managedDependencies = request.getManagedDependencies();
-            remoteRepositories = session.getRemoteRepositories();
+            remoteRepositories =
+                    request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories();
         }
         CollectRequest collectRequest = new CollectRequest()
                 .setRootArtifact(rootArtifact != null ? session.toArtifact(rootArtifact) : null)
@@ -149,6 +152,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 InternalSession.from(nonNull(request, "request").getSession());
         DependencyResolverResult result;
         DependencyResolverResult collectorResult = collect(request);
+        List<RemoteRepository> repositories =
+                request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories();
         if (request.getRequestType() == DependencyResolverRequest.RequestType.COLLECT) {
             result = collectorResult;
         } else {
@@ -171,7 +176,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
                         cache, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
                 ArtifactResolverResult artifactResolverResult =
-                        session.getService(ArtifactResolver.class).resolve(session, coordinates);
+                        session.getService(ArtifactResolver.class).resolve(session, coordinates, repositories);
                 for (Node node : nodes) {
                     Dependency d = node.getDependency();
                     Path path = (d != null) ? artifactResolverResult.getPath(d) : null;

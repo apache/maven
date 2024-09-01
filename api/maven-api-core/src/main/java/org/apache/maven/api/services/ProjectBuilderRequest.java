@@ -19,8 +19,10 @@
 package org.apache.maven.api.services;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -57,6 +59,9 @@ public interface ProjectBuilderRequest {
 
     boolean isProcessPlugins();
 
+    @Nullable
+    List<RemoteRepository> getRepositories();
+
     @Nonnull
     static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull Source source) {
         return builder()
@@ -86,6 +91,7 @@ public interface ProjectBuilderRequest {
         boolean allowStubModel;
         boolean recursive;
         boolean processPlugins = true;
+        List<RemoteRepository> repositories;
 
         ProjectBuilderRequestBuilder() {}
 
@@ -109,8 +115,14 @@ public interface ProjectBuilderRequest {
             return this;
         }
 
+        public ProjectBuilderRequestBuilder repositories(List<RemoteRepository> repositories) {
+            this.repositories = repositories;
+            return this;
+        }
+
         public ProjectBuilderRequest build() {
-            return new DefaultProjectBuilderRequest(session, path, source, allowStubModel, recursive, processPlugins);
+            return new DefaultProjectBuilderRequest(
+                    session, path, source, allowStubModel, recursive, processPlugins, repositories);
         }
 
         private static class DefaultProjectBuilderRequest extends BaseRequest implements ProjectBuilderRequest {
@@ -119,6 +131,7 @@ public interface ProjectBuilderRequest {
             private final boolean allowStubModel;
             private final boolean recursive;
             private final boolean processPlugins;
+            private final List<RemoteRepository> repositories;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultProjectBuilderRequest(
@@ -127,13 +140,15 @@ public interface ProjectBuilderRequest {
                     @Nullable Source source,
                     boolean allowStubModel,
                     boolean recursive,
-                    boolean processPlugins) {
+                    boolean processPlugins,
+                    @Nullable List<RemoteRepository> repositories) {
                 super(session);
                 this.path = path;
                 this.source = source;
                 this.allowStubModel = allowStubModel;
                 this.recursive = recursive;
                 this.processPlugins = processPlugins;
+                this.repositories = repositories;
             }
 
             @Nonnull
@@ -161,6 +176,11 @@ public interface ProjectBuilderRequest {
             @Override
             public boolean isProcessPlugins() {
                 return processPlugins;
+            }
+
+            @Override
+            public List<RemoteRepository> getRepositories() {
+                return repositories;
             }
         }
     }

@@ -54,7 +54,8 @@ public class DefaultArtifactResolver implements ArtifactResolver {
         try {
             Map<DownloadedArtifact, Path> paths = new HashMap<>();
             ArtifactManager artifactManager = session.getService(ArtifactManager.class);
-            List<RemoteRepository> repositories = session.toRepositories(session.getRemoteRepositories());
+            List<RemoteRepository> repositories = session.toRepositories(
+                    request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories());
             List<ArtifactRequest> requests = new ArrayList<>();
             for (ArtifactCoordinates coords : request.getCoordinates()) {
                 org.eclipse.aether.artifact.Artifact aetherArtifact = session.toArtifact(coords);

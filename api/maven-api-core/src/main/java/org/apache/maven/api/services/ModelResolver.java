@@ -18,12 +18,15 @@
  */
 package org.apache.maven.api.services;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Parent;
 
@@ -36,6 +39,7 @@ public interface ModelResolver extends Service {
      * Tries to resolve the POM for the specified parent coordinates possibly updating {@code parent}.
      *
      * @param session The session to use to resolve the model, must not be {@code null}.
+     * @param repositories The repositories to use to resolve the model, may be {@code null} in which case the {@code Session} repositories will be used.
      * @param parent The parent coordinates to resolve, must not be {@code null}.
      * @param modified a holder for the updated parent, must not be {@code null}.
      * @return The source of the requested POM, never {@code null}.
@@ -43,10 +47,14 @@ public interface ModelResolver extends Service {
      */
     @Nonnull
     default ModelSource resolveModel(
-            @Nonnull Session session, @Nonnull Parent parent, @Nonnull AtomicReference<Parent> modified)
+            @Nonnull Session session,
+            @Nullable List<RemoteRepository> repositories,
+            @Nonnull Parent parent,
+            @Nonnull AtomicReference<Parent> modified)
             throws ModelResolverException {
         return resolveModel(
                 session,
+                repositories,
                 parent.getGroupId(),
                 parent.getArtifactId(),
                 parent.getVersion(),
@@ -57,6 +65,7 @@ public interface ModelResolver extends Service {
      * Tries to resolve the POM for the specified dependency coordinates possibly updating {@code dependency}.
      *
      * @param session The session to use to resolve the model, must not be {@code null}.
+     * @param repositories The repositories to use to resolve the model, may be {@code null} in which case the {@code Session} repositories will be used.
      * @param dependency The dependency coordinates to resolve, must not be {@code null}.
      * @param modified a holder for the updated dependency, must not be {@code null}.
      * @return The source of the requested POM, never {@code null}.
@@ -64,10 +73,14 @@ public interface ModelResolver extends Service {
      */
     @Nonnull
     default ModelSource resolveModel(
-            @Nonnull Session session, @Nonnull Dependency dependency, @Nonnull AtomicReference<Dependency> modified)
+            @Nonnull Session session,
+            @Nullable List<RemoteRepository> repositories,
+            @Nonnull Dependency dependency,
+            @Nonnull AtomicReference<Dependency> modified)
             throws ModelResolverException {
         return resolveModel(
                 session,
+                repositories,
                 dependency.getGroupId(),
                 dependency.getArtifactId(),
                 dependency.getVersion(),
@@ -77,6 +90,7 @@ public interface ModelResolver extends Service {
     @Nonnull
     ModelSource resolveModel(
             @Nonnull Session session,
+            @Nullable List<RemoteRepository> repositories,
             @Nonnull String groupId,
             @Nonnull String artifactId,
             @Nonnull String version,

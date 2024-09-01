@@ -58,7 +58,10 @@ public class DefaultVersionResolver implements VersionResolver {
                     session.getSession(),
                     new VersionRequest(
                             session.toArtifact(request.getArtifactCoordinates()),
-                            session.toRepositories(session.getRemoteRepositories()),
+                            session.toRepositories(
+                                    request.getRepositories() != null
+                                            ? request.getRepositories()
+                                            : session.getRemoteRepositories()),
                             null));
 
             return new VersionResolverResult() {

@@ -40,7 +40,6 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.api.Session;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nullable;
@@ -1123,9 +1122,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         ModelSource modelSource;
         try {
             AtomicReference<Parent> modified = new AtomicReference<>();
-            Session session = request.getSession()
-                    .withRemoteRepositories(request.getModelRepositoryHolder().getRepositories());
-            modelSource = modelResolver.resolveModel(session, parent, modified);
+            modelSource = modelResolver.resolveModel(
+                    request.getSession(), request.getModelRepositoryHolder().getRepositories(), parent, modified);
             if (modified.get() != null) {
                 parent = modified.get();
             }
@@ -1352,9 +1350,11 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         final ModelSource importSource;
         try {
-            Session session = request.getSession()
-                    .withRemoteRepositories(request.getModelRepositoryHolder().getRepositories());
-            importSource = modelResolver.resolveModel(session, dependency, new AtomicReference<>());
+            importSource = modelResolver.resolveModel(
+                    request.getSession(),
+                    request.getModelRepositoryHolder().getRepositories(),
+                    dependency,
+                    new AtomicReference<>());
         } catch (ModelBuilderException e) {
             StringBuilder buffer = new StringBuilder(256);
             buffer.append("Non-resolvable import POM");
@@ -1387,9 +1387,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         final ModelBuilderResult importResult;
         try {
             ModelBuilderRequest importRequest = ModelBuilderRequest.builder()
-                    .session(request.getSession()
-                            .withRemoteRepositories(
-                                    request.getModelRepositoryHolder().getRepositories()))
+                    .session(request.getSession())
                     .validationLevel(ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL)
                     .systemProperties(request.getSystemProperties())
                     .userProperties(request.getUserProperties())
@@ -1398,6 +1396,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .modelCache(request.getModelCache())
                     .modelRepositoryHolder(request.getModelRepositoryHolder().copy())
                     .twoPhaseBuilding(false)
+                    .repositories(request.getModelRepositoryHolder().getRepositories())
                     .build();
             importResult = build(importRequest, importIds);
         } catch (ModelBuilderException e) {

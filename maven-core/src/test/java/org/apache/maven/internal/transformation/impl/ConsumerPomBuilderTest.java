@@ -27,8 +27,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelResolver;
@@ -101,7 +103,12 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     public static class MyModelResolver implements ModelResolver {
         @Override
         public ModelSource resolveModel(
-                Session session, String groupId, String artifactId, String version, Consumer<String> resolvedVersion)
+                Session session,
+                List<RemoteRepository> repositories,
+                String groupId,
+                String artifactId,
+                String version,
+                Consumer<String> resolvedVersion)
                 throws ModelResolverException {
             String id = groupId + ":" + artifactId + ":" + version;
             if (id.startsWith("org.sonatype.mavenbook.multi:parent:")) {

@@ -19,8 +19,10 @@
 package org.apache.maven.api.services;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -54,5 +56,23 @@ public interface ArtifactResolver extends Service {
      */
     default ArtifactResolverResult resolve(Session session, Collection<? extends ArtifactCoordinates> coordinates) {
         return resolve(ArtifactResolverRequest.build(session, coordinates));
+    }
+
+    /**
+     * Resolves several artifacts from their coordinates.
+     *
+     * @param session {@link Session}
+     * @param repositories the list of remote repositories or {@code null} to use the session repositories
+     * @param coordinates array of {@link ArtifactCoordinates}
+     * @return {@link ArtifactResolverResult}
+     * @throws ArtifactResolverException in case of an error.
+     * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
+     *             parameter {@code coordinates} is {@code null} or invalid
+     */
+    default ArtifactResolverResult resolve(
+            Session session,
+            Collection<? extends ArtifactCoordinates> coordinates,
+            List<RemoteRepository> repositories) {
+        return resolve(ArtifactResolverRequest.build(session, coordinates, repositories));
     }
 }
