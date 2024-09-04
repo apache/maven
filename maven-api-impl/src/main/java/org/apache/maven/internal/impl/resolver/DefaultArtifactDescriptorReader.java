@@ -48,9 +48,7 @@ import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
-import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.impl.VersionResolver;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
@@ -74,9 +72,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader {
-    private final RemoteRepositoryManager remoteRepositoryManager;
     private final VersionResolver versionResolver;
-    private final VersionRangeResolver versionRangeResolver;
     private final ArtifactResolver artifactResolver;
     private final RepositoryEventDispatcher repositoryEventDispatcher;
     private final ModelBuilder modelBuilder;
@@ -86,17 +82,12 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
     @Inject
     public DefaultArtifactDescriptorReader(
-            RemoteRepositoryManager remoteRepositoryManager,
             VersionResolver versionResolver,
-            VersionRangeResolver versionRangeResolver,
             ArtifactResolver artifactResolver,
             ModelBuilder modelBuilder,
             RepositoryEventDispatcher repositoryEventDispatcher,
             Map<String, MavenArtifactRelocationSource> artifactRelocationSources) {
-        this.remoteRepositoryManager =
-                Objects.requireNonNull(remoteRepositoryManager, "remoteRepositoryManager cannot be null");
         this.versionResolver = Objects.requireNonNull(versionResolver, "versionResolver cannot be null");
-        this.versionRangeResolver = Objects.requireNonNull(versionRangeResolver, "versionRangeResolver cannot be null");
         this.artifactResolver = Objects.requireNonNull(artifactResolver, "artifactResolver cannot be null");
         this.modelBuilder = Objects.requireNonNull(modelBuilder, "modelBuilder cannot be null");
         this.repositoryEventDispatcher =

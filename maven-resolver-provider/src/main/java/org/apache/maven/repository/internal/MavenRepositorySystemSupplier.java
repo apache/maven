@@ -988,9 +988,7 @@ public class MavenRepositorySystemSupplier implements Supplier<RepositorySystem>
     protected ArtifactDescriptorReader createArtifactDescriptorReader() {
         // from maven-resolver-provider
         return new DefaultArtifactDescriptorReader(
-                getRemoteRepositoryManager(),
                 getVersionResolver(),
-                getVersionRangeResolver(),
                 getArtifactResolver(),
                 getModelBuilder(),
                 getRepositoryEventDispatcher(),
