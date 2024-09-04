@@ -824,14 +824,13 @@ public class DefaultModelBuilder implements ModelBuilder {
     Model readRawModel(ModelBuilderRequest request, ModelProblemCollector problems) throws ModelBuilderException {
         ModelSource modelSource = request.getSource();
 
-        ModelData modelData =
+        Model model =
                 cache(getModelCache(request), modelSource, RAW, () -> doReadRawModel(modelSource, request, problems));
 
-        return modelData.model();
+        return model;
     }
 
-    private ModelData doReadRawModel(
-            ModelSource modelSource, ModelBuilderRequest request, ModelProblemCollector problems)
+    private Model doReadRawModel(ModelSource modelSource, ModelBuilderRequest request, ModelProblemCollector problems)
             throws ModelBuilderException {
         Model rawModel = readFileModel(request, problems);
         if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion()) && modelSource.getPath() != null) {
@@ -863,7 +862,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             throw problems.newModelBuilderException();
         }
 
-        return new ModelData(modelSource, rawModel);
+        return rawModel;
     }
 
     static String getGroupId(Model model) {
