@@ -23,9 +23,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderException;
@@ -49,9 +47,6 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
     private final Graph dag = new Graph();
     private final DefaultModelBuilder defaultModelBuilder;
     private final DefaultModelTransformerContext context;
-
-    private final Map<String, Set<ModelSource>> mappedSources = new ConcurrentHashMap<>(64);
-
     private volatile boolean fullReactorLoaded;
 
     DefaultModelTransformerContextBuilder(DefaultModelBuilder defaultModelBuilder) {
@@ -221,12 +216,12 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
     public ModelSource getSource(String groupId, String artifactId) {
         Set<ModelSource> sources;
         if (groupId != null) {
-            sources = mappedSources.get(groupId + ":" + artifactId);
+            sources = context.mappedSources.get(new GAKey(groupId, artifactId));
             if (sources == null) {
                 return null;
             }
         } else if (artifactId != null) {
-            sources = mappedSources.get(artifactId);
+            sources = context.mappedSources.get(new GAKey(null, artifactId));
             if (sources == null) {
                 return null;
             }
@@ -243,9 +238,11 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
     }
 
     public void putSource(String groupId, String artifactId, ModelSource source) {
-        mappedSources
-                .computeIfAbsent(groupId + ":" + artifactId, k -> new HashSet<>())
+        context.mappedSources
+                .computeIfAbsent(new GAKey(groupId, artifactId), k -> new HashSet<>())
                 .add(source);
-        mappedSources.computeIfAbsent(artifactId, k -> new HashSet<>()).add(source);
+        context.mappedSources
+                .computeIfAbsent(new GAKey(null, artifactId), k -> new HashSet<>())
+                .add(source);
     }
 }

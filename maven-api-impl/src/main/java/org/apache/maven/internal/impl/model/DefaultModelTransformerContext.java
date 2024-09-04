@@ -21,10 +21,12 @@ package org.apache.maven.internal.impl.model;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ModelTransformerContext;
 import org.apache.maven.api.services.model.ModelProcessor;
 
@@ -40,6 +42,8 @@ class DefaultModelTransformerContext implements ModelTransformerContext {
     final Map<Path, Holder> modelByPath = new ConcurrentHashMap<>();
 
     final Map<GAKey, Holder> modelByGA = new ConcurrentHashMap<>();
+
+    final Map<GAKey, Set<ModelSource>> mappedSources = new ConcurrentHashMap<>(64);
 
     public static class Holder {
         private volatile boolean set;
