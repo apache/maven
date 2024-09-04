@@ -297,9 +297,7 @@ public abstract class AbstractSession implements InternalSession {
         try {
             return lookup.lookup(c);
         } catch (LookupException e) {
-            NoSuchElementException nsee = new NoSuchElementException(c.getName());
-            e.initCause(e);
-            throw nsee;
+            throw new NoSuchElementException(c.getName(), e);
         }
     }
 
