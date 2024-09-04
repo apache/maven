@@ -114,6 +114,8 @@ import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  */
 @Named
@@ -208,6 +210,14 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
+    public ModelProblemCollector newCollector() {
+        return newCollector(new DefaultModelBuilderResult());
+    }
+
+    DefaultModelProblemCollector newCollector(DefaultModelBuilderResult result) {
+        return new DefaultModelProblemCollector(result);
+    }
+
     private static ModelBuilderRequest fillRequestDefaults(ModelBuilderRequest request) {
         ModelBuilderRequest.ModelBuilderRequestBuilder builder = ModelBuilderRequest.builder(request);
         if (request.getModelRepositoryHolder() == null) {
@@ -227,7 +237,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         // phase 1
         DefaultModelBuilderResult result = new DefaultModelBuilderResult();
 
-        ModelProblemCollector problems = new DefaultModelProblemCollector(result);
+        ModelProblemCollector problems = newCollector(result);
 
         // read and validate raw model
         Model fileModel = readFileModel(request, problems);
@@ -543,7 +553,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
         request = fillRequestDefaults(request);
-        ModelProblemCollector problems = new DefaultModelProblemCollector(new DefaultModelBuilderResult());
+        ModelProblemCollector problems = newCollector(new DefaultModelBuilderResult());
         Model model = readRawModel(request, problems);
         if (hasModelErrors(problems)) {
             throw problems.newModelBuilderException();
@@ -556,7 +566,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             throws ModelBuilderException {
         DefaultModelBuilderResult result = asDefaultModelBuilderResult(phaseOneResult);
 
-        ModelProblemCollector problems = new DefaultModelProblemCollector(result);
+        ModelProblemCollector problems = newCollector(result);
 
         // phase 2
         Model resultModel = readEffectiveModel(request, result, problems);
@@ -628,12 +638,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                 .locationTracking(locationTracking)
                 .source(ModelSource.fromPath(pomFile))
                 .build();
-        ModelProblemCollector problems = new DefaultModelProblemCollector(new DefaultModelBuilderResult());
+        ModelProblemCollector problems = newCollector(new DefaultModelBuilderResult());
         try {
             Model model = readFileModel(request, problems);
 
             try {
-                if (buildModelTransformer != null && context != null) {
+                if (context != null) {
                     buildModelTransformer.transform(context, model, pomFile);
                 }
             } catch (ModelBuilderException e) {
@@ -840,7 +850,15 @@ public class DefaultModelBuilder implements ModelBuilder {
                 ModelTransformerContextBuilder transformerContextBuilder = getTransformerContextBuilder(request);
                 if (transformerContextBuilder != null) {
                     ModelTransformerContext context = transformerContextBuilder.initialize(request, problems);
-                    rawModel = this.buildModelTransformer.transform(context, rawModel, pomFile);
+                    if (context == null) {
+                        problems.add(
+                                Severity.FATAL,
+                                ModelProblem.Version.V40,
+                                "Illegal state: ModelTransformerContextBuilder returned null",
+                                (Exception) null);
+                    } else {
+                        rawModel = this.buildModelTransformer.transform(context, rawModel, pomFile);
+                    }
                 }
             } catch (ModelTransformerException e) {
                 problems.add(Severity.FATAL, ModelProblem.Version.V40, null, e);
@@ -1142,7 +1160,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         String version = parent.getVersion();
 
         ModelResolver modelResolver = getModelResolver(request);
-        Objects.requireNonNull(
+        requireNonNull(
                 modelResolver,
                 String.format(
                         "request.modelResolver cannot be null (parent POM %s and POM %s)",

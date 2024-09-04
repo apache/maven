@@ -60,6 +60,7 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
     @Override
     public ModelTransformerContext initialize(ModelBuilderRequest request, ModelProblemCollector problems) {
         // We must assume the TransformerContext was created using this.newTransformerContextBuilder()
+        request.getSession().getData().set(ModelTransformerContext.KEY, context);
         return new ModelTransformerContext() {
 
             @Override

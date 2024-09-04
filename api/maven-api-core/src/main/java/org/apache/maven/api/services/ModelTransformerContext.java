@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Model;
 
 /**
@@ -35,7 +36,7 @@ public interface ModelTransformerContext {
     /**
      * Key to get the TransformerContext from the SessionData
      */
-    Object KEY = ModelTransformerContext.class;
+    SessionData.Key<ModelTransformerContext> KEY = SessionData.key(ModelTransformerContext.class);
 
     /**
      * Get the value of the Maven user property.
