@@ -20,7 +20,6 @@ package org.apache.maven.internal.transformation.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -61,13 +60,13 @@ import org.apache.maven.api.services.model.PluginManagementInjector;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileInjector;
 import org.apache.maven.api.services.model.ProfileSelector;
+import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.model.DefaultModelBuilder;
 import org.apache.maven.internal.impl.model.DefaultProfileSelector;
 import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.slf4j.Logger;
@@ -79,68 +78,71 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
 
     public static final String POM_PACKAGING = "pom";
 
-    @Inject
-    private ProfileInjector profileInjector;
+    private final ProfileInjector profileInjector;
+    private final InheritanceAssembler inheritanceAssembler;
+    private final DependencyManagementImporter dependencyManagementImporter;
+    private final DependencyManagementInjector dependencyManagementInjector;
+    private final LifecycleBindingsInjector lifecycleBindingsInjector;
+    private final ModelInterpolator modelInterpolator;
+    private final ModelNormalizer modelNormalizer;
+    private final ModelPathTranslator modelPathTranslator;
+    private final ModelProcessor modelProcessor;
+    private final ModelUrlNormalizer modelUrlNormalizer;
+    private final ModelValidator modelValidator;
+    private final PluginConfigurationExpander pluginConfigurationExpander;
+    private final PluginManagementInjector pluginManagementInjector;
+    private final SuperPomProvider superPomProvider;
+    private final ModelVersionParser versionParser;
+    // To break circular dependency    private final Provider<RepositorySystem> repositorySystem;
+    private final RemoteRepositoryManager remoteRepositoryManager;
+    private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
+    private final List<ModelTransformer> transformers;
+    private final ModelCacheFactory modelCacheFactory;
 
     @Inject
-    private InheritanceAssembler inheritanceAssembler;
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    DefaultConsumerPomBuilder(
+            ProfileInjector profileInjector,
+            InheritanceAssembler inheritanceAssembler,
+            DependencyManagementImporter dependencyManagementImporter,
+            DependencyManagementInjector dependencyManagementInjector,
+            LifecycleBindingsInjector lifecycleBindingsInjector,
+            ModelInterpolator modelInterpolator,
+            ModelNormalizer modelNormalizer,
+            ModelPathTranslator modelPathTranslator,
+            ModelProcessor modelProcessor,
+            ModelUrlNormalizer modelUrlNormalizer,
+            ModelValidator modelValidator,
+            PluginConfigurationExpander pluginConfigurationExpander,
+            PluginManagementInjector pluginManagementInjector,
+            SuperPomProvider superPomProvider,
+            ModelVersionParser versionParser,
+            RemoteRepositoryManager remoteRepositoryManager,
+            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
+            List<ModelTransformer> transformers,
+            ModelCacheFactory modelCacheFactory) {
+        this.profileInjector = profileInjector;
+        this.inheritanceAssembler = inheritanceAssembler;
+        this.dependencyManagementImporter = dependencyManagementImporter;
+        this.dependencyManagementInjector = dependencyManagementInjector;
+        this.lifecycleBindingsInjector = lifecycleBindingsInjector;
+        this.modelInterpolator = modelInterpolator;
+        this.modelNormalizer = modelNormalizer;
+        this.modelPathTranslator = modelPathTranslator;
+        this.modelProcessor = modelProcessor;
+        this.modelUrlNormalizer = modelUrlNormalizer;
+        this.modelValidator = modelValidator;
+        this.pluginConfigurationExpander = pluginConfigurationExpander;
+        this.pluginManagementInjector = pluginManagementInjector;
+        this.superPomProvider = superPomProvider;
+        this.versionParser = versionParser;
+        this.remoteRepositoryManager = remoteRepositoryManager;
+        this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
+        this.transformers = transformers;
+        this.modelCacheFactory = modelCacheFactory;
+    }
 
-    @Inject
-    private DependencyManagementImporter dependencyManagementImporter;
-
-    @Inject
-    private DependencyManagementInjector dependencyManagementInjector;
-
-    @Inject
-    private LifecycleBindingsInjector lifecycleBindingsInjector;
-
-    @Inject
-    private ModelInterpolator modelInterpolator;
-
-    @Inject
-    private ModelNormalizer modelNormalizer;
-
-    @Inject
-    private ModelPathTranslator modelPathTranslator;
-
-    @Inject
-    private ModelProcessor modelProcessor;
-
-    @Inject
-    private ModelUrlNormalizer modelUrlNormalizer;
-
-    @Inject
-    private ModelValidator modelValidator;
-
-    @Inject
-    private PluginConfigurationExpander pluginConfigurationExpander;
-
-    @Inject
-    private PluginManagementInjector pluginManagementInjector;
-
-    @Inject
-    private SuperPomProvider superPomProvider;
-
-    @Inject
-    private ModelVersionParser versionParser;
-
-    // To break circular dependency
-    @Inject
-    private Provider<RepositorySystem> repositorySystem;
-
-    @Inject
-    private RemoteRepositoryManager remoteRepositoryManager;
-
-    @Inject
-    private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
-
-    @Inject
-    private List<org.apache.maven.api.spi.ModelTransformer> transformers;
-
-    @Inject
-    private ModelCacheFactory modelCacheFactory;
-
-    Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuilderException {
