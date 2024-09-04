@@ -40,11 +40,11 @@ public interface ModelProblem extends BuilderProblem {
     }
 
     /**
-     * Gets the identifier of the model from which the problem originated. While the general form of this identifier is
-     * <code>groupId:artifactId:version</code> the returned identifier need not be complete. The identifier is derived
-     * from the information that is available at the point the problem occurs and as such merely serves as a best effort
+     * Gets the identifier of the model from which the problem originated. The identifier is derived from the
+     * information that is available at the point the problem occurs and as such merely serves as best effort
      * to provide information to the user to track the problem back to its origin.
      *
+     * @see ModelBuilderResult#getModelIds()
      * @return The identifier of the model from which the problem originated or an empty string if unknown, never
      *         {@code null}.
      */

@@ -36,9 +36,9 @@ public interface ModelBuilderResult {
 
     /**
      * Gets the sequence of model identifiers that denote the lineage of models from which the effective model was
-     * constructed. Model identifiers have the form {@code <groupId>:<artifactId>:<version>}. The first identifier from
-     * the list denotes the model on which the model builder was originally invoked. The last identifier will always be
-     * an empty string that by definition denotes the super POM.
+     * constructed. Model identifiers should be handled as "opaque strings" and this method should be used as source
+     * if navigating the linage. The first identifier from the list denotes the model on which the model builder
+     * was originally invoked. The last identifier will always be the super POM.
      *
      * @return The model identifiers from the lineage of models, never {@code null}.
      */
@@ -80,9 +80,9 @@ public interface ModelBuilderResult {
     /**
      * Gets the specified raw model as it was read from a model source. Apart from basic validation, a raw model has not
      * undergone any updates by the model builder, e.g. reflects neither inheritance nor interpolation. The model
-     * identifier should be from the collection obtained by {@link #getModelIds()}. As a special case, an empty string
-     * can be used as the identifier for the super POM.
+     * identifier should be from the collection obtained by {@link #getModelIds()}.
      *
+     * @see #getModelIds()
      * @param modelId The identifier of the desired raw model, must not be {@code null}.
      * @return The raw model or {@code null} if the specified model id does not refer to a known model.
      */
@@ -91,9 +91,9 @@ public interface ModelBuilderResult {
 
     /**
      * Gets the profiles from the specified model that were active during model building. The model identifier should be
-     * from the collection obtained by {@link #getModelIds()}. As a special case, an empty string can be used as the
-     * identifier for the super POM.
+     * from the collection obtained by {@link #getModelIds()}.
      *
+     * @see #getModelIds()
      * @param modelId The identifier of the model whose active profiles should be retrieved, must not be {@code null}.
      * @return The active profiles of the model or an empty list if the specified model id does
      *         not refer to a known model or has no active profiles.
