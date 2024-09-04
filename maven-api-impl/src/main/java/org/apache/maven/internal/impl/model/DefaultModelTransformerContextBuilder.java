@@ -63,9 +63,8 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
      * If an interface could be extracted, DefaultModelProblemCollector should be ModelProblemCollectorExt
      */
     @Override
-    public ModelTransformerContext initialize(ModelBuilderRequest request, ModelProblemCollector collector) {
+    public ModelTransformerContext initialize(ModelBuilderRequest request, ModelProblemCollector problems) {
         // We must assume the TransformerContext was created using this.newTransformerContextBuilder()
-        DefaultModelProblemCollector problems = (DefaultModelProblemCollector) collector;
         return new ModelTransformerContext() {
 
             @Override
@@ -166,6 +165,11 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
                         }
                     } catch (ModelBuilderException e) {
                         // gathered with problem collector
+                        problems.add(
+                                ModelProblem.Severity.ERROR,
+                                ModelProblem.Version.V40,
+                                "Failed to load project " + pom,
+                                e);
                     }
                 }
             }
@@ -191,7 +195,7 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
         };
     }
 
-    private boolean addEdge(Path from, Path p, DefaultModelProblemCollector problems) {
+    private boolean addEdge(Path from, Path p, ModelProblemCollector problems) {
         try {
             dag.addEdge(from.toString(), p.toString());
             return true;

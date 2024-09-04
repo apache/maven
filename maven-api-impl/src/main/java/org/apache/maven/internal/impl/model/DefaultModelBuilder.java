@@ -227,7 +227,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         // phase 1
         DefaultModelBuilderResult result = new DefaultModelBuilderResult();
 
-        DefaultModelProblemCollector problems = new DefaultModelProblemCollector(result);
+        ModelProblemCollector problems = new DefaultModelProblemCollector(result);
 
         // read and validate raw model
         Model fileModel = readFileModel(request, problems);
@@ -249,7 +249,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model inputModel,
             ModelBuilderRequest request,
             DefaultModelBuilderResult result,
-            DefaultModelProblemCollector problems)
+            ModelProblemCollector problems)
             throws ModelBuilderException {
         problems.setRootModel(inputModel);
 
@@ -294,7 +294,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private Model readEffectiveModel(
             final ModelBuilderRequest request,
             final DefaultModelBuilderResult result,
-            DefaultModelProblemCollector problems)
+            final ModelProblemCollector problems)
             throws ModelBuilderException {
         Model inputModel = readRawModel(request, problems);
         if (problems.hasFatalErrors()) {
@@ -451,7 +451,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private List<Profile> interpolateActivations(
-            List<Profile> profiles, DefaultProfileActivationContext context, DefaultModelProblemCollector problems) {
+            List<Profile> profiles, DefaultProfileActivationContext context, ModelProblemCollector problems) {
         if (profiles.stream()
                 .map(org.apache.maven.api.model.Profile::getActivation)
                 .noneMatch(Objects::nonNull)) {
@@ -519,7 +519,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private static void addInterpolationProblem(
-            DefaultModelProblemCollector problems,
+            ModelProblemCollector problems,
             InputLocationTracker target,
             String path,
             InterpolationException e,
@@ -543,7 +543,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
         request = fillRequestDefaults(request);
-        DefaultModelProblemCollector problems = new DefaultModelProblemCollector(new DefaultModelBuilderResult());
+        ModelProblemCollector problems = new DefaultModelProblemCollector(new DefaultModelBuilderResult());
         Model model = readRawModel(request, problems);
         if (hasModelErrors(problems)) {
             throw problems.newModelBuilderException();
@@ -556,7 +556,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             throws ModelBuilderException {
         DefaultModelBuilderResult result = asDefaultModelBuilderResult(phaseOneResult);
 
-        DefaultModelProblemCollector problems = new DefaultModelProblemCollector(result);
+        ModelProblemCollector problems = new DefaultModelProblemCollector(result);
 
         // phase 2
         Model resultModel = readEffectiveModel(request, result, problems);
@@ -628,7 +628,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 .locationTracking(locationTracking)
                 .source(ModelSource.fromPath(pomFile))
                 .build();
-        DefaultModelProblemCollector problems = new DefaultModelProblemCollector(new DefaultModelBuilderResult());
+        ModelProblemCollector problems = new DefaultModelProblemCollector(new DefaultModelBuilderResult());
         try {
             Model model = readFileModel(request, problems);
 
@@ -646,8 +646,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    Model readFileModel(ModelBuilderRequest request, DefaultModelProblemCollector problems)
-            throws ModelBuilderException {
+    Model readFileModel(ModelBuilderRequest request, ModelProblemCollector problems) throws ModelBuilderException {
         ModelSource modelSource = request.getSource();
         Model model =
                 cache(getModelCache(request), modelSource, FILE, () -> doReadFileModel(modelSource, request, problems));
@@ -662,8 +661,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     @SuppressWarnings("checkstyle:methodlength")
-    private Model doReadFileModel(
-            ModelSource modelSource, ModelBuilderRequest request, DefaultModelProblemCollector problems)
+    private Model doReadFileModel(ModelSource modelSource, ModelBuilderRequest request, ModelProblemCollector problems)
             throws ModelBuilderException {
         Model model;
         problems.setSource(modelSource.getLocation());
@@ -823,8 +821,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         return model;
     }
 
-    Model readRawModel(ModelBuilderRequest request, DefaultModelProblemCollector problems)
-            throws ModelBuilderException {
+    Model readRawModel(ModelBuilderRequest request, ModelProblemCollector problems) throws ModelBuilderException {
         ModelSource modelSource = request.getSource();
 
         ModelData modelData =
@@ -834,7 +831,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private ModelData doReadRawModel(
-            ModelSource modelSource, ModelBuilderRequest request, DefaultModelProblemCollector problems)
+            ModelSource modelSource, ModelBuilderRequest request, ModelProblemCollector problems)
             throws ModelBuilderException {
         Model rawModel = readFileModel(request, problems);
         if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion()) && modelSource.getPath() != null) {
@@ -1003,10 +1000,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private ModelData readParent(
-            Model childModel,
-            ModelSource childSource,
-            ModelBuilderRequest request,
-            DefaultModelProblemCollector problems)
+            Model childModel, ModelSource childSource, ModelBuilderRequest request, ModelProblemCollector problems)
             throws ModelBuilderException {
         ModelData parentData = null;
 
@@ -1032,10 +1026,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private ModelData readParentLocally(
-            Model childModel,
-            ModelSource childSource,
-            ModelBuilderRequest request,
-            DefaultModelProblemCollector problems)
+            Model childModel, ModelSource childSource, ModelBuilderRequest request, ModelProblemCollector problems)
             throws ModelBuilderException {
         ModelSource candidateSource = getParentPomFile(childModel, childSource);
         if (candidateSource == null) {
@@ -1141,7 +1132,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private ModelData readParentExternally(
-            Model childModel, ModelBuilderRequest request, DefaultModelProblemCollector problems)
+            Model childModel, ModelBuilderRequest request, ModelProblemCollector problems)
             throws ModelBuilderException {
         problems.setSource(childModel);
 
@@ -1227,13 +1218,13 @@ public class DefaultModelBuilder implements ModelBuilder {
         return new ModelData(modelSource, parentModel);
     }
 
-    Model readParentModel(ModelBuilderRequest request, DefaultModelProblemCollector problems) {
+    Model readParentModel(ModelBuilderRequest request, ModelProblemCollector problems) {
         ModelSource modelSource = request.getSource();
         Model model = cache(getModelCache(request), modelSource, PARENT, () -> doReadParentModel(request, problems));
         return model;
     }
 
-    private Model doReadParentModel(ModelBuilderRequest request, DefaultModelProblemCollector problems) {
+    private Model doReadParentModel(ModelBuilderRequest request, ModelProblemCollector problems) {
         Model raw = readRawModel(request, problems);
 
         ModelData parentData;
@@ -1259,10 +1250,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private Model importDependencyManagement(
-            Model model,
-            ModelBuilderRequest request,
-            DefaultModelProblemCollector problems,
-            Collection<String> importIds) {
+            Model model, ModelBuilderRequest request, ModelProblemCollector problems, Collection<String> importIds) {
         DependencyManagement depMgmt = model.getDependencyManagement();
 
         if (depMgmt == null) {
@@ -1307,7 +1295,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private DependencyManagement loadDependencyManagement(
             Model model,
             ModelBuilderRequest request,
-            DefaultModelProblemCollector problems,
+            ModelProblemCollector problems,
             Dependency dependency,
             Collection<String> importIds) {
         String groupId = dependency.getGroupId();
@@ -1402,7 +1390,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private Model doLoadDependencyManagement(
             Model model,
             ModelBuilderRequest request,
-            DefaultModelProblemCollector problems,
+            ModelProblemCollector problems,
             Dependency dependency,
             String groupId,
             String artifactId,

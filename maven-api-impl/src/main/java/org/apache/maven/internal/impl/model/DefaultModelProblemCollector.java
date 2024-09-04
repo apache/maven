@@ -90,7 +90,7 @@ class DefaultModelProblemCollector implements ModelProblemCollector {
         }
     }
 
-    private String getSource() {
+    public String getSource() {
         if (source == null && sourceModel != null) {
             source = ModelProblemUtils.toPath(sourceModel);
         }
