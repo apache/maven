@@ -34,7 +34,6 @@ import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
-import org.apache.maven.api.services.ModelRepositoryHolder;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
@@ -195,8 +194,6 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 String gav =
                         pomArtifact.getGroupId() + ":" + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion();
                 ModelResolver modelResolver = new DefaultModelResolver();
-                ModelRepositoryHolder modelRepositoryHolder = new DefaultModelRepositoryHolder(
-                        iSession, DefaultModelRepositoryHolder.RepositoryMerging.REQUEST_DOMINANT, repositories);
                 ModelBuilderRequest modelRequest = ModelBuilderRequest.builder()
                         .session(iSession)
                         .projectBuild(false)
@@ -208,7 +205,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         .systemProperties(toProperties(session.getUserProperties(), session.getSystemProperties()))
                         .userProperties(Map.of())
                         .modelResolver(modelResolver)
-                        .modelRepositoryHolder(modelRepositoryHolder)
+                        .repositoryMerging(ModelBuilderRequest.RepositoryMerging.REQUEST_DOMINANT)
                         .repositories(repositories)
                         .build();
 

@@ -26,26 +26,10 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Repository;
-import org.apache.maven.api.services.ModelRepositoryHolder;
+import org.apache.maven.api.services.ModelBuilderRequest.RepositoryMerging;
 import org.apache.maven.api.services.RepositoryFactory;
 
-public class DefaultModelRepositoryHolder implements ModelRepositoryHolder {
-
-    /**
-     * The possible merge modes for combining remote repositories.
-     */
-    public enum RepositoryMerging {
-
-        /**
-         * The repositories declared in the POM have precedence over the repositories specified in the request.
-         */
-        POM_DOMINANT,
-
-        /**
-         * The repositories specified in the request have precedence over the repositories declared in the POM.
-         */
-        REQUEST_DOMINANT,
-    }
+public class DefaultModelRepositoryHolder {
 
     final Session session;
     final RepositoryMerging repositoryMerging;
@@ -73,7 +57,6 @@ public class DefaultModelRepositoryHolder implements ModelRepositoryHolder {
         this.repositories = List.copyOf(holder.repositories);
     }
 
-    @Override
     public void merge(List<Repository> toAdd, boolean replace) {
         List<RemoteRepository> repos =
                 toAdd.stream().map(session::createRemoteRepository).toList();
@@ -100,13 +83,11 @@ public class DefaultModelRepositoryHolder implements ModelRepositoryHolder {
         }
     }
 
-    @Override
     public List<org.apache.maven.api.RemoteRepository> getRepositories() {
         return List.copyOf(repositories);
     }
 
-    @Override
-    public ModelRepositoryHolder copy() {
+    public DefaultModelRepositoryHolder copy() {
         return new DefaultModelRepositoryHolder(this);
     }
 }

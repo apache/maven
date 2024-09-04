@@ -90,7 +90,6 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.internal.impl.InternalSession;
-import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource2;
@@ -1191,14 +1190,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             modelBuildingRequest.userProperties(toMap(request.getUserProperties()));
             // bv4: modelBuildingRequest.setBuildStartTime(request.getBuildStartTime());
             modelBuildingRequest.modelResolver(modelResolver);
-            DefaultModelRepositoryHolder holder = new DefaultModelRepositoryHolder(
-                    internalSession,
-                    DefaultModelRepositoryHolder.RepositoryMerging.valueOf(
-                            request.getRepositoryMerging().name()),
-                    repositories.stream()
-                            .map(internalSession::getRemoteRepository)
-                            .toList());
-            modelBuildingRequest.modelRepositoryHolder(holder);
+            modelBuildingRequest.repositoryMerging(ModelBuilderRequest.RepositoryMerging.valueOf(
+                    request.getRepositoryMerging().name()));
             modelBuildingRequest.transformerContextBuilder(transformerContextBuilder);
             modelBuildingRequest.repositories(request.getRemoteRepositories().stream()
                     .map(r -> internalSession.getRemoteRepository(RepositoryUtils.toRepo(r)))

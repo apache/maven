@@ -79,6 +79,22 @@ public interface ModelBuilderRequest {
      */
     int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_4_0;
 
+    /**
+     * The possible merge modes for combining remote repositories.
+     */
+    enum RepositoryMerging {
+
+        /**
+         * The repositories declared in the POM have precedence over the repositories specified in the request.
+         */
+        POM_DOMINANT,
+
+        /**
+         * The repositories specified in the request have precedence over the repositories declared in the POM.
+         */
+        REQUEST_DOMINANT,
+    }
+
     @Nonnull
     Session getSession();
 
@@ -144,7 +160,10 @@ public interface ModelBuilderRequest {
     ModelResolver getModelResolver();
 
     @Nonnull
-    ModelRepositoryHolder getModelRepositoryHolder();
+    Object getModelRepositoryHolder();
+
+    @Nonnull
+    RepositoryMerging getRepositoryMerging();
 
     @Nullable
     Object getListener();
@@ -206,7 +225,8 @@ public interface ModelBuilderRequest {
         Map<String, String> systemProperties;
         Map<String, String> userProperties;
         ModelResolver modelResolver;
-        ModelRepositoryHolder modelRepositoryHolder;
+        Object modelRepositoryHolder;
+        RepositoryMerging repositoryMerging;
         Object listener;
         ModelBuilderResult interimResult;
         ModelTransformerContextBuilder transformerContextBuilder;
@@ -229,6 +249,7 @@ public interface ModelBuilderRequest {
             this.userProperties = request.getUserProperties();
             this.modelResolver = request.getModelResolver();
             this.modelRepositoryHolder = request.getModelRepositoryHolder();
+            this.repositoryMerging = request.getRepositoryMerging();
             this.listener = request.getListener();
             this.interimResult = request.getInterimResult();
             this.transformerContextBuilder = request.getTransformerContextBuilder();
@@ -300,8 +321,13 @@ public interface ModelBuilderRequest {
             return this;
         }
 
-        public ModelBuilderRequestBuilder modelRepositoryHolder(ModelRepositoryHolder modelRepositoryHolder) {
+        public ModelBuilderRequestBuilder modelRepositoryHolder(Object modelRepositoryHolder) {
             this.modelRepositoryHolder = modelRepositoryHolder;
+            return this;
+        }
+
+        public ModelBuilderRequestBuilder repositoryMerging(RepositoryMerging repositoryMerging) {
+            this.repositoryMerging = repositoryMerging;
             return this;
         }
 
@@ -342,6 +368,7 @@ public interface ModelBuilderRequest {
                     userProperties,
                     modelResolver,
                     modelRepositoryHolder,
+                    repositoryMerging,
                     listener,
                     interimResult,
                     transformerContextBuilder,
@@ -361,7 +388,8 @@ public interface ModelBuilderRequest {
             private final Map<String, String> systemProperties;
             private final Map<String, String> userProperties;
             private final ModelResolver modelResolver;
-            private final ModelRepositoryHolder modelRepositoryHolder;
+            private final Object modelRepositoryHolder;
+            private final RepositoryMerging repositoryMerging;
             private final Object listener;
             private final ModelBuilderResult interimResult;
             private final ModelTransformerContextBuilder transformerContextBuilder;
@@ -382,7 +410,8 @@ public interface ModelBuilderRequest {
                     Map<String, String> systemProperties,
                     Map<String, String> userProperties,
                     ModelResolver modelResolver,
-                    ModelRepositoryHolder modelRepositoryHolder,
+                    Object modelRepositoryHolder,
+                    RepositoryMerging repositoryMerging,
                     Object listener,
                     ModelBuilderResult interimResult,
                     ModelTransformerContextBuilder transformerContextBuilder,
@@ -402,6 +431,7 @@ public interface ModelBuilderRequest {
                 this.userProperties = userProperties != null ? Map.copyOf(userProperties) : session.getUserProperties();
                 this.modelResolver = modelResolver;
                 this.modelRepositoryHolder = modelRepositoryHolder;
+                this.repositoryMerging = repositoryMerging;
                 this.listener = listener;
                 this.interimResult = interimResult;
                 this.transformerContextBuilder = transformerContextBuilder;
@@ -469,10 +499,16 @@ public interface ModelBuilderRequest {
             }
 
             @Override
-            public ModelRepositoryHolder getModelRepositoryHolder() {
+            public Object getModelRepositoryHolder() {
                 return modelRepositoryHolder;
             }
 
+            @Override
+            public RepositoryMerging getRepositoryMerging() {
+                return repositoryMerging;
+            }
+
+            @Override
             public Object getListener() {
                 return listener;
             }

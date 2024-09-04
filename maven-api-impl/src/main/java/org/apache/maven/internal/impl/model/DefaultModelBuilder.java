@@ -220,11 +220,15 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private static ModelBuilderRequest fillRequestDefaults(ModelBuilderRequest request) {
         ModelBuilderRequest.ModelBuilderRequestBuilder builder = ModelBuilderRequest.builder(request);
-        if (request.getModelRepositoryHolder() == null) {
+        if (getModelRepositoryHolder(request) == null) {
             builder.modelRepositoryHolder(new DefaultModelRepositoryHolder(
                     request.getSession(),
-                    DefaultModelRepositoryHolder.RepositoryMerging.POM_DOMINANT,
-                    request.getSession().getRemoteRepositories()));
+                    request.getRepositoryMerging() != null
+                            ? request.getRepositoryMerging()
+                            : ModelBuilderRequest.RepositoryMerging.POM_DOMINANT,
+                    request.getRepositories() != null
+                            ? request.getRepositories()
+                            : request.getSession().getRemoteRepositories()));
         }
         if (request.getModelResolver() == null) {
             builder.modelResolver(new DefaultModelResolver());
@@ -378,11 +382,12 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // add repositories specified by the current model so that we can resolve the parent
             if (!model.getRepositories().isEmpty()) {
-                List<String> oldRepos = request.getModelRepositoryHolder().getRepositories().stream()
+                DefaultModelRepositoryHolder modelRepositoryHolder = getModelRepositoryHolder(request);
+                List<String> oldRepos = modelRepositoryHolder.getRepositories().stream()
                         .map(Object::toString)
                         .toList();
-                request.getModelRepositoryHolder().merge(model.getRepositories(), false);
-                List<String> newRepos = request.getModelRepositoryHolder().getRepositories().stream()
+                modelRepositoryHolder.merge(model.getRepositories(), false);
+                List<String> newRepos = modelRepositoryHolder.getRepositories().stream()
                         .map(Object::toString)
                         .toList();
                 if (!Objects.equals(oldRepos, newRepos)) {
@@ -444,11 +449,12 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         // Now the fully interpolated model is available: reconfigure the resolver
         if (!resultModel.getRepositories().isEmpty()) {
-            List<String> oldRepos = request.getModelRepositoryHolder().getRepositories().stream()
+            DefaultModelRepositoryHolder modelRepositoryHolder = getModelRepositoryHolder(request);
+            List<String> oldRepos = modelRepositoryHolder.getRepositories().stream()
                     .map(Object::toString)
                     .toList();
-            request.getModelRepositoryHolder().merge(resultModel.getRepositories(), true);
-            List<String> newRepos = request.getModelRepositoryHolder().getRepositories().stream()
+            modelRepositoryHolder.merge(resultModel.getRepositories(), true);
+            List<String> newRepos = modelRepositoryHolder.getRepositories().stream()
                     .map(Object::toString)
                     .toList();
             if (!Objects.equals(oldRepos, newRepos)) {
@@ -1171,7 +1177,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         try {
             AtomicReference<Parent> modified = new AtomicReference<>();
             modelSource = modelResolver.resolveModel(
-                    request.getSession(), request.getModelRepositoryHolder().getRepositories(), parent, modified);
+                    request.getSession(), getModelRepositoryHolder(request).getRepositories(), parent, modified);
             if (modified.get() != null) {
                 parent = modified.get();
             }
@@ -1426,7 +1432,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         try {
             importSource = modelResolver.resolveModel(
                     request.getSession(),
-                    request.getModelRepositoryHolder().getRepositories(),
+                    getModelRepositoryHolder(request).getRepositories(),
                     dependency,
                     new AtomicReference<>());
         } catch (ModelBuilderException e) {
@@ -1462,14 +1468,14 @@ public class DefaultModelBuilder implements ModelBuilder {
         try {
             ModelBuilderRequest importRequest = ModelBuilderRequest.builder()
                     .session(request.getSession())
-                    .repositories(request.getModelRepositoryHolder().getRepositories())
                     .validationLevel(ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL)
                     .systemProperties(request.getSystemProperties())
                     .userProperties(request.getUserProperties())
                     .source(importSource)
                     .modelResolver(modelResolver)
-                    .modelRepositoryHolder(request.getModelRepositoryHolder().copy())
+                    .modelRepositoryHolder(getModelRepositoryHolder(request).copy())
                     .twoPhaseBuilding(false)
+                    .repositories(getModelRepositoryHolder(request).getRepositories())
                     .build();
             importResult = build(importRequest, importIds);
         } catch (ModelBuilderException e) {
@@ -1482,6 +1488,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         importModel = importResult.getEffectiveModel();
 
         return importModel;
+    }
+
+    private static DefaultModelRepositoryHolder getModelRepositoryHolder(ModelBuilderRequest request) {
+        return (DefaultModelRepositoryHolder) request.getModelRepositoryHolder();
     }
 
     private static <T> T cache(
