@@ -208,11 +208,6 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
         }
     }
 
-    @Override
-    public ModelTransformerContext build() {
-        return context;
-    }
-
     public ModelSource getSource(String groupId, String artifactId) {
         Set<ModelSource> sources;
         if (groupId != null) {

@@ -36,11 +36,4 @@ public interface ModelTransformerContextBuilder {
      * @return the mutable transformerContext
      */
     ModelTransformerContext initialize(ModelBuilderRequest request, ModelProblemCollector problems);
-
-    /**
-     * The immutable transformerContext, can be used after the buildplan is finished.
-     *
-     * @return the immutable transformerContext
-     */
-    ModelTransformerContext build();
 }

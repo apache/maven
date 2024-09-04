@@ -42,7 +42,6 @@ import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.ModelTransformer;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.model.DependencyManagementImporter;
 import org.apache.maven.api.services.model.DependencyManagementInjector;
@@ -124,9 +123,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     @Inject
     private ModelVersionParser versionParser;
 
-    @Inject
-    private ModelTransformer modelTransformer;
-
     // To break circular dependency
     @Inject
     private Provider<RepositorySystem> repositorySystem;
@@ -197,7 +193,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 profileActivationFilePathInterpolator,
-                modelTransformer,
                 versionParser,
                 transformers,
                 modelCacheFactory);

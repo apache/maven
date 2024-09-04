@@ -80,7 +80,6 @@ import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.ModelTransformerContext;
 import org.apache.maven.api.services.ModelTransformerContextBuilder;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.model.ModelBuildingListener;
@@ -613,11 +612,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             try {
                 // Phase 2: get effective models from the reactor
                 List<ProjectBuildingResult> results = build(projectIndex, interimResults);
-
-                request.getRepositorySession()
-                        .getData()
-                        .set(ModelTransformerContext.KEY, transformerContextBuilder.build());
-
                 return results;
             } finally {
                 Thread.currentThread().setContextClassLoader(oldContextClassLoader);

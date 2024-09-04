@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,10 +74,8 @@ import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.ModelTransformer;
 import org.apache.maven.api.services.ModelTransformerContext;
 import org.apache.maven.api.services.ModelTransformerContextBuilder;
-import org.apache.maven.api.services.ModelTransformerException;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.VersionParserException;
@@ -102,6 +101,8 @@ import org.apache.maven.api.services.model.ProfileInjector;
 import org.apache.maven.api.services.model.ProfileSelector;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
+import org.apache.maven.api.spi.ModelTransformer;
+import org.apache.maven.api.spi.ModelTransformerException;
 import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
 import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
 import org.apache.maven.model.v4.MavenTransformer;
@@ -143,9 +144,9 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final LifecycleBindingsInjector lifecycleBindingsInjector;
     private final PluginConfigurationExpander pluginConfigurationExpander;
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
-    private final ModelTransformer transformer;
+    private final BuildModelTransformer buildModelTransformer;
     private final ModelVersionParser versionParser;
-    private final List<org.apache.maven.api.spi.ModelTransformer> transformers;
+    private final List<ModelTransformer> transformers;
     private final ModelCacheFactory modelCacheFactory;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -167,9 +168,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             @Nullable LifecycleBindingsInjector lifecycleBindingsInjector,
             PluginConfigurationExpander pluginConfigurationExpander,
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
-            ModelTransformer transformer,
             ModelVersionParser versionParser,
-            List<org.apache.maven.api.spi.ModelTransformer> transformers,
+            List<ModelTransformer> transformers,
             ModelCacheFactory modelCacheFactory) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
@@ -187,7 +187,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.lifecycleBindingsInjector = lifecycleBindingsInjector;
         this.pluginConfigurationExpander = pluginConfigurationExpander;
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
-        this.transformer = transformer;
+        this.buildModelTransformer = new BuildModelTransformer();
         this.versionParser = versionParser;
         this.transformers = transformers;
         this.modelCacheFactory = modelCacheFactory;
@@ -633,8 +633,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model model = readFileModel(request, problems);
 
             try {
-                if (transformer != null && context != null) {
-                    transformer.transform(context, model, pomFile);
+                if (buildModelTransformer != null && context != null) {
+                    buildModelTransformer.transform(context, model, pomFile);
                 }
             } catch (ModelBuilderException e) {
                 problems.add(Severity.FATAL, ModelProblem.Version.V40, null, e);
@@ -650,12 +650,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         ModelSource modelSource = request.getSource();
         Model model =
                 cache(getModelCache(request), modelSource, FILE, () -> doReadFileModel(modelSource, request, problems));
-
-        if (modelSource.getPath() != null) {
-            if (getTransformerContextBuilder(request) instanceof DefaultModelTransformerContextBuilder contextBuilder) {
-                contextBuilder.putSource(getGroupId(model), model.getArtifactId(), modelSource);
-            }
-        }
 
         return model;
     }
@@ -818,6 +812,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             throw problems.newModelBuilderException();
         }
 
+        if (modelSource.getPath() != null) {
+            if (getTransformerContextBuilder(request) instanceof DefaultModelTransformerContextBuilder contextBuilder) {
+                contextBuilder.putSource(getGroupId(model), model.getArtifactId(), modelSource);
+            }
+        }
+
         return model;
     }
 
@@ -841,7 +841,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 ModelTransformerContextBuilder transformerContextBuilder = getTransformerContextBuilder(request);
                 if (transformerContextBuilder != null) {
                     ModelTransformerContext context = transformerContextBuilder.initialize(request, problems);
-                    rawModel = this.transformer.transform(context, rawModel, pomFile);
+                    rawModel = this.buildModelTransformer.transform(context, rawModel, pomFile);
                 }
             } catch (ModelTransformerException e) {
                 problems.add(Severity.FATAL, ModelProblem.Version.V40, null, e);
@@ -1546,5 +1546,96 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private static ModelTransformerContextBuilder getTransformerContextBuilder(ModelBuilderRequest request) {
         return request.getTransformerContextBuilder();
+    }
+
+    /**
+     * ModelSourceTransformer for the build pom
+     */
+    public static class BuildModelTransformer {
+
+        public Model transform(ModelTransformerContext context, Model model, Path path) {
+            Model.Builder builder = Model.newBuilder(model);
+            handleParent(context, model, path, builder);
+            handleReactorDependencies(context, model, path, builder);
+            handleCiFriendlyVersion(context, model, path, builder);
+            return builder.build();
+        }
+
+        //
+        // Infer parent information
+        //
+        void handleParent(ModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
+            Parent parent = model.getParent();
+            if (parent != null) {
+                String version = parent.getVersion();
+                String modVersion = replaceCiFriendlyVersion(context, version);
+                builder.parent(parent.withVersion(modVersion));
+            }
+        }
+
+        //
+        // CI friendly versions
+        //
+        void handleCiFriendlyVersion(
+                ModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
+            String version = model.getVersion();
+            String modVersion = replaceCiFriendlyVersion(context, version);
+            builder.version(modVersion);
+        }
+
+        //
+        // Infer inner reactor dependencies version
+        //
+        void handleReactorDependencies(
+                ModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
+            List<Dependency> newDeps = new ArrayList<>();
+            boolean modified = false;
+            for (Dependency dep : model.getDependencies()) {
+                Dependency.Builder depBuilder = null;
+                if (dep.getVersion() == null) {
+                    Model depModel = context.getRawModel(model.getPomFile(), dep.getGroupId(), dep.getArtifactId());
+                    if (depModel != null) {
+                        String version = depModel.getVersion();
+                        InputLocation versionLocation = depModel.getLocation("version");
+                        if (version == null && depModel.getParent() != null) {
+                            version = depModel.getParent().getVersion();
+                            versionLocation = depModel.getParent().getLocation("version");
+                        }
+                        depBuilder = Dependency.newBuilder(dep);
+                        depBuilder.version(version).location("version", versionLocation);
+                        if (dep.getGroupId() == null) {
+                            String depGroupId = depModel.getGroupId();
+                            InputLocation groupIdLocation = depModel.getLocation("groupId");
+                            if (depGroupId == null && depModel.getParent() != null) {
+                                depGroupId = depModel.getParent().getGroupId();
+                                groupIdLocation = depModel.getParent().getLocation("groupId");
+                            }
+                            depBuilder.groupId(depGroupId).location("groupId", groupIdLocation);
+                        }
+                    }
+                }
+                if (depBuilder != null) {
+                    newDeps.add(depBuilder.build());
+                    modified = true;
+                } else {
+                    newDeps.add(dep);
+                }
+            }
+            if (modified) {
+                builder.dependencies(newDeps);
+            }
+        }
+
+        protected String replaceCiFriendlyVersion(ModelTransformerContext context, String version) {
+            if (version != null) {
+                for (String key : Arrays.asList("changelist", "revision", "sha1")) {
+                    String val = context.getUserProperty(key);
+                    if (val != null) {
+                        version = version.replace("${" + key + "}", val);
+                    }
+                }
+            }
+            return version;
+        }
     }
 }

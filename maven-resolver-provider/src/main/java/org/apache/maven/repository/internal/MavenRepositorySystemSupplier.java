@@ -32,7 +32,6 @@ import org.apache.maven.internal.impl.DefaultModelXmlFactory;
 import org.apache.maven.internal.impl.DefaultPluginConfigurationExpander;
 import org.apache.maven.internal.impl.DefaultSuperPomProvider;
 import org.apache.maven.internal.impl.DefaultUrlNormalizer;
-import org.apache.maven.internal.impl.model.BuildModelTransformer;
 import org.apache.maven.internal.impl.model.DefaultDependencyManagementImporter;
 import org.apache.maven.internal.impl.model.DefaultDependencyManagementInjector;
 import org.apache.maven.internal.impl.model.DefaultInheritanceAssembler;
@@ -1061,7 +1060,6 @@ public class MavenRepositorySystemSupplier implements Supplier<RepositorySystem>
                 (m, r, b) -> m,
                 new DefaultPluginConfigurationExpander(),
                 new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), new DefaultRootLocator()),
-                new BuildModelTransformer(),
                 new DefaultModelVersionParser(getVersionScheme()),
                 List.of(),
                 new DefaultModelCacheFactory());
