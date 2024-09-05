@@ -45,7 +45,7 @@ class TestApiStandalone {
         ModelBuilderResult result = builder.build(ModelBuilderRequest.builder()
                 .session(session)
                 .source(ModelSource.fromPath(Paths.get("pom.xml").toAbsolutePath()))
-                .projectBuild(true)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
                 .build());
         assertNotNull(result.getEffectiveModel());
 

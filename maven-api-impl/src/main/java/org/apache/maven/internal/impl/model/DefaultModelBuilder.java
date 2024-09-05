@@ -580,7 +580,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         resultModel = fireEvent(resultModel, request, problems, ModelBuildingListener::buildExtensionsAssembled);
 
-        if (request.isProcessPlugins()) {
+        if (request.getRequestType() != ModelBuilderRequest.RequestType.DEPENDENCY) {
             if (lifecycleBindingsInjector == null) {
                 throw new IllegalStateException("lifecycle bindings injector is missing");
             }
@@ -597,7 +597,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         resultModel = modelNormalizer.injectDefaultValues(resultModel, request, problems);
 
-        if (request.isProcessPlugins()) {
+        if (request.getRequestType() != ModelBuilderRequest.RequestType.DEPENDENCY) {
             // plugins configuration
             resultModel = pluginConfigurationExpander.expandPluginConfiguration(resultModel, request, problems);
         }
@@ -609,7 +609,13 @@ public class DefaultModelBuilder implements ModelBuilder {
         result.setEffectiveModel(resultModel);
 
         // effective model validation
-        modelValidator.validateEffectiveModel(resultModel, request, problems);
+        modelValidator.validateEffectiveModel(
+                resultModel,
+                request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
+                        ? ModelValidator.VALIDATION_LEVEL_STRICT
+                        : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                request,
+                problems);
 
         if (hasModelErrors(problems)) {
             throw problems.newModelBuilderException();
@@ -633,7 +639,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     public Result<? extends Model> buildRawModel(
             Path pomFile, int validationLevel, boolean locationTracking, DefaultModelTransformerContext context) {
         final ModelBuilderRequest request = ModelBuilderRequest.builder()
-                .validationLevel(validationLevel)
+                .requestType(ModelBuilderRequest.RequestType.DEPENDENCY)
                 .locationTracking(locationTracking)
                 .source(ModelSource.fromPath(pomFile))
                 .build();
@@ -642,7 +648,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model model = readFileModel(request, problems);
 
             try {
-                if (context != null && request.isProjectBuild()) {
+                if (context != null && request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
                     buildModelTransformer.transform(context, model, pomFile);
                 }
             } catch (ModelBuilderException e) {
@@ -669,7 +675,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         Model model;
         problems.setSource(modelSource.getLocation());
         try {
-            boolean strict = request.getValidationLevel() >= ModelBuilderRequest.VALIDATION_LEVEL_MAVEN_2_0;
+            boolean strict = request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM;
 
             Path rootDirectory;
             try {
@@ -702,7 +708,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     throw e;
                 }
 
-                Severity severity = request.isProjectBuild() ? Severity.ERROR : Severity.WARNING;
+                Severity severity = request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
+                        ? Severity.ERROR
+                        : Severity.WARNING;
                 problems.add(
                         severity,
                         ModelProblem.Version.V20,
@@ -747,7 +755,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             throw problems.newModelBuilderException();
         }
 
-        if (request.isProjectBuild()) {
+        if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
             model = model.withPomFile(modelSource.getPath());
 
             Parent parent = model.getParent();
@@ -816,12 +824,18 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         problems.setSource(model);
-        modelValidator.validateFileModel(model, request, problems);
+        modelValidator.validateFileModel(
+                model,
+                request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
+                        ? ModelValidator.VALIDATION_LEVEL_STRICT
+                        : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                request,
+                problems);
         if (hasFatalErrors(problems)) {
             throw problems.newModelBuilderException();
         }
 
-        if (request.isProjectBuild()) {
+        if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
             DefaultModelTransformerContext context = getTransformerContext(request, problems);
             context.putSource(getGroupId(model), model.getArtifactId(), modelSource);
         }
@@ -841,7 +855,8 @@ public class DefaultModelBuilder implements ModelBuilder {
     private Model doReadRawModel(ModelSource modelSource, ModelBuilderRequest request, ModelProblemCollector problems)
             throws ModelBuilderException {
         Model rawModel = readFileModel(request, problems);
-        if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion()) && request.isProjectBuild()) {
+        if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion())
+                && request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
             Path pomFile = modelSource.getPath();
 
             DefaultModelTransformerContext context = getTransformerContext(request, problems);
@@ -869,7 +884,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             rawModel = transformer.transformRawModel(rawModel);
         }
 
-        modelValidator.validateRawModel(rawModel, request, problems);
+        modelValidator.validateRawModel(
+                rawModel,
+                request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
+                        ? ModelValidator.VALIDATION_LEVEL_STRICT
+                        : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                request,
+                problems);
 
         if (hasFatalErrors(problems)) {
             throw problems.newModelBuilderException();
@@ -921,7 +942,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private void checkPluginVersions(List<Model> lineage, ModelBuilderRequest request, ModelProblemCollector problems) {
-        if (request.getValidationLevel() < ModelBuilderRequest.VALIDATION_LEVEL_MAVEN_2_0) {
+        if (request.getRequestType() != ModelBuilderRequest.RequestType.BUILD_POM) {
             return;
         }
 
@@ -1202,10 +1223,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             throw problems.newModelBuilderException();
         }
 
-        int validationLevel = Math.min(request.getValidationLevel(), ModelBuilderRequest.VALIDATION_LEVEL_MAVEN_2_0);
         ModelBuilderRequest lenientRequest = ModelBuilderRequest.builder(request)
-                .validationLevel(validationLevel)
-                .projectBuild(false)
+                .requestType(ModelBuilderRequest.RequestType.PARENT_POM)
                 .source(modelSource)
                 .build();
 
@@ -1451,7 +1470,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         } catch (IllegalStateException e) {
             rootDirectory = null;
         }
-        if (request.isProjectBuild() && rootDirectory != null) {
+        if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM && rootDirectory != null) {
             Path sourcePath = importSource.getPath();
             if (sourcePath != null && sourcePath.startsWith(rootDirectory)) {
                 problems.add(
@@ -1466,7 +1485,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         try {
             ModelBuilderRequest importRequest = ModelBuilderRequest.builder()
                     .session(request.getSession())
-                    .validationLevel(ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL)
+                    .requestType(ModelBuilderRequest.RequestType.DEPENDENCY)
                     .systemProperties(request.getSystemProperties())
                     .userProperties(request.getUserProperties())
                     .source(importSource)

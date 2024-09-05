@@ -69,22 +69,18 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         //    context to the model builder
         // * we also need to bind the model resolver explicitly to avoid going
         //    to maven central
-
         getContainer().lookup(Injector.class).bindImplicit(MyModelResolver.class);
         InternalSession iSession = InternalSession.from(session);
-        DefaultModelBuilder modelBuilder = (DefaultModelBuilder) getContainer().lookup(ModelBuilder.class);
+        // set up the transformers
+        List<ModelTransformer> transformers = List.of(new CIFriendlyVersionModelTransformer(iSession));
         Field transformersField = DefaultModelBuilder.class.getDeclaredField("transformers");
         transformersField.setAccessible(true);
-        transformersField.set(modelBuilder, List.of(new CIFriendlyVersionModelTransformer(iSession)));
-        //        ModelTransformerContextBuilder tcb = modelBuilder.newTransformerContextBuilder();
-        //        ModelTransformerContext context = tcb.initialize(
-        //                ModelBuilderRequest.builder()
-        //                        .projectBuild(true)
-        //                        .session(iSession)
-        //                        .transformerContextBuilder(tcb)
-        //                        .build(),
-        //                modelBuilder.newCollector());
-        //        iSession.getData().set(ModelTransformerContext.KEY, context);
+        DefaultModelBuilder modelBuilder = (DefaultModelBuilder) getContainer().lookup(ModelBuilder.class);
+        transformersField.set(modelBuilder, transformers);
+        transformersField = DefaultConsumerPomBuilder.class.getDeclaredField("transformers");
+        transformersField.setAccessible(true);
+        transformersField.set(builder, transformers);
+        // set up the model resolver
         iSession.getData().set(SessionData.key(ModelResolver.class), new MyModelResolver());
     }
 

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.model.ModelBuildingEvent;
 import org.apache.maven.api.services.model.ModelBuildingListener;
@@ -86,7 +87,7 @@ public class DefaultModelBuildingListener implements ModelBuildingListener {
         }
         project.setPluginArtifactRepositories(pluginRepositories);
 
-        if (event.request().isProcessPlugins()) {
+        if (event.request().getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
             try {
                 ProjectRealmCache.CacheRecord record =
                         projectBuildingHelper.createProjectRealm(project, model, projectBuildingRequest);

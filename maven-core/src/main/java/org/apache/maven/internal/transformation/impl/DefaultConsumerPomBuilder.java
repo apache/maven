@@ -200,10 +200,9 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 modelCacheFactory);
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
-        request.projectBuild(true);
+        request.requestType(ModelBuilderRequest.RequestType.BUILD_POM);
         request.session(iSession);
         request.source(ModelSource.fromPath(src));
-        request.validationLevel(ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL);
         request.locationTracking(false);
         request.modelResolver(iSession.getData().get(SessionData.key(ModelResolver.class)));
         request.systemProperties(session.getSystemProperties());

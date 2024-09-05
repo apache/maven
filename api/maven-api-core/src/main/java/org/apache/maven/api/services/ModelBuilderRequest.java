@@ -39,7 +39,6 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
  * the {@link ProjectBuilder} service.
  *
  * TODO: replace ModelRepositoryHolder with just the enum for the strategy
- * TODO: replace validation level with an enum (though, we usually need just a boolean)
  *
  * @since 4.0.0
  */
@@ -48,36 +47,22 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 public interface ModelBuilderRequest {
 
     /**
-     * Denotes minimal validation of POMs. This validation level is meant for processing of POMs from repositories
-     * during metadata retrieval.
+     * The possible request types for building a model.
      */
-    int VALIDATION_LEVEL_MINIMAL = 0;
-
-    /**
-     * Denotes validation as performed by Maven 2.0. This validation level is meant as a compatibility mode to allow
-     * users to migrate their projects.
-     */
-    int VALIDATION_LEVEL_MAVEN_2_0 = 20;
-
-    /**
-     * Denotes validation as performed by Maven 3.0. This validation level is meant for existing projects.
-     */
-    int VALIDATION_LEVEL_MAVEN_3_0 = 30;
-
-    /**
-     * Denotes validation as performed by Maven 3.1. This validation level is meant for existing projects.
-     */
-    int VALIDATION_LEVEL_MAVEN_3_1 = 31;
-
-    /**
-     * Denotes validation as performed by Maven 4.0. This validation level is meant for new projects.
-     */
-    int VALIDATION_LEVEL_MAVEN_4_0 = 40;
-
-    /**
-     * Denotes strict validation as recommended by the current Maven version.
-     */
-    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_4_0;
+    enum RequestType {
+        /**
+         * The request is for building a model from a POM file in a project on the filesystem.
+         */
+        BUILD_POM,
+        /**
+         * The request is for building a model from a parent POM file from a downloaded artifact.
+         */
+        PARENT_POM,
+        /**
+         * The request is for building a model from a dependency POM file from a downloaded artifact.
+         */
+        DEPENDENCY
+    }
 
     /**
      * The possible merge modes for combining remote repositories.
@@ -101,28 +86,12 @@ public interface ModelBuilderRequest {
     @Nonnull
     ModelSource getSource();
 
-    int getValidationLevel();
+    @Nonnull
+    RequestType getRequestType();
 
     boolean isTwoPhaseBuilding();
 
     boolean isLocationTracking();
-
-    /**
-     * Indicates if the model to be built is a local project or a dependency.
-     * In case the project is loaded externally from a remote repository (as a dependency or
-     * even as an external parent), the POM will be parsed in a lenient way.  Local POMs
-     * are parsed more strictly.
-     */
-    boolean isProjectBuild();
-
-    /**
-     * Specifies whether plugin processing should take place for the built model.
-     * This involves merging plugins specified by the {@link org.apache.maven.api.Packaging},
-     * configuration expansion (merging configuration defined globally for a given plugin
-     * using {@link org.apache.maven.api.model.Plugin#getConfiguration()}
-     * into the configuration for each {@link org.apache.maven.api.model.PluginExecution}.
-     */
-    boolean isProcessPlugins();
 
     /**
      * Defines external profiles that may be activated for the given model.
@@ -210,12 +179,10 @@ public interface ModelBuilderRequest {
     @NotThreadSafe
     class ModelBuilderRequestBuilder {
         Session session;
-        int validationLevel;
+        RequestType requestType;
         boolean locationTracking;
         boolean twoPhaseBuilding;
         ModelSource source;
-        boolean projectBuild;
-        boolean processPlugins = true;
         Collection<Profile> profiles;
         List<String> activeProfileIds;
         List<String> inactiveProfileIds;
@@ -232,12 +199,10 @@ public interface ModelBuilderRequest {
 
         ModelBuilderRequestBuilder(ModelBuilderRequest request) {
             this.session = request.getSession();
-            this.validationLevel = request.getValidationLevel();
+            this.requestType = request.getRequestType();
             this.locationTracking = request.isLocationTracking();
             this.twoPhaseBuilding = request.isTwoPhaseBuilding();
             this.source = request.getSource();
-            this.projectBuild = request.isProjectBuild();
-            this.processPlugins = request.isProcessPlugins();
             this.profiles = request.getProfiles();
             this.activeProfileIds = request.getActiveProfileIds();
             this.inactiveProfileIds = request.getInactiveProfileIds();
@@ -256,8 +221,8 @@ public interface ModelBuilderRequest {
             return this;
         }
 
-        public ModelBuilderRequestBuilder validationLevel(int validationLevel) {
-            this.validationLevel = validationLevel;
+        public ModelBuilderRequestBuilder requestType(RequestType requestType) {
+            this.requestType = requestType;
             return this;
         }
 
@@ -273,16 +238,6 @@ public interface ModelBuilderRequest {
 
         public ModelBuilderRequestBuilder source(ModelSource source) {
             this.source = source;
-            return this;
-        }
-
-        public ModelBuilderRequestBuilder projectBuild(boolean projectBuild) {
-            this.projectBuild = projectBuild;
-            return this;
-        }
-
-        public ModelBuilderRequestBuilder processPlugins(boolean processPlugins) {
-            this.processPlugins = processPlugins;
             return this;
         }
 
@@ -344,12 +299,10 @@ public interface ModelBuilderRequest {
         public ModelBuilderRequest build() {
             return new DefaultModelBuilderRequest(
                     session,
-                    validationLevel,
+                    requestType,
                     locationTracking,
                     twoPhaseBuilding,
                     source,
-                    projectBuild,
-                    processPlugins,
                     profiles,
                     activeProfileIds,
                     inactiveProfileIds,
@@ -364,12 +317,10 @@ public interface ModelBuilderRequest {
         }
 
         private static class DefaultModelBuilderRequest extends BaseRequest implements ModelBuilderRequest {
-            private final int validationLevel;
+            private final RequestType requestType;
             private final boolean locationTracking;
             private final boolean twoPhaseBuilding;
             private final ModelSource source;
-            private final boolean projectBuild;
-            private final boolean processPlugins;
             private final Collection<Profile> profiles;
             private final List<String> activeProfileIds;
             private final List<String> inactiveProfileIds;
@@ -385,12 +336,10 @@ public interface ModelBuilderRequest {
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultModelBuilderRequest(
                     @Nonnull Session session,
-                    int validationLevel,
+                    @Nonnull RequestType requestType,
                     boolean locationTracking,
                     boolean twoPhaseBuilding,
                     @Nonnull ModelSource source,
-                    boolean projectBuild,
-                    boolean processPlugins,
                     Collection<Profile> profiles,
                     List<String> activeProfileIds,
                     List<String> inactiveProfileIds,
@@ -403,12 +352,10 @@ public interface ModelBuilderRequest {
                     ModelBuilderResult interimResult,
                     List<RemoteRepository> repositories) {
                 super(session);
-                this.validationLevel = validationLevel;
+                this.requestType = nonNull(requestType, "requestType cannot be null");
                 this.locationTracking = locationTracking;
                 this.twoPhaseBuilding = twoPhaseBuilding;
                 this.source = source;
-                this.projectBuild = projectBuild;
-                this.processPlugins = processPlugins;
                 this.profiles = profiles != null ? List.copyOf(profiles) : List.of();
                 this.activeProfileIds = activeProfileIds != null ? List.copyOf(activeProfileIds) : List.of();
                 this.inactiveProfileIds = inactiveProfileIds != null ? List.copyOf(inactiveProfileIds) : List.of();
@@ -424,8 +371,8 @@ public interface ModelBuilderRequest {
             }
 
             @Override
-            public int getValidationLevel() {
-                return validationLevel;
+            public RequestType getRequestType() {
+                return requestType;
             }
 
             @Override
@@ -442,15 +389,6 @@ public interface ModelBuilderRequest {
             @Override
             public ModelSource getSource() {
                 return source;
-            }
-
-            public boolean isProjectBuild() {
-                return projectBuild;
-            }
-
-            @Override
-            public boolean isProcessPlugins() {
-                return processPlugins;
             }
 
             @Override

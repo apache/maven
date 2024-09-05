@@ -117,7 +117,7 @@ public abstract class AbstractMavenProjectTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository(getLocalRepository());
         configuration.setRemoteRepositories(Arrays.asList(new ArtifactRepository[] {}));
-        configuration.setProcessPlugins(false);
+        configuration.setProcessPlugins(true);
         configuration.setResolveDependencies(true);
         initRepoSession(configuration);
 

@@ -196,8 +196,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 ModelResolver modelResolver = new DefaultModelResolver();
                 ModelBuilderRequest modelRequest = ModelBuilderRequest.builder()
                         .session(iSession)
-                        .projectBuild(false)
-                        .processPlugins(false)
+                        .requestType(ModelBuilderRequest.RequestType.DEPENDENCY)
                         .twoPhaseBuilding(false)
                         .source(ModelSource.fromPath(pomArtifact.getPath(), gav))
                         // This merge is on purpose because otherwise user properties would override model

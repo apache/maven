@@ -91,6 +91,7 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource2;
 import org.apache.maven.model.building.ModelSource3;
 import org.apache.maven.model.resolution.UnresolvableModelException;
@@ -482,9 +483,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             new DefaultModelBuildingListener(project, projectBuildingHelper, this.request);
 
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
-                    ModelBuilderRequest request = builder.projectBuild(modelPool != null)
-                            .source(modelSource)
-                            .projectBuild(pomFile != null)
+                    ModelBuilderRequest request = builder.source(modelSource)
+                            .requestType(
+                                    pomFile != null
+                                                    && this.request.isProcessPlugins()
+                                                    && this.request.getValidationLevel()
+                                                            == ModelBuildingRequest.VALIDATION_LEVEL_STRICT
+                                            ? ModelBuilderRequest.RequestType.BUILD_POM
+                                            : ModelBuilderRequest.RequestType.DEPENDENCY)
                             .locationTracking(true)
                             .listener(listener)
                             .build();
@@ -661,7 +667,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             ModelBuilderRequest modelBuildingRequest = getModelBuildingRequest()
                     .source(ModelSource.fromPath(pomFile.toPath()))
-                    .projectBuild(true)
+                    .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
                     .twoPhaseBuilding(true)
                     .locationTracking(true)
                     .listener(listener)
@@ -1172,9 +1178,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             InternalSession internalSession = InternalSession.from(session);
             modelBuildingRequest.session(internalSession);
-            modelBuildingRequest.projectBuild(true);
-            modelBuildingRequest.validationLevel(request.getValidationLevel());
-            modelBuildingRequest.processPlugins(request.isProcessPlugins());
+            modelBuildingRequest.requestType(ModelBuilderRequest.RequestType.BUILD_POM);
             modelBuildingRequest.profiles(
                     request.getProfiles() != null
                             ? request.getProfiles().stream()
