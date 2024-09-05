@@ -35,12 +35,9 @@ import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.services.ModelBuilder;
-import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.ModelTransformerContext;
-import org.apache.maven.api.services.ModelTransformerContextBuilder;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.api.spi.ModelTransformerException;
 import org.apache.maven.di.Injector;
@@ -79,15 +76,15 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         Field transformersField = DefaultModelBuilder.class.getDeclaredField("transformers");
         transformersField.setAccessible(true);
         transformersField.set(modelBuilder, List.of(new CIFriendlyVersionModelTransformer(iSession)));
-        ModelTransformerContextBuilder tcb = modelBuilder.newTransformerContextBuilder();
-        ModelTransformerContext context = tcb.initialize(
-                ModelBuilderRequest.builder()
-                        .projectBuild(true)
-                        .session(iSession)
-                        .transformerContextBuilder(tcb)
-                        .build(),
-                modelBuilder.newCollector());
-        iSession.getData().set(ModelTransformerContext.KEY, context);
+        //        ModelTransformerContextBuilder tcb = modelBuilder.newTransformerContextBuilder();
+        //        ModelTransformerContext context = tcb.initialize(
+        //                ModelBuilderRequest.builder()
+        //                        .projectBuild(true)
+        //                        .session(iSession)
+        //                        .transformerContextBuilder(tcb)
+        //                        .build(),
+        //                modelBuilder.newCollector());
+        //        iSession.getData().set(ModelTransformerContext.KEY, context);
         iSession.getData().set(SessionData.key(ModelResolver.class), new MyModelResolver());
     }
 

@@ -172,9 +172,6 @@ public interface ModelBuilderRequest {
     ModelBuilderResult getInterimResult();
 
     @Nullable
-    ModelTransformerContextBuilder getTransformerContextBuilder();
-
-    @Nullable
     List<RemoteRepository> getRepositories();
 
     @Nonnull
@@ -229,7 +226,6 @@ public interface ModelBuilderRequest {
         RepositoryMerging repositoryMerging;
         Object listener;
         ModelBuilderResult interimResult;
-        ModelTransformerContextBuilder transformerContextBuilder;
         List<RemoteRepository> repositories;
 
         ModelBuilderRequestBuilder() {}
@@ -252,7 +248,6 @@ public interface ModelBuilderRequest {
             this.repositoryMerging = request.getRepositoryMerging();
             this.listener = request.getListener();
             this.interimResult = request.getInterimResult();
-            this.transformerContextBuilder = request.getTransformerContextBuilder();
             this.repositories = request.getRepositories();
         }
 
@@ -341,12 +336,6 @@ public interface ModelBuilderRequest {
             return this;
         }
 
-        public ModelBuilderRequestBuilder transformerContextBuilder(
-                ModelTransformerContextBuilder transformerContextBuilder) {
-            this.transformerContextBuilder = transformerContextBuilder;
-            return this;
-        }
-
         public ModelBuilderRequestBuilder repositories(List<RemoteRepository> repositories) {
             this.repositories = repositories;
             return this;
@@ -371,7 +360,6 @@ public interface ModelBuilderRequest {
                     repositoryMerging,
                     listener,
                     interimResult,
-                    transformerContextBuilder,
                     repositories);
         }
 
@@ -392,7 +380,6 @@ public interface ModelBuilderRequest {
             private final RepositoryMerging repositoryMerging;
             private final Object listener;
             private final ModelBuilderResult interimResult;
-            private final ModelTransformerContextBuilder transformerContextBuilder;
             private final List<RemoteRepository> repositories;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
@@ -414,7 +401,6 @@ public interface ModelBuilderRequest {
                     RepositoryMerging repositoryMerging,
                     Object listener,
                     ModelBuilderResult interimResult,
-                    ModelTransformerContextBuilder transformerContextBuilder,
                     List<RemoteRepository> repositories) {
                 super(session);
                 this.validationLevel = validationLevel;
@@ -434,7 +420,6 @@ public interface ModelBuilderRequest {
                 this.repositoryMerging = repositoryMerging;
                 this.listener = listener;
                 this.interimResult = interimResult;
-                this.transformerContextBuilder = transformerContextBuilder;
                 this.repositories = repositories != null ? List.copyOf(repositories) : null;
             }
 
@@ -516,10 +501,6 @@ public interface ModelBuilderRequest {
             @Override
             public ModelBuilderResult getInterimResult() {
                 return interimResult;
-            }
-
-            public ModelTransformerContextBuilder getTransformerContextBuilder() {
-                return transformerContextBuilder;
             }
 
             @Override

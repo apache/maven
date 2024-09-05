@@ -80,7 +80,6 @@ import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.ModelTransformerContextBuilder;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.model.ModelBuildingListener;
 import org.apache.maven.api.services.model.ModelProcessor;
@@ -381,7 +380,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private final List<RemoteRepository> repositories;
         private final ReactorModelPool modelPool;
         private final ConcurrentMap<String, Object> parentCache;
-        private final ModelTransformerContextBuilder transformerContextBuilder;
         private final ExecutorService executor;
         private final ModelResolver modelResolver;
         private final Map<String, String> ciFriendlyVersions = new ConcurrentHashMap<>();
@@ -395,10 +393,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             this.executor = createExecutor(getParallelism(request));
             if (localProjects) {
                 this.modelPool = new ReactorModelPool();
-                this.transformerContextBuilder = modelBuilder.newTransformerContextBuilder();
             } else {
                 this.modelPool = null;
-                this.transformerContextBuilder = null;
             }
             this.parentCache = new ConcurrentHashMap<>();
             this.modelResolver = new ModelResolverWrapper() {
@@ -488,7 +484,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
                     ModelBuilderRequest request = builder.projectBuild(modelPool != null)
                             .source(modelSource)
-                            .projectBuild(true)
+                            .projectBuild(pomFile != null)
                             .locationTracking(true)
                             .listener(listener)
                             .build();
@@ -1176,6 +1172,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             InternalSession internalSession = InternalSession.from(session);
             modelBuildingRequest.session(internalSession);
+            modelBuildingRequest.projectBuild(true);
             modelBuildingRequest.validationLevel(request.getValidationLevel());
             modelBuildingRequest.processPlugins(request.isProcessPlugins());
             modelBuildingRequest.profiles(
@@ -1192,7 +1189,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             modelBuildingRequest.modelResolver(modelResolver);
             modelBuildingRequest.repositoryMerging(ModelBuilderRequest.RepositoryMerging.valueOf(
                     request.getRepositoryMerging().name()));
-            modelBuildingRequest.transformerContextBuilder(transformerContextBuilder);
             modelBuildingRequest.repositories(request.getRemoteRepositories().stream()
                     .map(r -> internalSession.getRemoteRepository(RepositoryUtils.toRepo(r)))
                     .toList());

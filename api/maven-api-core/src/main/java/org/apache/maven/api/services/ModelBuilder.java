@@ -33,7 +33,5 @@ public interface ModelBuilder extends Service {
 
     ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException;
 
-    ModelTransformerContextBuilder newTransformerContextBuilder();
-
     Model buildRawModel(ModelBuilderRequest request);
 }

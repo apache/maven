@@ -18,7 +18,11 @@
  */
 package org.apache.maven.internal.impl.model;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -26,30 +30,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.ModelBuilderException;
+import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.ModelTransformerContext;
-import org.apache.maven.api.services.model.ModelProcessor;
 
-/**
- *
- * @since 4.0.0
- */
-class DefaultModelTransformerContext implements ModelTransformerContext {
-    final ModelProcessor modelLocator;
+class DefaultModelTransformerContext {
 
-    final Map<String, String> userProperties = new ConcurrentHashMap<>();
-
+    final DefaultModelBuilder modelBuilder;
+    final ModelBuilderRequest request;
+    final ModelProblemCollector problems;
+    final Graph dag = new Graph();
     final Map<Path, Holder> modelByPath = new ConcurrentHashMap<>();
-
     final Map<GAKey, Holder> modelByGA = new ConcurrentHashMap<>();
-
     final Map<GAKey, Set<ModelSource>> mappedSources = new ConcurrentHashMap<>(64);
+    volatile boolean fullReactorLoaded;
 
-    public static class Holder {
+    static class Holder {
         private volatile boolean set;
         private volatile Model model;
-
-        Holder() {}
 
         Holder(Model model) {
             this.model = Objects.requireNonNull(model);
@@ -89,57 +89,178 @@ class DefaultModelTransformerContext implements ModelTransformerContext {
         }
     }
 
-    DefaultModelTransformerContext(ModelProcessor modelLocator) {
-        this.modelLocator = modelLocator;
+    DefaultModelTransformerContext(
+            DefaultModelBuilder modelBuilder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        this.modelBuilder = modelBuilder;
+        this.request = request;
+        this.problems = problems;
     }
 
-    @Override
     public String getUserProperty(String key) {
-        return userProperties.get(key);
+        return request.getUserProperties().get(key);
     }
 
-    @Override
-    public Model getRawModel(Path from, Path p) {
-        return Holder.deref(modelByPath.get(p));
+    public Model getRawModel(Path from, String gId, String aId) {
+        Model model = findRawModel(from, gId, aId);
+        if (model != null) {
+            modelByGA.put(new GAKey(gId, aId), new Holder(model));
+            if (model.getPomFile() != null) {
+                modelByPath.put(model.getPomFile(), new Holder(model));
+            }
+        }
+        return model;
     }
 
-    @Override
-    public Model getRawModel(Path from, String groupId, String artifactId) {
-        return Holder.deref(modelByGA.get(new GAKey(groupId, artifactId)));
+    public Model getRawModel(Path from, Path path) {
+        Model model = findRawModel(from, path);
+        if (model != null) {
+            String groupId = DefaultModelBuilder.getGroupId(model);
+            modelByGA.put(new GAKey(groupId, model.getArtifactId()), new Holder(model));
+            modelByPath.put(path, new Holder(model));
+        }
+        return model;
     }
 
-    @Override
     public Path locate(Path path) {
-        return modelLocator.locateExistingPom(path);
+        return modelBuilder.getModelProcessor().locateExistingPom(path);
     }
 
-    static class GAKey {
-        private final String groupId;
-        private final String artifactId;
-        private final int hashCode;
-
-        GAKey(String groupId, String artifactId) {
-            this.groupId = groupId;
-            this.artifactId = artifactId;
-            this.hashCode = Objects.hash(groupId, artifactId);
+    private Model findRawModel(Path from, String groupId, String artifactId) {
+        ModelSource source = getSource(groupId, artifactId);
+        if (source == null) {
+            // we need to check the whole reactor in case it's a dependency
+            loadFullReactor();
+            source = getSource(groupId, artifactId);
         }
-
-        @Override
-        public int hashCode() {
-            return hashCode;
+        if (source != null) {
+            if (!addEdge(from, source.getPath(), problems)) {
+                return null;
+            }
+            try {
+                ModelBuilderRequest gaBuildingRequest = ModelBuilderRequest.build(request, source);
+                return modelBuilder.readRawModel(gaBuildingRequest, problems);
+            } catch (ModelBuilderException e) {
+                // gathered with problem collector
+            }
         }
+        return null;
+    }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
+    private void loadFullReactor() {
+        if (!fullReactorLoaded) {
+            synchronized (this) {
+                if (!fullReactorLoaded) {
+                    doLoadFullReactor();
+                    fullReactorLoaded = true;
+                }
             }
-            if (!(obj instanceof GAKey)) {
-                return false;
-            }
-
-            GAKey other = (GAKey) obj;
-            return Objects.equals(artifactId, other.artifactId) && Objects.equals(groupId, other.groupId);
         }
     }
+
+    private void doLoadFullReactor() {
+        Path rootDirectory;
+        try {
+            rootDirectory = request.getSession().getRootDirectory();
+        } catch (IllegalStateException e) {
+            // if no root directory, bail out
+            return;
+        }
+        List<Path> toLoad = new ArrayList<>();
+        Path root = modelBuilder.getModelProcessor().locateExistingPom(rootDirectory);
+        toLoad.add(root);
+        while (!toLoad.isEmpty()) {
+            Path pom = toLoad.remove(0);
+            try {
+                ModelBuilderRequest gaBuildingRequest = ModelBuilderRequest.build(request, ModelSource.fromPath(pom));
+                Model rawModel = modelBuilder.readFileModel(gaBuildingRequest, problems);
+                List<String> subprojects = rawModel.getSubprojects();
+                if (subprojects == null) {
+                    subprojects = rawModel.getModules();
+                }
+                for (String subproject : subprojects) {
+                    Path subprojectFile = modelBuilder
+                            .getModelProcessor()
+                            .locateExistingPom(pom.getParent().resolve(subproject));
+                    if (subprojectFile != null) {
+                        toLoad.add(subprojectFile);
+                    }
+                }
+            } catch (ModelBuilderException e) {
+                // gathered with problem collector
+                problems.add(ModelProblem.Severity.ERROR, ModelProblem.Version.V40, "Failed to load project " + pom, e);
+            }
+        }
+    }
+
+    private Model findRawModel(Path from, Path p) {
+        if (!Files.isRegularFile(p)) {
+            throw new IllegalArgumentException("Not a regular file: " + p);
+        }
+
+        if (!addEdge(from, p, problems)) {
+            return null;
+        }
+
+        ModelBuilderRequest req = ModelBuilderRequest.build(request, ModelSource.fromPath(p));
+
+        try {
+            return modelBuilder.readRawModel(req, problems);
+        } catch (ModelBuilderException e) {
+            // gathered with problem collector
+        }
+        return null;
+    }
+
+    private boolean addEdge(Path from, Path p, ModelProblemCollector problems) {
+        try {
+            dag.addEdge(from.toString(), p.toString());
+            return true;
+        } catch (Graph.CycleDetectedException e) {
+            problems.add(new DefaultModelProblem(
+                    "Cycle detected between models at " + from + " and " + p,
+                    ModelProblem.Severity.FATAL,
+                    null,
+                    null,
+                    0,
+                    0,
+                    null,
+                    e));
+            return false;
+        }
+    }
+
+    public ModelSource getSource(String groupId, String artifactId) {
+        Set<ModelSource> sources;
+        if (groupId != null) {
+            sources = mappedSources.get(new GAKey(groupId, artifactId));
+            if (sources == null) {
+                return null;
+            }
+        } else if (artifactId != null) {
+            sources = mappedSources.get(new GAKey(null, artifactId));
+            if (sources == null) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+        return sources.stream()
+                .reduce((a, b) -> {
+                    throw new IllegalStateException(String.format(
+                            "No unique Source for %s:%s: %s and %s",
+                            groupId, artifactId, a.getLocation(), b.getLocation()));
+                })
+                .orElse(null);
+    }
+
+    public void putSource(String groupId, String artifactId, ModelSource source) {
+        mappedSources
+                .computeIfAbsent(new GAKey(groupId, artifactId), k -> new HashSet<>())
+                .add(source);
+        mappedSources
+                .computeIfAbsent(new GAKey(null, artifactId), k -> new HashSet<>())
+                .add(source);
+    }
+
+    record GAKey(String groupId, String artifactId) {}
 }

@@ -41,7 +41,6 @@ import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.ModelTransformerContext;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.model.DependencyManagementImporter;
 import org.apache.maven.api.services.model.DependencyManagementInjector;
@@ -207,8 +206,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         request.validationLevel(ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL);
         request.locationTracking(false);
         request.modelResolver(iSession.getData().get(SessionData.key(ModelResolver.class)));
-        ModelTransformerContext context = iSession.getData().get(ModelTransformerContext.KEY);
-        request.transformerContextBuilder((r, p) -> context);
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());
         return modelBuilder.build(request.build());

@@ -35,10 +35,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.model.building.ModelSource;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -85,10 +83,9 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         MavenSession mavenSession = createMavenSession(pomFile);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
-        ModelSource modelSource = new FileModelSource(pomFile);
         ProjectBuildingResult result = getContainer()
                 .lookup(org.apache.maven.project.ProjectBuilder.class)
-                .build(modelSource, configuration);
+                .build(pomFile, configuration);
 
         assertNotNull(result.getProject().getParentFile());
     }
@@ -346,10 +343,9 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
-        ModelSource modelSource = new FileModelSource(pomFile);
         ProjectBuildingResult result = getContainer()
                 .lookup(org.apache.maven.project.ProjectBuilder.class)
-                .build(modelSource, configuration);
+                .build(pomFile, configuration);
 
         assertEquals(
                 pomFile.getAbsoluteFile(),

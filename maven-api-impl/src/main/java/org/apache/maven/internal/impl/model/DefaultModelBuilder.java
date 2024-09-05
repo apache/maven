@@ -74,8 +74,6 @@ import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.ModelTransformerContext;
-import org.apache.maven.api.services.ModelTransformerContextBuilder;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.VersionParserException;
@@ -193,11 +191,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.versionParser = versionParser;
         this.transformers = transformers;
         this.modelCacheFactory = modelCacheFactory;
-    }
-
-    @Override
-    public ModelTransformerContextBuilder newTransformerContextBuilder() {
-        return new DefaultModelTransformerContextBuilder(this);
     }
 
     @Override
@@ -638,7 +631,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     public Result<? extends Model> buildRawModel(
-            Path pomFile, int validationLevel, boolean locationTracking, ModelTransformerContext context) {
+            Path pomFile, int validationLevel, boolean locationTracking, DefaultModelTransformerContext context) {
         final ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .validationLevel(validationLevel)
                 .locationTracking(locationTracking)
@@ -649,7 +642,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model model = readFileModel(request, problems);
 
             try {
-                if (context != null) {
+                if (context != null && request.isProjectBuild()) {
                     buildModelTransformer.transform(context, model, pomFile);
                 }
             } catch (ModelBuilderException e) {
@@ -829,9 +822,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         if (request.isProjectBuild()) {
-            if (getTransformerContextBuilder(request) instanceof DefaultModelTransformerContextBuilder contextBuilder) {
-                contextBuilder.putSource(getGroupId(model), model.getArtifactId(), modelSource);
-            }
+            DefaultModelTransformerContext context = getTransformerContext(request, problems);
+            context.putSource(getGroupId(model), model.getArtifactId(), modelSource);
         }
 
         return model;
@@ -852,19 +844,16 @@ public class DefaultModelBuilder implements ModelBuilder {
         if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion()) && request.isProjectBuild()) {
             Path pomFile = modelSource.getPath();
 
+            DefaultModelTransformerContext context = getTransformerContext(request, problems);
             try {
-                ModelTransformerContextBuilder transformerContextBuilder = getTransformerContextBuilder(request);
-                if (transformerContextBuilder != null) {
-                    ModelTransformerContext context = transformerContextBuilder.initialize(request, problems);
-                    if (context == null) {
-                        problems.add(
-                                Severity.FATAL,
-                                ModelProblem.Version.V40,
-                                "Illegal state: ModelTransformerContextBuilder returned null",
-                                (Exception) null);
-                    } else {
-                        rawModel = this.buildModelTransformer.transform(context, rawModel, pomFile);
-                    }
+                if (context == null) {
+                    problems.add(
+                            Severity.FATAL,
+                            ModelProblem.Version.V40,
+                            "Illegal state: ModelTransformerContextBuilder returned null",
+                            (Exception) null);
+                } else {
+                    rawModel = this.buildModelTransformer.transform(context, rawModel, pomFile);
                 }
             } catch (ModelTransformerException e) {
                 problems.add(Severity.FATAL, ModelProblem.Version.V40, null, e);
@@ -887,6 +876,15 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         return rawModel;
+    }
+
+    private DefaultModelTransformerContext getTransformerContext(
+            ModelBuilderRequest request, ModelProblemCollector problems) {
+        return (DefaultModelTransformerContext) request.getSession()
+                .getData()
+                .computeIfAbsent(
+                        SessionData.key(DefaultModelTransformerContext.class),
+                        () -> new DefaultModelTransformerContext(this, request, problems));
     }
 
     static String getGroupId(Model model) {
@@ -1455,7 +1453,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
         if (request.isProjectBuild() && rootDirectory != null) {
             Path sourcePath = importSource.getPath();
-            if (sourcePath.startsWith(rootDirectory)) {
+            if (sourcePath != null && sourcePath.startsWith(rootDirectory)) {
                 problems.add(
                         Severity.WARNING,
                         ModelProblem.Version.BASE,
@@ -1571,16 +1569,12 @@ public class DefaultModelBuilder implements ModelBuilder {
         return request.getModelResolver();
     }
 
-    private static ModelTransformerContextBuilder getTransformerContextBuilder(ModelBuilderRequest request) {
-        return request.getTransformerContextBuilder();
-    }
-
     /**
      * ModelSourceTransformer for the build pom
      */
     public static class BuildModelTransformer {
 
-        public Model transform(ModelTransformerContext context, Model model, Path path) {
+        public Model transform(DefaultModelTransformerContext context, Model model, Path path) {
             Model.Builder builder = Model.newBuilder(model);
             handleParent(context, model, path, builder);
             handleReactorDependencies(context, model, path, builder);
@@ -1591,7 +1585,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         //
         // Infer parent information
         //
-        void handleParent(ModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
+        void handleParent(DefaultModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
             Parent parent = model.getParent();
             if (parent != null) {
                 String version = parent.getVersion();
@@ -1604,7 +1598,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         // CI friendly versions
         //
         void handleCiFriendlyVersion(
-                ModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
+                DefaultModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
             String version = model.getVersion();
             String modVersion = replaceCiFriendlyVersion(context, version);
             builder.version(modVersion);
@@ -1614,7 +1608,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         // Infer inner reactor dependencies version
         //
         void handleReactorDependencies(
-                ModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
+                DefaultModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
             List<Dependency> newDeps = new ArrayList<>();
             boolean modified = false;
             for (Dependency dep : model.getDependencies()) {
@@ -1653,7 +1647,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        protected String replaceCiFriendlyVersion(ModelTransformerContext context, String version) {
+        String replaceCiFriendlyVersion(DefaultModelTransformerContext context, String version) {
             if (version != null) {
                 for (String key : Arrays.asList("changelist", "revision", "sha1")) {
                     String val = context.getUserProperty(key);

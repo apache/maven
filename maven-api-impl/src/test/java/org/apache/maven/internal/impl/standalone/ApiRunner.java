@@ -158,7 +158,7 @@ public class ApiRunner {
 
         @Override
         public Path getRootDirectory() {
-            return null;
+            throw new IllegalStateException();
         }
 
         @Override
