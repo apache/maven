@@ -754,7 +754,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             throw problems.newModelBuilderException();
         }
 
-        if (modelSource.getPath() != null) {
+        if (request.isProjectBuild()) {
             model = model.withPomFile(modelSource.getPath());
 
             Parent parent = model.getParent();
@@ -828,7 +828,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             throw problems.newModelBuilderException();
         }
 
-        if (modelSource.getPath() != null) {
+        if (request.isProjectBuild()) {
             if (getTransformerContextBuilder(request) instanceof DefaultModelTransformerContextBuilder contextBuilder) {
                 contextBuilder.putSource(getGroupId(model), model.getArtifactId(), modelSource);
             }
@@ -849,7 +849,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private Model doReadRawModel(ModelSource modelSource, ModelBuilderRequest request, ModelProblemCollector problems)
             throws ModelBuilderException {
         Model rawModel = readFileModel(request, problems);
-        if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion()) && modelSource.getPath() != null) {
+        if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion()) && request.isProjectBuild()) {
             Path pomFile = modelSource.getPath();
 
             try {
@@ -1453,7 +1453,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         } catch (IllegalStateException e) {
             rootDirectory = null;
         }
-        if (importSource.getPath() != null && rootDirectory != null) {
+        if (request.isProjectBuild() && rootDirectory != null) {
             Path sourcePath = importSource.getPath();
             if (sourcePath.startsWith(rootDirectory)) {
                 problems.add(

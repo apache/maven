@@ -82,6 +82,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         ModelTransformerContextBuilder tcb = modelBuilder.newTransformerContextBuilder();
         ModelTransformerContext context = tcb.initialize(
                 ModelBuilderRequest.builder()
+                        .projectBuild(true)
                         .session(iSession)
                         .transformerContextBuilder(tcb)
                         .build(),
