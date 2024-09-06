@@ -47,6 +47,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.Type;
@@ -69,6 +70,7 @@ import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginManagement;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.ModelBuilder;
@@ -80,6 +82,7 @@ import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.VersionParserException;
@@ -108,7 +111,6 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.api.spi.ModelTransformerException;
-import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
 import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.interpolation.InterpolationException;
@@ -234,6 +236,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         final Map<Path, Holder> modelByPath;
         final Map<GAKey, Holder> modelByGA;
         final Map<GAKey, Set<ModelSource>> mappedSources;
+        final RepositoryHolder repositoryHolder;
 
         private String source;
         private Model sourceModel;
@@ -270,7 +273,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     new Graph(),
                     new ConcurrentHashMap<>(64),
                     new ConcurrentHashMap<>(64),
-                    new ConcurrentHashMap<>(64));
+                    new ConcurrentHashMap<>(64),
+                    null);
         }
 
         @SuppressWarnings("checkstyle:ParameterNumber")
@@ -282,7 +286,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Graph dag,
                 Map<Path, Holder> modelByPath,
                 Map<GAKey, Holder> modelByGA,
-                Map<GAKey, Set<ModelSource>> mappedSources) {
+                Map<GAKey, Set<ModelSource>> mappedSources,
+                RepositoryHolder repositoryHolder) {
             this.session = session;
             this.request = request;
             this.result = result;
@@ -291,6 +296,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.modelByPath = modelByPath;
             this.modelByGA = modelByGA;
             this.mappedSources = mappedSources;
+            this.repositoryHolder = repositoryHolder != null
+                    ? repositoryHolder
+                    : new RepositoryHolder(
+                            request.getRepositories() != null
+                                    ? request.getRepositories()
+                                    : session.getRemoteRepositories());
             this.result.getProblems().forEach(p -> severities.add(p.getSeverity()));
         }
 
@@ -303,7 +314,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throw new IllegalArgumentException("Session mismatch");
             }
             return new DefaultModelBuilderSession(
-                    session, request, result, cache, dag, modelByPath, modelByGA, mappedSources);
+                    session, request, result, cache, dag, modelByPath, modelByGA, mappedSources, repositoryHolder);
         }
 
         public Session session() {
@@ -665,6 +676,70 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
             return new ModelBuilderException(result);
         }
+
+        List<RemoteRepository> getRepositories() {
+            return repositoryHolder.getRepositories();
+        }
+
+        void mergeRepositories(List<Repository> repositories, boolean replace) {
+            repositoryHolder.mergeRepositories(repositories, replace);
+        }
+
+        class RepositoryHolder {
+
+            List<RemoteRepository> pomRepositories;
+            List<RemoteRepository> repositories;
+            List<RemoteRepository> externalRepositories;
+
+            RepositoryHolder(List<RemoteRepository> externalRepositories) {
+                this.pomRepositories = List.of();
+                this.externalRepositories = List.copyOf(externalRepositories);
+                this.repositories = List.copyOf(externalRepositories);
+            }
+
+            RepositoryHolder(RepositoryHolder holder) {
+                this.pomRepositories = List.copyOf(holder.pomRepositories);
+                this.externalRepositories = List.copyOf(holder.externalRepositories);
+                this.repositories = List.copyOf(holder.repositories);
+            }
+
+            public void mergeRepositories(List<Repository> toAdd, boolean replace) {
+                List<RemoteRepository> repos =
+                        toAdd.stream().map(session::createRemoteRepository).toList();
+                if (replace) {
+                    Set<String> ids =
+                            repos.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
+                    repositories = repositories.stream()
+                            .filter(r -> !ids.contains(r.getId()))
+                            .toList();
+                    pomRepositories = pomRepositories.stream()
+                            .filter(r -> !ids.contains(r.getId()))
+                            .toList();
+                } else {
+                    Set<String> ids = pomRepositories.stream()
+                            .map(RemoteRepository::getId)
+                            .collect(Collectors.toSet());
+                    repos = repos.stream().filter(r -> !ids.contains(r.getId())).toList();
+                }
+
+                RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
+                if (request.getRepositoryMerging() == ModelBuilderRequest.RepositoryMerging.REQUEST_DOMINANT) {
+                    repositories = repositoryFactory.aggregate(session, repositories, repos, true);
+                    pomRepositories = repositories;
+                } else {
+                    pomRepositories = repositoryFactory.aggregate(session, pomRepositories, repos, true);
+                    repositories = repositoryFactory.aggregate(session, pomRepositories, externalRepositories, false);
+                }
+            }
+
+            public List<RemoteRepository> getRepositories() {
+                return repositories;
+            }
+
+            public RepositoryHolder copy() {
+                return new RepositoryHolder(this);
+            }
+        }
     }
 
     DefaultModelProblemCollector newCollector(DefaultModelBuilderResult result) {
@@ -673,16 +748,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private static ModelBuilderRequest fillRequestDefaults(ModelBuilderRequest request) {
         ModelBuilderRequest.ModelBuilderRequestBuilder builder = ModelBuilderRequest.builder(request);
-        if (getModelRepositoryHolder(request) == null) {
-            builder.modelRepositoryHolder(new DefaultModelRepositoryHolder(
-                    request.getSession(),
-                    request.getRepositoryMerging() != null
-                            ? request.getRepositoryMerging()
-                            : ModelBuilderRequest.RepositoryMerging.POM_DOMINANT,
-                    request.getRepositories() != null
-                            ? request.getRepositories()
-                            : request.getSession().getRemoteRepositories()));
-        }
         if (request.getModelResolver() == null) {
             builder.modelResolver(new DefaultModelResolver());
         }
@@ -830,14 +895,11 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // add repositories specified by the current model so that we can resolve the parent
             if (!model.getRepositories().isEmpty()) {
-                DefaultModelRepositoryHolder modelRepositoryHolder = getModelRepositoryHolder(request);
-                List<String> oldRepos = modelRepositoryHolder.getRepositories().stream()
-                        .map(Object::toString)
-                        .toList();
-                modelRepositoryHolder.merge(model.getRepositories(), false);
-                List<String> newRepos = modelRepositoryHolder.getRepositories().stream()
-                        .map(Object::toString)
-                        .toList();
+                List<String> oldRepos =
+                        build.getRepositories().stream().map(Object::toString).toList();
+                build.mergeRepositories(model.getRepositories(), false);
+                List<String> newRepos =
+                        build.getRepositories().stream().map(Object::toString).toList();
                 if (!Objects.equals(oldRepos, newRepos)) {
                     logger.debug("Merging repositories from " + model.getId() + "\n"
                             + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
@@ -897,14 +959,11 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         // Now the fully interpolated model is available: reconfigure the resolver
         if (!resultModel.getRepositories().isEmpty()) {
-            DefaultModelRepositoryHolder modelRepositoryHolder = getModelRepositoryHolder(request);
-            List<String> oldRepos = modelRepositoryHolder.getRepositories().stream()
-                    .map(Object::toString)
-                    .toList();
-            modelRepositoryHolder.merge(resultModel.getRepositories(), true);
-            List<String> newRepos = modelRepositoryHolder.getRepositories().stream()
-                    .map(Object::toString)
-                    .toList();
+            List<String> oldRepos =
+                    build.getRepositories().stream().map(Object::toString).toList();
+            build.mergeRepositories(resultModel.getRepositories(), true);
+            List<String> newRepos =
+                    build.getRepositories().stream().map(Object::toString).toList();
             if (!Objects.equals(oldRepos, newRepos)) {
                 logger.debug("Replacing repositories from " + resultModel.getId() + "\n"
                         + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
@@ -1590,8 +1649,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         ModelSource modelSource;
         try {
             AtomicReference<Parent> modified = new AtomicReference<>();
-            modelSource = modelResolver.resolveModel(
-                    request.getSession(), getModelRepositoryHolder(request).getRepositories(), parent, modified);
+            modelSource = modelResolver.resolveModel(request.getSession(), build.getRepositories(), parent, modified);
             if (modified.get() != null) {
                 parent = modified.get();
             }
@@ -1835,10 +1893,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         final ModelSource importSource;
         try {
             importSource = modelResolver.resolveModel(
-                    request.getSession(),
-                    getModelRepositoryHolder(request).getRepositories(),
-                    dependency,
-                    new AtomicReference<>());
+                    request.getSession(), build.getRepositories(), dependency, new AtomicReference<>());
         } catch (ModelBuilderException e) {
             StringBuilder buffer = new StringBuilder(256);
             buffer.append("Non-resolvable import POM");
@@ -1877,9 +1932,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .userProperties(request.getUserProperties())
                     .source(importSource)
                     .modelResolver(modelResolver)
-                    .modelRepositoryHolder(getModelRepositoryHolder(request).copy())
                     .twoPhaseBuilding(false)
-                    .repositories(getModelRepositoryHolder(request).getRepositories())
+                    .repositories(build.getRepositories())
                     .build();
             importResult = build(new DefaultModelBuilderSession(importRequest), importIds);
         } catch (ModelBuilderException e) {
@@ -1892,10 +1946,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         importModel = importResult.getEffectiveModel();
 
         return importModel;
-    }
-
-    private static DefaultModelRepositoryHolder getModelRepositoryHolder(ModelBuilderRequest request) {
-        return (DefaultModelRepositoryHolder) request.getModelRepositoryHolder();
     }
 
     private static <T> T cache(

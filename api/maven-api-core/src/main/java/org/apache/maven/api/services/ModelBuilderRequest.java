@@ -38,8 +38,6 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
  * Request used to build a {@link org.apache.maven.api.Project} using
  * the {@link ProjectBuilder} service.
  *
- * TODO: replace ModelRepositoryHolder with just the enum for the strategy
- *
  * @since 4.0.0
  */
 @Experimental
@@ -129,9 +127,6 @@ public interface ModelBuilderRequest {
     ModelResolver getModelResolver();
 
     @Nonnull
-    Object getModelRepositoryHolder();
-
-    @Nonnull
     RepositoryMerging getRepositoryMerging();
 
     @Nullable
@@ -189,7 +184,6 @@ public interface ModelBuilderRequest {
         Map<String, String> systemProperties;
         Map<String, String> userProperties;
         ModelResolver modelResolver;
-        Object modelRepositoryHolder;
         RepositoryMerging repositoryMerging;
         Object listener;
         ModelBuilderResult interimResult;
@@ -209,7 +203,6 @@ public interface ModelBuilderRequest {
             this.systemProperties = request.getSystemProperties();
             this.userProperties = request.getUserProperties();
             this.modelResolver = request.getModelResolver();
-            this.modelRepositoryHolder = request.getModelRepositoryHolder();
             this.repositoryMerging = request.getRepositoryMerging();
             this.listener = request.getListener();
             this.interimResult = request.getInterimResult();
@@ -271,11 +264,6 @@ public interface ModelBuilderRequest {
             return this;
         }
 
-        public ModelBuilderRequestBuilder modelRepositoryHolder(Object modelRepositoryHolder) {
-            this.modelRepositoryHolder = modelRepositoryHolder;
-            return this;
-        }
-
         public ModelBuilderRequestBuilder repositoryMerging(RepositoryMerging repositoryMerging) {
             this.repositoryMerging = repositoryMerging;
             return this;
@@ -309,7 +297,6 @@ public interface ModelBuilderRequest {
                     systemProperties,
                     userProperties,
                     modelResolver,
-                    modelRepositoryHolder,
                     repositoryMerging,
                     listener,
                     interimResult,
@@ -327,7 +314,6 @@ public interface ModelBuilderRequest {
             private final Map<String, String> systemProperties;
             private final Map<String, String> userProperties;
             private final ModelResolver modelResolver;
-            private final Object modelRepositoryHolder;
             private final RepositoryMerging repositoryMerging;
             private final Object listener;
             private final ModelBuilderResult interimResult;
@@ -346,7 +332,6 @@ public interface ModelBuilderRequest {
                     Map<String, String> systemProperties,
                     Map<String, String> userProperties,
                     ModelResolver modelResolver,
-                    Object modelRepositoryHolder,
                     RepositoryMerging repositoryMerging,
                     Object listener,
                     ModelBuilderResult interimResult,
@@ -363,7 +348,6 @@ public interface ModelBuilderRequest {
                         systemProperties != null ? Map.copyOf(systemProperties) : session.getSystemProperties();
                 this.userProperties = userProperties != null ? Map.copyOf(userProperties) : session.getUserProperties();
                 this.modelResolver = modelResolver;
-                this.modelRepositoryHolder = modelRepositoryHolder;
                 this.repositoryMerging = repositoryMerging;
                 this.listener = listener;
                 this.interimResult = interimResult;
@@ -419,11 +403,6 @@ public interface ModelBuilderRequest {
             @Override
             public ModelResolver getModelResolver() {
                 return modelResolver;
-            }
-
-            @Override
-            public Object getModelRepositoryHolder() {
-                return modelRepositoryHolder;
             }
 
             @Override
