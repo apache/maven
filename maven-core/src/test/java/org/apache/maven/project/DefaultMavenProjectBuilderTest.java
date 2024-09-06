@@ -25,8 +25,11 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
+import org.apache.maven.api.SessionData;
+import org.apache.maven.api.services.model.ModelCache;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.internal.impl.InternalSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -328,6 +331,12 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         MavenProject project =
                 projectBuilder.build(pom.toFile(), buildingRequest).getProject();
         assertThat(project.getName(), is("aid")); // inherited from artifactId
+
+        // clear the cache
+        InternalSession.from(buildingRequest.getRepositorySession())
+                .getData()
+                .get(SessionData.key(ModelCache.class))
+                .clear();
 
         try (InputStream pomResource =
                 DefaultMavenProjectBuilderTest.class.getResourceAsStream("/projects/reread/pom2.xml")) {

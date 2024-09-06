@@ -16,21 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.api.services.model;
 
-import java.util.function.Supplier;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Caches auxiliary data used during model building like already processed raw/effective models. The data in the cache
- * is meant for exclusive consumption by the model builder and is opaque to the cache implementation. The cache key is
- * formed by a combination of group id, artifact id, version and tag. The first three components generally refer to the
- * identity of a model. The tag allows for further classification of the associated data on the sole discretion of the
- * model builder.
+ * Factory for creating model caches.
+ * <p>
+ * The model cache is meant for exclusive consumption by the model builder and is opaque to the cache implementation.
+ * The cache is created once per session and is valid through the lifetime of the session.
+ * <p>
+ * The cache implementation could be annotated with {@code SessionScoped} to be created once per session, but
+ * this would make tests more complicated to write as they would all need to enter the session scope.
+ * This is similar to the {@code CIFriendlyVersionModelTransformer}.
  *
+ * @since 4.0.0
  */
-public interface ModelCache {
+@Experimental
+public interface ModelCacheFactory {
 
-    <T> T computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<T> data);
-
-    <T> T computeIfAbsent(Source path, String tag, Supplier<T> data);
+    @Nonnull
+    ModelCache newInstance();
 }

@@ -218,7 +218,6 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         .userProperties(Map.of())
                         .modelResolver(modelResolver)
                         .modelRepositoryHolder(modelRepositoryHolder)
-                        .modelCache(DefaultModelCache.newInstance(session, false))
                         .repositories(repositories)
                         .build();
 

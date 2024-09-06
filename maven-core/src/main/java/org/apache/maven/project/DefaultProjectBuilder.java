@@ -75,7 +75,6 @@ import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.ModelCache;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
@@ -91,7 +90,6 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.internal.impl.InternalSession;
-import org.apache.maven.internal.impl.resolver.DefaultModelCache;
 import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
@@ -309,7 +307,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private final ConcurrentMap<String, Object> parentCache;
         private final ModelTransformerContextBuilder transformerContextBuilder;
         private final ExecutorService executor;
-        private final ModelCache modelCache;
         private final ModelResolver modelResolver;
         private final Map<String, String> ciFriendlyVersions = new ConcurrentHashMap<>();
 
@@ -328,7 +325,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 this.transformerContextBuilder = null;
             }
             this.parentCache = new ConcurrentHashMap<>();
-            this.modelCache = DefaultModelCache.newInstance(session, true);
             this.modelResolver = new ModelResolverWrapper() {
                 @Override
                 protected org.apache.maven.model.resolution.ModelResolver getResolver(
@@ -1131,7 +1127,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             .map(internalSession::getRemoteRepository)
                             .toList());
             modelBuildingRequest.modelRepositoryHolder(holder);
-            modelBuildingRequest.modelCache(modelCache);
             modelBuildingRequest.transformerContextBuilder(transformerContextBuilder);
             modelBuildingRequest.repositories(request.getRemoteRepositories().stream()
                     .map(r -> internalSession.getRemoteRepository(RepositoryUtils.toRepo(r)))

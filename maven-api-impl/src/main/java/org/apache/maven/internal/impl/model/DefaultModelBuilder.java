@@ -42,6 +42,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nullable;
@@ -67,7 +68,6 @@ import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.ModelCache;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelResolver;
@@ -86,6 +86,8 @@ import org.apache.maven.api.services.model.InheritanceAssembler;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.api.services.model.ModelBuildingEvent;
 import org.apache.maven.api.services.model.ModelBuildingListener;
+import org.apache.maven.api.services.model.ModelCache;
+import org.apache.maven.api.services.model.ModelCacheFactory;
 import org.apache.maven.api.services.model.ModelInterpolator;
 import org.apache.maven.api.services.model.ModelNormalizer;
 import org.apache.maven.api.services.model.ModelPathTranslator;
@@ -101,7 +103,6 @@ import org.apache.maven.api.services.model.ProfileSelector;
 import org.apache.maven.api.services.model.WorkspaceModelResolver;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
-import org.apache.maven.internal.impl.resolver.DefaultModelCache;
 import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
 import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
 import org.apache.maven.model.v4.MavenTransformer;
@@ -145,6 +146,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final ModelTransformer transformer;
     private final ModelVersionParser versionParser;
     private final List<org.apache.maven.api.spi.ModelTransformer> transformers;
+    private final ModelCacheFactory modelCacheFactory;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -167,7 +169,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             ModelTransformer transformer,
             ModelVersionParser versionParser,
-            List<org.apache.maven.api.spi.ModelTransformer> transformers) {
+            List<org.apache.maven.api.spi.ModelTransformer> transformers,
+            ModelCacheFactory modelCacheFactory) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
         this.modelNormalizer = modelNormalizer;
@@ -187,6 +190,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.transformer = transformer;
         this.versionParser = versionParser;
         this.transformers = transformers;
+        this.modelCacheFactory = modelCacheFactory;
     }
 
     @Override
@@ -206,9 +210,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private static ModelBuilderRequest fillRequestDefaults(ModelBuilderRequest request) {
         ModelBuilderRequest.ModelBuilderRequestBuilder builder = ModelBuilderRequest.builder(request);
-        if (request.getModelCache() == null) {
-            builder.modelCache(new DefaultModelCache());
-        }
         if (request.getModelRepositoryHolder() == null) {
             builder.modelRepositoryHolder(new DefaultModelRepositoryHolder(
                     request.getSession(),
@@ -1465,7 +1466,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .userProperties(request.getUserProperties())
                         .source(importSource)
                         .modelResolver(modelResolver)
-                        .modelCache(request.getModelCache())
                         .modelRepositoryHolder(
                                 request.getModelRepositoryHolder().copy())
                         .twoPhaseBuilding(false)
@@ -1486,21 +1486,11 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private static <T> T cache(
             ModelCache cache, String groupId, String artifactId, String version, String tag, Callable<T> supplier) {
-        Supplier<T> s = asSupplier(supplier);
-        if (cache == null) {
-            return s.get();
-        } else {
-            return cache.computeIfAbsent(groupId, artifactId, version, tag, s);
-        }
+        return cache.computeIfAbsent(groupId, artifactId, version, tag, asSupplier(supplier));
     }
 
     private static <T> T cache(ModelCache cache, Source source, String tag, Callable<T> supplier) {
-        Supplier<T> s = asSupplier(supplier);
-        if (cache == null) {
-            return s.get();
-        } else {
-            return cache.computeIfAbsent(source, tag, s);
-        }
+        return cache.computeIfAbsent(source, tag, asSupplier(supplier));
     }
 
     private static <T> Supplier<T> asSupplier(Callable<T> supplier) {
@@ -1557,8 +1547,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         return modelProcessor;
     }
 
-    private static ModelCache getModelCache(ModelBuilderRequest request) {
-        return request.getModelCache();
+    private ModelCache getModelCache(ModelBuilderRequest request) {
+        return request.getSession()
+                .getData()
+                .computeIfAbsent(SessionData.key(ModelCache.class), modelCacheFactory::newInstance);
     }
 
     private static ModelBuildingListener getModelBuildingListener(ModelBuilderRequest request) {

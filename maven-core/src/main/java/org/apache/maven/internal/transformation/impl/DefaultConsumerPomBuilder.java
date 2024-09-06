@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.SessionData;
@@ -49,6 +48,7 @@ import org.apache.maven.api.services.model.DependencyManagementImporter;
 import org.apache.maven.api.services.model.DependencyManagementInjector;
 import org.apache.maven.api.services.model.InheritanceAssembler;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
+import org.apache.maven.api.services.model.ModelCacheFactory;
 import org.apache.maven.api.services.model.ModelInterpolator;
 import org.apache.maven.api.services.model.ModelNormalizer;
 import org.apache.maven.api.services.model.ModelPathTranslator;
@@ -65,7 +65,6 @@ import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.model.DefaultModelBuilder;
 import org.apache.maven.internal.impl.model.DefaultProfileSelector;
 import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
-import org.apache.maven.internal.impl.resolver.DefaultModelCache;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
@@ -141,6 +140,9 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     @Inject
     private List<org.apache.maven.api.spi.ModelTransformer> transformers;
 
+    @Inject
+    private ModelCacheFactory modelCacheFactory;
+
     Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -197,7 +199,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 profileActivationFilePathInterpolator,
                 modelTransformer,
                 versionParser,
-                transformers);
+                transformers,
+                modelCacheFactory);
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
         request.projectBuild(true);
@@ -209,19 +212,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         request.transformerContextBuilder(modelBuilder.newTransformerContextBuilder());
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());
-        request.modelCache(DefaultModelCache.newInstance(session, false));
-        if (session.getCache() != null) {
-            Map<?, ?> map = (Map) session.getCache().get(session, DefaultModelCache.class.getName());
-            List<String> paths = map.keySet().stream()
-                    .map(Object::toString)
-                    .filter(s -> s.startsWith("SourceCacheKey"))
-                    .map(s -> s.substring("SourceCacheKey[location=".length(), s.indexOf(", tag")))
-                    .sorted()
-                    .distinct()
-                    .toList();
-            logger.debug("ModelCache contains " + paths.size());
-            paths.forEach(s -> logger.debug("    " + s));
-        }
         return modelBuilder.build(request.build());
     }
 
