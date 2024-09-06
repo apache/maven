@@ -692,7 +692,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             // In case the model is using CI friendly versions, at this point, it will contain uninterpolated version
             // such as ${revision}${changelist}, so we need to take care of it now
             Model modelWithVersion = getModelWithInterpolatedVersion(model, result.getProblems()::add);
-            modelPool.put(model.getPomFile(), modelWithVersion);
+            if (model.getPomFile() != null) {
+                modelPool.put(model.getPomFile(), modelWithVersion);
+            }
 
             InterimResult interimResult = new InterimResult(pomFile, modelBuildingRequest, result, project, isRoot);
 

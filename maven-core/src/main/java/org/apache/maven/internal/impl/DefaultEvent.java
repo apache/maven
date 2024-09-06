@@ -48,7 +48,7 @@ public class DefaultEvent implements Event {
 
     @Override
     public Optional<Project> getProject() {
-        return Optional.ofNullable(delegate.getProject()).map(session::getProject);
+        return Optional.ofNullable(session.getProject(delegate.getProject()));
     }
 
     @Override
