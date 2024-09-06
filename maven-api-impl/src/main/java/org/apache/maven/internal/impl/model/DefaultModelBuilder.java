@@ -233,14 +233,15 @@ public class DefaultModelBuilder implements ModelBuilder {
         final DefaultModelBuilderResult result;
         final ModelCache cache;
         final Graph dag;
-        final Map<Path, Holder> modelByPath;
-        final Map<GAKey, Holder> modelByGA;
         final Map<GAKey, Set<ModelSource>> mappedSources;
-        final RepositoryHolder repositoryHolder;
 
-        private String source;
-        private Model sourceModel;
-        private Model rootModel;
+        String source;
+        Model sourceModel;
+        Model rootModel;
+
+        List<RemoteRepository> pomRepositories;
+        List<RemoteRepository> externalRepositories;
+        List<RemoteRepository> repositories;
 
         private Set<ModelProblem.Severity> severities = EnumSet.noneOf(ModelProblem.Severity.class);
 
@@ -265,16 +266,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         DefaultModelBuilderSession(
                 Session session, ModelBuilderRequest request, DefaultModelBuilderResult result, ModelCache cache) {
-            this(
-                    session,
-                    request,
-                    result,
-                    cache,
-                    new Graph(),
-                    new ConcurrentHashMap<>(64),
-                    new ConcurrentHashMap<>(64),
-                    new ConcurrentHashMap<>(64),
-                    null);
+            this(session, request, result, cache, new Graph(), new ConcurrentHashMap<>(64), null, null, null);
         }
 
         @SuppressWarnings("checkstyle:ParameterNumber")
@@ -284,24 +276,28 @@ public class DefaultModelBuilder implements ModelBuilder {
                 DefaultModelBuilderResult result,
                 ModelCache cache,
                 Graph dag,
-                Map<Path, Holder> modelByPath,
-                Map<GAKey, Holder> modelByGA,
                 Map<GAKey, Set<ModelSource>> mappedSources,
-                RepositoryHolder repositoryHolder) {
+                List<RemoteRepository> pomRepositories,
+                List<RemoteRepository> externalRepositories,
+                List<RemoteRepository> repositories) {
             this.session = session;
             this.request = request;
             this.result = result;
             this.cache = cache;
             this.dag = dag;
-            this.modelByPath = modelByPath;
-            this.modelByGA = modelByGA;
             this.mappedSources = mappedSources;
-            this.repositoryHolder = repositoryHolder != null
-                    ? repositoryHolder
-                    : new RepositoryHolder(
-                            request.getRepositories() != null
-                                    ? request.getRepositories()
-                                    : session.getRemoteRepositories());
+            if (pomRepositories == null) {
+                this.pomRepositories = List.of();
+                this.externalRepositories = List.copyOf(
+                        request.getRepositories() != null
+                                ? request.getRepositories()
+                                : session.getRemoteRepositories());
+                this.repositories = this.externalRepositories;
+            } else {
+                this.pomRepositories = pomRepositories;
+                this.externalRepositories = externalRepositories;
+                this.repositories = repositories;
+            }
             this.result.getProblems().forEach(p -> severities.add(p.getSeverity()));
         }
 
@@ -314,7 +310,15 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throw new IllegalArgumentException("Session mismatch");
             }
             return new DefaultModelBuilderSession(
-                    session, request, result, cache, dag, modelByPath, modelByGA, mappedSources, repositoryHolder);
+                    session,
+                    request,
+                    result,
+                    cache,
+                    dag,
+                    mappedSources,
+                    pomRepositories,
+                    externalRepositories,
+                    repositories);
         }
 
         public Session session() {
@@ -342,74 +346,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     + cache + ']';
         }
 
-        static class Holder {
-            private volatile boolean set;
-            private volatile Model model;
-
-            Holder(Model model) {
-                this.model = requireNonNull(model);
-                this.set = true;
-            }
-
-            public static Model deref(Holder holder) {
-                return holder != null ? holder.get() : null;
-            }
-
-            public Model get() {
-                if (!set) {
-                    synchronized (this) {
-                        if (!set) {
-                            try {
-                                this.wait();
-                            } catch (InterruptedException e) {
-                                // Ignore
-                            }
-                        }
-                    }
-                }
-                return model;
-            }
-
-            public Model computeIfAbsent(Supplier<Model> supplier) {
-                if (!set) {
-                    synchronized (this) {
-                        if (!set) {
-                            this.set = true;
-                            this.model = supplier.get();
-                            this.notifyAll();
-                        }
-                    }
-                }
-                return model;
-            }
-        }
-
-        public Model getRawModel(Path from, String gId, String aId) {
-            Model model = findRawModel(from, gId, aId);
-            if (model != null) {
-                modelByGA.put(new GAKey(gId, aId), new Holder(model));
-                if (model.getPomFile() != null) {
-                    modelByPath.put(model.getPomFile(), new Holder(model));
-                }
-            }
-            return model;
-        }
-
-        public Model getRawModel(Path from, Path path) {
-            Model model = findRawModel(from, path);
-            if (model != null) {
-                String groupId = getGroupId(model);
-                modelByGA.put(new GAKey(groupId, model.getArtifactId()), new Holder(model));
-                modelByPath.put(path, new Holder(model));
-            }
-            return model;
-        }
-
-        public Path locate(Path path) {
-            return getModelProcessor().locateExistingPom(path);
-        }
-
-        private Model findRawModel(Path from, String groupId, String artifactId) {
+        public Model getRawModel(Path from, String groupId, String artifactId) {
             ModelSource source = getSource(groupId, artifactId);
             if (source == null) {
                 // we need to check the whole reactor in case it's a dependency
@@ -425,6 +362,21 @@ public class DefaultModelBuilder implements ModelBuilder {
                 } catch (ModelBuilderException e) {
                     // gathered with problem collector
                 }
+            }
+            return null;
+        }
+
+        public Model getRawModel(Path from, Path path) {
+            if (!Files.isRegularFile(path)) {
+                throw new IllegalArgumentException("Not a regular file: " + path);
+            }
+            if (!addEdge(from, path)) {
+                return null;
+            }
+            try {
+                return readRawModel(derive(ModelSource.fromPath(path)));
+            } catch (ModelBuilderException e) {
+                // gathered with problem collector
             }
             return null;
         }
@@ -471,21 +423,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                     add(Severity.ERROR, ModelProblem.Version.V40, "Failed to load project " + pom, e);
                 }
             }
-        }
-
-        private Model findRawModel(Path from, Path p) {
-            if (!Files.isRegularFile(p)) {
-                throw new IllegalArgumentException("Not a regular file: " + p);
-            }
-            if (!addEdge(from, p)) {
-                return null;
-            }
-            try {
-                return readRawModel(derive(ModelSource.fromPath(p)));
-            } catch (ModelBuilderException e) {
-                // gathered with problem collector
-            }
-            return null;
         }
 
         private boolean addEdge(Path from, Path p) {
@@ -677,73 +614,128 @@ public class DefaultModelBuilder implements ModelBuilder {
             return new ModelBuilderException(result);
         }
 
-        List<RemoteRepository> getRepositories() {
-            return repositoryHolder.getRepositories();
+        public List<RemoteRepository> getRepositories() {
+            return repositories;
         }
 
-        void mergeRepositories(List<Repository> repositories, boolean replace) {
-            repositoryHolder.mergeRepositories(repositories, replace);
+        /**
+         * TODO: this is not thread safe and the session is mutated
+         */
+        public void mergeRepositories(List<Repository> toAdd, boolean replace) {
+            List<RemoteRepository> repos =
+                    toAdd.stream().map(session::createRemoteRepository).toList();
+            if (replace) {
+                Set<String> ids = repos.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
+                repositories = repositories.stream()
+                        .filter(r -> !ids.contains(r.getId()))
+                        .toList();
+                pomRepositories = pomRepositories.stream()
+                        .filter(r -> !ids.contains(r.getId()))
+                        .toList();
+            } else {
+                Set<String> ids =
+                        pomRepositories.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
+                repos = repos.stream().filter(r -> !ids.contains(r.getId())).toList();
+            }
+
+            RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
+            if (request.getRepositoryMerging() == ModelBuilderRequest.RepositoryMerging.REQUEST_DOMINANT) {
+                repositories = repositoryFactory.aggregate(session, repositories, repos, true);
+                pomRepositories = repositories;
+            } else {
+                pomRepositories = repositoryFactory.aggregate(session, pomRepositories, repos, true);
+                repositories = repositoryFactory.aggregate(session, pomRepositories, externalRepositories, false);
+            }
         }
 
-        class RepositoryHolder {
+        /**
+         * ModelSourceTransformer for the build pom
+         *
+         * @param model
+         * @param path
+         */
+        public Model transform(Model model, Path path) {
+            Model.Builder builder = Model.newBuilder(model);
+            handleParent(model, path, builder);
+            handleReactorDependencies(model, path, builder);
+            handleCiFriendlyVersion(model, path, builder);
+            return builder.build();
+        }
 
-            List<RemoteRepository> pomRepositories;
-            List<RemoteRepository> repositories;
-            List<RemoteRepository> externalRepositories;
-
-            RepositoryHolder(List<RemoteRepository> externalRepositories) {
-                this.pomRepositories = List.of();
-                this.externalRepositories = List.copyOf(externalRepositories);
-                this.repositories = List.copyOf(externalRepositories);
+        //
+        // Infer parent information
+        //
+        void handleParent(Model model, Path pomFile, Model.Builder builder) {
+            Parent parent = model.getParent();
+            if (parent != null) {
+                String version = parent.getVersion();
+                String modVersion = replaceCiFriendlyVersion(version);
+                builder.parent(parent.withVersion(modVersion));
             }
+        }
 
-            RepositoryHolder(RepositoryHolder holder) {
-                this.pomRepositories = List.copyOf(holder.pomRepositories);
-                this.externalRepositories = List.copyOf(holder.externalRepositories);
-                this.repositories = List.copyOf(holder.repositories);
-            }
+        //
+        // CI friendly versions
+        //
+        void handleCiFriendlyVersion(Model model, Path pomFile, Model.Builder builder) {
+            String version = model.getVersion();
+            String modVersion = replaceCiFriendlyVersion(version);
+            builder.version(modVersion);
+        }
 
-            public void mergeRepositories(List<Repository> toAdd, boolean replace) {
-                List<RemoteRepository> repos =
-                        toAdd.stream().map(session::createRemoteRepository).toList();
-                if (replace) {
-                    Set<String> ids =
-                            repos.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
-                    repositories = repositories.stream()
-                            .filter(r -> !ids.contains(r.getId()))
-                            .toList();
-                    pomRepositories = pomRepositories.stream()
-                            .filter(r -> !ids.contains(r.getId()))
-                            .toList();
-                } else {
-                    Set<String> ids = pomRepositories.stream()
-                            .map(RemoteRepository::getId)
-                            .collect(Collectors.toSet());
-                    repos = repos.stream().filter(r -> !ids.contains(r.getId())).toList();
+        //
+        // Infer inner reactor dependencies version
+        //
+        void handleReactorDependencies(Model model, Path pomFile, Model.Builder builder) {
+            List<Dependency> newDeps = new ArrayList<>();
+            boolean modified = false;
+            for (Dependency dep : model.getDependencies()) {
+                Dependency.Builder depBuilder = null;
+                if (dep.getVersion() == null) {
+                    Model depModel = getRawModel(model.getPomFile(), dep.getGroupId(), dep.getArtifactId());
+                    if (depModel != null) {
+                        String version = depModel.getVersion();
+                        InputLocation versionLocation = depModel.getLocation("version");
+                        if (version == null && depModel.getParent() != null) {
+                            version = depModel.getParent().getVersion();
+                            versionLocation = depModel.getParent().getLocation("version");
+                        }
+                        depBuilder = Dependency.newBuilder(dep);
+                        depBuilder.version(version).location("version", versionLocation);
+                        if (dep.getGroupId() == null) {
+                            String depGroupId = depModel.getGroupId();
+                            InputLocation groupIdLocation = depModel.getLocation("groupId");
+                            if (depGroupId == null && depModel.getParent() != null) {
+                                depGroupId = depModel.getParent().getGroupId();
+                                groupIdLocation = depModel.getParent().getLocation("groupId");
+                            }
+                            depBuilder.groupId(depGroupId).location("groupId", groupIdLocation);
+                        }
+                    }
                 }
-
-                RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
-                if (request.getRepositoryMerging() == ModelBuilderRequest.RepositoryMerging.REQUEST_DOMINANT) {
-                    repositories = repositoryFactory.aggregate(session, repositories, repos, true);
-                    pomRepositories = repositories;
+                if (depBuilder != null) {
+                    newDeps.add(depBuilder.build());
+                    modified = true;
                 } else {
-                    pomRepositories = repositoryFactory.aggregate(session, pomRepositories, repos, true);
-                    repositories = repositoryFactory.aggregate(session, pomRepositories, externalRepositories, false);
+                    newDeps.add(dep);
                 }
             }
-
-            public List<RemoteRepository> getRepositories() {
-                return repositories;
-            }
-
-            public RepositoryHolder copy() {
-                return new RepositoryHolder(this);
+            if (modified) {
+                builder.dependencies(newDeps);
             }
         }
-    }
 
-    DefaultModelProblemCollector newCollector(DefaultModelBuilderResult result) {
-        return new DefaultModelProblemCollector(result);
+        String replaceCiFriendlyVersion(String version) {
+            if (version != null) {
+                for (String key : Arrays.asList("changelist", "revision", "sha1")) {
+                    String val = request.getUserProperties().get(key);
+                    if (val != null) {
+                        version = version.replace("${" + key + "}", val);
+                    }
+                }
+            }
+            return version;
+        }
     }
 
     private static ModelBuilderRequest fillRequestDefaults(ModelBuilderRequest request) {
@@ -1319,7 +1311,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 request,
                 build);
         if (hasFatalErrors(build)) {
-            throw ((ModelProblemCollector) build).newModelBuilderException();
+            throw build.newModelBuilderException();
         }
 
         return model;
@@ -1337,7 +1329,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 && request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
             Path pomFile = modelSource.getPath();
             try {
-                rawModel = this.transform(build, rawModel, pomFile);
+                rawModel = build.transform(rawModel, pomFile);
             } catch (ModelTransformerException e) {
                 build.add(Severity.FATAL, ModelProblem.Version.V40, null, e);
             }
@@ -2011,104 +2003,12 @@ public class DefaultModelBuilder implements ModelBuilder {
         return modelProcessor;
     }
 
-    private ModelCache getModelCache(ModelBuilderRequest request) {
-        return request.getSession()
-                .getData()
-                .computeIfAbsent(SessionData.key(ModelCache.class), modelCacheFactory::newInstance);
-    }
-
     private static ModelBuildingListener getModelBuildingListener(ModelBuilderRequest request) {
         return (ModelBuildingListener) request.getListener();
     }
 
     private static ModelResolver getModelResolver(ModelBuilderRequest request) {
         return request.getModelResolver();
-    }
-
-    /**
-     * ModelSourceTransformer for the build pom
-     */
-    Model transform(DefaultModelBuilderSession build, Model model, Path path) {
-        Model.Builder builder = Model.newBuilder(model);
-        handleParent(build, model, path, builder);
-        handleReactorDependencies(build, model, path, builder);
-        handleCiFriendlyVersion(build, model, path, builder);
-        return builder.build();
-    }
-
-    //
-    // Infer parent information
-    //
-    void handleParent(DefaultModelBuilderSession build, Model model, Path pomFile, Model.Builder builder) {
-        Parent parent = model.getParent();
-        if (parent != null) {
-            String version = parent.getVersion();
-            String modVersion = replaceCiFriendlyVersion(build, version);
-            builder.parent(parent.withVersion(modVersion));
-        }
-    }
-
-    //
-    // CI friendly versions
-    //
-    void handleCiFriendlyVersion(DefaultModelBuilderSession build, Model model, Path pomFile, Model.Builder builder) {
-        String version = model.getVersion();
-        String modVersion = replaceCiFriendlyVersion(build, version);
-        builder.version(modVersion);
-    }
-
-    //
-    // Infer inner reactor dependencies version
-    //
-    void handleReactorDependencies(DefaultModelBuilderSession build, Model model, Path pomFile, Model.Builder builder) {
-        List<Dependency> newDeps = new ArrayList<>();
-        boolean modified = false;
-        for (Dependency dep : model.getDependencies()) {
-            Dependency.Builder depBuilder = null;
-            if (dep.getVersion() == null) {
-                Model depModel = build.getRawModel(model.getPomFile(), dep.getGroupId(), dep.getArtifactId());
-                if (depModel != null) {
-                    String version = depModel.getVersion();
-                    InputLocation versionLocation = depModel.getLocation("version");
-                    if (version == null && depModel.getParent() != null) {
-                        version = depModel.getParent().getVersion();
-                        versionLocation = depModel.getParent().getLocation("version");
-                    }
-                    depBuilder = Dependency.newBuilder(dep);
-                    depBuilder.version(version).location("version", versionLocation);
-                    if (dep.getGroupId() == null) {
-                        String depGroupId = depModel.getGroupId();
-                        InputLocation groupIdLocation = depModel.getLocation("groupId");
-                        if (depGroupId == null && depModel.getParent() != null) {
-                            depGroupId = depModel.getParent().getGroupId();
-                            groupIdLocation = depModel.getParent().getLocation("groupId");
-                        }
-                        depBuilder.groupId(depGroupId).location("groupId", groupIdLocation);
-                    }
-                }
-            }
-            if (depBuilder != null) {
-                newDeps.add(depBuilder.build());
-                modified = true;
-            } else {
-                newDeps.add(dep);
-            }
-        }
-        if (modified) {
-            builder.dependencies(newDeps);
-        }
-    }
-
-    String replaceCiFriendlyVersion(DefaultModelBuilderSession build, String version) {
-        if (version != null) {
-            for (String key : Arrays.asList("changelist", "revision", "sha1")) {
-                String val = build.request.getUserProperties().get(key);
-                if (val != null) {
-                    version = version.replace("${" + key + "}", val);
-                }
-            }
-        }
-        return version;
     }
 
     record GAKey(String groupId, String artifactId) {}
