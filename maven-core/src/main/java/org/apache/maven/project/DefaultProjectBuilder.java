@@ -130,7 +130,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     private final org.eclipse.aether.RepositorySystem repoSystem;
     private final RemoteRepositoryManager repositoryManager;
     private final ProjectDependenciesResolver dependencyResolver;
-
     private final RootLocator rootLocator;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -384,6 +383,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private final ExecutorService executor;
         private final ModelResolver modelResolver;
         private final Map<String, String> ciFriendlyVersions = new ConcurrentHashMap<>();
+        private final ModelBuilder.ModelBuilderSession modelBuilderSession;
 
         BuildSession(ProjectBuildingRequest request, boolean localProjects) {
             this.request = request;
@@ -413,6 +413,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             parentCache);
                 }
             };
+            this.modelBuilderSession = modelBuilder.newSession();
         }
 
         ExecutorService createExecutor(int parallelism) {
@@ -501,7 +502,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
                     ModelBuilderResult result;
                     try {
-                        result = modelBuilder.build(request);
+                        result = modelBuilderSession.build(request);
                     } catch (ModelBuilderException e) {
                         result = e.getResult();
                         if (result == null || result.getEffectiveModel() == null) {
@@ -675,7 +676,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             ModelBuilderResult result;
             try {
-                result = modelBuilder.build(modelBuildingRequest);
+                result = modelBuilderSession.build(modelBuildingRequest);
             } catch (ModelBuilderException e) {
                 result = e.getResult();
                 if (result == null || result.getFileModel() == null) {
@@ -832,6 +833,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             // which may cause some re-entrance in the build() method and can
             // actually cause deadlocks.  In order to workaround the problem,
             // we do a first pass by reading all rawModels in order.
+            /*
             List<ProjectBuildingResult> results = new ArrayList<>();
             boolean failure = false;
             for (InterimResult r : interimResults) {
@@ -856,6 +858,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             if (failure) {
                 return results;
             }
+            */
 
             List<Callable<List<ProjectBuildingResult>>> callables = interimResults.stream()
                     .map(interimResult ->
@@ -890,7 +893,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
             MavenProject project = interimResult.project;
             try {
-                ModelBuilderResult result = modelBuilder.build(ModelBuilderRequest.builder(interimResult.request)
+                ModelBuilderResult result = modelBuilderSession.build(ModelBuilderRequest.builder(interimResult.request)
                         .interimResult(interimResult.result)
                         .build());
 

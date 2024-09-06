@@ -208,7 +208,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         .repositories(repositories)
                         .build();
 
-                ModelBuilderResult modelResult = modelBuilder.build(modelRequest);
+                ModelBuilderResult modelResult = modelBuilder.newSession().build(modelRequest);
                 // ModelBuildingEx is thrown only on FATAL and ERROR severities, but we still can have WARNs
                 // that may lead to unexpected build failure, log them
                 if (!modelResult.getProblems().isEmpty()) {

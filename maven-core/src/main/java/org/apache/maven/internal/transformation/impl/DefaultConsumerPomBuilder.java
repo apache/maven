@@ -178,6 +178,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 return new ArrayList<>();
             }
         };
+        // TODO: the custom selector should be used as a flag on the request
         DefaultModelBuilder modelBuilder = new DefaultModelBuilder(
                 modelProcessor,
                 modelValidator,
@@ -207,7 +208,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         request.modelResolver(iSession.getData().get(SessionData.key(ModelResolver.class)));
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());
-        return modelBuilder.build(request.build());
+        return modelBuilder.newSession().build(request.build());
     }
 
     static Model transform(Model model, MavenProject project) {

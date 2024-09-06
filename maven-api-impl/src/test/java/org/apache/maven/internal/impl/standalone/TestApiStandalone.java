@@ -42,11 +42,12 @@ class TestApiStandalone {
         Session session = ApiRunner.createSession();
 
         ModelBuilder builder = session.getService(ModelBuilder.class);
-        ModelBuilderResult result = builder.build(ModelBuilderRequest.builder()
-                .session(session)
-                .source(ModelSource.fromPath(Paths.get("pom.xml").toAbsolutePath()))
-                .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
-                .build());
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .source(ModelSource.fromPath(Paths.get("pom.xml").toAbsolutePath()))
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
+                        .build());
         assertNotNull(result.getEffectiveModel());
 
         ArtifactCoordinates coords =
