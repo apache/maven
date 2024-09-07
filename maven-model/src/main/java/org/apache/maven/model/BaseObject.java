@@ -35,7 +35,7 @@ public abstract class BaseObject implements Serializable, Cloneable, InputLocati
     }
 
     public BaseObject(Object delegate, ChildrenTracking parent) {
-        this.delegate = delegate;
+        this.delegate = requireNonNull(delegate, "delegate cannot be null");
         this.childrenTracking = parent;
     }
 
