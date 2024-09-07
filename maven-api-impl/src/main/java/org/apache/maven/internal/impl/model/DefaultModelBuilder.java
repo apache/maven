@@ -654,7 +654,7 @@ public class DefaultModelBuilder implements ModelBuilder {
          * @param model
          * @param path
          */
-        public Model transform(Model model, Path path) {
+        Model transformRawToBuildPom(Model model, Path path) {
             Model.Builder builder = Model.newBuilder(model);
             handleParent(model, path, builder);
             handleReactorDependencies(model, path, builder);
@@ -1329,7 +1329,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 && request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
             Path pomFile = modelSource.getPath();
             try {
-                rawModel = build.transform(rawModel, pomFile);
+                rawModel = build.transformRawToBuildPom(rawModel, pomFile);
             } catch (ModelTransformerException e) {
                 build.add(Severity.FATAL, ModelProblem.Version.V40, null, e);
             }
