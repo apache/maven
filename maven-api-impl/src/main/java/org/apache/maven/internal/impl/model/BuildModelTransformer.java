@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.maven.api.di.Named;
@@ -59,18 +58,34 @@ public class BuildModelTransformer implements ModelTransformer {
     void handleParent(ModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
         Parent parent = model.getParent();
         if (parent != null) {
+            String groupId = parent.getGroupId();
+            String artifactId = parent.getArtifactId();
             String version = parent.getVersion();
             String path = Optional.ofNullable(parent.getRelativePath()).orElse("..");
             if (version == null && !path.isEmpty()) {
                 Optional<RelativeProject> resolvedParent = resolveRelativePath(
                         pomFile, context, Paths.get(path), parent.getGroupId(), parent.getArtifactId());
                 if (resolvedParent.isPresent()) {
-                    version = resolvedParent.get().getVersion();
+                    RelativeProject project = resolvedParent.get();
+                    if (groupId == null
+                            || groupId.equals(project.getGroupId()) && artifactId == null
+                            || artifactId.equals(project.getArtifactId())) {
+                        groupId = project.getGroupId();
+                        artifactId = project.getArtifactId();
+                        version = resolvedParent.get().getVersion();
+                    }
                 }
             }
+
             // CI Friendly version for parent
             String modVersion = replaceCiFriendlyVersion(context, version);
-            builder.parent(parent.withVersion(modVersion));
+
+            // Update parent
+            builder.parent(parent.with()
+                    .groupId(groupId)
+                    .artifactId(artifactId)
+                    .version(modVersion)
+                    .build());
         }
     }
 
@@ -131,17 +146,8 @@ public class BuildModelTransformer implements ModelTransformer {
             return Optional.empty();
         }
 
-        Optional<RelativeProject> mappedProject = Optional.ofNullable(context.getRawModel(pomFile, pomPath.normalize()))
+        return Optional.ofNullable(context.getRawModel(pomFile, pomPath.normalize()))
                 .map(BuildModelTransformer::toRelativeProject);
-
-        if (mappedProject.isPresent()) {
-            RelativeProject project = mappedProject.get();
-
-            if (Objects.equals(groupId, project.getGroupId()) && Objects.equals(artifactId, project.getArtifactId())) {
-                return mappedProject;
-            }
-        }
-        return Optional.empty();
     }
 
     private static RelativeProject toRelativeProject(final Model m) {

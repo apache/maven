@@ -301,37 +301,6 @@ public class DefaultModelValidator implements ModelValidator {
     public void validateFileModel(Model m, ModelBuilderRequest request, ModelProblemCollector problems) {
 
         Parent parent = m.getParent();
-        if (parent != null) {
-            validateStringNotEmpty(
-                    "parent.groupId", problems, Severity.FATAL, Version.BASE, parent.getGroupId(), parent);
-
-            validateStringNotEmpty(
-                    "parent.artifactId", problems, Severity.FATAL, Version.BASE, parent.getArtifactId(), parent);
-
-            if (equals(parent.getGroupId(), m.getGroupId()) && equals(parent.getArtifactId(), m.getArtifactId())) {
-                addViolation(
-                        problems,
-                        Severity.FATAL,
-                        Version.BASE,
-                        "parent.artifactId",
-                        null,
-                        "must be changed"
-                                + ", the parent element cannot have the same groupId:artifactId as the project.",
-                        parent);
-            }
-
-            if (equals("LATEST", parent.getVersion()) || equals("RELEASE", parent.getVersion())) {
-                addViolation(
-                        problems,
-                        Severity.WARNING,
-                        Version.BASE,
-                        "parent.version",
-                        null,
-                        "is either LATEST or RELEASE (both of them are being deprecated)",
-                        parent);
-            }
-        }
-
         if (request.getValidationLevel() == ModelBuilderRequest.VALIDATION_LEVEL_MINIMAL) {
             // profiles: they are essential for proper model building (may contribute profiles, dependencies...)
             HashSet<String> minProfileIds = new HashSet<>();
@@ -553,7 +522,36 @@ public class DefaultModelValidator implements ModelValidator {
 
         if (parent != null) {
             validateStringNotEmpty(
+                    "parent.groupId", problems, Severity.FATAL, Version.BASE, parent.getGroupId(), parent);
+
+            validateStringNotEmpty(
+                    "parent.artifactId", problems, Severity.FATAL, Version.BASE, parent.getArtifactId(), parent);
+
+            validateStringNotEmpty(
                     "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(), parent);
+
+            if (equals(parent.getGroupId(), m.getGroupId()) && equals(parent.getArtifactId(), m.getArtifactId())) {
+                addViolation(
+                        problems,
+                        Severity.FATAL,
+                        Version.BASE,
+                        "parent.artifactId",
+                        null,
+                        "must be changed"
+                                + ", the parent element cannot have the same groupId:artifactId as the project.",
+                        parent);
+            }
+
+            if (equals("LATEST", parent.getVersion()) || equals("RELEASE", parent.getVersion())) {
+                addViolation(
+                        problems,
+                        Severity.WARNING,
+                        Version.BASE,
+                        "parent.version",
+                        null,
+                        "is either LATEST or RELEASE (both of them are being deprecated)",
+                        parent);
+            }
         }
     }
 
