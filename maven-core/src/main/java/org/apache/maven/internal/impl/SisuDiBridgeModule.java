@@ -39,7 +39,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.name.Names;
 import org.apache.maven.api.di.MojoExecutionScoped;
 import org.apache.maven.api.di.SessionScoped;
@@ -161,19 +160,13 @@ public class SisuDiBridgeModule extends AbstractModule {
                 .sorted(Comparator.comparing(k -> k.getRawType().getName()))
                 .distinct()
                 .forEach(key -> {
-                    Class<?> clazz = key.getRawType();
-                    Class<Object> itf = (clazz.isInterface()
-                            ? null
-                            : (Class<Object>) (clazz.getInterfaces().length > 0 ? clazz.getInterfaces()[0] : clazz));
-                    if (itf != null) {
-                        AnnotatedBindingBuilder<Object> binder = bind(itf);
-                        if (key.getQualifier() instanceof String s && !s.isEmpty()) {
-                            binder.annotatedWith(Names.named(s));
-                        } else if (key.getQualifier() instanceof Annotation a) {
-                            binder.annotatedWith(a);
-                        }
-                        binder.toProvider(() -> injector.getInstance(clazz));
+                    var mappedKey = (com.google.inject.Key<Object>) com.google.inject.Key.get(key.getType());
+                    if (key.getQualifier() instanceof String s && !s.isEmpty()) {
+                        mappedKey = mappedKey.withAnnotation(Names.named(s));
+                    } else if (key.getQualifier() instanceof Annotation a) {
+                        mappedKey = mappedKey.withAnnotation(a);
                     }
+                    bind(mappedKey).toProvider(() -> injector.getInstance(key));
                 });
     }
 
