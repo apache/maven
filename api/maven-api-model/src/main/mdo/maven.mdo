@@ -2511,7 +2511,7 @@
         </field>
         <field xml.transient="true">
           <name>priority</name>
-          <version>4.0.0/4.0.99</version>
+          <version>4.0.0+</version>
           <type>int</type>
           <description>
             <![CDATA[
@@ -2520,17 +2520,6 @@
             it is not part of the public API. In particular, this property can be changed or deleted without prior
             notice.</p>
             ]]>
-          </description>
-        </field>
-        <field>
-          <name>priority</name>
-          <version>4.1.0+</version>
-          <type>int</type>
-          <description>
-            The priority of this execution compared to other executions which are bound to the same phase.
-            Executions derived from the default lifecycle have a negative priority by default so that they are executed
-            before any custom plugin executions.
-            @since Maven 4.0.0
           </description>
         </field>
         <field>
