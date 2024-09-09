@@ -47,7 +47,6 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.Build;
@@ -302,7 +301,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         problems.setRootModel(inputModel);
 
         ModelData resultData = new ModelData(request.getSource(), inputModel);
-        String superModelVersion = inputModel.getModelVersion() != null ? inputModel.getModelVersion() : "4.0.0";
+        String superModelVersion =
+                inputModel.getModelVersion() != null ? inputModel.getModelVersion() : MODEL_VERSION_4_0_0;
         if (!VALID_MODEL_VERSIONS.contains(superModelVersion)) {
             // Maven 3.x is always using 4.0.0 version to load the supermodel, so
             // do the same when loading a dependency.  The model validator will also
@@ -790,7 +790,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             ModelSource modelSource, ModelBuilderRequest request, DefaultModelProblemCollector problems)
             throws ModelBuilderException {
         Model rawModel = readFileModel(request, problems);
-        if (Features.buildConsumer(request.getUserProperties()) && modelSource.getPath() != null) {
+        if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion()) && modelSource.getPath() != null) {
             Path pomFile = modelSource.getPath();
 
             try {

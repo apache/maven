@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.VersionRange;
-import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputSource;
@@ -97,6 +96,7 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.sisu.Nullable;
 
+import static org.apache.maven.api.services.ModelBuilder.MODEL_VERSION_4_0_0;
 import static org.apache.maven.model.building.Result.error;
 import static org.apache.maven.model.building.Result.newResult;
 
@@ -774,12 +774,13 @@ public class DefaultModelBuilder implements ModelBuilder {
         problems.setRootModel(inputModel);
 
         ModelData resultData = new ModelData(request.getModelSource(), inputModel);
-        String superModelVersion = inputModel.getModelVersion() != null ? inputModel.getModelVersion() : "4.0.0";
+        String superModelVersion =
+                inputModel.getModelVersion() != null ? inputModel.getModelVersion() : MODEL_VERSION_4_0_0;
         if (!DefaultModelValidator.VALID_MODEL_VERSIONS.contains(superModelVersion)) {
             // Maven 3.x is always using 4.0.0 version to load the supermodel, so
             // do the same when loading a dependency.  The model validator will also
             // check that field later.
-            superModelVersion = "4.0.0";
+            superModelVersion = MODEL_VERSION_4_0_0;
         }
         ModelData superData = new ModelData(null, getSuperModel(superModelVersion));
 
@@ -1251,19 +1252,22 @@ public class DefaultModelBuilder implements ModelBuilder {
             ModelSource modelSource, ModelBuildingRequest request, DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         Model rawModel;
-        if (Features.buildConsumer(request.getUserProperties()) && modelSource instanceof FileModelSource) {
+        if (modelSource instanceof FileModelSource) {
             rawModel = readFileModel(request, problems);
-            File pomFile = ((FileModelSource) modelSource).getFile();
 
-            try {
-                if (request.getTransformerContextBuilder() != null) {
-                    TransformerContext context =
-                            request.getTransformerContextBuilder().initialize(request, problems);
-                    transformer.transform(pomFile.toPath(), context, rawModel);
+            if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion())) {
+                File pomFile = ((FileModelSource) modelSource).getFile();
+
+                try {
+                    if (request.getTransformerContextBuilder() != null) {
+                        TransformerContext context =
+                                request.getTransformerContextBuilder().initialize(request, problems);
+                        transformer.transform(pomFile.toPath(), context, rawModel);
+                    }
+                } catch (TransformerException e) {
+                    problems.add(
+                            new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.V40).setException(e));
                 }
-            } catch (TransformerException e) {
-                problems.add(
-                        new ModelProblemCollectorRequest(Severity.FATAL, ModelProblem.Version.V40).setException(e));
             }
         } else if (request.getFileModel() == null) {
             rawModel = readFileModel(request, problems);

@@ -40,24 +40,24 @@ public final class Features {
     private Features() {}
 
     /**
-     * Check if the build/consumer POM feature is active.
+     * Check if the consumer POM feature is active.
      */
-    public static boolean buildConsumer(@Nullable Properties userProperties) {
+    public static boolean consumerPom(@Nullable Properties userProperties) {
         return doGet(userProperties, BUILDCONSUMER, true);
     }
 
     /**
-     * Check if the build/consumer POM feature is active.
+     * Check if the consumer POM feature is active.
      */
-    public static boolean buildConsumer(@Nullable Map<String, String> userProperties) {
+    public static boolean consumerPom(@Nullable Map<String, String> userProperties) {
         return doGet(userProperties, BUILDCONSUMER, true);
     }
 
     /**
-     * Check if the build/consumer POM feature is active.
+     * Check if the consumer POM feature is active.
      */
-    public static boolean buildConsumer(@Nullable Session session) {
-        return buildConsumer(session != null ? session.getUserProperties() : null);
+    public static boolean consumerPom(@Nullable Session session) {
+        return consumerPom(session != null ? session.getUserProperties() : null);
     }
 
     private static boolean doGet(Properties userProperties, String key, boolean def) {

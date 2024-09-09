@@ -80,7 +80,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
             // If there is no build POM there is no reason to inject artifacts for the consumer POM.
             return;
         }
-        if (Features.buildConsumer(session.getUserProperties())) {
+        if (Features.consumerPom(session.getUserProperties())) {
             Path buildDir =
                     project.getBuild() != null ? Paths.get(project.getBuild().getDirectory()) : null;
             if (buildDir != null) {
@@ -133,14 +133,14 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
     }
 
     public InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
-        if (Features.buildConsumer(session.getUserProperties()) && consumerPomPresent(request.getArtifacts())) {
+        if (Features.consumerPom(session.getUserProperties()) && consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));
         }
         return request;
     }
 
     public DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request) {
-        if (Features.buildConsumer(session.getUserProperties()) && consumerPomPresent(request.getArtifacts())) {
+        if (Features.consumerPom(session.getUserProperties()) && consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));
         }
         return request;
