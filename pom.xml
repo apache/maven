@@ -731,7 +731,7 @@ under the License.</licenseText>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.2.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
