@@ -423,17 +423,6 @@ public class MavenCli {
             cliManager.displayHelp(System.out);
             throw e;
         }
-
-        // check for presence of unsupported command line options
-        try {
-            if (cliRequest.commandLine.hasOption("llr")) {
-                throw new UnrecognizedOptionException("Option '-llr' is not supported starting with Maven 3.9.1");
-            }
-        } catch (ParseException e) {
-            System.err.println("Unsupported options: " + e.getMessage());
-            cliManager.displayHelp(System.out);
-            throw e;
-        }
     }
 
     private void informativeCommands(CliRequest cliRequest) throws ExitException {
@@ -495,7 +484,7 @@ public class MavenCli {
     /**
      * configure logging
      */
-    void logging(CliRequest cliRequest) {
+    void logging(CliRequest cliRequest) throws ExitException {
         // LOG LEVEL
         CommandLine commandLine = cliRequest.commandLine;
         cliRequest.verbose = commandLine.hasOption(CLIManager.VERBOSE) || commandLine.hasOption(CLIManager.DEBUG);
@@ -572,9 +561,37 @@ public class MavenCli {
             }
         }
 
-        if (commandLine.hasOption(CLIManager.DEBUG)) {
-            slf4jLogger.warn("The option '--debug' is deprecated and may be repurposed as Java debug"
-                    + " in a future version. Use -X/--verbose instead.");
+        // check for presence of deprecated options and print warning
+        boolean fail = false;
+        for (Option option : cliRequest.commandLine.getOptions()) {
+            if (option.isDeprecated()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("The option -").append(option.getOpt());
+                if (option.getLongOpt() != null) {
+                    sb.append(",--").append(option.getLongOpt());
+                }
+                sb.append(" is deprecated ");
+                if (option.getDeprecated().isForRemoval()) {
+                    sb.append("and will be removed in a future version");
+                }
+                if (option.getDeprecated().getSince() != null) {
+                    sb.append("since Maven ").append(option.getDeprecated().getSince());
+                }
+                boolean error = false;
+                if (option.getDeprecated().getDescription() != null) {
+                    sb.append(": ").append(option.getDeprecated().getDescription());
+                    error = option.getDeprecated().getDescription().startsWith("UNSUPPORTED:");
+                }
+                if (error) {
+                    slf4jLogger.error(sb.toString());
+                    fail = true;
+                } else {
+                    slf4jLogger.warn(sb.toString());
+                }
+            }
+        }
+        if (fail) {
+            throw new ExitException(1);
         }
     }
 
@@ -632,6 +649,7 @@ public class MavenCli {
         BasicInterpolator interpolator =
                 createInterpolator(paths, cliRequest.systemProperties, cliRequest.userProperties);
         CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
+        commandLineBuilder.setDeprecatedHandler(o -> {});
         for (Option option : cliRequest.commandLine.getOptions()) {
             if (!String.valueOf(CLIManager.SET_USER_PROPERTY).equals(option.getOpt())) {
                 List<String> values = option.getValuesList();
