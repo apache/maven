@@ -273,5 +273,13 @@ public final class Constants {
     @Config(type = "java.lang.Integer", defaultValue = "cores/2 + 1")
     public static final String MAVEN_PROJECT_BUILDER_PARALLELISM = "maven.projectBuilder.parallelism";
 
+    /**
+     * User property for enabling/disabling the consumer POM feature.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_CONSUMER_POM = "maven.consumer.pom";
+
     private Constants() {}
 }
