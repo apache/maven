@@ -365,7 +365,7 @@ under the License.
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.2.13</version>
+        <version>1.4.14</version>
         <optional>true</optional>
       </dependency>
       <!--  Wagon -->
