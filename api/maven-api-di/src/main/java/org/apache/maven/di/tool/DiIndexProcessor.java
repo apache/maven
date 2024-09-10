@@ -29,67 +29,122 @@ import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.maven.api.di.Named;
 
-// Auto-register the annotation processor
 @SupportedAnnotationTypes("org.apache.maven.api.di.Named")
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class DiIndexProcessor extends AbstractProcessor {
 
+    private final Set<String> processedClasses = new HashSet<>();
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        // Collect the fully qualified names of classes annotated with @Named
-        StringBuilder builder = new StringBuilder();
-
-        processingEnv
-                .getMessager()
-                .printMessage(
-                        Diagnostic.Kind.NOTE,
-                        "Processing " + roundEnv.getRootElements().size() + " classes");
+        logMessage(
+                Diagnostic.Kind.NOTE, "Processing " + roundEnv.getRootElements().size() + " classes");
 
         for (Element element : roundEnv.getElementsAnnotatedWith(Named.class)) {
             if (element instanceof TypeElement typeElement) {
-                // Get the fully qualified class name
-                String className = typeElement.getQualifiedName().toString();
-
-                // Handle inner classes by checking if the enclosing element is a class or interface
-                Element enclosingElement = typeElement.getEnclosingElement();
-                if (enclosingElement instanceof TypeElement) {
-                    // It's an inner class, replace the last dot with a '$'
-                    String enclosingClassName =
-                            ((TypeElement) enclosingElement).getQualifiedName().toString();
-                    className = enclosingClassName + "$" + typeElement.getSimpleName();
-                }
-
-                builder.append(className).append("\n");
+                String className = getFullClassName(typeElement);
+                processedClasses.add(className);
             }
         }
 
-        if (!builder.isEmpty()) { // Check if the StringBuilder is non-empty
+        if (roundEnv.processingOver()) {
             try {
-                writeFile(builder.toString());
-            } catch (IOException e) {
-                processingEnv
-                        .getMessager()
-                        .printMessage(Diagnostic.Kind.ERROR, "Error writing file: " + e.getMessage());
+                updateFileIfChanged();
+            } catch (Exception e) {
+                logError("Error updating file", e);
             }
         }
 
-        return true; // Indicate that annotations are claimed by this processor
+        return true;
     }
 
-    private void writeFile(String content) throws IOException {
-        // Create the file META-INF/maven/org.apache.maven.api.di.Inject
-        FileObject fileObject = processingEnv
-                .getFiler()
-                .createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/maven/org.apache.maven.api.di.Inject");
-
-        try (Writer writer = fileObject.openWriter()) {
-            writer.write(content);
+    private String getFullClassName(TypeElement typeElement) {
+        String className = typeElement.getQualifiedName().toString();
+        Element enclosingElement = typeElement.getEnclosingElement();
+        if (enclosingElement instanceof TypeElement) {
+            String enclosingClassName =
+                    ((TypeElement) enclosingElement).getQualifiedName().toString();
+            className = enclosingClassName + "$" + typeElement.getSimpleName();
         }
+        return className;
+    }
+
+    private void updateFileIfChanged() throws IOException {
+        String path = "META-INF/maven/org.apache.maven.api.di.Inject";
+        Set<String> existingClasses = new TreeSet<>(); // Using TreeSet for natural ordering
+        String existingContent = "";
+
+        // Try to read existing content
+        try {
+            FileObject inputFile = processingEnv.getFiler().getResource(StandardLocation.CLASS_OUTPUT, "", path);
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputFile.openInputStream()))) {
+                String line;
+                StringBuilder contentBuilder = new StringBuilder();
+                while ((line = reader.readLine()) != null) {
+                    if (!line.trim().startsWith("#")) {
+                        existingClasses.add(line.trim());
+                    }
+                    contentBuilder.append(line).append("\n");
+                }
+                existingContent = contentBuilder.toString();
+            }
+        } catch (IOException e) {
+            logMessage(Diagnostic.Kind.NOTE, "Unable to read existing file. Proceeding with empty content.");
+        }
+
+        Set<String> allClasses = new TreeSet<>(existingClasses); // Using TreeSet for natural ordering
+        allClasses.addAll(processedClasses);
+
+        StringBuilder newContentBuilder = new StringBuilder();
+        for (String className : allClasses) {
+            newContentBuilder.append(className).append("\n");
+        }
+        String newContent = newContentBuilder.toString();
+
+        if (!newContent.equals(existingContent)) {
+            logMessage(Diagnostic.Kind.NOTE, "Content has changed. Updating file.");
+            try {
+                FileObject outputFile =
+                        processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", path);
+                try (Writer writer = outputFile.openWriter()) {
+                    writer.write(newContent);
+                }
+            } catch (IOException e) {
+                logError("Failed to write to file", e);
+                throw e; // Re-throw to ensure the compilation fails
+            }
+        } else {
+            logMessage(Diagnostic.Kind.NOTE, "Content unchanged. Skipping file update.");
+        }
+    }
+
+    private void logMessage(Diagnostic.Kind kind, String message) {
+        processingEnv.getMessager().printMessage(kind, message);
+    }
+
+    private void logError(String message, Exception e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString();
+
+        String fullMessage = message + "\n" + "Exception: "
+                + e.getClass().getName() + "\n" + "Message: "
+                + e.getMessage() + "\n" + "Stack trace:\n"
+                + stackTrace;
+
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, fullMessage);
     }
 }
