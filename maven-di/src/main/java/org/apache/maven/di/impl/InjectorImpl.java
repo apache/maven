@@ -144,10 +144,9 @@ public class InjectorImpl implements Injector {
             doBindImplicit(key, binding);
             Class<?> cls = key.getRawType().getSuperclass();
             while (cls != Object.class && cls != null) {
-                key = Key.of(cls, key.getQualifier());
-                doBindImplicit(key, binding);
+                doBindImplicit(Key.of(cls, key.getQualifier()), binding);
                 if (key.getQualifier() != null) {
-                    bind(Key.ofType(key.getType()), binding);
+                    bind(Key.ofType(cls), binding);
                 }
                 cls = cls.getSuperclass();
             }
