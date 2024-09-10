@@ -123,6 +123,9 @@ public class InjectorImpl implements Injector {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
         if (clazz.isInterface()) {
             bindings.computeIfAbsent(key, $ -> new HashSet<>());
+            if (key.getQualifier() != null) {
+                bindings.computeIfAbsent(Key.ofType(clazz), $ -> new HashSet<>());
+            }
         } else if (!Modifier.isAbstract(clazz.getModifiers())) {
             Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
             doBind(key, binding);
@@ -143,6 +146,9 @@ public class InjectorImpl implements Injector {
             while (cls != Object.class && cls != null) {
                 key = Key.of(cls, key.getQualifier());
                 doBindImplicit(key, binding);
+                if (key.getQualifier() != null) {
+                    bind(Key.ofType(key.getType()), binding);
+                }
                 cls = cls.getSuperclass();
             }
             return this;
