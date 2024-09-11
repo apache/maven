@@ -18,18 +18,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/maven-v4_1_0.xsd">
-  <parent>
-    <groupId>org.sonatype.mavenbook.multi</groupId>
-    <artifactId>parent</artifactId>
-  </parent>
+  <parent />
   <artifactId>simple-parent</artifactId>
   <packaging>pom</packaging>
   <name>Multi Chapter Simple Parent Project</name>
-
-  <modules>
-    <module>simple-weather</module>
-    <module>simple-webapp</module>
-  </modules>
 
   <build>
     <pluginManagement>
