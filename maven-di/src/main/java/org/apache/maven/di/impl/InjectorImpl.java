@@ -64,10 +64,12 @@ public class InjectorImpl implements Injector {
         bindScope(Singleton.class, new SingletonScope());
     }
 
+    @Override
     public <T> T getInstance(Class<T> key) {
         return getInstance(Key.of(key));
     }
 
+    @Override
     public <T> T getInstance(Key<T> key) {
         return getCompiledBinding(key).get();
     }
@@ -100,10 +102,12 @@ public class InjectorImpl implements Injector {
         return this;
     }
 
+    @Override
     public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Scope scope) {
         return bindScope(scopeAnnotation, () -> scope);
     }
 
+    @Override
     public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Supplier<Scope> scope) {
         if (scopes.put(scopeAnnotation, scope) != null) {
             throw new DIException(
@@ -112,6 +116,7 @@ public class InjectorImpl implements Injector {
         return this;
     }
 
+    @Override
     public <U> Injector bindInstance(Class<U> clazz, U instance) {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
         Binding<U> binding = Binding.toInstance(instance);
