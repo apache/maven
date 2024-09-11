@@ -48,7 +48,7 @@ public abstract class BindingInitializer<T> {
                 .map(BindingInitializer::getDependencies)
                 .flatMap(Collection::stream)
                 .collect(toSet());
-        return new BindingInitializer<T>(deps) {
+        return new BindingInitializer<>(deps) {
             @Override
             public Consumer<T> compile(Function<Key<?>, Supplier<?>> compiler) {
                 return instance -> bindingInitializers.stream()

@@ -171,14 +171,14 @@ public final class ReflectionUtils {
         List<Constructor<?>> constructors = Arrays.asList(cls.getDeclaredConstructors());
         List<Constructor<?>> injectConstructors = constructors.stream()
                 .filter(c -> c.isAnnotationPresent(Inject.class))
-                .collect(toList());
+                .toList();
 
         List<Method> factoryMethods = Arrays.stream(cls.getDeclaredMethods())
                 .filter(method -> method.getReturnType() == cls && Modifier.isStatic(method.getModifiers()))
-                .collect(toList());
+                .toList();
         List<Method> injectFactoryMethods = factoryMethods.stream()
                 .filter(method -> method.isAnnotationPresent(Inject.class))
-                .collect(toList());
+                .toList();
 
         if (!injectConstructors.isEmpty()) {
             if (injectConstructors.size() > 1) {

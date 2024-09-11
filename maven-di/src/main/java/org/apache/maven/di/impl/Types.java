@@ -186,8 +186,7 @@ public class Types {
         if (type instanceof Class) {
             return type;
         }
-        if (type instanceof TypeVariable<?>) {
-            TypeVariable<?> typeVariable = (TypeVariable<?>) type;
+        if (type instanceof TypeVariable<?> typeVariable) {
             Type actualType = bindings.apply(typeVariable);
             if (actualType == null) {
                 throw new TypeNotBoundException("Type variable not found: " + typeVariable + " ( "
@@ -195,8 +194,7 @@ public class Types {
             }
             return actualType;
         }
-        if (type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
+        if (type instanceof ParameterizedType parameterizedType) {
             Type[] typeArguments = parameterizedType.getActualTypeArguments();
             Type[] typeArguments2 = new Type[typeArguments.length];
             for (int i = 0; i < typeArguments.length; i++) {
@@ -209,8 +207,7 @@ public class Types {
             Type componentType = ((GenericArrayType) type).getGenericComponentType();
             return new GenericArrayTypeImpl(bind(componentType, bindings));
         }
-        if (type instanceof WildcardType) {
-            WildcardType wildcardType = (WildcardType) type;
+        if (type instanceof WildcardType wildcardType) {
             Type[] upperBounds = wildcardType.getUpperBounds();
             Type[] upperBounds2 = new Type[upperBounds.length];
             for (int i = 0; i < upperBounds.length; i++) {
@@ -309,8 +306,7 @@ public class Types {
             return original;
         }
 
-        if (original instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) original;
+        if (original instanceof ParameterizedType parameterizedType) {
             Type[] typeArguments = parameterizedType.getActualTypeArguments();
             Type[] repackedTypeArguments = simplifyTypes(typeArguments);
 
@@ -329,8 +325,7 @@ public class Types {
             throw new IllegalArgumentException("Key should not contain a type variable: " + original);
         }
 
-        if (original instanceof WildcardType) {
-            WildcardType wildcardType = (WildcardType) original;
+        if (original instanceof WildcardType wildcardType) {
             Type[] upperBounds = wildcardType.getUpperBounds();
             if (upperBounds.length == 1) {
                 Type upperBound = upperBounds[0];
@@ -398,8 +393,7 @@ public class Types {
     private static boolean isAssignable(Type to, Type from, boolean strict) {
         if (to instanceof WildcardType || from instanceof WildcardType) {
             Type[] toUppers, toLowers;
-            if (to instanceof WildcardType) {
-                WildcardType wildcardTo = (WildcardType) to;
+            if (to instanceof WildcardType wildcardTo) {
                 toUppers = wildcardTo.getUpperBounds();
                 toLowers = wildcardTo.getLowerBounds();
             } else {
@@ -408,10 +402,9 @@ public class Types {
             }
 
             Type[] fromUppers, fromLowers;
-            if (from instanceof WildcardType) {
-                WildcardType wildcardTo = (WildcardType) to;
-                fromUppers = wildcardTo.getUpperBounds();
-                fromLowers = wildcardTo.getLowerBounds();
+            if (from instanceof WildcardType wildcardFrom) {
+                fromUppers = wildcardFrom.getUpperBounds();
+                fromLowers = wildcardFrom.getLowerBounds();
             } else {
                 fromUppers = new Type[] {from};
                 fromLowers = strict ? fromUppers : NO_TYPES;
@@ -523,10 +516,9 @@ public class Types {
 
         @Override
         public boolean equals(Object other) {
-            if (!(other instanceof ParameterizedType)) {
+            if (!(other instanceof ParameterizedType that)) {
                 return false;
             }
-            ParameterizedType that = (ParameterizedType) other;
             return this.getRawType().equals(that.getRawType())
                     && Objects.equals(this.getOwnerType(), that.getOwnerType())
                     && Arrays.equals(this.getActualTypeArguments(), that.getActualTypeArguments());
@@ -613,10 +605,9 @@ public class Types {
 
         @Override
         public boolean equals(Object other) {
-            if (!(other instanceof WildcardType)) {
+            if (!(other instanceof WildcardType that)) {
                 return false;
             }
-            WildcardType that = (WildcardType) other;
             return Arrays.equals(this.getUpperBounds(), that.getUpperBounds())
                     && Arrays.equals(this.getLowerBounds(), that.getLowerBounds());
         }
@@ -671,10 +662,9 @@ public class Types {
 
         @Override
         public boolean equals(Object other) {
-            if (!(other instanceof GenericArrayType)) {
+            if (!(other instanceof GenericArrayType that)) {
                 return false;
             }
-            GenericArrayType that = (GenericArrayType) other;
             return this.getGenericComponentType().equals(that.getGenericComponentType());
         }
 
@@ -700,8 +690,7 @@ public class Types {
             return Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
                     .map(Types::getSimpleName)
                     .collect(joining(",", "<", ">"));
-        } else if (type instanceof WildcardType) {
-            WildcardType wildcardType = (WildcardType) type;
+        } else if (type instanceof WildcardType wildcardType) {
             Type[] upperBounds = wildcardType.getUpperBounds();
             Type[] lowerBounds = wildcardType.getLowerBounds();
             return "?"

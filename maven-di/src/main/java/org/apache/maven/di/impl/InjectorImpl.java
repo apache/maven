@@ -88,7 +88,7 @@ public class InjectorImpl implements Injector {
                 try (InputStream is = enumeration.nextElement().openStream();
                         BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
                     for (String line :
-                            reader.lines().filter(l -> !l.startsWith("#")).collect(Collectors.toList())) {
+                            reader.lines().filter(l -> !l.startsWith("#")).toList()) {
                         Class<?> clazz = classLoader.loadClass(line);
                         bindImplicit(clazz);
                     }
@@ -133,7 +133,7 @@ public class InjectorImpl implements Injector {
         return this;
     }
 
-    private LinkedHashSet<Key<?>> current = new LinkedHashSet<>();
+    private final LinkedHashSet<Key<?>> current = new LinkedHashSet<>();
 
     private Injector doBind(Key<?> key, Binding<?> binding) {
         if (!current.add(key)) {
@@ -312,14 +312,13 @@ public class InjectorImpl implements Injector {
             this.mapper = mapper;
         }
 
-        @SuppressWarnings("NullableProblems")
         @Override
         public Set<Entry<K, V>> entrySet() {
-            return new AbstractSet<Entry<K, V>>() {
+            return new AbstractSet<>() {
                 @Override
                 public Iterator<Entry<K, V>> iterator() {
                     Iterator<Entry<K, T>> it = delegate.entrySet().iterator();
-                    return new Iterator<Entry<K, V>>() {
+                    return new Iterator<>() {
                         @Override
                         public boolean hasNext() {
                             return it.hasNext();
