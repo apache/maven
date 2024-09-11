@@ -188,7 +188,7 @@ public abstract class Binding<T> {
 
         @Override
         public String toString() {
-            return "BindingToConstructor[" + constructor + "]" + getDependencies();
+            return "BindingToConstructor[" + getOriginalKey() + "]" + getDependencies();
         }
     }
 }
