@@ -240,10 +240,12 @@ public final class ReflectionUtils {
     public static <T> BindingInitializer<T> fieldInjector(Key<T> container, Field field) {
         field.setAccessible(true);
         Key<Object> key = keyOf(container.getType(), field.getGenericType(), field);
-        return new BindingInitializer<T>(Collections.singleton(key)) {
+        boolean optional = field.isAnnotationPresent(Nullable.class);
+        Dependency<Object> dep = new Dependency<>(key, optional);
+        return new BindingInitializer<T>(Collections.singleton(dep)) {
             @Override
-            public Consumer<T> compile(Function<Key<?>, Supplier<?>> compiler) {
-                Supplier<?> binding = compiler.apply(key);
+            public Consumer<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
+                Supplier<?> binding = compiler.apply(dep);
                 return (T instance) -> {
                     Object arg = binding.get();
                     try {
@@ -258,10 +260,10 @@ public final class ReflectionUtils {
 
     public static <T> BindingInitializer<T> methodInjector(Key<T> container, Method method) {
         method.setAccessible(true);
-        Key<?>[] dependencies = toDependencies(container.getType(), method);
+        Dependency<?>[] dependencies = toDependencies(container.getType(), method);
         return new BindingInitializer<T>(new HashSet<>(Arrays.asList(dependencies))) {
             @Override
-            public Consumer<T> compile(Function<Key<?>, Supplier<?>> compiler) {
+            public Consumer<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
                 return instance -> {
                     Object[] args = getDependencies().stream()
                             .map(compiler)
@@ -279,35 +281,31 @@ public final class ReflectionUtils {
         };
     }
 
-    public static Key<?>[] toDependencies(@Nullable Type container, Executable executable) {
-        Key<?>[] keys = toArgDependencies(container, executable);
+    public static Dependency<?>[] toDependencies(@Nullable Type container, Executable executable) {
+        Dependency<?>[] keys = toArgDependencies(container, executable);
         if (executable instanceof Constructor || Modifier.isStatic(executable.getModifiers())) {
             return keys;
         } else {
-            Key<?>[] nkeys = new Key[keys.length + 1];
-            nkeys[0] = Key.ofType(container);
+            Dependency<?>[] nkeys = new Dependency[keys.length + 1];
+            nkeys[0] = new Dependency<>(Key.ofType(container), false);
             System.arraycopy(keys, 0, nkeys, 1, keys.length);
             return nkeys;
         }
     }
 
-    private static Key<?>[] toArgDependencies(@Nullable Type container, Executable executable) {
+    private static Dependency<?>[] toArgDependencies(@Nullable Type container, Executable executable) {
         Parameter[] parameters = executable.getParameters();
-        Key<?>[] dependencies = new Key<?>[parameters.length];
+        Dependency<?>[] dependencies = new Dependency<?>[parameters.length];
         if (parameters.length == 0) {
             return dependencies;
         }
 
-        Type type = parameters[0].getParameterizedType();
-        Parameter parameter = parameters[0];
-        dependencies[0] = keyOf(container, type, parameter);
-
         Type[] genericParameterTypes = executable.getGenericParameterTypes();
-        boolean hasImplicitDependency = genericParameterTypes.length != parameters.length;
-        for (int i = 1; i < dependencies.length; i++) {
-            type = genericParameterTypes[hasImplicitDependency ? i - 1 : i];
-            parameter = parameters[i];
-            dependencies[i] = keyOf(container, type, parameter);
+        for (int i = 0; i < dependencies.length; i++) {
+            Type type = genericParameterTypes[i];
+            Parameter parameter = parameters[i];
+            boolean optional = parameter.isAnnotationPresent(Nullable.class);
+            dependencies[i] = new Dependency<>(keyOf(container, type, parameter), optional);
         }
         return dependencies;
     }
@@ -353,7 +351,7 @@ public final class ReflectionUtils {
     public static <T> Binding<T> bindingFromConstructor(Key<T> key, Constructor<T> constructor) {
         constructor.setAccessible(true);
 
-        Key<?>[] dependencies = toDependencies(key.getType(), constructor);
+        Dependency<?>[] dependencies = toDependencies(key.getType(), constructor);
 
         Binding<T> binding = Binding.to(
                 key,

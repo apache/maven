@@ -71,7 +71,7 @@ public class InjectorImpl implements Injector {
 
     @Override
     public <T> T getInstance(Key<T> key) {
-        return getCompiledBinding(key).get();
+        return getCompiledBinding(new Dependency<>(key, false)).get();
     }
 
     @SuppressWarnings("unchecked")
@@ -180,7 +180,8 @@ public class InjectorImpl implements Injector {
         return bindings;
     }
 
-    public <Q> Supplier<Q> getCompiledBinding(Key<Q> key) {
+    public <Q> Supplier<Q> getCompiledBinding(Dependency<Q> dep) {
+        Key<Q> key = dep.key();
         Set<Binding<Q>> res = getBindings(key);
         if (res != null && !res.isEmpty()) {
             List<Binding<Q>> bindingList = new ArrayList<>(res);
@@ -215,6 +216,9 @@ public class InjectorImpl implements Injector {
                 //noinspection unchecked
                 return () -> (Q) map(map);
             }
+        }
+        if (dep.optional()) {
+            return () -> null;
         }
         throw new DIException("No binding to construct an instance for key "
                 + key.getDisplayString() + ".  Existing bindings:\n"

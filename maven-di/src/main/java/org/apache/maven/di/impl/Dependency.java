@@ -16,19 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.annotations;
+package org.apache.maven.di.impl;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import org.apache.maven.di.Key;
 
-/**
- * The annotated element can be {@code null}.
- *
- * @see Nonnull
- * @since 4.0.0
- */
-@Experimental
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Nullable {}
+public record Dependency<T>(Key<T> key, boolean optional) {
+    public String getDisplayString() {
+        String s = key.getDisplayString();
+        if (optional) {
+            s = "?" + s;
+        }
+        return s;
+    }
+}
