@@ -152,7 +152,7 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
                                 ModelBuilderRequest.build(request, ModelSource.fromPath(pom));
                         Model rawModel = defaultModelBuilder.readFileModel(gaBuildingRequest, problems);
                         List<String> subprojects = rawModel.getSubprojects();
-                        if (subprojects == null) {
+                        if (subprojects.isEmpty()) {
                             subprojects = rawModel.getModules();
                         }
                         for (String subproject : subprojects) {
