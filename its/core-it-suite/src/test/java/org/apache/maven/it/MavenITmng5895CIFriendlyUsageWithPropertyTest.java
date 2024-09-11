@@ -58,7 +58,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
 
         // verifier.setLogFileName( "log-only.txt" );
         verifier.addCliArgument("-Drevision=1.2");
-        verifier.addCliArgument("-Dmaven.buildconsumer=false");
+        verifier.addCliArgument("-Dmaven.consumerpom=false");
         verifier.addCliArgument("clean");
         verifier.execute();
         verifier.addCliArgument("package");
@@ -76,7 +76,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
 
         verifier.setLogFileName("log-bc.txt");
         verifier.addCliArgument("-Drevision=1.2");
-        verifier.addCliArgument("-Dmaven.buildconsumer=true");
+        verifier.addCliArgument("-Dmaven.consumerpom=true");
         verifier.addCliArgument("clean");
         verifier.execute();
         verifier.addCliArgument("package");

@@ -50,7 +50,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dchangelist=changelist");
-        verifier.addCliArgument("-Dmaven.buildconsumer=false");
+        verifier.addCliArgument("-Dmaven.consumerpom=false");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -83,7 +83,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dchangelist=changelist");
-        verifier.addCliArgument("-Dmaven.buildconsumer=true");
+        verifier.addCliArgument("-Dmaven.consumerpom=true");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
