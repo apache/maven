@@ -98,9 +98,13 @@ public abstract class Binding<T> {
                 final Supplier<T> compiledBinding = Binding.this.compile(compiler);
                 final Consumer<T> consumer = bindingInitializer.compile(compiler);
                 return () -> {
-                    T instance = compiledBinding.get();
-                    consumer.accept(instance);
-                    return instance;
+                    try {
+                        T instance = compiledBinding.get();
+                        consumer.accept(instance);
+                        return instance;
+                    } catch (DIException e) {
+                        throw new DIException("Error while initializing binding " + Binding.this, e);
+                    }
                 };
             }
 
