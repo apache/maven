@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
@@ -739,6 +741,40 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         if (modelSource.getPath() != null) {
             model = model.withPomFile(modelSource.getPath());
+
+            Parent parent = model.getParent();
+            if (parent != null) {
+                String groupId = parent.getGroupId();
+                String artifactId = parent.getArtifactId();
+                String version = parent.getVersion();
+                String path = Optional.ofNullable(parent.getRelativePath()).orElse("..");
+                if (version == null && !path.isEmpty()) {
+                    Path pomFile = model.getPomFile();
+                    Path relativePath = Paths.get(path);
+                    Path pomPath = pomFile.resolveSibling(relativePath).normalize();
+                    if (Files.isDirectory(pomPath)) {
+                        pomPath = getModelProcessor().locateExistingPom(pomPath);
+                    }
+                    if (pomPath != null && Files.isRegularFile(pomPath)) {
+                        ModelBuilderRequest parentRequest =
+                                ModelBuilderRequest.build(request, ModelSource.fromPath(pomPath));
+                        Model parentModel = readFileModel(parentRequest, problems);
+                        if (parentModel != null) {
+                            String parentGroupId = getGroupId(parentModel);
+                            String parentArtifactId = parentModel.getArtifactId();
+                            String parentVersion = getVersion(parentModel);
+                            if ((groupId == null || groupId.equals(parentGroupId))
+                                    && (artifactId == null || artifactId.equals(parentArtifactId))) {
+                                model = model.withParent(parent.with()
+                                        .groupId(parentGroupId)
+                                        .artifactId(parentArtifactId)
+                                        .version(parentVersion)
+                                        .build());
+                            }
+                        }
+                    }
+                }
+            }
 
             // subprojects discovery
             if (model.getSubprojects().isEmpty()

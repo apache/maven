@@ -20,7 +20,6 @@ package org.apache.maven.internal.impl.model;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,34 +57,13 @@ public class BuildModelTransformer implements ModelTransformer {
     void handleParent(ModelTransformerContext context, Model model, Path pomFile, Model.Builder builder) {
         Parent parent = model.getParent();
         if (parent != null) {
-            String groupId = parent.getGroupId();
-            String artifactId = parent.getArtifactId();
             String version = parent.getVersion();
-            String path = Optional.ofNullable(parent.getRelativePath()).orElse("..");
-            if (version == null && !path.isEmpty()) {
-                Optional<RelativeProject> resolvedParent = resolveRelativePath(
-                        pomFile, context, Paths.get(path), parent.getGroupId(), parent.getArtifactId());
-                if (resolvedParent.isPresent()) {
-                    RelativeProject project = resolvedParent.get();
-                    if (groupId == null
-                            || groupId.equals(project.getGroupId()) && artifactId == null
-                            || artifactId.equals(project.getArtifactId())) {
-                        groupId = project.getGroupId();
-                        artifactId = project.getArtifactId();
-                        version = resolvedParent.get().getVersion();
-                    }
-                }
-            }
 
             // CI Friendly version for parent
             String modVersion = replaceCiFriendlyVersion(context, version);
 
             // Update parent
-            builder.parent(parent.with()
-                    .groupId(groupId)
-                    .artifactId(artifactId)
-                    .version(modVersion)
-                    .build());
+            builder.parent(parent.with().version(modVersion).build());
         }
     }
 
