@@ -60,7 +60,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
-import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
@@ -541,11 +540,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 // Phase 2: get effective models from the reactor
                 List<ProjectBuildingResult> results = build(projectIndex, interimResults);
 
-                if (Features.buildConsumer(request.getUserProperties())) {
-                    request.getRepositorySession()
-                            .getData()
-                            .set(ModelTransformerContext.KEY, transformerContextBuilder.build());
-                }
+                request.getRepositorySession()
+                        .getData()
+                        .set(ModelTransformerContext.KEY, transformerContextBuilder.build());
 
                 return results;
             } finally {

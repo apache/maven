@@ -152,6 +152,7 @@ public class CollectConfiguration {
                                                                 : "java.lang.String")) {
                                                             case "java.lang.String" -> "String";
                                                             case "java.lang.Integer" -> "Integer";
+                                                            case "java.lang.Boolean" -> "Boolean";
                                                             default -> throw new IllegalStateException();
                                                         };
                                                 discoveredKeys.put(
