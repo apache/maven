@@ -29,6 +29,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Indicates that annotated component should be instantiated before session execution starts
  * and discarded after session execution completes.
+ * <p>
+ * A {@code org.apache.maven.api.Session} object is available in the scope of this annotation.
  *
  * @since 4.0.0
  */

@@ -29,6 +29,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Indicates that the annotated bean has a lifespan limited to a given mojo execution,
  * which means each mojo execution will result in a different instance being injected.
+ * <p>
+ * The following objects will be bound to the mojo execution scope:
+ *     <ul>
+ *         <li>{@code org.apache.maven.api.MojoExecution}</li>
+ *         <li>{@code org.apache.maven.api.Project}</li>
+ *         <li>{@code org.apache.maven.api.plugin.Log}</li>
+ *     </ul>
  *
  * @since 4.0.0
  */
