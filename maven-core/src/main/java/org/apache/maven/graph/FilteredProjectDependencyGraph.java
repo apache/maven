@@ -88,11 +88,11 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
         for (MavenProject project : projects) {
             if (whiteList.containsKey(project)) {
                 filtered.add(project);
-            } else {
+            } else if (!transitive) {
                 filtered.addAll(
                         upstream
-                                ? getUpstreamProjects(project, transitive)
-                                : getDownstreamProjects(project, transitive));
+                                ? getUpstreamProjects(project, false)
+                                : getDownstreamProjects(project, false));
             }
         }
         return filtered;
