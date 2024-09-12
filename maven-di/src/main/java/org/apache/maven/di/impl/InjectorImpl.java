@@ -241,7 +241,7 @@ public class InjectorImpl implements Injector {
                     .orElseThrow(() -> new DIException("Scope not bound for annotation "
                             + binding.getScope().annotationType()))
                     .get();
-            compiled = scope.scope((Key<Q>) binding.getOriginalKey(), binding.getScope(), compiled);
+            compiled = scope.scope((Key<Q>) binding.getOriginalKey(), compiled);
         }
         return compiled;
     }
@@ -379,8 +379,7 @@ public class InjectorImpl implements Injector {
 
         @SuppressWarnings("unchecked")
         @Override
-        public <T> java.util.function.Supplier<T> scope(
-                Key<T> key, Annotation scope, java.util.function.Supplier<T> unscoped) {
+        public <T> java.util.function.Supplier<T> scope(Key<T> key, java.util.function.Supplier<T> unscoped) {
             return (java.util.function.Supplier<T>)
                     cache.computeIfAbsent(key, k -> new java.util.function.Supplier<T>() {
                         volatile T instance;

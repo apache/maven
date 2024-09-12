@@ -31,7 +31,7 @@ import org.apache.maven.di.impl.Utils;
  * The key defines an identity of a binding. In any DI, a key is usually a type of the object along
  * with some optional tag to distinguish between bindings which make objects of the same type.
  * <p>
- * In ActiveJ Inject, a key is also a type token - special abstract class that can store type information
+ * In Maven Inject, a key is also a type token - special abstract class that can store type information
  * with the shortest syntax possible in Java.
  * <p>
  * For example, to create a key of type Map&lt;String, List&lt;Integer&gt;&gt;, you can just use
