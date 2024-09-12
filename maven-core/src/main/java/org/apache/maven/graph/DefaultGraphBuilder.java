@@ -94,8 +94,10 @@ public class DefaultGraphBuilder implements GraphBuilder {
         Result<ProjectDependencyGraph> result = null;
 
         if (session.getProjectDependencyGraph() != null || session.getProjects() != null) {
-            final ProjectDependencyGraph graph =
-                    new DefaultProjectDependencyGraph(session.getAllProjects(), session.getProjects());
+            ProjectDependencyGraph graph = new DefaultProjectDependencyGraph(session.getAllProjects());
+            if (session.getProjects() != null) {
+                graph = new FilteredProjectDependencyGraph(graph, session.getProjects());
+            }
 
             result = Result.success(graph);
         }
