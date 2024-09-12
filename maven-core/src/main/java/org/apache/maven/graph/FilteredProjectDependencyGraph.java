@@ -89,10 +89,7 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
             if (whiteList.containsKey(project)) {
                 filtered.add(project);
             } else if (!transitive) {
-                filtered.addAll(
-                        upstream
-                                ? getUpstreamProjects(project, false)
-                                : getDownstreamProjects(project, false));
+                filtered.addAll(upstream ? getUpstreamProjects(project, false) : getDownstreamProjects(project, false));
             }
         }
         return filtered;
