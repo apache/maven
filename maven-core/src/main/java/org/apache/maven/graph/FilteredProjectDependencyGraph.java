@@ -54,7 +54,9 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
         for (MavenProject project : whiteList) {
             this.whiteList.put(project, null);
         }
-        this.sortedProjects = applyFilter(projectDependencyGraph.getSortedProjects());
+        this.sortedProjects = projectDependencyGraph.getSortedProjects().stream()
+                .filter(this.whiteList::containsKey)
+                .toList();
     }
 
     /**
@@ -72,19 +74,25 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
 
     @Override
     public List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive) {
-        return applyFilter(projectDependencyGraph.getDownstreamProjects(project, transitive));
+        return applyFilter(projectDependencyGraph.getDownstreamProjects(project, transitive), transitive, false);
     }
 
     @Override
     public List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive) {
-        return applyFilter(projectDependencyGraph.getUpstreamProjects(project, transitive));
+        return applyFilter(projectDependencyGraph.getUpstreamProjects(project, transitive), transitive, true);
     }
 
-    private List<MavenProject> applyFilter(Collection<? extends MavenProject> projects) {
+    private List<MavenProject> applyFilter(
+            Collection<? extends MavenProject> projects, boolean transitive, boolean upstream) {
         List<MavenProject> filtered = new ArrayList<>(projects.size());
         for (MavenProject project : projects) {
             if (whiteList.containsKey(project)) {
                 filtered.add(project);
+            } else {
+                filtered.addAll(
+                        upstream
+                                ? getUpstreamProjects(project, transitive)
+                                : getDownstreamProjects(project, transitive));
             }
         }
         return filtered;
