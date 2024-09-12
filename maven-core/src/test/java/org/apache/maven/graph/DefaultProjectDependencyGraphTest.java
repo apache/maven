@@ -61,7 +61,7 @@ class DefaultProjectDependencyGraphTest {
         assertEquals(aProject, sortedProjects.get(0));
         assertEquals(cProject, sortedProjects.get(1));
 
-        assertTrue(graph.getDownstreamProjects(aProject, true).contains(cProject));
+        assertTrue(graph.getDownstreamProjects(aProject, false).contains(cProject));
     }
 
     @Test
