@@ -24,6 +24,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.project.MavenProject;
@@ -35,11 +36,11 @@ import org.apache.maven.project.MavenProject;
  */
 class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
 
-    private ProjectDependencyGraph projectDependencyGraph;
+    private final ProjectDependencyGraph projectDependencyGraph;
 
-    private Map<MavenProject, ?> whiteList;
+    private final Map<MavenProject, ?> whiteList;
 
-    private List<MavenProject> sortedProjects;
+    private final List<MavenProject> sortedProjects;
 
     /**
      * Creates a new project dependency graph from the specified graph.
@@ -51,46 +52,58 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
             ProjectDependencyGraph projectDependencyGraph, Collection<? extends MavenProject> whiteList) {
         this.projectDependencyGraph =
                 Objects.requireNonNull(projectDependencyGraph, "projectDependencyGraph cannot be null");
-
-        this.whiteList = new IdentityHashMap<MavenProject, Object>();
-
+        this.whiteList = new IdentityHashMap<>();
         for (MavenProject project : whiteList) {
             this.whiteList.put(project, null);
         }
+        this.sortedProjects = projectDependencyGraph.getSortedProjects().stream()
+                .filter(this.whiteList::containsKey)
+                .collect(Collectors.toList());
     }
 
     /**
      * @since 3.5.0
      */
+    @Override
     public List<MavenProject> getAllProjects() {
         return this.projectDependencyGraph.getAllProjects();
     }
 
+    @Override
     public List<MavenProject> getSortedProjects() {
-        if (sortedProjects == null) {
-            sortedProjects = applyFilter(projectDependencyGraph.getSortedProjects());
-        }
-
         return new ArrayList<>(sortedProjects);
     }
 
+    @Override
     public List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive) {
-        return applyFilter(projectDependencyGraph.getDownstreamProjects(project, transitive));
+        return applyFilter(projectDependencyGraph.getDownstreamProjects(project, transitive), transitive, false);
     }
 
+    @Override
     public List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive) {
-        return applyFilter(projectDependencyGraph.getUpstreamProjects(project, transitive));
+        return applyFilter(projectDependencyGraph.getUpstreamProjects(project, transitive), transitive, true);
     }
 
-    private List<MavenProject> applyFilter(Collection<? extends MavenProject> projects) {
+    /**
+     * Filter out whitelisted projects with a big twist:
+     * Assume we have all projects {@code a, b, c} while active are {@code a, c} and relation among all projects
+     * is {@code a -> b -> c}. This method handles well the case for transitive list. But, for non-transitive we need
+     * to "pull in" transitive dependencies of eliminated projects, as for case above, the properly filtered list would
+     * be {@code a -> c}.
+     * <p>
+     * Original code would falsely report {@code a} project as "without dependencies", basically would lose link due
+     * filtering. This causes build ordering issues in concurrent builders.
+     */
+    private List<MavenProject> applyFilter(
+            Collection<? extends MavenProject> projects, boolean transitive, boolean upstream) {
         List<MavenProject> filtered = new ArrayList<>(projects.size());
-
         for (MavenProject project : projects) {
             if (whiteList.containsKey(project)) {
                 filtered.add(project);
+            } else if (!transitive) {
+                filtered.addAll(upstream ? getUpstreamProjects(project, false) : getDownstreamProjects(project, false));
             }
         }
-
         return filtered;
     }
 
