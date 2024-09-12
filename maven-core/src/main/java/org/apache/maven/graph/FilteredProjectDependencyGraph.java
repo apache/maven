@@ -34,11 +34,11 @@ import org.apache.maven.project.MavenProject;
  */
 class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
 
-    private ProjectDependencyGraph projectDependencyGraph;
+    private final ProjectDependencyGraph projectDependencyGraph;
 
-    private Map<MavenProject, ?> whiteList;
+    private final Map<MavenProject, ?> whiteList;
 
-    private List<MavenProject> sortedProjects;
+    private final List<MavenProject> sortedProjects;
 
     /**
      * Creates a new project dependency graph from the specified graph.
@@ -50,46 +50,43 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
             ProjectDependencyGraph projectDependencyGraph, Collection<? extends MavenProject> whiteList) {
         this.projectDependencyGraph =
                 Objects.requireNonNull(projectDependencyGraph, "projectDependencyGraph cannot be null");
-
         this.whiteList = new IdentityHashMap<>();
-
         for (MavenProject project : whiteList) {
             this.whiteList.put(project, null);
         }
+        this.sortedProjects = applyFilter(projectDependencyGraph.getSortedProjects());
     }
 
     /**
      * @since 3.5.0
      */
+    @Override
     public List<MavenProject> getAllProjects() {
         return this.projectDependencyGraph.getAllProjects();
     }
 
+    @Override
     public List<MavenProject> getSortedProjects() {
-        if (sortedProjects == null) {
-            sortedProjects = applyFilter(projectDependencyGraph.getSortedProjects());
-        }
-
         return new ArrayList<>(sortedProjects);
     }
 
+    @Override
     public List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive) {
         return applyFilter(projectDependencyGraph.getDownstreamProjects(project, transitive));
     }
 
+    @Override
     public List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive) {
         return applyFilter(projectDependencyGraph.getUpstreamProjects(project, transitive));
     }
 
     private List<MavenProject> applyFilter(Collection<? extends MavenProject> projects) {
         List<MavenProject> filtered = new ArrayList<>(projects.size());
-
         for (MavenProject project : projects) {
             if (whiteList.containsKey(project)) {
                 filtered.add(project);
             }
         }
-
         return filtered;
     }
 

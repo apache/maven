@@ -29,12 +29,17 @@ import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
 class DefaultProjectDependencyGraphTest {
 
     private final MavenProject aProject = createA();
+
+    private final MavenProject bProject = createProject(Arrays.asList(toDependency(aProject)), "bProject");
+
+    private final MavenProject cProject = createProject(Arrays.asList(toDependency(bProject)), "cProject");
 
     private final MavenProject depender1 = createProject(Arrays.asList(toDependency(aProject)), "depender1");
 
@@ -46,6 +51,18 @@ class DefaultProjectDependencyGraphTest {
             createProject(Arrays.asList(toDependency(aProject), toDependency(depender3)), "depender4");
 
     private final MavenProject transitiveOnly = createProject(Arrays.asList(toDependency(depender3)), "depender5");
+
+    @Test
+    void myTheory() throws DuplicateProjectException, CycleDetectedException {
+        ProjectDependencyGraph graph = new FilteredProjectDependencyGraph(
+                new DefaultProjectDependencyGraph(Arrays.asList(aProject, bProject, cProject)),
+                Arrays.asList(aProject, cProject));
+        final List<MavenProject> sortedProjects = graph.getSortedProjects();
+        assertEquals(aProject, sortedProjects.get(0));
+        assertEquals(cProject, sortedProjects.get(1));
+
+        assertTrue(graph.getDownstreamProjects(aProject, true).contains(cProject));
+    }
 
     @Test
     void testGetSortedProjects() throws DuplicateProjectException, CycleDetectedException {

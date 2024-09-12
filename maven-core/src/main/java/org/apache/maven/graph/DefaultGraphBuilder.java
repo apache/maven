@@ -120,8 +120,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
         Result<ProjectDependencyGraph> result = null;
 
         if (session.getProjectDependencyGraph() != null || session.getProjects() != null) {
-            final ProjectDependencyGraph graph =
-                    new DefaultProjectDependencyGraph(session.getAllProjects(), session.getProjects());
+            final ProjectDependencyGraph graph = new DefaultProjectDependencyGraph(session.getAllProjects());
 
             result = Result.success(graph);
         }
