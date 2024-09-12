@@ -20,13 +20,11 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
-import org.opentest4j.AssertionFailedError;
 
 /**
  * With the build-consumer the pom.xml will be adjusted during the process.
@@ -111,15 +109,9 @@ public class MavenITmng6656BuildConsumer extends AbstractMavenIntegrationTestCas
     }
 
     static void assertTextEquals(File file1, File file2) throws IOException {
-        List<String> s1 = FileUtils.loadFile(file1);
-        List<String> s2 = FileUtils.loadFile(file2);
-        try {
-            assertEquals("Not same size", s1.size(), s2.size());
-            for (int i = 0; i < s1.size(); i++) {
-                assertEquals("Mismatch line " + i, s1.get(i), s2.get(i));
-            }
-        } catch (AssertionFailedError error) {
-            assertEquals(error.getMessage(), s1, s2);
-        }
+        assertEquals(
+                "pom files differ " + file1 + " " + file2,
+                String.join("\n", FileUtils.loadFile(file1)),
+                String.join("\n", FileUtils.loadFile(file2)));
     }
 }
