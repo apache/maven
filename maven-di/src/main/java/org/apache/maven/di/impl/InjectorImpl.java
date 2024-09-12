@@ -64,12 +64,14 @@ public class InjectorImpl implements Injector {
         bindScope(Singleton.class, new SingletonScope());
     }
 
+    @Override
     public <T> T getInstance(Class<T> key) {
         return getInstance(Key.of(key));
     }
 
+    @Override
     public <T> T getInstance(Key<T> key) {
-        return getCompiledBinding(key).get();
+        return getCompiledBinding(new Dependency<>(key, false)).get();
     }
 
     @SuppressWarnings("unchecked")
@@ -88,7 +90,7 @@ public class InjectorImpl implements Injector {
                 try (InputStream is = enumeration.nextElement().openStream();
                         BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
                     for (String line :
-                            reader.lines().filter(l -> !l.startsWith("#")).collect(Collectors.toList())) {
+                            reader.lines().filter(l -> !l.startsWith("#")).toList()) {
                         Class<?> clazz = classLoader.loadClass(line);
                         bindImplicit(clazz);
                     }
@@ -100,10 +102,12 @@ public class InjectorImpl implements Injector {
         return this;
     }
 
+    @Override
     public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Scope scope) {
         return bindScope(scopeAnnotation, () -> scope);
     }
 
+    @Override
     public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Supplier<Scope> scope) {
         if (scopes.put(scopeAnnotation, scope) != null) {
             throw new DIException(
@@ -112,6 +116,7 @@ public class InjectorImpl implements Injector {
         return this;
     }
 
+    @Override
     public <U> Injector bindInstance(Class<U> clazz, U instance) {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
         Binding<U> binding = Binding.toInstance(instance);
@@ -133,7 +138,7 @@ public class InjectorImpl implements Injector {
         return this;
     }
 
-    private LinkedHashSet<Key<?>> current = new LinkedHashSet<>();
+    private final LinkedHashSet<Key<?>> current = new LinkedHashSet<>();
 
     private Injector doBind(Key<?> key, Binding<?> binding) {
         if (!current.add(key)) {
@@ -175,7 +180,8 @@ public class InjectorImpl implements Injector {
         return bindings;
     }
 
-    public <Q> Supplier<Q> getCompiledBinding(Key<Q> key) {
+    public <Q> Supplier<Q> getCompiledBinding(Dependency<Q> dep) {
+        Key<Q> key = dep.key();
         Set<Binding<Q>> res = getBindings(key);
         if (res != null && !res.isEmpty()) {
             List<Binding<Q>> bindingList = new ArrayList<>(res);
@@ -210,6 +216,9 @@ public class InjectorImpl implements Injector {
                 //noinspection unchecked
                 return () -> (Q) map(map);
             }
+        }
+        if (dep.optional()) {
+            return () -> null;
         }
         throw new DIException("No binding to construct an instance for key "
                 + key.getDisplayString() + ".  Existing bindings:\n"
@@ -312,14 +321,13 @@ public class InjectorImpl implements Injector {
             this.mapper = mapper;
         }
 
-        @SuppressWarnings("NullableProblems")
         @Override
         public Set<Entry<K, V>> entrySet() {
-            return new AbstractSet<Entry<K, V>>() {
+            return new AbstractSet<>() {
                 @Override
                 public Iterator<Entry<K, V>> iterator() {
                     Iterator<Entry<K, T>> it = delegate.entrySet().iterator();
-                    return new Iterator<Entry<K, V>>() {
+                    return new Iterator<>() {
                         @Override
                         public boolean hasNext() {
                             return it.hasNext();

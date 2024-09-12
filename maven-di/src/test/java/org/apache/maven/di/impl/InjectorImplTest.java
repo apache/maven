@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
@@ -42,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SuppressWarnings("unused")
 public class InjectorImplTest {
@@ -327,5 +329,50 @@ public class InjectorImplTest {
 
         @Named
         static class Third {}
+    }
+
+    @Test
+    void testNullableOnField() {
+        Injector injector = Injector.create().bindImplicit(NullableOnField.class);
+        NullableOnField.MyMojo mojo = injector.getInstance(NullableOnField.MyMojo.class);
+        assertNotNull(mojo);
+        assertNull(mojo.service);
+    }
+
+    static class NullableOnField {
+
+        @Named
+        interface MyService {}
+
+        @Named
+        static class MyMojo {
+            @Inject
+            @Nullable
+            MyService service;
+        }
+    }
+
+    @Test
+    void testNullableOnConstructor() {
+        Injector injector = Injector.create().bindImplicit(NullableOnConstructor.class);
+        NullableOnConstructor.MyMojo mojo = injector.getInstance(NullableOnConstructor.MyMojo.class);
+        assertNotNull(mojo);
+        assertNull(mojo.service);
+    }
+
+    static class NullableOnConstructor {
+
+        @Named
+        interface MyService {}
+
+        @Named
+        static class MyMojo {
+            private final MyService service;
+
+            @Inject
+            public MyMojo(@Nullable MyService service) {
+                this.service = service;
+            }
+        }
     }
 }

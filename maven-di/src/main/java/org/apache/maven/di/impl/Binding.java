@@ -34,16 +34,16 @@ import org.apache.maven.di.Key;
 import static java.util.stream.Collectors.joining;
 
 public abstract class Binding<T> {
-    private final Set<Key<?>> dependencies;
+    private final Set<Dependency<?>> dependencies;
     private Annotation scope;
     private int priority;
     private Key<?> originalKey;
 
-    protected Binding(Key<? extends T> originalKey, Set<Key<?>> dependencies) {
+    protected Binding(Key<? extends T> originalKey, Set<Dependency<?>> dependencies) {
         this(originalKey, dependencies, null, 0);
     }
 
-    protected Binding(Key<?> originalKey, Set<Key<?>> dependencies, Annotation scope, int priority) {
+    protected Binding(Key<?> originalKey, Set<Dependency<?>> dependencies, Annotation scope, int priority) {
         this.originalKey = originalKey;
         this.dependencies = dependencies;
         this.scope = scope;
@@ -56,15 +56,18 @@ public abstract class Binding<T> {
 
     public static <R> Binding<R> to(Key<R> originalKey, TupleConstructorN<R> constructor, Class<?>[] types) {
         return Binding.to(
-                originalKey, constructor, Stream.of(types).map(Key::of).toArray(Key<?>[]::new));
+                originalKey,
+                constructor,
+                Stream.of(types).map(c -> new Dependency<>(Key.of(c), false)).toArray(Dependency<?>[]::new));
     }
 
-    public static <R> Binding<R> to(Key<R> originalKey, TupleConstructorN<R> constructor, Key<?>[] dependencies) {
+    public static <R> Binding<R> to(
+            Key<R> originalKey, TupleConstructorN<R> constructor, Dependency<?>[] dependencies) {
         return to(originalKey, constructor, dependencies, 0);
     }
 
     public static <R> Binding<R> to(
-            Key<R> originalKey, TupleConstructorN<R> constructor, Key<?>[] dependencies, int priority) {
+            Key<R> originalKey, TupleConstructorN<R> constructor, Dependency<?>[] dependencies, int priority) {
         return new BindingToConstructor<>(originalKey, constructor, dependencies, priority);
     }
 
@@ -94,13 +97,17 @@ public abstract class Binding<T> {
                 this.scope,
                 this.priority) {
             @Override
-            public Supplier<T> compile(Function<Key<?>, Supplier<?>> compiler) {
+            public Supplier<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
                 final Supplier<T> compiledBinding = Binding.this.compile(compiler);
                 final Consumer<T> consumer = bindingInitializer.compile(compiler);
                 return () -> {
-                    T instance = compiledBinding.get();
-                    consumer.accept(instance);
-                    return instance;
+                    try {
+                        T instance = compiledBinding.get();
+                        consumer.accept(instance);
+                        return instance;
+                    } catch (DIException e) {
+                        throw new DIException("Error while initializing binding " + Binding.this, e);
+                    }
                 };
             }
 
@@ -111,9 +118,9 @@ public abstract class Binding<T> {
         };
     }
 
-    public abstract Supplier<T> compile(Function<Key<?>, Supplier<?>> compiler);
+    public abstract Supplier<T> compile(Function<Dependency<?>, Supplier<?>> compiler);
 
-    public Set<Key<?>> getDependencies() {
+    public Set<Dependency<?>> getDependencies() {
         return dependencies;
     }
 
@@ -122,7 +129,7 @@ public abstract class Binding<T> {
     }
 
     public String getDisplayString() {
-        return dependencies.stream().map(Key::getDisplayString).collect(joining(", ", "[", "]"));
+        return dependencies.stream().map(Dependency::getDisplayString).collect(joining(", ", "[", "]"));
     }
 
     public Key<?> getOriginalKey() {
@@ -152,7 +159,7 @@ public abstract class Binding<T> {
         }
 
         @Override
-        public Supplier<T> compile(Function<Key<?>, Supplier<?>> compiler) {
+        public Supplier<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
             return () -> instance;
         }
 
@@ -164,17 +171,17 @@ public abstract class Binding<T> {
 
     public static class BindingToConstructor<T> extends Binding<T> {
         final TupleConstructorN<T> constructor;
-        final Key<?>[] args;
+        final Dependency<?>[] args;
 
         BindingToConstructor(
-                Key<? extends T> key, TupleConstructorN<T> constructor, Key<?>[] dependencies, int priority) {
+                Key<? extends T> key, TupleConstructorN<T> constructor, Dependency<?>[] dependencies, int priority) {
             super(key, new HashSet<>(Arrays.asList(dependencies)), null, priority);
             this.constructor = constructor;
             this.args = dependencies;
         }
 
         @Override
-        public Supplier<T> compile(Function<Key<?>, Supplier<?>> compiler) {
+        public Supplier<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
             return () -> {
                 Object[] args =
                         Stream.of(this.args).map(compiler).map(Supplier::get).toArray();
@@ -184,7 +191,7 @@ public abstract class Binding<T> {
 
         @Override
         public String toString() {
-            return "BindingToConstructor[" + constructor + "]" + getDependencies();
+            return "BindingToConstructor[" + getOriginalKey() + "]" + getDependencies();
         }
     }
 }

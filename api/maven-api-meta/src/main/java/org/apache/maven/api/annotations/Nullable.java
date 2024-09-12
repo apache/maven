@@ -30,5 +30,5 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Experimental
 @Documented
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Nullable {}

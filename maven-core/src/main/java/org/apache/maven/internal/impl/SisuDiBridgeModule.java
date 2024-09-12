@@ -48,6 +48,7 @@ import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.Binding;
 import org.apache.maven.di.impl.DIException;
+import org.apache.maven.di.impl.Dependency;
 import org.apache.maven.di.impl.InjectorImpl;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.session.scope.internal.SessionScope;
@@ -66,7 +67,8 @@ public class SisuDiBridgeModule extends AbstractModule {
 
         injector = new InjectorImpl() {
             @Override
-            public <Q> Supplier<Q> getCompiledBinding(Key<Q> key) {
+            public <Q> Supplier<Q> getCompiledBinding(Dependency<Q> dep) {
+                Key<Q> key = dep.key();
                 Set<Binding<Q>> res = getBindings(key);
                 if (res != null && !res.isEmpty()) {
                     List<Binding<Q>> bindingList = new ArrayList<>(res);
@@ -118,6 +120,9 @@ public class SisuDiBridgeModule extends AbstractModule {
                 } catch (Throwable e) {
                     // ignore
                     e.printStackTrace();
+                }
+                if (dep.optional()) {
+                    return () -> null;
                 }
                 throw new DIException("No binding to construct an instance for key "
                         + key.getDisplayString() + ".  Existing bindings:\n"

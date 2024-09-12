@@ -16,26 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.di;
+package org.apache.maven.di.impl;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.apache.maven.di.Key;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-/**
- * Indicates that annotated component should be instantiated before session execution starts
- * and discarded after session execution completes.
- * <p>
- * A {@code org.apache.maven.api.Session} object is available in the scope of this annotation.
- *
- * @since 4.0.0
- */
-@Scope
-@Documented
-@Retention(RUNTIME)
-@Target({TYPE, METHOD})
-public @interface SessionScoped {}
+public record Dependency<T>(Key<T> key, boolean optional) {
+    public String getDisplayString() {
+        String s = key.getDisplayString();
+        if (optional) {
+            s = "?" + s;
+        }
+        return s;
+    }
+}
