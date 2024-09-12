@@ -38,7 +38,6 @@ import org.apache.maven.api.settings.Settings;
 /**
  * The session to install / deploy / resolve artifacts and dependencies.
  *
- * TODO: move the remote repositories in the requests (plugins will need to access this list somehow)
  * TODO: add request trace so that requests can be linked together and through the resolver
  * TODO: add a Request interface holding session + parent request
  *
@@ -428,6 +427,19 @@ public interface Session {
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
      *
+     * @param coordinates coordinates of the artifact to resolve
+     * @param repositories repositories to use, if {@code null}, the session repositories are used
+     * @return requested artifact together with the path to its file
+     * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     *
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
+     */
+    @Nonnull
+    DownloadedArtifact resolveArtifact(@Nonnull ArtifactCoordinates coordinates, List<RemoteRepository> repositories);
+
+    /**
+     * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
+     *
      * @param coordinates coordinates of all artifacts to resolve
      * @return requested artifacts together with the paths to their files
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
@@ -452,6 +464,21 @@ public interface Session {
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
      *
+     * @param coordinates coordinates of all artifacts to resolve
+     * @param repositories repositories to use, if {@code null}, the session repositories are used
+     * @return requested artifacts together with the paths to their files
+     * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     *
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
+     */
+    @Nonnull
+    Collection<DownloadedArtifact> resolveArtifacts(
+            @Nonnull Collection<? extends ArtifactCoordinates> coordinates,
+            @Nullable List<RemoteRepository> repositories);
+
+    /**
+     * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
+     *
      * @param artifact the artifact to resolve
      * @return requested artifact together with the path to its file
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
@@ -460,6 +487,19 @@ public interface Session {
      */
     @Nonnull
     DownloadedArtifact resolveArtifact(@Nonnull Artifact artifact);
+
+    /**
+     * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
+     *
+     * @param artifact the artifact to resolve
+     * @param repositories repositories to use, if {@code null}, the session repositories are used
+     * @return requested artifact together with the path to its file
+     * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     *
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
+     */
+    @Nonnull
+    DownloadedArtifact resolveArtifact(@Nonnull Artifact artifact, @Nullable List<RemoteRepository> repositories);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.
@@ -716,6 +756,23 @@ public interface Session {
      */
     @Nonnull
     List<Version> resolveVersionRange(@Nonnull ArtifactCoordinates artifact);
+
+    /**
+     * Expands a version range to a list of matching versions, in ascending order.
+     * For example, resolves "[3.8,4.0)" to "3.8", "3.8.1", "3.8.2".
+     * The returned list of versions is only dependent on the configured repositories and their contents.
+     * The supplied request may also refer to a single concrete version rather than a version range.
+     * In this case though, the result contains simply the (parsed) input version, regardless of the
+     * repositories and their contents.
+     *
+     * @param artifact the artifact for which to resolve the versions
+     * @param repositories the repositories to use, or the session repositories if {@code null}
+     * @return a list of resolved {@code Version}s.
+     * @throws org.apache.maven.api.services.VersionRangeResolverException if the resolution failed
+     * @see org.apache.maven.api.services.VersionRangeResolver#resolve(Session, ArtifactCoordinates) (String)
+     */
+    @Nonnull
+    List<Version> resolveVersionRange(@Nonnull ArtifactCoordinates artifact, List<RemoteRepository> repositories);
 
     /**
      * Parses the specified version string, for example "1.0".

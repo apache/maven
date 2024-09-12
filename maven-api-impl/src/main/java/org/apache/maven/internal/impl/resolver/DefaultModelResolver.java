@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.DownloadedArtifact;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.di.Named;
@@ -50,7 +51,12 @@ public class DefaultModelResolver implements ModelResolver {
 
     @Override
     public ModelSource resolveModel(
-            Session session, String groupId, String artifactId, String version, Consumer<String> resolvedVersion)
+            Session session,
+            List<RemoteRepository> repositories,
+            String groupId,
+            String artifactId,
+            String version,
+            Consumer<String> resolvedVersion)
             throws ModelResolverException {
         try {
             ArtifactCoordinates coords = session.createArtifactCoordinates(groupId, artifactId, version, "pom");
@@ -63,7 +69,7 @@ public class DefaultModelResolver implements ModelResolver {
                         artifactId,
                         version);
             }
-            List<Version> versions = session.resolveVersionRange(coords);
+            List<Version> versions = session.resolveVersionRange(coords, repositories);
             if (versions.isEmpty()) {
                 throw new ModelResolverException(
                         String.format("No versions matched the requested version range '%s'", version),
@@ -76,8 +82,8 @@ public class DefaultModelResolver implements ModelResolver {
                 resolvedVersion.accept(newVersion);
             }
 
-            DownloadedArtifact resolved =
-                    session.resolveArtifact(session.createArtifactCoordinates(groupId, artifactId, newVersion, "pom"));
+            DownloadedArtifact resolved = session.resolveArtifact(
+                    session.createArtifactCoordinates(groupId, artifactId, newVersion, "pom"), repositories);
             Path path = resolved.getPath();
             String location = groupId + ":" + artifactId + ":" + newVersion;
             return new ModelSource() {
@@ -109,9 +115,8 @@ public class DefaultModelResolver implements ModelResolver {
         } catch (VersionRangeResolverException | ArtifactResolverException e) {
             throw new ModelResolverException(
                     e.getMessage() + " (remote repositories: "
-                            + session.getRemoteRepositories().stream()
-                                    .map(Object::toString)
-                                    .collect(Collectors.joining(", "))
+                            + (repositories != null ? repositories : session.getRemoteRepositories())
+                                    .stream().map(Object::toString).collect(Collectors.joining(", "))
                             + ")",
                     groupId,
                     artifactId,

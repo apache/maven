@@ -63,7 +63,10 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                     session.getSession(),
                     new VersionRangeRequest(
                             session.toArtifact(request.getArtifactCoordinates()),
-                            session.toRepositories(session.getRemoteRepositories()),
+                            session.toRepositories(
+                                    request.getRepositories() != null
+                                            ? request.getRepositories()
+                                            : session.getRemoteRepositories()),
                             null));
 
             Map<String, ArtifactRepository> repos = res.getVersions().stream()

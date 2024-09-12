@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -157,6 +158,9 @@ public interface ModelBuilderRequest {
     @Nullable
     ModelTransformerContextBuilder getTransformerContextBuilder();
 
+    @Nullable
+    List<RemoteRepository> getRepositories();
+
     @Nonnull
     static ModelBuilderRequest build(@Nonnull ModelBuilderRequest request, @Nonnull ModelSource source) {
         return builder(nonNull(request, "request cannot be null"))
@@ -210,6 +214,7 @@ public interface ModelBuilderRequest {
         Object listener;
         ModelBuilderResult interimResult;
         ModelTransformerContextBuilder transformerContextBuilder;
+        List<RemoteRepository> repositories;
 
         ModelBuilderRequestBuilder() {}
 
@@ -232,6 +237,7 @@ public interface ModelBuilderRequest {
             this.listener = request.getListener();
             this.interimResult = request.getInterimResult();
             this.transformerContextBuilder = request.getTransformerContextBuilder();
+            this.repositories = request.getRepositories();
         }
 
         public ModelBuilderRequestBuilder session(Session session) {
@@ -325,6 +331,11 @@ public interface ModelBuilderRequest {
             return this;
         }
 
+        public ModelBuilderRequestBuilder repositories(List<RemoteRepository> repositories) {
+            this.repositories = repositories;
+            return this;
+        }
+
         public ModelBuilderRequest build() {
             return new DefaultModelBuilderRequest(
                     session,
@@ -344,7 +355,8 @@ public interface ModelBuilderRequest {
                     modelCache,
                     listener,
                     interimResult,
-                    transformerContextBuilder);
+                    transformerContextBuilder,
+                    repositories);
         }
 
         private static class DefaultModelBuilderRequest extends BaseRequest implements ModelBuilderRequest {
@@ -365,6 +377,7 @@ public interface ModelBuilderRequest {
             private final Object listener;
             private final ModelBuilderResult interimResult;
             private final ModelTransformerContextBuilder transformerContextBuilder;
+            private final List<RemoteRepository> repositories;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultModelBuilderRequest(
@@ -385,7 +398,8 @@ public interface ModelBuilderRequest {
                     ModelCache modelCache,
                     Object listener,
                     ModelBuilderResult interimResult,
-                    ModelTransformerContextBuilder transformerContextBuilder) {
+                    ModelTransformerContextBuilder transformerContextBuilder,
+                    List<RemoteRepository> repositories) {
                 super(session);
                 this.validationLevel = validationLevel;
                 this.locationTracking = locationTracking;
@@ -405,6 +419,7 @@ public interface ModelBuilderRequest {
                 this.listener = listener;
                 this.interimResult = interimResult;
                 this.transformerContextBuilder = transformerContextBuilder;
+                this.repositories = repositories != null ? List.copyOf(repositories) : null;
             }
 
             @Override
@@ -488,6 +503,11 @@ public interface ModelBuilderRequest {
 
             public ModelTransformerContextBuilder getTransformerContextBuilder() {
                 return transformerContextBuilder;
+            }
+
+            @Override
+            public List<RemoteRepository> getRepositories() {
+                return repositories;
             }
         }
     }

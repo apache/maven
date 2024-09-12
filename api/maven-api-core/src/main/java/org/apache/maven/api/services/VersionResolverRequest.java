@@ -18,11 +18,15 @@
  */
 package org.apache.maven.api.services;
 
+import java.util.List;
+
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
+import org.apache.maven.api.annotations.Nullable;
 
 import static org.apache.maven.api.services.BaseRequest.nonNull;
 
@@ -39,11 +43,26 @@ public interface VersionResolverRequest {
     @Nonnull
     ArtifactCoordinates getArtifactCoordinates();
 
+    @Nullable
+    List<RemoteRepository> getRepositories();
+
     @Nonnull
     static VersionResolverRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinates artifactCoordinates) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
                 .artifactCoordinates(nonNull(artifactCoordinates, "artifactCoordinates cannot be null"))
+                .build();
+    }
+
+    @Nonnull
+    static VersionResolverRequest build(
+            @Nonnull Session session,
+            @Nonnull ArtifactCoordinates artifactCoordinates,
+            @Nullable List<RemoteRepository> repositories) {
+        return builder()
+                .session(nonNull(session, "session cannot be null"))
+                .artifactCoordinates(nonNull(artifactCoordinates, "artifactCoordinates cannot be null"))
+                .repositories(repositories)
                 .build();
     }
 
@@ -56,6 +75,7 @@ public interface VersionResolverRequest {
     class VersionResolverRequestBuilder {
         Session session;
         ArtifactCoordinates artifactCoordinates;
+        List<RemoteRepository> repositories;
 
         public VersionResolverRequestBuilder session(Session session) {
             this.session = session;
@@ -67,23 +87,39 @@ public interface VersionResolverRequest {
             return this;
         }
 
+        public VersionResolverRequestBuilder repositories(List<RemoteRepository> repositories) {
+            this.repositories = repositories;
+            return this;
+        }
+
         public VersionResolverRequest build() {
-            return new DefaultVersionResolverRequest(session, artifactCoordinates);
+            return new DefaultVersionResolverRequest(session, artifactCoordinates, repositories);
         }
 
         private static class DefaultVersionResolverRequest extends BaseRequest implements VersionResolverRequest {
             private final ArtifactCoordinates artifactCoordinates;
+            private final List<RemoteRepository> repositories;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
-            DefaultVersionResolverRequest(@Nonnull Session session, @Nonnull ArtifactCoordinates artifactCoordinates) {
+            DefaultVersionResolverRequest(
+                    @Nonnull Session session,
+                    @Nonnull ArtifactCoordinates artifactCoordinates,
+                    @Nullable List<RemoteRepository> repositories) {
                 super(session);
                 this.artifactCoordinates = artifactCoordinates;
+                this.repositories = repositories;
             }
 
             @Nonnull
             @Override
             public ArtifactCoordinates getArtifactCoordinates() {
                 return artifactCoordinates;
+            }
+
+            @Nullable
+            @Override
+            public List<RemoteRepository> getRepositories() {
+                return repositories;
             }
         }
     }

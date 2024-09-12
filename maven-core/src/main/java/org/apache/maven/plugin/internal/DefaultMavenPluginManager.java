@@ -54,7 +54,6 @@ import org.apache.maven.api.plugin.descriptor.Resolution;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.PathScopeRegistry;
-import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
@@ -548,10 +547,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
         InternalMavenSession sessionV4 = InternalMavenSession.from(session.getSession());
         Project project = sessionV4.getProject(session.getCurrentProject());
-
-        List<org.apache.maven.api.RemoteRepository> repos =
-                sessionV4.getService(ProjectManager.class).getRemoteProjectRepositories(project);
-        sessionV4 = InternalMavenSession.from(sessionV4.withRemoteRepositories(repos));
 
         org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
         org.apache.maven.api.plugin.Log log = new DefaultLog(
