@@ -82,6 +82,16 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
         return applyFilter(projectDependencyGraph.getUpstreamProjects(project, transitive), transitive, true);
     }
 
+    /**
+     * Filter out whitelisted projects with a big twist:
+     * Assume we have all projects {@code a, b, c} while active are {@code a, c} and relation among all projects
+     * is {@code a -> b -> c}. This method handles well the case for transitive list. But, for non-transitive we need
+     * to "pull in" transitive dependencies of eliminated projects, as for case above, the properly filtered list would
+     * be {@code a -> c}.
+     * <p>
+     * Original code would falsely report {@code a} project as "without dependencies", basically would lose link due
+     * filtering. This causes build ordering issues in concurrent builders.
+     */
     private List<MavenProject> applyFilter(
             Collection<? extends MavenProject> projects, boolean transitive, boolean upstream) {
         List<MavenProject> filtered = new ArrayList<>(projects.size());
