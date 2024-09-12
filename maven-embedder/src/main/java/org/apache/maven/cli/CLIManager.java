@@ -20,10 +20,12 @@ package org.apache.maven.cli;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.DeprecatedAttributes;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -130,11 +132,12 @@ public class CLIManager {
     public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
 
     /** This option is deprecated and may be repurposed as Java debug in a future version.
-     * Use {@code -X/--verbose} instead. */
+     * Use {@code -X,--verbose} instead. */
     @Deprecated
     public static final String DEBUG = "debug";
 
     protected Options options;
+    protected final Set<Option> usedDeprecatedOptions = new LinkedHashSet<>();
 
     @SuppressWarnings("checkstyle:MethodLength")
     public CLIManager() {
@@ -223,12 +226,6 @@ public class CLIManager {
                 .desc("Alternate path for the project settings file")
                 .hasArg()
                 .build());
-        options.addOption(Option.builder(ALTERNATE_GLOBAL_SETTINGS)
-                .longOpt("global-settings")
-                .desc("Alternate path for the global settings file")
-                .hasArg()
-                .deprecated()
-                .build());
         options.addOption(Option.builder(ALTERNATE_INSTALLATION_SETTINGS)
                 .longOpt("install-settings")
                 .desc("Alternate path for the installation settings file")
@@ -238,12 +235,6 @@ public class CLIManager {
                 .longOpt("toolchains")
                 .desc("Alternate path for the user toolchains file")
                 .hasArg()
-                .build());
-        options.addOption(Option.builder(ALTERNATE_GLOBAL_TOOLCHAINS)
-                .longOpt("global-toolchains")
-                .desc("Alternate path for the global toolchains file")
-                .hasArg()
-                .deprecated()
                 .build());
         options.addOption(Option.builder(ALTERNATE_INSTALLATION_TOOLCHAINS)
                 .longOpt("install-toolchains")
@@ -351,13 +342,42 @@ public class CLIManager {
         // Adding this back to make Maven fail if used
         options.addOption(Option.builder("llr")
                 .longOpt("legacy-local-repository")
-                .desc("UNSUPPORTED: Use of this option will make Maven invocation fail.")
+                .desc("<deprecated> Use Maven 2 Legacy Local Repository behaviour.")
+                .deprecated(DeprecatedAttributes.builder()
+                        .setSince("3.9.1")
+                        .setDescription("UNSUPPORTED: Use of this option will make Maven invocation fail.")
+                        .get())
                 .build());
 
         // Deprecated
         options.addOption(Option.builder()
                 .longOpt(DEBUG)
-                .desc("Produce execution verbose output (deprecated; only kept for backward compatibility)")
+                .desc("<deprecated> Produce execution verbose output.")
+                .deprecated(DeprecatedAttributes.builder()
+                        .setForRemoval(true)
+                        .setSince("4.0.0")
+                        .setDescription("Use -X,--verbose instead.")
+                        .get())
+                .build());
+        options.addOption(Option.builder(ALTERNATE_GLOBAL_SETTINGS)
+                .longOpt("global-settings")
+                .desc("<deprecated> Alternate path for the global settings file.")
+                .hasArg()
+                .deprecated(DeprecatedAttributes.builder()
+                        .setForRemoval(true)
+                        .setSince("4.0.0")
+                        .setDescription("Use -is,--install-settings instead.")
+                        .get())
+                .build());
+        options.addOption(Option.builder(ALTERNATE_GLOBAL_TOOLCHAINS)
+                .longOpt("global-toolchains")
+                .desc("<deprecated> Alternate path for the global toolchains file.")
+                .hasArg()
+                .deprecated(DeprecatedAttributes.builder()
+                        .setForRemoval(true)
+                        .setSince("4.0.0")
+                        .setDescription("Use -it,--install-toolchains instead.")
+                        .get())
                 .build());
     }
 
@@ -365,9 +385,15 @@ public class CLIManager {
         // We need to eat any quotes surrounding arguments...
         String[] cleanArgs = CleanArgument.cleanArgs(args);
 
-        CommandLineParser parser = new DefaultParser();
+        DefaultParser parser = DefaultParser.builder()
+                .setDeprecatedHandler(usedDeprecatedOptions::add)
+                .build();
 
         return parser.parse(options, cleanArgs);
+    }
+
+    public Set<Option> getUsedDeprecatedOptions() {
+        return usedDeprecatedOptions;
     }
 
     public void displayHelp(PrintStream stdout) {
