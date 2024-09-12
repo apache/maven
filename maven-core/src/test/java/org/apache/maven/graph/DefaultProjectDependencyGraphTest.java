@@ -53,7 +53,7 @@ class DefaultProjectDependencyGraphTest {
     private final MavenProject transitiveOnly = createProject(Arrays.asList(toDependency(depender3)), "depender5");
 
     @Test
-    void myTheory() throws DuplicateProjectException, CycleDetectedException {
+    void testNonTransitiveFiltering() throws DuplicateProjectException, CycleDetectedException {
         ProjectDependencyGraph graph = new FilteredProjectDependencyGraph(
                 new DefaultProjectDependencyGraph(Arrays.asList(aProject, bProject, cProject)),
                 Arrays.asList(aProject, cProject));
