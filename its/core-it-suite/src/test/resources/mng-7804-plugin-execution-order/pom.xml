@@ -16,16 +16,14 @@
             <goals>
               <goal>clean</goal>
             </goals>
-            <phase>clean</phase>
-            <priority>100</priority>
+            <phase>clean[100]</phase>
           </execution>
           <execution>
             <id>300. This should be third</id>
             <goals>
               <goal>clean</goal>
             </goals>
-            <phase>clean</phase>
-            <priority>300</priority>
+            <phase>clean[300]</phase>
           </execution>
         </executions>
       </plugin>
@@ -38,16 +36,14 @@
             <goals>
               <goal>run</goal>
             </goals>
-            <phase>clean</phase>
-            <priority>200</priority>
+            <phase>clean[200]</phase>
           </execution>
           <execution>
             <id>400. This should be fourth</id>
             <goals>
               <goal>run</goal>
             </goals>
-            <phase>clean</phase>
-            <priority>400</priority>
+            <phase>clean[400]</phase>
           </execution>
         </executions>
       </plugin>
