@@ -157,6 +157,7 @@ public class SisuDiBridgeModule extends AbstractModule {
         loadFromClassLoader(classLoader);
         injector.getBindings().keySet().stream()
                 .filter(k -> k.getQualifier() != null)
+                .filter(k -> !injector.getBindings().get(k).isEmpty())
                 .sorted(Comparator.comparing(k -> k.getRawType().getName()))
                 .distinct()
                 .forEach(key -> {
