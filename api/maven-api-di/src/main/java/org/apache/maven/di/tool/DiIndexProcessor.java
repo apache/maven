@@ -24,6 +24,7 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
@@ -71,14 +72,19 @@ public class DiIndexProcessor extends AbstractProcessor {
     }
 
     private String getFullClassName(TypeElement typeElement) {
-        String className = typeElement.getQualifiedName().toString();
+        StringBuilder className = new StringBuilder(typeElement.getSimpleName());
         Element enclosingElement = typeElement.getEnclosingElement();
-        if (enclosingElement instanceof TypeElement) {
-            String enclosingClassName =
-                    ((TypeElement) enclosingElement).getQualifiedName().toString();
-            className = enclosingClassName + "$" + typeElement.getSimpleName();
+
+        while (enclosingElement instanceof TypeElement) {
+            className.insert(0, "$").insert(0, ((TypeElement) enclosingElement).getSimpleName());
+            enclosingElement = enclosingElement.getEnclosingElement();
         }
-        return className;
+
+        if (enclosingElement instanceof PackageElement) {
+            className.insert(0, ".").insert(0, ((PackageElement) enclosingElement).getQualifiedName());
+        }
+
+        return className.toString();
     }
 
     private void updateFileIfChanged() throws IOException {
