@@ -79,6 +79,7 @@ import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.SimplexTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
+import org.apache.maven.di.Injector;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -95,7 +96,6 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
-import org.apache.maven.internal.impl.SisuDiBridgeModule;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -732,10 +732,20 @@ public class MavenCli {
         for (CoreExtensionEntry extension : extensions) {
             container.discoverComponents(
                     extension.getClassRealm(),
+                    new AbstractModule() {
+                        @Override
+                        protected void configure() {
+                            try {
+                                container.lookup(Injector.class).discover(extension.getClassRealm());
+                            } catch (Throwable e) {
+                                // ignore
+                                e.printStackTrace();
+                            }
+                        }
+                    },
                     new SessionScopeModule(container.lookup(SessionScope.class)),
                     new MojoExecutionScopeModule(container.lookup(MojoExecutionScope.class)),
                     new ExtensionConfigurationModule(extension, extensionSource));
-            container.lookup(SisuDiBridgeModule.class).loadFromClassLoader(extension.getClassRealm());
         }
 
         customizeContainer(container);
