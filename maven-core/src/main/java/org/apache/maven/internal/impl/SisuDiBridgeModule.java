@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.binder.AnnotatedBindingBuilder;
+import com.google.inject.Binder;
 import com.google.inject.name.Names;
 import org.apache.maven.api.di.MojoExecutionScoped;
 import org.apache.maven.api.di.SessionScoped;
@@ -66,7 +66,7 @@ public class SisuDiBridgeModule extends AbstractModule {
     protected void configure() {
         Provider<PlexusContainer> containerProvider = getProvider(PlexusContainer.class);
 
-        injector = new BridgeInjectorImpl(containerProvider);
+        injector = new BridgeInjectorImpl(containerProvider, binder());
         bindScope(injector, containerProvider, SessionScoped.class, SessionScope.class);
         bindScope(injector, containerProvider, MojoExecutionScoped.class, MojoExecutionScope.class);
         injector.bindInstance(Injector.class, injector);
@@ -79,25 +79,6 @@ public class SisuDiBridgeModule extends AbstractModule {
         if (discover) {
             injector.discover(classLoader);
         }
-        injector.getBindings().keySet().stream()
-                .filter(k -> k.getQualifier() != null)
-                .sorted(Comparator.comparing(k -> k.getRawType().getName()))
-                .distinct()
-                .forEach(key -> {
-                    Class<?> clazz = key.getRawType();
-                    Class<Object> itf = (clazz.isInterface()
-                            ? null
-                            : (Class<Object>) (clazz.getInterfaces().length > 0 ? clazz.getInterfaces()[0] : clazz));
-                    if (itf != null) {
-                        AnnotatedBindingBuilder<Object> binder = bind(itf);
-                        if (key.getQualifier() instanceof String s && !s.isEmpty()) {
-                            binder.annotatedWith(Names.named(s));
-                        } else if (key.getQualifier() instanceof Annotation a) {
-                            binder.annotatedWith(a);
-                        }
-                        binder.toProvider(() -> injector.getInstance(clazz));
-                    }
-                });
     }
 
     private void bindScope(
@@ -115,10 +96,47 @@ public class SisuDiBridgeModule extends AbstractModule {
     }
 
     static class BridgeInjectorImpl extends InjectorImpl {
-        private final Provider<PlexusContainer> containerProvider;
+        final Provider<PlexusContainer> containerProvider;
+        final Binder binder;
 
-        BridgeInjectorImpl(Provider<PlexusContainer> containerProvider) {
+        BridgeInjectorImpl(Provider<PlexusContainer> containerProvider, Binder binder) {
             this.containerProvider = containerProvider;
+            this.binder = binder;
+        }
+
+        @Override
+        protected <U> Injector bind(Key<U> key, Binding<U> binding) {
+            super.bind(key, binding);
+            if (key.getQualifier() != null) {
+                com.google.inject.Key<U> k = toGuiceKey(key);
+                // System.out.println("Bind di -> guice: " + k);
+                this.binder.bind(k).toProvider(new BridgeProvider<>(binding));
+            }
+            return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        private static <U> com.google.inject.Key<U> toGuiceKey(Key<U> key) {
+            if (key.getQualifier() instanceof String s) {
+                return (com.google.inject.Key<U>) com.google.inject.Key.get(key.getType(), Names.named(s));
+            } else if (key.getQualifier() instanceof Annotation a) {
+                return (com.google.inject.Key<U>) com.google.inject.Key.get(key.getType(), a);
+            } else {
+                return (com.google.inject.Key<U>) com.google.inject.Key.get(key.getType());
+            }
+        }
+
+        class BridgeProvider<T> implements Provider<T> {
+            final Binding<T> binding;
+
+            BridgeProvider(Binding<T> binding) {
+                this.binding = binding;
+            }
+
+            @Override
+            public T get() {
+                return compile(binding).get();
+            }
         }
 
         @Override
