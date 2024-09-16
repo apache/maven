@@ -21,17 +21,10 @@ package org.apache.maven.internal.impl;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +36,6 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.name.Names;
 import org.apache.maven.api.di.MojoExecutionScoped;
 import org.apache.maven.api.di.SessionScoped;
-import org.apache.maven.api.services.MavenException;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.Binding;
@@ -58,8 +50,16 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 @Named
 public class SisuDiBridgeModule extends AbstractModule {
 
-    InjectorImpl injector;
-    final Set<String> loaded = new HashSet<>();
+    protected final boolean discover;
+    protected InjectorImpl injector;
+
+    public SisuDiBridgeModule() {
+        this(true);
+    }
+
+    public SisuDiBridgeModule(boolean discover) {
+        this.discover = discover;
+    }
 
     @Override
     protected void configure() {
@@ -155,7 +155,9 @@ public class SisuDiBridgeModule extends AbstractModule {
         if (classLoader == null) {
             classLoader = getClass().getClassLoader();
         }
-        loadFromClassLoader(classLoader);
+        if (discover) {
+            injector.discover(classLoader);
+        }
         injector.getBindings().keySet().stream()
                 .filter(k -> k.getQualifier() != null)
                 .sorted(Comparator.comparing(k -> k.getRawType().getName()))
@@ -175,38 +177,5 @@ public class SisuDiBridgeModule extends AbstractModule {
                         binder.toProvider(() -> injector.getInstance(clazz));
                     }
                 });
-    }
-
-    public void loadFromClassLoader(ClassLoader classLoader) {
-        try {
-            for (Iterator<URL> it = classLoader
-                            .getResources("META-INF/maven/org.apache.maven.api.di.Inject")
-                            .asIterator();
-                    it.hasNext(); ) {
-                URL url = it.next();
-                if (loaded.add(url.toExternalForm())) {
-                    List<String> lines;
-                    try (InputStream is = url.openStream();
-                            BufferedReader reader =
-                                    new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                        lines = reader.lines()
-                                .map(String::trim)
-                                .filter(s -> !s.isEmpty() && !s.startsWith("#"))
-                                .toList();
-                    }
-                    for (String className : lines) {
-                        try {
-                            Class<?> clazz = classLoader.loadClass(className);
-                            injector.bindImplicit(clazz);
-                        } catch (ClassNotFoundException e) {
-                            // ignore
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new MavenException(e);
-        }
     }
 }
