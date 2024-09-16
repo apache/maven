@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl.di;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -98,17 +99,19 @@ public class SessionScope implements Scope {
 
     @SuppressWarnings("unchecked")
     protected <T> T createProxy(Key<T> key, Supplier<T> unscoped) {
-        InvocationHandler dispatcher = (proxy, method, args) -> {
-            method.setAccessible(true);
-            try {
-                return method.invoke(getScopeState().scope(key, unscoped).get(), args);
-            } catch (InvocationTargetException e) {
-                throw e.getCause();
-            }
-        };
+        InvocationHandler dispatcher = (proxy, method, args) -> dispatch(key, unscoped, method, args);
         Class<T> superType = (Class<T>) Types.getRawType(key.getType());
         Class<?>[] interfaces = getInterfaces(superType);
         return (T) java.lang.reflect.Proxy.newProxyInstance(superType.getClassLoader(), interfaces, dispatcher);
+    }
+
+    protected <T> Object dispatch(Key<T> key, Supplier<T> unscoped, Method method, Object[] args) throws Throwable {
+        method.setAccessible(true);
+        try {
+            return method.invoke(getScopeState().scope(key, unscoped).get(), args);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
     }
 
     protected Class<?>[] getInterfaces(Class<?> superType) {

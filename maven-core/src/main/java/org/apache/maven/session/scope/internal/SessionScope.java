@@ -21,7 +21,6 @@ package org.apache.maven.session.scope.internal;
 import java.lang.annotation.Annotation;
 
 import com.google.inject.Key;
-import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
 import com.google.inject.name.Named;
@@ -44,13 +43,6 @@ public class SessionScope extends org.apache.maven.internal.impl.di.SessionScope
 
     public static <T> Provider<T> seededKeyProvider(Class<? extends T> clazz) {
         return SessionScope.<T>seededKeySupplier(clazz)::get;
-    }
-
-    protected ScopeState getScopeState() {
-        if (values.isEmpty()) {
-            throw new OutOfScopeException("Cannot access session scope outside of a scoping block");
-        }
-        return values.get(0);
     }
 
     protected boolean isTypeAnnotation(Class<? extends Annotation> annotationType) {
