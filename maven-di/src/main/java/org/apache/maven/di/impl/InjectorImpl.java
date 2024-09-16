@@ -59,6 +59,7 @@ public class InjectorImpl implements Injector {
 
     private final Map<Key<?>, Set<Binding<?>>> bindings = new HashMap<>();
     private final Map<Class<? extends Annotation>, Supplier<Scope>> scopes = new HashMap<>();
+    private final Set<String> loadedUrls = new HashSet<>();
 
     public InjectorImpl() {
         bindScope(Singleton.class, new SingletonScope());
@@ -87,12 +88,16 @@ public class InjectorImpl implements Injector {
         try {
             Enumeration<URL> enumeration = classLoader.getResources("META-INF/maven/org.apache.maven.api.di.Inject");
             while (enumeration.hasMoreElements()) {
-                try (InputStream is = enumeration.nextElement().openStream();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
-                    for (String line :
-                            reader.lines().filter(l -> !l.startsWith("#")).toList()) {
-                        Class<?> clazz = classLoader.loadClass(line);
-                        bindImplicit(clazz);
+                URL url = enumeration.nextElement();
+                if (loadedUrls.add(url.toExternalForm())) {
+                    try (InputStream is = url.openStream();
+                            BufferedReader reader =
+                                    new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
+                        for (String line :
+                                reader.lines().filter(l -> !l.startsWith("#")).toList()) {
+                            Class<?> clazz = classLoader.loadClass(line);
+                            bindImplicit(clazz);
+                        }
                     }
                 }
             }
