@@ -22,18 +22,22 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.google.inject.spi.ProviderInstanceBinding;
 import org.apache.maven.api.di.MojoExecutionScoped;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.di.Injector;
@@ -47,6 +51,8 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.eclipse.sisu.plexus.PlexusBean;
+import org.eclipse.sisu.plexus.PlexusBeanLocator;
 
 @Named
 public class SisuDiBridgeModule extends AbstractModule {
@@ -65,7 +71,6 @@ public class SisuDiBridgeModule extends AbstractModule {
     @Override
     protected void configure() {
         Provider<PlexusContainer> containerProvider = getProvider(PlexusContainer.class);
-
         injector = new BridgeInjectorImpl(containerProvider, binder());
         bindScope(injector, containerProvider, SessionScoped.class, SessionScope.class);
         bindScope(injector, containerProvider, MojoExecutionScoped.class, MojoExecutionScope.class);
@@ -151,39 +156,52 @@ public class SisuDiBridgeModule extends AbstractModule {
                 return compile(binding);
             }
             if (key.getRawType() == List.class) {
-                Set<Binding<Object>> res2 = getBindings(key.getTypeParameter(0));
-                Set<Binding<Object>> res3 = res2 != null ? new HashSet<>(res2) : new HashSet<>();
-                try {
-                    List<Object> l = containerProvider
-                            .get()
-                            .lookupList(key.getTypeParameter(0).getRawType());
-                    l.forEach(o -> res3.add(new Binding.BindingToInstance<>(o)));
-                } catch (Throwable e) {
-                    // ignore
-                    e.printStackTrace();
-                }
-                List<Supplier<Object>> list = res3.stream().map(this::compile).collect(Collectors.toList());
-                //noinspection unchecked
-                return () -> (Q) list(list);
+                return () -> {
+                    Key<Object> elementType = key.getTypeParameter(0);
+                    Set<Binding<Object>> res2 = getBindings(elementType);
+                    Set<Binding<Object>> res3 = res2 != null ? new HashSet<>(res2) : new HashSet<>();
+                    try {
+                        PlexusContainer container = containerProvider.get();
+                        PlexusBeanLocator locator = container.lookup(PlexusBeanLocator.class);
+                        for (PlexusBean<Object> bean : locator.locate(TypeLiteral.get(elementType.getRawType()))) {
+                            if (!isDiBean(bean)) {
+                                res3.add(new Binding<>(elementType, Set.of()) {
+                                    @Override
+                                    public Supplier<Object> compile(Function<Dependency<?>, Supplier<?>> compiler) {
+                                        return bean::getValue;
+                                    }
+                                });
+                            }
+                        }
+                    } catch (Throwable e) {
+                        // ignore
+                    }
+                    List<Supplier<Object>> list =
+                            res3.stream().map(this::compile).collect(Collectors.toList());
+                    //noinspection unchecked
+                    return (Q) list(list);
+                };
             }
             if (key.getRawType() == Map.class) {
                 Key<?> k = key.getTypeParameter(0);
                 Key<Object> v = key.getTypeParameter(1);
                 if (k.getRawType() == String.class) {
-                    Set<Binding<Object>> res2 = getBindings(v);
-                    Set<Binding<Object>> res3 = res2 != null ? new HashSet<>(res2) : new HashSet<>();
-                    Map<String, Supplier<Object>> map = res3.stream()
-                            .filter(b -> b.getOriginalKey() == null
-                                    || b.getOriginalKey().getQualifier() == null
-                                    || b.getOriginalKey().getQualifier() instanceof String)
-                            .collect(Collectors.toMap(
-                                    b -> (String)
-                                            (b.getOriginalKey() != null
-                                                    ? b.getOriginalKey().getQualifier()
-                                                    : null),
-                                    this::compile));
-                    //noinspection unchecked
-                    return () -> (Q) map(map);
+                    return () -> {
+                        Set<Binding<Object>> res2 = getBindings(v);
+                        Set<Binding<Object>> res3 = res2 != null ? new HashSet<>(res2) : new HashSet<>();
+                        Map<String, Supplier<Object>> map = res3.stream()
+                                .filter(b -> b.getOriginalKey() == null
+                                        || b.getOriginalKey().getQualifier() == null
+                                        || b.getOriginalKey().getQualifier() instanceof String)
+                                .collect(Collectors.toMap(
+                                        b -> (String)
+                                                (b.getOriginalKey() != null
+                                                        ? b.getOriginalKey().getQualifier()
+                                                        : null),
+                                        this::compile));
+                        //noinspection unchecked
+                        return (Q) map(map);
+                    };
                 }
             }
             try {
@@ -191,7 +209,6 @@ public class SisuDiBridgeModule extends AbstractModule {
                 return compile(new Binding.BindingToInstance<>(t));
             } catch (Throwable e) {
                 // ignore
-                e.printStackTrace();
             }
             if (dep.optional()) {
                 return () -> null;
@@ -204,6 +221,30 @@ public class SisuDiBridgeModule extends AbstractModule {
                             .sorted()
                             .distinct()
                             .collect(Collectors.joining("\n - ", " - ", "")));
+        }
+
+        private boolean isDiBean(PlexusBean<Object> bean) throws IllegalAccessException {
+            try {
+                if ("org.eclipse.sisu.plexus.LazyPlexusBean"
+                        .equals(bean.getClass().getName())) {
+                    Field f = bean.getClass().getDeclaredField("bean");
+                    f.setAccessible(true);
+                    Object entry = f.get(bean);
+                    if ("org.eclipse.sisu.inject.LazyBeanEntry"
+                            .equals(entry.getClass().getName())) {
+                        f = entry.getClass().getDeclaredField("binding");
+                        f.setAccessible(true);
+                        Object b = f.get(entry);
+                        if (b instanceof ProviderInstanceBinding<?> pib
+                                && pib.getUserSuppliedProvider() instanceof BridgeProvider<?>) {
+                            return true;
+                        }
+                    }
+                }
+            } catch (NoSuchFieldException e) {
+                // ignore
+            }
+            return false;
         }
     }
 }

@@ -50,7 +50,7 @@ public class DiTest {
 
     // return true to run the test
     static boolean testShouldNotHaveDuplicates() {
-        return false;
+        return true;
     }
 
     @Nested
