@@ -38,6 +38,7 @@ import org.apache.maven.api.di.MojoExecutionScoped;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
+import org.apache.maven.di.Scope;
 import org.apache.maven.di.impl.Binding;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.di.impl.Dependency;
@@ -65,89 +66,9 @@ public class SisuDiBridgeModule extends AbstractModule {
     protected void configure() {
         Provider<PlexusContainer> containerProvider = getProvider(PlexusContainer.class);
 
-        injector = new InjectorImpl() {
-            @Override
-            public <Q> Supplier<Q> getCompiledBinding(Dependency<Q> dep) {
-                Key<Q> key = dep.key();
-                Set<Binding<Q>> res = getBindings(key);
-                if (res != null && !res.isEmpty()) {
-                    List<Binding<Q>> bindingList = new ArrayList<>(res);
-                    Comparator<Binding<Q>> comparing = Comparator.comparing(Binding::getPriority);
-                    bindingList.sort(comparing.reversed());
-                    Binding<Q> binding = bindingList.get(0);
-                    return compile(binding);
-                }
-                if (key.getRawType() == List.class) {
-                    Set<Binding<Object>> res2 = getBindings(key.getTypeParameter(0));
-                    Set<Binding<Object>> res3 = res2 != null ? new HashSet<>(res2) : new HashSet<>();
-                    try {
-                        List<Object> l = containerProvider
-                                .get()
-                                .lookupList(key.getTypeParameter(0).getRawType());
-                        l.forEach(o -> res3.add(new Binding.BindingToInstance<>(o)));
-                    } catch (Throwable e) {
-                        // ignore
-                        e.printStackTrace();
-                    }
-                    List<Supplier<Object>> list =
-                            res3.stream().map(this::compile).collect(Collectors.toList());
-                    //noinspection unchecked
-                    return () -> (Q) list(list);
-                }
-                if (key.getRawType() == Map.class) {
-                    Key<?> k = key.getTypeParameter(0);
-                    Key<Object> v = key.getTypeParameter(1);
-                    if (k.getRawType() == String.class) {
-                        Set<Binding<Object>> res2 = getBindings(v);
-                        Set<Binding<Object>> res3 = res2 != null ? new HashSet<>(res2) : new HashSet<>();
-                        Map<String, Supplier<Object>> map = res3.stream()
-                                .filter(b -> b.getOriginalKey() == null
-                                        || b.getOriginalKey().getQualifier() == null
-                                        || b.getOriginalKey().getQualifier() instanceof String)
-                                .collect(Collectors.toMap(
-                                        b -> (String)
-                                                (b.getOriginalKey() != null
-                                                        ? b.getOriginalKey().getQualifier()
-                                                        : null),
-                                        this::compile));
-                        //noinspection unchecked
-                        return () -> (Q) map(map);
-                    }
-                }
-                try {
-                    Q t = containerProvider.get().lookup(key.getRawType());
-                    return compile(new Binding.BindingToInstance<>(t));
-                } catch (Throwable e) {
-                    // ignore
-                    e.printStackTrace();
-                }
-                if (dep.optional()) {
-                    return () -> null;
-                }
-                throw new DIException("No binding to construct an instance for key "
-                        + key.getDisplayString() + ".  Existing bindings:\n"
-                        + getBoundKeys().stream()
-                                .map(Key::toString)
-                                .map(String::trim)
-                                .sorted()
-                                .distinct()
-                                .collect(Collectors.joining("\n - ", " - ", "")));
-            }
-        };
-        injector.bindScope(SessionScoped.class, () -> {
-            try {
-                return containerProvider.get().lookup(SessionScope.class);
-            } catch (ComponentLookupException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        injector.bindScope(MojoExecutionScoped.class, () -> {
-            try {
-                return containerProvider.get().lookup(MojoExecutionScope.class);
-            } catch (ComponentLookupException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        injector = new BridgeInjectorImpl(containerProvider);
+        bindScope(injector, containerProvider, SessionScoped.class, SessionScope.class);
+        bindScope(injector, containerProvider, MojoExecutionScoped.class, MojoExecutionScope.class);
         injector.bindInstance(Injector.class, injector);
         bind(Injector.class).toInstance(injector);
         bind(SisuDiBridgeModule.class).toInstance(this);
@@ -177,5 +98,94 @@ public class SisuDiBridgeModule extends AbstractModule {
                         binder.toProvider(() -> injector.getInstance(clazz));
                     }
                 });
+    }
+
+    private void bindScope(
+            InjectorImpl injector,
+            Provider<PlexusContainer> containerProvider,
+            Class<? extends Annotation> sa,
+            Class<? extends Scope> ss) {
+        injector.bindScope(sa, () -> {
+            try {
+                return containerProvider.get().lookup(ss);
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    static class BridgeInjectorImpl extends InjectorImpl {
+        private final Provider<PlexusContainer> containerProvider;
+
+        BridgeInjectorImpl(Provider<PlexusContainer> containerProvider) {
+            this.containerProvider = containerProvider;
+        }
+
+        @Override
+        public <Q> Supplier<Q> getCompiledBinding(Dependency<Q> dep) {
+            Key<Q> key = dep.key();
+            Set<Binding<Q>> res = getBindings(key);
+            if (res != null && !res.isEmpty()) {
+                List<Binding<Q>> bindingList = new ArrayList<>(res);
+                Comparator<Binding<Q>> comparing = Comparator.comparing(Binding::getPriority);
+                bindingList.sort(comparing.reversed());
+                Binding<Q> binding = bindingList.get(0);
+                return compile(binding);
+            }
+            if (key.getRawType() == List.class) {
+                Set<Binding<Object>> res2 = getBindings(key.getTypeParameter(0));
+                Set<Binding<Object>> res3 = res2 != null ? new HashSet<>(res2) : new HashSet<>();
+                try {
+                    List<Object> l = containerProvider
+                            .get()
+                            .lookupList(key.getTypeParameter(0).getRawType());
+                    l.forEach(o -> res3.add(new Binding.BindingToInstance<>(o)));
+                } catch (Throwable e) {
+                    // ignore
+                    e.printStackTrace();
+                }
+                List<Supplier<Object>> list = res3.stream().map(this::compile).collect(Collectors.toList());
+                //noinspection unchecked
+                return () -> (Q) list(list);
+            }
+            if (key.getRawType() == Map.class) {
+                Key<?> k = key.getTypeParameter(0);
+                Key<Object> v = key.getTypeParameter(1);
+                if (k.getRawType() == String.class) {
+                    Set<Binding<Object>> res2 = getBindings(v);
+                    Set<Binding<Object>> res3 = res2 != null ? new HashSet<>(res2) : new HashSet<>();
+                    Map<String, Supplier<Object>> map = res3.stream()
+                            .filter(b -> b.getOriginalKey() == null
+                                    || b.getOriginalKey().getQualifier() == null
+                                    || b.getOriginalKey().getQualifier() instanceof String)
+                            .collect(Collectors.toMap(
+                                    b -> (String)
+                                            (b.getOriginalKey() != null
+                                                    ? b.getOriginalKey().getQualifier()
+                                                    : null),
+                                    this::compile));
+                    //noinspection unchecked
+                    return () -> (Q) map(map);
+                }
+            }
+            try {
+                Q t = containerProvider.get().lookup(key.getRawType());
+                return compile(new Binding.BindingToInstance<>(t));
+            } catch (Throwable e) {
+                // ignore
+                e.printStackTrace();
+            }
+            if (dep.optional()) {
+                return () -> null;
+            }
+            throw new DIException("No binding to construct an instance for key "
+                    + key.getDisplayString() + ".  Existing bindings:\n"
+                    + getBoundKeys().stream()
+                            .map(Key::toString)
+                            .map(String::trim)
+                            .sorted()
+                            .distinct()
+                            .collect(Collectors.joining("\n - ", " - ", "")));
+        }
     }
 }
