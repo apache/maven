@@ -1228,7 +1228,7 @@ class PomConstructionTest {
     @Test
     void testPropertiesNoDuplication() throws Exception {
         PomTestWrapper pom = buildPom("properties-no-duplication/sub");
-        assertEquals(3, ((Properties) pom.getValue("properties")).size());
+        assertEquals(4, ((Properties) pom.getValue("properties")).size());
         assertEquals("child", pom.getValue("properties/pomProfile"));
     }
 
@@ -1351,10 +1351,11 @@ class PomConstructionTest {
         assertEquals(1, ((List<?>) pom.getValue("modules")).size());
         assertEquals("sub", pom.getValue("modules[1]"));
 
-        assertEquals(3, ((Map<?, ?>) pom.getValue("properties")).size());
+        assertEquals(4, ((Map<?, ?>) pom.getValue("properties")).size());
         assertEquals("project-property", pom.getValue("properties[1]/itProperty"));
         assertEquals("UTF-8", pom.getValue("properties[1]/project.build.sourceEncoding"));
         assertEquals("UTF-8", pom.getValue("properties[1]/project.reporting.outputEncoding"));
+        assertEquals("2001-01-01T00:00:00Z", pom.getValue("properties[1]/project.build.outputTimestamp"));
 
         assertEquals(1, ((List<?>) pom.getValue("dependencyManagement/dependencies")).size());
         assertEquals("org.apache.maven.its", pom.getValue("dependencyManagement/dependencies[1]/groupId"));
