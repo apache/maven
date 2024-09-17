@@ -200,7 +200,7 @@ public class InjectorImpl implements Injector {
             if (res2 != null) {
                 List<Supplier<Object>> list = res2.stream().map(this::compile).collect(Collectors.toList());
                 //noinspection unchecked
-                return () -> (Q) list(list);
+                return () -> (Q) list(list, Supplier::get);
             }
         }
         if (key.getRawType() == Map.class) {
@@ -219,7 +219,7 @@ public class InjectorImpl implements Injector {
                                                 : null),
                                 this::compile));
                 //noinspection unchecked
-                return () -> (Q) map(map);
+                return () -> (Q) map(map, Supplier::get);
             }
         }
         if (dep.optional()) {
@@ -312,8 +312,8 @@ public class InjectorImpl implements Injector {
         }
     }
 
-    protected <K, V> Map<K, V> map(Map<K, Supplier<V>> map) {
-        return new WrappingMap<>(map, Supplier::get);
+    protected <K, V, T> Map<K, V> map(Map<K, T> map, Function<T, V> mapper) {
+        return new WrappingMap<>(map, mapper);
     }
 
     private static class WrappingMap<K, V, T> extends AbstractMap<K, V> {
@@ -354,8 +354,8 @@ public class InjectorImpl implements Injector {
         }
     }
 
-    protected <T> List<T> list(List<Supplier<T>> bindingList) {
-        return new WrappingList<>(bindingList, Supplier::get);
+    protected <Q, T> List<Q> list(List<T> bindingList, Function<T, Q> mapper) {
+        return new WrappingList<>(bindingList, mapper);
     }
 
     private static class WrappingList<Q, T> extends AbstractList<Q> {

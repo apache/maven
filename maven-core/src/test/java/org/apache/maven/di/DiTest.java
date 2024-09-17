@@ -76,27 +76,39 @@ public class DiTest {
             List<ModelParser> parsers = container.lookupList(ModelParser.class);
             assertNotNull(parsers);
             assertEquals(1, parsers.size());
+            Map<String, ModelParser> parsersMap = container.lookupMap(ModelParser.class);
+            assertNotNull(parsersMap);
+            assertEquals(1, parsersMap.size());
         }
 
         @Test
         void testGuice() throws Exception {
-            List<Binding<ModelParser>> parsers2 =
+            List<Binding<ModelParser>> parsers =
                     container.lookup(Injector.class).findBindingsByType(TypeLiteral.get(ModelParser.class));
-            assertNotNull(parsers2);
-            assertEquals(1, parsers2.size());
+            assertNotNull(parsers);
+            assertEquals(1, parsers.size());
         }
 
         @Test
         void testDI() throws Exception {
             DiInjected diInjected = new DiInjected();
             container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
+            assertNotNull(diInjected.parser);
             assertNotNull(diInjected.parsers);
             assertEquals(1, diInjected.parsers.size());
+            assertNotNull(diInjected.parsersMap);
+            assertEquals(1, diInjected.parsersMap.size());
         }
 
         static class DiInjected {
             @org.apache.maven.api.di.Inject
+            ModelParser parser;
+
+            @org.apache.maven.api.di.Inject
             List<ModelParser> parsers;
+
+            @org.apache.maven.api.di.Inject
+            Map<String, ModelParser> parsersMap;
         }
 
         @Named
@@ -135,6 +147,9 @@ public class DiTest {
             List<ModelParser> parsers = container.lookupList(ModelParser.class);
             assertNotNull(parsers);
             assertEquals(1, parsers.size());
+            Map<String, ModelParser> parsersMap = container.lookupMap(ModelParser.class);
+            assertNotNull(parsersMap);
+            assertEquals(1, parsersMap.size());
         }
 
         @Test
@@ -150,11 +165,17 @@ public class DiTest {
         void testDI() throws Exception {
             DiInjected diInjected = new DiInjected();
             container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
+            assertNotNull(diInjected.parser);
             assertNotNull(diInjected.parsers);
             assertEquals(1, diInjected.parsers.size());
+            assertNotNull(diInjected.parsersMap);
+            assertEquals(1, diInjected.parsersMap.size());
         }
 
         static class DiInjected {
+            @org.apache.maven.api.di.Inject
+            ModelParser parser;
+
             @org.apache.maven.api.di.Inject
             List<ModelParser> parsers;
 
@@ -198,14 +219,17 @@ public class DiTest {
             List<ModelParser> parsers = container.lookupList(ModelParser.class);
             assertNotNull(parsers);
             assertEquals(1, parsers.size());
+            Map<String, ModelParser> parsersMap = container.lookupMap(ModelParser.class);
+            assertNotNull(parsersMap);
+            assertEquals(1, parsersMap.size());
         }
 
         @Test
         void testGuice() throws Exception {
-            List<Binding<ModelParser>> parsers2 =
+            List<Binding<ModelParser>> parsers =
                     container.lookup(Injector.class).findBindingsByType(TypeLiteral.get(ModelParser.class));
-            assertNotNull(parsers2);
-            assertEquals(1, parsers2.size());
+            assertNotNull(parsers);
+            assertEquals(1, parsers.size());
         }
 
         @Test
@@ -213,11 +237,17 @@ public class DiTest {
         void testDI() throws Exception {
             DiInjected diInjected = new DiInjected();
             container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
+            assertNotNull(diInjected.parser);
             assertNotNull(diInjected.parsers);
             assertEquals(1, diInjected.parsers.size());
+            assertNotNull(diInjected.parsersMap);
+            assertEquals(1, diInjected.parsersMap.size());
         }
 
         static class DiInjected {
+            @org.apache.maven.api.di.Inject
+            ModelParser parser;
+
             @org.apache.maven.api.di.Inject
             List<ModelParser> parsers;
 
