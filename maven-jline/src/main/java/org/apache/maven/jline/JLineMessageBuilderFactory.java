@@ -74,7 +74,7 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory, Prompt
 
     @Override
     public String readLine() throws IOException {
-        return doPrompt(null, true);
+        return doPrompt(null, false);
     }
 
     @Override
