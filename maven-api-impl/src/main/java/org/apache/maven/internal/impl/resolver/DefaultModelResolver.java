@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -86,32 +87,7 @@ public class DefaultModelResolver implements ModelResolver {
                     session.createArtifactCoordinates(groupId, artifactId, newVersion, "pom"), repositories);
             Path path = resolved.getPath();
             String location = groupId + ":" + artifactId + ":" + newVersion;
-            return new ModelSource() {
-                @Override
-                public ModelSource resolve(ModelLocator modelLocator, String relative) {
-                    return null;
-                }
-
-                @Override
-                public Path getPath() {
-                    return null;
-                }
-
-                @Override
-                public InputStream openStream() throws IOException {
-                    return Files.newInputStream(path);
-                }
-
-                @Override
-                public String getLocation() {
-                    return location;
-                }
-
-                @Override
-                public Source resolve(String relative) {
-                    return null;
-                }
-            };
+            return new ResolverModelSource(path, location);
         } catch (VersionRangeResolverException | ArtifactResolverException e) {
             throw new ModelResolverException(
                     e.getMessage() + " (remote repositories: "
@@ -122,6 +98,58 @@ public class DefaultModelResolver implements ModelResolver {
                     artifactId,
                     version,
                     e);
+        }
+    }
+
+    private static class ResolverModelSource implements ModelSource {
+        private final Path path;
+        private final String location;
+
+        ResolverModelSource(Path path, String location) {
+            this.path = path;
+            this.location = location;
+        }
+
+        @Override
+        public ModelSource resolve(ModelLocator modelLocator, String relative) {
+            return null;
+        }
+
+        @Override
+        public Path getPath() {
+            return null;
+        }
+
+        @Override
+        public InputStream openStream() throws IOException {
+            return Files.newInputStream(path);
+        }
+
+        @Override
+        public String getLocation() {
+            return location;
+        }
+
+        @Override
+        public Source resolve(String relative) {
+            return null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            ResolverModelSource that = (ResolverModelSource) o;
+            return Objects.equals(path, that.path) && Objects.equals(location, that.location);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(path, location);
         }
     }
 }

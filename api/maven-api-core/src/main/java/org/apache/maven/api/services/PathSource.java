@@ -72,7 +72,7 @@ class PathSource implements ModelSource {
 
     @Override
     public boolean equals(Object o) {
-        return this == o || o instanceof PathSource ps && Objects.equals(path, ps.path);
+        return this == o || o.getClass() == getClass() && Objects.equals(path, ((PathSource) o).path);
     }
 
     @Override

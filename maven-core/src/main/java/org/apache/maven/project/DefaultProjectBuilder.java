@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -179,56 +180,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         if (modelSource instanceof FileModelSource fms) {
             return ModelSource.fromPath(fms.getPath());
         } else {
-            return new ModelSource() {
-                @Override
-                public ModelSource resolve(ModelLocator modelLocator, String relative) {
-                    if (modelSource instanceof ModelSource3 ms) {
-                        return toSource(ms.getRelatedSource(
-                                new org.apache.maven.model.locator.ModelLocator() {
-                                    @Override
-                                    public File locatePom(File projectDirectory) {
-                                        return null;
-                                    }
-
-                                    @Override
-                                    public Path locatePom(Path projectDirectory) {
-                                        return null;
-                                    }
-
-                                    @Override
-                                    public Path locateExistingPom(Path project) {
-                                        return modelLocator.locateExistingPom(project);
-                                    }
-                                },
-                                relative));
-                    }
-                    return null;
-                }
-
-                @Override
-                public Path getPath() {
-                    return null;
-                }
-
-                @Override
-                public InputStream openStream() throws IOException {
-                    return modelSource.getInputStream();
-                }
-
-                @Override
-                public String getLocation() {
-                    return modelSource.getLocation();
-                }
-
-                @Override
-                public Source resolve(String relative) {
-                    if (modelSource instanceof ModelSource2 ms) {
-                        return toSource(ms.getRelatedSource(relative));
-                    } else {
-                        return null;
-                    }
-                }
-            };
+            return new WrapModelSource(modelSource);
         }
     }
 
@@ -296,6 +248,132 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             this.projectBuildingResult = projectBuildingResult;
             this.pomFile = projectBuildingResult.getPomFile();
             this.project = projectBuildingResult.getProject();
+        }
+    }
+
+    private static class StubModelSource implements ModelSource {
+        private final String xml;
+        private final Artifact artifact;
+
+        StubModelSource(String xml, Artifact artifact) {
+            this.xml = xml;
+            this.artifact = artifact;
+        }
+
+        @Override
+        public ModelSource resolve(ModelLocator modelLocator, String relative) {
+            return null;
+        }
+
+        @Override
+        public Path getPath() {
+            return null;
+        }
+
+        @Override
+        public InputStream openStream() throws IOException {
+            return new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+        }
+
+        @Override
+        public String getLocation() {
+            return artifact.getId();
+        }
+
+        @Override
+        public Source resolve(String relative) {
+            return null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            StubModelSource that = (StubModelSource) o;
+            return Objects.equals(xml, that.xml) && Objects.equals(artifact, that.artifact);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(xml, artifact);
+        }
+    }
+
+    private static class WrapModelSource implements ModelSource {
+        private final org.apache.maven.model.building.ModelSource modelSource;
+
+        WrapModelSource(org.apache.maven.model.building.ModelSource modelSource) {
+            this.modelSource = modelSource;
+        }
+
+        @Override
+        public ModelSource resolve(ModelLocator modelLocator, String relative) {
+            if (modelSource instanceof ModelSource3 ms) {
+                return toSource(ms.getRelatedSource(
+                        new org.apache.maven.model.locator.ModelLocator() {
+                            @Override
+                            public File locatePom(File projectDirectory) {
+                                return null;
+                            }
+
+                            @Override
+                            public Path locatePom(Path projectDirectory) {
+                                return null;
+                            }
+
+                            @Override
+                            public Path locateExistingPom(Path project) {
+                                return modelLocator.locateExistingPom(project);
+                            }
+                        },
+                        relative));
+            }
+            return null;
+        }
+
+        @Override
+        public Path getPath() {
+            return null;
+        }
+
+        @Override
+        public InputStream openStream() throws IOException {
+            return modelSource.getInputStream();
+        }
+
+        @Override
+        public String getLocation() {
+            return modelSource.getLocation();
+        }
+
+        @Override
+        public Source resolve(String relative) {
+            if (modelSource instanceof ModelSource2 ms) {
+                return toSource(ms.getRelatedSource(relative));
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            WrapModelSource that = (WrapModelSource) o;
+            return Objects.equals(modelSource, that.modelSource);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(modelSource);
         }
     }
 
@@ -1199,32 +1277,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         buffer.append("<packaging>").append(artifact.getType()).append("</packaging>");
         buffer.append("</project>");
 
-        return new ModelSource() {
-            @Override
-            public ModelSource resolve(ModelLocator modelLocator, String relative) {
-                return null;
-            }
+        String xml = buffer.toString();
 
-            @Override
-            public Path getPath() {
-                return null;
-            }
-
-            @Override
-            public InputStream openStream() throws IOException {
-                return new ByteArrayInputStream(buffer.toString().getBytes(StandardCharsets.UTF_8));
-            }
-
-            @Override
-            public String getLocation() {
-                return artifact.getId();
-            }
-
-            @Override
-            public Source resolve(String relative) {
-                return null;
-            }
-        };
+        return new StubModelSource(xml, artifact);
     }
 
     private static String inheritedGroupId(final ModelBuilderResult result, final int modelIndex) {
