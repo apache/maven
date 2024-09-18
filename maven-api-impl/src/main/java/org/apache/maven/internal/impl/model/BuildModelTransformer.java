@@ -28,6 +28,7 @@ import java.util.Optional;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.services.ModelTransformer;
@@ -83,18 +84,35 @@ public class BuildModelTransformer implements ModelTransformer {
         List<Dependency> newDeps = new ArrayList<>();
         boolean modified = false;
         for (Dependency dep : model.getDependencies()) {
+            Dependency.Builder depBuilder = null;
             if (dep.getVersion() == null) {
                 Model depModel = context.getRawModel(model.getPomFile(), dep.getGroupId(), dep.getArtifactId());
                 if (depModel != null) {
-                    String v = depModel.getVersion();
-                    if (v == null && depModel.getParent() != null) {
-                        v = depModel.getParent().getVersion();
+                    String version = depModel.getVersion();
+                    InputLocation versionLocation = depModel.getLocation("version");
+                    if (version == null && depModel.getParent() != null) {
+                        version = depModel.getParent().getVersion();
+                        versionLocation = depModel.getParent().getLocation("version");
                     }
-                    dep = dep.withVersion(v);
-                    modified = true;
+                    depBuilder = Dependency.newBuilder(dep);
+                    depBuilder.version(version).location("version", versionLocation);
+                    if (dep.getGroupId() == null) {
+                        String depGroupId = depModel.getGroupId();
+                        InputLocation groupIdLocation = depModel.getLocation("groupId");
+                        if (depGroupId == null && depModel.getParent() != null) {
+                            depGroupId = depModel.getParent().getGroupId();
+                            groupIdLocation = depModel.getParent().getLocation("groupId");
+                        }
+                        depBuilder.groupId(depGroupId).location("groupId", groupIdLocation);
+                    }
                 }
             }
-            newDeps.add(dep);
+            if (depBuilder != null) {
+                newDeps.add(depBuilder.build());
+                modified = true;
+            } else {
+                newDeps.add(dep);
+            }
         }
         if (modified) {
             builder.dependencies(newDeps);

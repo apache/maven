@@ -83,7 +83,8 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
             public Model getRawModel(Path from, String gId, String aId) {
                 Model model = findRawModel(from, gId, aId);
                 if (model != null) {
-                    context.modelByGA.put(new GAKey(gId, aId), new Holder(model));
+                    String groupId = DefaultModelBuilder.getGroupId(model);
+                    context.modelByGA.put(new GAKey(groupId, model.getArtifactId()), new Holder(model));
                     context.modelByPath.put(model.getPomFile(), new Holder(model));
                 }
                 return model;
@@ -214,8 +215,18 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
     }
 
     public ModelSource getSource(String groupId, String artifactId) {
-        Set<ModelSource> sources = mappedSources.get(groupId + ":" + artifactId);
-        if (sources == null) {
+        Set<ModelSource> sources;
+        if (groupId != null) {
+            sources = mappedSources.get(groupId + ":" + artifactId);
+            if (sources == null) {
+                return null;
+            }
+        } else if (artifactId != null) {
+            sources = mappedSources.get(artifactId);
+            if (sources == null) {
+                return null;
+            }
+        } else {
             return null;
         }
         return sources.stream()
@@ -231,5 +242,6 @@ class DefaultModelTransformerContextBuilder implements ModelTransformerContextBu
         mappedSources
                 .computeIfAbsent(groupId + ":" + artifactId, k -> new HashSet<>())
                 .add(source);
+        mappedSources.computeIfAbsent(artifactId, k -> new HashSet<>()).add(source);
     }
 }
