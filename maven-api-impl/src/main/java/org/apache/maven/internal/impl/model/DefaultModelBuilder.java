@@ -124,6 +124,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private static final String RAW = "raw";
     private static final String FILE = "file";
     private static final String IMPORT = "import";
+    private static final String PARENT = "parent";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -1215,7 +1216,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 .source(modelSource)
                 .build();
 
-        Model parentModel = readRawModel(lenientRequest, problems);
+        Model parentModel = readParentModel(lenientRequest, problems);
 
         if (!parent.getVersion().equals(version)) {
             String rawChildModelVersion = childModel.getVersion();
@@ -1243,6 +1244,33 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         return new ModelData(modelSource, parentModel);
+    }
+
+    Model readParentModel(ModelBuilderRequest request, DefaultModelProblemCollector problems) {
+        ModelSource modelSource = request.getSource();
+        Model model = cache(getModelCache(request), modelSource, PARENT, () -> doReadParentModel(request, problems));
+        return model;
+    }
+
+    private Model doReadParentModel(ModelBuilderRequest request, DefaultModelProblemCollector problems) {
+        Model raw = readRawModel(request, problems);
+
+        ModelData parentData;
+        if (raw.getParent() != null) {
+            parentData = readParentExternally(raw, request, problems);
+        } else {
+            String superModelVersion = raw.getModelVersion() != null ? raw.getModelVersion() : "4.0.0";
+            if (!VALID_MODEL_VERSIONS.contains(superModelVersion)) {
+                // Maven 3.x is always using 4.0.0 version to load the supermodel, so
+                // do the same when loading a dependency.  The model validator will also
+                // check that field later.
+                superModelVersion = MODEL_VERSION_4_0_0;
+            }
+            parentData = new ModelData(null, getSuperModel(superModelVersion));
+        }
+
+        Model parent = inheritanceAssembler.assembleModelInheritance(raw, parentData.model(), request, problems);
+        return parent.withParent(null);
     }
 
     private Model getSuperModel(String modelVersion) {
