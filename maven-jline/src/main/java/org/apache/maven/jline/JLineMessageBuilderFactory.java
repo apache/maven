@@ -193,7 +193,21 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory, Prompt
 
     private String doPrompt(String message, boolean password) throws IOException {
         try {
-            return MessageUtils.reader.readLine(message != null ? message + ": " : null, password ? '*' : null);
+            if (message != null) {
+                if (!message.endsWith("\n")) {
+                    if (message.endsWith(":")) {
+                        message += " ";
+                    } else if (!message.endsWith(": ")) {
+                        message += ": ";
+                    }
+                }
+                int lastNl = message.lastIndexOf('\n');
+                String begin = message.substring(0, lastNl + 1);
+                message = message.substring(lastNl + 1);
+                MessageUtils.terminal.writer().print(begin);
+                MessageUtils.terminal.flush();
+            }
+            return MessageUtils.reader.readLine(message, password ? '*' : null);
         } catch (Exception e) {
             throw new IOException("Unable to prompt user", e);
         }
