@@ -36,27 +36,29 @@ public interface Injector {
     }
 
     @Nonnull
-    Injector discover(ClassLoader classLoader);
+    Injector discover(@Nonnull ClassLoader classLoader);
 
     @Nonnull
-    Injector bindScope(Class<? extends Annotation> scopeAnnotation, Scope scope);
+    Injector bindScope(@Nonnull Class<? extends Annotation> scopeAnnotation, @Nonnull Scope scope);
 
     @Nonnull
-    Injector bindScope(Class<? extends Annotation> scopeAnnotation, Supplier<Scope> scope);
+    Injector bindScope(@Nonnull Class<? extends Annotation> scopeAnnotation, @Nonnull Supplier<Scope> scope);
 
     @Nonnull
-    Injector bindImplicit(Class<?> cls);
+    Injector bindImplicit(@Nonnull Class<?> cls);
 
     @Nonnull
-    <T> Injector bindInstance(Class<T> cls, T instance);
+    <T> Injector bindInstance(@Nonnull Class<T> cls, @Nonnull T instance);
 
     //
     // Bean access
     //
 
-    <T> void injectInstance(T instance);
+    <T> void injectInstance(@Nonnull T instance);
 
-    <T> T getInstance(Class<T> key);
+    @Nonnull
+    <T> T getInstance(@Nonnull Class<T> key);
 
-    <T> T getInstance(Key<T> key);
+    @Nonnull
+    <T> T getInstance(@Nonnull Key<T> key);
 }

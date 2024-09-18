@@ -59,6 +59,7 @@ public class InjectorImpl implements Injector {
 
     private final Map<Key<?>, Set<Binding<?>>> bindings = new HashMap<>();
     private final Map<Class<? extends Annotation>, Supplier<Scope>> scopes = new HashMap<>();
+    private final Set<String> loadedUrls = new HashSet<>();
 
     public InjectorImpl() {
         bindScope(Singleton.class, new SingletonScope());
@@ -87,12 +88,16 @@ public class InjectorImpl implements Injector {
         try {
             Enumeration<URL> enumeration = classLoader.getResources("META-INF/maven/org.apache.maven.api.di.Inject");
             while (enumeration.hasMoreElements()) {
-                try (InputStream is = enumeration.nextElement().openStream();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
-                    for (String line :
-                            reader.lines().filter(l -> !l.startsWith("#")).toList()) {
-                        Class<?> clazz = classLoader.loadClass(line);
-                        bindImplicit(clazz);
+                URL url = enumeration.nextElement();
+                if (loadedUrls.add(url.toExternalForm())) {
+                    try (InputStream is = url.openStream();
+                            BufferedReader reader =
+                                    new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
+                        for (String line :
+                                reader.lines().filter(l -> !l.startsWith("#")).toList()) {
+                            Class<?> clazz = classLoader.loadClass(line);
+                            bindImplicit(clazz);
+                        }
                     }
                 }
             }
@@ -195,7 +200,7 @@ public class InjectorImpl implements Injector {
             if (res2 != null) {
                 List<Supplier<Object>> list = res2.stream().map(this::compile).collect(Collectors.toList());
                 //noinspection unchecked
-                return () -> (Q) list(list);
+                return () -> (Q) list(list, Supplier::get);
             }
         }
         if (key.getRawType() == Map.class) {
@@ -214,7 +219,7 @@ public class InjectorImpl implements Injector {
                                                 : null),
                                 this::compile));
                 //noinspection unchecked
-                return () -> (Q) map(map);
+                return () -> (Q) map(map, Supplier::get);
             }
         }
         if (dep.optional()) {
@@ -241,7 +246,7 @@ public class InjectorImpl implements Injector {
                     .orElseThrow(() -> new DIException("Scope not bound for annotation "
                             + binding.getScope().annotationType()))
                     .get();
-            compiled = scope.scope((Key<Q>) binding.getOriginalKey(), binding.getScope(), compiled);
+            compiled = scope.scope((Key<Q>) binding.getOriginalKey(), compiled);
         }
         return compiled;
     }
@@ -307,8 +312,8 @@ public class InjectorImpl implements Injector {
         }
     }
 
-    protected <K, V> Map<K, V> map(Map<K, Supplier<V>> map) {
-        return new WrappingMap<>(map, Supplier::get);
+    protected <K, V, T> Map<K, V> map(Map<K, T> map, Function<T, V> mapper) {
+        return new WrappingMap<>(map, mapper);
     }
 
     private static class WrappingMap<K, V, T> extends AbstractMap<K, V> {
@@ -349,8 +354,8 @@ public class InjectorImpl implements Injector {
         }
     }
 
-    protected <T> List<T> list(List<Supplier<T>> bindingList) {
-        return new WrappingList<>(bindingList, Supplier::get);
+    protected <Q, T> List<Q> list(List<T> bindingList, Function<T, Q> mapper) {
+        return new WrappingList<>(bindingList, mapper);
     }
 
     private static class WrappingList<Q, T> extends AbstractList<Q> {
@@ -379,8 +384,7 @@ public class InjectorImpl implements Injector {
 
         @SuppressWarnings("unchecked")
         @Override
-        public <T> java.util.function.Supplier<T> scope(
-                Key<T> key, Annotation scope, java.util.function.Supplier<T> unscoped) {
+        public <T> java.util.function.Supplier<T> scope(Key<T> key, java.util.function.Supplier<T> unscoped) {
             return (java.util.function.Supplier<T>)
                     cache.computeIfAbsent(key, k -> new java.util.function.Supplier<T>() {
                         volatile T instance;

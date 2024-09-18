@@ -16,21 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.di.impl;
+package org.apache.maven.internal.impl.di;
 
-import org.apache.maven.di.Injector;
+import org.apache.maven.di.impl.DIException;
 
-/**
- * A runtime exception that is thrown on startup when some static conditions fail
- * (missing or cyclic dependencies, incorrect annotations etc.) or in runtime when
- * you ask an {@link Injector} for an instance it does not have a {@link Binding binding} for.
- */
-public class DIException extends RuntimeException {
-    public DIException(String message) {
+public class OutOfScopeException extends DIException {
+    public OutOfScopeException(String message) {
         super(message);
     }
 
-    public DIException(String message, Throwable cause) {
+    public OutOfScopeException(String message, Throwable cause) {
         super(message, cause);
     }
 }

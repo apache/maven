@@ -41,6 +41,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.di.Provides;
+import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.ArtifactManager;
@@ -58,6 +59,7 @@ import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.internal.impl.AbstractSession;
 import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.di.SessionScope;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -75,7 +77,12 @@ public class ApiRunner {
         injector.bindInstance(Injector.class, injector);
         injector.bindImplicit(ApiRunner.class);
         injector.discover(ApiRunner.class.getClassLoader());
-        return injector.getInstance(Session.class);
+        Session session = injector.getInstance(Session.class);
+        SessionScope scope = new SessionScope();
+        scope.enter();
+        scope.seed(Session.class, session);
+        injector.bindScope(SessionScoped.class, scope);
+        return session;
     }
 
     static class DefaultSession extends AbstractSession {
