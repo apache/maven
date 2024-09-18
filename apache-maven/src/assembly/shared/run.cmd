@@ -1,6 +1,7 @@
 "%JAVACMD%" ^
   %MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^
+  --enable-native-access=ALL-UNNAMED ^
   -classpath %LAUNCHER_JAR% ^
   "-Dclassworlds.conf=%CLASSWORLDS_CONF%" ^
   "-Dmaven.home=%MAVEN_HOME%" ^
