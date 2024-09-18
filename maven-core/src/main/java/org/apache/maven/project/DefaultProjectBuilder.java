@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -75,7 +76,6 @@ import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.ModelCache;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelResolverException;
@@ -91,7 +91,6 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.internal.impl.InternalSession;
-import org.apache.maven.internal.impl.resolver.DefaultModelCache;
 import org.apache.maven.internal.impl.resolver.DefaultModelRepositoryHolder;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
@@ -181,56 +180,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         if (modelSource instanceof FileModelSource fms) {
             return ModelSource.fromPath(fms.getPath());
         } else {
-            return new ModelSource() {
-                @Override
-                public ModelSource resolve(ModelLocator modelLocator, String relative) {
-                    if (modelSource instanceof ModelSource3 ms) {
-                        return toSource(ms.getRelatedSource(
-                                new org.apache.maven.model.locator.ModelLocator() {
-                                    @Override
-                                    public File locatePom(File projectDirectory) {
-                                        return null;
-                                    }
-
-                                    @Override
-                                    public Path locatePom(Path projectDirectory) {
-                                        return null;
-                                    }
-
-                                    @Override
-                                    public Path locateExistingPom(Path project) {
-                                        return modelLocator.locateExistingPom(project);
-                                    }
-                                },
-                                relative));
-                    }
-                    return null;
-                }
-
-                @Override
-                public Path getPath() {
-                    return null;
-                }
-
-                @Override
-                public InputStream openStream() throws IOException {
-                    return modelSource.getInputStream();
-                }
-
-                @Override
-                public String getLocation() {
-                    return modelSource.getLocation();
-                }
-
-                @Override
-                public Source resolve(String relative) {
-                    if (modelSource instanceof ModelSource2 ms) {
-                        return toSource(ms.getRelatedSource(relative));
-                    } else {
-                        return null;
-                    }
-                }
-            };
+            return new WrapModelSource(modelSource);
         }
     }
 
@@ -301,6 +251,132 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
     }
 
+    private static class StubModelSource implements ModelSource {
+        private final String xml;
+        private final Artifact artifact;
+
+        StubModelSource(String xml, Artifact artifact) {
+            this.xml = xml;
+            this.artifact = artifact;
+        }
+
+        @Override
+        public ModelSource resolve(ModelLocator modelLocator, String relative) {
+            return null;
+        }
+
+        @Override
+        public Path getPath() {
+            return null;
+        }
+
+        @Override
+        public InputStream openStream() throws IOException {
+            return new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+        }
+
+        @Override
+        public String getLocation() {
+            return artifact.getId();
+        }
+
+        @Override
+        public Source resolve(String relative) {
+            return null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            StubModelSource that = (StubModelSource) o;
+            return Objects.equals(xml, that.xml) && Objects.equals(artifact, that.artifact);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(xml, artifact);
+        }
+    }
+
+    private static class WrapModelSource implements ModelSource {
+        private final org.apache.maven.model.building.ModelSource modelSource;
+
+        WrapModelSource(org.apache.maven.model.building.ModelSource modelSource) {
+            this.modelSource = modelSource;
+        }
+
+        @Override
+        public ModelSource resolve(ModelLocator modelLocator, String relative) {
+            if (modelSource instanceof ModelSource3 ms) {
+                return toSource(ms.getRelatedSource(
+                        new org.apache.maven.model.locator.ModelLocator() {
+                            @Override
+                            public File locatePom(File projectDirectory) {
+                                return null;
+                            }
+
+                            @Override
+                            public Path locatePom(Path projectDirectory) {
+                                return null;
+                            }
+
+                            @Override
+                            public Path locateExistingPom(Path project) {
+                                return modelLocator.locateExistingPom(project);
+                            }
+                        },
+                        relative));
+            }
+            return null;
+        }
+
+        @Override
+        public Path getPath() {
+            return null;
+        }
+
+        @Override
+        public InputStream openStream() throws IOException {
+            return modelSource.getInputStream();
+        }
+
+        @Override
+        public String getLocation() {
+            return modelSource.getLocation();
+        }
+
+        @Override
+        public Source resolve(String relative) {
+            if (modelSource instanceof ModelSource2 ms) {
+                return toSource(ms.getRelatedSource(relative));
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            WrapModelSource that = (WrapModelSource) o;
+            return Objects.equals(modelSource, that.modelSource);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(modelSource);
+        }
+    }
+
     class BuildSession implements AutoCloseable {
         private final ProjectBuildingRequest request;
         private final RepositorySystemSession session;
@@ -309,7 +385,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private final ConcurrentMap<String, Object> parentCache;
         private final ModelTransformerContextBuilder transformerContextBuilder;
         private final ExecutorService executor;
-        private final ModelCache modelCache;
         private final ModelResolver modelResolver;
         private final Map<String, String> ciFriendlyVersions = new ConcurrentHashMap<>();
 
@@ -328,7 +403,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 this.transformerContextBuilder = null;
             }
             this.parentCache = new ConcurrentHashMap<>();
-            this.modelCache = DefaultModelCache.newInstance(session, true);
             this.modelResolver = new ModelResolverWrapper() {
                 @Override
                 protected org.apache.maven.model.resolution.ModelResolver getResolver(
@@ -1131,7 +1205,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             .map(internalSession::getRemoteRepository)
                             .toList());
             modelBuildingRequest.modelRepositoryHolder(holder);
-            modelBuildingRequest.modelCache(modelCache);
             modelBuildingRequest.transformerContextBuilder(transformerContextBuilder);
             modelBuildingRequest.repositories(request.getRemoteRepositories().stream()
                     .map(r -> internalSession.getRemoteRepository(RepositoryUtils.toRepo(r)))
@@ -1204,32 +1277,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         buffer.append("<packaging>").append(artifact.getType()).append("</packaging>");
         buffer.append("</project>");
 
-        return new ModelSource() {
-            @Override
-            public ModelSource resolve(ModelLocator modelLocator, String relative) {
-                return null;
-            }
+        String xml = buffer.toString();
 
-            @Override
-            public Path getPath() {
-                return null;
-            }
-
-            @Override
-            public InputStream openStream() throws IOException {
-                return new ByteArrayInputStream(buffer.toString().getBytes(StandardCharsets.UTF_8));
-            }
-
-            @Override
-            public String getLocation() {
-                return artifact.getId();
-            }
-
-            @Override
-            public Source resolve(String relative) {
-                return null;
-            }
-        };
+        return new StubModelSource(xml, artifact);
     }
 
     private static String inheritedGroupId(final ModelBuilderResult result, final int modelIndex) {

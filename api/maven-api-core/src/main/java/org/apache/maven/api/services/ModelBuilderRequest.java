@@ -147,9 +147,6 @@ public interface ModelBuilderRequest {
     ModelRepositoryHolder getModelRepositoryHolder();
 
     @Nullable
-    ModelCache getModelCache();
-
-    @Nullable
     Object getListener();
 
     @Nullable
@@ -210,7 +207,6 @@ public interface ModelBuilderRequest {
         Map<String, String> userProperties;
         ModelResolver modelResolver;
         ModelRepositoryHolder modelRepositoryHolder;
-        ModelCache modelCache;
         Object listener;
         ModelBuilderResult interimResult;
         ModelTransformerContextBuilder transformerContextBuilder;
@@ -233,7 +229,6 @@ public interface ModelBuilderRequest {
             this.userProperties = request.getUserProperties();
             this.modelResolver = request.getModelResolver();
             this.modelRepositoryHolder = request.getModelRepositoryHolder();
-            this.modelCache = request.getModelCache();
             this.listener = request.getListener();
             this.interimResult = request.getInterimResult();
             this.transformerContextBuilder = request.getTransformerContextBuilder();
@@ -310,11 +305,6 @@ public interface ModelBuilderRequest {
             return this;
         }
 
-        public ModelBuilderRequestBuilder modelCache(ModelCache modelCache) {
-            this.modelCache = modelCache;
-            return this;
-        }
-
         public ModelBuilderRequestBuilder listener(Object listener) {
             this.listener = listener;
             return this;
@@ -352,7 +342,6 @@ public interface ModelBuilderRequest {
                     userProperties,
                     modelResolver,
                     modelRepositoryHolder,
-                    modelCache,
                     listener,
                     interimResult,
                     transformerContextBuilder,
@@ -373,7 +362,6 @@ public interface ModelBuilderRequest {
             private final Map<String, String> userProperties;
             private final ModelResolver modelResolver;
             private final ModelRepositoryHolder modelRepositoryHolder;
-            private final ModelCache modelCache;
             private final Object listener;
             private final ModelBuilderResult interimResult;
             private final ModelTransformerContextBuilder transformerContextBuilder;
@@ -395,7 +383,6 @@ public interface ModelBuilderRequest {
                     Map<String, String> userProperties,
                     ModelResolver modelResolver,
                     ModelRepositoryHolder modelRepositoryHolder,
-                    ModelCache modelCache,
                     Object listener,
                     ModelBuilderResult interimResult,
                     ModelTransformerContextBuilder transformerContextBuilder,
@@ -415,7 +402,6 @@ public interface ModelBuilderRequest {
                 this.userProperties = userProperties != null ? Map.copyOf(userProperties) : session.getUserProperties();
                 this.modelResolver = modelResolver;
                 this.modelRepositoryHolder = modelRepositoryHolder;
-                this.modelCache = modelCache;
                 this.listener = listener;
                 this.interimResult = interimResult;
                 this.transformerContextBuilder = transformerContextBuilder;
@@ -485,11 +471,6 @@ public interface ModelBuilderRequest {
             @Override
             public ModelRepositoryHolder getModelRepositoryHolder() {
                 return modelRepositoryHolder;
-            }
-
-            @Override
-            public ModelCache getModelCache() {
-                return modelCache;
             }
 
             public Object getListener() {

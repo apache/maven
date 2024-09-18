@@ -29,6 +29,8 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
+import org.apache.maven.api.SessionData;
+import org.apache.maven.api.services.model.ModelCache;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.InputLocation;
@@ -179,6 +181,12 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         File child = new File(tempDir.toFile(), "child/pom.xml");
         // build project once
         projectBuilder.build(child, configuration);
+        // clear the cache
+        mavenSession
+                .getSession()
+                .getData()
+                .get(SessionData.key(ModelCache.class))
+                .clear();
         // modify parent
         File parent = new File(tempDir.toFile(), "pom.xml");
         String parentContent = new String(Files.readAllBytes(parent.toPath()), StandardCharsets.UTF_8);

@@ -16,17 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl.resolver;
+package org.apache.maven.internal.impl.model;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
-import org.apache.maven.api.services.ModelCache;
 import org.apache.maven.api.services.Source;
-import org.eclipse.aether.RepositoryCache;
-import org.eclipse.aether.RepositorySystemSession;
+import org.apache.maven.api.services.model.ModelCache;
 
 import static java.util.Objects.requireNonNull;
 
@@ -35,25 +33,6 @@ import static java.util.Objects.requireNonNull;
  *
  */
 public class DefaultModelCache implements ModelCache {
-    private static final String KEY = DefaultModelCache.class.getName();
-
-    @SuppressWarnings("unchecked")
-    public static ModelCache newInstance(RepositorySystemSession session, boolean anew) {
-        ConcurrentHashMap<Object, Supplier<?>> cache;
-        RepositoryCache repositoryCache = session != null ? session.getCache() : null;
-        if (repositoryCache == null) {
-            return new DefaultModelCache(new ConcurrentHashMap<>());
-        } else {
-            if (anew) {
-                cache = new ConcurrentHashMap<>();
-                repositoryCache.put(session, KEY, cache);
-            } else {
-                cache = (ConcurrentHashMap<Object, Supplier<?>>)
-                        repositoryCache.computeIfAbsent(session, KEY, ConcurrentHashMap::new);
-            }
-            return new DefaultModelCache(cache);
-        }
-    }
 
     private final ConcurrentMap<Object, Supplier<?>> cache;
 
@@ -75,6 +54,11 @@ public class DefaultModelCache implements ModelCache {
     @SuppressWarnings({"unchecked"})
     public <T> T computeIfAbsent(Source path, String tag, Supplier<T> data) {
         return (T) computeIfAbsent(new SourceCacheKey(path, tag), data);
+    }
+
+    @Override
+    public void clear() {
+        cache.clear();
     }
 
     protected Object computeIfAbsent(Object key, Supplier<?> data) {
