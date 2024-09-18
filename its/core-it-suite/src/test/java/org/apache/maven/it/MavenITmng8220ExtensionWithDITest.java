@@ -41,7 +41,7 @@ public class MavenITmng8220ExtensionWithDITest extends AbstractMavenIntegrationT
     public void testitModel() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8220-extension-with-di");
 
-        Verifier verifier = newVerifier(new File(testDir, "extension").getAbsolutePath());
+        Verifier verifier = newVerifier(new File(testDir, "extensions").getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -50,6 +50,9 @@ public class MavenITmng8220ExtensionWithDITest extends AbstractMavenIntegrationT
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        verifier.verifyTextInLog("[MNG-8220] DumbModelParser Called from extension");
+        verifier.verifyTextInLog("[MNG-8220] DumbModelParser1 Called from extension");
+        verifier.verifyTextInLog("[MNG-8220] DumbModelParser2 Called from extension");
+        verifier.verifyTextInLog("[MNG-8220] DumbModelParser3 Called from extension");
+        verifier.verifyTextInLog("[MNG-8220] DumbModelParser4 Called from extension");
     }
 }

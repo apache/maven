@@ -1,7 +1,22 @@
 <extensions>
     <extension>
         <groupId>org.apache.maven.its.mng8220</groupId>
-        <artifactId>extension</artifactId>
+        <artifactId>extension1</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </extension>
+    <extension>
+        <groupId>org.apache.maven.its.mng8220</groupId>
+        <artifactId>extension2</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </extension>
+    <extension>
+        <groupId>org.apache.maven.its.mng8220</groupId>
+        <artifactId>extension3</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </extension>
+    <extension>
+        <groupId>org.apache.maven.its.mng8220</groupId>
+        <artifactId>extension4</artifactId>
         <version>1.0-SNAPSHOT</version>
     </extension>
 </extensions>
