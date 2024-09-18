@@ -23,6 +23,7 @@ import java.io.File;
 import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
+@Disabled("MNG-7255 provides the default groupId from the parent")
 public class MavenITmng3863AutoPluginGroupIdTest extends AbstractMavenIntegrationTestCase {
 
     public MavenITmng3863AutoPluginGroupIdTest() {
