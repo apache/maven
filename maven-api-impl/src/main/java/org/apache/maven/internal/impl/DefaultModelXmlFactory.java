@@ -105,7 +105,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                 w.write(outputStream, content);
             } else {
                 try (OutputStream os = Files.newOutputStream(path)) {
-                    w.write(outputStream, content);
+                    w.write(os, content);
                 }
             }
         } catch (Exception e) {
