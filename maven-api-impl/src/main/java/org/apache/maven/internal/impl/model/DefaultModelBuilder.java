@@ -648,45 +648,54 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        /**
-         * ModelSourceTransformer for the build pom
-         *
-         * @param model
-         * @param path
-         */
-        Model transformRawToBuildPom(Model model, Path path) {
+        //
+        // Transform raw model to build pom
+        //
+        Model transformRawToBuildPom(Model model) {
             Model.Builder builder = Model.newBuilder(model);
-            handleParent(model, path, builder);
-            handleReactorDependencies(model, path, builder);
-            handleCiFriendlyVersion(model, path, builder);
+            builder = handleParent(model, builder);
+            builder = handleReactorDependencies(model, builder);
+            builder = handleCiFriendlyVersion(model, builder);
             return builder.build();
         }
 
         //
         // Infer parent information
         //
-        void handleParent(Model model, Path pomFile, Model.Builder builder) {
+        Model.Builder handleParent(Model model, Model.Builder builder) {
             Parent parent = model.getParent();
             if (parent != null) {
                 String version = parent.getVersion();
                 String modVersion = replaceCiFriendlyVersion(version);
-                builder.parent(parent.withVersion(modVersion));
+                if (!Objects.equals(version, modVersion)) {
+                    if (builder == null) {
+                        builder = Model.newBuilder(model);
+                    }
+                    builder.parent(parent.withVersion(modVersion));
+                }
             }
+            return builder;
         }
 
         //
         // CI friendly versions
         //
-        void handleCiFriendlyVersion(Model model, Path pomFile, Model.Builder builder) {
+        Model.Builder handleCiFriendlyVersion(Model model, Model.Builder builder) {
             String version = model.getVersion();
             String modVersion = replaceCiFriendlyVersion(version);
-            builder.version(modVersion);
+            if (!Objects.equals(version, modVersion)) {
+                if (builder == null) {
+                    builder = Model.newBuilder(model);
+                }
+                builder.version(modVersion);
+            }
+            return builder;
         }
 
         //
         // Infer inner reactor dependencies version
         //
-        void handleReactorDependencies(Model model, Path pomFile, Model.Builder builder) {
+        Model.Builder handleReactorDependencies(Model model, Model.Builder builder) {
             List<Dependency> newDeps = new ArrayList<>();
             boolean modified = false;
             for (Dependency dep : model.getDependencies()) {
@@ -721,8 +730,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
             if (modified) {
+                if (builder == null) {
+                    builder = Model.newBuilder(model);
+                }
                 builder.dependencies(newDeps);
             }
+            return builder;
         }
 
         String replaceCiFriendlyVersion(String version) {
@@ -1323,13 +1336,11 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private Model doReadRawModel(DefaultModelBuilderSession build) throws ModelBuilderException {
         ModelBuilderRequest request = build.request;
-        ModelSource modelSource = request.getSource();
         Model rawModel = readFileModel(build);
         if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion())
                 && request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
-            Path pomFile = modelSource.getPath();
             try {
-                rawModel = build.transformRawToBuildPom(rawModel, pomFile);
+                rawModel = build.transformRawToBuildPom(rawModel);
             } catch (ModelTransformerException e) {
                 build.add(Severity.FATAL, ModelProblem.Version.V40, null, e);
             }
