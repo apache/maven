@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
@@ -39,7 +38,6 @@ import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblemCollector;
-import org.apache.maven.api.services.ModelResolver;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.model.DependencyManagementImporter;
@@ -51,6 +49,7 @@ import org.apache.maven.api.services.model.ModelInterpolator;
 import org.apache.maven.api.services.model.ModelNormalizer;
 import org.apache.maven.api.services.model.ModelPathTranslator;
 import org.apache.maven.api.services.model.ModelProcessor;
+import org.apache.maven.api.services.model.ModelResolver;
 import org.apache.maven.api.services.model.ModelUrlNormalizer;
 import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.api.services.model.ModelVersionParser;
@@ -97,6 +96,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final List<ModelTransformer> transformers;
     private final ModelCacheFactory modelCacheFactory;
+    private final ModelResolver modelResolver;
 
     @Inject
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -119,7 +119,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
             RemoteRepositoryManager remoteRepositoryManager,
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             List<ModelTransformer> transformers,
-            ModelCacheFactory modelCacheFactory) {
+            ModelCacheFactory modelCacheFactory,
+            ModelResolver modelResolver) {
         this.profileInjector = profileInjector;
         this.inheritanceAssembler = inheritanceAssembler;
         this.dependencyManagementImporter = dependencyManagementImporter;
@@ -139,6 +140,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.transformers = transformers;
         this.modelCacheFactory = modelCacheFactory;
+        this.modelResolver = modelResolver;
     }
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -198,14 +200,14 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 profileActivationFilePathInterpolator,
                 versionParser,
                 transformers,
-                modelCacheFactory);
+                modelCacheFactory,
+                modelResolver);
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
         request.requestType(ModelBuilderRequest.RequestType.BUILD_POM);
         request.session(iSession);
         request.source(ModelSource.fromPath(src));
         request.locationTracking(false);
-        request.modelResolver(iSession.getData().get(SessionData.key(ModelResolver.class)));
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());
         return modelBuilder.newSession().build(request.build());

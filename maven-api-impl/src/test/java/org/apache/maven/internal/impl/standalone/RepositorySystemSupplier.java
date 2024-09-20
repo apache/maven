@@ -50,6 +50,7 @@ import org.apache.maven.internal.impl.model.DefaultProfileSelector;
 import org.apache.maven.internal.impl.model.DefaultRootLocator;
 import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader;
+import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
 import org.apache.maven.internal.impl.resolver.DefaultVersionRangeResolver;
 import org.apache.maven.internal.impl.resolver.DefaultVersionResolver;
 import org.apache.maven.internal.impl.resolver.MavenArtifactRelocationSource;
@@ -1058,7 +1059,8 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), new DefaultRootLocator()),
                 new DefaultModelVersionParser(getVersionScheme()),
                 List.of(),
-                new DefaultModelCacheFactory());
+                new DefaultModelCacheFactory(),
+                new DefaultModelResolver());
     }
 
     private RepositorySystem repositorySystem;

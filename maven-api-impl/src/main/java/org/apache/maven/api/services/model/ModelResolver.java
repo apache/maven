@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.api.services.model;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -29,6 +29,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Parent;
+import org.apache.maven.api.services.ModelSource;
 
 /**
  * Resolves a POM from its coordinates.

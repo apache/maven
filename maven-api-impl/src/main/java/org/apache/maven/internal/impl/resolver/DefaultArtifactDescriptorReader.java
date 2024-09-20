@@ -34,9 +34,8 @@ import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
-import org.apache.maven.api.services.ModelResolver;
-import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.model.ModelProblemUtils;
 import org.eclipse.aether.RepositoryEvent;
@@ -193,7 +192,6 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         .toList();
                 String gav =
                         pomArtifact.getGroupId() + ":" + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion();
-                ModelResolver modelResolver = new DefaultModelResolver();
                 ModelBuilderRequest modelRequest = ModelBuilderRequest.builder()
                         .session(iSession)
                         .requestType(ModelBuilderRequest.RequestType.DEPENDENCY)
@@ -203,7 +201,6 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         // properties in dependencies the user does not know. See MNG-7563 for details.
                         .systemProperties(toProperties(session.getUserProperties(), session.getSystemProperties()))
                         .userProperties(Map.of())
-                        .modelResolver(modelResolver)
                         .repositoryMerging(ModelBuilderRequest.RepositoryMerging.REQUEST_DOMINANT)
                         .repositories(repositories)
                         .build();

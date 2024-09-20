@@ -35,11 +35,11 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.ArtifactResolverException;
-import org.apache.maven.api.services.ModelResolver;
-import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.VersionRangeResolverException;
+import org.apache.maven.api.services.model.ModelResolver;
+import org.apache.maven.api.services.model.ModelResolverException;
 
 /**
  * A model resolver to assist building of dependency POMs.

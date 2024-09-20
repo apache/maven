@@ -124,9 +124,6 @@ public interface ModelBuilderRequest {
     Map<String, String> getUserProperties();
 
     @Nonnull
-    ModelResolver getModelResolver();
-
-    @Nonnull
     RepositoryMerging getRepositoryMerging();
 
     @Nullable
@@ -183,7 +180,6 @@ public interface ModelBuilderRequest {
         List<String> inactiveProfileIds;
         Map<String, String> systemProperties;
         Map<String, String> userProperties;
-        ModelResolver modelResolver;
         RepositoryMerging repositoryMerging;
         Object listener;
         ModelBuilderResult interimResult;
@@ -202,7 +198,6 @@ public interface ModelBuilderRequest {
             this.inactiveProfileIds = request.getInactiveProfileIds();
             this.systemProperties = request.getSystemProperties();
             this.userProperties = request.getUserProperties();
-            this.modelResolver = request.getModelResolver();
             this.repositoryMerging = request.getRepositoryMerging();
             this.listener = request.getListener();
             this.interimResult = request.getInterimResult();
@@ -259,11 +254,6 @@ public interface ModelBuilderRequest {
             return this;
         }
 
-        public ModelBuilderRequestBuilder modelResolver(ModelResolver modelResolver) {
-            this.modelResolver = modelResolver;
-            return this;
-        }
-
         public ModelBuilderRequestBuilder repositoryMerging(RepositoryMerging repositoryMerging) {
             this.repositoryMerging = repositoryMerging;
             return this;
@@ -296,7 +286,6 @@ public interface ModelBuilderRequest {
                     inactiveProfileIds,
                     systemProperties,
                     userProperties,
-                    modelResolver,
                     repositoryMerging,
                     listener,
                     interimResult,
@@ -313,7 +302,6 @@ public interface ModelBuilderRequest {
             private final List<String> inactiveProfileIds;
             private final Map<String, String> systemProperties;
             private final Map<String, String> userProperties;
-            private final ModelResolver modelResolver;
             private final RepositoryMerging repositoryMerging;
             private final Object listener;
             private final ModelBuilderResult interimResult;
@@ -331,7 +319,6 @@ public interface ModelBuilderRequest {
                     List<String> inactiveProfileIds,
                     Map<String, String> systemProperties,
                     Map<String, String> userProperties,
-                    ModelResolver modelResolver,
                     RepositoryMerging repositoryMerging,
                     Object listener,
                     ModelBuilderResult interimResult,
@@ -347,7 +334,6 @@ public interface ModelBuilderRequest {
                 this.systemProperties =
                         systemProperties != null ? Map.copyOf(systemProperties) : session.getSystemProperties();
                 this.userProperties = userProperties != null ? Map.copyOf(userProperties) : session.getUserProperties();
-                this.modelResolver = modelResolver;
                 this.repositoryMerging = repositoryMerging;
                 this.listener = listener;
                 this.interimResult = interimResult;
@@ -398,11 +384,6 @@ public interface ModelBuilderRequest {
             @Override
             public Map<String, String> getUserProperties() {
                 return userProperties;
-            }
-
-            @Override
-            public ModelResolver getModelResolver() {
-                return modelResolver;
             }
 
             @Override

@@ -1060,7 +1060,8 @@ public class MavenRepositorySystemSupplier implements Supplier<RepositorySystem>
                 new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), new DefaultRootLocator()),
                 new DefaultModelVersionParser(getVersionScheme()),
                 List.of(),
-                new DefaultModelCacheFactory());
+                new DefaultModelCacheFactory(),
+                new org.apache.maven.internal.impl.resolver.DefaultModelResolver());
     }
 
     private RepositorySystem repositorySystem;

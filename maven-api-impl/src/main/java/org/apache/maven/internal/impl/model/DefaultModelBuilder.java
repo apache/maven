@@ -79,8 +79,6 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblemCollector;
-import org.apache.maven.api.services.ModelResolver;
-import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.Source;
@@ -98,6 +96,8 @@ import org.apache.maven.api.services.model.ModelInterpolator;
 import org.apache.maven.api.services.model.ModelNormalizer;
 import org.apache.maven.api.services.model.ModelPathTranslator;
 import org.apache.maven.api.services.model.ModelProcessor;
+import org.apache.maven.api.services.model.ModelResolver;
+import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.api.services.model.ModelUrlNormalizer;
 import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.api.services.model.ModelVersionParser;
@@ -111,7 +111,6 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.api.spi.ModelTransformerException;
-import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -120,8 +119,6 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  */
@@ -156,6 +153,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final ModelVersionParser versionParser;
     private final List<ModelTransformer> transformers;
     private final ModelCacheFactory modelCacheFactory;
+    private final ModelResolver modelResolver;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -178,7 +176,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             ModelVersionParser versionParser,
             List<ModelTransformer> transformers,
-            ModelCacheFactory modelCacheFactory) {
+            ModelCacheFactory modelCacheFactory,
+            ModelResolver modelResolver) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
         this.modelNormalizer = modelNormalizer;
@@ -198,6 +197,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.versionParser = versionParser;
         this.transformers = transformers;
         this.modelCacheFactory = modelCacheFactory;
+        this.modelResolver = modelResolver;
     }
 
     public ModelBuilderSession newSession() {
@@ -206,7 +206,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             @Override
             public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
-                request = fillRequestDefaults(request);
                 if (request.getInterimResult() != null) {
                     if (mainSession == null) {
                         throw new IllegalStateException("ModelBuilderSession is not initialized");
@@ -751,14 +750,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    private static ModelBuilderRequest fillRequestDefaults(ModelBuilderRequest request) {
-        ModelBuilderRequest.ModelBuilderRequestBuilder builder = ModelBuilderRequest.builder(request);
-        if (request.getModelResolver() == null) {
-            builder.modelResolver(new DefaultModelResolver());
-        }
-        return builder.build();
-    }
-
     protected ModelBuilderResult build(DefaultModelBuilderSession build, Collection<String> importIds)
             throws ModelBuilderException {
         // phase 1
@@ -1071,7 +1062,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
-        request = fillRequestDefaults(request);
         DefaultModelBuilderSession build = new DefaultModelBuilderSession(request);
         Model model = readRawModel(build);
         if (hasModelErrors(build)) {
@@ -1641,14 +1631,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         String artifactId = parent.getArtifactId();
         String version = parent.getVersion();
 
-        ModelResolver modelResolver = getModelResolver(request);
-        requireNonNull(
-                modelResolver,
-                String.format(
-                        "request.modelResolver cannot be null (parent POM %s and POM %s)",
-                        ModelProblemUtils.toId(groupId, artifactId, version),
-                        ModelProblemUtils.toSourceHint(childModel)));
-
         ModelSource modelSource;
         try {
             AtomicReference<Parent> modified = new AtomicReference<>();
@@ -1884,12 +1866,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             String version,
             Collection<String> importIds) {
         final ModelBuilderRequest request = build.request;
-        final ModelResolver modelResolver = getModelResolver(request);
-        if (modelResolver == null) {
-            throw new NullPointerException(String.format(
-                    "request.workspaceModelResolver and request.modelResolver cannot be null (parent POM %s and POM %s)",
-                    ModelProblemUtils.toId(groupId, artifactId, version), ModelProblemUtils.toSourceHint(model)));
-        }
 
         Model importModel;
         // no workspace resolver or workspace resolver returned null (i.e. model not in workspace)
@@ -1934,7 +1910,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .systemProperties(request.getSystemProperties())
                     .userProperties(request.getUserProperties())
                     .source(importSource)
-                    .modelResolver(modelResolver)
                     .twoPhaseBuilding(false)
                     .repositories(build.getRepositories())
                     .build();
@@ -2016,10 +1991,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private static ModelBuildingListener getModelBuildingListener(ModelBuilderRequest request) {
         return (ModelBuildingListener) request.getListener();
-    }
-
-    private static ModelResolver getModelResolver(ModelBuilderRequest request) {
-        return request.getModelResolver();
     }
 
     record GAKey(String groupId, String artifactId) {}
