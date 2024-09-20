@@ -38,6 +38,7 @@ import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
@@ -72,6 +73,9 @@ class PomConstructionTest {
 
     @Inject
     private MavenRepositorySystem repositorySystem;
+
+    @Inject
+    private PlexusContainer container;
 
     private File testDirectory;
 
@@ -1888,7 +1892,7 @@ class PomConstructionTest {
                         ? ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
                         : ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
 
-        DefaultRepositorySystemSession repoSession = MavenTestHelper.createSession(repositorySystem);
+        DefaultRepositorySystemSession repoSession = MavenTestHelper.createSession(repositorySystem, container);
         LocalRepository localRepo =
                 new LocalRepository(config.getLocalRepository().getBasedir());
         repoSession.setLocalRepositoryManager(

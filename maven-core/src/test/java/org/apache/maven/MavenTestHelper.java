@@ -18,33 +18,24 @@
  */
 package org.apache.maven;
 
-import java.util.List;
-
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.DefaultRepositoryFactory;
+import org.apache.maven.internal.impl.DefaultLookup;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.internal.impl.InternalSession;
+import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
-import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
-import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 
 public class MavenTestHelper {
-    public static DefaultRepositorySystemSession createSession(MavenRepositorySystem repositorySystem) {
+    public static DefaultRepositorySystemSession createSession(
+            MavenRepositorySystem repositorySystem, PlexusContainer container) {
         DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(h -> false);
         DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
         MavenSession mavenSession = new MavenSession(repoSession, request, new DefaultMavenExecutionResult());
-        DefaultSession session = new DefaultSession(
-                mavenSession,
-                null,
-                null,
-                repositorySystem,
-                new SimpleLookup(List.of(new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
-                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())))),
-                null);
+        DefaultSession session =
+                new DefaultSession(mavenSession, null, null, repositorySystem, new DefaultLookup(container), null);
         InternalSession.associate(repoSession, session);
         return repoSession;
     }
