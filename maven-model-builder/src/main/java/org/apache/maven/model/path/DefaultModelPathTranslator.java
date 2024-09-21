@@ -126,7 +126,10 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
 
     private String alignToBaseDirectory(String path, Path basedir) {
         String newPath = mayAlignToBaseDirectoryOrNull(path, basedir);
-        return Objects.equals(path, newPath) ? path : newPath;
+        if (newPath != null) {
+            return newPath;
+        }
+        return path;
     }
 
     /**
