@@ -49,7 +49,6 @@ public interface Lifecycle extends ExtensibleEnum {
     String CLEAN = "clean";
     String DEFAULT = "default";
     String SITE = "site";
-    String WRAPPER = "wrapper";
 
     // ======================
     // Phase qualifiers

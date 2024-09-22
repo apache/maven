@@ -93,10 +93,6 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
 
     public static final MojoDescriptor SITE_DEPLOY = createMojoDescriptor("site-deploy");
 
-    // wrapper
-
-    public static final MojoDescriptor WRAPPER = createMojoDescriptor("wrapper");
-
     /**
      * @deprecated instead use {@link #getNumberOfExecutions(ProjectBuildList)}
      */
