@@ -27,7 +27,9 @@ import org.apache.maven.model.building.ModelProblem.Version;
 /**
  * Class to wrap request parameters to ModelProblemCollector.addProblem
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public final class ModelProblemCollectorRequest {
 
     private final ModelProblem.Severity severity;

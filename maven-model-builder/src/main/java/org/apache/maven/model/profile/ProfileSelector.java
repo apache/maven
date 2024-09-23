@@ -28,7 +28,9 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Calculates the active profiles among a given collection of profiles.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ProfileSelector {
 
     /**

@@ -25,7 +25,9 @@ import java.util.Map;
 /**
  * Describes the environmental context used to determine the activation status of profiles.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ProfileActivationContext {
     /**
      * Key of the property containing the project's packaging.

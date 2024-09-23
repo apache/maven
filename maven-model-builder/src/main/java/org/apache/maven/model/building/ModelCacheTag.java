@@ -26,7 +26,9 @@ import org.apache.maven.api.model.Model;
  * and a class to provide some type safety when working with the otherwise untyped cache.
  *
  * @param <T> The type of data associated with the tag.
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 interface ModelCacheTag<T> {
 
     /**

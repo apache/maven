@@ -48,9 +48,11 @@ import org.codehaus.plexus.interpolation.ValueSource;
  * StringVisitorModelInterpolator
  *
  * @since 3.6.2
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class StringVisitorModelInterpolator extends AbstractStringBasedModelInterpolator {
     @Inject
     public StringVisitorModelInterpolator(

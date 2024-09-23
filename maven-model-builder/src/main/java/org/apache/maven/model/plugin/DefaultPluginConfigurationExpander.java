@@ -35,9 +35,11 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles expansion of general build plugin configuration into individual executions.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultPluginConfigurationExpander implements PluginConfigurationExpander {
 
     @Override

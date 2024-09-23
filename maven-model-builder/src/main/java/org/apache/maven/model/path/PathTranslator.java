@@ -24,7 +24,9 @@ import java.nio.file.Path;
 /**
  * Resolves relative paths against a specific base directory.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface PathTranslator {
 
     /**

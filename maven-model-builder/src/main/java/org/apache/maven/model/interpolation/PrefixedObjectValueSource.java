@@ -28,7 +28,10 @@ import org.codehaus.plexus.interpolation.QueryEnabledValueSource;
  * Wraps an arbitrary object with an {@link ObjectBasedValueSource} instance, then
  * wraps that source with a {@link PrefixedValueSourceWrapper} instance, to which
  * this class delegates all of its calls.
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class PrefixedObjectValueSource extends AbstractDelegatingValueSource implements QueryEnabledValueSource {
 
     /**

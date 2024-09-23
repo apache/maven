@@ -28,7 +28,9 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Checks the model for missing or invalid values.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelValidator {
     /**
      * Checks the specified file model for missing or invalid values. This model is directly created from the POM

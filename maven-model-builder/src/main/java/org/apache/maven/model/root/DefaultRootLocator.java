@@ -28,7 +28,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ */
 @Named
+@Deprecated(since = "4.0.0")
 public class DefaultRootLocator implements RootLocator {
 
     public boolean isRootDirectory(Path dir) {

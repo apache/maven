@@ -26,6 +26,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ */
+@Deprecated(since = "4.0.0")
 class MethodMap {
     private static final int MORE_SPECIFIC = 0;
 

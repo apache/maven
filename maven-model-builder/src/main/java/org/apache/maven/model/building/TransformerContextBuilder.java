@@ -23,7 +23,9 @@ package org.apache.maven.model.building;
  * In case rawModels are missing, it could do new buildingRequests on the ModelBuilder.
  *
  * @since 4.0.0
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface TransformerContextBuilder {
     /**
      * This method is used to initialize the TransformerContext

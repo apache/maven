@@ -25,7 +25,9 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles inheritance of model values.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface InheritanceAssembler {
 
     /**

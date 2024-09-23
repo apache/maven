@@ -39,9 +39,11 @@ import org.apache.maven.model.profile.activation.ProfileActivator;
 /**
  * Calculates the active profiles among a given collection of profiles.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultProfileSelector implements ProfileSelector {
 
     private final List<ProfileActivator> activators;

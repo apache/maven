@@ -31,9 +31,12 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 
 /**
  * Determines profile activation based on the project's packaging.
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("packaging")
 @Singleton
+@Deprecated(since = "4.0.0")
 public class PackagingProfileActivator implements ProfileActivator {
 
     @Override

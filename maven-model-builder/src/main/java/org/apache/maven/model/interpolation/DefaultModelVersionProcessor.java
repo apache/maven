@@ -28,9 +28,12 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 /**
  * Maven default implementation of the {@link ModelVersionProcessor} to support
  * <a href="https://maven.apache.org/maven-ci-friendly.html">CI Friendly Versions</a>
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultModelVersionProcessor implements ModelVersionProcessor {
 
     private static final String SHA1_PROPERTY = "sha1";

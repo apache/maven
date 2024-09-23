@@ -85,7 +85,9 @@ import static java.util.Objects.requireNonNull;
  * this factory to provide custom implementations for some of the components used by the model builder, or use the
  * builder API to inject custom instances.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class DefaultModelBuilderFactory {
 
     private ModelProcessor modelProcessor;

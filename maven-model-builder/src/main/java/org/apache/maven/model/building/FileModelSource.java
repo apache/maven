@@ -28,7 +28,9 @@ import org.apache.maven.model.locator.ModelLocator;
 /**
  * Wraps an ordinary {@link File} as a model source.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class FileModelSource extends FileSource implements ModelSource3 {
 
     /**
