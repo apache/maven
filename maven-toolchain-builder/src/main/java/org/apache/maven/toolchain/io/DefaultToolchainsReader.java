@@ -38,9 +38,11 @@ import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
  * Handles deserialization of toolchains from the default textual format.
  *
  * @since 3.3.0
+ * @deprecated since 4.0.0, use {@link MavenToolchainsStaxReader} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultToolchainsReader implements ToolchainsReader {
 
     @Override

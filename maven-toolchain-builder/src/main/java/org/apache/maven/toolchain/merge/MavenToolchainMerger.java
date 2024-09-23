@@ -23,7 +23,9 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 /**
  *
  * @since 3.2.4
+ * @deprecated since 4.0.0, use {@link org.apache.maven.toolchain.v4.MavenToolchainsMerger} instead
  */
+@Deprecated(since = "4.0.0")
 public class MavenToolchainMerger {
 
     public void merge(PersistedToolchains dominant, PersistedToolchains recessive, String recessiveSourceLevel) {

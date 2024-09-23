@@ -27,7 +27,9 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 /**
  * Handles serialization of toolchains into some kind of textual format like XML.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.xml.ToolchainsXmlFactory} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ToolchainsWriter {
 
     /**

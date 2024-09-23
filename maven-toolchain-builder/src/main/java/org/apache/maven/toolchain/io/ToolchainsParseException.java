@@ -25,6 +25,7 @@ import java.io.IOException;
  *
  * @since 3.3.0
  */
+@Deprecated(since = "4.0.0")
 public class ToolchainsParseException extends IOException {
 
     /**
