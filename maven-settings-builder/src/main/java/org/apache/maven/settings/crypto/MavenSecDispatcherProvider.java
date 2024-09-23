@@ -32,6 +32,7 @@ import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 
 @Named("maven")
 @Singleton
+@Deprecated(since = "4.0.0")
 public final class MavenSecDispatcherProvider implements Provider<SecDispatcher> {
     private final SecDispatcher secDispatcher;
 

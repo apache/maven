@@ -28,7 +28,9 @@ import java.util.List;
  * possible before eventually failing to provide callers with rich error information. Use {@link #getProblems()} to
  * query the details of the failure.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.SettingsBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class SettingsBuildingException extends Exception {
 
     private final List<SettingsProblem> problems;

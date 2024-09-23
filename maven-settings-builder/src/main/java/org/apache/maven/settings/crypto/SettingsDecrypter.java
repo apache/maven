@@ -21,7 +21,9 @@ package org.apache.maven.settings.crypto;
 /**
  * Decrypts passwords in the settings.
  *
+ * @deprecated since 4.0.0
  */
+@Deprecated(since = "4.0.0")
 public interface SettingsDecrypter {
 
     /**

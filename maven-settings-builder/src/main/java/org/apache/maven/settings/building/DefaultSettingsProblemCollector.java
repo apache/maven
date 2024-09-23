@@ -26,7 +26,9 @@ import org.apache.maven.settings.io.SettingsParseException;
 /**
  * Collects problems that are encountered during settings building.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.SettingsBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 class DefaultSettingsProblemCollector implements SettingsProblemCollector {
 
     private List<SettingsProblem> problems;

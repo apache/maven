@@ -32,9 +32,11 @@ import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.building.SettingsProblemCollector;
 
 /**
+ * @deprecated since 4.0.0, use {@link org.apache.maven.internal.impl.DefaultSettingsValidator} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultSettingsValidator implements SettingsValidator {
 
     private static final String ID = "[\\w.-]+";

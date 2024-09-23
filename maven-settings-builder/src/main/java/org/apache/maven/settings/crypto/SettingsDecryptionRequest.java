@@ -26,7 +26,9 @@ import org.apache.maven.settings.Server;
 /**
  * Collects parameters that control the decryption of settings.
  *
+ * @deprecated since 4.0.0
  */
+@Deprecated(since = "4.0.0")
 public interface SettingsDecryptionRequest {
 
     /**

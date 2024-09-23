@@ -23,7 +23,9 @@ import java.io.IOException;
 /**
  * Signals a failure to parse the settings due to invalid syntax (e.g. non well formed XML or unknown elements).
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.xml.SettingsXmlFactory} instead
  */
+@Deprecated(since = "4.0.0")
 public class SettingsParseException extends IOException {
 
     /**
