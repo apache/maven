@@ -52,6 +52,8 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
 
     private List<ModelProblem> problems;
 
+    private final List<DefaultModelBuilderResult> children = new ArrayList<>();
+
     DefaultModelBuilderResult() {
         modelIds = new ArrayList<>();
         rawModels = new HashMap<>();
@@ -183,6 +185,11 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
         }
 
         return this;
+    }
+
+    @Override
+    public List<DefaultModelBuilderResult> getChildren() {
+        return children;
     }
 
     public String toString() {

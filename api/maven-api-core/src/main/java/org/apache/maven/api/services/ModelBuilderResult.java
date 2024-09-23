@@ -118,6 +118,9 @@ public interface ModelBuilderResult {
     @Nonnull
     List<ModelProblem> getProblems();
 
+    @Nonnull
+    List<? extends ModelBuilderResult> getChildren();
+
     /**
      * Creates a human-readable representation of these errors.
      */

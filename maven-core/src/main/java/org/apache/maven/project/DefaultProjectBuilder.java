@@ -42,7 +42,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -99,7 +98,6 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
-import org.apache.maven.utils.Os;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
@@ -584,8 +582,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             try {
                 // Phase 2: get effective models from the reactor
-                List<ProjectBuildingResult> results = build(projectIndex, interimResults);
-                return results;
+                return build(projectIndex, interimResults);
             } finally {
                 Thread.currentThread().setContextClassLoader(oldContextClassLoader);
             }
@@ -642,6 +639,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     .twoPhaseBuilding(true)
                     .locationTracking(true)
                     .listener(listener)
+                    .recursive(recursive)
                     .build();
 
             ModelBuilderResult result;
@@ -658,11 +656,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 // result.getProblems().addAll(e.getProblems()) ?
             }
 
+            InterimResult interimResult = new InterimResult(pomFile, modelBuildingRequest, result, project, isRoot);
+            interimResult.subprojects = result.getChildren().stream()
+                    .map(r -> build(projectIndex, r.getFileModel().getPomFile().toFile(), aggregatorFiles, false, true))
+                    .toList();
+            /*
             Model model = result.getActivatedFileModel();
 
-            InterimResult interimResult = new InterimResult(pomFile, modelBuildingRequest, result, project, isRoot);
-
-            if (recursive) {
+            if (recursive && model != null) {
                 File basedir = pomFile.getParentFile();
                 List<String> subprojects = model.getSubprojects();
                 if (subprojects.isEmpty()) {
@@ -731,6 +732,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     interimResult.subprojects = build(projectIndex, subprojectFiles, aggregatorFiles, false, recursive);
                 }
             }
+             */
 
             projectIndex.put(pomFile, project);
 
@@ -739,62 +741,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
         private List<ProjectBuildingResult> build(
                 Map<File, MavenProject> projectIndex, List<InterimResult> interimResults) {
-            // The transformation may need to access dependencies raw models,
-            // which may cause some re-entrance in the build() method and can
-            // actually cause deadlocks.  In order to workaround the problem,
-            // we do a first pass by reading all rawModels in order.
-            /*
-            List<ProjectBuildingResult> results = new ArrayList<>();
-            boolean failure = false;
-            for (InterimResult r : interimResults) {
-                DefaultProjectBuildingResult res;
-                try {
-                    Model model = modelBuilder.buildRawModel(r.request);
-                    res = new DefaultProjectBuildingResult(
-                            model.getId(),
-                            model.getPomFile() != null ? model.getPomFile().toFile() : null,
-                            null);
-                } catch (ModelBuilderException e) {
-                    failure = true;
-                    res = new DefaultProjectBuildingResult(
-                            e.getModelId(),
-                            r.request.getSource().getPath() != null
-                                    ? r.request.getSource().getPath().toFile()
-                                    : null,
-                            convert(e.getProblems()));
-                }
-                results.add(res);
-            }
-            if (failure) {
-                return results;
-            }
-            */
-
-            List<Callable<List<ProjectBuildingResult>>> callables = interimResults.stream()
-                    .map(interimResult ->
-                            (Callable<List<ProjectBuildingResult>>) () -> doBuild(projectIndex, interimResult))
+            return interimResults.stream()
+                    .map(ir -> doBuild(projectIndex, ir))
+                    .flatMap(List::stream)
                     .collect(Collectors.toList());
-
-            try {
-                List<Future<List<ProjectBuildingResult>>> futures = executor.invokeAll(callables);
-                return futures.stream()
-                        .map(listFuture -> {
-                            try {
-                                return listFuture.get();
-                            } catch (InterruptedException e) {
-                                uncheckedThrow(e);
-                                return null;
-                            } catch (ExecutionException e) {
-                                uncheckedThrow(e.getCause());
-                                return null;
-                            }
-                        })
-                        .flatMap(List::stream)
-                        .collect(Collectors.toList());
-            } catch (InterruptedException e) {
-                uncheckedThrow(e);
-                return null;
-            }
         }
 
         private List<ProjectBuildingResult> doBuild(Map<File, MavenProject> projectIndex, InterimResult interimResult) {
@@ -803,9 +753,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
             MavenProject project = interimResult.project;
             try {
-                ModelBuilderResult result = modelBuilderSession.build(ModelBuilderRequest.builder(interimResult.request)
-                        .interimResult(interimResult.result)
-                        .build());
+                ModelBuilderResult result = interimResult.result;
 
                 // 2nd pass of initialization: resolve and build parent if necessary
                 List<org.apache.maven.model.building.ModelProblem> problems = convert(result.getProblems());

@@ -106,6 +106,7 @@ import org.apache.maven.api.services.model.PluginManagementInjector;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileInjector;
 import org.apache.maven.api.services.model.ProfileSelector;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParserException;
@@ -301,6 +302,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         public DefaultModelBuilderSession derive(ModelSource source) {
+            return derive(source, result);
+        }
+
+        public DefaultModelBuilderSession derive(ModelSource source, DefaultModelBuilderResult result) {
             return derive(ModelBuilderRequest.build(request, source), result);
         }
 
@@ -405,10 +410,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             while (!toLoad.isEmpty()) {
                 Path pom = toLoad.remove(0);
                 try {
-                    Model rawModel = readFileModel(derive(ModelSource.fromPath(pom)));
-                    List<String> subprojects = rawModel.getSubprojects();
+                    Model model = readFileModel(derive(ModelSource.fromPath(pom)));
+                    model = activateFileModel(this, model);
+                    List<String> subprojects = model.getSubprojects();
                     if (subprojects.isEmpty()) {
-                        subprojects = rawModel.getModules();
+                        subprojects = model.getModules();
                     }
                     for (String subproject : subprojects) {
                         Path subprojectFile = getModelProcessor()
@@ -752,24 +758,112 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     protected ModelBuilderResult build(DefaultModelBuilderSession build, Collection<String> importIds)
             throws ModelBuilderException {
-        // phase 1
-        ModelBuilderRequest request = build.request;
-        DefaultModelBuilderResult result = build.result;
+        if (build.request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
+                && build.request.isRecursive()) {
+            return buildRecursive(build, importIds);
+        } else {
+            return buildParentOrDependency(build, importIds);
+        }
+    }
 
-        // read and validate raw model
-        Model fileModel = readFileModel(build);
-        result.setFileModel(fileModel);
+    private ModelBuilderResult buildRecursive(DefaultModelBuilderSession build, Collection<String> importIds)
+            throws ModelBuilderException {
+        Set<Path> buildParts = new HashSet<>();
+        Path top = build.request.getSource().getPath();
+        if (top == null) {
+            throw new IllegalStateException("Recursive build requested but source has no path");
+        }
+        buildParts.add(top);
 
-        Model activatedFileModel = activateFileModel(build, fileModel);
-        result.setActivatedFileModel(activatedFileModel);
-
-        if (!request.isTwoPhaseBuilding()) {
-            return build2(build, importIds);
-        } else if (hasModelErrors(build)) {
+        Path rootDirectory;
+        try {
+            rootDirectory = build.session.getRootDirectory();
+        } catch (IllegalStateException e) {
+            rootDirectory = build.session.getService(RootLocator.class).findRoot(top);
+        }
+        List<Path> toLoad = new ArrayList<>();
+        Path root = getModelProcessor().locateExistingPom(rootDirectory);
+        toLoad.add(root);
+        while (!toLoad.isEmpty()) {
+            Path pom = toLoad.remove(0);
+            DefaultModelBuilderResult r;
+            boolean isBuildPart = buildParts.contains(pom);
+            if (pom.equals(top)) {
+                r = build.result;
+            } else {
+                r = new DefaultModelBuilderResult();
+                if (isBuildPart) {
+                    build.result.getChildren().add(r);
+                }
+            }
+            try {
+                Model model = readFileModel(build.derive(ModelSource.fromPath(pom), r));
+                r.setFileModel(model);
+                Model activated = activateFileModel(build, model);
+                r.setActivatedFileModel(activated);
+                List<String> subprojects = activated.getSubprojects();
+                if (subprojects.isEmpty()) {
+                    subprojects = activated.getModules();
+                }
+                for (String subproject : subprojects) {
+                    Path subprojectFile = getModelProcessor()
+                            .locateExistingPom(pom.getParent().resolve(subproject));
+                    if (subprojectFile != null) {
+                        toLoad.add(subprojectFile);
+                        if (isBuildPart) {
+                            buildParts.add(subprojectFile);
+                        }
+                    }
+                }
+            } catch (ModelBuilderException e) {
+                // gathered with problem collector
+                build.add(Severity.ERROR, ModelProblem.Version.V40, "Failed to load project " + pom, e);
+            }
+            if (pom != root) {
+                build.result.getProblems().addAll(r.getProblems());
+                r.getProblems().clear();
+            }
+        }
+        if (hasModelErrors(build)) {
             throw build.newModelBuilderException();
         }
 
-        return result;
+        build2(build, importIds);
+        for (DefaultModelBuilderResult r : build.result.getChildren()) {
+            if (r.getFileModel() == null) {
+                continue;
+            }
+            var pbs = r.getProblems();
+            r.setProblems(List.of());
+            build2(build.derive(ModelSource.fromPath(r.getFileModel().getPomFile()), r), importIds);
+            build.result.getProblems().addAll(r.getProblems());
+            pbs.addAll(r.getProblems());
+            r.setProblems(pbs);
+        }
+        if (hasModelErrors(build)) {
+            throw build.newModelBuilderException();
+        }
+
+        return build.result;
+    }
+
+    private ModelBuilderResult buildParentOrDependency(DefaultModelBuilderSession build, Collection<String> importIds)
+            throws ModelBuilderException {
+        // phase 1: read and validate raw model
+        Model fileModel = readFileModel(build);
+        build.result.setFileModel(fileModel);
+
+        Model activatedFileModel = activateFileModel(build, fileModel);
+        build.result.setActivatedFileModel(activatedFileModel);
+
+        // if (!build.request.isTwoPhaseBuilding()) {
+        // phase 2: build the effective model
+        return build2(build, importIds);
+        // } else if (hasModelErrors(build)) {
+        //    throw build.newModelBuilderException();
+        // }
+
+        // return build.result;
     }
 
     private Model activateFileModel(DefaultModelBuilderSession build, Model inputModel) throws ModelBuilderException {
@@ -1154,9 +1248,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         ModelSource modelSource = request.getSource();
         Model model;
         build.setSource(modelSource.getLocation());
+        logger.debug("Reading file model from " + modelSource.getLocation());
         try {
             boolean strict = request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM;
-
+            // TODO: we do cache, but what if strict does not have the same value?
             Path rootDirectory;
             try {
                 rootDirectory = request.getSession().getRootDirectory();

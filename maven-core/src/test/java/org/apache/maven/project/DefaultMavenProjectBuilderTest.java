@@ -29,6 +29,7 @@ import org.apache.maven.api.SessionData;
 import org.apache.maven.api.services.model.ModelCache;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.impl.InternalSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -419,6 +420,12 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     public void testSubprojectDiscovery() throws Exception {
         File pom = getTestFile("src/test/resources/projects/subprojects-discover/pom.xml");
         ProjectBuildingRequest configuration = newBuildingRequest();
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
 
         List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
         assertEquals(2, results.size());

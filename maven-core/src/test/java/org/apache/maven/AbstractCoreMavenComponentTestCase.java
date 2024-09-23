@@ -90,6 +90,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
 
     protected MavenExecutionRequest createMavenExecutionRequest(File pom) throws Exception {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+                .setRootDirectory(pom != null ? pom.toPath().getParent() : null)
                 .setPom(pom)
                 .setProjectPresent(true)
                 .setShowErrors(true)

@@ -316,7 +316,8 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
         configuration.setResolveDependencies(true);
-        List<ProjectBuildingResult> result = projectBuilder.build(Collections.singletonList(file), true, configuration);
+        List<ProjectBuildingResult> result =
+                projectBuilder.build(Collections.singletonList(file), false, configuration);
         MavenProject project = result.get(0).getProject();
         // verify a few typical parameters are not duplicated
         assertEquals(1, project.getTestCompileSourceRoots().size());

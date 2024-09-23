@@ -91,6 +91,8 @@ public interface ModelBuilderRequest {
 
     boolean isLocationTracking();
 
+    boolean isRecursive();
+
     /**
      * Defines external profiles that may be activated for the given model.
      * Those are external profiles usually defined in {@link org.apache.maven.api.settings.Settings#getProfiles()}.
@@ -174,6 +176,7 @@ public interface ModelBuilderRequest {
         RequestType requestType;
         boolean locationTracking;
         boolean twoPhaseBuilding;
+        boolean recursive;
         ModelSource source;
         Collection<Profile> profiles;
         List<String> activeProfileIds;
@@ -192,6 +195,7 @@ public interface ModelBuilderRequest {
             this.requestType = request.getRequestType();
             this.locationTracking = request.isLocationTracking();
             this.twoPhaseBuilding = request.isTwoPhaseBuilding();
+            this.recursive = request.isRecursive();
             this.source = request.getSource();
             this.profiles = request.getProfiles();
             this.activeProfileIds = request.getActiveProfileIds();
@@ -221,6 +225,11 @@ public interface ModelBuilderRequest {
 
         public ModelBuilderRequestBuilder locationTracking(boolean locationTracking) {
             this.locationTracking = locationTracking;
+            return this;
+        }
+
+        public ModelBuilderRequestBuilder recursive(boolean recursive) {
+            this.recursive = recursive;
             return this;
         }
 
@@ -280,6 +289,7 @@ public interface ModelBuilderRequest {
                     requestType,
                     locationTracking,
                     twoPhaseBuilding,
+                    recursive,
                     source,
                     profiles,
                     activeProfileIds,
@@ -296,6 +306,7 @@ public interface ModelBuilderRequest {
             private final RequestType requestType;
             private final boolean locationTracking;
             private final boolean twoPhaseBuilding;
+            private final boolean recursive;
             private final ModelSource source;
             private final Collection<Profile> profiles;
             private final List<String> activeProfileIds;
@@ -313,6 +324,7 @@ public interface ModelBuilderRequest {
                     @Nonnull RequestType requestType,
                     boolean locationTracking,
                     boolean twoPhaseBuilding,
+                    boolean recursive,
                     @Nonnull ModelSource source,
                     Collection<Profile> profiles,
                     List<String> activeProfileIds,
@@ -327,6 +339,7 @@ public interface ModelBuilderRequest {
                 this.requestType = nonNull(requestType, "requestType cannot be null");
                 this.locationTracking = locationTracking;
                 this.twoPhaseBuilding = twoPhaseBuilding;
+                this.recursive = recursive;
                 this.source = source;
                 this.profiles = profiles != null ? List.copyOf(profiles) : List.of();
                 this.activeProfileIds = activeProfileIds != null ? List.copyOf(activeProfileIds) : List.of();
@@ -353,6 +366,11 @@ public interface ModelBuilderRequest {
             @Override
             public boolean isLocationTracking() {
                 return locationTracking;
+            }
+
+            @Override
+            public boolean isRecursive() {
+                return recursive;
             }
 
             @Nonnull
