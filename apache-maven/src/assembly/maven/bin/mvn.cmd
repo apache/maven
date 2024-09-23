@@ -69,7 +69,6 @@ if not exist "%JAVACMD%" (
   echo The java.exe command does not exist in PATH nor is JAVA_HOME set, so Apache Maven cannot be started. >&2
   goto error
 )
-
 :chkMHome
 set "MAVEN_HOME=%~dp0"
 set "MAVEN_HOME=%MAVEN_HOME:~0,-5%"
@@ -178,6 +177,7 @@ set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 "%JAVACMD%" ^
   %MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^
+  --enable-native-access=ALL-UNNAMED ^
   -classpath %LAUNCHER_JAR% ^
   "-Dclassworlds.conf=%CLASSWORLDS_CONF%" ^
   "-Dmaven.home=%MAVEN_HOME%" ^
