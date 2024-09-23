@@ -23,7 +23,9 @@ import org.apache.maven.model.Model;
 /**
  * Provides the super POM that all models implicitly inherit from.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface SuperPomProvider {
 
     /**

@@ -29,7 +29,9 @@ import org.apache.maven.model.Model;
  * local pom is the original source.
  *
  * @since 4.0.0
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelSourceTransformer {
     /**
      *

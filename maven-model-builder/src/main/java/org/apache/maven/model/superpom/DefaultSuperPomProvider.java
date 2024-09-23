@@ -36,9 +36,11 @@ import org.apache.maven.model.building.ModelProcessor;
 /**
  * Provides the super POM that all models implicitly inherit from.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultSuperPomProvider implements SuperPomProvider {
 
     private final ModelProcessor modelProcessor;

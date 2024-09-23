@@ -21,7 +21,9 @@ package org.apache.maven.model.resolution;
 /**
  * Signals an error when resolving the path to an external model.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class UnresolvableModelException extends Exception {
 
     /**

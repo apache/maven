@@ -37,7 +37,9 @@ import org.apache.maven.model.building.DefaultTransformerContext.Holder;
  * This is an inner class, as it must be able to call readRawModel()
  *
  * @since 4.0.0
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 class DefaultTransformerContextBuilder implements TransformerContextBuilder {
     private final Graph dag = new Graph();
     private final DefaultModelBuilder defaultModelBuilder;

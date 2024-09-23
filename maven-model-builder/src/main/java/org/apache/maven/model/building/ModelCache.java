@@ -29,7 +29,9 @@ import org.apache.maven.building.Source;
  * identity of a model. The tag allows for further classification of the associated data on the sole discretion of the
  * model builder.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelCache {
 
     <T> T computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<T> data);

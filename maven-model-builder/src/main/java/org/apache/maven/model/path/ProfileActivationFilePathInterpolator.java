@@ -36,9 +36,11 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 /**
  * Finds an absolute path for {@link ActivationFile#getExists()} or {@link ActivationFile#getMissing()}
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated
 public class ProfileActivationFilePathInterpolator {
 
     private final PathTranslator pathTranslator;

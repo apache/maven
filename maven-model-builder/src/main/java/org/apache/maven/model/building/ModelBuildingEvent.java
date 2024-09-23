@@ -23,7 +23,9 @@ import org.apache.maven.model.Model;
 /**
  * Holds data relevant for a model building event.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelBuildingEvent {
 
     /**

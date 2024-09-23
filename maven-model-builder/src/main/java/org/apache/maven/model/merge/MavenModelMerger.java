@@ -25,6 +25,7 @@ import java.util.Objects;
  * The domain-specific model merger for the Maven POM, overriding generic code from parent class when necessary with
  * more adapted algorithms.
  *
+ * @deprecated use {@link org.apache.maven.internal.impl.model.MavenModelMerger} instead
  */
 public class MavenModelMerger extends org.apache.maven.internal.impl.model.MavenModelMerger {
 

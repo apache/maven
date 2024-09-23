@@ -25,7 +25,9 @@ import org.apache.maven.model.building.ModelBuildingRequest;
  * Normalizes URLs to remove the ugly parent references "../" that got potentially inserted by URL adjustment during
  * model inheritance.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelUrlNormalizer {
 
     /**

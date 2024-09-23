@@ -47,9 +47,11 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles profile injection into the model.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 @SuppressWarnings({"checkstyle:methodname"})
 public class DefaultProfileInjector implements ProfileInjector {
 

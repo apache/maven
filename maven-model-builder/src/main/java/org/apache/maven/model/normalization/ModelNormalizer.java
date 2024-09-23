@@ -26,7 +26,9 @@ import org.apache.maven.model.building.ModelProblemCollector;
  * Handles normalization of a model. In this context, normalization is the process of producing a canonical
  * representation for models that physically look different but are semantically equivalent.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelNormalizer {
 
     /**

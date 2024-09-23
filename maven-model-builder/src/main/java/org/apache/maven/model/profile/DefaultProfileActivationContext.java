@@ -28,7 +28,9 @@ import java.util.stream.Collectors;
 /**
  * Describes the environmental context used to determine the activation status of profiles.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class DefaultProfileActivationContext implements ProfileActivationContext {
 
     private List<String> activeProfileIds = Collections.emptyList();

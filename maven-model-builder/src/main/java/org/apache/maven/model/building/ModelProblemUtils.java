@@ -25,7 +25,9 @@ import org.apache.maven.model.Model;
 /**
  * Assists in the handling of model problems.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class ModelProblemUtils {
 
     /**

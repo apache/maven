@@ -29,7 +29,9 @@ import org.apache.maven.api.model.Model;
 /**
  * Handles serialization of a model into some kind of textual format like XML.
  *
+ * @deprecated use {@link org.apache.maven.api.services.xml.ModelXmlFactory} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelWriter {
 
     /**

@@ -24,7 +24,9 @@ import java.nio.file.Path;
 /**
  * Locates a POM file within a project base directory.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelLocator {
 
     /**

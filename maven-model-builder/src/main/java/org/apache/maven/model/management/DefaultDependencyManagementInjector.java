@@ -38,10 +38,12 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles injection of dependency management into the model.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @SuppressWarnings({"checkstyle:methodname"})
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultDependencyManagementInjector implements DependencyManagementInjector {
 
     private ManagementModelMerger merger = new ManagementModelMerger();

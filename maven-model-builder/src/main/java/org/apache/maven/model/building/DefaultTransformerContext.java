@@ -31,7 +31,9 @@ import org.apache.maven.model.locator.ModelLocator;
 /**
  *
  * @since 4.0.0
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 class DefaultTransformerContext implements TransformerContext {
     final ModelLocator modelLocator;
 

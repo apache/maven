@@ -38,9 +38,11 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 /**
  * Resolves relative paths within a model against a specific base directory.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultModelPathTranslator implements ModelPathTranslator {
 
     private final PathTranslator pathTranslator;

@@ -28,7 +28,7 @@ under the License.
 
   <artifactId>maven-model-builder</artifactId>
 
-  <name>Maven Model Builder</name>
+  <name>Maven Model Builder (deprecated)</name>
   <description>The effective model builder, with inheritance, profile activation, interpolation, ...</description>
 
   <properties>

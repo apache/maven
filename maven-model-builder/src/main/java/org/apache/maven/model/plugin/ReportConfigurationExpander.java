@@ -25,7 +25,9 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles expansion of general report plugin configuration into individual report sets.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ReportConfigurationExpander {
 
     /**

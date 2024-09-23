@@ -28,6 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ */
+@Deprecated(since = "4.0.0")
 class Graph {
 
     final Map<String, Set<String>> graph = new LinkedHashMap<>();
