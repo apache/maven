@@ -28,7 +28,9 @@ import org.eclipse.aether.repository.RepositoryPolicy;
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
  * of the public API. In particular, this class can be changed or deleted without prior notice.
  *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public class ArtifactDescriptorUtils {
 
     public static Artifact toPomArtifact(Artifact artifact) {

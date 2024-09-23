@@ -49,7 +49,9 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
  * <p>
  * <strong>Note:</strong> This class is part of work in progress and can be changed or removed without notice.
  * @since 3.2.4
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public class ArtifactDescriptorReaderDelegate {
     public void populateResult(RepositorySystemSession session, ArtifactDescriptorResult result, Model model) {
         ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();

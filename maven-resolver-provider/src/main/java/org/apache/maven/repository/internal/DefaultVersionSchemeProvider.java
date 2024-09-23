@@ -27,9 +27,12 @@ import org.eclipse.aether.version.VersionScheme;
 
 /**
  * Default version scheme provider: provides singleton {@link GenericVersionScheme} instance.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Singleton
 @Named
+@Deprecated(since = "4.0.0")
 public final class DefaultVersionSchemeProvider implements Provider<VersionScheme> {
     private final GenericVersionScheme genericVersionScheme;
 

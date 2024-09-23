@@ -23,7 +23,10 @@ import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * Factory for {@link ModelCache} objects.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelCacheFactory {
 
     ModelCache createCache(RepositorySystemSession session);

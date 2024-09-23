@@ -30,7 +30,9 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
  * explicitly order implementations using Sisu priorities.
  *
  * @since 4.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public interface MavenArtifactRelocationSource {
     /**
      * Returns {@link Artifact} instance where to relocate to, or {@code null}.

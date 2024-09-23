@@ -29,9 +29,12 @@ import org.eclipse.aether.installation.InstallRequest;
 
 /**
  * Maven GAV level metadata generator factory.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Named(SnapshotMetadataGeneratorFactory.NAME)
 @Singleton
+@Deprecated(since = "4.0.0")
 public class SnapshotMetadataGeneratorFactory implements MetadataGeneratorFactory {
     public static final String NAME = "snapshot";
 

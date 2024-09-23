@@ -61,7 +61,9 @@ import static java.util.Objects.requireNonNull;
  * Extend this class and override methods to customize, if needed.
  *
  * @since 4.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     protected final RepositorySystem repositorySystem;
     protected final InternalScopeManager scopeManager;

@@ -26,9 +26,12 @@ import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * Default implementation of {@link ModelCacheFactory}.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Singleton
 @Named
+@Deprecated(since = "4.0.0")
 public class DefaultModelCacheFactory implements ModelCacheFactory {
     @Override
     public ModelCache createCache(RepositorySystemSession session) {

@@ -35,7 +35,10 @@ import org.eclipse.aether.util.ConfigUtils;
  * Maven local GAV level metadata generator.
  * <p>
  * Local snapshot metadata contains non-transformed snapshot version.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 class LocalSnapshotMetadataGenerator implements MetadataGenerator {
 
     private final Map<Object, LocalSnapshotMetadata> snapshots;

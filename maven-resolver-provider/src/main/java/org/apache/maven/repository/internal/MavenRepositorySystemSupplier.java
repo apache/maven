@@ -185,7 +185,9 @@ import org.eclipse.aether.version.VersionScheme;
  * well. Any subsequent {@code getXXX} method invocation attempt will fail with {@link IllegalStateException}.
  *
  * @since 4.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public class MavenRepositorySystemSupplier implements Supplier<RepositorySystem> {
     private final AtomicBoolean closed = new AtomicBoolean(false);
 

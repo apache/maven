@@ -59,9 +59,11 @@ import org.eclipse.aether.version.VersionRange;
 import org.eclipse.aether.version.VersionScheme;
 
 /**
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead/
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultVersionRangeResolver implements VersionRangeResolver {
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";

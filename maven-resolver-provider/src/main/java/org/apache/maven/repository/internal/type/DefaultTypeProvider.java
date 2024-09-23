@@ -29,6 +29,7 @@ import org.apache.maven.api.Type;
 import org.apache.maven.api.spi.TypeProvider;
 
 @Named
+@Deprecated(since = "4.0.0")
 public class DefaultTypeProvider implements TypeProvider {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
