@@ -25,7 +25,9 @@ import org.apache.maven.settings.Settings;
 /**
  * Collects the output of the settings builder.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.SettingsBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface SettingsBuildingResult {
 
     /**

@@ -37,9 +37,11 @@ import org.apache.maven.settings.v4.SettingsStaxReader;
 /**
  * Handles deserialization of settings from the default textual format.
  *
+ * @deprecated since 4.0.0, use {@link SettingsStaxReader} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultSettingsReader implements SettingsReader {
 
     @Override

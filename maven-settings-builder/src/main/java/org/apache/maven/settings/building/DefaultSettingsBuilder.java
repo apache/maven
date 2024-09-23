@@ -43,9 +43,11 @@ import org.apache.maven.settings.Settings;
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.SettingsBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final org.apache.maven.internal.impl.DefaultSettingsBuilder builder;
