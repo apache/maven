@@ -27,7 +27,7 @@ under the License.
 
   <artifactId>maven-toolchain-builder</artifactId>
 
-  <name>Maven Toolchain Builder</name>
+  <name>Maven Toolchain Builder (deprecated)</name>
   <description>The effective toolchain builder.</description>
 
   <dependencies>

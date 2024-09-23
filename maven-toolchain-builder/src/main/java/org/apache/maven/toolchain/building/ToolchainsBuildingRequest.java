@@ -24,7 +24,9 @@ import org.apache.maven.building.Source;
  * Collects toolchains that control the building of effective toolchains.
  *
  * @since 3.3.0
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.ToolchainsBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ToolchainsBuildingRequest {
 
     /**
