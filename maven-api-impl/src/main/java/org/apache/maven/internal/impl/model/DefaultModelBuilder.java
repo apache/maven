@@ -768,12 +768,10 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private ModelBuilderResult buildRecursive(DefaultModelBuilderSession build, Collection<String> importIds)
             throws ModelBuilderException {
-        Set<Path> buildParts = new HashSet<>();
         Path top = build.request.getSource().getPath();
         if (top == null) {
             throw new IllegalStateException("Recursive build requested but source has no path");
         }
-        buildParts.add(top);
 
         Path rootDirectory;
         try {
@@ -784,6 +782,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         List<Path> toLoad = new ArrayList<>();
         Path root = getModelProcessor().locateExistingPom(rootDirectory);
         toLoad.add(root);
+        Set<Path> buildParts = new HashSet<>();
         while (!toLoad.isEmpty()) {
             Path pom = toLoad.remove(0);
             DefaultModelBuilderResult r;
@@ -810,7 +809,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             .locateExistingPom(pom.getParent().resolve(subproject));
                     if (subprojectFile != null) {
                         toLoad.add(subprojectFile);
-                        if (isBuildPart) {
+                        if (pom.equals(top)) {
                             buildParts.add(subprojectFile);
                         }
                     }
