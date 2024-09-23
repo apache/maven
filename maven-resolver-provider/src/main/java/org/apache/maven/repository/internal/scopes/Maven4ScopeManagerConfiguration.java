@@ -46,7 +46,9 @@ import static org.eclipse.aether.impl.scope.BuildScopeQuery.union;
  * This manager supports all the new Maven 4 dependency scopes defined in {@link DependencyScope}.
  *
  * @since 2.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfiguration {
     public static final Maven4ScopeManagerConfiguration INSTANCE = new Maven4ScopeManagerConfiguration();
 

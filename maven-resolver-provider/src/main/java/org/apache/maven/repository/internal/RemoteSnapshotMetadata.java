@@ -37,7 +37,10 @@ import org.eclipse.aether.artifact.Artifact;
 
 /**
  * Maven remote GAV level metadata.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
     public static final String DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT = "yyyyMMdd.HHmmss";
 

@@ -44,10 +44,12 @@ import org.slf4j.LoggerFactory;
  * Relocation source from user properties.
  *
  * @since 4.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Singleton
 @Named(UserPropertiesArtifactRelocationSource.NAME)
 @Priority(50)
+@Deprecated(since = "4.0.0")
 public final class UserPropertiesArtifactRelocationSource implements MavenArtifactRelocationSource {
     public static final String NAME = "userProperties";
     private static final Logger LOGGER = LoggerFactory.getLogger(UserPropertiesArtifactRelocationSource.class);

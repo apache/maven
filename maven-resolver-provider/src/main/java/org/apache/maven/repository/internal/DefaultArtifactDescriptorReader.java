@@ -70,9 +70,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default artifact descriptor reader.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader {
     private final RemoteRepositoryManager remoteRepositoryManager;
     private final VersionResolver versionResolver;

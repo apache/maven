@@ -39,7 +39,9 @@ import static java.util.Objects.requireNonNull;
  * Default implementation of {@link Type} and Resolver {@link ArtifactType}.
  *
  * @since 4.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public class DefaultType implements Type, ArtifactType {
     private final String id;
     private final Language language;

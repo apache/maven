@@ -47,7 +47,9 @@ import static org.eclipse.aether.impl.scope.BuildScopeQuery.union;
  * This manager supports the old Maven 3 dependency scopes.
  *
  * @since 2.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public final class Maven3ScopeManagerConfiguration implements ScopeManagerConfiguration {
     public static final Maven3ScopeManagerConfiguration INSTANCE = new Maven3ScopeManagerConfiguration();
     public static final String DS_COMPILE = "compile";

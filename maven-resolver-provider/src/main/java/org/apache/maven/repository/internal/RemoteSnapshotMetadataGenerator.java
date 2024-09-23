@@ -35,7 +35,10 @@ import org.eclipse.aether.util.ConfigUtils;
  * Maven remote GAV level metadata generator.
  * <p>
  * Remote snapshot metadata converts artifact on-the-fly to use timestamped snapshot version, and enlist it accordingly.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
 
     private final Map<Object, RemoteSnapshotMetadata> snapshots;

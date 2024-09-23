@@ -27,7 +27,9 @@ import org.eclipse.aether.artifact.AbstractArtifact;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public final class RelocatedArtifact extends AbstractArtifact {
 
     private final Artifact artifact;
