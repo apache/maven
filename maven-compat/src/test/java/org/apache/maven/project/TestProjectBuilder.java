@@ -47,15 +47,7 @@ public class TestProjectBuilder extends DefaultProjectBuilder {
             RemoteRepositoryManager repositoryManager,
             ProjectDependenciesResolver dependencyResolver,
             RootLocator rootLocator) {
-        super(
-                modelBuilder,
-                modelProcessor,
-                projectBuildingHelper,
-                repositorySystem,
-                repoSystem,
-                repositoryManager,
-                dependencyResolver,
-                rootLocator);
+        super(modelBuilder, projectBuildingHelper, repositorySystem, repoSystem, dependencyResolver, rootLocator);
     }
 
     @Override
