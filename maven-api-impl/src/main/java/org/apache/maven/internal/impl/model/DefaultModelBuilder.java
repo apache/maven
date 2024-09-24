@@ -28,7 +28,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -245,8 +244,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         List<RemoteRepository> externalRepositories;
         List<RemoteRepository> repositories;
 
-        private final Set<ModelProblem.Severity> severities = EnumSet.noneOf(ModelProblem.Severity.class);
-
         DefaultModelBuilderSession(ModelBuilderRequest request) {
             this(request, new DefaultModelBuilderResult());
         }
@@ -298,7 +295,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 this.externalRepositories = externalRepositories;
                 this.repositories = repositories;
             }
-            this.result.getProblems().forEach(p -> severities.add(p.getSeverity()));
         }
 
         public DefaultModelBuilderSession derive(ModelSource source) {
@@ -447,11 +443,13 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         public boolean hasFatalErrors() {
-            return severities.contains(ModelProblem.Severity.FATAL);
+            return result.getProblems().stream().anyMatch(p -> p.getSeverity() == ModelProblem.Severity.FATAL);
         }
 
         public boolean hasErrors() {
-            return severities.contains(ModelProblem.Severity.ERROR) || severities.contains(ModelProblem.Severity.FATAL);
+            return result.getProblems().stream()
+                    .anyMatch(p -> p.getSeverity() == ModelProblem.Severity.FATAL
+                            || p.getSeverity() == ModelProblem.Severity.ERROR);
         }
 
         @Override
@@ -499,16 +497,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         @Override
         public void add(ModelProblem problem) {
             result.getProblems().add(problem);
-
-            severities.add(problem.getSeverity());
         }
 
         public void addAll(Collection<ModelProblem> problems) {
             this.result.getProblems().addAll(problems);
-
-            for (ModelProblem problem : problems) {
-                severities.add(problem.getSeverity());
-            }
         }
 
         @Override
@@ -758,7 +750,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 var pbs = r.getProblems();
                 r.setProblems(List.of());
                 derive(ModelSource.fromPath(r.getFileModel().getPomFile()), r).build2(importIds);
-                result.getProblems().addAll(r.getProblems());
+                r.getProblems().forEach(this::add);
                 pbs.addAll(r.getProblems());
                 r.setProblems(pbs);
             }
@@ -812,7 +804,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                         if (subprojectFile == null) {
                             ModelProblem problem = new org.apache.maven.internal.impl.model.DefaultModelProblem(
-                                    "Child subproject " + subprojectFile + " of " + pomDirectory + " does not exist",
+                                    "Child subproject " + subproject + " of " + pomDirectory + " does not exist",
                                     ModelProblem.Severity.ERROR,
                                     ModelProblem.Version.BASE,
                                     model,

@@ -171,6 +171,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         FileUtils.copyDirectoryStructure(new File("src/test/resources/projects/grandchild-check"), tempDir.toFile());
 
         MavenSession mavenSession = createMavenSession(null);
+        mavenSession.getRequest().setRootDirectory(tempDir);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
         org.apache.maven.project.ProjectBuilder projectBuilder =

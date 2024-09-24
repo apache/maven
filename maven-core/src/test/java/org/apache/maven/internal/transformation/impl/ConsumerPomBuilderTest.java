@@ -92,9 +92,12 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
             org.apache.maven.model.Model model =
                     new org.apache.maven.model.Model(new MavenStaxReader().read(inputStream));
             project = new MavenProject(model);
-            project.setRootDirectory(Paths.get("src/test/resources/consumer/trivial"));
             project.setOriginalModel(model);
         }
+        InternalMavenSession.from(InternalSession.from(session))
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(Paths.get("src/test/resources/consumer/trivial"));
         Model model = builder.build(session, project, file);
 
         assertNotNull(model);
@@ -114,7 +117,6 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
             org.apache.maven.model.Model model =
                     new org.apache.maven.model.Model(new MavenStaxReader().read(inputStream));
             project = new MavenProject(model);
-            project.setRootDirectory(Paths.get("src/test/resources/consumer/simple"));
             project.setOriginalModel(model);
         }
         InternalMavenSession.from(InternalSession.from(session))

@@ -324,6 +324,11 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         final Path pom = projectRoot.resolve("pom.xml");
         final ProjectBuildingRequest buildingRequest = newBuildingRequest();
 
+        InternalMavenSession.from(InternalSession.from(buildingRequest.getRepositorySession()))
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(projectRoot);
+
         try (InputStream pomResource =
                 DefaultMavenProjectBuilderTest.class.getResourceAsStream("/projects/reread/pom1.xml")) {
             Files.copy(pomResource, pom, StandardCopyOption.REPLACE_EXISTING);

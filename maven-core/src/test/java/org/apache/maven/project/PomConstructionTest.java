@@ -1234,7 +1234,7 @@ class PomConstructionTest {
 
     @Test
     void testPomInheritance() throws Exception {
-        PomTestWrapper pom = buildPom("pom-inheritance/sub");
+        PomTestWrapper pom = buildPom("pom-inheritance/child-1");
         assertEquals("parent-description", pom.getValue("description"));
         assertEquals("jar", pom.getValue("packaging"));
     }
@@ -1906,7 +1906,9 @@ class PomConstructionTest {
         InternalSession iSession = InternalSession.from(repoSession);
         InternalMavenSession mSession = InternalMavenSession.from(iSession);
         Path root = pomFile.getParentFile().toPath();
-        while (root != null && !Files.isDirectory(root.resolve(".mvn")) && Files.isRegularFile(root.resolve("../pom.xml"))) {
+        while (root != null
+                && !Files.isDirectory(root.resolve(".mvn"))
+                && Files.isRegularFile(root.resolve("../pom.xml"))) {
             root = root.getParent();
         }
         mSession.getMavenSession().getRequest().setRootDirectory(root);
