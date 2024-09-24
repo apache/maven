@@ -41,7 +41,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -89,8 +88,6 @@ import org.apache.maven.api.services.model.DependencyManagementImporter;
 import org.apache.maven.api.services.model.DependencyManagementInjector;
 import org.apache.maven.api.services.model.InheritanceAssembler;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
-import org.apache.maven.api.services.model.ModelBuildingEvent;
-import org.apache.maven.api.services.model.ModelBuildingListener;
 import org.apache.maven.api.services.model.ModelCache;
 import org.apache.maven.api.services.model.ModelCacheFactory;
 import org.apache.maven.api.services.model.ModelInterpolator;
@@ -208,22 +205,14 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             @Override
             public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
-                if (request.getInterimResult() != null) {
-                    if (mainSession == null) {
-                        throw new IllegalStateException("ModelBuilderSession is not initialized");
-                    }
-                    DefaultModelBuilderResult result = asDefaultModelBuilderResult(request.getInterimResult());
-                    return mainSession.derive(request, result).build2(new LinkedHashSet<>());
+                DefaultModelBuilderSession session;
+                if (mainSession == null) {
+                    mainSession = new DefaultModelBuilderSession(request);
+                    session = mainSession;
                 } else {
-                    DefaultModelBuilderSession session;
-                    if (mainSession == null) {
-                        mainSession = new DefaultModelBuilderSession(request);
-                        session = mainSession;
-                    } else {
-                        session = mainSession.derive(request, new DefaultModelBuilderResult());
-                    }
-                    return session.build(new LinkedHashSet<>());
+                    session = mainSession.derive(request, new DefaultModelBuilderResult());
                 }
+                return session.build(new LinkedHashSet<>());
             }
         };
     }
@@ -897,8 +886,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // plugin management injection
             resultModel = pluginManagementInjector.injectManagement(resultModel, request, this);
-
-            resultModel = fireEvent(resultModel, request, this, ModelBuildingListener::buildExtensionsAssembled);
 
             if (request.getRequestType() != ModelBuilderRequest.RequestType.DEPENDENCY) {
                 if (lifecycleBindingsInjector == null) {
@@ -2065,26 +2052,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         throw (T) t; // rely on vacuous cast
     }
 
-    private Model fireEvent(
-            Model model,
-            ModelBuilderRequest request,
-            ModelProblemCollector problems,
-            BiConsumer<ModelBuildingListener, ModelBuildingEvent> catapult) {
-        ModelBuildingListener listener = getModelBuildingListener(request);
-
-        if (listener != null) {
-            AtomicReference<Model> m = new AtomicReference<>(model);
-
-            ModelBuildingEvent event = new DefaultModelBuildingEvent(model, m::set, request, problems);
-
-            catapult.accept(listener, event);
-
-            return m.get();
-        }
-
-        return model;
-    }
-
     private boolean containsCoordinates(String message, String groupId, String artifactId, String version) {
         return message != null
                 && (groupId == null || message.contains(groupId))
@@ -2094,10 +2061,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     ModelProcessor getModelProcessor() {
         return modelProcessor;
-    }
-
-    private static ModelBuildingListener getModelBuildingListener(ModelBuilderRequest request) {
-        return (ModelBuildingListener) request.getListener();
     }
 
     record GAKey(String groupId, String artifactId) {}

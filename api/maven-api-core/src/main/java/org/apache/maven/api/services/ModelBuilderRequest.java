@@ -127,12 +127,6 @@ public interface ModelBuilderRequest {
     RepositoryMerging getRepositoryMerging();
 
     @Nullable
-    Object getListener();
-
-    @Nullable
-    ModelBuilderResult getInterimResult();
-
-    @Nullable
     List<RemoteRepository> getRepositories();
 
     @Nonnull
@@ -181,8 +175,6 @@ public interface ModelBuilderRequest {
         Map<String, String> systemProperties;
         Map<String, String> userProperties;
         RepositoryMerging repositoryMerging;
-        Object listener;
-        ModelBuilderResult interimResult;
         List<RemoteRepository> repositories;
 
         ModelBuilderRequestBuilder() {}
@@ -199,8 +191,6 @@ public interface ModelBuilderRequest {
             this.systemProperties = request.getSystemProperties();
             this.userProperties = request.getUserProperties();
             this.repositoryMerging = request.getRepositoryMerging();
-            this.listener = request.getListener();
-            this.interimResult = request.getInterimResult();
             this.repositories = request.getRepositories();
         }
 
@@ -259,16 +249,6 @@ public interface ModelBuilderRequest {
             return this;
         }
 
-        public ModelBuilderRequestBuilder listener(Object listener) {
-            this.listener = listener;
-            return this;
-        }
-
-        public ModelBuilderRequestBuilder interimResult(ModelBuilderResult interimResult) {
-            this.interimResult = interimResult;
-            return this;
-        }
-
         public ModelBuilderRequestBuilder repositories(List<RemoteRepository> repositories) {
             this.repositories = repositories;
             return this;
@@ -287,8 +267,6 @@ public interface ModelBuilderRequest {
                     systemProperties,
                     userProperties,
                     repositoryMerging,
-                    listener,
-                    interimResult,
                     repositories);
         }
 
@@ -303,8 +281,6 @@ public interface ModelBuilderRequest {
             private final Map<String, String> systemProperties;
             private final Map<String, String> userProperties;
             private final RepositoryMerging repositoryMerging;
-            private final Object listener;
-            private final ModelBuilderResult interimResult;
             private final List<RemoteRepository> repositories;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
@@ -320,8 +296,6 @@ public interface ModelBuilderRequest {
                     Map<String, String> systemProperties,
                     Map<String, String> userProperties,
                     RepositoryMerging repositoryMerging,
-                    Object listener,
-                    ModelBuilderResult interimResult,
                     List<RemoteRepository> repositories) {
                 super(session);
                 this.requestType = nonNull(requestType, "requestType cannot be null");
@@ -335,8 +309,6 @@ public interface ModelBuilderRequest {
                         systemProperties != null ? Map.copyOf(systemProperties) : session.getSystemProperties();
                 this.userProperties = userProperties != null ? Map.copyOf(userProperties) : session.getUserProperties();
                 this.repositoryMerging = repositoryMerging;
-                this.listener = listener;
-                this.interimResult = interimResult;
                 this.repositories = repositories != null ? List.copyOf(repositories) : null;
             }
 
@@ -389,16 +361,6 @@ public interface ModelBuilderRequest {
             @Override
             public RepositoryMerging getRepositoryMerging() {
                 return repositoryMerging;
-            }
-
-            @Override
-            public Object getListener() {
-                return listener;
-            }
-
-            @Override
-            public ModelBuilderResult getInterimResult() {
-                return interimResult;
             }
 
             @Override

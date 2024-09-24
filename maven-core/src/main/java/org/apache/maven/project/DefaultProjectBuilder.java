@@ -63,15 +63,13 @@ import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Source;
-import org.apache.maven.api.services.model.ModelBuildingEvent;
-import org.apache.maven.api.services.model.ModelBuildingListener;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.internal.impl.InternalSession;
-import org.apache.maven.model.building.DefaultModelProblem;
+import org.apache.maven.internal.impl.model.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource2;
@@ -337,9 +335,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     project = new MavenProject();
                     project.setFile(pomFile != null ? pomFile.toFile() : null);
 
-                    ModelBuildingListener listener =
-                            new DefaultModelBuildingListener(project, projectBuildingHelper, this.request);
-
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
                     ModelBuilderRequest request = builder.source(modelSource)
                             .requestType(
@@ -350,7 +345,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                                             ? ModelBuilderRequest.RequestType.BUILD_POM
                                             : ModelBuilderRequest.RequestType.DEPENDENCY)
                             .locationTracking(true)
-                            .listener(listener)
                             .build();
 
                     if (pomFile != null) {
@@ -360,6 +354,15 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     ModelBuilderResult result;
                     try {
                         result = modelBuilderSession.build(request);
+
+                        buildExtensionsAssembled(
+                                result.getEffectiveModel(),
+                                result.getProblems(),
+                                request,
+                                project,
+                                projectBuildingHelper,
+                                this.request);
+
                     } catch (ModelBuilderException e) {
                         result = e.getResult();
                         if (result == null || result.getEffectiveModel() == null) {
@@ -479,19 +482,25 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             project.setRootDirectory(
                     rootLocator.findRoot(pomFile.getParentFile().toPath()));
 
-            ModelBuildingListener listener = new DefaultModelBuildingListener(project, projectBuildingHelper, request);
-
             ModelBuilderRequest modelBuildingRequest = getModelBuildingRequest()
                     .source(ModelSource.fromPath(pomFile.toPath()))
                     .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
                     .locationTracking(true)
-                    .listener(listener)
                     .recursive(recursive)
                     .build();
 
             ModelBuilderResult result;
             try {
                 result = modelBuilderSession.build(modelBuildingRequest);
+
+                buildExtensionsAssembled(
+                        result.getEffectiveModel(),
+                        result.getProblems(),
+                        modelBuildingRequest,
+                        project,
+                        projectBuildingHelper,
+                        request);
+
             } catch (ModelBuilderException e) {
                 result = e.getResult();
                 if (result == null || result.getEffectiveModel() == null) {
@@ -509,7 +518,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 try {
                     initProject(project, result);
                 } catch (InvalidArtifactRTException iarte) {
-                    problems.add(new DefaultModelProblem(
+                    problems.add(new org.apache.maven.model.building.DefaultModelProblem(
                             null,
                             org.apache.maven.model.building.ModelProblem.Severity.ERROR,
                             null,
@@ -552,17 +561,18 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 return null;
             }
             return problems.stream()
-                    .map(p -> (org.apache.maven.model.building.ModelProblem) new DefaultModelProblem(
-                            p.getMessage(),
-                            org.apache.maven.model.building.ModelProblem.Severity.valueOf(
-                                    p.getSeverity().name()),
-                            org.apache.maven.model.building.ModelProblem.Version.valueOf(
-                                    p.getVersion().name()),
-                            p.getSource(),
-                            p.getLineNumber(),
-                            p.getColumnNumber(),
-                            p.getModelId(),
-                            p.getException()))
+                    .map(p -> (org.apache.maven.model.building.ModelProblem)
+                            new org.apache.maven.model.building.DefaultModelProblem(
+                                    p.getMessage(),
+                                    org.apache.maven.model.building.ModelProblem.Severity.valueOf(
+                                            p.getSeverity().name()),
+                                    org.apache.maven.model.building.ModelProblem.Version.valueOf(
+                                            p.getVersion().name()),
+                                    p.getSource(),
+                                    p.getLineNumber(),
+                                    p.getColumnNumber(),
+                                    p.getModelId(),
+                                    p.getException()))
                     .toList();
         }
 
@@ -918,97 +928,69 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
     }
 
-    /**
-     * Processes events from the model builder while building the effective model for a {@link MavenProject} instance.
-     *
-     */
-    public static class DefaultModelBuildingListener implements ModelBuildingListener {
-
-        private final MavenProject project;
-
-        private final ProjectBuildingHelper projectBuildingHelper;
-
-        private final ProjectBuildingRequest projectBuildingRequest;
-
-        private List<ArtifactRepository> remoteRepositories;
-
-        private List<ArtifactRepository> pluginRepositories;
-
-        public DefaultModelBuildingListener(
-                MavenProject project,
-                ProjectBuildingHelper projectBuildingHelper,
-                ProjectBuildingRequest projectBuildingRequest) {
-            this.project = Objects.requireNonNull(project, "project cannot be null");
-            this.projectBuildingHelper =
-                    Objects.requireNonNull(projectBuildingHelper, "projectBuildingHelper cannot be null");
-            this.projectBuildingRequest =
-                    Objects.requireNonNull(projectBuildingRequest, "projectBuildingRequest cannot be null");
-            this.remoteRepositories = projectBuildingRequest.getRemoteRepositories();
-            this.pluginRepositories = projectBuildingRequest.getPluginArtifactRepositories();
+    public void buildExtensionsAssembled(
+            Model model,
+            List<ModelProblem> problems,
+            ModelBuilderRequest request,
+            MavenProject project,
+            ProjectBuildingHelper projectBuildingHelper,
+            ProjectBuildingRequest projectBuildingRequest) {
+        org.apache.maven.model.Model model3 = new org.apache.maven.model.Model(model);
+        List<ArtifactRepository> remoteRepositories = projectBuildingRequest.getRemoteRepositories();
+        List<ArtifactRepository> pluginRepositories = projectBuildingRequest.getPluginArtifactRepositories();
+        try {
+            pluginRepositories = projectBuildingHelper.createArtifactRepositories(
+                    model3.getPluginRepositories(), pluginRepositories, projectBuildingRequest);
+        } catch (Exception e) {
+            add(
+                    problems,
+                    BuilderProblem.Severity.ERROR,
+                    ModelProblem.Version.BASE,
+                    "Invalid plugin repository: " + e.getMessage(),
+                    e);
         }
+        project.setPluginArtifactRepositories(pluginRepositories);
 
-        /**
-         * Gets the project whose model is being built.
-         *
-         * @return The project, never {@code null}.
-         */
-        public MavenProject getProject() {
-            return project;
-        }
-
-        @Override
-        public void buildExtensionsAssembled(ModelBuildingEvent event) {
-            org.apache.maven.model.Model model = new org.apache.maven.model.Model(event.model());
-
+        if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
             try {
-                pluginRepositories = projectBuildingHelper.createArtifactRepositories(
-                        model.getPluginRepositories(), pluginRepositories, projectBuildingRequest);
-            } catch (Exception e) {
-                event.problems()
-                        .add(
-                                BuilderProblem.Severity.ERROR,
-                                ModelProblem.Version.BASE,
-                                "Invalid plugin repository: " + e.getMessage(),
-                                e);
-            }
-            project.setPluginArtifactRepositories(pluginRepositories);
+                ProjectRealmCache.CacheRecord record =
+                        projectBuildingHelper.createProjectRealm(project, model3, projectBuildingRequest);
 
-            if (event.request().getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
-                try {
-                    ProjectRealmCache.CacheRecord record =
-                            projectBuildingHelper.createProjectRealm(project, model, projectBuildingRequest);
-
-                    project.setClassRealm(record.getRealm());
-                    project.setExtensionDependencyFilter(record.getExtensionArtifactFilter());
-                } catch (PluginResolutionException | PluginManagerException | PluginVersionResolutionException e) {
-                    event.problems()
-                            .add(
-                                    BuilderProblem.Severity.ERROR,
-                                    ModelProblem.Version.BASE,
-                                    "Unresolvable build extension: " + e.getMessage(),
-                                    e);
-                }
-
-                projectBuildingHelper.selectProjectRealm(project);
+                project.setClassRealm(record.getRealm());
+                project.setExtensionDependencyFilter(record.getExtensionArtifactFilter());
+            } catch (PluginResolutionException | PluginManagerException | PluginVersionResolutionException e) {
+                add(
+                        problems,
+                        BuilderProblem.Severity.ERROR,
+                        ModelProblem.Version.BASE,
+                        "Unresolvable build extension: " + e.getMessage(),
+                        e);
             }
 
-            // build the regular repos after extensions are loaded to allow for custom layouts
-            try {
-                remoteRepositories = projectBuildingHelper.createArtifactRepositories(
-                        model.getRepositories(), remoteRepositories, projectBuildingRequest);
-            } catch (Exception e) {
-                event.problems()
-                        .add(
-                                BuilderProblem.Severity.ERROR,
-                                ModelProblem.Version.BASE,
-                                "Invalid artifact repository: " + e.getMessage(),
-                                e);
-            }
-            project.setRemoteArtifactRepositories(remoteRepositories);
-
-            if (model.getDelegate() != event.model()) {
-                event.update().accept(model.getDelegate());
-            }
+            projectBuildingHelper.selectProjectRealm(project);
         }
+
+        // build the regular repos after extensions are loaded to allow for custom layouts
+        try {
+            remoteRepositories = projectBuildingHelper.createArtifactRepositories(
+                    model3.getRepositories(), remoteRepositories, projectBuildingRequest);
+        } catch (Exception e) {
+            add(
+                    problems,
+                    BuilderProblem.Severity.ERROR,
+                    ModelProblem.Version.BASE,
+                    "Invalid artifact repository: " + e.getMessage(),
+                    e);
+        }
+        project.setRemoteArtifactRepositories(remoteRepositories);
+    }
+
+    void add(
+            List<ModelProblem> problems,
+            BuilderProblem.Severity severity,
+            ModelProblem.Version version,
+            String message,
+            Exception e) {
+        problems.add(new DefaultModelProblem(null, severity, version, null, -1, -1, message, e));
     }
 }
