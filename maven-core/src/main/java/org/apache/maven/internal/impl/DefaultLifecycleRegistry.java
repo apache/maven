@@ -89,7 +89,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
     @Inject
     public DefaultLifecycleRegistry(List<LifecycleProvider> providers) {
         List<LifecycleProvider> p = new ArrayList<>(providers);
-        p.add(() -> List.of(new CleanLifecycle(), new DefaultLifecycle(), new SiteLifecycle(), new WrapperLifecycle()));
+        p.add(() -> List.of(new CleanLifecycle(), new DefaultLifecycle(), new SiteLifecycle()));
         this.providers = p;
         // validate lifecycle
         for (Lifecycle lifecycle : this) {
@@ -187,8 +187,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                 return all.keySet().stream()
                         .filter(id -> !Lifecycle.CLEAN.equals(id)
                                 && !Lifecycle.DEFAULT.equals(id)
-                                && !Lifecycle.SITE.equals(id)
-                                && !Lifecycle.WRAPPER.equals(id))
+                                && !Lifecycle.SITE.equals(id))
                         .map(id -> wrap(all.get(id)))
                         .collect(Collectors.toList());
             } catch (ComponentLookupException e) {
@@ -302,15 +301,6 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
     static class SiteLifecycleProvider extends BaseLifecycleProvider {
         SiteLifecycleProvider() {
             super(Lifecycle.SITE);
-        }
-    }
-
-    @Singleton
-    @Named(Lifecycle.WRAPPER)
-    @SuppressWarnings("unused")
-    static class WrapperLifecycleProvider extends BaseLifecycleProvider {
-        WrapperLifecycleProvider() {
-            super(Lifecycle.WRAPPER);
         }
     }
 
@@ -460,31 +450,6 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         @Override
         public Collection<Alias> aliases() {
             return List.of(alias("pre-site", BEFORE + PHASE_SITE), alias("post-site", AFTER + PHASE_SITE));
-        }
-    }
-
-    static class WrapperLifecycle implements Lifecycle {
-
-        private static final String MAVEN_WRAPPER_PLUGIN_VERSION = "3.2.0";
-        private static final String PHASE_WRAPPER = "wrapper";
-
-        @Override
-        public String id() {
-            return WRAPPER;
-        }
-
-        @Override
-        public Collection<Phase> phases() {
-            return List.of(phase(
-                    PHASE_WRAPPER,
-                    plugin(
-                            MAVEN_PLUGINS + "maven-wrapper-plugin:" + MAVEN_WRAPPER_PLUGIN_VERSION + ":wrapper",
-                            PHASE_WRAPPER)));
-        }
-
-        @Override
-        public Collection<Alias> aliases() {
-            return List.of();
         }
     }
 }
