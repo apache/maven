@@ -789,8 +789,33 @@ public class DefaultModelBuilder implements ModelBuilder {
             } catch (IllegalStateException e) {
                 rootDirectory = session.getService(RootLocator.class).findRoot(top);
             }
-            List<Path> toLoad = new ArrayList<>();
+            loadFromRoot(rootDirectory, top);
+            if (hasErrors()) {
+                throw newModelBuilderException();
+            }
+
+            build2(importIds);
+            for (DefaultModelBuilderResult r : result.getChildren()) {
+                if (r.getFileModel() == null) {
+                    continue;
+                }
+                var pbs = r.getProblems();
+                r.setProblems(List.of());
+                derive(ModelSource.fromPath(r.getFileModel().getPomFile()), r).build2(importIds);
+                result.getProblems().addAll(r.getProblems());
+                pbs.addAll(r.getProblems());
+                r.setProblems(pbs);
+            }
+            if (hasErrors()) {
+                throw newModelBuilderException();
+            }
+
+            return result;
+        }
+
+        private void loadFromRoot(Path rootDirectory, Path top) {
             Path root = getModelProcessor().locateExistingPom(rootDirectory);
+            List<Path> toLoad = new ArrayList<>();
             toLoad.add(root);
             Set<Path> buildParts = new HashSet<>();
             while (!toLoad.isEmpty()) {
@@ -885,32 +910,23 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // gathered with problem collector
                     add(Severity.ERROR, ModelProblem.Version.V40, "Failed to load project " + pom, e);
                 }
-                if (pom != root) {
+                if (r != result) {
                     result.getProblems().addAll(r.getProblems());
                     r.getProblems().clear();
                 }
             }
-            if (hasErrors()) {
-                throw newModelBuilderException();
+            if (result.getFileModel() == null && !Objects.equals(top.getParent(), rootDirectory)) {
+                logger.warn(
+                        "The top project ({}) cannot be found in the reactor from root project ({}). "
+                                + "Make sure the root directory is correct (a missing '.mvn' directory in the root "
+                                + "project is the most common cause) and the project is correctly included "
+                                + "in the reactor (missing activated profiles, command line options, etc.). For this "
+                                + "build, the top project will be used as the root project.",
+                        top,
+                        rootDirectory);
+                cache.clear();
+                loadFromRoot(top.getParent(), top);
             }
-
-            build2(importIds);
-            for (DefaultModelBuilderResult r : result.getChildren()) {
-                if (r.getFileModel() == null) {
-                    continue;
-                }
-                var pbs = r.getProblems();
-                r.setProblems(List.of());
-                derive(ModelSource.fromPath(r.getFileModel().getPomFile()), r).build2(importIds);
-                result.getProblems().addAll(r.getProblems());
-                pbs.addAll(r.getProblems());
-                r.setProblems(pbs);
-            }
-            if (hasErrors()) {
-                throw newModelBuilderException();
-            }
-
-            return result;
         }
 
         private ModelBuilderResult buildParentOrDependency(Collection<String> importIds) throws ModelBuilderException {
