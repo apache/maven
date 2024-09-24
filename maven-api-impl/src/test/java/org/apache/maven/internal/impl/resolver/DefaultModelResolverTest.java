@@ -87,7 +87,7 @@ class DefaultModelResolverTest {
                 ModelResolverException.class,
                 () -> newModelResolver().resolveModel(session, null, parent, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
-        assertEquals("No versions matched the requested version range '[2.0,2.1)'", e.getMessage());
+        assertEquals("No versions matched the requested parent version range '[2.0,2.1)'", e.getMessage());
     }
 
     @Test
@@ -102,7 +102,7 @@ class DefaultModelResolverTest {
                 ModelResolverException.class,
                 () -> newModelResolver().resolveModel(session, null, parent, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
-        assertEquals("The requested version range '[1,)' does not specify an upper bound", e.getMessage());
+        assertEquals("The requested parent version range '[1,)' does not specify an upper bound", e.getMessage());
     }
 
     @Test
@@ -158,7 +158,7 @@ class DefaultModelResolverTest {
                 ModelResolverException.class,
                 () -> newModelResolver().resolveModel(session, null, dependency, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
-        assertEquals("No versions matched the requested version range '[2.0,2.1)'", e.getMessage());
+        assertEquals("No versions matched the requested dependency version range '[2.0,2.1)'", e.getMessage());
     }
 
     @Test
@@ -173,7 +173,7 @@ class DefaultModelResolverTest {
                 ModelResolverException.class,
                 () -> newModelResolver().resolveModel(session, null, dependency, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
-        assertEquals("The requested version range '[1,)' does not specify an upper bound", e.getMessage());
+        assertEquals("The requested dependency version range '[1,)' does not specify an upper bound", e.getMessage());
     }
 
     @Test

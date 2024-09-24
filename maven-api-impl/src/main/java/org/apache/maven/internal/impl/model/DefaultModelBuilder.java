@@ -1125,10 +1125,13 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             ModelSource modelSource;
             try {
-                AtomicReference<Parent> modified = new AtomicReference<>();
-                modelSource = modelResolver.resolveModel(request.getSession(), getRepositories(), parent, modified);
-                if (modified.get() != null) {
-                    parent = modified.get();
+                modelSource = resolveReactorModel(groupId, artifactId, version);
+                if (modelSource == null) {
+                    AtomicReference<Parent> modified = new AtomicReference<>();
+                    modelSource = modelResolver.resolveModel(request.getSession(), getRepositories(), parent, modified);
+                    if (modified.get() != null) {
+                        parent = modified.get();
+                    }
                 }
             } catch (ModelResolverException e) {
                 // Message below is checked for in the MNG-2199 core IT.
@@ -1749,11 +1752,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                 String version,
                 Collection<String> importIds) {
             Model importModel;
-            // no workspace resolver or workspace resolver returned null (i.e. model not in workspace)
-            final ModelSource importSource;
+            ModelSource importSource;
             try {
-                importSource = modelResolver.resolveModel(
-                        request.getSession(), getRepositories(), dependency, new AtomicReference<>());
+                importSource = resolveReactorModel(groupId, artifactId, version);
+                if (importSource == null) {
+                    importSource = modelResolver.resolveModel(
+                            request.getSession(), getRepositories(), dependency, new AtomicReference<>());
+                }
             } catch (ModelBuilderException e) {
                 StringBuilder buffer = new StringBuilder(256);
                 buffer.append("Non-resolvable import POM");
@@ -1805,6 +1810,20 @@ public class DefaultModelBuilder implements ModelBuilder {
             importModel = importResult.getEffectiveModel();
 
             return importModel;
+        }
+
+        ModelSource resolveReactorModel(String groupId, String artifactId, String version) {
+            Set<ModelSource> sources = mappedSources.get(new GAKey(groupId, artifactId));
+            if (sources != null) {
+                for (ModelSource source : sources) {
+                    Model model = derive(source).readRawModel();
+                    if (Objects.equals(model.getVersion(), version)) {
+                        return source;
+                    }
+                }
+                // TODO: log a warning ?
+            }
+            return null;
         }
 
         private <T> T cache(String groupId, String artifactId, String version, String tag, Callable<T> supplier) {
