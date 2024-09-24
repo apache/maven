@@ -94,7 +94,7 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
             for (int i = 0; i < resources.size(); i++) {
                 T resource = resources.get(i);
                 T newResource = mapper.apply(resource);
-                if (newResource != null) {
+                if (newResource != resource) {
                     if (newResources == null) {
                         newResources = new ArrayList<>(resources);
                     }
@@ -105,29 +105,39 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
         return newResources;
     }
 
+    /**
+     * Returns a resource with all properties identical to the given resource, except the paths
+     * which are resolved according the given {@code basedir}. If the paths are unchanged, then
+     * this method returns the previous instance.
+     *
+     * @param resource the resource to relocate, or {@code null}
+     * @param basedir the new base directory
+     * @return relocated resource, or {@code null} if the given resource was null
+     */
+    @SuppressWarnings("StringEquality") // Identity comparison is ok in this method.
     private Resource alignToBaseDirectory(Resource resource, Path basedir) {
         if (resource != null) {
-            String newDir = mayAlignToBaseDirectoryOrNull(resource.getDirectory(), basedir);
-            if (newDir != null) {
-                return resource.withDirectory(newDir);
+            String oldDir = resource.getDirectory();
+            String newDir = alignToBaseDirectory(oldDir, basedir);
+            if (newDir != oldDir) {
+                return resource.with().directory(newDir).build();
             }
         }
         return resource;
     }
 
-    private String alignToBaseDirectory(String path, Path basedir) {
-        String newPath = mayAlignToBaseDirectoryOrNull(path, basedir);
-        if (newPath != null) {
-            return newPath;
-        }
-        return path;
-    }
-
     /**
-     * Returns aligned path or {@code null} if no need for change.
+     * Returns a path relocated to the given base directory. If the result of this operation
+     * is the same path as before, then this method returns the old {@code path} instance.
+     * It is okay for the caller to compare the {@link String} instances using the identity
+     * comparator for detecting changes.
+     *
+     * @param path the path to relocate, or {@code null}
+     * @param basedir the new base directory
+     * @return relocated path, or {@code null} if the given path was null
      */
-    private String mayAlignToBaseDirectoryOrNull(String path, Path basedir) {
+    private String alignToBaseDirectory(String path, Path basedir) {
         String newPath = pathTranslator.alignToBaseDirectory(path, basedir);
-        return Objects.equals(path, newPath) ? null : newPath;
+        return Objects.equals(path, newPath) ? path : newPath;
     }
 }
