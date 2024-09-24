@@ -159,7 +159,6 @@ under the License.
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
             <excludes combine.children="append">
-              <exclude>src/assembly/maven/bin/m2.conf</exclude>
               <!-- these are partial scripts, resulting in mvn scripts -->
               <exclude>src/assembly/shared/init</exclude>
               <exclude>src/assembly/shared/init.cmd</exclude>
