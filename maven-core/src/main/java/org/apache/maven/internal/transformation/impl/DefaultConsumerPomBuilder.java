@@ -68,7 +68,6 @@ import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolato
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,8 +92,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private final PluginManagementInjector pluginManagementInjector;
     private final SuperPomProvider superPomProvider;
     private final ModelVersionParser versionParser;
-    // To break circular dependency    private final Provider<RepositorySystem> repositorySystem;
-    private final RemoteRepositoryManager remoteRepositoryManager;
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final List<ModelTransformer> transformers;
     private final ModelCacheFactory modelCacheFactory;
@@ -118,7 +115,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
             PluginManagementInjector pluginManagementInjector,
             SuperPomProvider superPomProvider,
             ModelVersionParser versionParser,
-            RemoteRepositoryManager remoteRepositoryManager,
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             List<ModelTransformer> transformers,
             ModelCacheFactory modelCacheFactory,
@@ -138,7 +134,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         this.pluginManagementInjector = pluginManagementInjector;
         this.superPomProvider = superPomProvider;
         this.versionParser = versionParser;
-        this.remoteRepositoryManager = remoteRepositoryManager;
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.transformers = transformers;
         this.modelCacheFactory = modelCacheFactory;

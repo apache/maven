@@ -1033,10 +1033,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             // resolver.
             //
 
-            /*
-             * if ( version == null || !version.equals( parent.getVersion() ) ) { return null; }
-             */
-
             return new ModelData(candidateSource, candidateModel);
         }
 
