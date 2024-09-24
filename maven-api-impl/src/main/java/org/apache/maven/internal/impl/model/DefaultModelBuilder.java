@@ -40,6 +40,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -333,6 +336,10 @@ public class DefaultModelBuilder implements ModelBuilder {
                     + request + ", " + "result="
                     + result + ", " + "cache="
                     + cache + ']';
+        }
+
+        ExecutorService createExecutor() {
+            return Executors.newFixedThreadPool(getParallelism());
         }
 
         private int getParallelism() {
@@ -731,17 +738,25 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throw newModelBuilderException();
             }
 
-            build2(importIds);
-            for (DefaultModelBuilderResult r : result.getChildren()) {
-                if (r.getFileModel() == null) {
-                    continue;
+            ExecutorService executor = createExecutor();
+            try {
+                executor.submit(() -> build2(importIds));
+                for (DefaultModelBuilderResult r : result.getChildren()) {
+                    if (r.getFileModel() == null) {
+                        continue;
+                    }
+                    executor.submit(() -> {
+                        var pbs = r.getProblems();
+                        r.setProblems(List.of());
+                        derive(ModelSource.fromPath(r.getFileModel().getPomFile()), r)
+                                .build2(importIds);
+                        r.getProblems().forEach(this::add);
+                        pbs.addAll(r.getProblems());
+                        r.setProblems(pbs);
+                    });
                 }
-                var pbs = r.getProblems();
-                r.setProblems(List.of());
-                derive(ModelSource.fromPath(r.getFileModel().getPomFile()), r).build2(importIds);
-                r.getProblems().forEach(this::add);
-                pbs.addAll(r.getProblems());
-                r.setProblems(pbs);
+            } finally {
+                close(executor);
             }
             if (hasErrors()) {
                 throw newModelBuilderException();
@@ -750,96 +765,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             return result;
         }
 
-        record PomToLoad(Path pom, Set<Path> parents) {}
-
         @SuppressWarnings("checkstyle:MethodLength")
         private void loadFromRoot(Path root, Path top) {
-            List<PomToLoad> toLoad = new ArrayList<>();
-            toLoad.add(new PomToLoad(root, Set.of()));
-            Set<Path> buildParts = new HashSet<>();
-            while (!toLoad.isEmpty()) {
-                PomToLoad pomToLoad = toLoad.remove(0);
-                Path pom = pomToLoad.pom;
-                Set<Path> parents = pomToLoad.parents;
-                DefaultModelBuilderResult r;
-                boolean isBuildPart = buildParts.contains(pom);
-                if (pom.equals(top)) {
-                    r = result;
-                } else {
-                    r = new DefaultModelBuilderResult();
-                    if (isBuildPart) {
-                        result.getChildren().add(r);
-                    }
-                }
-                try {
-                    Path pomDirectory = Files.isDirectory(pom) ? pom : pom.getParent();
-                    Model model = derive(ModelSource.fromPath(pom), r).readFileModel();
-                    r.setFileModel(model);
-                    Model activated = activateFileModel(model);
-                    r.setActivatedFileModel(activated);
-                    List<String> subprojects = activated.getSubprojects();
-                    if (subprojects.isEmpty()) {
-                        subprojects = activated.getModules();
-                    }
-                    for (String subproject : subprojects) {
-                        if (subproject == null || subproject.isEmpty()) {
-                            continue;
-                        }
-
-                        subproject =
-                                subproject.replace('\\', File.separatorChar).replace('/', File.separatorChar);
-
-                        Path subprojectFile = modelProcessor.locateExistingPom(pomDirectory.resolve(subproject));
-
-                        if (subprojectFile == null) {
-                            ModelProblem problem = new org.apache.maven.internal.impl.model.DefaultModelProblem(
-                                    "Child subproject " + subproject + " of " + pomDirectory + " does not exist",
-                                    ModelProblem.Severity.ERROR,
-                                    ModelProblem.Version.BASE,
-                                    model,
-                                    -1,
-                                    -1,
-                                    null);
-                            r.getProblems().add(problem);
-                            add(problem);
-                            continue;
-                        }
-
-                        subprojectFile = subprojectFile.toAbsolutePath().normalize();
-
-                        if (parents.contains(subprojectFile)) {
-                            StringBuilder buffer = new StringBuilder(256);
-                            for (Path aggregatorFile : parents) {
-                                buffer.append(aggregatorFile).append(" -> ");
-                            }
-                            buffer.append(subprojectFile);
-
-                            ModelProblem problem = new org.apache.maven.internal.impl.model.DefaultModelProblem(
-                                    "Child subproject " + subprojectFile + " of " + pom + " forms aggregation cycle "
-                                            + buffer,
-                                    ModelProblem.Severity.ERROR,
-                                    ModelProblem.Version.BASE,
-                                    model,
-                                    -1,
-                                    -1,
-                                    null);
-                            r.getProblems().add(problem);
-                            continue;
-                        }
-
-                        toLoad.add(new PomToLoad(subprojectFile, concat(parents, pom)));
-                        if (pom.equals(top) && request.isRecursive()) {
-                            buildParts.add(subprojectFile);
-                        }
-                    }
-                } catch (ModelBuilderException e) {
-                    // gathered with problem collector
-                    add(Severity.ERROR, ModelProblem.Version.V40, "Failed to load project " + pom, e);
-                }
-                if (r != result) {
-                    result.getProblems().addAll(r.getProblems());
-                    r.getProblems().clear();
-                }
+            ExecutorService executor = createExecutor();
+            try {
+                loadFilePom(executor, top, root, Set.of(), new HashSet<>());
+            } finally {
+                close(executor);
             }
             if (result.getFileModel() == null && !Objects.equals(top, root)) {
                 logger.warn(
@@ -853,6 +785,110 @@ public class DefaultModelBuilder implements ModelBuilder {
                 cache.clear();
                 mappedSources.clear();
                 loadFromRoot(top, top);
+            }
+        }
+
+        private void close(ExecutorService executor) {
+            boolean terminated = executor.isTerminated();
+            if (!terminated) {
+                executor.shutdown();
+                boolean interrupted = false;
+                while (!terminated) {
+                    try {
+                        terminated = executor.awaitTermination(1L, TimeUnit.DAYS);
+                    } catch (InterruptedException e) {
+                        if (!interrupted) {
+                            executor.shutdownNow();
+                            interrupted = true;
+                        }
+                    }
+                }
+                if (interrupted) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        private void loadFilePom(
+                ExecutorService executor, Path top, Path pom, Set<Path> parents, Set<Path> buildParts) {
+            DefaultModelBuilderResult r;
+            boolean isBuildPart = buildParts.contains(pom);
+            if (pom.equals(top)) {
+                r = result;
+            } else {
+                r = new DefaultModelBuilderResult();
+                if (isBuildPart) {
+                    result.getChildren().add(r);
+                }
+            }
+            try {
+                Path pomDirectory = Files.isDirectory(pom) ? pom : pom.getParent();
+                Model model = derive(ModelSource.fromPath(pom), r).readFileModel();
+                r.setFileModel(model);
+                Model activated = activateFileModel(model);
+                r.setActivatedFileModel(activated);
+                List<String> subprojects = activated.getSubprojects();
+                if (subprojects.isEmpty()) {
+                    subprojects = activated.getModules();
+                }
+                for (String subproject : subprojects) {
+                    if (subproject == null || subproject.isEmpty()) {
+                        continue;
+                    }
+
+                    subproject = subproject.replace('\\', File.separatorChar).replace('/', File.separatorChar);
+
+                    Path rawSubprojectFile = modelProcessor.locateExistingPom(pomDirectory.resolve(subproject));
+
+                    if (rawSubprojectFile == null) {
+                        ModelProblem problem = new DefaultModelProblem(
+                                "Child subproject " + subproject + " of " + pomDirectory + " does not exist",
+                                Severity.ERROR,
+                                ModelProblem.Version.BASE,
+                                model,
+                                -1,
+                                -1,
+                                null);
+                        r.getProblems().add(problem);
+                        add(problem);
+                        continue;
+                    }
+
+                    Path subprojectFile = rawSubprojectFile.toAbsolutePath().normalize();
+
+                    if (parents.contains(subprojectFile)) {
+                        StringBuilder buffer = new StringBuilder(256);
+                        for (Path aggregatorFile : parents) {
+                            buffer.append(aggregatorFile).append(" -> ");
+                        }
+                        buffer.append(subprojectFile);
+
+                        ModelProblem problem = new DefaultModelProblem(
+                                "Child subproject " + subprojectFile + " of " + pom + " forms aggregation cycle "
+                                        + buffer,
+                                Severity.ERROR,
+                                ModelProblem.Version.BASE,
+                                model,
+                                -1,
+                                -1,
+                                null);
+                        r.getProblems().add(problem);
+                        continue;
+                    }
+
+                    executor.submit(() -> loadFilePom(executor, top, subprojectFile, concat(parents, pom), buildParts));
+
+                    if (pom.equals(top) && request.isRecursive()) {
+                        buildParts.add(subprojectFile);
+                    }
+                }
+            } catch (ModelBuilderException e) {
+                // gathered with problem collector
+                add(Severity.ERROR, ModelProblem.Version.V40, "Failed to load project " + pom, e);
+            }
+            if (r != result) {
+                result.getProblems().addAll(r.getProblems());
+                r.getProblems().clear();
             }
         }
 
