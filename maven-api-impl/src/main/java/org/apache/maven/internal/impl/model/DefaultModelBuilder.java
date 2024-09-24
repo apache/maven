@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.impl.model;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -814,12 +815,17 @@ public class DefaultModelBuilder implements ModelBuilder {
             return result;
         }
 
+        record PomToLoad(Path pom, Set<Path> parents) {}
+
+        @SuppressWarnings("checkstyle:MethodLength")
         private void loadFromRoot(Path root, Path top) {
-            List<Path> toLoad = new ArrayList<>();
-            toLoad.add(root);
+            List<PomToLoad> toLoad = new ArrayList<>();
+            toLoad.add(new PomToLoad(root, Set.of()));
             Set<Path> buildParts = new HashSet<>();
             while (!toLoad.isEmpty()) {
-                Path pom = toLoad.remove(0);
+                PomToLoad pomToLoad = toLoad.remove(0);
+                Path pom = pomToLoad.pom;
+                Set<Path> parents = pomToLoad.parents;
                 DefaultModelBuilderResult r;
                 boolean isBuildPart = buildParts.contains(pom);
                 if (pom.equals(top)) {
@@ -831,6 +837,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     }
                 }
                 try {
+                    Path pomDirectory = Files.isDirectory(pom) ? pom : pom.getParent();
                     Model model = derive(ModelSource.fromPath(pom), r).readFileModel();
                     r.setFileModel(model);
                     Model activated = activateFileModel(model);
@@ -840,72 +847,56 @@ public class DefaultModelBuilder implements ModelBuilder {
                         subprojects = activated.getModules();
                     }
                     for (String subproject : subprojects) {
-                        Path subprojectFile = getModelProcessor()
-                                .locateExistingPom(pom.getParent().resolve(subproject));
-                        if (subprojectFile != null) {
-                            toLoad.add(subprojectFile);
-                            if (pom.equals(top)) {
-                                buildParts.add(subprojectFile);
+                        if (subproject == null || subproject.isEmpty()) {
+                            continue;
+                        }
+
+                        subproject =
+                                subproject.replace('\\', File.separatorChar).replace('/', File.separatorChar);
+
+                        Path subprojectFile = modelProcessor.locateExistingPom(pomDirectory.resolve(subproject));
+
+                        if (subprojectFile == null) {
+                            ModelProblem problem = new org.apache.maven.internal.impl.model.DefaultModelProblem(
+                                    "Child subproject " + subprojectFile + " of " + pomDirectory + " does not exist",
+                                    ModelProblem.Severity.ERROR,
+                                    ModelProblem.Version.BASE,
+                                    model,
+                                    -1,
+                                    -1,
+                                    null);
+                            r.getProblems().add(problem);
+                            add(problem);
+                            continue;
+                        }
+
+                        subprojectFile = subprojectFile.toAbsolutePath().normalize();
+
+                        if (parents.contains(subprojectFile)) {
+                            StringBuilder buffer = new StringBuilder(256);
+                            for (Path aggregatorFile : parents) {
+                                buffer.append(aggregatorFile).append(" -> ");
                             }
+                            buffer.append(subprojectFile);
+
+                            ModelProblem problem = new org.apache.maven.internal.impl.model.DefaultModelProblem(
+                                    "Child subproject " + subprojectFile + " of " + pom + " forms aggregation cycle "
+                                            + buffer,
+                                    ModelProblem.Severity.ERROR,
+                                    ModelProblem.Version.BASE,
+                                    model,
+                                    -1,
+                                    -1,
+                                    null);
+                            r.getProblems().add(problem);
+                            continue;
+                        }
+
+                        toLoad.add(new PomToLoad(subprojectFile, concat(parents, pom)));
+                        if (pom.equals(top)) {
+                            buildParts.add(subprojectFile);
                         }
                     }
-                    /*
-                      TODO: adapt those checks
-
-                      if (subproject == null || subproject.isEmpty()) {
-                           continue;
-                       }
-
-                       subproject = subproject.replace('\\', File.separatorChar).replace('/', File.separatorChar);
-
-                       Path subprojectPath = modelProcessor.locateExistingPom(new File(basedir, subproject).toPath());
-                       File subprojectFile = subprojectPath != null ? subprojectPath.toFile() : null;
-
-                       if (subprojectFile == null) {
-                           ModelProblem problem = new org.apache.maven.internal.impl.model.DefaultModelProblem(
-                                   "Child subproject " + subprojectFile + " of " + pomFile + " does not exist",
-                                   ModelProblem.Severity.ERROR,
-                                   ModelProblem.Version.BASE,
-                                   model,
-                                   -1,
-                                   -1,
-                                   null);
-                           result.getProblems().add(problem);
-                           continue;
-                       }
-
-                       if (Os.IS_WINDOWS) {
-                           // we don't canonicalize on unix to avoid interfering with symlinks
-                           try {
-                               subprojectFile = subprojectFile.getCanonicalFile();
-                           } catch (IOException e) {
-                               subprojectFile = subprojectFile.getAbsoluteFile();
-                           }
-                       } else {
-                           subprojectFile = new File(subprojectFile.toURI().normalize());
-                       }
-
-                       if (aggregatorFiles.contains(subprojectFile)) {
-                           StringBuilder buffer = new StringBuilder(256);
-                           for (File aggregatorFile : aggregatorFiles) {
-                               buffer.append(aggregatorFile).append(" -> ");
-                           }
-                           buffer.append(subprojectFile);
-
-                           ModelProblem problem = new org.apache.maven.internal.impl.model.DefaultModelProblem(
-                                   "Child subproject " + subprojectFile + " of " + pomFile + " forms aggregation cycle "
-                                           + buffer,
-                                   ModelProblem.Severity.ERROR,
-                                   ModelProblem.Version.BASE,
-                                   model,
-                                   -1,
-                                   -1,
-                                   null);
-                           result.getProblems().add(problem);
-
-                           continue;
-                       }
-                    */
                 } catch (ModelBuilderException e) {
                     // gathered with problem collector
                     add(Severity.ERROR, ModelProblem.Version.V40, "Failed to load project " + pom, e);
@@ -925,8 +916,15 @@ public class DefaultModelBuilder implements ModelBuilder {
                         top,
                         root);
                 cache.clear();
+                mappedSources.clear();
                 loadFromRoot(top, top);
             }
+        }
+
+        static <T> Set<T> concat(Set<T> a, T b) {
+            Set<T> result = new HashSet<>(a);
+            result.add(b);
+            return Set.copyOf(result);
         }
 
         private ModelBuilderResult buildParentOrDependency(Collection<String> importIds) throws ModelBuilderException {
