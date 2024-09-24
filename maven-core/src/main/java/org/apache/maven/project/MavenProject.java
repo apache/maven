@@ -197,7 +197,7 @@ public class MavenProject implements Cloneable {
     @Nonnull
     private List<Artifact> attachedArtifacts;
 
-    @Nonnull
+    @Nullable
     private MavenProject executionProject;
 
     /**
@@ -337,7 +337,6 @@ public class MavenProject implements Cloneable {
     public MavenProject(@Nonnull Model model) {
         // Do not invoke `setModel(Model)` as escaping `this` is deprecated.
         this.model = Objects.requireNonNull(model);
-        executionProject = this;
 
         // Immutable collections.
         pluginArtifacts = Set.of();
@@ -375,7 +374,7 @@ public class MavenProject implements Cloneable {
         rootDirectory = project.getRootDirectory();
         artifactFilter = project.artifactFilter; // This internal property has no getter.
         parentArtifact = project.getParentArtifact();
-        executionProject = project.getExecutionProject();
+        executionProject = project.executionProject; // Intentionally avoid the getter.
         releaseArtifactRepository = project.getReleaseArtifactRepository();
         snapshotArtifactRepository = project.getSnapshotArtifactRepository();
         artifact = project.getArtifact();
@@ -1255,12 +1254,13 @@ public class MavenProject implements Cloneable {
         return dom;
     }
 
+    @Nonnull
     public MavenProject getExecutionProject() {
-        return executionProject;
+        return (executionProject == null ? this : executionProject);
     }
 
-    public void setExecutionProject(MavenProject project) {
-        executionProject = Objects.requireNonNull(project);
+    public void setExecutionProject(@Nullable MavenProject project) {
+        executionProject = project;
     }
 
     @Nonnull
