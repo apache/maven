@@ -493,7 +493,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 result = modelBuilderSession.build(modelBuildingRequest);
             } catch (ModelBuilderException e) {
                 result = e.getResult();
-                if (result == null || result.getFileModel() == null) {
+                if (result == null || result.getEffectiveModel() == null) {
                     return List.of(new DefaultProjectBuildingResult(e.getModelId(), pomFile, convert(e.getProblems())));
                 }
                 // validation error, continue project building and delay failing to help IDEs
