@@ -789,7 +789,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             } catch (IllegalStateException e) {
                 rootDirectory = session.getService(RootLocator.class).findRoot(top);
             }
-            loadFromRoot(rootDirectory, top);
+            Path root = getModelProcessor().locateExistingPom(rootDirectory);
+            loadFromRoot(root, top);
             if (hasErrors()) {
                 throw newModelBuilderException();
             }
@@ -813,8 +814,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return result;
         }
 
-        private void loadFromRoot(Path rootDirectory, Path top) {
-            Path root = getModelProcessor().locateExistingPom(rootDirectory);
+        private void loadFromRoot(Path root, Path top) {
             List<Path> toLoad = new ArrayList<>();
             toLoad.add(root);
             Set<Path> buildParts = new HashSet<>();
@@ -915,7 +915,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     r.getProblems().clear();
                 }
             }
-            if (result.getFileModel() == null && !Objects.equals(top.getParent(), rootDirectory)) {
+            if (result.getFileModel() == null && !Objects.equals(top, root)) {
                 logger.warn(
                         "The top project ({}) cannot be found in the reactor from root project ({}). "
                                 + "Make sure the root directory is correct (a missing '.mvn' directory in the root "
@@ -923,9 +923,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 + "in the reactor (missing activated profiles, command line options, etc.). For this "
                                 + "build, the top project will be used as the root project.",
                         top,
-                        rootDirectory);
+                        root);
                 cache.clear();
-                loadFromRoot(top.getParent(), top);
+                loadFromRoot(top, top);
             }
         }
 
