@@ -881,14 +881,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model activatedFileModel = activateFileModel(fileModel);
             result.setActivatedFileModel(activatedFileModel);
 
-            // if (!build.request.isTwoPhaseBuilding()) {
             // phase 2: build the effective model
             return build2(importIds);
-            // } else if (hasModelErrors(build)) {
-            //    throw build.newModelBuilderException();
-            // }
-
-            // return build.result;
         }
 
         private ModelBuilderResult build2(Collection<String> importIds) throws ModelBuilderException {
@@ -1742,7 +1736,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .systemProperties(request.getSystemProperties())
                         .userProperties(request.getUserProperties())
                         .source(importSource)
-                        .twoPhaseBuilding(false)
                         .repositories(getRepositories())
                         .build();
                 importResult = new DefaultModelBuilderSession(importRequest).build(importIds);

@@ -87,8 +87,6 @@ public interface ModelBuilderRequest {
     @Nonnull
     RequestType getRequestType();
 
-    boolean isTwoPhaseBuilding();
-
     boolean isLocationTracking();
 
     boolean isRecursive();
@@ -175,7 +173,6 @@ public interface ModelBuilderRequest {
         Session session;
         RequestType requestType;
         boolean locationTracking;
-        boolean twoPhaseBuilding;
         boolean recursive;
         ModelSource source;
         Collection<Profile> profiles;
@@ -194,7 +191,6 @@ public interface ModelBuilderRequest {
             this.session = request.getSession();
             this.requestType = request.getRequestType();
             this.locationTracking = request.isLocationTracking();
-            this.twoPhaseBuilding = request.isTwoPhaseBuilding();
             this.recursive = request.isRecursive();
             this.source = request.getSource();
             this.profiles = request.getProfiles();
@@ -215,11 +211,6 @@ public interface ModelBuilderRequest {
 
         public ModelBuilderRequestBuilder requestType(RequestType requestType) {
             this.requestType = requestType;
-            return this;
-        }
-
-        public ModelBuilderRequestBuilder twoPhaseBuilding(boolean twoPhaseBuilding) {
-            this.twoPhaseBuilding = twoPhaseBuilding;
             return this;
         }
 
@@ -288,7 +279,6 @@ public interface ModelBuilderRequest {
                     session,
                     requestType,
                     locationTracking,
-                    twoPhaseBuilding,
                     recursive,
                     source,
                     profiles,
@@ -305,7 +295,6 @@ public interface ModelBuilderRequest {
         private static class DefaultModelBuilderRequest extends BaseRequest implements ModelBuilderRequest {
             private final RequestType requestType;
             private final boolean locationTracking;
-            private final boolean twoPhaseBuilding;
             private final boolean recursive;
             private final ModelSource source;
             private final Collection<Profile> profiles;
@@ -323,7 +312,6 @@ public interface ModelBuilderRequest {
                     @Nonnull Session session,
                     @Nonnull RequestType requestType,
                     boolean locationTracking,
-                    boolean twoPhaseBuilding,
                     boolean recursive,
                     @Nonnull ModelSource source,
                     Collection<Profile> profiles,
@@ -338,7 +326,6 @@ public interface ModelBuilderRequest {
                 super(session);
                 this.requestType = nonNull(requestType, "requestType cannot be null");
                 this.locationTracking = locationTracking;
-                this.twoPhaseBuilding = twoPhaseBuilding;
                 this.recursive = recursive;
                 this.source = source;
                 this.profiles = profiles != null ? List.copyOf(profiles) : List.of();
@@ -356,11 +343,6 @@ public interface ModelBuilderRequest {
             @Override
             public RequestType getRequestType() {
                 return requestType;
-            }
-
-            @Override
-            public boolean isTwoPhaseBuilding() {
-                return twoPhaseBuilding;
             }
 
             @Override

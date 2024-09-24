@@ -484,7 +484,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             ModelBuilderRequest modelBuildingRequest = getModelBuildingRequest()
                     .source(ModelSource.fromPath(pomFile.toPath()))
                     .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
-                    .twoPhaseBuilding(true)
                     .locationTracking(true)
                     .listener(listener)
                     .recursive(recursive)
