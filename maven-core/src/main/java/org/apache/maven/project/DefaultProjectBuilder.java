@@ -45,6 +45,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
@@ -315,8 +316,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             this.request = request;
             this.session =
                     RepositoryUtils.overlay(request.getLocalRepository(), request.getRepositorySession(), repoSystem);
-            InternalSession.from(session);
+            InternalSession iSession = InternalSession.from(session);
             this.modelBuilderSession = modelBuilder.newSession();
+            iSession.getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), modelBuilderSession);
         }
 
         @Override

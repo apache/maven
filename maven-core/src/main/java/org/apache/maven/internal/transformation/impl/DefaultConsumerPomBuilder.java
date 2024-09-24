@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
@@ -34,6 +35,7 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
@@ -210,7 +212,12 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         request.locationTracking(false);
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());
-        return modelBuilder.newSession().build(request.build());
+        ModelBuilder.ModelBuilderSession mbSession =
+                iSession.getData().get(SessionData.key(ModelBuilder.ModelBuilderSession.class));
+        if (mbSession == null) {
+            mbSession = modelBuilder.newSession();
+        }
+        return mbSession.build(request.build());
     }
 
     static Model transform(Model model, MavenProject project) {

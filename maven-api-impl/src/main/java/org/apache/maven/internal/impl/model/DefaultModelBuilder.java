@@ -247,8 +247,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private final Set<ModelProblem.Severity> severities = EnumSet.noneOf(ModelProblem.Severity.class);
 
-        volatile boolean fullReactorLoaded;
-
         DefaultModelBuilderSession(ModelBuilderRequest request) {
             this(request, new DefaultModelBuilderResult());
         }
@@ -335,7 +333,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return request;
         }
 
-        public DefaultModelBuilderResult result() {
+        public ModelBuilderResult result() {
             return result;
         }
 
@@ -367,11 +365,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         public Model getRawModel(Path from, String groupId, String artifactId) {
             ModelSource source = getSource(groupId, artifactId);
-            if (source == null) {
-                // we need to check the whole reactor in case it's a dependency
-                loadFullReactor();
-                source = getSource(groupId, artifactId);
-            }
             if (source != null) {
                 if (!addEdge(from, source.getPath())) {
                     return null;
@@ -398,51 +391,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 // gathered with problem collector
             }
             return null;
-        }
-
-        private void loadFullReactor() {
-            if (!fullReactorLoaded) {
-                synchronized (this) {
-                    if (!fullReactorLoaded) {
-                        doLoadFullReactor();
-                        fullReactorLoaded = true;
-                    }
-                }
-            }
-        }
-
-        private void doLoadFullReactor() {
-            Path rootDirectory;
-            try {
-                rootDirectory = session().getRootDirectory();
-            } catch (IllegalStateException e) {
-                // if no root directory, bail out
-                return;
-            }
-            List<Path> toLoad = new ArrayList<>();
-            Path root = getModelProcessor().locateExistingPom(rootDirectory);
-            toLoad.add(root);
-            while (!toLoad.isEmpty()) {
-                Path pom = toLoad.remove(0);
-                try {
-                    Model model = derive(ModelSource.fromPath(pom)).readFileModel();
-                    model = activateFileModel(model);
-                    List<String> subprojects = model.getSubprojects();
-                    if (subprojects.isEmpty()) {
-                        subprojects = model.getModules();
-                    }
-                    for (String subproject : subprojects) {
-                        Path subprojectFile = getModelProcessor()
-                                .locateExistingPom(pom.getParent().resolve(subproject));
-                        if (subprojectFile != null) {
-                            toLoad.add(subprojectFile);
-                        }
-                    }
-                } catch (ModelBuilderException e) {
-                    // gathered with problem collector
-                    add(Severity.ERROR, ModelProblem.Version.V40, "Failed to load project " + pom, e);
-                }
-            }
         }
 
         private boolean addEdge(Path from, Path p) {
@@ -771,18 +719,19 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         ModelBuilderResult build(Collection<String> importIds) throws ModelBuilderException {
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM && request.isRecursive()) {
-                return buildRecursive(importIds);
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
+                return buildBuildPom(importIds);
             } else {
                 return buildParentOrDependency(importIds);
             }
         }
 
-        private ModelBuilderResult buildRecursive(Collection<String> importIds) throws ModelBuilderException {
+        private ModelBuilderResult buildBuildPom(Collection<String> importIds) throws ModelBuilderException {
             Path top = request.getSource().getPath();
             if (top == null) {
                 throw new IllegalStateException("Recursive build requested but source has no path");
             }
+            top = top.toAbsolutePath().normalize();
 
             Path rootDirectory;
             try {
@@ -791,6 +740,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                 rootDirectory = session.getService(RootLocator.class).findRoot(top);
             }
             Path root = getModelProcessor().locateExistingPom(rootDirectory);
+            if (root != null) {
+                root = root.toAbsolutePath().normalize();
+            } else {
+                root = top;
+            }
             loadFromRoot(root, top);
             if (hasErrors()) {
                 throw newModelBuilderException();
@@ -893,7 +847,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         }
 
                         toLoad.add(new PomToLoad(subprojectFile, concat(parents, pom)));
-                        if (pom.equals(top)) {
+                        if (pom.equals(top) && request.isRecursive()) {
                             buildParts.add(subprojectFile);
                         }
                     }
