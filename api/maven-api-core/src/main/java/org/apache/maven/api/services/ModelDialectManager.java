@@ -30,15 +30,15 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
 
 /**
- * The {@code ModelDialectManager} provides a mechanism for managing and 
- * translating between different dialects of Maven models. 
+ * The {@code ModelDialectManager} provides a mechanism for managing and
+ * translating between different dialects of Maven models.
  * It allows reading and writing models in various dialects supported by the system.
  */
 public interface ModelDialectManager extends Service {
 
     /**
      * Retrieves the set of all available dialects.
-     * The result is never {@code null} and always contains at least one element, 
+     * The result is never {@code null} and always contains at least one element,
      * the core {@link org.apache.maven.api.Dialect#XML} dialect.
      *
      * @return a non-null {@link Set} of available dialects.
