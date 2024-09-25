@@ -121,6 +121,9 @@ public interface ModelBuilderResult {
     @Nonnull
     List<? extends ModelBuilderResult> getChildren();
 
+    @Nonnull
+    ModelSource getSource();
+
     /**
      * Creates a human-readable representation of these errors.
      */

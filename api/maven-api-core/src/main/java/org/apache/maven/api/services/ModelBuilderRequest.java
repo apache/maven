@@ -129,6 +129,9 @@ public interface ModelBuilderRequest {
     @Nullable
     List<RemoteRepository> getRepositories();
 
+    @Nullable
+    ModelTransformer getLifecycleBindingsInjector();
+
     @Nonnull
     static ModelBuilderRequest build(@Nonnull ModelBuilderRequest request, @Nonnull ModelSource source) {
         return builder(nonNull(request, "request cannot be null"))
@@ -176,6 +179,7 @@ public interface ModelBuilderRequest {
         Map<String, String> userProperties;
         RepositoryMerging repositoryMerging;
         List<RemoteRepository> repositories;
+        ModelTransformer lifecycleBindingsInjector;
 
         ModelBuilderRequestBuilder() {}
 
@@ -192,6 +196,7 @@ public interface ModelBuilderRequest {
             this.userProperties = request.getUserProperties();
             this.repositoryMerging = request.getRepositoryMerging();
             this.repositories = request.getRepositories();
+            this.lifecycleBindingsInjector = request.getLifecycleBindingsInjector();
         }
 
         public ModelBuilderRequestBuilder session(Session session) {
@@ -254,6 +259,11 @@ public interface ModelBuilderRequest {
             return this;
         }
 
+        public ModelBuilderRequestBuilder lifecycleBindingsInjector(ModelTransformer lifecycleBindingsInjector) {
+            this.lifecycleBindingsInjector = lifecycleBindingsInjector;
+            return this;
+        }
+
         public ModelBuilderRequest build() {
             return new DefaultModelBuilderRequest(
                     session,
@@ -267,7 +277,8 @@ public interface ModelBuilderRequest {
                     systemProperties,
                     userProperties,
                     repositoryMerging,
-                    repositories);
+                    repositories,
+                    lifecycleBindingsInjector);
         }
 
         private static class DefaultModelBuilderRequest extends BaseRequest implements ModelBuilderRequest {
@@ -282,6 +293,7 @@ public interface ModelBuilderRequest {
             private final Map<String, String> userProperties;
             private final RepositoryMerging repositoryMerging;
             private final List<RemoteRepository> repositories;
+            private final ModelTransformer lifecycleBindingsInjector;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultModelBuilderRequest(
@@ -296,7 +308,8 @@ public interface ModelBuilderRequest {
                     Map<String, String> systemProperties,
                     Map<String, String> userProperties,
                     RepositoryMerging repositoryMerging,
-                    List<RemoteRepository> repositories) {
+                    List<RemoteRepository> repositories,
+                    ModelTransformer lifecycleBindingsInjector) {
                 super(session);
                 this.requestType = nonNull(requestType, "requestType cannot be null");
                 this.locationTracking = locationTracking;
@@ -310,6 +323,7 @@ public interface ModelBuilderRequest {
                 this.userProperties = userProperties != null ? Map.copyOf(userProperties) : session.getUserProperties();
                 this.repositoryMerging = repositoryMerging;
                 this.repositories = repositories != null ? List.copyOf(repositories) : null;
+                this.lifecycleBindingsInjector = lifecycleBindingsInjector;
             }
 
             @Override
@@ -366,6 +380,11 @@ public interface ModelBuilderRequest {
             @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;
+            }
+
+            @Override
+            public ModelTransformer getLifecycleBindingsInjector() {
+                return lifecycleBindingsInjector;
             }
         }
     }

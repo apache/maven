@@ -221,7 +221,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         // multi projects build entry point
         ProjectBuildingException ex2 = assertThrows(
                 ProjectBuildingException.class,
-                () -> projectBuilder.build(Collections.singletonList(pomFile), false, configuration));
+                () -> projectBuilder.build(Collections.singletonList(pomFile), true, configuration));
 
         assertEquals(1, ex2.getResults().size());
         MavenProject project2 = ex2.getResults().get(0).getProject();

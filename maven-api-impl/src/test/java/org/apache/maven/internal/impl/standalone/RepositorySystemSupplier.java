@@ -1054,7 +1054,6 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 new DefaultPluginManagementInjector(),
                 new DefaultDependencyManagementInjector(),
                 new DefaultDependencyManagementImporter(),
-                (m, r, b) -> m,
                 new DefaultPluginConfigurationExpander(),
                 new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), new DefaultRootLocator()),
                 new DefaultModelVersionParser(getVersionScheme()),

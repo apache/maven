@@ -40,9 +40,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -55,7 +56,6 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionRange;
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -90,7 +90,6 @@ import org.apache.maven.api.services.VersionParserException;
 import org.apache.maven.api.services.model.DependencyManagementImporter;
 import org.apache.maven.api.services.model.DependencyManagementInjector;
 import org.apache.maven.api.services.model.InheritanceAssembler;
-import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.api.services.model.ModelCache;
 import org.apache.maven.api.services.model.ModelCacheFactory;
 import org.apache.maven.api.services.model.ModelInterpolator;
@@ -149,7 +148,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final PluginManagementInjector pluginManagementInjector;
     private final DependencyManagementInjector dependencyManagementInjector;
     private final DependencyManagementImporter dependencyManagementImporter;
-    private final LifecycleBindingsInjector lifecycleBindingsInjector;
     private final PluginConfigurationExpander pluginConfigurationExpander;
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final ModelVersionParser versionParser;
@@ -173,7 +171,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             PluginManagementInjector pluginManagementInjector,
             DependencyManagementInjector dependencyManagementInjector,
             DependencyManagementImporter dependencyManagementImporter,
-            @Nullable LifecycleBindingsInjector lifecycleBindingsInjector,
             PluginConfigurationExpander pluginConfigurationExpander,
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             ModelVersionParser versionParser,
@@ -193,7 +190,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.pluginManagementInjector = pluginManagementInjector;
         this.dependencyManagementInjector = dependencyManagementInjector;
         this.dependencyManagementImporter = dependencyManagementImporter;
-        this.lifecycleBindingsInjector = lifecycleBindingsInjector;
         this.pluginConfigurationExpander = pluginConfigurationExpander;
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.versionParser = versionParser;
@@ -215,7 +211,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                 } else {
                     session = mainSession.derive(request, new DefaultModelBuilderResult());
                 }
-                return session.build(new LinkedHashSet<>());
+                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
+                    return session.buildBuildPom();
+                } else {
+                    return session.buildParentOrDependency(new LinkedHashSet<>());
+                }
             }
         };
     }
@@ -338,8 +338,49 @@ public class DefaultModelBuilder implements ModelBuilder {
                     + cache + ']';
         }
 
-        ExecutorService createExecutor() {
-            return Executors.newFixedThreadPool(getParallelism());
+        static class TaskTreeExecutor implements Executor, AutoCloseable {
+            private final ExecutorService executor;
+            private final Phaser phaser;
+
+            TaskTreeExecutor(int nThreads) {
+                this.executor = Executors.newFixedThreadPool(nThreads);
+                this.phaser = new Phaser();
+            }
+
+            public void execute(Runnable task) {
+                phaser.register();
+                executor.submit(new WrappedTask(task));
+            }
+
+            public void close() {
+                // Otherwise, register and then wait
+                phaser.register();
+                phaser.arriveAndAwaitAdvance();
+                phaser.arriveAndDeregister();
+                // Close executor
+                executor.shutdownNow();
+            }
+
+            private class WrappedTask implements Runnable {
+                private final Runnable task;
+
+                WrappedTask(Runnable task) {
+                    this.task = task;
+                }
+
+                @Override
+                public void run() {
+                    try {
+                        task.run();
+                    } finally {
+                        phaser.arrive();
+                    }
+                }
+            }
+        }
+
+        TaskTreeExecutor createExecutor() {
+            return new TaskTreeExecutor(getParallelism());
         }
 
         private int getParallelism() {
@@ -706,15 +747,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return version;
         }
 
-        ModelBuilderResult build(Collection<String> importIds) throws ModelBuilderException {
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
-                return buildBuildPom(importIds);
-            } else {
-                return buildParentOrDependency(importIds);
-            }
-        }
-
-        private ModelBuilderResult buildBuildPom(Collection<String> importIds) throws ModelBuilderException {
+        private ModelBuilderResult buildBuildPom() throws ModelBuilderException {
             Path top = request.getSource().getPath();
             if (top == null) {
                 throw new IllegalStateException("Recursive build requested but source has no path");
@@ -738,26 +771,29 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throw newModelBuilderException();
             }
 
-            ExecutorService executor = createExecutor();
-            try {
-                executor.submit(() -> build2(importIds));
-                for (DefaultModelBuilderResult r : result.getChildren()) {
-                    if (r.getFileModel() == null) {
-                        continue;
+            var allResults = results(result).toList();
+            try (TaskTreeExecutor executor = createExecutor()) {
+                allResults.forEach(r -> executor.execute(() -> {
+                    try {
+                        derive(r.getSource(), r).build2(new LinkedHashSet<>());
+                    } catch (ModelBuilderException e) {
+                        // gathered with problem collector
+                    } catch (Exception t) {
+                        r.getProblems()
+                                .add(new DefaultModelProblem(
+                                        t.getMessage(),
+                                        Severity.FATAL,
+                                        ModelProblem.Version.BASE,
+                                        null,
+                                        -1,
+                                        -1,
+                                        null,
+                                        t));
                     }
-                    executor.submit(() -> {
-                        var pbs = r.getProblems();
-                        r.setProblems(List.of());
-                        derive(ModelSource.fromPath(r.getFileModel().getPomFile()), r)
-                                .build2(importIds);
-                        r.getProblems().forEach(this::add);
-                        pbs.addAll(r.getProblems());
-                        r.setProblems(pbs);
-                    });
-                }
-            } finally {
-                close(executor);
+                }));
             }
+            allResults.stream().filter(r -> r != result).forEach(r -> r.getProblems()
+                    .forEach(this::add));
             if (hasErrors()) {
                 throw newModelBuilderException();
             }
@@ -765,13 +801,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             return result;
         }
 
+        Stream<DefaultModelBuilderResult> results(DefaultModelBuilderResult r) {
+            return Stream.concat(Stream.of(r), r.getChildren().stream().flatMap(this::results));
+        }
+
         @SuppressWarnings("checkstyle:MethodLength")
         private void loadFromRoot(Path root, Path top) {
-            ExecutorService executor = createExecutor();
-            try {
-                loadFilePom(executor, top, root, Set.of(), new HashSet<>());
-            } finally {
-                close(executor);
+            try (TaskTreeExecutor executor = createExecutor()) {
+                loadFilePom(executor, top, root, Set.of(), null);
             }
             if (result.getFileModel() == null && !Objects.equals(top, root)) {
                 logger.warn(
@@ -788,43 +825,23 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        private void close(ExecutorService executor) {
-            boolean terminated = executor.isTerminated();
-            if (!terminated) {
-                executor.shutdown();
-                boolean interrupted = false;
-                while (!terminated) {
-                    try {
-                        terminated = executor.awaitTermination(1L, TimeUnit.DAYS);
-                    } catch (InterruptedException e) {
-                        if (!interrupted) {
-                            executor.shutdownNow();
-                            interrupted = true;
-                        }
-                    }
-                }
-                if (interrupted) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }
-
         private void loadFilePom(
-                ExecutorService executor, Path top, Path pom, Set<Path> parents, Set<Path> buildParts) {
+                Executor executor, Path top, Path pom, Set<Path> parents, DefaultModelBuilderResult parent) {
             DefaultModelBuilderResult r;
-            boolean isBuildPart = buildParts.contains(pom);
             if (pom.equals(top)) {
                 r = result;
             } else {
                 r = new DefaultModelBuilderResult();
-                if (isBuildPart) {
-                    result.getChildren().add(r);
+                if (parent != null) {
+                    parent.getChildren().add(r);
                 }
             }
             try {
                 Path pomDirectory = Files.isDirectory(pom) ? pom : pom.getParent();
-                Model model = derive(ModelSource.fromPath(pom), r).readFileModel();
+                ModelSource src = ModelSource.fromPath(pom);
+                Model model = derive(src, r).readFileModel();
                 r.setFileModel(model);
+                r.setSource(src);
                 Model activated = activateFileModel(model);
                 r.setActivatedFileModel(activated);
                 List<String> subprojects = activated.getSubprojects();
@@ -876,11 +893,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                         continue;
                     }
 
-                    executor.submit(() -> loadFilePom(executor, top, subprojectFile, concat(parents, pom), buildParts));
-
-                    if (pom.equals(top) && request.isRecursive()) {
-                        buildParts.add(subprojectFile);
-                    }
+                    executor.execute(() -> loadFilePom(
+                            executor,
+                            top,
+                            subprojectFile,
+                            concat(parents, pom),
+                            (parent != null || Objects.equals(pom, top)) && request.isRecursive() ? r : null));
                 }
             } catch (ModelBuilderException e) {
                 // gathered with problem collector
@@ -902,6 +920,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // phase 1: read and validate raw model
             Model fileModel = readFileModel();
             result.setFileModel(fileModel);
+            result.setSource(request.getSource());
 
             Model activatedFileModel = activateFileModel(fileModel);
             result.setActivatedFileModel(activatedFileModel);
@@ -923,13 +942,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             // plugin management injection
             resultModel = pluginManagementInjector.injectManagement(resultModel, request, this);
 
+            // lifecycle bindings injection
             if (request.getRequestType() != ModelBuilderRequest.RequestType.DEPENDENCY) {
-                if (lifecycleBindingsInjector == null) {
-                    throw new IllegalStateException("lifecycle bindings injector is missing");
+                org.apache.maven.api.services.ModelTransformer lifecycleBindingsInjector =
+                        request.getLifecycleBindingsInjector();
+                if (lifecycleBindingsInjector != null) {
+                    resultModel = lifecycleBindingsInjector.transform(resultModel, request, this);
                 }
-
-                // lifecycle bindings injection
-                resultModel = lifecycleBindingsInjector.injectLifecycleBindings(resultModel, request, this);
             }
 
             // dependency management import
@@ -1358,6 +1377,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         Model doReadFileModel() throws ModelBuilderException {
             ModelBuilderRequest request = this.request;
             ModelSource modelSource = request.getSource();
+            result.setSource(modelSource);
             Model model;
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
@@ -1757,7 +1777,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .source(importSource)
                         .repositories(getRepositories())
                         .build();
-                importResult = new DefaultModelBuilderSession(importRequest).build(importIds);
+                importResult = new DefaultModelBuilderSession(importRequest).buildParentOrDependency(importIds);
             } catch (ModelBuilderException e) {
                 e.getResult().getProblems().forEach(this::add);
                 return null;
@@ -1877,11 +1897,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private static boolean isNotEmpty(String string) {
         return string != null && !string.isEmpty();
-    }
-
-    public ModelBuilderResult build(final ModelBuilderRequest request, final ModelBuilderResult result)
-            throws ModelBuilderException {
-        return new DefaultModelBuilderSession(request, (DefaultModelBuilderResult) result).build(new LinkedHashSet<>());
     }
 
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {

@@ -192,7 +192,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 pluginManagementInjector,
                 dependencyManagementInjector,
                 dependencyManagementImporter,
-                lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionParser,
@@ -207,6 +206,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         request.locationTracking(false);
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());
+        request.lifecycleBindingsInjector(lifecycleBindingsInjector::injectLifecycleBindings);
         ModelBuilder.ModelBuilderSession mbSession =
                 iSession.getData().get(SessionData.key(ModelBuilder.ModelBuilderSession.class));
         if (mbSession == null) {

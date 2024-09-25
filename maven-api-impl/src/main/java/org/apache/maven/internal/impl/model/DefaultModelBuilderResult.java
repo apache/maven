@@ -31,12 +31,14 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.api.services.ModelSource;
 
 /**
  * Collects the output of the model builder.
  *
  */
 class DefaultModelBuilderResult implements ModelBuilderResult {
+    private ModelSource source;
     private Model fileModel;
     private Model activatedFileModel;
 
@@ -74,6 +76,14 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
             this.rawModels.put(modelId, result.getRawModel(modelId).orElseThrow());
             this.activePomProfiles.put(modelId, result.getActivePomProfiles(modelId));
         }
+    }
+
+    public ModelSource getSource() {
+        return source;
+    }
+
+    public void setSource(ModelSource source) {
+        this.source = source;
     }
 
     @Override
