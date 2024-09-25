@@ -30,37 +30,43 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
 
 /**
- * Dialect manager, that offers passage between various dialects.
+ * The {@code ModelDialectManager} provides a mechanism for managing and 
+ * translating between different dialects of Maven models. 
+ * It allows reading and writing models in various dialects supported by the system.
  */
 public interface ModelDialectManager extends Service {
+
     /**
-     * Returns the available dialects, never {@code null}. Result set has at least one element, the {@link org.apache.maven.api.Dialect#XML}
-     * which is present in core.
+     * Retrieves the set of all available dialects.
+     * The result is never {@code null} and always contains at least one element, 
+     * the core {@link org.apache.maven.api.Dialect#XML} dialect.
+     *
+     * @return a non-null {@link Set} of available dialects.
      */
     @Nonnull
     Set<Dialect> getAvailableDialects();
 
     /**
-     * Reads the model from given directory in given dialect.
+     * Reads a Maven model from the specified directory using the specified dialect.
      *
-     * @param dir the directory from where to read, never {@code null}
-     * @param dialect the dialect to use to read, never {@code null}
-     * @param options the options for reading
-     * @return optional with the model that was read or empty
-     * @throws IllegalArgumentException if unknown dialect was asked for
+     * @param dir the directory from which to read the model, must not be {@code null}.
+     * @param dialect the dialect to be used for reading, must not be {@code null}.
+     * @param options optional parameters for reading, may be {@code null}.
+     * @return an {@link Optional} containing the read model, or an empty {@link Optional} if reading fails.
+     * @throws IllegalArgumentException if an unrecognized dialect is provided.
      */
     @Nonnull
     Optional<Model> readModel(@Nonnull Path dir, @Nonnull Dialect dialect, @Nullable Map<String, ?> options);
 
     /**
-     * Write the model to given directory in given dialect.
+     * Writes the given Maven model to the specified directory using the specified dialect.
      *
-     * @param dir the directory to where to write, never {@code null}
-     * @param dialect the dialect to use to write, never {@code null}
-     * @param model the model to write, never {@code null}
-     * @param options the options for writing
-     * @return optional with file path where write happened or empty
-     * @throws IllegalArgumentException if unknown dialect was asked for
+     * @param dir the directory where the model will be written, must not be {@code null}.
+     * @param dialect the dialect to be used for writing, must not be {@code null}.
+     * @param model the Maven model to be written, must not be {@code null}.
+     * @param options optional parameters for writing, may be {@code null}.
+     * @return an {@link Optional} containing the path of the written file, or an empty {@link Optional} if the writing fails.
+     * @throws IllegalArgumentException if an unrecognized dialect is provided.
      */
     @Nonnull
     Optional<Path> writeModel(
