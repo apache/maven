@@ -563,16 +563,16 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 project.addTestCompileSourceRoot(build.getTestSourceDirectory());
             }
 
-            project.setActiveProfiles(Stream.concat(
-                            result.getActivePomProfiles(result.getModelIds().get(0)).stream(),
-                            result.getActiveExternalProfiles().stream())
-                    .map(org.apache.maven.model.Profile::new)
-                    .toList());
+            project.setActiveProfiles(
+                    Stream.concat(result.getActivePomProfiles().stream(), result.getActiveExternalProfiles().stream())
+                            .map(org.apache.maven.model.Profile::new)
+                            .toList());
 
-            project.setInjectedProfileIds("external", getProfileIds(result.getActiveExternalProfiles()));
-            for (String modelId : result.getModelIds()) {
-                project.setInjectedProfileIds(modelId, getProfileIds(result.getActivePomProfiles(modelId)));
-            }
+            //            project.setInjectedProfileIds("external", getProfileIds(result.getActiveExternalProfiles()));
+            //            for (String modelId : result.getModelIds()) {
+            //                project.setInjectedProfileIds(modelId,
+            // getProfileIds(result.getActivePomProfiles(modelId)));
+            //            }
 
             //
             // All the parts that were taken out of MavenProject for Maven 4.0.0
@@ -703,23 +703,16 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
 
         private void initParent(MavenProject project, ModelBuilderResult result) {
-            Model parentModel = result.getModelIds().size() > 1
-                            && !result.getModelIds().get(1).isEmpty()
-                    ? result.getRawModel(result.getModelIds().get(1)).orElse(null)
-                    : null;
+            Model parentModel = result.getParentModel();
 
             if (parentModel != null) {
-                final String parentGroupId = inheritedGroupId(result, 1);
-                final String parentVersion = inheritedVersion(result, 1);
+                final String parentGroupId = getGroupId(parentModel);
+                final String parentVersion = getVersion(parentModel);
 
                 project.setParentArtifact(repositorySystem.createProjectArtifact(
                         parentGroupId, parentModel.getArtifactId(), parentVersion));
 
-                // org.apache.maven.its.mng4834:parent:0.1
-                String parentModelId = result.getModelIds().get(1);
-                Path parentPomFile =
-                        result.getRawModel(parentModelId).map(Model::getPomFile).orElse(null);
-                MavenProject parent = parentPomFile != null ? projectIndex.get(parentPomFile.toFile()) : null;
+                MavenProject parent = projectIndex.get(parentModel.getId());
                 if (parent == null) {
                     //
                     // At this point the DefaultModelBuildingListener has fired and it populates the
@@ -727,6 +720,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     // defined repositories.
                     //
                     request.setRemoteRepositories(project.getRemoteArtifactRepositories());
+                    Path parentPomFile = parentModel.getPomFile();
                     if (parentPomFile != null) {
                         project.setParentFile(parentPomFile.toFile());
                         try {
@@ -840,29 +834,19 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         return new StubModelSource(xml, artifact);
     }
 
-    private static String inheritedGroupId(final ModelBuilderResult result, final int modelIndex) {
-        String groupId = null;
-        final String modelId = result.getModelIds().get(modelIndex);
-
-        if (!modelId.isEmpty()) {
-            final Model model = result.getRawModel(modelId).orElseThrow();
-            groupId = model.getGroupId() != null ? model.getGroupId() : inheritedGroupId(result, modelIndex + 1);
+    static String getGroupId(Model model) {
+        String groupId = model.getGroupId();
+        if (groupId == null && model.getParent() != null) {
+            groupId = model.getParent().getGroupId();
         }
-
         return groupId;
     }
 
-    private static String inheritedVersion(final ModelBuilderResult result, final int modelIndex) {
-        String version = null;
-        final String modelId = result.getModelIds().get(modelIndex);
-
-        if (!modelId.isEmpty()) {
-            version = result.getRawModel(modelId).map(Model::getVersion).orElse(null);
-            if (version == null) {
-                version = inheritedVersion(result, modelIndex + 1);
-            }
+    static String getVersion(Model model) {
+        String version = model.getVersion();
+        if (version == null && model.getParent() != null) {
+            version = model.getParent().getVersion();
         }
-
         return version;
     }
 

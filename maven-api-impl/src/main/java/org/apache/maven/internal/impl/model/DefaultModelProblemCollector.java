@@ -182,17 +182,17 @@ class DefaultModelProblemCollector implements ModelProblemCollector {
     }
 
     public ModelBuilderException newModelBuilderException() {
-        ModelBuilderResult result = this.result;
-        if (result.getModelIds().isEmpty()) {
-            DefaultModelBuilderResult tmp = new DefaultModelBuilderResult();
-            tmp.setEffectiveModel(result.getEffectiveModel());
-            tmp.setProblems(getProblems());
-            tmp.setActiveExternalProfiles(result.getActiveExternalProfiles());
-            String id = getRootModelId();
-            tmp.addModelId(id);
-            tmp.setRawModel(id, getRootModel());
-            result = tmp;
-        }
+        //        ModelBuilderResult result = this.result;
+        //        if (result.getModelIds().isEmpty()) {
+        //            DefaultModelBuilderResult tmp = new DefaultModelBuilderResult();
+        //            tmp.setEffectiveModel(result.getEffectiveModel());
+        //            tmp.setProblems(getProblems());
+        //            tmp.setActiveExternalProfiles(result.getActiveExternalProfiles());
+        //            String id = getRootModelId();
+        //            tmp.addModelId(id);
+        //            tmp.setRawModel(id, getRootModel());
+        //            result = tmp;
+        //        }
         return new ModelBuilderException(result);
     }
 }

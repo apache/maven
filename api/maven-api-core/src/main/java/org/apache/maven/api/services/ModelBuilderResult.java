@@ -19,7 +19,6 @@
 package org.apache.maven.api.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -35,15 +34,12 @@ import org.apache.maven.api.model.Profile;
 public interface ModelBuilderResult {
 
     /**
-     * Gets the sequence of model identifiers that denote the lineage of models from which the effective model was
-     * constructed. Model identifiers have the form {@code <groupId>:<artifactId>:<version>}. The first identifier from
-     * the list denotes the model on which the model builder was originally invoked. The last identifier will always be
-     * an empty string that by definition denotes the super POM.
+     * Gets the source from which the model was read.
      *
-     * @return The model identifiers from the lineage of models, never {@code null}.
+     * @return The source from which the model was read, never {@code null}.
      */
     @Nonnull
-    List<String> getModelIds();
+    ModelSource getSource();
 
     /**
      * Gets the file model.
@@ -70,6 +66,14 @@ public interface ModelBuilderResult {
     Model getRawModel();
 
     /**
+     * Gets the effective model of the parent POM.
+     *
+     * @return the effective model of the parent POM, never {@code null}
+     */
+    @Nonnull
+    Model getParentModel();
+
+    /**
      * Gets the assembled model with inheritance, interpolation and profile injection.
      *
      * @return The assembled model, never {@code null}.
@@ -78,28 +82,12 @@ public interface ModelBuilderResult {
     Model getEffectiveModel();
 
     /**
-     * Gets the specified raw model as it was read from a model source. Apart from basic validation, a raw model has not
-     * undergone any updates by the model builder, e.g. reflects neither inheritance nor interpolation. The model
-     * identifier should be from the collection obtained by {@link #getModelIds()}. As a special case, an empty string
-     * can be used as the identifier for the super POM.
+     * Gets the profiles that were active during model building.
      *
-     * @param modelId The identifier of the desired raw model, must not be {@code null}.
-     * @return The raw model or {@code null} if the specified model id does not refer to a known model.
+     * @return The active profiles of the model or an empty list if the model has no active profiles.
      */
     @Nonnull
-    Optional<Model> getRawModel(@Nonnull String modelId);
-
-    /**
-     * Gets the profiles from the specified model that were active during model building. The model identifier should be
-     * from the collection obtained by {@link #getModelIds()}. As a special case, an empty string can be used as the
-     * identifier for the super POM.
-     *
-     * @param modelId The identifier of the model whose active profiles should be retrieved, must not be {@code null}.
-     * @return The active profiles of the model or an empty list if the specified model id does
-     *         not refer to a known model or has no active profiles.
-     */
-    @Nonnull
-    List<Profile> getActivePomProfiles(@Nonnull String modelId);
+    List<Profile> getActivePomProfiles();
 
     /**
      * Gets the external profiles that were active during model building. External profiles are those that were
@@ -118,11 +106,13 @@ public interface ModelBuilderResult {
     @Nonnull
     List<ModelProblem> getProblems();
 
+    /**
+     * Gets the children of this result.
+     *
+     * @return the children of this result, can be empty but never {@code null}
+     */
     @Nonnull
     List<? extends ModelBuilderResult> getChildren();
-
-    @Nonnull
-    ModelSource getSource();
 
     /**
      * Creates a human-readable representation of these errors.

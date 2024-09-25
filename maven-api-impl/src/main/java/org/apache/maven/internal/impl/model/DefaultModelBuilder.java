@@ -597,17 +597,17 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         public ModelBuilderException newModelBuilderException() {
-            ModelBuilderResult result = this.result;
-            if (result.getModelIds().isEmpty()) {
-                DefaultModelBuilderResult tmp = new DefaultModelBuilderResult();
-                tmp.setEffectiveModel(result.getEffectiveModel());
-                tmp.setProblems(getProblems());
-                tmp.setActiveExternalProfiles(result.getActiveExternalProfiles());
-                String id = getRootModelId();
-                tmp.addModelId(id);
-                tmp.setRawModel(id, getRootModel());
-                result = tmp;
-            }
+//            ModelBuilderResult result = this.result;
+//            if (result.getEffectiveModel() == null && result.getParentModel() == null) {
+//                DefaultModelBuilderResult tmp = new DefaultModelBuilderResult();
+//                tmp.setParentModel(result.getParentModel());
+//                tmp.setEffectiveModel(result.getEffectiveModel());
+//                tmp.setProblems(getProblems());
+//                tmp.setActiveExternalProfiles(result.getActiveExternalProfiles());
+//                String id = getRootModelId();
+//                tmp.setRawModel(id, getRootModel());
+//                result = tmp;
+//            }
             return new ModelBuilderException(result);
         }
 
@@ -648,8 +648,12 @@ public class DefaultModelBuilder implements ModelBuilder {
         //
         // Transform raw model to build pom
         //
-        Model transformRawToBuildPom(Model model) {
+        Model transformFileToRaw(Model model) {
             Model.Builder builder = Model.newBuilder(model);
+            String namespace = model.getNamespaceUri();
+            if (model.getModelVersion() == null && namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
+                builder.modelVersion(namespace.substring(NAMESPACE_PREFIX.length()));
+            }
             builder = handleParent(model, builder);
             builder = handleReactorDependencies(model, builder);
             builder = handleCiFriendlyVersion(model, builder);
@@ -773,24 +777,18 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             var allResults = results(result).toList();
             try (TaskTreeExecutor executor = createExecutor()) {
-                allResults.forEach(r -> executor.execute(() -> {
-                    try {
-                        derive(r.getSource(), r).build2(new LinkedHashSet<>());
-                    } catch (ModelBuilderException e) {
-                        // gathered with problem collector
-                    } catch (Exception t) {
-                        r.getProblems()
-                                .add(new DefaultModelProblem(
-                                        t.getMessage(),
-                                        Severity.FATAL,
-                                        ModelProblem.Version.BASE,
-                                        null,
-                                        -1,
-                                        -1,
-                                        null,
-                                        t));
-                    }
-                }));
+                for (DefaultModelBuilderResult r : allResults) {
+                    executor.execute(() -> {
+                        DefaultModelBuilderSession mbs = derive(r.getSource(), r);
+                        try {
+                            mbs.build2(new LinkedHashSet<>());
+                        } catch (ModelBuilderException e) {
+                            // gathered with problem collector
+                        } catch (Exception t) {
+                            mbs.add(Severity.FATAL, ModelProblem.Version.BASE, t.getMessage(), t);
+                        }
+                    });
+                }
             }
             allResults.stream().filter(r -> r != result).forEach(r -> r.getProblems()
                     .forEach(this::add));
@@ -986,17 +984,16 @@ public class DefaultModelBuilder implements ModelBuilder {
             return result;
         }
 
-        ModelData readParent(Model childModel, ModelSource childSource) throws ModelBuilderException {
-            ModelData parentData = null;
+        Model readParent(Model childModel, ModelSource childSource) throws ModelBuilderException {
+            Model parentModel = null;
 
             Parent parent = childModel.getParent();
             if (parent != null) {
-                parentData = readParentLocally(childModel, childSource);
-                if (parentData == null) {
-                    parentData = resolveAndReadParentExternally(childModel);
+                parentModel = readParentLocally(childModel, childSource);
+                if (parentModel == null) {
+                    parentModel = resolveAndReadParentExternally(childModel);
                 }
 
-                Model parentModel = parentData.model();
                 if (!"pom".equals(parentModel.getPackaging())) {
                     add(
                             Severity.ERROR,
@@ -1007,15 +1004,16 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
 
-            return parentData;
+            return parentModel;
         }
 
-        private ModelData readParentLocally(Model childModel, ModelSource childSource) throws ModelBuilderException {
+        private Model readParentLocally(Model childModel, ModelSource childSource) throws ModelBuilderException {
             ModelSource candidateSource = getParentPomFile(childModel, childSource);
             if (candidateSource == null) {
                 return null;
             }
-            final Model candidateModel = derive(candidateSource).readRawModel();
+
+            Model candidateModel = derive(candidateSource).readParentModel();
 
             //
             // TODO jvz Why isn't all this checking the job of the duty of the workspace resolver, we know that we
@@ -1088,10 +1086,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             // resolver.
             //
 
-            return new ModelData(candidateSource, candidateModel);
+            return candidateModel;
         }
 
-        ModelData resolveAndReadParentExternally(Model childModel) throws ModelBuilderException {
+        Model resolveAndReadParentExternally(Model childModel) throws ModelBuilderException {
             ModelBuilderRequest request = this.request;
             setSource(childModel);
 
@@ -1166,7 +1164,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 // MNG-2199: What else to check here ?
             }
 
-            return new ModelData(modelSource, parentModel);
+            return parentModel;
         }
 
         Model activateFileModel(Model inputModel) throws ModelBuilderException {
@@ -1219,21 +1217,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (hasFatalErrors()) {
                 throw newModelBuilderException();
             }
+            result.setRawModel(inputModel);
 
             inputModel = activateFileModel(inputModel);
 
             setRootModel(inputModel);
-
-            ModelData resultData = new ModelData(request.getSource(), inputModel);
-            String superModelVersion =
-                    inputModel.getModelVersion() != null ? inputModel.getModelVersion() : MODEL_VERSION_4_0_0;
-            if (!VALID_MODEL_VERSIONS.contains(superModelVersion)) {
-                // Maven 3.x is always using 4.0.0 version to load the supermodel, so
-                // do the same when loading a dependency.  The model validator will also
-                // check that field later.
-                superModelVersion = MODEL_VERSION_4_0_0;
-            }
-            ModelData superData = new ModelData(null, getSuperModel(superModelVersion));
 
             // profile activation
             DefaultProfileActivationContext profileActivationContext = getProfileActivationContext(request, inputModel);
@@ -1249,99 +1237,40 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationContext.setUserProperties(profileProps);
             }
 
-            Collection<String> parentIds = new LinkedHashSet<>();
-
-            List<Model> lineage = new ArrayList<>();
-
-            for (ModelData currentData = resultData; ; ) {
-                String modelId = currentData.id();
-                result.addModelId(modelId);
-
-                Model model = currentData.model();
-                result.setRawModel(modelId, model);
-                setSource(model);
-
-                // model normalization
-                model = modelNormalizer.mergeDuplicates(model, request, this);
-
-                // profile activation
-                profileActivationContext.setProjectProperties(model.getProperties());
-
-                List<Profile> interpolatedProfiles =
-                        interpolateActivations(model.getProfiles(), profileActivationContext, this);
-
-                // profile injection
-                List<Profile> activePomProfiles =
-                        profileSelector.getActiveProfiles(interpolatedProfiles, profileActivationContext, this);
-                result.setActivePomProfiles(modelId, activePomProfiles);
-                model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
-                if (currentData == resultData) {
-                    model = profileInjector.injectProfiles(model, activeExternalProfiles, request, this);
+            Model parentModel = readParent(inputModel, request.getSource());
+            if (parentModel == null) {
+                String superModelVersion =
+                        inputModel.getModelVersion() != null ? inputModel.getModelVersion() : MODEL_VERSION_4_0_0;
+                if (!VALID_MODEL_VERSIONS.contains(superModelVersion)) {
+                    // Maven 3.x is always using 4.0.0 version to load the supermodel, so
+                    // do the same when loading a dependency.  The model validator will also
+                    // check that field later.
+                    superModelVersion = MODEL_VERSION_4_0_0;
                 }
-
-                lineage.add(model);
-
-                if (currentData == superData) {
-                    break;
-                }
-
-                // add repositories specified by the current model so that we can resolve the parent
-                if (!model.getRepositories().isEmpty()) {
-                    List<String> oldRepos =
-                            getRepositories().stream().map(Object::toString).toList();
-                    mergeRepositories(model.getRepositories(), false);
-                    List<String> newRepos =
-                            getRepositories().stream().map(Object::toString).toList();
-                    if (!Objects.equals(oldRepos, newRepos)) {
-                        logger.debug("Merging repositories from " + model.getId() + "\n"
-                                + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
-                    }
-                }
-
-                // we pass a cloned model, so that resolving the parent version does not affect the returned model
-                ModelData parentData = readParent(model, currentData.source());
-
-                if (parentData == null) {
-                    currentData = superData;
-                } else if (!parentIds.add(parentData.id())) {
-                    StringBuilder message = new StringBuilder("The parents form a cycle: ");
-                    for (String parentId : parentIds) {
-                        message.append(parentId).append(" -> ");
-                    }
-                    message.append(parentData.id());
-
-                    add(Severity.FATAL, ModelProblem.Version.BASE, message.toString());
-
-                    throw newModelBuilderException();
-                } else {
-                    currentData = parentData;
-                }
+                parentModel = getSuperModel(superModelVersion);
+            } else {
+                result.setParentModel(parentModel);
             }
 
-            Model tmpModel = lineage.get(0);
+            Model model = inheritanceAssembler.assembleModelInheritance(inputModel, parentModel, request, this);
 
-            // inject interpolated activations
-            List<Profile> interpolated = interpolateActivations(tmpModel.getProfiles(), profileActivationContext, this);
-            if (interpolated != tmpModel.getProfiles()) {
-                tmpModel = tmpModel.withProfiles(interpolated);
-            }
+            // model normalization
+            model = modelNormalizer.mergeDuplicates(model, request, this);
 
-            // inject external profile into current model
-            tmpModel = profileInjector.injectProfiles(tmpModel, activeExternalProfiles, request, this);
+            // profile activation
+            profileActivationContext.setProjectProperties(model.getProperties());
 
-            lineage.set(0, tmpModel);
+            List<Profile> interpolatedProfiles =
+                    interpolateActivations(model.getProfiles(), profileActivationContext, this);
 
-            checkPluginVersions(lineage, request, this);
+            // profile injection
+            List<Profile> activePomProfiles =
+                    profileSelector.getActiveProfiles(interpolatedProfiles, profileActivationContext, this);
+            result.setActivePomProfiles(activePomProfiles);
+            model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
 
-            // inheritance assembly
-            Model resultModel = assembleInheritance(lineage, request, this);
-
-            // consider caching inherited model
-
-            setSource(resultModel);
-            setRootModel(resultModel);
-
-            // model interpolation
+             // model interpolation
+            Model resultModel = model;
             resultModel = interpolateModel(resultModel, request, this);
 
             // url normalization
@@ -1551,18 +1480,14 @@ public class DefaultModelBuilder implements ModelBuilder {
         private Model doReadRawModel() throws ModelBuilderException {
             ModelBuilderRequest request = this.request;
             Model rawModel = readFileModel();
+
             if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion())
                     && request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
                 try {
-                    rawModel = transformRawToBuildPom(rawModel);
+                    rawModel = transformFileToRaw(rawModel);
                 } catch (ModelTransformerException e) {
-                    add(Severity.FATAL, ModelProblem.Version.V40, null, e);
+                    add(Severity.FATAL, ModelProblem.Version.V41, null, e);
                 }
-            }
-
-            String namespace = rawModel.getNamespaceUri();
-            if (rawModel.getModelVersion() == null && namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
-                rawModel = rawModel.withModelVersion(namespace.substring(NAMESPACE_PREFIX.length()));
             }
 
             for (var transformer : transformers) {
@@ -1591,7 +1516,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         private Model doReadParentModel() {
             Model raw = readRawModel();
 
-            ModelData parentData;
+            Model parentData;
             if (raw.getParent() != null) {
                 parentData = resolveAndReadParentExternally(raw);
             } else {
@@ -1602,10 +1527,10 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // check that field later.
                     superModelVersion = MODEL_VERSION_4_0_0;
                 }
-                parentData = new ModelData(null, getSuperModel(superModelVersion));
+                parentData = getSuperModel(superModelVersion);
             }
 
-            Model parent = inheritanceAssembler.assembleModelInheritance(raw, parentData.model(), request, this);
+            Model parent = inheritanceAssembler.assembleModelInheritance(raw, parentData, request, this);
             return parent.withParent(null);
         }
 
@@ -1924,7 +1849,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         return groupId;
     }
 
-    private String getVersion(Model model) {
+    static String getVersion(Model model) {
         String version = model.getVersion();
         if (version == null && model.getParent() != null) {
             version = model.getParent().getVersion();

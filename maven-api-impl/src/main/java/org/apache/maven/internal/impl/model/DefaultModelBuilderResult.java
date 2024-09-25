@@ -19,11 +19,7 @@
 package org.apache.maven.internal.impl.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,25 +37,17 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     private ModelSource source;
     private Model fileModel;
     private Model activatedFileModel;
-
+    private Model rawModel;
+    private Model parentModel;
     private Model effectiveModel;
-
-    private List<String> modelIds;
-
-    private Map<String, Model> rawModels;
-
-    private Map<String, List<Profile>> activePomProfiles;
-
+    private List<Profile> activePomProfiles;
     private List<Profile> activeExternalProfiles;
-
     private List<ModelProblem> problems;
 
     private final List<DefaultModelBuilderResult> children = new ArrayList<>();
 
     DefaultModelBuilderResult() {
-        modelIds = new ArrayList<>();
-        rawModels = new HashMap<>();
-        activePomProfiles = new HashMap<>();
+        activePomProfiles = new ArrayList<>();
         activeExternalProfiles = new ArrayList<>();
         problems = new ArrayList<>();
     }
@@ -67,15 +55,12 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     DefaultModelBuilderResult(ModelBuilderResult result) {
         this();
         this.activeExternalProfiles.addAll(result.getActiveExternalProfiles());
+        this.activePomProfiles.addAll(result.getActivePomProfiles());
         this.effectiveModel = result.getEffectiveModel();
+        this.parentModel = result.getParentModel();
         this.fileModel = result.getFileModel();
+        this.rawModel = result.getRawModel();
         this.problems.addAll(result.getProblems());
-
-        for (String modelId : result.getModelIds()) {
-            this.modelIds.add(modelId);
-            this.rawModels.put(modelId, result.getRawModel(modelId).orElseThrow());
-            this.activePomProfiles.put(modelId, result.getActivePomProfiles(modelId));
-        }
     }
 
     public ModelSource getSource() {
@@ -100,9 +85,26 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
         return activatedFileModel;
     }
 
-    public DefaultModelBuilderResult setActivatedFileModel(Model activatedFileModel) {
+    public void setActivatedFileModel(Model activatedFileModel) {
         this.activatedFileModel = activatedFileModel;
-        return this;
+    }
+
+    @Override
+    public Model getRawModel() {
+        return rawModel;
+    }
+
+    public void setRawModel(Model rawModel) {
+        this.rawModel = rawModel;
+    }
+
+    @Override
+    public Model getParentModel() {
+        return parentModel;
+    }
+
+    public void setParentModel(Model parentModel) {
+        this.parentModel = parentModel;
     }
 
     @Override
@@ -116,52 +118,15 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     }
 
     @Override
-    public List<String> getModelIds() {
-        return modelIds;
+    public List<Profile> getActivePomProfiles() {
+        return activePomProfiles;
     }
 
-    public DefaultModelBuilderResult addModelId(String modelId) {
-        // Intentionally notNull because Super POM may not contain a modelId
-        Objects.requireNonNull(modelId, "modelId cannot be null");
-
-        modelIds.add(modelId);
-
-        return this;
-    }
-
-    @Override
-    public Model getRawModel() {
-        return rawModels.get(modelIds.get(0));
-    }
-
-    @Override
-    public Optional<Model> getRawModel(String modelId) {
-        return Optional.ofNullable(rawModels.get(modelId));
-    }
-
-    public DefaultModelBuilderResult setRawModel(String modelId, Model rawModel) {
-        // Intentionally notNull because Super POM may not contain a modelId
-        Objects.requireNonNull(modelId, "modelId cannot be null");
-
-        rawModels.put(modelId, rawModel);
-
-        return this;
-    }
-
-    @Override
-    public List<Profile> getActivePomProfiles(String modelId) {
-        List<Profile> profiles = activePomProfiles.get(modelId);
-        return profiles != null ? profiles : List.of();
-    }
-
-    public DefaultModelBuilderResult setActivePomProfiles(String modelId, List<Profile> activeProfiles) {
-        // Intentionally notNull because Super POM may not contain a modelId
-        Objects.requireNonNull(modelId, "modelId cannot be null");
-
+    public DefaultModelBuilderResult setActivePomProfiles(List<Profile> activeProfiles) {
         if (activeProfiles != null) {
-            this.activePomProfiles.put(modelId, new ArrayList<>(activeProfiles));
+            this.activePomProfiles = new ArrayList<>(activeProfiles);
         } else {
-            this.activePomProfiles.remove(modelId);
+            this.activePomProfiles.clear();
         }
 
         return this;
@@ -203,8 +168,17 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     }
 
     public String toString() {
-        if (!modelIds.isEmpty()) {
-            String modelId = modelIds.get(0);
+        String modelId;
+        if (effectiveModel != null) {
+            modelId = effectiveModel.getId();
+        } else if (rawModel != null) {
+            modelId = rawModel.getId();
+        } else if (fileModel != null) {
+            modelId = fileModel.getId();
+        } else {
+            modelId = null;
+        }
+        if (!problems.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             sb.append(problems.size())
                     .append(
@@ -234,6 +208,6 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
             }
             return sb.toString();
         }
-        return null;
+        return modelId;
     }
 }

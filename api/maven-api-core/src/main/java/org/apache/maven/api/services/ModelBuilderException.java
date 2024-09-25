@@ -60,10 +60,17 @@ public class ModelBuilderException extends MavenException {
      * @return The identifier of the POM or an empty string if not known, never {@code null}.
      */
     public String getModelId() {
-        if (result == null || result.getModelIds().isEmpty()) {
+        if (result == null) {
+            return "";
+        } else if (result.getEffectiveModel() != null) {
+            return result.getEffectiveModel().getId();
+        } else if (result.getRawModel() != null) {
+            return result.getRawModel().getId();
+        } else if (result.getFileModel() != null) {
+            return result.getFileModel().getId();
+        } else {
             return "";
         }
-        return result.getModelIds().get(0);
     }
 
     /**
