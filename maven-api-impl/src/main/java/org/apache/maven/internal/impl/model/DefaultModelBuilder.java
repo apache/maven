@@ -386,7 +386,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         private int getParallelism() {
             int parallelism = Runtime.getRuntime().availableProcessors() / 2 + 1;
             try {
-                String str = request.getUserProperties().get(Constants.MAVEN_PROJECT_BUILDER_PARALLELISM);
+                String str = request.getUserProperties().get(Constants.MAVEN_MODEL_BUILDER_PARALLELISM);
                 if (str != null) {
                     parallelism = Integer.parseInt(str);
                 }
@@ -597,17 +597,17 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         public ModelBuilderException newModelBuilderException() {
-//            ModelBuilderResult result = this.result;
-//            if (result.getEffectiveModel() == null && result.getParentModel() == null) {
-//                DefaultModelBuilderResult tmp = new DefaultModelBuilderResult();
-//                tmp.setParentModel(result.getParentModel());
-//                tmp.setEffectiveModel(result.getEffectiveModel());
-//                tmp.setProblems(getProblems());
-//                tmp.setActiveExternalProfiles(result.getActiveExternalProfiles());
-//                String id = getRootModelId();
-//                tmp.setRawModel(id, getRootModel());
-//                result = tmp;
-//            }
+            //            ModelBuilderResult result = this.result;
+            //            if (result.getEffectiveModel() == null && result.getParentModel() == null) {
+            //                DefaultModelBuilderResult tmp = new DefaultModelBuilderResult();
+            //                tmp.setParentModel(result.getParentModel());
+            //                tmp.setEffectiveModel(result.getEffectiveModel());
+            //                tmp.setProblems(getProblems());
+            //                tmp.setActiveExternalProfiles(result.getActiveExternalProfiles());
+            //                String id = getRootModelId();
+            //                tmp.setRawModel(id, getRootModel());
+            //                result = tmp;
+            //            }
             return new ModelBuilderException(result);
         }
 
@@ -1138,7 +1138,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .source(modelSource)
                     .build();
 
-            Model parentModel = new DefaultModelBuilderSession(lenientRequest, this.result).readParentModel();
+            DefaultModelBuilderResult r = new DefaultModelBuilderResult();
+            Model parentModel = new DefaultModelBuilderSession(lenientRequest, r).readParentModel();
+            this.result.getProblems().addAll(r.getProblems());
 
             if (!parent.getVersion().equals(version)) {
                 String rawChildModelVersion = childModel.getVersion();
@@ -1209,10 +1211,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         @SuppressWarnings("checkstyle:methodlength")
         private Model readEffectiveModel() throws ModelBuilderException {
-
-            ModelBuilderRequest request = this.request;
-            DefaultModelBuilderResult result = this.result;
-
             Model inputModel = readRawModel();
             if (hasFatalErrors()) {
                 throw newModelBuilderException();
@@ -1252,7 +1250,16 @@ public class DefaultModelBuilder implements ModelBuilder {
                 result.setParentModel(parentModel);
             }
 
-            Model model = inheritanceAssembler.assembleModelInheritance(inputModel, parentModel, request, this);
+            List<Profile> parentInterpolatedProfiles =
+                    interpolateActivations(parentModel.getProfiles(), profileActivationContext, this);
+            // profile injection
+            List<Profile> parentActivePomProfiles =
+                    profileSelector.getActiveProfiles(parentInterpolatedProfiles, profileActivationContext, this);
+            Model injectedParentModel = profileInjector
+                    .injectProfiles(parentModel, parentActivePomProfiles, request, this)
+                    .withProfiles(List.of());
+
+            Model model = inheritanceAssembler.assembleModelInheritance(inputModel, injectedParentModel, request, this);
 
             // model normalization
             model = modelNormalizer.mergeDuplicates(model, request, this);
@@ -1269,7 +1276,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             result.setActivePomProfiles(activePomProfiles);
             model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
 
-             // model interpolation
+            // model interpolation
             Model resultModel = model;
             resultModel = interpolateModel(resultModel, request, this);
 
@@ -1304,7 +1311,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         @SuppressWarnings("checkstyle:methodlength")
         Model doReadFileModel() throws ModelBuilderException {
-            ModelBuilderRequest request = this.request;
             ModelSource modelSource = request.getSource();
             result.setSource(modelSource);
             Model model;
@@ -1518,7 +1524,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             Model parentData;
             if (raw.getParent() != null) {
-                parentData = resolveAndReadParentExternally(raw);
+                parentData = readParent(raw, request.getSource());
             } else {
                 String superModelVersion = raw.getModelVersion() != null ? raw.getModelVersion() : "4.0.0";
                 if (!VALID_MODEL_VERSIONS.contains(superModelVersion)) {
@@ -1530,7 +1536,36 @@ public class DefaultModelBuilder implements ModelBuilder {
                 parentData = getSuperModel(superModelVersion);
             }
 
-            Model parent = inheritanceAssembler.assembleModelInheritance(raw, parentData, request, this);
+            Model parent = new DefaultInheritanceAssembler.InheritanceModelMerger() {
+                @Override
+                protected void mergeModel_Modules(
+                        Model.Builder builder,
+                        Model target,
+                        Model source,
+                        boolean sourceDominant,
+                        Map<Object, Object> context) {}
+
+                @Override
+                protected void mergeModel_Subprojects(
+                        Model.Builder builder,
+                        Model target,
+                        Model source,
+                        boolean sourceDominant,
+                        Map<Object, Object> context) {}
+
+                @Override
+                protected void mergeModel_Profiles(
+                        Model.Builder builder,
+                        Model target,
+                        Model source,
+                        boolean sourceDominant,
+                        Map<Object, Object> context) {
+                    builder.profiles(Stream.concat(source.getProfiles().stream(), target.getProfiles().stream())
+                            .map(p -> p.withModules(null).withSubprojects(null))
+                            .toList());
+                }
+            }.merge(raw, parentData, false, Map.of());
+
             return parent.withParent(null);
         }
 

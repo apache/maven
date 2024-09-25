@@ -506,7 +506,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 project.setFile(pom);
                 project.setExecutionRoot(pom.equals(pomFile));
                 initProject(project, r);
-                project.setCollectedProjects(r.getChildren().stream()
+                project.setCollectedProjects(results(r)
+                        .filter(cr -> cr != r)
                         .map(cr -> projectIndex.get(cr.getEffectiveModel().getId()))
                         .collect(Collectors.toList()));
 
