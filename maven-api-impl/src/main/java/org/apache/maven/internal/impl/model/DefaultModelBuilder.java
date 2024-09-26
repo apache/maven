@@ -41,9 +41,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -112,6 +110,7 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.api.spi.ModelTransformerException;
+import org.apache.maven.internal.impl.util.PhasingExecutor;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -338,49 +337,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     + cache + ']';
         }
 
-        static class TaskTreeExecutor implements Executor, AutoCloseable {
-            private final ExecutorService executor;
-            private final Phaser phaser;
-
-            TaskTreeExecutor(int nThreads) {
-                this.executor = Executors.newFixedThreadPool(nThreads);
-                this.phaser = new Phaser();
-            }
-
-            public void execute(Runnable task) {
-                phaser.register();
-                executor.submit(new WrappedTask(task));
-            }
-
-            public void close() {
-                // Otherwise, register and then wait
-                phaser.register();
-                phaser.arriveAndAwaitAdvance();
-                phaser.arriveAndDeregister();
-                // Close executor
-                executor.shutdownNow();
-            }
-
-            private class WrappedTask implements Runnable {
-                private final Runnable task;
-
-                WrappedTask(Runnable task) {
-                    this.task = task;
-                }
-
-                @Override
-                public void run() {
-                    try {
-                        task.run();
-                    } finally {
-                        phaser.arrive();
-                    }
-                }
-            }
-        }
-
-        TaskTreeExecutor createExecutor() {
-            return new TaskTreeExecutor(getParallelism());
+        PhasingExecutor createExecutor() {
+            return new PhasingExecutor(Executors.newFixedThreadPool(getParallelism()));
         }
 
         private int getParallelism() {
@@ -776,7 +734,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             var allResults = results(result).toList();
-            try (TaskTreeExecutor executor = createExecutor()) {
+            try (PhasingExecutor executor = createExecutor()) {
                 for (DefaultModelBuilderResult r : allResults) {
                     executor.execute(() -> {
                         DefaultModelBuilderSession mbs = derive(r.getSource(), r);
@@ -805,7 +763,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         @SuppressWarnings("checkstyle:MethodLength")
         private void loadFromRoot(Path root, Path top) {
-            try (TaskTreeExecutor executor = createExecutor()) {
+            try (PhasingExecutor executor = createExecutor()) {
                 loadFilePom(executor, top, root, Set.of(), null);
             }
             if (result.getFileModel() == null && !Objects.equals(top, root)) {

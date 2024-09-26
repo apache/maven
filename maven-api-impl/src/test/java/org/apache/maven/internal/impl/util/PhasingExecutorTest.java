@@ -16,20 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.lifecycle.internal.concurrent;
+package org.apache.maven.internal.impl.util;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import org.junit.jupiter.api.Test;
 
-public class PhasingExecutorTest {
+class PhasingExecutorTest {
 
     @Test
     void testPhaser() {
-        PhasingExecutor p = new PhasingExecutor(Executors.newFixedThreadPool(4));
-        p.execute(() -> waitSomeTime(p, 2));
-        p.await();
+        try (PhasingExecutor p = new PhasingExecutor(Executors.newFixedThreadPool(4))) {
+            p.execute(() -> waitSomeTime(p, 2));
+        }
     }
 
     private void waitSomeTime(Executor executor, int nb) {

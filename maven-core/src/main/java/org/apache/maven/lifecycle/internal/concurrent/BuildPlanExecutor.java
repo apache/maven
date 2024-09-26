@@ -53,6 +53,7 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.internal.MultilineMessageHelper;
+import org.apache.maven.internal.impl.util.PhasingExecutor;
 import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -301,10 +302,9 @@ public class BuildPlanExecutor {
         }
 
         void execute() {
-            try {
+            try (var phase = executor.phase()) {
                 plan();
                 executePlan();
-                executor.await();
             } catch (Exception e) {
                 session.getResult().addException(e);
             }
