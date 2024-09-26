@@ -46,7 +46,6 @@ import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCal
 import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.SITE_DEPLOY;
 import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.TEST;
 import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.VALIDATE;
-import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.WRAPPER;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -73,10 +72,8 @@ public class DefaultLifecyclesStub {
         List<String> stubSiteCycle =
                 Arrays.asList(PRE_SITE.getPhase(), SITE.getPhase(), POST_SITE.getPhase(), SITE_DEPLOY.getPhase());
 
-        List<String> stubWrapperCycle = Arrays.asList(WRAPPER.getPhase());
-
-        Iterator<List<String>> lcs = Arrays.asList(stubDefaultCycle, stubCleanCycle, stubSiteCycle, stubWrapperCycle)
-                .iterator();
+        Iterator<List<String>> lcs =
+                Arrays.asList(stubDefaultCycle, stubCleanCycle, stubSiteCycle).iterator();
 
         Map<String, Lifecycle> lifeCycles = new HashMap<>();
         for (String s : DefaultLifecycles.STANDARD_LIFECYCLES) {
