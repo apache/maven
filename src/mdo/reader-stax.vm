@@ -348,6 +348,15 @@ public class ${className} {
         DEFAULT_ENTITIES = Collections.unmodifiableMap(entities);
     }
 
+    static class InputFactoryHolder {
+        static XMLInputFactory XML_INPUT_FACTORY;
+        static {
+            XMLInputFactory factory = XMLInputFactory.newFactory();
+            factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+            XML_INPUT_FACTORY = factory;
+        }
+    }
+
     private boolean addDefaultEntities = true;
 #if ( $locationTracking )
     private boolean addLocationInformation = true;
@@ -361,6 +370,15 @@ public class ${className} {
 
     public ${className}(ContentTransformer contentTransformer) {
         this.contentTransformer = contentTransformer;
+    }
+
+    /**
+     * Returns the {@link XMLInputFactory} used by this reader.
+     *
+     * @return the {@link XMLInputFactory} used by this reader.
+     */
+    public XMLInputFactory getXMLInputFactory() {
+        return InputFactoryHolder.XML_INPUT_FACTORY;
     }
 
     /**
@@ -421,13 +439,12 @@ public class ${className} {
 #else
     public ${root.name} read(Reader reader, boolean strict) throws XMLStreamException {
 #end
-        XMLInputFactory factory = XMLInputFactory.newFactory();
-        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
 #if ( $locationTracking )
         StreamSource streamSource = new StreamSource(reader, source != null ? source.getLocation() : null);
 #else
         StreamSource streamSource = new StreamSource(reader);
 #end
+        XMLInputFactory factory = getXMLInputFactory();
         XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
 #if ( $locationTracking )
         return read(parser, strict, source);
@@ -458,13 +475,12 @@ public class ${className} {
 #else
     public ${root.name} read(InputStream in, boolean strict) throws XMLStreamException {
 #end
-        XMLInputFactory factory = XMLInputFactory.newFactory();
-        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
 #if ( $locationTracking )
         StreamSource streamSource = new StreamSource(in, source != null ? source.getLocation() : null);
 #else
         StreamSource streamSource = new StreamSource(in);
 #end
+        XMLInputFactory factory = getXMLInputFactory();
         XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
 #if ( $locationTracking )
         return read(parser, strict, source);
