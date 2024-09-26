@@ -569,11 +569,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             .map(org.apache.maven.model.Profile::new)
                             .toList());
 
-            //            project.setInjectedProfileIds("external", getProfileIds(result.getActiveExternalProfiles()));
-            //            for (String modelId : result.getModelIds()) {
-            //                project.setInjectedProfileIds(modelId,
-            // getProfileIds(result.getActivePomProfiles(modelId)));
-            //            }
+            project.setInjectedProfileIds("external", getProfileIds(result.getActiveExternalProfiles()));
+            project.setInjectedProfileIds(
+                    result.getEffectiveModel().getId(), getProfileIds(result.getActivePomProfiles()));
 
             //
             // All the parts that were taken out of MavenProject for Maven 4.0.0
