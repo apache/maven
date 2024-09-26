@@ -1275,6 +1275,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     profileSelector.getActiveProfiles(interpolatedProfiles, profileActivationContext, this);
             result.setActivePomProfiles(activePomProfiles);
             model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
+            model = profileInjector.injectProfiles(model, activeExternalProfiles, request, this);
 
             // model interpolation
             Model resultModel = model;
@@ -1536,35 +1537,36 @@ public class DefaultModelBuilder implements ModelBuilder {
                 parentData = getSuperModel(superModelVersion);
             }
 
-            Model parent = new DefaultInheritanceAssembler.InheritanceModelMerger() {
-                @Override
-                protected void mergeModel_Modules(
-                        Model.Builder builder,
-                        Model target,
-                        Model source,
-                        boolean sourceDominant,
-                        Map<Object, Object> context) {}
+            Model parent = new DefaultInheritanceAssembler(new DefaultInheritanceAssembler.InheritanceModelMerger() {
+                        @Override
+                        protected void mergeModel_Modules(
+                                Model.Builder builder,
+                                Model target,
+                                Model source,
+                                boolean sourceDominant,
+                                Map<Object, Object> context) {}
 
-                @Override
-                protected void mergeModel_Subprojects(
-                        Model.Builder builder,
-                        Model target,
-                        Model source,
-                        boolean sourceDominant,
-                        Map<Object, Object> context) {}
+                        @Override
+                        protected void mergeModel_Subprojects(
+                                Model.Builder builder,
+                                Model target,
+                                Model source,
+                                boolean sourceDominant,
+                                Map<Object, Object> context) {}
 
-                @Override
-                protected void mergeModel_Profiles(
-                        Model.Builder builder,
-                        Model target,
-                        Model source,
-                        boolean sourceDominant,
-                        Map<Object, Object> context) {
-                    builder.profiles(Stream.concat(source.getProfiles().stream(), target.getProfiles().stream())
-                            .map(p -> p.withModules(null).withSubprojects(null))
-                            .toList());
-                }
-            }.merge(raw, parentData, false, Map.of());
+                        @Override
+                        protected void mergeModel_Profiles(
+                                Model.Builder builder,
+                                Model target,
+                                Model source,
+                                boolean sourceDominant,
+                                Map<Object, Object> context) {
+                            builder.profiles(Stream.concat(source.getProfiles().stream(), target.getProfiles().stream())
+                                    .map(p -> p.withModules(null).withSubprojects(null))
+                                    .toList());
+                        }
+                    })
+                    .assembleModelInheritance(raw, parentData, request, this);
 
             return parent.withParent(null);
         }
