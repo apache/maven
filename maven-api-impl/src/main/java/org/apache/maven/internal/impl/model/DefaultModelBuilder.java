@@ -60,7 +60,6 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
-import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
@@ -68,8 +67,6 @@ import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
-import org.apache.maven.api.model.Plugin;
-import org.apache.maven.api.model.PluginManagement;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
@@ -231,7 +228,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         };
     }
 
-    protected final class DefaultModelBuilderSession implements ModelProblemCollector {
+    protected class DefaultModelBuilderSession implements ModelProblemCollector {
         final Session session;
         final ModelBuilderRequest request;
         final DefaultModelBuilderResult result;
@@ -252,21 +249,25 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         DefaultModelBuilderSession(ModelBuilderRequest request, DefaultModelBuilderResult result) {
-            this(request.getSession(), request, result);
-        }
-
-        DefaultModelBuilderSession(Session session, ModelBuilderRequest request, DefaultModelBuilderResult result) {
             this(
-                    session,
+                    request.getSession(),
                     request,
                     result,
-                    session.getData()
-                            .computeIfAbsent(SessionData.key(ModelCache.class), modelCacheFactory::newInstance));
+                    request.getSession()
+                            .getData()
+                            .computeIfAbsent(SessionData.key(ModelCache.class), modelCacheFactory::newInstance),
+                    new Graph(),
+                    new ConcurrentHashMap<>(64),
+                    List.of(),
+                    repos(request),
+                    repos(request));
         }
 
-        DefaultModelBuilderSession(
-                Session session, ModelBuilderRequest request, DefaultModelBuilderResult result, ModelCache cache) {
-            this(session, request, result, cache, new Graph(), new ConcurrentHashMap<>(64), null, null, null);
+        static List<RemoteRepository> repos(ModelBuilderRequest request) {
+            return List.copyOf(
+                    request.getRepositories() != null
+                            ? request.getRepositories()
+                            : request.getSession().getRemoteRepositories());
         }
 
         @SuppressWarnings("checkstyle:ParameterNumber")
@@ -286,18 +287,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.cache = cache;
             this.dag = dag;
             this.mappedSources = mappedSources;
-            if (pomRepositories == null) {
-                this.pomRepositories = List.of();
-                this.externalRepositories = List.copyOf(
-                        request.getRepositories() != null
-                                ? request.getRepositories()
-                                : session.getRemoteRepositories());
-                this.repositories = this.externalRepositories;
-            } else {
-                this.pomRepositories = pomRepositories;
-                this.externalRepositories = externalRepositories;
-                this.repositories = repositories;
-            }
+            this.pomRepositories = pomRepositories;
+            this.externalRepositories = externalRepositories;
+            this.repositories = repositories;
         }
 
         DefaultModelBuilderSession derive(ModelSource source) {
@@ -412,37 +404,26 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         public ModelSource getSource(String groupId, String artifactId) {
-            Set<ModelSource> sources;
-            if (groupId != null) {
-                sources = mappedSources.get(new GAKey(groupId, artifactId));
-                if (sources == null) {
-                    return null;
-                }
-            } else if (artifactId != null) {
-                sources = mappedSources.get(new GAKey(null, artifactId));
-                if (sources == null) {
-                    return null;
-                }
-            } else {
-                return null;
+            Set<ModelSource> sources = mappedSources.get(new GAKey(groupId, artifactId));
+            if (sources != null) {
+                return sources.stream()
+                        .reduce((a, b) -> {
+                            throw new IllegalStateException(String.format(
+                                    "No unique Source for %s:%s: %s and %s",
+                                    groupId, artifactId, a.getLocation(), b.getLocation()));
+                        })
+                        .orElse(null);
             }
-            return sources.stream()
-                    .reduce((a, b) -> {
-                        throw new IllegalStateException(String.format(
-                                "No unique Source for %s:%s: %s and %s",
-                                groupId, artifactId, a.getLocation(), b.getLocation()));
-                    })
-                    .orElse(null);
+            return null;
         }
 
         public void putSource(String groupId, String artifactId, ModelSource source) {
             mappedSources
                     .computeIfAbsent(new GAKey(groupId, artifactId), k -> new HashSet<>())
                     .add(source);
+            // Also  register the source under the null groupId
             if (groupId != null) {
-                mappedSources
-                        .computeIfAbsent(new GAKey(null, artifactId), k -> new HashSet<>())
-                        .add(source);
+                putSource(null, artifactId, source);
             }
         }
 
@@ -556,27 +537,9 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         public ModelBuilderException newModelBuilderException() {
-            //            ModelBuilderResult result = this.result;
-            //            if (result.getEffectiveModel() == null && result.getParentModel() == null) {
-            //                DefaultModelBuilderResult tmp = new DefaultModelBuilderResult();
-            //                tmp.setParentModel(result.getParentModel());
-            //                tmp.setEffectiveModel(result.getEffectiveModel());
-            //                tmp.setProblems(getProblems());
-            //                tmp.setActiveExternalProfiles(result.getActiveExternalProfiles());
-            //                String id = getRootModelId();
-            //                tmp.setRawModel(id, getRootModel());
-            //                result = tmp;
-            //            }
             return new ModelBuilderException(result);
         }
 
-        public List<RemoteRepository> getRepositories() {
-            return repositories;
-        }
-
-        /**
-         * TODO: this is not thread safe and the session is mutated
-         */
         public void mergeRepositories(List<Repository> toAdd, boolean replace) {
             List<RemoteRepository> repos =
                     toAdd.stream().map(session::createRemoteRepository).toList();
@@ -1060,10 +1023,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             // add repositories specified by the current model so that we can resolve the parent
             if (!childModel.getRepositories().isEmpty()) {
                 List<String> oldRepos =
-                        getRepositories().stream().map(Object::toString).toList();
+                        repositories.stream().map(Object::toString).toList();
                 mergeRepositories(childModel.getRepositories(), false);
                 List<String> newRepos =
-                        getRepositories().stream().map(Object::toString).toList();
+                        repositories.stream().map(Object::toString).toList();
                 if (!Objects.equals(oldRepos, newRepos)) {
                     logger.debug("Merging repositories from " + childModel.getId() + "\n"
                             + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
@@ -1075,7 +1038,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 modelSource = resolveReactorModel(groupId, artifactId, version);
                 if (modelSource == null) {
                     AtomicReference<Parent> modified = new AtomicReference<>();
-                    modelSource = modelResolver.resolveModel(request.getSession(), getRepositories(), parent, modified);
+                    modelSource = modelResolver.resolveModel(request.getSession(), repositories, parent, modified);
                     if (modified.get() != null) {
                         parent = modified.get();
                     }
@@ -1110,7 +1073,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .build();
 
             DefaultModelBuilderResult r = new DefaultModelBuilderResult(this.result);
-            Model parentModel = new DefaultModelBuilderSession(lenientRequest, r).readParentModel();
+            Model parentModel = derive(lenientRequest, r).readParentModel();
 
             if (!parent.getVersion().equals(version)) {
                 String rawChildModelVersion = childModel.getVersion();
@@ -1253,15 +1216,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             // url normalization
             resultModel = modelUrlNormalizer.normalize(resultModel, request);
 
-            result.setEffectiveModel(resultModel);
-
             // Now the fully interpolated model is available: reconfigure the resolver
             if (!resultModel.getRepositories().isEmpty()) {
                 List<String> oldRepos =
-                        getRepositories().stream().map(Object::toString).toList();
+                        repositories.stream().map(Object::toString).toList();
                 mergeRepositories(resultModel.getRepositories(), true);
                 List<String> newRepos =
-                        getRepositories().stream().map(Object::toString).toList();
+                        repositories.stream().map(Object::toString).toList();
                 if (!Objects.equals(oldRepos, newRepos)) {
                     logger.debug("Replacing repositories from " + resultModel.getId() + "\n"
                             + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
@@ -1671,7 +1632,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 importSource = resolveReactorModel(groupId, artifactId, version);
                 if (importSource == null) {
                     importSource = modelResolver.resolveModel(
-                            request.getSession(), getRepositories(), dependency, new AtomicReference<>());
+                            request.getSession(), repositories, dependency, new AtomicReference<>());
                 }
             } catch (ModelBuilderException e) {
                 StringBuilder buffer = new StringBuilder(256);
@@ -1710,7 +1671,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .systemProperties(request.getSystemProperties())
                         .userProperties(request.getUserProperties())
                         .source(importSource)
-                        .repositories(getRepositories())
+                        .repositories(repositories)
                         .build();
                 DefaultModelBuilderSession modelBuilderSession = new DefaultModelBuilderSession(importRequest);
                 // build the effective model
@@ -1868,58 +1829,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         context.setProjectDirectory(model.getProjectDirectory());
 
         return context;
-    }
-
-    private void checkPluginVersions(List<Model> lineage, ModelBuilderRequest request, ModelProblemCollector problems) {
-        if (request.getRequestType() != ModelBuilderRequest.RequestType.BUILD_POM) {
-            return;
-        }
-
-        Map<String, Plugin> plugins = new HashMap<>();
-        Map<String, String> versions = new HashMap<>();
-        Map<String, String> managedVersions = new HashMap<>();
-
-        for (int i = lineage.size() - 1; i >= 0; i--) {
-            Model model = lineage.get(i);
-            Build build = model.getBuild();
-            if (build != null) {
-                for (Plugin plugin : build.getPlugins()) {
-                    String key = plugin.getKey();
-                    if (versions.get(key) == null) {
-                        versions.put(key, plugin.getVersion());
-                        plugins.put(key, plugin);
-                    }
-                }
-                PluginManagement mgmt = build.getPluginManagement();
-                if (mgmt != null) {
-                    for (Plugin plugin : mgmt.getPlugins()) {
-                        String key = plugin.getKey();
-                        managedVersions.computeIfAbsent(key, k -> plugin.getVersion());
-                    }
-                }
-            }
-        }
-
-        for (String key : versions.keySet()) {
-            if (versions.get(key) == null && managedVersions.get(key) == null) {
-                InputLocation location = plugins.get(key).getLocation("");
-                problems.add(
-                        Severity.WARNING,
-                        ModelProblem.Version.V20,
-                        "'build.plugins.plugin.version' for " + key + " is missing.",
-                        location);
-            }
-        }
-    }
-
-    private Model assembleInheritance(
-            List<Model> lineage, ModelBuilderRequest request, ModelProblemCollector problems) {
-        Model parent = lineage.get(lineage.size() - 1);
-        for (int i = lineage.size() - 2; i >= 0; i--) {
-            Model child = lineage.get(i);
-            parent = inheritanceAssembler.assembleModelInheritance(child, parent, request, problems);
-        }
-        return parent;
     }
 
     private Map<String, Activation> getProfileActivations(Model model) {

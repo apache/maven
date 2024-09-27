@@ -66,6 +66,7 @@ import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ModelValidator;
@@ -2040,8 +2041,15 @@ public class DefaultModelValidator implements ModelValidator {
             int validationLevel,
             ModelBuilderRequest request) {
         if (string == null) {
-            // NOTE: The check for missing plugin versions is handled directly by the model builder
-            return true;
+            addViolation(
+                    problems,
+                    Severity.WARNING,
+                    ModelProblem.Version.V20,
+                    fieldName,
+                    sourceHint,
+                    " is missing.",
+                    tracker);
+            return false;
         }
 
         Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
