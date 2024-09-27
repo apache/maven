@@ -497,11 +497,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
 
             List<ProjectBuildingResult> results = new ArrayList<>();
-            Path rootDirectory = rootLocator.findRoot(pomFile.getParentFile().toPath());
             List<ModelBuilderResult> allModels = results(result).toList();
             for (ModelBuilderResult r : allModels) {
                 File pom = r.getSource().getPath().toFile();
                 MavenProject project = projectIndex.get(r.getEffectiveModel().getId());
+                Path rootDirectory = rootLocator.findRoot(pom.getParentFile().toPath());
                 project.setRootDirectory(rootDirectory);
                 project.setFile(pom);
                 project.setExecutionRoot(pom.equals(pomFile));
