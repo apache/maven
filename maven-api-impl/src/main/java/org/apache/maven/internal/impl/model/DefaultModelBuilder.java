@@ -289,6 +289,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.pomRepositories = pomRepositories;
             this.externalRepositories = externalRepositories;
             this.repositories = repositories;
+            this.result.setSource(this.request.getSource());
         }
 
         DefaultModelBuilderSession derive(ModelSource source) {
@@ -1221,8 +1222,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         Model readFileModel() throws ModelBuilderException {
-            result.setSource(request.getSource());
             Model model = cache(request.getSource(), FILE, this::doReadFileModel);
+            // set the file model in the result outside the cache
             result.setFileModel(model);
             return model;
         }
@@ -1267,11 +1268,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                         throw e;
                     }
 
-                    Severity severity = request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                            ? Severity.ERROR
-                            : Severity.WARNING;
                     add(
-                            severity,
+                            Severity.ERROR,
                             ModelProblem.Version.V20,
                             "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(),
                             e);
@@ -1403,8 +1401,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         Model readRawModel() throws ModelBuilderException {
+            // ensure file model is available
             readFileModel();
             Model model = cache(request.getSource(), RAW, this::doReadRawModel);
+            // set the raw model in the result outside the cache
             result.setRawModel(model);
             return model;
         }
