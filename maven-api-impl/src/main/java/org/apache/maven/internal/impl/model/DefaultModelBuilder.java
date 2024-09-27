@@ -741,7 +741,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         @SuppressWarnings("checkstyle:MethodLength")
         private void loadFromRoot(Path root, Path top) {
             try (PhasingExecutor executor = createExecutor()) {
-                loadFilePom(executor, top, root, Set.of(), null);
+                DefaultModelBuilderResult r = Objects.equals(top, root) ? result : new DefaultModelBuilderResult();
+                loadFilePom(executor, top, root, Set.of(), r);
             }
             if (result.getFileModel() == null && !Objects.equals(top, root)) {
                 logger.warn(
@@ -759,16 +760,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         private void loadFilePom(
-                Executor executor, Path top, Path pom, Set<Path> parents, DefaultModelBuilderResult parent) {
-            DefaultModelBuilderResult r;
-            if (pom.equals(top)) {
-                r = result;
-            } else {
-                r = new DefaultModelBuilderResult(parent);
-                if (parent != null) {
-                    parent.getChildren().add(r);
-                }
-            }
+                Executor executor, Path top, Path pom, Set<Path> parents, DefaultModelBuilderResult r) {
             try {
                 Path pomDirectory = Files.isDirectory(pom) ? pom : pom.getParent();
                 ModelSource src = ModelSource.fromPath(pom);
@@ -821,12 +813,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                         continue;
                     }
 
-                    executor.execute(() -> loadFilePom(
-                            executor,
-                            top,
-                            subprojectFile,
-                            concat(parents, pom),
-                            (parent != null || Objects.equals(pom, top)) && request.isRecursive() ? r : null));
+                    DefaultModelBuilderResult cr =
+                            Objects.equals(top, subprojectFile) ? result : new DefaultModelBuilderResult(r);
+                    if (request.isRecursive()) {
+                        r.getChildren().add(cr);
+                    }
+
+                    executor.execute(() -> loadFilePom(executor, top, subprojectFile, concat(parents, pom), cr));
                 }
             } catch (ModelBuilderException e) {
                 // gathered with problem collector
