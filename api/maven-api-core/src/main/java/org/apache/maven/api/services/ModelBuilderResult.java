@@ -50,14 +50,6 @@ public interface ModelBuilderResult {
     Model getFileModel();
 
     /**
-     * Returns the file model + profile injection.
-     *
-     * @return the activated file model, never {@code null}.
-     */
-    @Nonnull
-    Model getActivatedFileModel();
-
-    /**
      * Gets the file model + build pom transformation, without inheritance nor interpolation.
      *
      * @return The raw model, never {@code null}.

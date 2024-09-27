@@ -64,7 +64,6 @@ import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
-import org.apache.maven.api.model.InputLocationTracker;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
@@ -200,8 +199,16 @@ public class DefaultModelBuilder implements ModelBuilder {
         return new ModelBuilderSession() {
             DefaultModelBuilderSession mainSession;
 
+            /**
+             * Builds a model based on the provided ModelBuilderRequest.
+             *
+             * @param request The request containing the parameters for building the model.
+             * @return The result of the model building process.
+             * @throws ModelBuilderException If an error occurs during model building.
+             */
             @Override
             public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
+                // Create or derive a session based on the request
                 DefaultModelBuilderSession session;
                 if (mainSession == null) {
                     mainSession = new DefaultModelBuilderSession(request);
@@ -209,11 +216,15 @@ public class DefaultModelBuilder implements ModelBuilder {
                 } else {
                     session = mainSession.derive(request, new DefaultModelBuilderResult());
                 }
+                // Build the request
                 if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
-                    return session.buildBuildPom();
+                    // build the build poms
+                    session.buildBuildPom();
                 } else {
-                    return session.buildParentOrDependency(new LinkedHashSet<>());
+                    // simply build the effective model
+                    session.buildEffectiveModel(new LinkedHashSet<>());
                 }
+                return session.result();
             }
         };
     }
@@ -287,15 +298,15 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        public DefaultModelBuilderSession derive(ModelSource source) {
-            return derive(source, result);
+        DefaultModelBuilderSession derive(ModelSource source) {
+            return derive(source, new DefaultModelBuilderResult(result));
         }
 
-        public DefaultModelBuilderSession derive(ModelSource source, DefaultModelBuilderResult result) {
+        DefaultModelBuilderSession derive(ModelSource source, DefaultModelBuilderResult result) {
             return derive(ModelBuilderRequest.build(request, source), result);
         }
 
-        public DefaultModelBuilderSession derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
+        DefaultModelBuilderSession derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
             if (session != request.getSession()) {
                 throw new IllegalArgumentException("Session mismatch");
             }
@@ -388,15 +399,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                 dag.addEdge(from.toString(), p.toString());
                 return true;
             } catch (Graph.CycleDetectedException e) {
-                add(new DefaultModelProblem(
-                        "Cycle detected between models at " + from + " and " + p,
+                add(
                         Severity.FATAL,
+                        ModelProblem.Version.BASE,
+                        "Cycle detected between models at " + from + " and " + p,
                         null,
-                        null,
-                        0,
-                        0,
-                        null,
-                        e));
+                        e);
                 return false;
             }
         }
@@ -484,17 +492,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             return rootModel;
         }
 
-        public String getRootModelId() {
-            return ModelProblemUtils.toId(rootModel);
-        }
-
         @Override
         public void add(ModelProblem problem) {
-            result.getProblems().add(problem);
-        }
-
-        public void addAll(Collection<ModelProblem> problems) {
-            this.result.getProblems().addAll(problems);
+            result.addProblem(problem);
         }
 
         @Override
@@ -704,37 +704,47 @@ public class DefaultModelBuilder implements ModelBuilder {
             return version;
         }
 
-        private ModelBuilderResult buildBuildPom() throws ModelBuilderException {
+        private void buildBuildPom() throws ModelBuilderException {
+            // Retrieve and normalize the source path, ensuring it's non-null and in absolute form
             Path top = request.getSource().getPath();
             if (top == null) {
                 throw new IllegalStateException("Recursive build requested but source has no path");
             }
             top = top.toAbsolutePath().normalize();
 
+            // Obtain the root directory, resolving it if necessary
             Path rootDirectory;
             try {
                 rootDirectory = session.getRootDirectory();
             } catch (IllegalStateException e) {
                 rootDirectory = session.getService(RootLocator.class).findRoot(top);
             }
+
+            // Locate and normalize the root POM if it exists, fallback to top otherwise
             Path root = getModelProcessor().locateExistingPom(rootDirectory);
             if (root != null) {
                 root = root.toAbsolutePath().normalize();
             } else {
                 root = top;
             }
+
+            // Load all models starting from the root
             loadFromRoot(root, top);
+
+            // Check for errors after loading models
             if (hasErrors()) {
                 throw newModelBuilderException();
             }
 
+            // For the top model and all its children, build the effective model.
+            // This is done through the phased executor
             var allResults = results(result).toList();
             try (PhasingExecutor executor = createExecutor()) {
                 for (DefaultModelBuilderResult r : allResults) {
                     executor.execute(() -> {
                         DefaultModelBuilderSession mbs = derive(r.getSource(), r);
                         try {
-                            mbs.build2(new LinkedHashSet<>());
+                            mbs.buildEffectiveModel(new LinkedHashSet<>());
                         } catch (ModelBuilderException e) {
                             // gathered with problem collector
                         } catch (Exception t) {
@@ -743,15 +753,21 @@ public class DefaultModelBuilder implements ModelBuilder {
                     });
                 }
             }
-            allResults.stream().filter(r -> r != result).forEach(r -> r.getProblems()
-                    .forEach(this::add));
+
+            // Check for errors again after execution
             if (hasErrors()) {
                 throw newModelBuilderException();
             }
-
-            return result;
         }
 
+        /**
+         * Generates a stream of DefaultModelBuilderResult objects, starting with the provided
+         * result and recursively including all its child results.
+         *
+         * @param r The initial DefaultModelBuilderResult object from which to generate the stream.
+         * @return A Stream of DefaultModelBuilderResult objects, starting with the provided result
+         *         and including all its child results.
+         */
         Stream<DefaultModelBuilderResult> results(DefaultModelBuilderResult r) {
             return Stream.concat(Stream.of(r), r.getChildren().stream().flatMap(this::results));
         }
@@ -782,7 +798,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (pom.equals(top)) {
                 r = result;
             } else {
-                r = new DefaultModelBuilderResult();
+                r = new DefaultModelBuilderResult(parent);
                 if (parent != null) {
                     parent.getChildren().add(r);
                 }
@@ -791,10 +807,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Path pomDirectory = Files.isDirectory(pom) ? pom : pom.getParent();
                 ModelSource src = ModelSource.fromPath(pom);
                 Model model = derive(src, r).readFileModel();
-                r.setFileModel(model);
-                r.setSource(src);
+                putSource(getGroupId(model), model.getArtifactId(), src);
                 Model activated = activateFileModel(model);
-                r.setActivatedFileModel(activated);
                 List<String> subprojects = activated.getSubprojects();
                 if (subprojects.isEmpty()) {
                     subprojects = activated.getModules();
@@ -817,8 +831,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 -1,
                                 -1,
                                 null);
-                        r.getProblems().add(problem);
-                        add(problem);
+                        r.addProblem(problem);
                         continue;
                     }
 
@@ -840,7 +853,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 -1,
                                 -1,
                                 null);
-                        r.getProblems().add(problem);
+                        r.addProblem(problem);
                         continue;
                     }
 
@@ -856,8 +869,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 add(Severity.ERROR, ModelProblem.Version.V40, "Failed to load project " + pom, e);
             }
             if (r != result) {
-                result.getProblems().addAll(r.getProblems());
-                r.getProblems().clear();
+                r.getProblems().forEach(result::addProblem);
             }
         }
 
@@ -867,21 +879,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return Set.copyOf(result);
         }
 
-        private ModelBuilderResult buildParentOrDependency(Collection<String> importIds) throws ModelBuilderException {
-            // phase 1: read and validate raw model
-            Model fileModel = readFileModel();
-            result.setFileModel(fileModel);
-            result.setSource(request.getSource());
-
-            Model activatedFileModel = activateFileModel(fileModel);
-            result.setActivatedFileModel(activatedFileModel);
-
-            // phase 2: build the effective model
-            return build2(importIds);
-        }
-
-        private ModelBuilderResult build2(Collection<String> importIds) throws ModelBuilderException {
-            // phase 2
+        void buildEffectiveModel(Collection<String> importIds) throws ModelBuilderException {
             Model resultModel = readEffectiveModel();
             setSource(resultModel);
             setRootModel(resultModel);
@@ -933,8 +931,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (hasErrors()) {
                 throw newModelBuilderException();
             }
-
-            return result;
         }
 
         Model readParent(Model childModel, ModelSource childSource) throws ModelBuilderException {
@@ -1052,6 +1048,19 @@ public class DefaultModelBuilder implements ModelBuilder {
             String artifactId = parent.getArtifactId();
             String version = parent.getVersion();
 
+            // add repositories specified by the current model so that we can resolve the parent
+            if (!childModel.getRepositories().isEmpty()) {
+                List<String> oldRepos =
+                        getRepositories().stream().map(Object::toString).toList();
+                mergeRepositories(childModel.getRepositories(), false);
+                List<String> newRepos =
+                        getRepositories().stream().map(Object::toString).toList();
+                if (!Objects.equals(oldRepos, newRepos)) {
+                    logger.debug("Merging repositories from " + childModel.getId() + "\n"
+                            + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
+                }
+            }
+
             ModelSource modelSource;
             try {
                 modelSource = resolveReactorModel(groupId, artifactId, version);
@@ -1091,9 +1100,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .source(modelSource)
                     .build();
 
-            DefaultModelBuilderResult r = new DefaultModelBuilderResult();
+            DefaultModelBuilderResult r = new DefaultModelBuilderResult(this.result);
             Model parentModel = new DefaultModelBuilderSession(lenientRequest, r).readParentModel();
-            this.result.getProblems().addAll(r.getProblems());
 
             if (!parent.getVersion().equals(version)) {
                 String rawChildModelVersion = childModel.getVersion();
@@ -1168,7 +1176,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (hasFatalErrors()) {
                 throw newModelBuilderException();
             }
-            result.setRawModel(inputModel);
 
             inputModel = activateFileModel(inputModel);
 
@@ -1186,19 +1193,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
                 profileProps.putAll(profileActivationContext.getUserProperties());
                 profileActivationContext.setUserProperties(profileProps);
-            }
-
-            // add repositories specified by the current model so that we can resolve the parent
-            if (!inputModel.getRepositories().isEmpty()) {
-                List<String> oldRepos =
-                        getRepositories().stream().map(Object::toString).toList();
-                mergeRepositories(inputModel.getRepositories(), false);
-                List<String> newRepos =
-                        getRepositories().stream().map(Object::toString).toList();
-                if (!Objects.equals(oldRepos, newRepos)) {
-                    logger.debug("Merging repositories from " + inputModel.getId() + "\n"
-                            + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
-                }
             }
 
             Model parentModel = readParent(inputModel, request.getSource());
@@ -1269,17 +1263,15 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         Model readFileModel() throws ModelBuilderException {
+            result.setSource(request.getSource());
             Model model = cache(request.getSource(), FILE, this::doReadFileModel);
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
-                putSource(getGroupId(model), model.getArtifactId(), request.getSource());
-            }
+            result.setFileModel(model);
             return model;
         }
 
         @SuppressWarnings("checkstyle:methodlength")
         Model doReadFileModel() throws ModelBuilderException {
             ModelSource modelSource = request.getSource();
-            result.setSource(modelSource);
             Model model;
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
@@ -1364,8 +1356,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throw newModelBuilderException();
             }
 
-            if (model.getModelVersion() == null
-                    && request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
+            if (model.getModelVersion() == null) {
                 String namespace = model.getNamespaceUri();
                 if (namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
                     model = model.withModelVersion(namespace.substring(NAMESPACE_PREFIX.length()));
@@ -1455,7 +1446,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         Model readRawModel() throws ModelBuilderException {
-            return cache(request.getSource(), RAW, this::doReadRawModel);
+            readFileModel();
+            Model model = cache(request.getSource(), RAW, this::doReadRawModel);
+            result.setRawModel(model);
+            return model;
         }
 
         private Model doReadRawModel() throws ModelBuilderException {
@@ -1709,7 +1703,10 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .source(importSource)
                         .repositories(getRepositories())
                         .build();
-                importResult = new DefaultModelBuilderSession(importRequest).buildParentOrDependency(importIds);
+                DefaultModelBuilderSession modelBuilderSession = new DefaultModelBuilderSession(importRequest);
+                // build the effective model
+                modelBuilderSession.buildEffectiveModel(importIds);
+                importResult = modelBuilderSession.result();
             } catch (ModelBuilderException e) {
                 e.getResult().getProblems().forEach(this::add);
                 return null;
@@ -1804,27 +1801,18 @@ public class DefaultModelBuilder implements ModelBuilder {
                     try {
                         return profileActivationFilePathInterpolator.interpolate(path, context);
                     } catch (InterpolationException e) {
-                        addInterpolationProblem(problems, target, path, e, locationKey);
+                        problems.add(
+                                Severity.ERROR,
+                                ModelProblem.Version.BASE,
+                                "Failed to interpolate file location " + path + ": " + e.getMessage(),
+                                target.getLocation(locationKey),
+                                e);
                     }
                 }
                 return path;
             }
         }
         return profiles.stream().map(new ProfileInterpolator()).toList();
-    }
-
-    private static void addInterpolationProblem(
-            ModelProblemCollector problems,
-            InputLocationTracker target,
-            String path,
-            InterpolationException e,
-            String locationKey) {
-        problems.add(
-                Severity.ERROR,
-                ModelProblem.Version.BASE,
-                "Failed to interpolate file location " + path + ": " + e.getMessage(),
-                target.getLocation(locationKey),
-                e);
     }
 
     private static boolean isNotEmpty(String string) {
@@ -1838,14 +1826,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             throw build.newModelBuilderException();
         }
         return model;
-    }
-
-    private DefaultModelBuilderResult asDefaultModelBuilderResult(ModelBuilderResult phaseOneResult) {
-        if (phaseOneResult instanceof DefaultModelBuilderResult) {
-            return (DefaultModelBuilderResult) phaseOneResult;
-        } else {
-            return new DefaultModelBuilderResult(phaseOneResult);
-        }
     }
 
     static String getGroupId(Model model) {

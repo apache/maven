@@ -19,6 +19,7 @@
 package org.apache.maven.internal.impl.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,36 +32,26 @@ import org.apache.maven.api.services.ModelSource;
 
 /**
  * Collects the output of the model builder.
- *
  */
 class DefaultModelBuilderResult implements ModelBuilderResult {
     private ModelSource source;
     private Model fileModel;
-    private Model activatedFileModel;
     private Model rawModel;
     private Model parentModel;
     private Model effectiveModel;
     private List<Profile> activePomProfiles;
     private List<Profile> activeExternalProfiles;
-    private List<ModelProblem> problems;
+    private final List<ModelProblem> problems = new ArrayList<>();
+    private final DefaultModelBuilderResult problemHolder;
 
     private final List<DefaultModelBuilderResult> children = new ArrayList<>();
 
     DefaultModelBuilderResult() {
-        activePomProfiles = new ArrayList<>();
-        activeExternalProfiles = new ArrayList<>();
-        problems = new ArrayList<>();
+        this(null);
     }
 
-    DefaultModelBuilderResult(ModelBuilderResult result) {
-        this();
-        this.activeExternalProfiles.addAll(result.getActiveExternalProfiles());
-        this.activePomProfiles.addAll(result.getActivePomProfiles());
-        this.effectiveModel = result.getEffectiveModel();
-        this.parentModel = result.getParentModel();
-        this.fileModel = result.getFileModel();
-        this.rawModel = result.getRawModel();
-        this.problems.addAll(result.getProblems());
+    DefaultModelBuilderResult(DefaultModelBuilderResult problemHolder) {
+        this.problemHolder = problemHolder;
     }
 
     public ModelSource getSource() {
@@ -76,17 +67,8 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
         return fileModel;
     }
 
-    public DefaultModelBuilderResult setFileModel(Model fileModel) {
+    public void setFileModel(Model fileModel) {
         this.fileModel = fileModel;
-        return this;
-    }
-
-    public Model getActivatedFileModel() {
-        return activatedFileModel;
-    }
-
-    public void setActivatedFileModel(Model activatedFileModel) {
-        this.activatedFileModel = activatedFileModel;
     }
 
     @Override
@@ -112,9 +94,8 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
         return effectiveModel;
     }
 
-    public DefaultModelBuilderResult setEffectiveModel(Model model) {
+    public void setEffectiveModel(Model model) {
         this.effectiveModel = model;
-        return this;
     }
 
     @Override
@@ -122,14 +103,8 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
         return activePomProfiles;
     }
 
-    public DefaultModelBuilderResult setActivePomProfiles(List<Profile> activeProfiles) {
-        if (activeProfiles != null) {
-            this.activePomProfiles = new ArrayList<>(activeProfiles);
-        } else {
-            this.activePomProfiles.clear();
-        }
-
-        return this;
+    public void setActivePomProfiles(List<Profile> activeProfiles) {
+        this.activePomProfiles = activeProfiles;
     }
 
     @Override
@@ -137,29 +112,31 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
         return activeExternalProfiles;
     }
 
-    public DefaultModelBuilderResult setActiveExternalProfiles(List<Profile> activeProfiles) {
-        if (activeProfiles != null) {
-            this.activeExternalProfiles = new ArrayList<>(activeProfiles);
-        } else {
-            this.activeExternalProfiles.clear();
-        }
-
-        return this;
+    public void setActiveExternalProfiles(List<Profile> activeProfiles) {
+        this.activeExternalProfiles = activeProfiles;
     }
 
+    /**
+     * Returns an unmodifiable list of problems encountered during the model building process.
+     *
+     * @return a list of ModelProblem instances representing the encountered problems,
+     *         guaranteed to be non-null but possibly empty.
+     */
     @Override
     public List<ModelProblem> getProblems() {
-        return problems;
+        return Collections.unmodifiableList(problems);
     }
 
-    public DefaultModelBuilderResult setProblems(List<ModelProblem> problems) {
-        if (problems != null) {
-            this.problems = new ArrayList<>(problems);
-        } else {
-            this.problems.clear();
+    /**
+     * Adds a given problem to the list of problems and propagates it to the parent result if present.
+     *
+     * @param problem The problem to be added. It must be an instance of ModelProblem.
+     */
+    public void addProblem(ModelProblem problem) {
+        problems.add(problem);
+        if (problemHolder != null) {
+            problemHolder.addProblem(problem);
         }
-
-        return this;
     }
 
     @Override
@@ -194,7 +171,11 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
                 sb.append("    - [");
                 sb.append(problem.getSeverity());
                 sb.append("] ");
-                sb.append(problem.getMessage());
+                if (problem.getMessage() != null && !problem.getMessage().isEmpty()) {
+                    sb.append(problem.getMessage());
+                } else if (problem.getException() != null) {
+                    sb.append(problem.getException().toString());
+                }
                 String loc = Stream.of(
                                 problem.getModelId().equals(modelId) ? problem.getModelId() : "",
                                 problem.getModelId().equals(modelId) ? problem.getSource() : "",
