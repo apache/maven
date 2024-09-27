@@ -40,6 +40,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
@@ -73,6 +74,7 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.BuilderProblem.Severity;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
@@ -739,6 +741,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // For the top model and all its children, build the effective model.
             // This is done through the phased executor
             var allResults = results(result).toList();
+            List<RuntimeException> exceptions = new CopyOnWriteArrayList<>();
             try (PhasingExecutor executor = createExecutor()) {
                 for (DefaultModelBuilderResult r : allResults) {
                     executor.execute(() -> {
@@ -747,15 +750,21 @@ public class DefaultModelBuilder implements ModelBuilder {
                             mbs.buildEffectiveModel(new LinkedHashSet<>());
                         } catch (ModelBuilderException e) {
                             // gathered with problem collector
-                        } catch (Exception t) {
-                            mbs.add(Severity.FATAL, ModelProblem.Version.BASE, t.getMessage(), t);
+                        } catch (RuntimeException t) {
+                            exceptions.add(t);
                         }
                     });
                 }
             }
 
             // Check for errors again after execution
-            if (hasErrors()) {
+            if (exceptions.size() == 1) {
+                throw exceptions.get(0);
+            } else if (exceptions.size() > 1) {
+                MavenException fatalException = new MavenException("Multiple fatal exceptions occurred");
+                exceptions.forEach(fatalException::addSuppressed);
+                throw fatalException;
+            } else if (hasErrors()) {
                 throw newModelBuilderException();
             }
         }
