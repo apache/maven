@@ -38,7 +38,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
@@ -118,6 +117,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * The model builder is responsible for building the {@link Model} from the POM file.
+ * There are two ways to main use cases: the first one is to build the model from a POM file
+ * on the file system in order to actually build the project. The second one is to build the
+ * model for a dependency  or an external parent.
  */
 @Named
 @Singleton
@@ -223,7 +226,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // simply build the effective model
                     session.buildEffectiveModel(new LinkedHashSet<>());
                 }
-                return session.result();
+                return session.result;
             }
         };
     }
@@ -245,14 +248,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         List<RemoteRepository> repositories;
 
         DefaultModelBuilderSession(ModelBuilderRequest request) {
-            this(request, new DefaultModelBuilderResult());
-        }
-
-        DefaultModelBuilderSession(ModelBuilderRequest request, DefaultModelBuilderResult result) {
             this(
                     request.getSession(),
                     request,
-                    result,
+                    new DefaultModelBuilderResult(),
                     request.getSession()
                             .getData()
                             .computeIfAbsent(SessionData.key(ModelCache.class), modelCacheFactory::newInstance),
@@ -300,6 +299,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             return derive(ModelBuilderRequest.build(request, source), result);
         }
 
+        /**
+         * Creates a new session, sharing cached datas and propagating errors.
+         */
+        DefaultModelBuilderSession derive(ModelBuilderRequest request) {
+            return derive(request, new DefaultModelBuilderResult(result));
+        }
+
         DefaultModelBuilderSession derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
             if (session != request.getSession()) {
                 throw new IllegalArgumentException("Session mismatch");
@@ -314,22 +320,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                     pomRepositories,
                     externalRepositories,
                     repositories);
-        }
-
-        public Session session() {
-            return session;
-        }
-
-        public ModelBuilderRequest request() {
-            return request;
-        }
-
-        public ModelBuilderResult result() {
-            return result;
-        }
-
-        public ModelCache cache() {
-            return cache;
         }
 
         @Override
@@ -361,7 +351,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         public Model getRawModel(Path from, String groupId, String artifactId) {
             ModelSource source = getSource(groupId, artifactId);
             if (source != null) {
-                if (!addEdge(from, source.getPath())) {
+                if (addEdge(from, source.getPath())) {
                     return null;
                 }
                 try {
@@ -377,7 +367,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (!Files.isRegularFile(path)) {
                 throw new IllegalArgumentException("Not a regular file: " + path);
             }
-            if (!addEdge(from, path)) {
+            if (addEdge(from, path)) {
                 return null;
             }
             try {
@@ -388,10 +378,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
+        /**
+         * Returns false if the edge was added, true if it caused a cycle.
+         */
         private boolean addEdge(Path from, Path p) {
             try {
                 dag.addEdge(from.toString(), p.toString());
-                return true;
+                return false;
             } catch (Graph.CycleDetectedException e) {
                 add(
                         Severity.FATAL,
@@ -399,7 +392,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         "Cycle detected between models at " + from + " and " + p,
                         null,
                         e);
-                return false;
+                return true;
             }
         }
 
@@ -686,7 +679,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             // Locate and normalize the root POM if it exists, fallback to top otherwise
-            Path root = getModelProcessor().locateExistingPom(rootDirectory);
+            Path root = modelProcessor.locateExistingPom(rootDirectory);
             if (root != null) {
                 root = root.toAbsolutePath().normalize();
             } else {
@@ -779,13 +772,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Path pomDirectory = Files.isDirectory(pom) ? pom : pom.getParent();
                 ModelSource src = ModelSource.fromPath(pom);
                 Model model = derive(src, r).readFileModel();
+                // keep all loaded file models in memory, those will be needed
+                // during the raw to build transformation
                 putSource(getGroupId(model), model.getArtifactId(), src);
                 Model activated = activateFileModel(model);
-                List<String> subprojects = activated.getSubprojects();
-                if (subprojects.isEmpty()) {
-                    subprojects = activated.getModules();
-                }
-                for (String subproject : subprojects) {
+                for (String subproject : getSubprojects(activated)) {
                     if (subproject == null || subproject.isEmpty()) {
                         continue;
                     }
@@ -905,12 +896,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        Model readParent(Model childModel, ModelSource childSource) throws ModelBuilderException {
-            Model parentModel = null;
+        Model readParent(Model childModel) throws ModelBuilderException {
+            Model parentModel;
 
             Parent parent = childModel.getParent();
             if (parent != null) {
-                parentModel = readParentLocally(childModel, childSource);
+                parentModel = readParentLocally(childModel);
                 if (parentModel == null) {
                     parentModel = resolveAndReadParentExternally(childModel);
                 }
@@ -923,18 +914,28 @@ public class DefaultModelBuilder implements ModelBuilder {
                                     + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"",
                             parentModel.getLocation("packaging"));
                 }
+                result.setParentModel(parentModel);
+            } else {
+                String superModelVersion = childModel.getModelVersion();
+                if (superModelVersion == null || !VALID_MODEL_VERSIONS.contains(superModelVersion)) {
+                    // Maven 3.x is always using 4.0.0 version to load the supermodel, so
+                    // do the same when loading a dependency.  The model validator will also
+                    // check that field later.
+                    superModelVersion = MODEL_VERSION_4_0_0;
+                }
+                parentModel = getSuperModel(superModelVersion);
             }
 
             return parentModel;
         }
 
-        private Model readParentLocally(Model childModel, ModelSource childSource) throws ModelBuilderException {
-            ModelSource candidateSource = getParentPomFile(childModel, childSource);
+        private Model readParentLocally(Model childModel) throws ModelBuilderException {
+            ModelSource candidateSource = getParentPomFile(childModel, request.getSource());
             if (candidateSource == null) {
                 return null;
             }
 
-            Model candidateModel = derive(candidateSource).readParentModel();
+            Model candidateModel = derive(candidateSource).readAsParentModel();
 
             //
             // TODO jvz Why isn't all this checking the job of the duty of the workspace resolver, we know that we
@@ -1022,14 +1023,15 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // add repositories specified by the current model so that we can resolve the parent
             if (!childModel.getRepositories().isEmpty()) {
-                List<String> oldRepos =
-                        repositories.stream().map(Object::toString).toList();
+                var previousRepositories = repositories;
                 mergeRepositories(childModel.getRepositories(), false);
-                List<String> newRepos =
-                        repositories.stream().map(Object::toString).toList();
-                if (!Objects.equals(oldRepos, newRepos)) {
-                    logger.debug("Merging repositories from " + childModel.getId() + "\n"
-                            + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
+                if (!Objects.equals(previousRepositories, repositories)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Merging repositories from " + childModel.getId() + "\n"
+                                + repositories.stream()
+                                        .map(Object::toString)
+                                        .collect(Collectors.joining("\n", "    ", "")));
+                    }
                 }
             }
 
@@ -1072,8 +1074,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .source(modelSource)
                     .build();
 
-            DefaultModelBuilderResult r = new DefaultModelBuilderResult(this.result);
-            Model parentModel = derive(lenientRequest, r).readParentModel();
+            Model parentModel = derive(lenientRequest).readAsParentModel();
 
             if (!parent.getVersion().equals(version)) {
                 String rawChildModelVersion = childModel.getVersion();
@@ -1167,20 +1168,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationContext.setUserProperties(profileProps);
             }
 
-            Model parentModel = readParent(inputModel, request.getSource());
-            if (parentModel == null) {
-                String superModelVersion =
-                        inputModel.getModelVersion() != null ? inputModel.getModelVersion() : MODEL_VERSION_4_0_0;
-                if (!VALID_MODEL_VERSIONS.contains(superModelVersion)) {
-                    // Maven 3.x is always using 4.0.0 version to load the supermodel, so
-                    // do the same when loading a dependency.  The model validator will also
-                    // check that field later.
-                    superModelVersion = MODEL_VERSION_4_0_0;
-                }
-                parentModel = getSuperModel(superModelVersion);
-            } else {
-                result.setParentModel(parentModel);
-            }
+            Model parentModel = readParent(inputModel);
 
             List<Profile> parentInterpolatedProfiles =
                     interpolateActivations(parentModel.getProfiles(), profileActivationContext, this);
@@ -1347,7 +1335,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         Path relativePath = Paths.get(path);
                         Path pomPath = pomFile.resolveSibling(relativePath).normalize();
                         if (Files.isDirectory(pomPath)) {
-                            pomPath = getModelProcessor().locateExistingPom(pomPath);
+                            pomPath = modelProcessor.locateExistingPom(pomPath);
                         }
                         if (pomPath != null && Files.isRegularFile(pomPath)) {
                             Model parentModel =
@@ -1370,8 +1358,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
 
                 // subprojects discovery
-                if (model.getSubprojects().isEmpty()
-                        && model.getModules().isEmpty()
+                if (getSubprojects(model).isEmpty()
                         // only discover subprojects if POM > 4.0.0
                         && !MODEL_VERSION_4_0_0.equals(model.getModelVersion())
                         // and if packaging is POM (we check type, but the session is not yet available,
@@ -1450,27 +1437,16 @@ public class DefaultModelBuilder implements ModelBuilder {
             return rawModel;
         }
 
-        Model readParentModel() {
-            return cache(request.getSource(), PARENT, this::doReadParentModel);
+        /**
+         * Reads the request source's parent.
+         */
+        Model readAsParentModel() {
+            return cache(request.getSource(), PARENT, this::doReadAsParentModel);
         }
 
-        private Model doReadParentModel() {
+        private Model doReadAsParentModel() throws ModelBuilderException {
             Model raw = readRawModel();
-
-            Model parentData;
-            if (raw.getParent() != null) {
-                parentData = readParent(raw, request.getSource());
-            } else {
-                String superModelVersion = raw.getModelVersion() != null ? raw.getModelVersion() : "4.0.0";
-                if (!VALID_MODEL_VERSIONS.contains(superModelVersion)) {
-                    // Maven 3.x is always using 4.0.0 version to load the supermodel, so
-                    // do the same when loading a dependency.  The model validator will also
-                    // check that field later.
-                    superModelVersion = MODEL_VERSION_4_0_0;
-                }
-                parentData = getSuperModel(superModelVersion);
-            }
-
+            Model parentData = readParent(raw);
             Model parent = new DefaultInheritanceAssembler(new DefaultInheritanceAssembler.InheritanceModelMerger() {
                         @Override
                         protected void mergeModel_Modules(
@@ -1488,6 +1464,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 boolean sourceDominant,
                                 Map<Object, Object> context) {}
 
+                        @SuppressWarnings("deprecation")
                         @Override
                         protected void mergeModel_Profiles(
                                 Model.Builder builder,
@@ -1676,7 +1653,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 DefaultModelBuilderSession modelBuilderSession = new DefaultModelBuilderSession(importRequest);
                 // build the effective model
                 modelBuilderSession.buildEffectiveModel(importIds);
-                importResult = modelBuilderSession.result();
+                importResult = modelBuilderSession.result;
             } catch (ModelBuilderException e) {
                 e.getResult().getProblems().forEach(this::add);
                 return null;
@@ -1703,13 +1680,22 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
-        private <T> T cache(String groupId, String artifactId, String version, String tag, Callable<T> supplier) {
-            return cache.computeIfAbsent(groupId, artifactId, version, tag, asSupplier(supplier));
+        private <T> T cache(String groupId, String artifactId, String version, String tag, Supplier<T> supplier) {
+            return cache.computeIfAbsent(groupId, artifactId, version, tag, supplier);
         }
 
-        private <T> T cache(Source source, String tag, Callable<T> supplier) {
-            return cache.computeIfAbsent(source, tag, asSupplier(supplier));
+        private <T> T cache(Source source, String tag, Supplier<T> supplier) {
+            return cache.computeIfAbsent(source, tag, supplier);
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private static List<String> getSubprojects(Model activated) {
+        List<String> subprojects = activated.getSubprojects();
+        if (subprojects.isEmpty()) {
+            subprojects = activated.getModules();
+        }
+        return subprojects;
     }
 
     private List<Profile> interpolateActivations(
@@ -1914,30 +1900,11 @@ public class DefaultModelBuilder implements ModelBuilder {
         return match.equals("*") || match.equals(text);
     }
 
-    private static <T> Supplier<T> asSupplier(Callable<T> supplier) {
-        return () -> {
-            try {
-                return supplier.call();
-            } catch (Exception e) {
-                uncheckedThrow(e);
-                return null;
-            }
-        };
-    }
-
-    static <T extends Throwable> void uncheckedThrow(Throwable t) throws T {
-        throw (T) t; // rely on vacuous cast
-    }
-
     private boolean containsCoordinates(String message, String groupId, String artifactId, String version) {
         return message != null
                 && (groupId == null || message.contains(groupId))
                 && (artifactId == null || message.contains(artifactId))
                 && (version == null || message.contains(version));
-    }
-
-    ModelProcessor getModelProcessor() {
-        return modelProcessor;
     }
 
     record GAKey(String groupId, String artifactId) {}
