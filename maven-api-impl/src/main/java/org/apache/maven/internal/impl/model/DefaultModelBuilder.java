@@ -109,7 +109,6 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
-import org.apache.maven.api.spi.ModelTransformerException;
 import org.apache.maven.internal.impl.util.PhasingExecutor;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.interpolation.InterpolationException;
@@ -608,10 +607,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         //
         Model transformFileToRaw(Model model) {
             Model.Builder builder = Model.newBuilder(model);
-            String namespace = model.getNamespaceUri();
-            if (model.getModelVersion() == null && namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
-                builder.modelVersion(namespace.substring(NAMESPACE_PREFIX.length()));
-            }
             builder = handleParent(model, builder);
             builder = handleReactorDependencies(model, builder);
             builder = handleCiFriendlyVersion(model, builder);
@@ -1356,6 +1351,14 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throw newModelBuilderException();
             }
 
+            if (model.getModelVersion() == null
+                    && request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
+                String namespace = model.getNamespaceUri();
+                if (namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
+                    model = model.withModelVersion(namespace.substring(NAMESPACE_PREFIX.length()));
+                }
+            }
+
             if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
                 model = model.withPomFile(modelSource.getPath());
 
@@ -1448,11 +1451,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion())
                     && request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
-                try {
-                    rawModel = transformFileToRaw(rawModel);
-                } catch (ModelTransformerException e) {
-                    add(Severity.FATAL, ModelProblem.Version.V41, null, e);
-                }
+                rawModel = transformFileToRaw(rawModel);
             }
 
             for (var transformer : transformers) {
