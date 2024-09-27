@@ -521,8 +521,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
 
         private Stream<ModelBuilderResult> results(ModelBuilderResult result) {
-            return Stream.concat(
-                    Stream.of(result), result.getChildren().stream().flatMap(this::results));
+            return Stream.concat(result.getChildren().stream().flatMap(this::results), Stream.of(result));
         }
 
         private List<org.apache.maven.model.building.ModelProblem> convert(List<ModelProblem> problems) {
