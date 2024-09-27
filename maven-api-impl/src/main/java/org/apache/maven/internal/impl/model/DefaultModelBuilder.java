@@ -1188,6 +1188,19 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationContext.setUserProperties(profileProps);
             }
 
+            // add repositories specified by the current model so that we can resolve the parent
+            if (!inputModel.getRepositories().isEmpty()) {
+                List<String> oldRepos =
+                        getRepositories().stream().map(Object::toString).toList();
+                mergeRepositories(inputModel.getRepositories(), false);
+                List<String> newRepos =
+                        getRepositories().stream().map(Object::toString).toList();
+                if (!Objects.equals(oldRepos, newRepos)) {
+                    logger.debug("Merging repositories from " + inputModel.getId() + "\n"
+                            + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
+                }
+            }
+
             Model parentModel = readParent(inputModel, request.getSource());
             if (parentModel == null) {
                 String superModelVersion =
