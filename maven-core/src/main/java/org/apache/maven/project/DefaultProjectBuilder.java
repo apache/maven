@@ -918,6 +918,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
         project.setRemoteArtifactRepositories(remoteRepositories);
 
-        return lifecycleBindingsInjector.injectLifecycleBindings(model, request, problems);
+        return lifecycleBindingsInjector.injectLifecycleBindings(model3.getDelegate(), request, problems);
     }
 }
