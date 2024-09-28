@@ -222,7 +222,8 @@ class PathModularization {
     }
 
     /**
-     * {@return the type of path detected}. The return value is {@link JavaPathType#MODULES}
+     * {@return the type of path detected}
+     * The return value is {@link JavaPathType#MODULES}
      * if the dependency is a modular JAR file or a directory containing module descriptor(s),
      * or {@link JavaPathType#CLASSES} otherwise. A JAR file without module descriptor but with
      * an "Automatic-Module-Name" manifest attribute is considered modular.
@@ -246,14 +247,14 @@ class PathModularization {
     }
 
     /**
-     * {@return whether the dependency contains a module of the given name}.
+     * {@return whether the dependency contains a module of the given name}
      */
     public boolean containsModule(String name) {
         return descriptors.containsValue(name);
     }
 
     /**
-     * {@return a string representation of this object for debugging purposes}.
+     * {@return a string representation of this object for debugging purposes}
      * This string representation may change in any future version.
      */
     @Override

@@ -28,14 +28,43 @@ import org.apache.maven.api.services.ModelProblemCollector;
  */
 public interface ModelValidator {
     /**
+     * Denotes minimal validation of POMs. This validation level is meant for processing of POMs from repositories
+     * during metadata retrieval.
+     */
+    int VALIDATION_LEVEL_MINIMAL = 0;
+    /**
+     * Denotes validation as performed by Maven 2.0. This validation level is meant as a compatibility mode to allow
+     * users to migrate their projects.
+     */
+    int VALIDATION_LEVEL_MAVEN_2_0 = 20;
+    /**
+     * Denotes validation as performed by Maven 3.0. This validation level is meant for existing projects.
+     */
+    int VALIDATION_LEVEL_MAVEN_3_0 = 30;
+    /**
+     * Denotes validation as performed by Maven 3.1. This validation level is meant for existing projects.
+     */
+    int VALIDATION_LEVEL_MAVEN_3_1 = 31;
+    /**
+     * Denotes validation as performed by Maven 4.0. This validation level is meant for new projects.
+     */
+    int VALIDATION_LEVEL_MAVEN_4_0 = 40;
+    /**
+     * Denotes strict validation as recommended by the current Maven version.
+     */
+    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_4_0;
+
+    /**
      * Checks the specified file model for missing or invalid values. This model is directly created from the POM
      * file and has not been subjected to inheritance, interpolation or profile/default injection.
      *
      * @param model The model to validate, must not be {@code null}.
+     * @param validationLevel The validation level.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    default void validateFileModel(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
+    default void validateFileModel(
+            Model model, int validationLevel, ModelBuilderRequest request, ModelProblemCollector problems) {
         // do nothing
     }
 
@@ -44,18 +73,22 @@ public interface ModelValidator {
      * transformation and has not been subjected to inheritance, interpolation or profile/default injection.
      *
      * @param model The model to validate, must not be {@code null}.
+     * @param validationLevel The validation level.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void validateRawModel(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+    void validateRawModel(
+            Model model, int validationLevel, ModelBuilderRequest request, ModelProblemCollector problems);
 
     /**
      * Checks the specified (effective) model for missing or invalid values. The effective model is fully assembled and
      * has undergone inheritance, interpolation and other model operations.
      *
      * @param model The model to validate, must not be {@code null}.
+     * @param validationLevel The validation level.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void validateEffectiveModel(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+    void validateEffectiveModel(
+            Model model, int validationLevel, ModelBuilderRequest request, ModelProblemCollector problems);
 }

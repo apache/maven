@@ -31,9 +31,12 @@ public interface ModelBuilder extends Service {
 
     List<String> VALID_MODEL_VERSIONS = List.of(MODEL_VERSION_4_0_0, MODEL_VERSION_4_1_0);
 
-    ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException;
+    ModelBuilderSession newSession();
 
-    ModelTransformerContextBuilder newTransformerContextBuilder();
+    interface ModelBuilderSession {
+
+        ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException;
+    }
 
     Model buildRawModel(ModelBuilderRequest request);
 }

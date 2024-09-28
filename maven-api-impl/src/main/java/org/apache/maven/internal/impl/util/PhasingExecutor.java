@@ -16,12 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.lifecycle.internal.concurrent;
+package org.apache.maven.internal.impl.util;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Phaser;
 
+/**
+ * The phasing executor is a simple executor that allows to execute tasks in parallel
+ * and wait for all tasks to be executed before closing the executor. The tasks that are
+ * currently being executed are allowed to submit new tasks while the executor is closed.
+ * The executor implements {@link AutoCloseable} to allow using the executor with
+ * a try-with-resources statement.
+ *
+ * The {@link #phase()} method can be used to submit tasks and wait for them to be executed
+ * without closing the executor.
+ */
 public class PhasingExecutor implements Executor, AutoCloseable {
     private final ExecutorService executor;
     private final Phaser phaser = new Phaser();
@@ -43,12 +53,14 @@ public class PhasingExecutor implements Executor, AutoCloseable {
         });
     }
 
-    public void await() {
-        phaser.arriveAndAwaitAdvance();
+    public AutoCloseable phase() {
+        phaser.register();
+        return () -> phaser.awaitAdvance(phaser.arriveAndDeregister());
     }
 
     @Override
     public void close() {
+        phaser.arriveAndAwaitAdvance();
         executor.shutdownNow();
     }
 }

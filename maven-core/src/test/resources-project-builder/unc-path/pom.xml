@@ -29,7 +29,7 @@
   <description>Test inheritance of UNC paths</description>
 
   <modules>
-    <module>child</module>
+    <module>sub</module>
   </modules>
 
   <distributionManagement>

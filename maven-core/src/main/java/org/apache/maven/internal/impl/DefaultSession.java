@@ -93,7 +93,9 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
 
     @Override
     public Project getProject(MavenProject project) {
-        return allProjects.computeIfAbsent(project.getId(), id -> new DefaultProject(this, project));
+        return project != null && project.getBasedir() != null
+                ? allProjects.computeIfAbsent(project.getId(), id -> new DefaultProject(this, project))
+                : null;
     }
 
     @Override

@@ -18,27 +18,26 @@
  */
 package org.apache.maven.api.services;
 
-import java.nio.file.Path;
-
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Model;
 
 /**
- * The ModelTransformer is a way to transform the local pom while streaming the input.
- *
- * The {@link #transform(ModelTransformerContext, Model, Path)} method uses a Path on purpose, to ensure the
- * local pom is the original source.
+ * A model transformer.
  *
  * @since 4.0.0
  */
+@Experimental
 public interface ModelTransformer {
+
     /**
-     * @param context the context, cannot be null
-     * @param model   the model to transform
-     * @param path    the pom file, cannot be null
-     * @throws ModelTransformerException if the transformation fails
+     * Apply a transformation on the file model.
+     *
+     * @param model the input model
+     * @param problems the problem collector to report any issues encountered during transformation
+     * @return the transformed model, or the input model if no transformation is needed
      */
     @Nonnull
-    Model transform(@Nonnull ModelTransformerContext context, @Nonnull Model model, @Nonnull Path path)
-            throws ModelTransformerException;
+    Model transform(
+            @Nonnull Model model, @Nonnull ModelBuilderRequest request, @Nonnull ModelProblemCollector problems);
 }

@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.InputLocation;
@@ -36,6 +37,7 @@ import org.apache.maven.api.model.Reporting;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.InheritanceAssembler;
+import org.apache.maven.model.v4.MavenMerger;
 
 /**
  * Handles inheritance of model values.
@@ -50,7 +52,16 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
 
     private static final String CHILD_DIRECTORY_PROPERTY = "project.directory";
 
-    private final InheritanceModelMerger merger = new InheritanceModelMerger();
+    private final MavenMerger merger;
+
+    @Inject
+    public DefaultInheritanceAssembler() {
+        this(new InheritanceModelMerger());
+    }
+
+    public DefaultInheritanceAssembler(MavenMerger merger) {
+        this.merger = merger;
+    }
 
     @Override
     public Model assembleModelInheritance(
@@ -134,17 +145,11 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
             Object childDirectory = context.get(CHILD_DIRECTORY);
             Object childPathAdjustment = context.get(CHILD_PATH_ADJUSTMENT);
 
-            boolean isBlankParentUrl = true;
-
-            if (parentUrl != null) {
-                for (int i = 0; i < parentUrl.length(); i++) {
-                    if (!Character.isWhitespace(parentUrl.charAt(i))) {
-                        isBlankParentUrl = false;
-                    }
-                }
-            }
-
-            if (isBlankParentUrl || childDirectory == null || childPathAdjustment == null || !appendPath) {
+            if (parentUrl == null
+                    || parentUrl.isBlank()
+                    || childDirectory == null
+                    || childPathAdjustment == null
+                    || !appendPath) {
                 return parentUrl;
             }
 

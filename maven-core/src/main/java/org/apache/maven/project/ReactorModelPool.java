@@ -66,7 +66,9 @@ class ReactorModelPool {
     }
 
     void put(Path pomFile, Model model) {
-        modelsByPath.put(pomFile, model);
+        if (pomFile != null) {
+            modelsByPath.put(pomFile, model);
+        }
         modelsByGa
                 .computeIfAbsent(new GAKey(getGroupId(model), model.getArtifactId()), k -> new HashSet<>())
                 .add(model);

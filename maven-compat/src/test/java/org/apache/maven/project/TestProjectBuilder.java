@@ -26,12 +26,10 @@ import java.io.File;
 import java.util.Collections;
 
 import org.apache.maven.api.services.ModelBuilder;
-import org.apache.maven.api.services.model.ModelProcessor;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.root.RootLocator;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
 
 @Named("classpath")
 @Singleton
@@ -40,22 +38,20 @@ public class TestProjectBuilder extends DefaultProjectBuilder {
     @Inject
     public TestProjectBuilder(
             ModelBuilder modelBuilder,
-            ModelProcessor modelProcessor,
             ProjectBuildingHelper projectBuildingHelper,
             MavenRepositorySystem repositorySystem,
             RepositorySystem repoSystem,
-            RemoteRepositoryManager repositoryManager,
             ProjectDependenciesResolver dependencyResolver,
-            RootLocator rootLocator) {
+            RootLocator rootLocator,
+            LifecycleBindingsInjector lifecycleBindingsInjector) {
         super(
                 modelBuilder,
-                modelProcessor,
                 projectBuildingHelper,
                 repositorySystem,
                 repoSystem,
-                repositoryManager,
                 dependencyResolver,
-                rootLocator);
+                rootLocator,
+                lifecycleBindingsInjector);
     }
 
     @Override
@@ -63,7 +59,7 @@ public class TestProjectBuilder extends DefaultProjectBuilder {
             throws ProjectBuildingException {
         ProjectBuildingResult result = super.build(pomFile, configuration);
 
-        result.getProject().setRemoteArtifactRepositories(Collections.<ArtifactRepository>emptyList());
+        result.getProject().setRemoteArtifactRepositories(Collections.emptyList());
 
         return result;
     }

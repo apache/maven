@@ -28,8 +28,8 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Parent;
-import org.apache.maven.api.services.ModelResolver;
-import org.apache.maven.api.services.ModelResolverException;
+import org.apache.maven.api.services.model.ModelResolver;
+import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.internal.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,7 +87,7 @@ class DefaultModelResolverTest {
                 ModelResolverException.class,
                 () -> newModelResolver().resolveModel(session, null, parent, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
-        assertEquals("No versions matched the requested version range '[2.0,2.1)'", e.getMessage());
+        assertEquals("No versions matched the requested parent version range '[2.0,2.1)'", e.getMessage());
     }
 
     @Test
@@ -102,7 +102,7 @@ class DefaultModelResolverTest {
                 ModelResolverException.class,
                 () -> newModelResolver().resolveModel(session, null, parent, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
-        assertEquals("The requested version range '[1,)' does not specify an upper bound", e.getMessage());
+        assertEquals("The requested parent version range '[1,)' does not specify an upper bound", e.getMessage());
     }
 
     @Test
@@ -158,7 +158,7 @@ class DefaultModelResolverTest {
                 ModelResolverException.class,
                 () -> newModelResolver().resolveModel(session, null, dependency, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
-        assertEquals("No versions matched the requested version range '[2.0,2.1)'", e.getMessage());
+        assertEquals("No versions matched the requested dependency version range '[2.0,2.1)'", e.getMessage());
     }
 
     @Test
@@ -173,7 +173,7 @@ class DefaultModelResolverTest {
                 ModelResolverException.class,
                 () -> newModelResolver().resolveModel(session, null, dependency, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
-        assertEquals("The requested version range '[1,)' does not specify an upper bound", e.getMessage());
+        assertEquals("The requested dependency version range '[1,)' does not specify an upper bound", e.getMessage());
     }
 
     @Test

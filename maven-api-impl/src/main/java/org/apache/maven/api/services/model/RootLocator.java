@@ -20,6 +20,7 @@ package org.apache.maven.api.services.model;
 
 import java.nio.file.Path;
 
+import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
@@ -34,7 +35,7 @@ import org.apache.maven.api.annotations.Nullable;
  * The default implementation will look for a {@code .mvn} child directory
  * or a {@code pom.xml} containing the {@code root="true"} attribute.
  */
-public interface RootLocator {
+public interface RootLocator extends Service {
 
     String UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE = "Unable to find the root directory. "
             + "Create a .mvn directory in the root directory or add the root=\"true\""

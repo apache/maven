@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.execution.MavenSession;
 
 import static org.apache.maven.internal.impl.Utils.cast;
@@ -33,8 +34,16 @@ public interface InternalMavenSession extends InternalSession {
         return cast(InternalMavenSession.class, session, "session should be an " + InternalMavenSession.class);
     }
 
+    static InternalMavenSession from(org.eclipse.aether.RepositorySystemSession session) {
+        return cast(InternalMavenSession.class, session.getData().get(InternalSession.class), "session");
+    }
+
     List<Project> getProjects(List<org.apache.maven.project.MavenProject> projects);
 
+    /**
+     * May return null if the input project is null or is not part of the reactor.
+     */
+    @Nullable
     Project getProject(org.apache.maven.project.MavenProject project);
 
     List<org.apache.maven.artifact.repository.ArtifactRepository> toArtifactRepositories(

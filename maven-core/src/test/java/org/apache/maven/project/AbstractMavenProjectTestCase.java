@@ -26,6 +26,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -34,16 +35,17 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.impl.DefaultLookup;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
+import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.junit.jupiter.api.BeforeEach;
-
-import static org.mockito.Mockito.mock;
 
 /**
  */
@@ -53,6 +55,9 @@ public abstract class AbstractMavenProjectTestCase {
 
     @Inject
     protected MavenRepositorySystem repositorySystem;
+
+    @Inject
+    protected RepositorySystem repoSystem;
 
     @Inject
     protected PlexusContainer container;
@@ -151,18 +156,22 @@ public abstract class AbstractMavenProjectTestCase {
         return configuration;
     }
 
-    protected void initRepoSession(ProjectBuildingRequest request) {
+    protected void initRepoSession(ProjectBuildingRequest request) throws ComponentLookupException {
         File localRepo = new File(request.getLocalRepository().getBasedir());
         DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(h -> false);
 
         DefaultSessionFactory defaultSessionFactory =
-                new DefaultSessionFactory(mock(RepositorySystem.class), null, new DefaultLookup(container), null);
+                new DefaultSessionFactory(repoSystem, repositorySystem, new DefaultLookup(container), null);
 
         MavenSession session = new MavenSession(
                 getContainer(), repoSession, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult());
         session.setSession(defaultSessionFactory.newSession(session));
 
-        new DefaultSession(session, null, null, null, null, null);
+        DefaultSession s = new DefaultSession(session, null, null, null, null, null);
+        SessionScope scope = container.lookup(SessionScope.class);
+        scope.enter();
+        scope.seed(Session.class, s);
+        scope.seed(InternalMavenSession.class, s);
 
         repoSession.setCache(new DefaultRepositoryCache());
         repoSession.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));

@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.services;
 
+import org.apache.maven.api.annotations.Nonnull;
+
 /**
  * Describes a problem that was encountered during model building. A problem can either be an exception that was thrown
  * or a simple string message. In addition, a problem carries a hint about its source, e.g. the POM file that exhibits
@@ -44,15 +46,16 @@ public interface ModelProblem extends BuilderProblem {
      * information that is available at the point the problem occurs and as such merely serves as best effort
      * to provide information to the user to track the problem back to its origin.
      *
-     * @see ModelBuilderResult#getModelIds()
      * @return The identifier of the model from which the problem originated or an empty string if unknown, never
      *         {@code null}.
      */
+    @Nonnull
     String getModelId();
 
     /**
      * Gets the applicable maven version/validation level of this problem
      * @return The version, never {@code null}.
      */
+    @Nonnull
     Version getVersion();
 }

@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.util.List;
 
 import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.Model;
 
 /**
  * Collects problems that are encountered during model building. The primary purpose of this component is to account for
@@ -64,4 +65,16 @@ public interface ModelProblemCollector {
             Exception exception);
 
     void add(ModelProblem problem);
+
+    ModelBuilderException newModelBuilderException();
+
+    void setSource(String location);
+
+    void setSource(Model model);
+
+    String getSource();
+
+    void setRootModel(Model model);
+
+    Model getRootModel();
 }

@@ -33,6 +33,7 @@ record ModelData(ModelSource source, Model model) {
      * @return The effective identifier of the model, never {@code null}.
      */
     public String id() {
+        // TODO: this should be model.getId() but it fails for some reason
         // if source is null, it is the super model, which can be accessed via empty string
         return source != null ? source.getLocation() : "";
     }

@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -34,8 +35,9 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.DefaultRepositoryFactory;
-import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.DefaultLookup;
+import org.apache.maven.internal.impl.DefaultSessionFactory;
+import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -48,19 +50,15 @@ import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.repository.internal.MavenSessionBuilderSupplier;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
-import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
-import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
-import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-import static org.mockito.Mockito.mock;
 
 @PlexusTest
 @Deprecated
@@ -70,7 +68,10 @@ public abstract class AbstractCoreMavenComponentTestCase {
     protected PlexusContainer container;
 
     @Inject
-    protected RepositorySystem repositorySystem;
+    protected org.eclipse.aether.RepositorySystem repositorySystem;
+
+    @Inject
+    protected RepositorySystem mavenRepositorySystem;
 
     @Inject
     protected org.apache.maven.project.ProjectBuilder projectBuilder;
@@ -128,20 +129,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
                 .setSystemProperties(executionProperties)
                 .setUserProperties(new Properties());
 
-        initRepoSession(configuration);
-
-        MavenSession session = new MavenSession(
-                getContainer(), configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());
-        DefaultSession iSession = new DefaultSession(
-                session,
-                mock(org.eclipse.aether.RepositorySystem.class),
-                null,
-                null,
-                new SimpleLookup(List.of(new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
-                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())))),
-                null);
-        InternalSession.associate(session.getRepositorySession(), iSession);
-        session.setSession(iSession);
+        initRepoSession(request, configuration);
 
         List<MavenProject> projects = new ArrayList<>();
 
@@ -165,18 +153,45 @@ public abstract class AbstractCoreMavenComponentTestCase {
             projects.add(project);
         }
 
+        InternalSession iSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mSession = InternalMavenSession.from(iSession);
+        MavenSession session = mSession.getMavenSession();
+
         session.setProjects(projects);
         session.setAllProjects(session.getProjects());
 
         return session;
     }
 
-    protected void initRepoSession(ProjectBuildingRequest request) throws Exception {
-        File localRepoDir = new File(request.getLocalRepository().getBasedir());
-        LocalRepository localRepo = new LocalRepository(localRepoDir);
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-        session.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory().newInstance(session, localRepo));
-        request.setRepositorySession(session);
+    protected void initRepoSession(
+            MavenExecutionRequest mavenExecutionRequest, ProjectBuildingRequest projectBuildingRequest)
+            throws Exception {
+        File localRepoDir = new File(projectBuildingRequest.getLocalRepository().getBasedir());
+        LocalRepository localRepo = new LocalRepository(localRepoDir, "simple");
+
+        RepositorySystemSession session = new MavenSessionBuilderSupplier(repositorySystem)
+                .get()
+                .withLocalRepositories(localRepo)
+                .build();
+        projectBuildingRequest.setRepositorySession(session);
+
+        DefaultSessionFactory defaultSessionFactory =
+                new DefaultSessionFactory(repositorySystem, null, new DefaultLookup(container), null);
+
+        MavenSession mSession = new MavenSession(
+                container,
+                projectBuildingRequest.getRepositorySession(),
+                mavenExecutionRequest,
+                new DefaultMavenExecutionResult());
+
+        InternalSession iSession = defaultSessionFactory.newSession(mSession);
+        mSession.setSession(iSession);
+
+        SessionScope sessionScope = getContainer().lookup(SessionScope.class);
+        sessionScope.enter();
+        sessionScope.seed(MavenSession.class, mSession);
+        sessionScope.seed(Session.class, iSession);
+        sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(iSession));
     }
 
     protected MavenProject createStubMavenProject() {
@@ -201,7 +216,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
         repository.setReleases(policy);
         repository.setSnapshots(policy);
 
-        return Arrays.asList(repositorySystem.buildArtifactRepository(repository));
+        return Arrays.asList(mavenRepositorySystem.buildArtifactRepository(repository));
     }
 
     protected List<ArtifactRepository> getPluginArtifactRepositories() throws InvalidRepositoryException {
@@ -211,7 +226,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
     protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {
         File repoDir = new File(getBasedir(), "target/local-repo").getAbsoluteFile();
 
-        return repositorySystem.createLocalRepository(repoDir);
+        return mavenRepositorySystem.createLocalRepository(repoDir);
     }
 
     protected class ProjectBuilder {

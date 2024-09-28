@@ -32,7 +32,6 @@ import org.apache.maven.internal.impl.DefaultModelXmlFactory;
 import org.apache.maven.internal.impl.DefaultPluginConfigurationExpander;
 import org.apache.maven.internal.impl.DefaultSuperPomProvider;
 import org.apache.maven.internal.impl.DefaultUrlNormalizer;
-import org.apache.maven.internal.impl.model.BuildModelTransformer;
 import org.apache.maven.internal.impl.model.DefaultDependencyManagementImporter;
 import org.apache.maven.internal.impl.model.DefaultDependencyManagementInjector;
 import org.apache.maven.internal.impl.model.DefaultInheritanceAssembler;
@@ -51,6 +50,7 @@ import org.apache.maven.internal.impl.model.DefaultProfileSelector;
 import org.apache.maven.internal.impl.model.DefaultRootLocator;
 import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader;
+import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
 import org.apache.maven.internal.impl.resolver.DefaultVersionRangeResolver;
 import org.apache.maven.internal.impl.resolver.DefaultVersionResolver;
 import org.apache.maven.internal.impl.resolver.MavenArtifactRelocationSource;
@@ -987,9 +987,7 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
     protected ArtifactDescriptorReader createArtifactDescriptorReader() {
         // from maven-resolver-provider
         return new DefaultArtifactDescriptorReader(
-                getRemoteRepositoryManager(),
                 getVersionResolver(),
-                getVersionRangeResolver(),
                 getArtifactResolver(),
                 getModelBuilder(),
                 getRepositoryEventDispatcher(),
@@ -1056,13 +1054,12 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 new DefaultPluginManagementInjector(),
                 new DefaultDependencyManagementInjector(),
                 new DefaultDependencyManagementImporter(),
-                (m, r, b) -> m,
                 new DefaultPluginConfigurationExpander(),
                 new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), new DefaultRootLocator()),
-                new BuildModelTransformer(),
                 new DefaultModelVersionParser(getVersionScheme()),
                 List.of(),
-                new DefaultModelCacheFactory());
+                new DefaultModelCacheFactory(),
+                new DefaultModelResolver());
     }
 
     private RepositorySystem repositorySystem;

@@ -224,6 +224,13 @@ public interface Project {
 
     /**
      * Returns project parent project, if any.
+     * <p>
+     * Note that the model may have a parent defined, but an empty parent
+     * project may be returned if the parent comes from a remote repository,
+     * as a {@code Project} must refer to a buildable project.
+     *
+     * @return an optional containing the parent project
+     * @see Model#getParent()
      */
     @Nonnull
     Optional<Project> getParent();

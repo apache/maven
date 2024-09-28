@@ -107,7 +107,7 @@ public class DefaultModelProblem implements ModelProblem {
         this.columnNumber = columnNumber;
         this.modelId = (modelId != null) ? modelId : "";
         this.exception = exception;
-        this.version = version;
+        this.version = version != null ? version : Version.BASE;
     }
 
     @Override
