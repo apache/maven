@@ -396,7 +396,7 @@ public class BuildPlanExecutor {
             return clocks.computeIfAbsent(key, p -> new Clock());
         }
 
-        private void plan() {
+        private void plan() throws Exception {
             lock.writeLock().lock();
             try {
                 Set<BuildStep> planSteps = plan.allSteps()
@@ -412,6 +412,12 @@ public class BuildPlanExecutor {
                                 MojoDescriptor mojoDescriptor = getMojoDescriptor(project, plugin, goal);
                                 String phase =
                                         execution.getPhase() != null ? execution.getPhase() : mojoDescriptor.getPhase();
+                                if (phase == null) {
+                                    throw new LifecyclePhaseNotFoundException(
+                                            "The builder requested using id = " + execution.getId()
+                                                    + " cannot be found.",
+                                            null);
+                                }
                                 String tmpResolvedPhase = plan.aliases().getOrDefault(phase, phase);
                                 String resolvedPhase = tmpResolvedPhase.startsWith(AT)
                                         ? tmpResolvedPhase.substring(AT.length())
