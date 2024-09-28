@@ -46,7 +46,7 @@ class MavenITmng7679SingleMojoNoPomTest extends AbstractMavenIntegrationTestCase
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7679");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.addCliArgument("install:install-file");
+        verifier.addCliArgument("org.apache.maven.plugins:maven-install-plugin:3.0.1:install-file");
         verifier.addCliArgument("-Dfile=mng-7679.txt");
         verifier.addCliArgument("-DgroupId=org.apache.maven.it.mng7679");
         verifier.addCliArgument("-DartifactId=artifact");
