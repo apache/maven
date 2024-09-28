@@ -123,7 +123,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.jline</groupId>
-      <artifactId>jline</artifactId>
+      <artifactId>jansi-core</artifactId>
     </dependency>
 
     <dependency>
