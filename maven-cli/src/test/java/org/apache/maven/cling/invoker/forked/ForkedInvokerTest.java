@@ -21,7 +21,8 @@ package org.apache.maven.cling.invoker.forked;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.maven.cling.invoker.local.LocalParser;
+import org.apache.maven.cling.invoker.mvn.forked.ForkedInvoker;
+import org.apache.maven.cling.invoker.mvn.local.LocalParser;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

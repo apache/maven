@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.local;
+package org.apache.maven.cling.invoker.mvn.local;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -48,14 +48,13 @@ import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.cli.props.MavenPropertiesLoader;
-import org.apache.maven.cling.invoker.BaseInvokerRequest;
-import org.apache.maven.cling.invoker.CommonsCliMavenOptions;
-import org.apache.maven.cling.invoker.InvokerRequest;
-import org.apache.maven.cling.invoker.LayeredMavenOptions;
-import org.apache.maven.cling.invoker.MavenOptions;
-import org.apache.maven.cling.invoker.Parser;
 import org.apache.maven.cling.invoker.ParserException;
 import org.apache.maven.cling.invoker.ParserRequest;
+import org.apache.maven.cling.invoker.mvn.CommonsCliMavenOptions;
+import org.apache.maven.cling.invoker.mvn.LayeredMavenOptions;
+import org.apache.maven.cling.invoker.mvn.MavenInvokerRequest;
+import org.apache.maven.cling.invoker.mvn.MavenOptions;
+import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
@@ -69,9 +68,9 @@ import static org.apache.maven.cling.invoker.Utils.prefix;
 import static org.apache.maven.cling.invoker.Utils.stripLeadingAndTrailingQuotes;
 import static org.apache.maven.cling.invoker.Utils.toMap;
 
-public class LocalParser implements Parser {
+public class LocalParser implements MavenParser {
     @Override
-    public InvokerRequest parse(ParserRequest parserRequest) throws ParserException, IOException {
+    public MavenInvokerRequest parse(ParserRequest parserRequest) throws ParserException, IOException {
         requireNonNull(parserRequest);
 
         // the basics
@@ -136,7 +135,7 @@ public class LocalParser implements Parser {
         String userExtensionsFile = userProperties.get(Constants.MAVEN_USER_EXTENSIONS);
         extensions.addAll(readCoreExtensionsDescriptor(userExtensionsFile, fileSystem));
 
-        return new BaseInvokerRequest(
+        return new MavenInvokerRequest(
                 cwd,
                 installationDirectory,
                 userHomeDirectory,

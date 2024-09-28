@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker;
+package org.apache.maven.cling.invoker.mvn;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.cling.invoker.BaseOptions;
 
 /**
  * Maven options.

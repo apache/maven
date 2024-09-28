@@ -16,9 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker;
+package org.apache.maven.cling.invoker.mvn;
 
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -29,20 +28,15 @@ import java.util.Optional;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.maven.cli.CLIManager;
+import org.apache.maven.cling.invoker.CommonsCliBaseOptions;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 
-import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.Utils.createInterpolator;
-import static org.apache.maven.cling.invoker.Utils.toMap;
 
-public class CommonsCliMavenOptions implements MavenOptions {
-    private final CLIManager cliManager;
-    private final CommandLine commandLine;
-
+public class CommonsCliMavenOptions extends CommonsCliBaseOptions implements MavenOptions {
     public CommonsCliMavenOptions(CLIManager cliManager, CommandLine commandLine) {
-        this.cliManager = requireNonNull(cliManager);
-        this.commandLine = requireNonNull(commandLine);
+        super(cliManager, commandLine);
     }
 
     private static CommonsCliMavenOptions interpolate(
@@ -70,18 +64,6 @@ public class CommonsCliMavenOptions implements MavenOptions {
         }
     }
 
-    public Collection<Option> getUsedDeprecatedOptions() {
-        return cliManager.getUsedDeprecatedOptions();
-    }
-
-    @Override
-    public Optional<Map<String, String>> userProperties() {
-        if (commandLine.hasOption(CLIManager.SET_USER_PROPERTY)) {
-            return Optional.of(toMap(commandLine.getOptionProperties(String.valueOf(CLIManager.SET_USER_PROPERTY))));
-        }
-        return Optional.empty();
-    }
-
     @Override
     public Optional<String> alternatePomFile() {
         if (commandLine.hasOption(CLIManager.ALTERNATE_POM_FILE)) {
@@ -93,46 +75,6 @@ public class CommonsCliMavenOptions implements MavenOptions {
     @Override
     public Optional<Boolean> offline() {
         if (commandLine.hasOption(CLIManager.OFFLINE)) {
-            return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Boolean> showVersionAndExit() {
-        if (commandLine.hasOption(CLIManager.VERSION)) {
-            return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Boolean> showVersion() {
-        if (commandLine.hasOption(CLIManager.SHOW_VERSION)) {
-            return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Boolean> quiet() {
-        if (commandLine.hasOption(CLIManager.QUIET)) {
-            return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Boolean> verbose() {
-        if (commandLine.hasOption(CLIManager.VERBOSE) || commandLine.hasOption(CLIManager.DEBUG)) {
-            return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Boolean> showErrors() {
-        if (commandLine.hasOption(CLIManager.ERRORS)) {
             return Optional.of(Boolean.TRUE);
         }
         return Optional.empty();
@@ -163,22 +105,6 @@ public class CommonsCliMavenOptions implements MavenOptions {
     }
 
     @Override
-    public Optional<Boolean> nonInteractive() {
-        if (commandLine.hasOption(CLIManager.NON_INTERACTIVE) || commandLine.hasOption(CLIManager.BATCH_MODE)) {
-            return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Boolean> forceInteractive() {
-        if (commandLine.hasOption(CLIManager.FORCE_INTERACTIVE)) {
-            return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
     public Optional<Boolean> suppressSnapshotUpdates() {
         if (commandLine.hasOption(CLIManager.SUPPRESS_SNAPSHOT_UPDATES)) {
             return Optional.of(Boolean.TRUE);
@@ -198,52 +124,6 @@ public class CommonsCliMavenOptions implements MavenOptions {
     public Optional<Boolean> relaxedChecksums() {
         if (commandLine.hasOption(CLIManager.CHECKSUM_WARNING_POLICY)) {
             return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> altUserSettings() {
-        if (commandLine.hasOption(CLIManager.ALTERNATE_USER_SETTINGS)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.ALTERNATE_USER_SETTINGS));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> altProjectSettings() {
-        if (commandLine.hasOption(CLIManager.ALTERNATE_PROJECT_SETTINGS)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.ALTERNATE_PROJECT_SETTINGS));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> altInstallationSettings() {
-        if (commandLine.hasOption(CLIManager.ALTERNATE_INSTALLATION_SETTINGS)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.ALTERNATE_INSTALLATION_SETTINGS));
-        }
-        if (commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_SETTINGS)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_SETTINGS));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> altUserToolchains() {
-        if (commandLine.hasOption(CLIManager.ALTERNATE_USER_TOOLCHAINS)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.ALTERNATE_USER_TOOLCHAINS));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> altInstallationToolchains() {
-        if (commandLine.hasOption(CLIManager.ALTERNATE_INSTALLATION_TOOLCHAINS)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.ALTERNATE_INSTALLATION_TOOLCHAINS));
-        }
-        if (commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS));
         }
         return Optional.empty();
     }
@@ -321,14 +201,6 @@ public class CommonsCliMavenOptions implements MavenOptions {
     }
 
     @Override
-    public Optional<String> logFile() {
-        if (commandLine.hasOption(CLIManager.LOG_FILE)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.LOG_FILE));
-        }
-        return Optional.empty();
-    }
-
-    @Override
     public Optional<String> threads() {
         if (commandLine.hasOption(CLIManager.THREADS)) {
             return Optional.of(commandLine.getOptionValue(CLIManager.THREADS));
@@ -348,18 +220,6 @@ public class CommonsCliMavenOptions implements MavenOptions {
     public Optional<Boolean> noTransferProgress() {
         if (commandLine.hasOption(CLIManager.NO_TRANSFER_PROGRESS)) {
             return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> color() {
-        if (commandLine.hasOption(CLIManager.COLOR)) {
-            if (commandLine.getOptionValue(CLIManager.COLOR) != null) {
-                return Optional.of(commandLine.getOptionValue(CLIManager.COLOR));
-            } else {
-                return Optional.of("auto");
-            }
         }
         return Optional.empty();
     }
@@ -390,14 +250,6 @@ public class CommonsCliMavenOptions implements MavenOptions {
     }
 
     @Override
-    public Optional<Boolean> help() {
-        if (commandLine.hasOption(CLIManager.HELP)) {
-            return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
     public Optional<List<String>> goals() {
         if (!commandLine.getArgList().isEmpty()) {
             return Optional.of(commandLine.getArgList());
@@ -408,10 +260,5 @@ public class CommonsCliMavenOptions implements MavenOptions {
     @Override
     public MavenOptions interpolate(Collection<Map<String, String>> properties) {
         return interpolate(this, properties);
-    }
-
-    @Override
-    public void displayHelp(PrintStream printStream) {
-        cliManager.displayHelp(printStream);
     }
 }

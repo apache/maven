@@ -19,11 +19,13 @@
 package org.apache.maven.cling.invoker;
 
 /**
- * Component responsible to invoke Maven using information provided in invoker request.
+ * Component responsible to invoke an application using information provided in invoker request.
+ *
+ * @param <R> The request type.
  */
-public interface Invoker {
+public interface Invoker<R extends InvokerRequest> {
     /**
-     * Invokes Maven and returns exit code.
+     * Invokes application and returns exit code.
      */
-    int invoke(InvokerRequest invokerRequest) throws InvokerException;
+    int invoke(R invokerRequest) throws InvokerException;
 }

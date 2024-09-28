@@ -118,8 +118,8 @@ public interface InvokerRequest {
     Optional<List<CoreExtension>> coreExtensions();
 
     /**
-     * Mandatory: the effective options.
+     * The mandatory options.
      */
     @Nonnull
-    MavenOptions options();
+    BaseOptions options();
 }

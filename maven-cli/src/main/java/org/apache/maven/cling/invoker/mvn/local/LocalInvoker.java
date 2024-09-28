@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.local;
+package org.apache.maven.cling.invoker.mvn.local;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -61,10 +61,11 @@ import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.SimplexTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
-import org.apache.maven.cling.invoker.Invoker;
 import org.apache.maven.cling.invoker.InvokerException;
 import org.apache.maven.cling.invoker.InvokerRequest;
-import org.apache.maven.cling.invoker.MavenOptions;
+import org.apache.maven.cling.invoker.mvn.MavenInvoker;
+import org.apache.maven.cling.invoker.mvn.MavenInvokerRequest;
+import org.apache.maven.cling.invoker.mvn.MavenOptions;
 import org.apache.maven.di.Injector;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
@@ -127,16 +128,16 @@ import static org.apache.maven.cling.invoker.Utils.toProperties;
  * Local invoker implementation, when Maven CLI is being run. System uses ClassWorld launcher, and class world
  * instance is passed in via "enhanced" main method. Hence, this class expects fully setup ClassWorld via constructor.
  */
-public class LocalInvoker implements Invoker {
+public class LocalInvoker implements MavenInvoker {
 
     protected static class LocalContext implements AutoCloseable {
-        final InvokerRequest invokerRequest;
+        final MavenInvokerRequest invokerRequest;
         final Function<String, Path> cwdResolver;
         final InputStream stdIn;
         final PrintStream stdOut;
         final PrintStream stdErr;
 
-        protected LocalContext(InvokerRequest invokerRequest) {
+        protected LocalContext(MavenInvokerRequest invokerRequest) {
             this.invokerRequest = requireNonNull(invokerRequest);
             this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
             this.stdIn = invokerRequest.in().orElse(System.in);
@@ -171,7 +172,7 @@ public class LocalInvoker implements Invoker {
     }
 
     @Override
-    public int invoke(InvokerRequest invokerRequest) throws InvokerException {
+    public int invoke(MavenInvokerRequest invokerRequest) throws InvokerException {
         requireNonNull(invokerRequest);
 
         try (LocalContext localContext = new LocalContext(invokerRequest)) {
@@ -232,7 +233,7 @@ public class LocalInvoker implements Invoker {
     }
 
     protected void logging(LocalContext localContext) throws Exception {
-        InvokerRequest invokerRequest = localContext.invokerRequest;
+        MavenInvokerRequest invokerRequest = localContext.invokerRequest;
         // LOG COLOR
         MavenOptions mavenOptions = invokerRequest.options();
         Map<String, String> userProperties = invokerRequest.userProperties();
@@ -404,7 +405,7 @@ public class LocalInvoker implements Invoker {
     }
 
     protected List<Path> parseExtClasspath(LocalContext localContext) throws Exception {
-        InvokerRequest invokerRequest = localContext.invokerRequest;
+        MavenInvokerRequest invokerRequest = localContext.invokerRequest;
         String extClassPath = invokerRequest.userProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
         if (extClassPath == null) {
             extClassPath = invokerRequest.systemProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
@@ -468,7 +469,7 @@ public class LocalInvoker implements Invoker {
 
     protected List<CoreExtensionEntry> loadCoreExtensions(
             LocalContext localContext, ClassRealm containerRealm, Set<String> providedArtifacts) throws Exception {
-        InvokerRequest invokerRequest = localContext.invokerRequest;
+        MavenInvokerRequest invokerRequest = localContext.invokerRequest;
         if (invokerRequest.coreExtensions().isEmpty()
                 || invokerRequest.coreExtensions().get().isEmpty()) {
             return Collections.emptyList();
@@ -523,7 +524,7 @@ public class LocalInvoker implements Invoker {
     }
 
     protected void postCommands(LocalContext localContext) {
-        InvokerRequest invokerRequest = localContext.invokerRequest;
+        MavenInvokerRequest invokerRequest = localContext.invokerRequest;
         Logger logger = localContext.logger;
         if (invokerRequest.options().showErrors().orElse(false)) {
             logger.info("Error stacktraces are turned on.");

@@ -16,17 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.forked;
+package org.apache.maven.cling.invoker.mvn.forked;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.maven.cling.invoker.Invoker;
 import org.apache.maven.cling.invoker.InvokerException;
-import org.apache.maven.cling.invoker.InvokerRequest;
-import org.apache.maven.cling.invoker.MavenOptions;
+import org.apache.maven.cling.invoker.mvn.MavenInvoker;
+import org.apache.maven.cling.invoker.mvn.MavenInvokerRequest;
+import org.apache.maven.cling.invoker.mvn.MavenOptions;
 import org.apache.maven.utils.Os;
 
 import static java.util.Objects.requireNonNull;
@@ -34,9 +34,9 @@ import static java.util.Objects.requireNonNull;
 /**
  * Forked invoker implementation, it spawns a subprocess with Maven.
  */
-public class ForkedInvoker implements Invoker {
+public class ForkedInvoker implements MavenInvoker {
     @Override
-    public int invoke(InvokerRequest invokerRequest) throws InvokerException {
+    public int invoke(MavenInvokerRequest invokerRequest) throws InvokerException {
         requireNonNull(invokerRequest);
 
         ArrayList<String> cmdAndArguments = new ArrayList<>();
@@ -108,5 +108,5 @@ public class ForkedInvoker implements Invoker {
         }
     }
 
-    protected void validate(InvokerRequest invokerRequest) throws InvokerException {}
+    protected void validate(MavenInvokerRequest invokerRequest) throws InvokerException {}
 }

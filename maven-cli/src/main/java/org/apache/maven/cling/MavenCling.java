@@ -22,8 +22,8 @@ import java.io.IOException;
 
 import org.apache.maven.cling.invoker.InvokerException;
 import org.apache.maven.cling.invoker.ParserException;
-import org.apache.maven.cling.invoker.local.LocalInvoker;
-import org.apache.maven.cling.invoker.local.LocalParser;
+import org.apache.maven.cling.invoker.mvn.local.LocalInvoker;
+import org.apache.maven.cling.invoker.mvn.local.LocalParser;
 import org.apache.maven.jline.MessageUtils;
 import org.codehaus.plexus.classworlds.ClassWorld;
 

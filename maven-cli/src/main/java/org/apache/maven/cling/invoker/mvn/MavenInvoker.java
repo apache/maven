@@ -16,18 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker;
+package org.apache.maven.cling.invoker.mvn;
 
-import java.io.IOException;
+import org.apache.maven.cling.invoker.Invoker;
+import org.apache.maven.cling.invoker.InvokerException;
 
-import org.apache.maven.api.annotations.Nonnull;
-
-public interface Parser<R extends InvokerRequest> {
-    @Nonnull
-    default R parse(String[] args) throws ParserException, IOException {
-        return parse(ParserRequest.builder(args).build());
-    }
-
-    @Nonnull
-    R parse(ParserRequest parserRequest) throws ParserException, IOException;
+/**
+ * Component responsible to invoke Maven using information provided in invoker request.
+ */
+public interface MavenInvoker extends Invoker<MavenInvokerRequest> {
+    @Override
+    int invoke(MavenInvokerRequest invokerRequest) throws InvokerException;
 }
