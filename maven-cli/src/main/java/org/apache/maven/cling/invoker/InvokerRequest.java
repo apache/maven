@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 /**
  * Maven execution request.
  */
-public interface Request {
+public interface InvokerRequest {
     /**
      * Mandatory: the current working directory, usually the {@code "user.dir"} Java System Property.
      */
@@ -121,5 +121,5 @@ public interface Request {
      * Mandatory: the effective options.
      */
     @Nonnull
-    Options options();
+    MavenOptions options();
 }

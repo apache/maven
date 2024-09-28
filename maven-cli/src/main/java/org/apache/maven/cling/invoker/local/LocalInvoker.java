@@ -63,8 +63,8 @@ import org.apache.maven.cli.transfer.SimplexTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.cling.invoker.Invoker;
 import org.apache.maven.cling.invoker.InvokerException;
-import org.apache.maven.cling.invoker.Options;
-import org.apache.maven.cling.invoker.Request;
+import org.apache.maven.cling.invoker.InvokerRequest;
+import org.apache.maven.cling.invoker.MavenOptions;
 import org.apache.maven.di.Injector;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
@@ -130,19 +130,19 @@ import static org.apache.maven.cling.invoker.Utils.toProperties;
 public class LocalInvoker implements Invoker {
 
     protected static class LocalContext implements AutoCloseable {
-        final Request request;
+        final InvokerRequest invokerRequest;
         final Function<String, Path> cwdResolver;
         final InputStream stdIn;
         final PrintStream stdOut;
         final PrintStream stdErr;
 
-        protected LocalContext(Request request) {
-            this.request = requireNonNull(request);
-            this.cwdResolver = s -> request.cwd().resolve(s).normalize().toAbsolutePath();
-            this.stdIn = request.in().orElse(System.in);
-            this.stdOut = request.out().orElse(System.out);
-            this.stdErr = request.err().orElse(System.err);
-            this.logger = request.logger();
+        protected LocalContext(InvokerRequest invokerRequest) {
+            this.invokerRequest = requireNonNull(invokerRequest);
+            this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
+            this.stdIn = invokerRequest.in().orElse(System.in);
+            this.stdOut = invokerRequest.out().orElse(System.out);
+            this.stdErr = invokerRequest.err().orElse(System.err);
+            this.logger = invokerRequest.logger();
         }
 
         Logger logger;
@@ -171,20 +171,20 @@ public class LocalInvoker implements Invoker {
     }
 
     @Override
-    public int invoke(Request request) throws InvokerException {
-        requireNonNull(request);
+    public int invoke(InvokerRequest invokerRequest) throws InvokerException {
+        requireNonNull(invokerRequest);
 
-        try (LocalContext localContext = new LocalContext(request)) {
+        try (LocalContext localContext = new LocalContext(invokerRequest)) {
             try {
                 defaultMavenExecutionRequest(localContext);
                 logging(localContext);
 
-                if (request.options().help().isPresent()) {
-                    request.options().displayHelp(localContext.stdOut);
+                if (invokerRequest.options().help().isPresent()) {
+                    invokerRequest.options().displayHelp(localContext.stdOut);
                     return 0;
                 }
-                if (request.options().showVersionAndExit().isPresent()) {
-                    if (request.options().quiet().orElse(false)) {
+                if (invokerRequest.options().showVersionAndExit().isPresent()) {
+                    if (invokerRequest.options().quiet().orElse(false)) {
                         localContext.stdOut.println(CLIReportingUtils.showVersionMinimal());
                     } else {
                         localContext.stdOut.println(CLIReportingUtils.showVersion());
@@ -205,7 +205,7 @@ public class LocalInvoker implements Invoker {
                         localContext.logger,
                         "Error executing Maven.",
                         e,
-                        request.options().showErrors().orElse(false));
+                        invokerRequest.options().showErrors().orElse(false));
                 throw new InvokerException(e.getMessage(), e);
             }
         }
@@ -232,11 +232,12 @@ public class LocalInvoker implements Invoker {
     }
 
     protected void logging(LocalContext localContext) throws Exception {
-        Request request = localContext.request;
+        InvokerRequest invokerRequest = localContext.invokerRequest;
         // LOG COLOR
-        Options options = request.options();
-        Map<String, String> userProperties = request.userProperties();
-        String styleColor = options.color()
+        MavenOptions mavenOptions = invokerRequest.options();
+        Map<String, String> userProperties = invokerRequest.userProperties();
+        String styleColor = mavenOptions
+                .color()
                 .orElse(userProperties.getOrDefault(
                         Constants.MAVEN_STYLE_COLOR_PROPERTY, userProperties.getOrDefault("style.color", "auto")));
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
@@ -247,9 +248,9 @@ public class LocalInvoker implements Invoker {
             throw new IllegalArgumentException(
                     "Invalid color configuration value '" + styleColor + "'. Supported are 'auto', 'always', 'never'.");
         } else {
-            boolean isBatchMode = !options.forceInteractive().orElse(false)
-                    && options.nonInteractive().orElse(false);
-            if (isBatchMode || options.logFile().isPresent()) {
+            boolean isBatchMode = !mavenOptions.forceInteractive().orElse(false)
+                    && mavenOptions.nonInteractive().orElse(false);
+            if (isBatchMode || mavenOptions.logFile().isPresent()) {
                 MessageUtils.setColorEnabled(false);
             }
         }
@@ -257,10 +258,10 @@ public class LocalInvoker implements Invoker {
         localContext.loggerFactory = LoggerFactory.getILoggerFactory();
         Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(localContext.loggerFactory);
 
-        if (options.verbose().orElse(false)) {
+        if (mavenOptions.verbose().orElse(false)) {
             localContext.mavenExecutionRequest.setLoggingLevel(MavenExecutionRequest.LOGGING_LEVEL_DEBUG);
             slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.DEBUG);
-        } else if (options.quiet().orElse(false)) {
+        } else if (mavenOptions.quiet().orElse(false)) {
             localContext.mavenExecutionRequest.setLoggingLevel(MavenExecutionRequest.LOGGING_LEVEL_ERROR);
             slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.ERROR);
         }
@@ -268,8 +269,8 @@ public class LocalInvoker implements Invoker {
         // see https://issues.apache.org/jira/browse/MNG-2570
 
         // LOG STREAMS
-        if (options.logFile().isPresent()) {
-            Path logFile = localContext.cwdResolver.apply(options.logFile().get());
+        if (mavenOptions.logFile().isPresent()) {
+            Path logFile = localContext.cwdResolver.apply(mavenOptions.logFile().get());
             // redirect stdout and stderr to file
             try {
                 PrintStream ps = new PrintStream(Files.newOutputStream(logFile));
@@ -284,8 +285,8 @@ public class LocalInvoker implements Invoker {
         localContext.logger =
                 localContext.loggerFactory.getLogger(this.getClass().getName());
 
-        if (options.failOnSeverity().isPresent()) {
-            String logLevelThreshold = options.failOnSeverity().get();
+        if (mavenOptions.failOnSeverity().isPresent()) {
+            String logLevelThreshold = mavenOptions.failOnSeverity().get();
 
             if (localContext.loggerFactory instanceof MavenSlf4jWrapperFactory) {
                 LogLevelRecorder logLevelRecorder = new LogLevelRecorder(logLevelThreshold);
@@ -302,7 +303,7 @@ public class LocalInvoker implements Invoker {
     }
 
     protected void container(LocalContext localContext) throws Exception {
-        Request request = localContext.request;
+        InvokerRequest invokerRequest = localContext.invokerRequest;
         ClassRealm coreRealm = classWorld.getClassRealm("plexus.core");
         List<Path> extClassPath = parseExtClasspath(localContext);
         CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom(coreRealm);
@@ -333,7 +334,7 @@ public class LocalInvoker implements Invoker {
             protected void configure() {
                 bind(ILoggerFactory.class).toInstance(localContext.loggerFactory);
                 bind(CoreExports.class).toInstance(exports);
-                bind(MessageBuilderFactory.class).toInstance(localContext.request.messageBuilderFactory());
+                bind(MessageBuilderFactory.class).toInstance(localContext.invokerRequest.messageBuilderFactory());
             }
         });
 
@@ -345,9 +346,9 @@ public class LocalInvoker implements Invoker {
         AbstractValueSource extensionSource = new AbstractValueSource(false) {
             @Override
             public Object getValue(String expression) {
-                Object value = request.userProperties().get(expression);
+                Object value = invokerRequest.userProperties().get(expression);
                 if (value == null) {
-                    value = request.systemProperties().get(expression);
+                    value = invokerRequest.systemProperties().get(expression);
                 }
                 return value;
             }
@@ -380,9 +381,9 @@ public class LocalInvoker implements Invoker {
         DefaultEventSpyContext eventSpyContext = new DefaultEventSpyContext();
         Map<String, Object> data = eventSpyContext.getData();
         data.put("plexus", container);
-        data.put("workingDirectory", request.cwd().toString());
-        data.put("systemProperties", toProperties(request.systemProperties()));
-        data.put("userProperties", toProperties(request.userProperties()));
+        data.put("workingDirectory", invokerRequest.cwd().toString());
+        data.put("systemProperties", toProperties(invokerRequest.systemProperties()));
+        data.put("userProperties", toProperties(invokerRequest.userProperties()));
         data.put("versionProperties", CLIReportingUtils.getBuildProperties());
         localContext.eventSpyDispatcher.init(eventSpyContext);
 
@@ -403,10 +404,10 @@ public class LocalInvoker implements Invoker {
     }
 
     protected List<Path> parseExtClasspath(LocalContext localContext) throws Exception {
-        Request request = localContext.request;
-        String extClassPath = request.userProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
+        InvokerRequest invokerRequest = localContext.invokerRequest;
+        String extClassPath = invokerRequest.userProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
         if (extClassPath == null) {
-            extClassPath = request.systemProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
+            extClassPath = invokerRequest.systemProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
             if (extClassPath != null) {
                 localContext.logger.warn(
                         "The property '{}' has been set using a JVM system property which is deprecated. "
@@ -467,12 +468,13 @@ public class LocalInvoker implements Invoker {
 
     protected List<CoreExtensionEntry> loadCoreExtensions(
             LocalContext localContext, ClassRealm containerRealm, Set<String> providedArtifacts) throws Exception {
-        Request request = localContext.request;
-        if (request.coreExtensions().isEmpty() || request.coreExtensions().get().isEmpty()) {
+        InvokerRequest invokerRequest = localContext.invokerRequest;
+        if (invokerRequest.coreExtensions().isEmpty()
+                || invokerRequest.coreExtensions().get().isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<CoreExtension> extensions = request.coreExtensions().get();
+        List<CoreExtension> extensions = invokerRequest.coreExtensions().get();
         ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld(containerRealm.getWorld())
                 .setRealm(containerRealm)
@@ -514,21 +516,21 @@ public class LocalInvoker implements Invoker {
     protected void customizeContainer(PlexusContainer container) {}
 
     protected void preCommands(LocalContext localContext) {
-        Options options = localContext.request.options();
-        if (options.verbose().orElse(false) || options.showVersion().orElse(false)) {
+        MavenOptions mavenOptions = localContext.invokerRequest.options();
+        if (mavenOptions.verbose().orElse(false) || mavenOptions.showVersion().orElse(false)) {
             localContext.stdOut.println(CLIReportingUtils.showVersion());
         }
     }
 
     protected void postCommands(LocalContext localContext) {
-        Request request = localContext.request;
+        InvokerRequest invokerRequest = localContext.invokerRequest;
         Logger logger = localContext.logger;
-        if (request.options().showErrors().orElse(false)) {
+        if (invokerRequest.options().showErrors().orElse(false)) {
             logger.info("Error stacktraces are turned on.");
         }
-        if (request.options().relaxedChecksums().orElse(false)) {
+        if (invokerRequest.options().relaxedChecksums().orElse(false)) {
             logger.info("Disabling strict checksum verification on all artifact downloads.");
-        } else if (request.options().strictChecksums().orElse(false)) {
+        } else if (invokerRequest.options().strictChecksums().orElse(false)) {
             logger.info("Enabling strict checksum verification on all artifact downloads.");
         }
         if (logger.isDebugEnabled()) {
@@ -552,18 +554,19 @@ public class LocalInvoker implements Invoker {
     }
 
     protected void settings(LocalContext localContext, SettingsBuilder settingsBuilder) throws Exception {
-        Options options = localContext.request.options();
+        MavenOptions mavenOptions = localContext.invokerRequest.options();
         Path userSettingsFile = null;
 
-        if (options.altUserSettings().isPresent()) {
-            userSettingsFile =
-                    localContext.cwdResolver.apply(options.altUserSettings().get());
+        if (mavenOptions.altUserSettings().isPresent()) {
+            userSettingsFile = localContext.cwdResolver.apply(
+                    mavenOptions.altUserSettings().get());
 
             if (!Files.isRegularFile(userSettingsFile)) {
                 throw new FileNotFoundException("The specified user settings file does not exist: " + userSettingsFile);
             }
         } else {
-            String userSettingsFileStr = localContext.request.userProperties().get(Constants.MAVEN_USER_SETTINGS);
+            String userSettingsFileStr =
+                    localContext.invokerRequest.userProperties().get(Constants.MAVEN_USER_SETTINGS);
             if (userSettingsFileStr != null) {
                 userSettingsFile = localContext.cwdResolver.apply(userSettingsFileStr);
             }
@@ -571,9 +574,9 @@ public class LocalInvoker implements Invoker {
 
         Path projectSettingsFile = null;
 
-        if (options.altProjectSettings().isPresent()) {
-            projectSettingsFile =
-                    localContext.cwdResolver.apply(options.altProjectSettings().get());
+        if (mavenOptions.altProjectSettings().isPresent()) {
+            projectSettingsFile = localContext.cwdResolver.apply(
+                    mavenOptions.altProjectSettings().get());
 
             if (!Files.isRegularFile(projectSettingsFile)) {
                 throw new FileNotFoundException(
@@ -581,7 +584,7 @@ public class LocalInvoker implements Invoker {
             }
         } else {
             String projectSettingsFileStr =
-                    localContext.request.userProperties().get(Constants.MAVEN_PROJECT_SETTINGS);
+                    localContext.invokerRequest.userProperties().get(Constants.MAVEN_PROJECT_SETTINGS);
             if (projectSettingsFileStr != null) {
                 projectSettingsFile = localContext.cwdResolver.apply(projectSettingsFileStr);
             }
@@ -589,9 +592,9 @@ public class LocalInvoker implements Invoker {
 
         Path installationSettingsFile = null;
 
-        if (options.altInstallationSettings().isPresent()) {
+        if (mavenOptions.altInstallationSettings().isPresent()) {
             installationSettingsFile = localContext.cwdResolver.apply(
-                    options.altInstallationSettings().get());
+                    mavenOptions.altInstallationSettings().get());
 
             if (!Files.isRegularFile(installationSettingsFile)) {
                 throw new FileNotFoundException(
@@ -599,7 +602,7 @@ public class LocalInvoker implements Invoker {
             }
         } else {
             String installationSettingsFileStr =
-                    localContext.request.userProperties().get(Constants.MAVEN_INSTALLATION_SETTINGS);
+                    localContext.invokerRequest.userProperties().get(Constants.MAVEN_INSTALLATION_SETTINGS);
             if (installationSettingsFileStr != null) {
                 installationSettingsFile = localContext.cwdResolver.apply(installationSettingsFileStr);
             }
@@ -613,12 +616,12 @@ public class LocalInvoker implements Invoker {
         settingsRequest.setGlobalSettingsFile(toFile(installationSettingsFile));
         settingsRequest.setProjectSettingsFile(toFile(projectSettingsFile));
         settingsRequest.setUserSettingsFile(toFile(userSettingsFile));
-        settingsRequest.setSystemProperties(toProperties(localContext.request.systemProperties()));
-        Properties props = toProperties(localContext.request.userProperties());
-        if (localContext.request.rootDirectory() != null) {
+        settingsRequest.setSystemProperties(toProperties(localContext.invokerRequest.systemProperties()));
+        Properties props = toProperties(localContext.invokerRequest.userProperties());
+        if (localContext.invokerRequest.rootDirectory() != null) {
             props.put(
                     "session.rootDirectory",
-                    localContext.request.rootDirectory().toString());
+                    localContext.invokerRequest.rootDirectory().toString());
         }
         settingsRequest.setUserProperties(props);
 
@@ -750,16 +753,17 @@ public class LocalInvoker implements Invoker {
     protected void toolchains(LocalContext localContext) throws Exception {
         Path userToolchainsFile = null;
 
-        if (localContext.request.options().altUserToolchains().isPresent()) {
+        if (localContext.invokerRequest.options().altUserToolchains().isPresent()) {
             userToolchainsFile = localContext.cwdResolver.apply(
-                    localContext.request.options().altUserToolchains().get());
+                    localContext.invokerRequest.options().altUserToolchains().get());
 
             if (!Files.isRegularFile(userToolchainsFile)) {
                 throw new FileNotFoundException(
                         "The specified user toolchains file does not exist: " + userToolchainsFile);
             }
         } else {
-            String userToolchainsFileStr = localContext.request.userProperties().get(Constants.MAVEN_USER_TOOLCHAINS);
+            String userToolchainsFileStr =
+                    localContext.invokerRequest.userProperties().get(Constants.MAVEN_USER_TOOLCHAINS);
             if (userToolchainsFileStr != null) {
                 userToolchainsFile = localContext.cwdResolver.apply(userToolchainsFileStr);
             }
@@ -767,9 +771,12 @@ public class LocalInvoker implements Invoker {
 
         Path installationToolchainsFile = null;
 
-        if (localContext.request.options().altInstallationToolchains().isPresent()) {
-            installationToolchainsFile = localContext.cwdResolver.apply(
-                    localContext.request.options().altInstallationToolchains().get());
+        if (localContext.invokerRequest.options().altInstallationToolchains().isPresent()) {
+            installationToolchainsFile = localContext.cwdResolver.apply(localContext
+                    .invokerRequest
+                    .options()
+                    .altInstallationToolchains()
+                    .get());
 
             if (!Files.isRegularFile(installationToolchainsFile)) {
                 throw new FileNotFoundException(
@@ -777,7 +784,7 @@ public class LocalInvoker implements Invoker {
             }
         } else {
             String installationToolchainsFileStr =
-                    localContext.request.userProperties().get(Constants.MAVEN_INSTALLATION_TOOLCHAINS);
+                    localContext.invokerRequest.userProperties().get(Constants.MAVEN_INSTALLATION_TOOLCHAINS);
             if (installationToolchainsFileStr != null) {
                 installationToolchainsFile = localContext.cwdResolver.apply(installationToolchainsFileStr);
             }
@@ -829,24 +836,24 @@ public class LocalInvoker implements Invoker {
     }
 
     protected void populateRequest(LocalContext localContext, MavenExecutionRequest request) {
-        Options options = localContext.request.options();
-        request.setShowErrors(options.showErrors().orElse(false));
+        MavenOptions mavenOptions = localContext.invokerRequest.options();
+        request.setShowErrors(mavenOptions.showErrors().orElse(false));
         disableInteractiveModeIfNeeded(localContext);
-        request.setNoSnapshotUpdates(options.suppressSnapshotUpdates().orElse(false));
-        request.setGoals(options.goals().orElse(List.of()));
+        request.setNoSnapshotUpdates(mavenOptions.suppressSnapshotUpdates().orElse(false));
+        request.setGoals(mavenOptions.goals().orElse(List.of()));
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(localContext));
-        request.setRecursive(!options.nonRecursive().orElse(!request.isRecursive()));
-        request.setOffline(options.offline().orElse(request.isOffline()));
-        request.setUpdateSnapshots(options.updateSnapshots().orElse(false));
+        request.setRecursive(!mavenOptions.nonRecursive().orElse(!request.isRecursive()));
+        request.setOffline(mavenOptions.offline().orElse(request.isOffline()));
+        request.setUpdateSnapshots(mavenOptions.updateSnapshots().orElse(false));
         request.setGlobalChecksumPolicy(determineGlobalChecksumPolicy(localContext));
-        request.setBaseDirectory(localContext.request.cwd().toFile());
-        request.setSystemProperties(toProperties(localContext.request.systemProperties()));
-        request.setUserProperties(toProperties(localContext.request.userProperties()));
+        request.setBaseDirectory(localContext.invokerRequest.cwd().toFile());
+        request.setSystemProperties(toProperties(localContext.invokerRequest.systemProperties()));
+        request.setUserProperties(toProperties(localContext.invokerRequest.userProperties()));
         request.setMultiModuleProjectDirectory(
-                localContext.request.rootDirectory().toFile());
+                localContext.invokerRequest.rootDirectory().toFile());
 
-        request.setRootDirectory(localContext.request.rootDirectory());
-        request.setTopDirectory(localContext.request.topDirectory());
+        request.setRootDirectory(localContext.invokerRequest.rootDirectory());
+        request.setTopDirectory(localContext.invokerRequest.topDirectory());
 
         Path pom = determinePom(localContext);
         request.setPom(pom != null ? pom.toFile() : null);
@@ -857,13 +864,13 @@ public class LocalInvoker implements Invoker {
             request.setBaseDirectory(request.getPom().getParentFile());
         }
 
-        request.setResumeFrom(options.resumeFrom().orElse(null));
-        request.setResume(options.resume().orElse(false));
+        request.setResumeFrom(mavenOptions.resumeFrom().orElse(null));
+        request.setResume(mavenOptions.resume().orElse(false));
         request.setMakeBehavior(determineMakeBehavior(localContext));
-        request.setCacheNotFound(options.cacheArtifactNotFound().orElse(true));
+        request.setCacheNotFound(mavenOptions.cacheArtifactNotFound().orElse(true));
         request.setCacheTransferError(false);
 
-        if (options.strictArtifactDescriptorPolicy().orElse(false)) {
+        if (mavenOptions.strictArtifactDescriptorPolicy().orElse(false)) {
             request.setIgnoreMissingArtifactDescriptor(false);
             request.setIgnoreInvalidArtifactDescriptor(false);
         } else {
@@ -872,7 +879,7 @@ public class LocalInvoker implements Invoker {
         }
 
         request.setIgnoreTransitiveRepositories(
-                options.ignoreTransitiveRepositories().orElse(false));
+                mavenOptions.ignoreTransitiveRepositories().orElse(false));
 
         performProjectActivation(localContext, request.getProjectActivation());
         performProfileActivation(localContext, request.getProfileActivation());
@@ -890,9 +897,9 @@ public class LocalInvoker implements Invoker {
         // parameters but this is sufficient for now. Ultimately we want components like Builders to provide a way to
         // extend the command line to accept its own configuration parameters.
         //
-        if (localContext.request.options().threads().isPresent()) {
+        if (localContext.invokerRequest.options().threads().isPresent()) {
             int degreeOfConcurrency = calculateDegreeOfConcurrency(
-                    localContext.request.options().threads().get());
+                    localContext.invokerRequest.options().threads().get());
             if (degreeOfConcurrency > 1) {
                 request.setBuilderId("multithreaded");
                 request.setDegreeOfConcurrency(degreeOfConcurrency);
@@ -902,17 +909,17 @@ public class LocalInvoker implements Invoker {
         //
         // Allow the builder to be overridden by the user if requested. The builders are now pluggable.
         //
-        if (localContext.request.options().builder().isPresent()) {
-            request.setBuilderId(localContext.request.options().builder().get());
+        if (localContext.invokerRequest.options().builder().isPresent()) {
+            request.setBuilderId(localContext.invokerRequest.options().builder().get());
         }
     }
 
     protected void disableInteractiveModeIfNeeded(LocalContext localContext) {
-        if (localContext.request.options().forceInteractive().orElse(false)) {
+        if (localContext.invokerRequest.options().forceInteractive().orElse(false)) {
             return;
         }
 
-        if (localContext.request.options().nonInteractive().orElse(false)) {
+        if (localContext.invokerRequest.options().nonInteractive().orElse(false)) {
             localContext.mavenExecutionRequest.setInteractiveMode(false);
         } else {
             boolean runningOnCI = isRunningOnCI(localContext);
@@ -926,10 +933,10 @@ public class LocalInvoker implements Invoker {
     }
 
     protected Path determinePom(LocalContext localContext) {
-        Path current = localContext.request.cwd();
-        if (localContext.request.options().alternatePomFile().isPresent()) {
+        Path current = localContext.invokerRequest.cwd();
+        if (localContext.invokerRequest.options().alternatePomFile().isPresent()) {
             current = localContext.cwdResolver.apply(
-                    localContext.request.options().alternatePomFile().get());
+                    localContext.invokerRequest.options().alternatePomFile().get());
         }
         if (localContext.modelProcessor != null) {
             return localContext.modelProcessor.locateExistingPom(current);
@@ -939,9 +946,11 @@ public class LocalInvoker implements Invoker {
     }
 
     protected String determineLocalRepositoryPath(LocalContext localContext) {
-        String userDefinedLocalRepo = localContext.request.userProperties().get(Constants.MAVEN_REPO_LOCAL);
+        String userDefinedLocalRepo =
+                localContext.invokerRequest.userProperties().get(Constants.MAVEN_REPO_LOCAL);
         if (userDefinedLocalRepo == null) {
-            userDefinedLocalRepo = localContext.request.systemProperties().get(Constants.MAVEN_REPO_LOCAL);
+            userDefinedLocalRepo =
+                    localContext.invokerRequest.systemProperties().get(Constants.MAVEN_REPO_LOCAL);
             if (userDefinedLocalRepo != null) {
                 localContext.logger.warn(
                         "The property '{}' has been set using a JVM system property which is deprecated. "
@@ -954,12 +963,12 @@ public class LocalInvoker implements Invoker {
     }
 
     protected String determineReactorFailureBehaviour(LocalContext localContext) {
-        Options options = localContext.request.options();
-        if (options.failFast().isPresent()) {
+        MavenOptions mavenOptions = localContext.invokerRequest.options();
+        if (mavenOptions.failFast().isPresent()) {
             return MavenExecutionRequest.REACTOR_FAIL_FAST;
-        } else if (options.failAtEnd().isPresent()) {
+        } else if (mavenOptions.failAtEnd().isPresent()) {
             return MavenExecutionRequest.REACTOR_FAIL_AT_END;
-        } else if (options.failNever().isPresent()) {
+        } else if (mavenOptions.failNever().isPresent()) {
             return MavenExecutionRequest.REACTOR_FAIL_NEVER;
         } else {
             return MavenExecutionRequest.REACTOR_FAIL_FAST;
@@ -995,15 +1004,15 @@ public class LocalInvoker implements Invoker {
     }
 
     protected boolean isRunningOnCI(LocalContext localContext) {
-        String ciEnv = localContext.request.systemProperties().get("env.CI");
+        String ciEnv = localContext.invokerRequest.systemProperties().get("env.CI");
         return ciEnv != null && !"false".equals(ciEnv);
     }
 
     protected String determineGlobalChecksumPolicy(LocalContext localContext) {
-        Options options = localContext.request.options();
-        if (options.strictChecksums().orElse(false)) {
+        MavenOptions mavenOptions = localContext.invokerRequest.options();
+        if (mavenOptions.strictChecksums().orElse(false)) {
             return MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
-        } else if (options.relaxedChecksums().orElse(false)) {
+        } else if (mavenOptions.relaxedChecksums().orElse(false)) {
             return MavenExecutionRequest.CHECKSUM_POLICY_WARN;
         } else {
             return null;
@@ -1011,13 +1020,13 @@ public class LocalInvoker implements Invoker {
     }
 
     protected TransferListener determineTransferListener(LocalContext localContext) {
-        boolean quiet = localContext.request.options().quiet().orElse(false);
-        boolean logFile = localContext.request.options().logFile().isPresent();
+        boolean quiet = localContext.invokerRequest.options().quiet().orElse(false);
+        boolean logFile = localContext.invokerRequest.options().logFile().isPresent();
         boolean noTransferProgress =
-                localContext.request.options().noTransferProgress().orElse(false);
+                localContext.invokerRequest.options().noTransferProgress().orElse(false);
         boolean runningOnCI = isRunningOnCI(localContext);
         boolean quietCI = runningOnCI
-                && !localContext.request.options().forceInteractive().orElse(false);
+                && !localContext.invokerRequest.options().forceInteractive().orElse(false);
 
         if (quiet || noTransferProgress || quietCI) {
             return new QuietMavenTransferListener();
@@ -1027,9 +1036,9 @@ public class LocalInvoker implements Invoker {
             // download progress all over the place
             //
             return new SimplexTransferListener(new ConsoleMavenTransferListener(
-                    localContext.request.messageBuilderFactory(),
+                    localContext.invokerRequest.messageBuilderFactory(),
                     localContext.stdOut,
-                    localContext.request.options().verbose().orElse(false)));
+                    localContext.invokerRequest.options().verbose().orElse(false)));
         } else {
             // default: batch mode which goes along with interactive
             return new Slf4jMavenTransferListener();
@@ -1037,7 +1046,8 @@ public class LocalInvoker implements Invoker {
     }
 
     protected ExecutionListener determineExecutionListener(LocalContext localContext) {
-        ExecutionListener executionListener = new ExecutionEventLogger(localContext.request.messageBuilderFactory());
+        ExecutionListener executionListener =
+                new ExecutionEventLogger(localContext.invokerRequest.messageBuilderFactory());
         if (localContext.eventSpyDispatcher != null) {
             return localContext.eventSpyDispatcher.chainListener(executionListener);
         } else {
@@ -1046,13 +1056,15 @@ public class LocalInvoker implements Invoker {
     }
 
     protected String determineMakeBehavior(LocalContext localContext) {
-        Options options = localContext.request.options();
-        if (options.alsoMake().isPresent() && options.alsoMakeDependents().isEmpty()) {
+        MavenOptions mavenOptions = localContext.invokerRequest.options();
+        if (mavenOptions.alsoMake().isPresent()
+                && mavenOptions.alsoMakeDependents().isEmpty()) {
             return MavenExecutionRequest.REACTOR_MAKE_UPSTREAM;
-        } else if (options.alsoMake().isEmpty() && options.alsoMakeDependents().isPresent()) {
+        } else if (mavenOptions.alsoMake().isEmpty()
+                && mavenOptions.alsoMakeDependents().isPresent()) {
             return MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM;
-        } else if (options.alsoMake().isPresent()
-                && options.alsoMakeDependents().isPresent()) {
+        } else if (mavenOptions.alsoMake().isPresent()
+                && mavenOptions.alsoMakeDependents().isPresent()) {
             return MavenExecutionRequest.REACTOR_MAKE_BOTH;
         } else {
             return null;
@@ -1060,9 +1072,10 @@ public class LocalInvoker implements Invoker {
     }
 
     protected void performProjectActivation(LocalContext localContext, ProjectActivation projectActivation) {
-        Options options = localContext.request.options();
-        if (options.projects().isPresent() && !options.projects().get().isEmpty()) {
-            List<String> optionValues = options.projects().get();
+        MavenOptions mavenOptions = localContext.invokerRequest.options();
+        if (mavenOptions.projects().isPresent()
+                && !mavenOptions.projects().get().isEmpty()) {
+            List<String> optionValues = mavenOptions.projects().get();
             for (final String optionValue : optionValues) {
                 for (String token : optionValue.split(",")) {
                     String selector = token.trim();
@@ -1087,10 +1100,10 @@ public class LocalInvoker implements Invoker {
     }
 
     protected void performProfileActivation(LocalContext localContext, ProfileActivation profileActivation) {
-        Options options = localContext.request.options();
-        if (options.activatedProfiles().isPresent()
-                && !options.activatedProfiles().get().isEmpty()) {
-            List<String> optionValues = options.activatedProfiles().get();
+        MavenOptions mavenOptions = localContext.invokerRequest.options();
+        if (mavenOptions.activatedProfiles().isPresent()
+                && !mavenOptions.activatedProfiles().get().isEmpty()) {
+            List<String> optionValues = mavenOptions.activatedProfiles().get();
             for (final String optionValue : optionValues) {
                 for (String token : optionValue.split(",")) {
                     String profileId = token.trim();
@@ -1150,7 +1163,7 @@ public class LocalInvoker implements Invoker {
 
             localContext.logger.error("");
 
-            if (!localContext.request.options().showErrors().orElse(false)) {
+            if (!localContext.invokerRequest.options().showErrors().orElse(false)) {
                 localContext.logger.error(
                         "To see the full stack trace of the errors, re-run Maven with the '{}' switch",
                         MessageUtils.builder().strong("-e"));
@@ -1186,7 +1199,7 @@ public class LocalInvoker implements Invoker {
                 }
             }
 
-            if (localContext.request.options().failNever().orElse(false)) {
+            if (localContext.invokerRequest.options().failNever().orElse(false)) {
                 localContext.logger.info("Build failures were ignored.");
                 return 0;
             } else {
@@ -1281,7 +1294,7 @@ public class LocalInvoker implements Invoker {
             line = indent + line + ("".equals(nextColor) ? "" : ANSI_RESET);
 
             if ((i == lines.length - 1)
-                    && (localContext.request.options().showErrors().orElse(false)
+                    && (localContext.invokerRequest.options().showErrors().orElse(false)
                             || (summary.getException() instanceof InternalErrorException))) {
                 localContext.logger.error(line, summary.getException());
             } else {

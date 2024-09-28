@@ -25,5 +25,5 @@ public interface Invoker {
     /**
      * Invokes Maven and returns exit code.
      */
-    int invoke(Request request) throws InvokerException;
+    int invoke(InvokerRequest invokerRequest) throws InvokerException;
 }

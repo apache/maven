@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 
 import static java.util.Objects.requireNonNull;
 
-public class BaseRequest implements Request {
+public class BaseInvokerRequest implements InvokerRequest {
     private final Path cwd;
     private final Path installationDirectory;
     private final Path userHomeDirectory;
@@ -49,10 +49,10 @@ public class BaseRequest implements Request {
     private final PrintStream err;
     private final List<CoreExtension> coreExtensions;
 
-    private final Options options;
+    private final MavenOptions mavenOptions;
 
     @SuppressWarnings("ParameterNumber")
-    public BaseRequest(
+    public BaseInvokerRequest(
             @Nonnull Path cwd,
             @Nonnull Path installationDirectory,
             @Nonnull Path userHomeDirectory,
@@ -66,7 +66,7 @@ public class BaseRequest implements Request {
             @Nullable PrintStream out,
             @Nullable PrintStream err,
             @Nullable List<CoreExtension> coreExtensions,
-            @Nonnull Options options) {
+            @Nonnull MavenOptions mavenOptions) {
         this.cwd = requireNonNull(cwd);
         this.installationDirectory = requireNonNull(installationDirectory);
         this.userHomeDirectory = requireNonNull(userHomeDirectory);
@@ -82,7 +82,7 @@ public class BaseRequest implements Request {
         this.err = err;
         this.coreExtensions = coreExtensions;
 
-        this.options = requireNonNull(options);
+        this.mavenOptions = requireNonNull(mavenOptions);
     }
 
     @Override
@@ -151,7 +151,7 @@ public class BaseRequest implements Request {
     }
 
     @Override
-    public Options options() {
-        return options;
+    public MavenOptions options() {
+        return mavenOptions;
     }
 }

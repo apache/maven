@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.local;
+package org.apache.maven.cling.invoker;
 
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -29,7 +29,6 @@ import java.util.Optional;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.maven.cli.CLIManager;
-import org.apache.maven.cling.invoker.Options;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 
@@ -37,17 +36,17 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.Utils.createInterpolator;
 import static org.apache.maven.cling.invoker.Utils.toMap;
 
-public class CommonsCliOptions implements Options {
+public class CommonsCliMavenOptions implements MavenOptions {
     private final CLIManager cliManager;
     private final CommandLine commandLine;
 
-    public CommonsCliOptions(CLIManager cliManager, CommandLine commandLine) {
+    public CommonsCliMavenOptions(CLIManager cliManager, CommandLine commandLine) {
         this.cliManager = requireNonNull(cliManager);
         this.commandLine = requireNonNull(commandLine);
     }
 
-    private static CommonsCliOptions interpolate(
-            CommonsCliOptions options, Collection<Map<String, String>> properties) {
+    private static CommonsCliMavenOptions interpolate(
+            CommonsCliMavenOptions options, Collection<Map<String, String>> properties) {
         try {
             // now that we have properties, interpolate all arguments
             BasicInterpolator interpolator = createInterpolator(properties);
@@ -65,7 +64,7 @@ public class CommonsCliOptions implements Options {
             for (String arg : options.commandLine.getArgList()) {
                 commandLineBuilder.addArg(interpolator.interpolate(arg));
             }
-            return new CommonsCliOptions(options.cliManager, commandLineBuilder.build());
+            return new CommonsCliMavenOptions(options.cliManager, commandLineBuilder.build());
         } catch (InterpolationException e) {
             throw new IllegalArgumentException("Could not interpolate CommonsCliOptions", e);
         }
@@ -407,7 +406,7 @@ public class CommonsCliOptions implements Options {
     }
 
     @Override
-    public Options interpolate(Collection<Map<String, String>> properties) {
+    public MavenOptions interpolate(Collection<Map<String, String>> properties) {
         return interpolate(this, properties);
     }
 

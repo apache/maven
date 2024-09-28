@@ -20,27 +20,17 @@ package org.apache.maven.cling.invoker;
 
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Maven options.
- * <p>
- * This is pretty much what Maven CLI surface offers as knobs and switches. Also, {@code maven.config} may contain
- * subset of these (ie no goals).
+ * Base options, options supported by our tools.
  */
-public interface Options {
+public interface BaseOptions {
     @Nonnull
     Optional<Map<String, String>> userProperties();
-
-    @Nonnull
-    Optional<String> alternatePomFile();
-
-    @Nonnull
-    Optional<Boolean> offline();
 
     @Nonnull
     Optional<Boolean> showVersionAndExit();
@@ -58,28 +48,10 @@ public interface Options {
     Optional<Boolean> showErrors();
 
     @Nonnull
-    Optional<Boolean> nonRecursive();
-
-    @Nonnull
-    Optional<Boolean> updateSnapshots();
-
-    @Nonnull
-    Optional<List<String>> activatedProfiles();
-
-    @Nonnull
     Optional<Boolean> nonInteractive();
 
     @Nonnull
     Optional<Boolean> forceInteractive();
-
-    @Nonnull
-    Optional<Boolean> suppressSnapshotUpdates();
-
-    @Nonnull
-    Optional<Boolean> strictChecksums();
-
-    @Nonnull
-    Optional<Boolean> relaxedChecksums();
 
     @Nonnull
     Optional<String> altUserSettings();
@@ -97,68 +69,20 @@ public interface Options {
     Optional<String> altInstallationToolchains();
 
     @Nonnull
-    Optional<String> failOnSeverity();
-
-    @Nonnull
-    Optional<Boolean> failFast();
-
-    @Nonnull
-    Optional<Boolean> failAtEnd();
-
-    @Nonnull
-    Optional<Boolean> failNever();
-
-    @Nonnull
-    Optional<Boolean> resume();
-
-    @Nonnull
-    Optional<String> resumeFrom();
-
-    @Nonnull
-    Optional<List<String>> projects();
-
-    @Nonnull
-    Optional<Boolean> alsoMake();
-
-    @Nonnull
-    Optional<Boolean> alsoMakeDependents();
-
-    @Nonnull
     Optional<String> logFile();
-
-    @Nonnull
-    Optional<String> threads();
-
-    @Nonnull
-    Optional<String> builder();
-
-    @Nonnull
-    Optional<Boolean> noTransferProgress();
 
     @Nonnull
     Optional<String> color();
 
     @Nonnull
-    Optional<Boolean> cacheArtifactNotFound();
-
-    @Nonnull
-    Optional<Boolean> strictArtifactDescriptorPolicy();
-
-    @Nonnull
-    Optional<Boolean> ignoreTransitiveRepositories();
-
-    @Nonnull
     Optional<Boolean> help();
 
-    @Nonnull
-    Optional<List<String>> goals();
-
     /**
-     * Returns new instance of {@link Options} that is result of interpolating this instance with given collection
+     * Returns new instance of {@link BaseOptions} that is result of interpolating this instance with given collection
      * of properties.
      */
     @Nonnull
-    Options interpolate(Collection<Map<String, String>> properties);
+    BaseOptions interpolate(Collection<Map<String, String>> properties);
 
     /**
      * Displays help.

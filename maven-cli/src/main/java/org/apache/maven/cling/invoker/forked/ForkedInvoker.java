@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.apache.maven.cling.invoker.Invoker;
 import org.apache.maven.cling.invoker.InvokerException;
-import org.apache.maven.cling.invoker.Options;
-import org.apache.maven.cling.invoker.Request;
+import org.apache.maven.cling.invoker.InvokerRequest;
+import org.apache.maven.cling.invoker.MavenOptions;
 import org.apache.maven.utils.Os;
 
 import static java.util.Objects.requireNonNull;
@@ -36,76 +36,77 @@ import static java.util.Objects.requireNonNull;
  */
 public class ForkedInvoker implements Invoker {
     @Override
-    public int invoke(Request request) throws InvokerException {
-        requireNonNull(request);
+    public int invoke(InvokerRequest invokerRequest) throws InvokerException {
+        requireNonNull(invokerRequest);
 
         ArrayList<String> cmdAndArguments = new ArrayList<>();
-        cmdAndArguments.add(request.installationDirectory()
+        cmdAndArguments.add(invokerRequest
+                .installationDirectory()
                 .resolve("bin")
                 .resolve(Os.IS_WINDOWS ? "mvn.cmd" : "mvn")
                 .toString());
 
-        Options options = request.options();
-        if (options.userProperties().isPresent()) {
+        MavenOptions mavenOptions = invokerRequest.options();
+        if (mavenOptions.userProperties().isPresent()) {
             for (Map.Entry<String, String> entry :
-                    options.userProperties().get().entrySet()) {
+                    mavenOptions.userProperties().get().entrySet()) {
                 cmdAndArguments.add("-D" + entry.getKey() + "=" + entry.getValue());
             }
         }
-        if (options.alternatePomFile().isPresent()) {
+        if (mavenOptions.alternatePomFile().isPresent()) {
             cmdAndArguments.add("-f");
-            cmdAndArguments.add(options.alternatePomFile().get());
+            cmdAndArguments.add(mavenOptions.alternatePomFile().get());
         }
-        if (options.offline().orElse(false)) {
+        if (mavenOptions.offline().orElse(false)) {
             cmdAndArguments.add("-o");
         }
-        if (options.showVersionAndExit().orElse(false)) {
+        if (mavenOptions.showVersionAndExit().orElse(false)) {
             cmdAndArguments.add("-v");
         }
-        if (options.showVersion().orElse(false)) {
+        if (mavenOptions.showVersion().orElse(false)) {
             cmdAndArguments.add("-V");
         }
-        if (options.quiet().orElse(false)) {
+        if (mavenOptions.quiet().orElse(false)) {
             cmdAndArguments.add("-q");
         }
-        if (options.verbose().orElse(false)) {
+        if (mavenOptions.verbose().orElse(false)) {
             cmdAndArguments.add("-X");
         }
-        if (options.showErrors().orElse(false)) {
+        if (mavenOptions.showErrors().orElse(false)) {
             cmdAndArguments.add("-e");
         }
-        if (options.nonRecursive().orElse(false)) {
+        if (mavenOptions.nonRecursive().orElse(false)) {
             cmdAndArguments.add("-N");
         }
-        if (options.updateSnapshots().orElse(false)) {
+        if (mavenOptions.updateSnapshots().orElse(false)) {
             cmdAndArguments.add("-U");
         }
-        if (options.nonInteractive().orElse(false)) {
+        if (mavenOptions.nonInteractive().orElse(false)) {
             cmdAndArguments.add("-B");
         }
-        if (options.logFile().isPresent()) {
+        if (mavenOptions.logFile().isPresent()) {
             cmdAndArguments.add("-l");
-            cmdAndArguments.add(options.logFile().get());
+            cmdAndArguments.add(mavenOptions.logFile().get());
         }
         // TODO: etc
 
         // last the goals
-        cmdAndArguments.addAll(options.goals().orElse(Collections.emptyList()));
+        cmdAndArguments.addAll(mavenOptions.goals().orElse(Collections.emptyList()));
 
         try {
             return new ProcessBuilder()
-                    .directory(request.cwd().toFile())
+                    .directory(invokerRequest.cwd().toFile())
                     .command(cmdAndArguments)
                     .start()
                     .waitFor();
         } catch (IOException e) {
-            request.logger().error("IO problem while executing command: " + cmdAndArguments, e);
+            invokerRequest.logger().error("IO problem while executing command: " + cmdAndArguments, e);
             return 127;
         } catch (InterruptedException e) {
-            request.logger().error("Interrupted while executing command: " + cmdAndArguments, e);
+            invokerRequest.logger().error("Interrupted while executing command: " + cmdAndArguments, e);
             return 127;
         }
     }
 
-    protected void validate(Request request) throws InvokerException {}
+    protected void validate(InvokerRequest invokerRequest) throws InvokerException {}
 }

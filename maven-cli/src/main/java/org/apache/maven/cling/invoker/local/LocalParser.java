@@ -48,13 +48,14 @@ import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.cli.props.MavenPropertiesLoader;
-import org.apache.maven.cling.invoker.BaseRequest;
-import org.apache.maven.cling.invoker.LayeredOptions;
-import org.apache.maven.cling.invoker.Options;
+import org.apache.maven.cling.invoker.BaseInvokerRequest;
+import org.apache.maven.cling.invoker.CommonsCliMavenOptions;
+import org.apache.maven.cling.invoker.InvokerRequest;
+import org.apache.maven.cling.invoker.LayeredMavenOptions;
+import org.apache.maven.cling.invoker.MavenOptions;
 import org.apache.maven.cling.invoker.Parser;
 import org.apache.maven.cling.invoker.ParserException;
 import org.apache.maven.cling.invoker.ParserRequest;
-import org.apache.maven.cling.invoker.Request;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
@@ -70,7 +71,7 @@ import static org.apache.maven.cling.invoker.Utils.toMap;
 
 public class LocalParser implements Parser {
     @Override
-    public Request parse(ParserRequest parserRequest) throws ParserException, IOException {
+    public InvokerRequest parse(ParserRequest parserRequest) throws ParserException, IOException {
         requireNonNull(parserRequest);
 
         // the basics
@@ -93,8 +94,8 @@ public class LocalParser implements Parser {
 
         // options; args and maven.config
         CLIManager argCLIManager = new CLIManager();
-        CommonsCliOptions argOptions = parseCliOptions(argCLIManager, parserRequest.args());
-        CommonsCliOptions mavenConfigOptions = null;
+        CommonsCliMavenOptions argOptions = parseCliOptions(argCLIManager, parserRequest.args());
+        CommonsCliMavenOptions mavenConfigOptions = null;
         if (rootDirectory != null) {
             Path mavenConfig = rootDirectory.resolve(".mvn/maven.config");
             if (Files.isRegularFile(mavenConfig)) {
@@ -110,7 +111,7 @@ public class LocalParser implements Parser {
         }
 
         // options: layer args and mavenConfig (layer is null safe, will just leave nulls out)
-        Options options = LayeredOptions.layer(argOptions, mavenConfigOptions);
+        MavenOptions mavenOptions = LayeredMavenOptions.layer(argOptions, mavenConfigOptions);
 
         // system and user properties
         Map<String, String> systemProperties = populateSystemProperties(overrides);
@@ -119,10 +120,10 @@ public class LocalParser implements Parser {
         if (rootDirectory != null) {
             paths.put("session.rootDirectory", rootDirectory.toString());
         }
-        Map<String, String> userProperties = populateUserProperties(systemProperties, fileSystem, paths, options);
+        Map<String, String> userProperties = populateUserProperties(systemProperties, fileSystem, paths, mavenOptions);
 
         // options: interpolate
-        options = options.interpolate(Arrays.asList(paths, systemProperties, userProperties));
+        mavenOptions = mavenOptions.interpolate(Arrays.asList(paths, systemProperties, userProperties));
 
         // core extensions
         ArrayList<CoreExtension> extensions = new ArrayList<>();
@@ -135,7 +136,7 @@ public class LocalParser implements Parser {
         String userExtensionsFile = userProperties.get(Constants.MAVEN_USER_EXTENSIONS);
         extensions.addAll(readCoreExtensionsDescriptor(userExtensionsFile, fileSystem));
 
-        return new BaseRequest(
+        return new BaseInvokerRequest(
                 cwd,
                 installationDirectory,
                 userHomeDirectory,
@@ -149,7 +150,7 @@ public class LocalParser implements Parser {
                 parserRequest.out(),
                 parserRequest.err(),
                 extensions,
-                options);
+                mavenOptions);
     }
 
     protected FileSystem getFileSystem(ParserRequest parserRequest) throws ParserException, IOException {
@@ -257,7 +258,10 @@ public class LocalParser implements Parser {
     }
 
     protected Map<String, String> populateUserProperties(
-            Map<String, String> systemProperties, FileSystem fileSystem, Map<String, String> paths, Options options)
+            Map<String, String> systemProperties,
+            FileSystem fileSystem,
+            Map<String, String> paths,
+            MavenOptions mavenOptions)
             throws ParserException, IOException {
         Properties userProperties = new Properties();
 
@@ -267,7 +271,8 @@ public class LocalParser implements Parser {
         // are most dominant.
         // ----------------------------------------------------------------------
 
-        Map<String, String> userSpecifiedProperties = options.userProperties().orElse(new HashMap<>());
+        Map<String, String> userSpecifiedProperties =
+                mavenOptions.userProperties().orElse(new HashMap<>());
         userProperties.putAll(userSpecifiedProperties);
 
         // ----------------------------------------------------------------------
@@ -301,15 +306,15 @@ public class LocalParser implements Parser {
         return toMap(userProperties);
     }
 
-    protected CommonsCliOptions parseCliOptions(CLIManager cliManager, String[] args) throws ParserException {
+    protected CommonsCliMavenOptions parseCliOptions(CLIManager cliManager, String[] args) throws ParserException {
         try {
-            return new CommonsCliOptions(cliManager, cliManager.parse(args));
+            return new CommonsCliMavenOptions(cliManager, cliManager.parse(args));
         } catch (ParseException e) {
             throw new ParserException("Failed to parse command line options: " + e.getMessage(), e);
         }
     }
 
-    protected CommonsCliOptions parseConfigOptions(CLIManager cliManager, Path configFile)
+    protected CommonsCliMavenOptions parseConfigOptions(CLIManager cliManager, Path configFile)
             throws ParserException, IOException {
         try (Stream<String> lines = Files.lines(configFile, Charset.defaultCharset())) {
             String[] args =
@@ -320,13 +325,14 @@ public class LocalParser implements Parser {
                 // This file can only contain options, not args (goals or phases)
                 throw new ParserException("Unrecognized maven.config file entries: " + goals);
             }
-            return new CommonsCliOptions(cliManager, mavenConfig);
+            return new CommonsCliMavenOptions(cliManager, mavenConfig);
         } catch (ParseException e) {
             throw new ParserException("Failed to parse maven.config file: " + e.getMessage(), e);
         }
     }
 
-    protected void warnAboutDeprecatedOptions(ParserRequest parserRequest, String location, CommonsCliOptions options) {
+    protected void warnAboutDeprecatedOptions(
+            ParserRequest parserRequest, String location, CommonsCliMavenOptions options) {
         if (options.getUsedDeprecatedOptions().isEmpty()) {
             return;
         }

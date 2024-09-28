@@ -38,12 +38,14 @@ import org.apache.maven.jline.MessageUtils;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
- * Maven Tool.
+ * Maven Encryption Tool.
  */
-public class MavenTool implements Tool {
+public class MavenEncryptTool implements Tool {
+    public MavenEncryptTool() {}
+
     @Override
     public String name() {
-        return "mvn";
+        return "mvnenc";
     }
 
     @Override

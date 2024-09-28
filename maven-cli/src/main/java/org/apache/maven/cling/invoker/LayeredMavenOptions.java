@@ -34,232 +34,232 @@ import static java.util.Objects.requireNonNull;
 /**
  * Options that are "layered" by precedence order.
  */
-public class LayeredOptions implements Options {
-    public static Options layer(Options... options) {
+public class LayeredMavenOptions implements MavenOptions {
+    public static MavenOptions layer(MavenOptions... options) {
         return layer(Arrays.asList(options));
     }
 
-    public static Options layer(Collection<Options> options) {
-        List<Options> o = options.stream().filter(Objects::nonNull).toList();
+    public static MavenOptions layer(Collection<MavenOptions> options) {
+        List<MavenOptions> o = options.stream().filter(Objects::nonNull).toList();
         if (o.isEmpty()) {
             throw new IllegalArgumentException("No options specified (or all were null)");
         } else if (o.size() == 1) {
             return o.get(0);
         } else {
-            return new LayeredOptions(o);
+            return new LayeredMavenOptions(o);
         }
     }
 
-    private final List<Options> options;
+    private final List<MavenOptions> options;
 
-    private LayeredOptions(List<Options> options) {
+    private LayeredMavenOptions(List<MavenOptions> options) {
         this.options = requireNonNull(options);
     }
 
     @Override
     public Optional<Map<String, String>> userProperties() {
-        return collectMapIfPresentOrEmpty(Options::userProperties);
+        return collectMapIfPresentOrEmpty(MavenOptions::userProperties);
     }
 
     @Override
     public Optional<String> alternatePomFile() {
-        return returnFirstPresentOrEmpty(Options::alternatePomFile);
+        return returnFirstPresentOrEmpty(MavenOptions::alternatePomFile);
     }
 
     @Override
     public Optional<Boolean> offline() {
-        return returnFirstPresentOrEmpty(Options::offline);
+        return returnFirstPresentOrEmpty(MavenOptions::offline);
     }
 
     @Override
     public Optional<Boolean> showVersionAndExit() {
-        return returnFirstPresentOrEmpty(Options::showVersionAndExit);
+        return returnFirstPresentOrEmpty(MavenOptions::showVersionAndExit);
     }
 
     @Override
     public Optional<Boolean> showVersion() {
-        return returnFirstPresentOrEmpty(Options::showVersion);
+        return returnFirstPresentOrEmpty(MavenOptions::showVersion);
     }
 
     @Override
     public Optional<Boolean> quiet() {
-        return returnFirstPresentOrEmpty(Options::quiet);
+        return returnFirstPresentOrEmpty(MavenOptions::quiet);
     }
 
     @Override
     public Optional<Boolean> verbose() {
-        return returnFirstPresentOrEmpty(Options::verbose);
+        return returnFirstPresentOrEmpty(MavenOptions::verbose);
     }
 
     @Override
     public Optional<Boolean> showErrors() {
-        return returnFirstPresentOrEmpty(Options::showErrors);
+        return returnFirstPresentOrEmpty(MavenOptions::showErrors);
     }
 
     @Override
     public Optional<Boolean> nonRecursive() {
-        return returnFirstPresentOrEmpty(Options::nonRecursive);
+        return returnFirstPresentOrEmpty(MavenOptions::nonRecursive);
     }
 
     @Override
     public Optional<Boolean> updateSnapshots() {
-        return returnFirstPresentOrEmpty(Options::updateSnapshots);
+        return returnFirstPresentOrEmpty(MavenOptions::updateSnapshots);
     }
 
     @Override
     public Optional<List<String>> activatedProfiles() {
-        return collectListIfPresentOrEmpty(Options::activatedProfiles);
+        return collectListIfPresentOrEmpty(MavenOptions::activatedProfiles);
     }
 
     @Override
     public Optional<Boolean> nonInteractive() {
-        return returnFirstPresentOrEmpty(Options::nonInteractive);
+        return returnFirstPresentOrEmpty(MavenOptions::nonInteractive);
     }
 
     @Override
     public Optional<Boolean> forceInteractive() {
-        return returnFirstPresentOrEmpty(Options::forceInteractive);
+        return returnFirstPresentOrEmpty(MavenOptions::forceInteractive);
     }
 
     @Override
     public Optional<Boolean> suppressSnapshotUpdates() {
-        return returnFirstPresentOrEmpty(Options::suppressSnapshotUpdates);
+        return returnFirstPresentOrEmpty(MavenOptions::suppressSnapshotUpdates);
     }
 
     @Override
     public Optional<Boolean> strictChecksums() {
-        return returnFirstPresentOrEmpty(Options::strictChecksums);
+        return returnFirstPresentOrEmpty(MavenOptions::strictChecksums);
     }
 
     @Override
     public Optional<Boolean> relaxedChecksums() {
-        return returnFirstPresentOrEmpty(Options::relaxedChecksums);
+        return returnFirstPresentOrEmpty(MavenOptions::relaxedChecksums);
     }
 
     @Override
     public Optional<String> altUserSettings() {
-        return returnFirstPresentOrEmpty(Options::altUserSettings);
+        return returnFirstPresentOrEmpty(MavenOptions::altUserSettings);
     }
 
     @Override
     public Optional<String> altProjectSettings() {
-        return returnFirstPresentOrEmpty(Options::altProjectSettings);
+        return returnFirstPresentOrEmpty(MavenOptions::altProjectSettings);
     }
 
     @Override
     public Optional<String> altInstallationSettings() {
-        return returnFirstPresentOrEmpty(Options::altInstallationSettings);
+        return returnFirstPresentOrEmpty(MavenOptions::altInstallationSettings);
     }
 
     @Override
     public Optional<String> altUserToolchains() {
-        return returnFirstPresentOrEmpty(Options::altUserToolchains);
+        return returnFirstPresentOrEmpty(MavenOptions::altUserToolchains);
     }
 
     @Override
     public Optional<String> altInstallationToolchains() {
-        return returnFirstPresentOrEmpty(Options::altInstallationToolchains);
+        return returnFirstPresentOrEmpty(MavenOptions::altInstallationToolchains);
     }
 
     @Override
     public Optional<String> failOnSeverity() {
-        return returnFirstPresentOrEmpty(Options::failOnSeverity);
+        return returnFirstPresentOrEmpty(MavenOptions::failOnSeverity);
     }
 
     @Override
     public Optional<Boolean> failFast() {
-        return returnFirstPresentOrEmpty(Options::failFast);
+        return returnFirstPresentOrEmpty(MavenOptions::failFast);
     }
 
     @Override
     public Optional<Boolean> failAtEnd() {
-        return returnFirstPresentOrEmpty(Options::failAtEnd);
+        return returnFirstPresentOrEmpty(MavenOptions::failAtEnd);
     }
 
     @Override
     public Optional<Boolean> failNever() {
-        return returnFirstPresentOrEmpty(Options::failNever);
+        return returnFirstPresentOrEmpty(MavenOptions::failNever);
     }
 
     @Override
     public Optional<Boolean> resume() {
-        return returnFirstPresentOrEmpty(Options::resume);
+        return returnFirstPresentOrEmpty(MavenOptions::resume);
     }
 
     @Override
     public Optional<String> resumeFrom() {
-        return returnFirstPresentOrEmpty(Options::resumeFrom);
+        return returnFirstPresentOrEmpty(MavenOptions::resumeFrom);
     }
 
     @Override
     public Optional<List<String>> projects() {
-        return collectListIfPresentOrEmpty(Options::projects);
+        return collectListIfPresentOrEmpty(MavenOptions::projects);
     }
 
     @Override
     public Optional<Boolean> alsoMake() {
-        return returnFirstPresentOrEmpty(Options::alsoMake);
+        return returnFirstPresentOrEmpty(MavenOptions::alsoMake);
     }
 
     @Override
     public Optional<Boolean> alsoMakeDependents() {
-        return returnFirstPresentOrEmpty(Options::alsoMakeDependents);
+        return returnFirstPresentOrEmpty(MavenOptions::alsoMakeDependents);
     }
 
     @Override
     public Optional<String> logFile() {
-        return returnFirstPresentOrEmpty(Options::logFile);
+        return returnFirstPresentOrEmpty(MavenOptions::logFile);
     }
 
     @Override
     public Optional<String> threads() {
-        return returnFirstPresentOrEmpty(Options::threads);
+        return returnFirstPresentOrEmpty(MavenOptions::threads);
     }
 
     @Override
     public Optional<String> builder() {
-        return returnFirstPresentOrEmpty(Options::builder);
+        return returnFirstPresentOrEmpty(MavenOptions::builder);
     }
 
     @Override
     public Optional<Boolean> noTransferProgress() {
-        return returnFirstPresentOrEmpty(Options::noTransferProgress);
+        return returnFirstPresentOrEmpty(MavenOptions::noTransferProgress);
     }
 
     @Override
     public Optional<String> color() {
-        return returnFirstPresentOrEmpty(Options::color);
+        return returnFirstPresentOrEmpty(MavenOptions::color);
     }
 
     @Override
     public Optional<Boolean> cacheArtifactNotFound() {
-        return returnFirstPresentOrEmpty(Options::cacheArtifactNotFound);
+        return returnFirstPresentOrEmpty(MavenOptions::cacheArtifactNotFound);
     }
 
     @Override
     public Optional<Boolean> strictArtifactDescriptorPolicy() {
-        return returnFirstPresentOrEmpty(Options::strictArtifactDescriptorPolicy);
+        return returnFirstPresentOrEmpty(MavenOptions::strictArtifactDescriptorPolicy);
     }
 
     @Override
     public Optional<Boolean> ignoreTransitiveRepositories() {
-        return returnFirstPresentOrEmpty(Options::ignoreTransitiveRepositories);
+        return returnFirstPresentOrEmpty(MavenOptions::ignoreTransitiveRepositories);
     }
 
     @Override
     public Optional<Boolean> help() {
-        return returnFirstPresentOrEmpty(Options::help);
+        return returnFirstPresentOrEmpty(MavenOptions::help);
     }
 
     @Override
     public Optional<List<String>> goals() {
-        return collectListIfPresentOrEmpty(Options::goals);
+        return collectListIfPresentOrEmpty(MavenOptions::goals);
     }
 
     @Override
-    public Options interpolate(Collection<Map<String, String>> properties) {
-        ArrayList<Options> interpolatedOptions = new ArrayList<>(options.size());
-        for (Options o : options) {
+    public MavenOptions interpolate(Collection<Map<String, String>> properties) {
+        ArrayList<MavenOptions> interpolatedOptions = new ArrayList<>(options.size());
+        for (MavenOptions o : options) {
             interpolatedOptions.add(o.interpolate(properties));
         }
         return layer(interpolatedOptions);
@@ -270,8 +270,8 @@ public class LayeredOptions implements Options {
         options.get(0).displayHelp(printStream);
     }
 
-    private <T> Optional<T> returnFirstPresentOrEmpty(Function<Options, Optional<T>> getter) {
-        for (Options option : options) {
+    private <T> Optional<T> returnFirstPresentOrEmpty(Function<MavenOptions, Optional<T>> getter) {
+        for (MavenOptions option : options) {
             Optional<T> o = getter.apply(option);
             if (o.isPresent()) {
                 return o;
@@ -280,10 +280,10 @@ public class LayeredOptions implements Options {
         return Optional.empty();
     }
 
-    private Optional<List<String>> collectListIfPresentOrEmpty(Function<Options, Optional<List<String>>> getter) {
+    private Optional<List<String>> collectListIfPresentOrEmpty(Function<MavenOptions, Optional<List<String>>> getter) {
         int had = 0;
         ArrayList<String> items = new ArrayList<>();
-        for (Options option : options) {
+        for (MavenOptions option : options) {
             Optional<List<String>> o = getter.apply(option);
             if (o.isPresent()) {
                 had++;
@@ -294,10 +294,10 @@ public class LayeredOptions implements Options {
     }
 
     private Optional<Map<String, String>> collectMapIfPresentOrEmpty(
-            Function<Options, Optional<Map<String, String>>> getter) {
+            Function<MavenOptions, Optional<Map<String, String>>> getter) {
         int had = 0;
         HashMap<String, String> items = new HashMap<>();
-        for (Options option : options) {
+        for (MavenOptions option : options) {
             Optional<Map<String, String>> up = getter.apply(option);
             if (up.isPresent()) {
                 had++;

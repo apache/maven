@@ -120,6 +120,7 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
@@ -129,11 +130,6 @@ import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
-import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
-import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
 import static java.util.Comparator.comparing;
 import static org.apache.maven.api.Constants.MAVEN_HOME;
@@ -172,7 +168,7 @@ public class MavenCli {
 
     private ToolchainsBuilder toolchainsBuilder;
 
-    private DefaultSecDispatcher dispatcher;
+    private SecDispatcher dispatcher;
 
     private Map<String, ConfigurationProcessor> configurationProcessors;
 
@@ -776,7 +772,7 @@ public class MavenCli {
 
         toolchainsBuilder = container.lookup(ToolchainsBuilder.class);
 
-        dispatcher = (DefaultSecDispatcher) container.lookup(SecDispatcher.class, "maven");
+        dispatcher = container.lookup(SecDispatcher.class);
 
         return container;
     }
@@ -936,25 +932,8 @@ public class MavenCli {
     //
     private void encryption(CliRequest cliRequest) throws Exception {
         if (cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_MASTER_PASSWORD)) {
-            String passwd = cliRequest.commandLine.getOptionValue(CLIManager.ENCRYPT_MASTER_PASSWORD);
-
-            if (passwd == null) {
-                Console cons = System.console();
-                char[] password = (cons == null) ? null : cons.readPassword("Master password: ");
-                if (password != null) {
-                    // Cipher uses Strings
-                    passwd = String.copyValueOf(password);
-
-                    // Sun/Oracle advises to empty the char array
-                    java.util.Arrays.fill(password, ' ');
-                }
-            }
-
-            DefaultPlexusCipher cipher = new DefaultPlexusCipher();
-
-            System.out.println(cipher.encryptAndDecorate(passwd, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION));
-
-            throw new ExitException(0);
+            System.out.println("Master password encyption is not supported anymore");
+            throw new ExitException(1);
         } else if (cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_PASSWORD)) {
             String passwd = cliRequest.commandLine.getOptionValue(CLIManager.ENCRYPT_PASSWORD);
 
@@ -969,30 +948,7 @@ public class MavenCli {
                     java.util.Arrays.fill(password, ' ');
                 }
             }
-
-            String configurationFile = dispatcher.getConfigurationFile();
-
-            if (configurationFile.startsWith("~")) {
-                configurationFile = System.getProperty("user.home") + configurationFile.substring(1);
-            }
-
-            String file = System.getProperty(DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION, configurationFile);
-
-            String master = null;
-
-            SettingsSecurity sec = SecUtil.read(file, true);
-            if (sec != null) {
-                master = sec.getMaster();
-            }
-
-            if (master == null) {
-                throw new IllegalStateException("Master password is not set in the setting security file: " + file);
-            }
-
-            DefaultPlexusCipher cipher = new DefaultPlexusCipher();
-            String masterPasswd = cipher.decryptDecorated(master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION);
-            System.out.println(cipher.encryptAndDecorate(passwd, masterPasswd));
-
+            System.out.println(dispatcher.encrypt(passwd, null));
             throw new ExitException(0);
         }
     }

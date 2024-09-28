@@ -24,10 +24,10 @@ import org.apache.maven.api.annotations.Nonnull;
 
 public interface Parser {
     @Nonnull
-    default Request parse(String[] args) throws ParserException, IOException {
+    default InvokerRequest parse(String[] args) throws ParserException, IOException {
         return parse(ParserRequest.builder(args).build());
     }
 
     @Nonnull
-    Request parse(ParserRequest parserRequest) throws ParserException, IOException;
+    InvokerRequest parse(ParserRequest parserRequest) throws ParserException, IOException;
 }
