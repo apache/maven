@@ -23,10 +23,9 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Component responsible to invoke an application using information provided in invoker request.
  *
- * @param <O> The options type.
  * @param <R> The request type.
  */
-public interface Invoker<O extends Options, R extends InvokerRequest<O>> {
+public interface Invoker<R extends InvokerRequest<? extends Options>> {
     /**
      * Invokes application and returns exit code.
      */
