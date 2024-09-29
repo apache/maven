@@ -24,7 +24,10 @@ import org.eclipse.aether.repository.WorkspaceReader;
 
 /**
  * MavenWorkspaceReader
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public interface MavenWorkspaceReader extends WorkspaceReader {
 
     Model findModel(Artifact artifact);

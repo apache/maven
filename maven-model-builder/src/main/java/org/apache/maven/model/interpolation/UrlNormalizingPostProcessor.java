@@ -27,7 +27,9 @@ import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 /**
  * Ensures that expressions referring to URLs evaluate to normalized URLs.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 class UrlNormalizingPostProcessor implements InterpolationPostProcessor {
 
     private static final Set<String> URL_EXPRESSIONS;

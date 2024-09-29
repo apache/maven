@@ -25,7 +25,9 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 /**
  * Determines whether a profile should be activated.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ProfileActivator {
 
     /**

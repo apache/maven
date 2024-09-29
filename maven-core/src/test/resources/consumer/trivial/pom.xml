@@ -5,7 +5,7 @@
   <packaging>pom</packaging>
 
   <subprojects>
-    <subproject>child.xml</subproject>
+    <subproject>child</subproject>
   </subprojects>
 
   <dependencyManagement>

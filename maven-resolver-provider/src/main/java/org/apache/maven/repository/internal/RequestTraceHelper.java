@@ -32,7 +32,9 @@ import org.eclipse.aether.resolution.DependencyRequest;
  * Helper class to manage {@link RequestTrace} for better error logging.
  *
  * @since 3.9.9
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public final class RequestTraceHelper {
 
     /**

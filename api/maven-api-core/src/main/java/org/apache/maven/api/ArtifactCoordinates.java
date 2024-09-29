@@ -33,13 +33,13 @@ import org.apache.maven.api.annotations.Nonnull;
 @Immutable
 public interface ArtifactCoordinates {
     /**
-     * {@return the group identifier of the artifact}.
+     * {@return the group identifier of the artifact}
      */
     @Nonnull
     String getGroupId();
 
     /**
-     * {@return the identifier of the artifact}.
+     * {@return the identifier of the artifact}
      */
     @Nonnull
     String getArtifactId();
@@ -53,7 +53,7 @@ public interface ArtifactCoordinates {
     String getClassifier();
 
     /**
-     * {@return the specific version, range of versions or meta-version of the artifact}.
+     * {@return the specific version, range of versions or meta-version of the artifact}
      * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
      */
     @Nonnull

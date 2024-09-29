@@ -20,6 +20,8 @@ package org.apache.maven.model;
 
 import java.io.Serializable;
 
+import static java.util.Objects.requireNonNull;
+
 public abstract class BaseObject implements Serializable, Cloneable, InputLocationTracker {
     protected transient ChildrenTracking childrenTracking;
 
@@ -28,12 +30,12 @@ public abstract class BaseObject implements Serializable, Cloneable, InputLocati
     public BaseObject() {}
 
     public BaseObject(Object delegate, BaseObject parent) {
-        this.delegate = delegate;
+        this.delegate = requireNonNull(delegate, "delegate cannot be null");
         this.childrenTracking = parent != null ? parent::replace : null;
     }
 
     public BaseObject(Object delegate, ChildrenTracking parent) {
-        this.delegate = delegate;
+        this.delegate = requireNonNull(delegate, "delegate cannot be null");
         this.childrenTracking = parent;
     }
 

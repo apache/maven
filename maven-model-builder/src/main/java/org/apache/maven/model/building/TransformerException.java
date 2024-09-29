@@ -21,7 +21,9 @@ package org.apache.maven.model.building;
 /**
  *
  * @since 4.0.0
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class TransformerException extends Exception {
 
     public TransformerException(Exception e) {

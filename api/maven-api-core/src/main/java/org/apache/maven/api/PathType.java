@@ -123,7 +123,7 @@ public interface PathType {
     String name();
 
     /**
-     * {@return a string representation for this extensible enum describing a path type}.
+     * {@return a string representation for this extensible enum describing a path type}
      * For example {@code "PathType[PATCH_MODULE:foo.bar]"}.
      */
     @Nonnull

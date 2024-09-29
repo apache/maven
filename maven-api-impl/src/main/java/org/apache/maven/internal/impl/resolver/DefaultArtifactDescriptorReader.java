@@ -34,10 +34,8 @@ import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
-import org.apache.maven.api.services.ModelRepositoryHolder;
-import org.apache.maven.api.services.ModelResolver;
-import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.model.ModelProblemUtils;
 import org.eclipse.aether.RepositoryEvent;
@@ -48,9 +46,7 @@ import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
-import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.impl.VersionResolver;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
@@ -74,9 +70,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader {
-    private final RemoteRepositoryManager remoteRepositoryManager;
     private final VersionResolver versionResolver;
-    private final VersionRangeResolver versionRangeResolver;
     private final ArtifactResolver artifactResolver;
     private final RepositoryEventDispatcher repositoryEventDispatcher;
     private final ModelBuilder modelBuilder;
@@ -86,17 +80,12 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
     @Inject
     public DefaultArtifactDescriptorReader(
-            RemoteRepositoryManager remoteRepositoryManager,
             VersionResolver versionResolver,
-            VersionRangeResolver versionRangeResolver,
             ArtifactResolver artifactResolver,
             ModelBuilder modelBuilder,
             RepositoryEventDispatcher repositoryEventDispatcher,
             Map<String, MavenArtifactRelocationSource> artifactRelocationSources) {
-        this.remoteRepositoryManager =
-                Objects.requireNonNull(remoteRepositoryManager, "remoteRepositoryManager cannot be null");
         this.versionResolver = Objects.requireNonNull(versionResolver, "versionResolver cannot be null");
-        this.versionRangeResolver = Objects.requireNonNull(versionRangeResolver, "versionRangeResolver cannot be null");
         this.artifactResolver = Objects.requireNonNull(artifactResolver, "artifactResolver cannot be null");
         this.modelBuilder = Objects.requireNonNull(modelBuilder, "modelBuilder cannot be null");
         this.repositoryEventDispatcher =
@@ -203,25 +192,19 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         .toList();
                 String gav =
                         pomArtifact.getGroupId() + ":" + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion();
-                ModelResolver modelResolver = new DefaultModelResolver();
-                ModelRepositoryHolder modelRepositoryHolder = new DefaultModelRepositoryHolder(
-                        iSession, DefaultModelRepositoryHolder.RepositoryMerging.REQUEST_DOMINANT, repositories);
                 ModelBuilderRequest modelRequest = ModelBuilderRequest.builder()
                         .session(iSession)
-                        .projectBuild(false)
-                        .processPlugins(false)
-                        .twoPhaseBuilding(false)
+                        .requestType(ModelBuilderRequest.RequestType.DEPENDENCY)
                         .source(ModelSource.fromPath(pomArtifact.getPath(), gav))
                         // This merge is on purpose because otherwise user properties would override model
                         // properties in dependencies the user does not know. See MNG-7563 for details.
                         .systemProperties(toProperties(session.getUserProperties(), session.getSystemProperties()))
                         .userProperties(Map.of())
-                        .modelResolver(modelResolver)
-                        .modelRepositoryHolder(modelRepositoryHolder)
+                        .repositoryMerging(ModelBuilderRequest.RepositoryMerging.REQUEST_DOMINANT)
                         .repositories(repositories)
                         .build();
 
-                ModelBuilderResult modelResult = modelBuilder.build(modelRequest);
+                ModelBuilderResult modelResult = modelBuilder.newSession().build(modelRequest);
                 // ModelBuildingEx is thrown only on FATAL and ERROR severities, but we still can have WARNs
                 // that may lead to unexpected build failure, log them
                 if (!modelResult.getProblems().isEmpty()) {

@@ -27,7 +27,9 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 abstract class MavenSnapshotMetadata extends MavenMetadata {
     static final String SNAPSHOT = "SNAPSHOT";
 

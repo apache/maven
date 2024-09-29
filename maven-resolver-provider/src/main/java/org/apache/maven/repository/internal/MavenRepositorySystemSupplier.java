@@ -32,7 +32,6 @@ import org.apache.maven.internal.impl.DefaultModelXmlFactory;
 import org.apache.maven.internal.impl.DefaultPluginConfigurationExpander;
 import org.apache.maven.internal.impl.DefaultSuperPomProvider;
 import org.apache.maven.internal.impl.DefaultUrlNormalizer;
-import org.apache.maven.internal.impl.model.BuildModelTransformer;
 import org.apache.maven.internal.impl.model.DefaultDependencyManagementImporter;
 import org.apache.maven.internal.impl.model.DefaultDependencyManagementInjector;
 import org.apache.maven.internal.impl.model.DefaultInheritanceAssembler;
@@ -185,7 +184,9 @@ import org.eclipse.aether.version.VersionScheme;
  * well. Any subsequent {@code getXXX} method invocation attempt will fail with {@link IllegalStateException}.
  *
  * @since 4.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public class MavenRepositorySystemSupplier implements Supplier<RepositorySystem> {
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
@@ -989,9 +990,7 @@ public class MavenRepositorySystemSupplier implements Supplier<RepositorySystem>
     protected ArtifactDescriptorReader createArtifactDescriptorReader() {
         // from maven-resolver-provider
         return new DefaultArtifactDescriptorReader(
-                getRemoteRepositoryManager(),
                 getVersionResolver(),
-                getVersionRangeResolver(),
                 getArtifactResolver(),
                 getModelBuilder(),
                 getRepositoryEventDispatcher(),
@@ -1058,13 +1057,12 @@ public class MavenRepositorySystemSupplier implements Supplier<RepositorySystem>
                 new DefaultPluginManagementInjector(),
                 new DefaultDependencyManagementInjector(),
                 new DefaultDependencyManagementImporter(),
-                (m, r, b) -> m,
                 new DefaultPluginConfigurationExpander(),
                 new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), new DefaultRootLocator()),
-                new BuildModelTransformer(),
                 new DefaultModelVersionParser(getVersionScheme()),
                 List.of(),
-                new DefaultModelCacheFactory());
+                new DefaultModelCacheFactory(),
+                new org.apache.maven.internal.impl.resolver.DefaultModelResolver());
     }
 
     private RepositorySystem repositorySystem;

@@ -41,10 +41,12 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles inheritance of model values.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @SuppressWarnings({"checkstyle:methodname"})
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultInheritanceAssembler implements InheritanceAssembler {
 
     private static final String CHILD_DIRECTORY = "child-directory";

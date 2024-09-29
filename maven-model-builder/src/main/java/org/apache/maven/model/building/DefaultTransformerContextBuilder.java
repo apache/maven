@@ -37,7 +37,9 @@ import org.apache.maven.model.building.DefaultTransformerContext.Holder;
  * This is an inner class, as it must be able to call readRawModel()
  *
  * @since 4.0.0
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 class DefaultTransformerContextBuilder implements TransformerContextBuilder {
     private final Graph dag = new Graph();
     private final DefaultModelBuilder defaultModelBuilder;
@@ -201,7 +203,7 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
     }
 
     public FileModelSource getSource(String groupId, String artifactId) {
-        Set<FileModelSource> sources = mappedSources.get(groupId + ":" + artifactId);
+        Set<FileModelSource> sources = mappedSources.get(groupId != null ? groupId + ":" + artifactId : artifactId);
         if (sources == null) {
             return null;
         }
@@ -218,5 +220,8 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder {
         mappedSources
                 .computeIfAbsent(groupId + ":" + artifactId, k -> new HashSet<>())
                 .add(source);
+        if (groupId != null) {
+            mappedSources.computeIfAbsent(artifactId, k -> new HashSet<>()).add(source);
+        }
     }
 }

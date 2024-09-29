@@ -58,7 +58,7 @@ abstract class AetherDependencyWrapper {
     }
 
     /**
-     * {@return the group identifier of the wrapped dependency}.
+     * {@return the group identifier of the wrapped dependency}
      * The default implementation delegates to the Eclipse Aether artifact.
      */
     public String getGroupId() {
@@ -66,7 +66,7 @@ abstract class AetherDependencyWrapper {
     }
 
     /**
-     * {@return the artifact identifier of the wrapped dependency}.
+     * {@return the artifact identifier of the wrapped dependency}
      * The default implementation delegates to the Eclipse Aether artifact.
      */
     public String getArtifactId() {
@@ -74,7 +74,7 @@ abstract class AetherDependencyWrapper {
     }
 
     /**
-     * {@return the file extension of the wrapped dependency}.
+     * {@return the file extension of the wrapped dependency}
      * The default implementation delegates to the Eclipse Aether artifact.
      */
     public String getExtension() {
@@ -82,7 +82,7 @@ abstract class AetherDependencyWrapper {
     }
 
     /**
-     * {@return the type of the wrapped dependency}.
+     * {@return the type of the wrapped dependency}
      * The default implementation infers the type from the properties associated to the Eclipse Aether artifact.
      */
     public Type getType() {
@@ -91,7 +91,7 @@ abstract class AetherDependencyWrapper {
     }
 
     /**
-     * {@return the classifier ("jar", "test-jar", …) of the wrapped dependency}.
+     * {@return the classifier ("jar", "test-jar", …) of the wrapped dependency}
      * The default implementation first delegates to the Eclipse Aether artifact.
      * If the latter does not provide a non-empty classifier,
      * then the default value is determined by {@linkplain #getType() type}.
@@ -109,7 +109,7 @@ abstract class AetherDependencyWrapper {
     }
 
     /**
-     * {@return the scope (compile, test, …) of this dependency}.
+     * {@return the scope (compile, test, …) of this dependency}
      */
     @Nonnull
     public DependencyScope getScope() {
@@ -117,7 +117,7 @@ abstract class AetherDependencyWrapper {
     }
 
     /**
-     * {@return a string representation of this dependency}.
+     * {@return a string representation of this dependency}
      * This is for debugging purposes only and may change in any future version.
      */
     @Override

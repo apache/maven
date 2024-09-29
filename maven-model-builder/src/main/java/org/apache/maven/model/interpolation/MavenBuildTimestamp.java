@@ -27,7 +27,10 @@ import java.util.TimeZone;
 
 /**
  * MavenBuildTimestamp
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class MavenBuildTimestamp {
     // ISO 8601-compliant timestamp for machine readability
     public static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";

@@ -27,7 +27,9 @@ import org.apache.maven.model.Model;
  * Holds a model along with some auxiliary information. This internal utility class assists the model builder during POM
  * processing by providing a means to transport information that cannot be (easily) extracted from the model itself.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 class ModelData {
     private final Source source;
 

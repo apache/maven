@@ -38,9 +38,6 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
  * Request used to build a {@link org.apache.maven.api.Project} using
  * the {@link ProjectBuilder} service.
  *
- * TODO: replace ModelRepositoryHolder with just the enum for the strategy
- * TODO: replace validation level with an enum (though, we usually need just a boolean)
- *
  * @since 4.0.0
  */
 @Experimental
@@ -48,36 +45,38 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 public interface ModelBuilderRequest {
 
     /**
-     * Denotes minimal validation of POMs. This validation level is meant for processing of POMs from repositories
-     * during metadata retrieval.
+     * The possible request types for building a model.
      */
-    int VALIDATION_LEVEL_MINIMAL = 0;
+    enum RequestType {
+        /**
+         * The request is for building a model from a POM file in a project on the filesystem.
+         */
+        BUILD_POM,
+        /**
+         * The request is for building a model from a parent POM file from a downloaded artifact.
+         */
+        PARENT_POM,
+        /**
+         * The request is for building a model from a dependency POM file from a downloaded artifact.
+         */
+        DEPENDENCY
+    }
 
     /**
-     * Denotes validation as performed by Maven 2.0. This validation level is meant as a compatibility mode to allow
-     * users to migrate their projects.
+     * The possible merge modes for combining remote repositories.
      */
-    int VALIDATION_LEVEL_MAVEN_2_0 = 20;
+    enum RepositoryMerging {
 
-    /**
-     * Denotes validation as performed by Maven 3.0. This validation level is meant for existing projects.
-     */
-    int VALIDATION_LEVEL_MAVEN_3_0 = 30;
+        /**
+         * The repositories declared in the POM have precedence over the repositories specified in the request.
+         */
+        POM_DOMINANT,
 
-    /**
-     * Denotes validation as performed by Maven 3.1. This validation level is meant for existing projects.
-     */
-    int VALIDATION_LEVEL_MAVEN_3_1 = 31;
-
-    /**
-     * Denotes validation as performed by Maven 4.0. This validation level is meant for new projects.
-     */
-    int VALIDATION_LEVEL_MAVEN_4_0 = 40;
-
-    /**
-     * Denotes strict validation as recommended by the current Maven version.
-     */
-    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_4_0;
+        /**
+         * The repositories specified in the request have precedence over the repositories declared in the POM.
+         */
+        REQUEST_DOMINANT,
+    }
 
     @Nonnull
     Session getSession();
@@ -85,28 +84,12 @@ public interface ModelBuilderRequest {
     @Nonnull
     ModelSource getSource();
 
-    int getValidationLevel();
-
-    boolean isTwoPhaseBuilding();
+    @Nonnull
+    RequestType getRequestType();
 
     boolean isLocationTracking();
 
-    /**
-     * Indicates if the model to be built is a local project or a dependency.
-     * In case the project is loaded externally from a remote repository (as a dependency or
-     * even as an external parent), the POM will be parsed in a lenient way.  Local POMs
-     * are parsed more strictly.
-     */
-    boolean isProjectBuild();
-
-    /**
-     * Specifies whether plugin processing should take place for the built model.
-     * This involves merging plugins specified by the {@link org.apache.maven.api.Packaging},
-     * configuration expansion (merging configuration defined globally for a given plugin
-     * using {@link org.apache.maven.api.model.Plugin#getConfiguration()}
-     * into the configuration for each {@link org.apache.maven.api.model.PluginExecution}.
-     */
-    boolean isProcessPlugins();
+    boolean isRecursive();
 
     /**
      * Defines external profiles that may be activated for the given model.
@@ -141,22 +124,13 @@ public interface ModelBuilderRequest {
     Map<String, String> getUserProperties();
 
     @Nonnull
-    ModelResolver getModelResolver();
-
-    @Nonnull
-    ModelRepositoryHolder getModelRepositoryHolder();
-
-    @Nullable
-    Object getListener();
-
-    @Nullable
-    ModelBuilderResult getInterimResult();
-
-    @Nullable
-    ModelTransformerContextBuilder getTransformerContextBuilder();
+    RepositoryMerging getRepositoryMerging();
 
     @Nullable
     List<RemoteRepository> getRepositories();
+
+    @Nullable
+    ModelTransformer getLifecycleBindingsInjector();
 
     @Nonnull
     static ModelBuilderRequest build(@Nonnull ModelBuilderRequest request, @Nonnull ModelSource source) {
@@ -194,45 +168,35 @@ public interface ModelBuilderRequest {
     @NotThreadSafe
     class ModelBuilderRequestBuilder {
         Session session;
-        int validationLevel;
+        RequestType requestType;
         boolean locationTracking;
-        boolean twoPhaseBuilding;
+        boolean recursive;
         ModelSource source;
-        boolean projectBuild;
-        boolean processPlugins = true;
         Collection<Profile> profiles;
         List<String> activeProfileIds;
         List<String> inactiveProfileIds;
         Map<String, String> systemProperties;
         Map<String, String> userProperties;
-        ModelResolver modelResolver;
-        ModelRepositoryHolder modelRepositoryHolder;
-        Object listener;
-        ModelBuilderResult interimResult;
-        ModelTransformerContextBuilder transformerContextBuilder;
+        RepositoryMerging repositoryMerging;
         List<RemoteRepository> repositories;
+        ModelTransformer lifecycleBindingsInjector;
 
         ModelBuilderRequestBuilder() {}
 
         ModelBuilderRequestBuilder(ModelBuilderRequest request) {
             this.session = request.getSession();
-            this.validationLevel = request.getValidationLevel();
+            this.requestType = request.getRequestType();
             this.locationTracking = request.isLocationTracking();
-            this.twoPhaseBuilding = request.isTwoPhaseBuilding();
+            this.recursive = request.isRecursive();
             this.source = request.getSource();
-            this.projectBuild = request.isProjectBuild();
-            this.processPlugins = request.isProcessPlugins();
             this.profiles = request.getProfiles();
             this.activeProfileIds = request.getActiveProfileIds();
             this.inactiveProfileIds = request.getInactiveProfileIds();
             this.systemProperties = request.getSystemProperties();
             this.userProperties = request.getUserProperties();
-            this.modelResolver = request.getModelResolver();
-            this.modelRepositoryHolder = request.getModelRepositoryHolder();
-            this.listener = request.getListener();
-            this.interimResult = request.getInterimResult();
-            this.transformerContextBuilder = request.getTransformerContextBuilder();
+            this.repositoryMerging = request.getRepositoryMerging();
             this.repositories = request.getRepositories();
+            this.lifecycleBindingsInjector = request.getLifecycleBindingsInjector();
         }
 
         public ModelBuilderRequestBuilder session(Session session) {
@@ -240,13 +204,8 @@ public interface ModelBuilderRequest {
             return this;
         }
 
-        public ModelBuilderRequestBuilder validationLevel(int validationLevel) {
-            this.validationLevel = validationLevel;
-            return this;
-        }
-
-        public ModelBuilderRequestBuilder twoPhaseBuilding(boolean twoPhaseBuilding) {
-            this.twoPhaseBuilding = twoPhaseBuilding;
+        public ModelBuilderRequestBuilder requestType(RequestType requestType) {
+            this.requestType = requestType;
             return this;
         }
 
@@ -255,18 +214,13 @@ public interface ModelBuilderRequest {
             return this;
         }
 
+        public ModelBuilderRequestBuilder recursive(boolean recursive) {
+            this.recursive = recursive;
+            return this;
+        }
+
         public ModelBuilderRequestBuilder source(ModelSource source) {
             this.source = source;
-            return this;
-        }
-
-        public ModelBuilderRequestBuilder projectBuild(boolean projectBuild) {
-            this.projectBuild = projectBuild;
-            return this;
-        }
-
-        public ModelBuilderRequestBuilder processPlugins(boolean processPlugins) {
-            this.processPlugins = processPlugins;
             return this;
         }
 
@@ -295,29 +249,8 @@ public interface ModelBuilderRequest {
             return this;
         }
 
-        public ModelBuilderRequestBuilder modelResolver(ModelResolver modelResolver) {
-            this.modelResolver = modelResolver;
-            return this;
-        }
-
-        public ModelBuilderRequestBuilder modelRepositoryHolder(ModelRepositoryHolder modelRepositoryHolder) {
-            this.modelRepositoryHolder = modelRepositoryHolder;
-            return this;
-        }
-
-        public ModelBuilderRequestBuilder listener(Object listener) {
-            this.listener = listener;
-            return this;
-        }
-
-        public ModelBuilderRequestBuilder interimResult(ModelBuilderResult interimResult) {
-            this.interimResult = interimResult;
-            return this;
-        }
-
-        public ModelBuilderRequestBuilder transformerContextBuilder(
-                ModelTransformerContextBuilder transformerContextBuilder) {
-            this.transformerContextBuilder = transformerContextBuilder;
+        public ModelBuilderRequestBuilder repositoryMerging(RepositoryMerging repositoryMerging) {
+            this.repositoryMerging = repositoryMerging;
             return this;
         }
 
@@ -326,96 +259,76 @@ public interface ModelBuilderRequest {
             return this;
         }
 
+        public ModelBuilderRequestBuilder lifecycleBindingsInjector(ModelTransformer lifecycleBindingsInjector) {
+            this.lifecycleBindingsInjector = lifecycleBindingsInjector;
+            return this;
+        }
+
         public ModelBuilderRequest build() {
             return new DefaultModelBuilderRequest(
                     session,
-                    validationLevel,
+                    requestType,
                     locationTracking,
-                    twoPhaseBuilding,
+                    recursive,
                     source,
-                    projectBuild,
-                    processPlugins,
                     profiles,
                     activeProfileIds,
                     inactiveProfileIds,
                     systemProperties,
                     userProperties,
-                    modelResolver,
-                    modelRepositoryHolder,
-                    listener,
-                    interimResult,
-                    transformerContextBuilder,
-                    repositories);
+                    repositoryMerging,
+                    repositories,
+                    lifecycleBindingsInjector);
         }
 
         private static class DefaultModelBuilderRequest extends BaseRequest implements ModelBuilderRequest {
-            private final int validationLevel;
+            private final RequestType requestType;
             private final boolean locationTracking;
-            private final boolean twoPhaseBuilding;
+            private final boolean recursive;
             private final ModelSource source;
-            private final boolean projectBuild;
-            private final boolean processPlugins;
             private final Collection<Profile> profiles;
             private final List<String> activeProfileIds;
             private final List<String> inactiveProfileIds;
             private final Map<String, String> systemProperties;
             private final Map<String, String> userProperties;
-            private final ModelResolver modelResolver;
-            private final ModelRepositoryHolder modelRepositoryHolder;
-            private final Object listener;
-            private final ModelBuilderResult interimResult;
-            private final ModelTransformerContextBuilder transformerContextBuilder;
+            private final RepositoryMerging repositoryMerging;
             private final List<RemoteRepository> repositories;
+            private final ModelTransformer lifecycleBindingsInjector;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultModelBuilderRequest(
                     @Nonnull Session session,
-                    int validationLevel,
+                    @Nonnull RequestType requestType,
                     boolean locationTracking,
-                    boolean twoPhaseBuilding,
+                    boolean recursive,
                     @Nonnull ModelSource source,
-                    boolean projectBuild,
-                    boolean processPlugins,
                     Collection<Profile> profiles,
                     List<String> activeProfileIds,
                     List<String> inactiveProfileIds,
                     Map<String, String> systemProperties,
                     Map<String, String> userProperties,
-                    ModelResolver modelResolver,
-                    ModelRepositoryHolder modelRepositoryHolder,
-                    Object listener,
-                    ModelBuilderResult interimResult,
-                    ModelTransformerContextBuilder transformerContextBuilder,
-                    List<RemoteRepository> repositories) {
+                    RepositoryMerging repositoryMerging,
+                    List<RemoteRepository> repositories,
+                    ModelTransformer lifecycleBindingsInjector) {
                 super(session);
-                this.validationLevel = validationLevel;
+                this.requestType = nonNull(requestType, "requestType cannot be null");
                 this.locationTracking = locationTracking;
-                this.twoPhaseBuilding = twoPhaseBuilding;
+                this.recursive = recursive;
                 this.source = source;
-                this.projectBuild = projectBuild;
-                this.processPlugins = processPlugins;
                 this.profiles = profiles != null ? List.copyOf(profiles) : List.of();
                 this.activeProfileIds = activeProfileIds != null ? List.copyOf(activeProfileIds) : List.of();
                 this.inactiveProfileIds = inactiveProfileIds != null ? List.copyOf(inactiveProfileIds) : List.of();
                 this.systemProperties =
                         systemProperties != null ? Map.copyOf(systemProperties) : session.getSystemProperties();
                 this.userProperties = userProperties != null ? Map.copyOf(userProperties) : session.getUserProperties();
-                this.modelResolver = modelResolver;
-                this.modelRepositoryHolder = modelRepositoryHolder;
-                this.listener = listener;
-                this.interimResult = interimResult;
-                this.transformerContextBuilder = transformerContextBuilder;
+                this.repositoryMerging = repositoryMerging;
                 this.repositories = repositories != null ? List.copyOf(repositories) : null;
+                this.lifecycleBindingsInjector = lifecycleBindingsInjector;
             }
 
             @Override
-            public int getValidationLevel() {
-                return validationLevel;
-            }
-
-            @Override
-            public boolean isTwoPhaseBuilding() {
-                return twoPhaseBuilding;
+            public RequestType getRequestType() {
+                return requestType;
             }
 
             @Override
@@ -423,19 +336,15 @@ public interface ModelBuilderRequest {
                 return locationTracking;
             }
 
+            @Override
+            public boolean isRecursive() {
+                return recursive;
+            }
+
             @Nonnull
             @Override
             public ModelSource getSource() {
                 return source;
-            }
-
-            public boolean isProjectBuild() {
-                return projectBuild;
-            }
-
-            @Override
-            public boolean isProcessPlugins() {
-                return processPlugins;
             }
 
             @Override
@@ -464,31 +373,18 @@ public interface ModelBuilderRequest {
             }
 
             @Override
-            public ModelResolver getModelResolver() {
-                return modelResolver;
-            }
-
-            @Override
-            public ModelRepositoryHolder getModelRepositoryHolder() {
-                return modelRepositoryHolder;
-            }
-
-            public Object getListener() {
-                return listener;
-            }
-
-            @Override
-            public ModelBuilderResult getInterimResult() {
-                return interimResult;
-            }
-
-            public ModelTransformerContextBuilder getTransformerContextBuilder() {
-                return transformerContextBuilder;
+            public RepositoryMerging getRepositoryMerging() {
+                return repositoryMerging;
             }
 
             @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;
+            }
+
+            @Override
+            public ModelTransformer getLifecycleBindingsInjector() {
+                return lifecycleBindingsInjector;
             }
         }
     }

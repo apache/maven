@@ -27,7 +27,9 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 /**
  * Resolves relative paths of a model against a specific base directory.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelPathTranslator {
 
     /**

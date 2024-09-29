@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -32,14 +33,19 @@ import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Version;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.services.ArtifactResolverException;
-import org.apache.maven.api.services.ModelResolver;
-import org.apache.maven.api.services.ModelResolverException;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.VersionRangeResolverException;
+import org.apache.maven.api.services.model.ModelResolver;
+import org.apache.maven.api.services.model.ModelResolverException;
 
 /**
  * A model resolver to assist building of dependency POMs.
@@ -50,13 +56,64 @@ import org.apache.maven.api.services.VersionRangeResolverException;
 @Singleton
 public class DefaultModelResolver implements ModelResolver {
 
+    @Nonnull
     @Override
+    public ModelSource resolveModel(
+            @Nonnull Session session,
+            @Nullable List<RemoteRepository> repositories,
+            @Nonnull Parent parent,
+            @Nonnull AtomicReference<Parent> modified)
+            throws ModelResolverException {
+        return resolveModel(
+                session,
+                repositories,
+                parent.getGroupId(),
+                parent.getArtifactId(),
+                parent.getVersion(),
+                "parent",
+                parent.getLocation("version"),
+                version -> modified.set(parent.withVersion(version)));
+    }
+
+    @Nonnull
+    public ModelSource resolveModel(
+            @Nonnull Session session,
+            @Nullable List<RemoteRepository> repositories,
+            @Nonnull Dependency dependency,
+            @Nonnull AtomicReference<Dependency> modified)
+            throws ModelResolverException {
+        return resolveModel(
+                session,
+                repositories,
+                dependency.getGroupId(),
+                dependency.getArtifactId(),
+                dependency.getVersion(),
+                "dependency",
+                dependency.getLocation("version"),
+                version -> modified.set(dependency.withVersion(version)));
+    }
+
+    @Override
+    public ModelSource resolveModel(
+            @Nonnull Session session,
+            @Nullable List<RemoteRepository> repositories,
+            @Nonnull String groupId,
+            @Nonnull String artifactId,
+            @Nonnull String version,
+            @Nonnull Consumer<String> resolvedVersion)
+            throws ModelResolverException {
+        return resolveModel(session, repositories, groupId, artifactId, version, null, null, resolvedVersion);
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public ModelSource resolveModel(
             Session session,
             List<RemoteRepository> repositories,
             String groupId,
             String artifactId,
             String version,
+            String type,
+            InputLocation location,
             Consumer<String> resolvedVersion)
             throws ModelResolverException {
         try {
@@ -65,7 +122,9 @@ public class DefaultModelResolver implements ModelResolver {
                     && coords.getVersionConstraint().getVersionRange().getUpperBoundary() == null) {
                 // Message below is checked for in the MNG-2199 core IT.
                 throw new ModelResolverException(
-                        String.format("The requested version range '%s' does not specify an upper bound", version),
+                        "The requested " + (type != null ? type + " " : "") + "version range '" + version + "'"
+                                + (location != null ? " (at " + location + ")" : "")
+                                + " does not specify an upper bound",
                         groupId,
                         artifactId,
                         version);
@@ -73,7 +132,8 @@ public class DefaultModelResolver implements ModelResolver {
             List<Version> versions = session.resolveVersionRange(coords, repositories);
             if (versions.isEmpty()) {
                 throw new ModelResolverException(
-                        String.format("No versions matched the requested version range '%s'", version),
+                        "No versions matched the requested " + (type != null ? type + " " : "") + "version range '"
+                                + version + "'",
                         groupId,
                         artifactId,
                         version);
@@ -83,11 +143,8 @@ public class DefaultModelResolver implements ModelResolver {
                 resolvedVersion.accept(newVersion);
             }
 
-            DownloadedArtifact resolved = session.resolveArtifact(
-                    session.createArtifactCoordinates(groupId, artifactId, newVersion, "pom"), repositories);
-            Path path = resolved.getPath();
-            String location = groupId + ":" + artifactId + ":" + newVersion;
-            return new ResolverModelSource(path, location);
+            Path path = getPath(session, repositories, groupId, artifactId, newVersion);
+            return new ResolverModelSource(path, groupId + ":" + artifactId + ":" + newVersion);
         } catch (VersionRangeResolverException | ArtifactResolverException e) {
             throw new ModelResolverException(
                     e.getMessage() + " (remote repositories: "
@@ -101,7 +158,18 @@ public class DefaultModelResolver implements ModelResolver {
         }
     }
 
-    private static class ResolverModelSource implements ModelSource {
+    protected Path getPath(
+            Session session,
+            List<RemoteRepository> repositories,
+            String groupId,
+            String artifactId,
+            String newVersion) {
+        DownloadedArtifact resolved = session.resolveArtifact(
+                session.createArtifactCoordinates(groupId, artifactId, newVersion, "pom"), repositories);
+        return resolved.getPath();
+    }
+
+    protected static class ResolverModelSource implements ModelSource {
         private final Path path;
         private final String location;
 

@@ -32,7 +32,10 @@ import org.eclipse.aether.artifact.ArtifactProperties;
 
 /**
  * Maven GA level metadata.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 final class VersionsMetadata extends MavenMetadata {
 
     private final Artifact artifact;

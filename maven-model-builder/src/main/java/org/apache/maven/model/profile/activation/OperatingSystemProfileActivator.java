@@ -34,9 +34,11 @@ import org.apache.maven.utils.Os;
  * Determines profile activation based on the operating system of the current runtime platform.
  *
  * @see ActivationOS
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("os")
 @Singleton
+@Deprecated(since = "4.0.0")
 public class OperatingSystemProfileActivator implements ProfileActivator {
 
     private static final String REGEX_PREFIX = "regex:";

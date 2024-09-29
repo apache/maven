@@ -22,7 +22,10 @@ import java.util.List;
 
 /**
  * Extends the ModelProblemCollector by the capacity of returning the collected problems.
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelProblemCollectorExt extends ModelProblemCollector {
 
     /**

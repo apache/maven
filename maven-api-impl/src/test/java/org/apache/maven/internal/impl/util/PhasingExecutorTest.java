@@ -16,18 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.internal.impl.util;
 
-import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.model.Repository;
+import org.junit.jupiter.api.Test;
 
-public interface ModelRepositoryHolder {
+class PhasingExecutorTest {
 
-    void merge(List<Repository> repos, boolean replace);
+    @Test
+    void testPhaser() {
+        try (PhasingExecutor p = new PhasingExecutor(Executors.newFixedThreadPool(4))) {
+            p.execute(() -> waitSomeTime(p, 2));
+        }
+    }
 
-    List<RemoteRepository> getRepositories();
-
-    ModelRepositoryHolder copy();
+    private void waitSomeTime(Executor executor, int nb) {
+        try {
+            Thread.sleep(10);
+            if (nb > 0) {
+                executor.execute(() -> waitSomeTime(executor, nb - 1));
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -27,7 +27,9 @@ import org.apache.maven.building.Problem;
 
 /**
  * @since 3.3.0
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.ToolchainsBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class ToolchainsBuildingException extends Exception {
 
     private final List<Problem> problems;

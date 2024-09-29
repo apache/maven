@@ -48,9 +48,11 @@ import org.codehaus.plexus.interpolation.os.OperatingSystemUtils;
 /**
  *
  * @since 3.3.0
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.ToolchainsBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     private final org.apache.maven.api.services.ToolchainsBuilder builder;
     private final ToolchainsXmlFactory toolchainsXmlFactory;

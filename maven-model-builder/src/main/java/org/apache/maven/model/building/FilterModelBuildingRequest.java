@@ -33,7 +33,9 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
  * A model building request that delegates all methods invocations to another request, meant for easy transformations by
  * subclassing.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 class FilterModelBuildingRequest implements ModelBuildingRequest {
 
     protected ModelBuildingRequest request;

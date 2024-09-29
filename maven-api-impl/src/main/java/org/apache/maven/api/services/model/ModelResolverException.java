@@ -16,7 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.api.services.model;
+
+import org.apache.maven.api.services.MavenException;
 
 /**
  * Signals an error when resolving the path to an external model.

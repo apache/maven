@@ -159,7 +159,7 @@ public class DefaultProject implements Project {
     @Override
     public Optional<Project> getParent() {
         MavenProject parent = project.getParent();
-        return parent != null ? Optional.of(session.getProject(parent)) : Optional.empty();
+        return Optional.ofNullable(session.getProject(parent));
     }
 
     @Nonnull

@@ -22,7 +22,10 @@ import org.apache.maven.model.Model;
 
 /**
  * WorkspaceModelResolver
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface WorkspaceModelResolver {
 
     Model resolveRawModel(String groupId, String artifactId, String versionConstraint)

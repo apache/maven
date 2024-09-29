@@ -29,9 +29,12 @@ import org.eclipse.aether.installation.InstallRequest;
 
 /**
  * Maven GA level metadata generator factory.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Named(VersionsMetadataGeneratorFactory.NAME)
 @Singleton
+@Deprecated(since = "4.0.0")
 public class VersionsMetadataGeneratorFactory implements MetadataGeneratorFactory {
     public static final String NAME = "versions";
 

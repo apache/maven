@@ -38,9 +38,11 @@ import org.apache.maven.model.profile.ProfileActivationContext;
  * Determines profile activation based on the version of the current Java runtime.
  *
  * @see Activation#getJdk()
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("jdk-version")
 @Singleton
+@Deprecated(since = "4.0.0")
 public class JdkVersionProfileActivator implements ProfileActivator {
 
     private static final Pattern FILTER_1 = Pattern.compile("[^\\d._-]");

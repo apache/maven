@@ -76,9 +76,11 @@ import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
 
 /**
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultModelValidator implements ModelValidator {
     public static final String BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION =
             "maven.build.allowExpressionInEffectiveProjectVersion";

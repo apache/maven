@@ -23,7 +23,10 @@ import org.apache.maven.model.locator.ModelLocator;
 /**
  * Enhancement to the {@link ModelSource2} to support locating POM files using the {@link ModelLocator}
  * when pointing to a directory.
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelSource3 extends ModelSource2 {
     /**
      * Returns model source identified by a path relative to this model source POM. Implementation <strong>MUST</strong>

@@ -148,7 +148,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
     }
 
     protected List<String> getProjectPrefixes(ModelBuilderRequest request) {
-        return request.getValidationLevel() >= ModelBuilderRequest.VALIDATION_LEVEL_MAVEN_4_0
+        return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
                 ? PROJECT_PREFIXES_4_0
                 : PROJECT_PREFIXES_3_1;
     }
@@ -159,21 +159,17 @@ public class DefaultModelInterpolator implements ModelInterpolator {
 
         ValueSource projectPrefixValueSource;
         ValueSource prefixlessObjectBasedValueSource;
-        if (request.getValidationLevel() >= ModelBuilderRequest.VALIDATION_LEVEL_MAVEN_4_0) {
+        if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
             projectPrefixValueSource = new PrefixedObjectValueSource(PROJECT_PREFIXES_4_0, model, false);
             prefixlessObjectBasedValueSource = new ObjectBasedValueSource(model);
         } else {
             projectPrefixValueSource = new PrefixedObjectValueSource(PROJECT_PREFIXES_3_1, model, false);
-            if (request.getValidationLevel() >= ModelBuilderRequest.VALIDATION_LEVEL_MAVEN_2_0) {
-                projectPrefixValueSource =
-                        new ProblemDetectingValueSource(projectPrefixValueSource, PREFIX_POM, PREFIX_PROJECT, problems);
-            }
+            projectPrefixValueSource =
+                    new ProblemDetectingValueSource(projectPrefixValueSource, PREFIX_POM, PREFIX_PROJECT, problems);
 
             prefixlessObjectBasedValueSource = new ObjectBasedValueSource(model);
-            if (request.getValidationLevel() >= ModelBuilderRequest.VALIDATION_LEVEL_MAVEN_2_0) {
-                prefixlessObjectBasedValueSource =
-                        new ProblemDetectingValueSource(prefixlessObjectBasedValueSource, "", PREFIX_PROJECT, problems);
-            }
+            prefixlessObjectBasedValueSource =
+                    new ProblemDetectingValueSource(prefixlessObjectBasedValueSource, "", PREFIX_PROJECT, problems);
         }
 
         // NOTE: Order counts here!

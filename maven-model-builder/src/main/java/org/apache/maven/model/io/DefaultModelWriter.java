@@ -38,9 +38,11 @@ import org.codehaus.plexus.util.xml.XmlStreamWriter;
 /**
  * Handles serialization of a model into some kind of textual format like XML.
  *
+ * @deprecated use {@link XmlStreamWriter} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultModelWriter implements ModelWriter {
 
     @Override

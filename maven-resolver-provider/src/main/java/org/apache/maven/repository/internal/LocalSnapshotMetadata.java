@@ -34,7 +34,10 @@ import org.eclipse.aether.artifact.Artifact;
 
 /**
  * Maven local GAV level metadata.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 final class LocalSnapshotMetadata extends MavenMetadata {
 
     private final Collection<Artifact> artifacts = new ArrayList<>();

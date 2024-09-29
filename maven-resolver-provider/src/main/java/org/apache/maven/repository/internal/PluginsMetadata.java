@@ -32,7 +32,10 @@ import org.apache.maven.artifact.repository.metadata.Plugin;
 
 /**
  * Maven G level metadata.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 final class PluginsMetadata extends MavenMetadata {
     static final class PluginInfo {
         @Nonnull

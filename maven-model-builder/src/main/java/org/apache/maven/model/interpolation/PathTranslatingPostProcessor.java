@@ -28,7 +28,9 @@ import org.codehaus.plexus.interpolation.util.ValueSourceUtils;
 
 /**
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 class PathTranslatingPostProcessor implements InterpolationPostProcessor {
 
     private final Collection<String> unprefixedPathKeys;

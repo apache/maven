@@ -48,7 +48,10 @@ import org.slf4j.LoggerFactory;
  * Maven G level metadata generator.
  * <p>
  * Plugin metadata contains G level list of "prefix" to A mapping for plugins present under this G.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 class PluginsMetadataGenerator implements MetadataGenerator {
     private static final String PLUGIN_DESCRIPTOR_LOCATION = "META-INF/maven/plugin.xml";
 

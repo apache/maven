@@ -100,7 +100,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 @Nonnull
                 @Override
                 public Optional<Project> getProject() {
-                    return Optional.ofNullable(res.getProject()).map(session::getProject);
+                    return Optional.ofNullable(session.getProject(res.getProject()));
                 }
 
                 @Nonnull

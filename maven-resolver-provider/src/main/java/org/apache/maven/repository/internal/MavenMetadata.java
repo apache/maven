@@ -38,7 +38,9 @@ import org.eclipse.aether.metadata.AbstractMetadata;
 import org.eclipse.aether.metadata.MergeableMetadata;
 
 /**
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 abstract class MavenMetadata extends AbstractMetadata implements MergeableMetadata {
 
     static final String MAVEN_METADATA_XML = "maven-metadata.xml";

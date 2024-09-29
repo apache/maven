@@ -101,9 +101,11 @@ import static org.apache.maven.model.building.Result.error;
 import static org.apache.maven.model.building.Result.newResult;
 
 /**
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultModelBuilder implements ModelBuilder {
 
     private final ModelProcessor modelProcessor;

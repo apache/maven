@@ -28,4 +28,7 @@ under the License.
   <packaging>pom</packaging>
 
   <!-- minimal parent just to have one more level of inheritance -->
+  <modules>
+    <module>sub</module>
+  </modules>
 </project>

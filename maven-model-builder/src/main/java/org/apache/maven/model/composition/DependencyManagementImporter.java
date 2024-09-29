@@ -28,7 +28,9 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles the import of dependency management from other models into the target model.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface DependencyManagementImporter {
 
     /**

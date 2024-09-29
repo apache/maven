@@ -18,14 +18,14 @@
  */
 package org.apache.maven.model.building;
 
-import org.apache.maven.api.services.ModelBuilderResult;
-
 /**
  * Describes a problem that was encountered during model building. A problem can either be an exception that was thrown
  * or a simple string message. In addition, a problem carries a hint about its source, e.g. the POM file that exhibits
  * the problem.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelProblem {
 
     /**
@@ -55,7 +55,6 @@ public interface ModelProblem {
      * information that is available at the point the problem occurs and as such merely serves as best effort
      * to provide information to the user to track the problem back to its origin.
      *
-     * @see ModelBuilderResult#getModelIds()
      * @return The hint about the source of the problem or an empty string if unknown, never {@code null}.
      */
     String getSource();

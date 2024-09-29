@@ -27,7 +27,10 @@ import java.util.Map;
  * A cache of introspection information for a specific class instance.
  * Keys {@link Method} objects by a concatenation of the
  * method name and the names of classes that make up the parameters.
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 class ClassMap {
     private static final class CacheMiss {}
 

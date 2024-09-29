@@ -29,7 +29,7 @@
   <description>Test inheritance of reporting plugin configuration</description>
 
   <modules>
-    <module>child</module>
+    <module>sub</module>
   </modules>
 
   <reporting>

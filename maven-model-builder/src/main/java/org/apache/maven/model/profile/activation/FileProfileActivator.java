@@ -42,9 +42,11 @@ import org.codehaus.plexus.interpolation.InterpolationException;
  *
  * @see ActivationFile
  * @see org.apache.maven.model.validation.DefaultModelValidator#validateRawModel
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("file")
 @Singleton
+@Deprecated(since = "4.0.0")
 public class FileProfileActivator implements ProfileActivator {
 
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;

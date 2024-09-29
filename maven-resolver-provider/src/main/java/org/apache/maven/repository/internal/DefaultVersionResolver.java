@@ -63,9 +63,11 @@ import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.util.ConfigUtils;
 
 /**
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultVersionResolver implements VersionResolver {
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";

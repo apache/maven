@@ -39,13 +39,16 @@ import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelSourceTransformer;
 import org.apache.maven.model.v4.MavenStaxReader;
+import org.codehaus.plexus.util.xml.XmlStreamWriter;
 
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
  *
+ * @deprecated use {@link XmlStreamWriter} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultModelReader implements ModelReader {
     private final ModelSourceTransformer transformer;
 

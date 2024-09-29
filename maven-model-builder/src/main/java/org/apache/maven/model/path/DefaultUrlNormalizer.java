@@ -24,9 +24,11 @@ import javax.inject.Singleton;
 /**
  * Normalizes a URL.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultUrlNormalizer implements UrlNormalizer {
 
     @Override

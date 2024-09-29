@@ -24,7 +24,9 @@ package org.apache.maven.repository.internal.artifact;
  *
  * @see org.eclipse.aether.artifact.ArtifactProperties
  * @since 4.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public final class MavenArtifactProperties {
     /**
      * A boolean flag indicating whether the artifact presents some kind of bundle that physically includes its

@@ -29,7 +29,9 @@ import org.apache.maven.model.building.ModelProblemCollector;
  * Replaces expressions of the form <code>${token}</code> with their effective values. Effective values are basically
  * calculated from the elements of the model itself and the execution properties from the building request.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelInterpolator {
 
     /**

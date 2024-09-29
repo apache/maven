@@ -97,7 +97,7 @@ public interface DependencyResolverResult {
     Map<PathType, List<Path>> getDispatchedPaths();
 
     /**
-     * {@return all dependencies associated to their paths}.
+     * {@return all dependencies associated to their paths}
      * Some dependencies may be associated to a null value if there is no path available.
      */
     @Nonnull

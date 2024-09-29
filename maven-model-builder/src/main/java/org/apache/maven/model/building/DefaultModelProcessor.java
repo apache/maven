@@ -66,10 +66,13 @@ import org.eclipse.sisu.Typed;
  * As a non-default component this now gets a negative priority relative to other implementations
  * of the same interface. Since we want to allow overriding this doesn't matter in this case.
  * (if it did we could add @Priority of 0 to match the priority given to default components.)
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("core-default")
 @Singleton
 @Typed(ModelProcessor.class)
+@Deprecated(since = "4.0.0")
 public class DefaultModelProcessor implements ModelProcessor {
 
     private final Collection<ModelParser> modelParsers;

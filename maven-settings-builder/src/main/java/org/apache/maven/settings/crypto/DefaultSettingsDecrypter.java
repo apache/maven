@@ -36,9 +36,11 @@ import org.codehaus.plexus.components.secdispatcher.SecDispatcherException;
 /**
  * Decrypts passwords in the settings.
  *
+ * @deprecated since 4.0.0
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultSettingsDecrypter implements SettingsDecrypter {
     private final SecDispatcher securityDispatcher;
 

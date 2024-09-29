@@ -23,6 +23,10 @@ import java.util.Map;
 
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 
+/**
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ */
+@Deprecated(since = "4.0.0")
 class BuildTimestampValueSource extends AbstractValueSource {
     private final Date startTime;
     private final Map<String, String> properties;
