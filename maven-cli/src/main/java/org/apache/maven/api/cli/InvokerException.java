@@ -16,16 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn;
+package org.apache.maven.api.cli;
 
-import java.io.IOException;
+public class InvokerException extends RuntimeException {
+    public InvokerException(String message) {
+        super(message);
+    }
 
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.cling.invoker.Parser;
-import org.apache.maven.cling.invoker.ParserException;
-import org.apache.maven.cling.invoker.ParserRequest;
-
-public interface MavenParser extends Parser<MavenInvokerRequest> {
-    @Nonnull
-    MavenInvokerRequest parse(ParserRequest parserRequest) throws ParserException, IOException;
+    public InvokerException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

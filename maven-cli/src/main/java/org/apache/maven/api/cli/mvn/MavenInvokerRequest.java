@@ -16,16 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker;
+package org.apache.maven.api.cli.mvn;
 
-/**
- * Component responsible to invoke an application using information provided in invoker request.
- *
- * @param <R> The request type.
- */
-public interface Invoker<R extends InvokerRequest> {
-    /**
-     * Invokes application and returns exit code.
-     */
-    int invoke(R invokerRequest) throws InvokerException;
+import org.apache.maven.api.cli.InvokerRequest;
+
+public interface MavenInvokerRequest extends InvokerRequest<MavenOptions> {
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker;
+package org.apache.maven.api.cli;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.MessageBuilderFactory;
+import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.slf4j.Logger;
 
@@ -87,7 +88,7 @@ public interface ParserRequest {
     PrintStream err();
 
     @Nonnull
-    static Builder builder(String[] args) {
+    static Builder builder(@Nonnull String[] args) {
         return new Builder(args);
     }
 

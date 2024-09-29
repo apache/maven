@@ -29,9 +29,9 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.apache.maven.cling.invoker.InvokerException;
-import org.apache.maven.cling.invoker.ParserException;
-import org.apache.maven.cling.invoker.ParserRequest;
+import org.apache.maven.api.cli.InvokerException;
+import org.apache.maven.api.cli.ParserException;
+import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.mvn.local.LocalInvoker;
 import org.apache.maven.cling.invoker.mvn.local.LocalParser;
 import org.apache.maven.jline.MessageUtils;

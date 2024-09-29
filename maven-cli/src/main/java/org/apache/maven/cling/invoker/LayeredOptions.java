@@ -18,6 +18,8 @@
  */
 package org.apache.maven.cling.invoker;
 
+import org.apache.maven.api.cli.Options;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,91 +33,91 @@ import java.util.function.Function;
  *
  * @param <O> The type of options.
  */
-public abstract class LayeredBaseOptions<O extends BaseOptions> implements BaseOptions {
+public abstract class LayeredOptions<O extends Options> implements Options {
     protected final List<O> options;
 
-    protected LayeredBaseOptions(List<O> options) {
+    protected LayeredOptions(List<O> options) {
         this.options = new ArrayList<>(options);
     }
 
     @Override
     public Optional<Map<String, String>> userProperties() {
-        return collectMapIfPresentOrEmpty(BaseOptions::userProperties);
+        return collectMapIfPresentOrEmpty(Options::userProperties);
     }
 
     @Override
     public Optional<Boolean> showVersionAndExit() {
-        return returnFirstPresentOrEmpty(BaseOptions::showVersionAndExit);
+        return returnFirstPresentOrEmpty(Options::showVersionAndExit);
     }
 
     @Override
     public Optional<Boolean> showVersion() {
-        return returnFirstPresentOrEmpty(BaseOptions::showVersion);
+        return returnFirstPresentOrEmpty(Options::showVersion);
     }
 
     @Override
     public Optional<Boolean> quiet() {
-        return returnFirstPresentOrEmpty(BaseOptions::quiet);
+        return returnFirstPresentOrEmpty(Options::quiet);
     }
 
     @Override
     public Optional<Boolean> verbose() {
-        return returnFirstPresentOrEmpty(BaseOptions::verbose);
+        return returnFirstPresentOrEmpty(Options::verbose);
     }
 
     @Override
     public Optional<Boolean> showErrors() {
-        return returnFirstPresentOrEmpty(BaseOptions::showErrors);
+        return returnFirstPresentOrEmpty(Options::showErrors);
     }
 
     @Override
     public Optional<Boolean> nonInteractive() {
-        return returnFirstPresentOrEmpty(BaseOptions::nonInteractive);
+        return returnFirstPresentOrEmpty(Options::nonInteractive);
     }
 
     @Override
     public Optional<Boolean> forceInteractive() {
-        return returnFirstPresentOrEmpty(BaseOptions::forceInteractive);
+        return returnFirstPresentOrEmpty(Options::forceInteractive);
     }
 
     @Override
     public Optional<String> altUserSettings() {
-        return returnFirstPresentOrEmpty(BaseOptions::altUserSettings);
+        return returnFirstPresentOrEmpty(Options::altUserSettings);
     }
 
     @Override
     public Optional<String> altProjectSettings() {
-        return returnFirstPresentOrEmpty(BaseOptions::altProjectSettings);
+        return returnFirstPresentOrEmpty(Options::altProjectSettings);
     }
 
     @Override
     public Optional<String> altInstallationSettings() {
-        return returnFirstPresentOrEmpty(BaseOptions::altInstallationSettings);
+        return returnFirstPresentOrEmpty(Options::altInstallationSettings);
     }
 
     @Override
     public Optional<String> altUserToolchains() {
-        return returnFirstPresentOrEmpty(BaseOptions::altUserToolchains);
+        return returnFirstPresentOrEmpty(Options::altUserToolchains);
     }
 
     @Override
     public Optional<String> altInstallationToolchains() {
-        return returnFirstPresentOrEmpty(BaseOptions::altInstallationToolchains);
+        return returnFirstPresentOrEmpty(Options::altInstallationToolchains);
     }
 
     @Override
     public Optional<String> logFile() {
-        return returnFirstPresentOrEmpty(BaseOptions::logFile);
+        return returnFirstPresentOrEmpty(Options::logFile);
     }
 
     @Override
     public Optional<String> color() {
-        return returnFirstPresentOrEmpty(BaseOptions::color);
+        return returnFirstPresentOrEmpty(Options::color);
     }
 
     @Override
     public Optional<Boolean> help() {
-        return returnFirstPresentOrEmpty(BaseOptions::help);
+        return returnFirstPresentOrEmpty(Options::help);
     }
 
     @Override
