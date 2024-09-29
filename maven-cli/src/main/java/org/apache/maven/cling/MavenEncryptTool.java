@@ -24,7 +24,6 @@ import javax.tools.Tool;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -32,8 +31,10 @@ import java.util.Set;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
+import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.mvn.local.LocalInvoker;
 import org.apache.maven.cling.invoker.mvn.local.LocalParser;
+import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.apache.maven.jline.MessageUtils;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -56,7 +57,7 @@ public class MavenEncryptTool implements Tool {
 
     @Override
     public int run(InputStream in, OutputStream out, OutputStream err, String... arguments) {
-        PrintStream stderr = toPsOrDef(err, System.err);
+        ProtoLogger logger = new ProtoLogger(out, err);
         try (ClassWorld classWorld = new ClassWorld(
                 MavenCling.CORE_CLASS_REALM_ID, Thread.currentThread().getContextClassLoader())) {
             MessageUtils.systemInstall();
@@ -64,13 +65,13 @@ public class MavenEncryptTool implements Tool {
             try {
                 return new LocalInvoker(classWorld)
                         .invoke(new LocalParser()
-                                .parse(ParserRequest.builder(arguments)
+                                .parse(ParserRequest.builder(arguments, logger, new JLineMessageBuilderFactory())
                                         .in(in)
-                                        .out(toPs(out))
-                                        .err(toPs(err))
+                                        .out(out)
+                                        .err(err)
                                         .build()));
             } catch (ParserException e) {
-                stderr.println(e.getMessage());
+                logger.error(e.getMessage(), e);
                 return 1;
             } catch (InvokerException e) {
                 return 1;
@@ -78,22 +79,8 @@ public class MavenEncryptTool implements Tool {
                 MessageUtils.systemUninstall();
             }
         } catch (IOException e) {
-            e.printStackTrace(stderr);
+            logger.error(e.getMessage(), e);
             return 2;
         }
-    }
-
-    private PrintStream toPs(OutputStream outputStream) {
-        return toPsOrDef(outputStream, null);
-    }
-
-    private PrintStream toPsOrDef(OutputStream outputStream, PrintStream def) {
-        if (outputStream == null) {
-            return def;
-        }
-        if (outputStream instanceof PrintStream ps) {
-            return ps;
-        }
-        return new PrintStream(outputStream);
     }
 }

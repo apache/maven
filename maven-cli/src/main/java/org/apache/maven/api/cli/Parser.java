@@ -21,11 +21,14 @@ package org.apache.maven.api.cli;
 import java.io.IOException;
 
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.services.MessageBuilderFactory;
+import org.slf4j.Logger;
 
 public interface Parser<O extends Options, R extends InvokerRequest<O>> {
     @Nonnull
-    default R parse(@Nonnull String[] args) throws ParserException, IOException {
-        return parse(ParserRequest.builder(args).build());
+    default R parse(@Nonnull String[] args, Logger logger, MessageBuilderFactory messageBuilderFactory)
+            throws ParserException, IOException {
+        return parse(ParserRequest.builder(args, logger, messageBuilderFactory).build());
     }
 
     @Nonnull

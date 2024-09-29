@@ -18,7 +18,7 @@
  */
 package org.apache.maven.api.cli;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -87,5 +87,5 @@ public interface Options {
     /**
      * Displays help.
      */
-    void displayHelp(PrintStream printStream);
+    void displayHelp(PrintWriter printWriter);
 }

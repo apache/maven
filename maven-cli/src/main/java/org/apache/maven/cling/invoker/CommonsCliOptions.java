@@ -18,7 +18,7 @@
  */
 package org.apache.maven.cling.invoker;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -183,7 +183,7 @@ public abstract class CommonsCliOptions implements Options {
     }
 
     @Override
-    public void displayHelp(PrintStream printStream) {
+    public void displayHelp(PrintWriter printStream) {
         cliManager.displayHelp(printStream);
     }
 }

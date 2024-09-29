@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cling.invoker;
 
+import java.io.OutputStream;
 import java.io.PrintStream;
 
 import org.apache.maven.api.annotations.Nullable;
@@ -46,16 +47,19 @@ public class ProtoLogger implements Logger {
         this(null, null);
     }
 
-    public ProtoLogger(@Nullable PrintStream out, @Nullable PrintStream err) {
-        this.out = nvl(out, System.out);
-        this.err = nvl(err, System.err);
+    public ProtoLogger(@Nullable OutputStream out, @Nullable OutputStream err) {
+        this.out = toPsOrDef(out, System.out);
+        this.err = toPsOrDef(err, System.err);
     }
 
-    private PrintStream nvl(PrintStream ps, PrintStream def) {
-        if (ps != null) {
+    private PrintStream toPsOrDef(OutputStream outputStream, PrintStream def) {
+        if (outputStream == null) {
+            return def;
+        }
+        if (outputStream instanceof PrintStream ps) {
             return ps;
         }
-        return def;
+        return new PrintStream(outputStream);
     }
 
     //

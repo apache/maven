@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -133,15 +134,15 @@ public class LocalInvoker implements MavenInvoker {
         final MavenInvokerRequest invokerRequest;
         final Function<String, Path> cwdResolver;
         final InputStream stdIn;
-        final PrintStream stdOut;
-        final PrintStream stdErr;
+        final PrintWriter stdOut;
+        final PrintWriter stdErr;
 
         protected LocalContext(MavenInvokerRequest invokerRequest) {
             this.invokerRequest = requireNonNull(invokerRequest);
             this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
             this.stdIn = invokerRequest.in().orElse(System.in);
-            this.stdOut = invokerRequest.out().orElse(System.out);
-            this.stdErr = invokerRequest.err().orElse(System.err);
+            this.stdOut = new PrintWriter(invokerRequest.out().orElse(System.out), true);
+            this.stdErr = new PrintWriter(invokerRequest.err().orElse(System.err), true);
             this.logger = invokerRequest.logger();
         }
 

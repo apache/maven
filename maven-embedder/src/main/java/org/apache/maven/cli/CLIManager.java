@@ -400,16 +400,18 @@ public class CLIManager {
     }
 
     public void displayHelp(PrintStream stdout) {
-        stdout.println();
+        displayHelp(new PrintWriter(stdout));
+    }
 
-        PrintWriter pw = new PrintWriter(stdout);
-
+    public void displayHelp(PrintWriter pw) {
         HelpFormatter formatter = new HelpFormatter();
 
         int width = MessageUtils.getTerminalWidth();
         if (width <= 0) {
             width = HelpFormatter.DEFAULT_WIDTH;
         }
+
+        pw.println();
 
         formatter.printHelp(
                 pw,

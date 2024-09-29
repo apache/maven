@@ -19,14 +19,12 @@
 package org.apache.maven.api.cli;
 
 import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.cling.invoker.ProtoLogger;
-import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.slf4j.Logger;
 
 import static java.util.Objects.requireNonNull;
@@ -34,13 +32,13 @@ import static java.util.Objects.requireNonNull;
 public interface ParserRequest {
 
     /**
-     * Mandatory: Logger to use at very early stages. Defaults to {@link ProtoLogger}.
+     * Mandatory: Logger to use at very early stages.
      */
     @Nonnull
     Logger logger();
 
     /**
-     * Mandatory: MessageBuilderFactory to use. Defaults to {@link JLineMessageBuilderFactory}.
+     * Mandatory: MessageBuilderFactory to use.
      */
     @Nonnull
     MessageBuilderFactory messageBuilderFactory();
@@ -79,42 +77,35 @@ public interface ParserRequest {
      * Optional: the STDOUT to use. If not given, {@link System#out} is used.
      */
     @Nullable
-    PrintStream out();
+    OutputStream out();
 
     /**
      * Optional: the STDERR to use. If not given, {@link System#err} is used.
      */
     @Nullable
-    PrintStream err();
+    OutputStream err();
 
     @Nonnull
-    static Builder builder(@Nonnull String[] args) {
-        return new Builder(args);
+    static Builder builder(
+            @Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return new Builder(args, logger, messageBuilderFactory);
     }
 
     class Builder {
         private final String[] args;
-        private Logger logger = new ProtoLogger();
-        private MessageBuilderFactory messageBuilderFactory = new JLineMessageBuilderFactory();
+        private Logger logger;
+        private MessageBuilderFactory messageBuilderFactory;
         private Path cwd;
         private Path mavenHome;
         private Path userHome;
         private InputStream in;
-        private PrintStream out;
-        private PrintStream err;
+        private OutputStream out;
+        private OutputStream err;
 
-        private Builder(String[] args) {
+        private Builder(String[] args, Logger logger, MessageBuilderFactory messageBuilderFactory) {
             this.args = requireNonNull(args);
-        }
-
-        public Builder logger(Logger logger) {
             this.logger = requireNonNull(logger);
-            return this;
-        }
-
-        public Builder messageBuilderFactory(MessageBuilderFactory messageBuilderFactory) {
             this.messageBuilderFactory = requireNonNull(messageBuilderFactory);
-            return this;
         }
 
         public Builder cwd(Path cwd) {
@@ -137,24 +128,18 @@ public interface ParserRequest {
             return this;
         }
 
-        public Builder out(PrintStream out) {
+        public Builder out(OutputStream out) {
             this.out = out;
-            if (this.logger instanceof ProtoLogger) {
-                this.logger = new ProtoLogger(this.out, this.err);
-            }
             return this;
         }
 
-        public Builder err(PrintStream err) {
+        public Builder err(OutputStream err) {
             this.err = err;
-            if (this.logger instanceof ProtoLogger) {
-                this.logger = new ProtoLogger(this.out, this.err);
-            }
             return this;
         }
 
         public ParserRequest build() {
-            return new ParserRequestImpl(logger, messageBuilderFactory, args, cwd, mavenHome, userHome, in, out, err);
+            return new ParserRequestImpl(args, logger, messageBuilderFactory, cwd, mavenHome, userHome, in, out, err);
         }
 
         @SuppressWarnings("ParameterNumber")
@@ -166,22 +151,22 @@ public interface ParserRequest {
             private final Path mavenHome;
             private final Path userHome;
             private final InputStream in;
-            private final PrintStream out;
-            private final PrintStream err;
+            private final OutputStream out;
+            private final OutputStream err;
 
             private ParserRequestImpl(
+                    String[] args,
                     Logger logger,
                     MessageBuilderFactory messageBuilderFactory,
-                    String[] args,
                     Path cwd,
                     Path mavenHome,
                     Path userHome,
                     InputStream in,
-                    PrintStream out,
-                    PrintStream err) {
-                this.logger = logger;
-                this.messageBuilderFactory = messageBuilderFactory;
-                this.args = args;
+                    OutputStream out,
+                    OutputStream err) {
+                this.args = requireNonNull(args);
+                this.logger = requireNonNull(logger);
+                this.messageBuilderFactory = requireNonNull(messageBuilderFactory);
                 this.cwd = cwd;
                 this.mavenHome = mavenHome;
                 this.userHome = userHome;
@@ -226,12 +211,12 @@ public interface ParserRequest {
             }
 
             @Override
-            public PrintStream out() {
+            public OutputStream out() {
                 return out;
             }
 
             @Override
-            public PrintStream err() {
+            public OutputStream err() {
                 return err;
             }
         }
