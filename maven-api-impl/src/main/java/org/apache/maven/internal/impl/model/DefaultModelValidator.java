@@ -70,7 +70,6 @@ import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ModelValidator;
-import org.apache.maven.api.services.model.ModelVersionProcessor;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
 
@@ -288,12 +287,8 @@ public class DefaultModelValidator implements ModelValidator {
 
     private final Set<String> validProfileIds = new HashSet<>();
 
-    private final ModelVersionProcessor versionProcessor;
-
     @Inject
-    public DefaultModelValidator(ModelVersionProcessor versionProcessor) {
-        this.versionProcessor = versionProcessor;
-    }
+    public DefaultModelValidator() {}
 
     @Override
     @SuppressWarnings("checkstyle:MethodLength")
@@ -1634,19 +1629,14 @@ public class DefaultModelValidator implements ModelValidator {
 
         Matcher m = EXPRESSION_NAME_PATTERN.matcher(string.trim());
         while (m.find()) {
-            String property = m.group(1);
-            if (!versionProcessor.isValidProperty(property)) {
-                addViolation(
-                        problems,
-                        severity,
-                        version,
-                        fieldName,
-                        null,
-                        "contains an expression but should be a constant.",
-                        tracker);
-
-                return false;
-            }
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    fieldName,
+                    null,
+                    "contains an expression but should be a constant.",
+                    tracker);
         }
 
         return true;

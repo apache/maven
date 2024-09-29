@@ -26,7 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,6 +44,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -233,6 +234,8 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     protected class DefaultModelBuilderSession implements ModelProblemCollector {
+        private static final Pattern REGEX = Pattern.compile("\\$\\{([^}]+)}");
+
         final Session session;
         final ModelBuilderRequest request;
         final DefaultModelBuilderResult result;
@@ -557,58 +560,15 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         //
-        // Transform raw model to build pom
-        //
-        Model transformFileToRaw(Model model) {
-            Model.Builder builder = Model.newBuilder(model);
-            builder = handleParent(model, builder);
-            builder = handleReactorDependencies(model, builder);
-            builder = handleCiFriendlyVersion(model, builder);
-            return builder.build();
-        }
-
-        //
-        // Infer parent information
-        //
-        Model.Builder handleParent(Model model, Model.Builder builder) {
-            Parent parent = model.getParent();
-            if (parent != null) {
-                String version = parent.getVersion();
-                String modVersion = replaceCiFriendlyVersion(version);
-                if (!Objects.equals(version, modVersion)) {
-                    if (builder == null) {
-                        builder = Model.newBuilder(model);
-                    }
-                    builder.parent(parent.withVersion(modVersion));
-                }
-            }
-            return builder;
-        }
-
-        //
-        // CI friendly versions
-        //
-        Model.Builder handleCiFriendlyVersion(Model model, Model.Builder builder) {
-            String version = model.getVersion();
-            String modVersion = replaceCiFriendlyVersion(version);
-            if (!Objects.equals(version, modVersion)) {
-                if (builder == null) {
-                    builder = Model.newBuilder(model);
-                }
-                builder.version(modVersion);
-            }
-            return builder;
-        }
-
-        //
+        // Transform raw model to build pom.
         // Infer inner reactor dependencies version
         //
-        Model.Builder handleReactorDependencies(Model model, Model.Builder builder) {
+        Model transformFileToRaw(Model model) {
             List<Dependency> newDeps = new ArrayList<>();
             boolean modified = false;
             for (Dependency dep : model.getDependencies()) {
-                Dependency.Builder depBuilder = null;
                 if (dep.getVersion() == null) {
+                    Dependency.Builder depBuilder = null;
                     Model depModel = getRawModel(model.getPomFile(), dep.getGroupId(), dep.getArtifactId());
                     if (depModel != null) {
                         String version = depModel.getVersion();
@@ -629,30 +589,35 @@ public class DefaultModelBuilder implements ModelBuilder {
                             depBuilder.groupId(depGroupId).location("groupId", groupIdLocation);
                         }
                     }
-                }
-                if (depBuilder != null) {
-                    newDeps.add(depBuilder.build());
-                    modified = true;
-                } else {
-                    newDeps.add(dep);
+                    if (depBuilder != null) {
+                        newDeps.add(depBuilder.build());
+                        modified = true;
+                    } else {
+                        newDeps.add(dep);
+                    }
                 }
             }
-            if (modified) {
-                if (builder == null) {
-                    builder = Model.newBuilder(model);
-                }
-                builder.dependencies(newDeps);
-            }
-            return builder;
+            return modified ? model.withDependencies(newDeps) : model;
         }
 
-        String replaceCiFriendlyVersion(String version) {
+        String replaceCiFriendlyVersion(Map<String, String> properties, String version) {
+            // TODO: we're using a simple regex here, but we should probably use
+            //       a proper interpolation service to do the replacements
+            //       once one is available in maven-api-impl
+            //       https://issues.apache.org/jira/browse/MNG-8262
             if (version != null) {
-                for (String key : Arrays.asList("changelist", "revision", "sha1")) {
-                    String val = request.getUserProperties().get(key);
-                    if (val != null) {
-                        version = version.replace("${" + key + "}", val);
-                    }
+                Matcher matcher = REGEX.matcher(version);
+                if (matcher.find()) {
+                    StringBuilder result = new StringBuilder();
+                    do {
+                        // extract the key inside ${}
+                        String key = matcher.group(1);
+                        // get replacement from the map, or use the original ${xy} if not found
+                        String replacement = properties.getOrDefault(key, "\\" + matcher.group(0));
+                        matcher.appendReplacement(result, replacement);
+                    } while (matcher.find());
+                    matcher.appendTail(result); // Append the remaining part of the string
+                    return result.toString();
                 }
             }
             return version;
@@ -733,7 +698,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             return Stream.concat(Stream.of(r), r.getChildren().stream().flatMap(this::results));
         }
 
-        @SuppressWarnings("checkstyle:MethodLength")
         private void loadFromRoot(Path root, Path top) {
             try (PhasingExecutor executor = createExecutor()) {
                 DefaultModelBuilderResult r = Objects.equals(top, root) ? result : new DefaultModelBuilderResult();
@@ -1212,16 +1176,18 @@ public class DefaultModelBuilder implements ModelBuilder {
         Model doReadFileModel() throws ModelBuilderException {
             ModelSource modelSource = request.getSource();
             Model model;
+            Path rootDirectory;
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
             try {
                 boolean strict = request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM;
-                // TODO: we do cache, but what if strict does not have the same value?
-                Path rootDirectory;
                 try {
                     rootDirectory = request.getSession().getRootDirectory();
                 } catch (IllegalStateException ignore) {
                     rootDirectory = modelSource.getPath();
+                    while (rootDirectory != null && !Files.isDirectory(rootDirectory)) {
+                        rootDirectory = rootDirectory.getParent();
+                    }
                 }
                 try (InputStream is = modelSource.openStream()) {
                     model = modelProcessor.read(XmlReaderRequest.builder()
@@ -1355,6 +1321,29 @@ public class DefaultModelBuilder implements ModelBuilder {
                         add(Severity.FATAL, Version.V41, "Error discovering subprojects", e);
                     }
                 }
+
+                // CI friendly version
+                // All expressions are interpolated using user properties and properties
+                // defined on the root project.
+                Map<String, String> properties = new HashMap<>();
+                if (!Objects.equals(rootDirectory, model.getProjectDirectory())) {
+                    Model rootModel = derive(ModelSource.fromPath(modelProcessor.locateExistingPom(rootDirectory)))
+                            .readFileModel();
+                    properties.putAll(rootModel.getProperties());
+                } else {
+                    properties.putAll(model.getProperties());
+                }
+                properties.putAll(session.getUserProperties());
+                model = model.with()
+                        .version(replaceCiFriendlyVersion(properties, model.getVersion()))
+                        .parent(
+                                model.getParent() != null
+                                        ? model.getParent()
+                                                .withVersion(replaceCiFriendlyVersion(
+                                                        properties,
+                                                        model.getParent().getVersion()))
+                                        : null)
+                        .build();
             }
 
             for (var transformer : transformers) {
