@@ -23,7 +23,7 @@ import java.io.IOException;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.MessageBuilderFactory;
 
-public interface Parser<O extends Options, R extends InvokerRequest<O>> {
+public interface Parser<R extends InvokerRequest<? extends Options>> {
     @Nonnull
     default R parse(@Nonnull String[] args, Logger logger, MessageBuilderFactory messageBuilderFactory)
             throws ParserException, IOException {

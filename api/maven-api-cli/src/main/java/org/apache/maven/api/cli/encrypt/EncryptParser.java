@@ -25,7 +25,7 @@ import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 
-public interface EncryptParser extends Parser<EncryptOptions, EncryptInvokerRequest> {
+public interface EncryptParser extends Parser<EncryptInvokerRequest> {
     @Nonnull
     EncryptInvokerRequest parse(@Nonnull ParserRequest parserRequest) throws ParserException, IOException;
 }
