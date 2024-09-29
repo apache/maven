@@ -25,7 +25,7 @@ import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 
-public interface MavenParser extends Parser<MavenInvokerRequest> {
+public interface MavenParser extends Parser<MavenOptions, MavenInvokerRequest> {
     @Nonnull
     MavenInvokerRequest parse(@Nonnull ParserRequest parserRequest) throws ParserException, IOException;
 }

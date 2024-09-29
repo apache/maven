@@ -43,7 +43,6 @@ import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.cli.InvokerException;
-import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenInvoker;
 import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
@@ -304,7 +303,7 @@ public class LocalInvoker implements MavenInvoker {
     }
 
     protected void container(LocalContext localContext) throws Exception {
-        InvokerRequest invokerRequest = localContext.invokerRequest;
+        MavenInvokerRequest invokerRequest = localContext.invokerRequest;
         ClassRealm coreRealm = classWorld.getClassRealm("plexus.core");
         List<Path> extClassPath = parseExtClasspath(localContext);
         CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom(coreRealm);

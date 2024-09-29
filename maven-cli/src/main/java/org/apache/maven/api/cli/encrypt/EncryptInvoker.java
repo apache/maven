@@ -16,19 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
+package org.apache.maven.api.cli.encrypt;
 
-import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.cli.Invoker;
+import org.apache.maven.api.cli.InvokerException;
 
 /**
- * Component responsible to invoke an application using information provided in invoker request.
- *
- * @param <O> The options type.
- * @param <R> The request type.
+ * Component responsible to invoke Encrypt using information provided in invoker request.
  */
-public interface Invoker<O extends Options, R extends InvokerRequest<O>> {
-    /**
-     * Invokes application and returns exit code.
-     */
-    int invoke(@Nonnull R invokerRequest) throws InvokerException;
+public interface EncryptInvoker extends Invoker<EncryptOptions, EncryptInvokerRequest> {
+    @Override
+    int invoke(EncryptInvokerRequest invokerRequest) throws InvokerException;
 }

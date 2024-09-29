@@ -16,19 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
+package org.apache.maven.api.cli.encrypt;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.cli.Options;
 
 /**
- * Component responsible to invoke an application using information provided in invoker request.
- *
- * @param <O> The options type.
- * @param <R> The request type.
+ * Encrypt options.
  */
-public interface Invoker<O extends Options, R extends InvokerRequest<O>> {
+public interface EncryptOptions extends Options {
+    @Nonnull
+    Optional<String> cipher();
+
     /**
-     * Invokes application and returns exit code.
+     * "init", "add-server", "delete-server",...
      */
-    int invoke(@Nonnull R invokerRequest) throws InvokerException;
+    @Nonnull
+    Optional<List<String>> goals();
+
+    /**
+     * Returns new instance of {@link EncryptOptions} that is result of interpolating this instance with given collection
+     * of properties.
+     */
+    @Nonnull
+    EncryptOptions interpolate(Collection<Map<String, String>> properties);
 }

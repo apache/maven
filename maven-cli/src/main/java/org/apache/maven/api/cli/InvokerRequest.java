@@ -34,9 +34,9 @@ import org.slf4j.Logger;
 /**
  * Maven execution request.
  *
- * @param <T> the type of Options.
+ * @param <O> the type of Options.
  */
-public interface InvokerRequest<T extends Options> {
+public interface InvokerRequest<O extends Options> {
     /**
      * Mandatory: the current working directory, usually the {@code "user.dir"} Java System Property.
      */
@@ -123,5 +123,5 @@ public interface InvokerRequest<T extends Options> {
      * The mandatory options.
      */
     @Nonnull
-    T options();
+    O options();
 }
