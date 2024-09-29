@@ -27,8 +27,8 @@ import java.util.Optional;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.cli.internal.extension.model.CoreExtension;
 
 /**
  * Maven execution request.

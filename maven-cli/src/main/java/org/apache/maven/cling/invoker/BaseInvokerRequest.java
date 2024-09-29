@@ -30,8 +30,8 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.cli.internal.extension.model.CoreExtension;
 
 import static java.util.Objects.requireNonNull;
 
