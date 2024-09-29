@@ -18,7 +18,7 @@
  */
 package org.apache.maven.cling.invoker;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,8 +121,8 @@ public abstract class LayeredOptions<O extends Options> implements Options {
     }
 
     @Override
-    public void displayHelp(PrintStream printStream) {
-        options.get(0).displayHelp(printStream);
+    public void displayHelp(PrintWriter printWriter) {
+        options.get(0).displayHelp(printWriter);
     }
 
     protected <T> Optional<T> returnFirstPresentOrEmpty(Function<O, Optional<T>> getter) {

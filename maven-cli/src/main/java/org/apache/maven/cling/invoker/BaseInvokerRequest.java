@@ -19,7 +19,7 @@
 package org.apache.maven.cling.invoker;
 
 import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +47,8 @@ public abstract class BaseInvokerRequest<T extends Options> implements InvokerRe
     private final Path rootDirectory;
 
     private final InputStream in;
-    private final PrintStream out;
-    private final PrintStream err;
+    private final OutputStream out;
+    private final OutputStream err;
     private final List<CoreExtension> coreExtensions;
 
     @SuppressWarnings("ParameterNumber")
@@ -63,8 +63,8 @@ public abstract class BaseInvokerRequest<T extends Options> implements InvokerRe
             @Nonnull Path topDirectory,
             @Nullable Path rootDirectory,
             @Nullable InputStream in,
-            @Nullable PrintStream out,
-            @Nullable PrintStream err,
+            @Nullable OutputStream out,
+            @Nullable OutputStream err,
             @Nullable List<CoreExtension> coreExtensions) {
         this.cwd = requireNonNull(cwd);
         this.installationDirectory = requireNonNull(installationDirectory);
@@ -133,12 +133,12 @@ public abstract class BaseInvokerRequest<T extends Options> implements InvokerRe
     }
 
     @Override
-    public Optional<PrintStream> out() {
+    public Optional<OutputStream> out() {
         return Optional.ofNullable(out);
     }
 
     @Override
-    public Optional<PrintStream> err() {
+    public Optional<OutputStream> err() {
         return Optional.ofNullable(err);
     }
 

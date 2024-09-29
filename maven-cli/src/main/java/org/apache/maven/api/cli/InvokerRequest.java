@@ -19,7 +19,7 @@
 package org.apache.maven.api.cli;
 
 import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -105,13 +105,13 @@ public interface InvokerRequest<O extends Options> {
      * Optional: if running embedded.
      */
     @Nonnull
-    Optional<PrintStream> out();
+    Optional<OutputStream> out();
 
     /**
      * Optional: if running embedded.
      */
     @Nonnull
-    Optional<PrintStream> err();
+    Optional<OutputStream> err();
 
     /**
      * Optional: if core extensions were configured in {@code .mvn/extensions.xml} file.

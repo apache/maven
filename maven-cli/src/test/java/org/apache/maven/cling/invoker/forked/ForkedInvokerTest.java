@@ -21,8 +21,10 @@ package org.apache.maven.cling.invoker.forked;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.mvn.forked.ForkedInvoker;
 import org.apache.maven.cling.invoker.mvn.local.LocalParser;
+import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -34,7 +36,11 @@ public class ForkedInvokerTest {
         ForkedInvoker invoker = new ForkedInvoker();
         Path log = tempDir.resolve("build.log").toAbsolutePath();
         System.setProperty("maven.home", "/home/cstamas/.sdkman/candidates/maven/current");
-        int exitcode = invoker.invoke(new LocalParser().parse(new String[] {"-l", log.toString(), "clean"}));
+        int exitcode = invoker.invoke(new LocalParser()
+                .parse(
+                        new String[] {"-l", log.toString(), "clean"},
+                        new ProtoLogger(),
+                        new JLineMessageBuilderFactory()));
         System.out.println("exit code: " + exitcode);
         System.out.println("log:");
         System.out.println(Files.readString(log));

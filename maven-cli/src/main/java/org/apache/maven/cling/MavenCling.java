@@ -22,8 +22,10 @@ import java.io.IOException;
 
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.ParserException;
+import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.mvn.local.LocalInvoker;
 import org.apache.maven.cling.invoker.mvn.local.LocalParser;
+import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.apache.maven.jline.MessageUtils;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -78,7 +80,8 @@ public class MavenCling {
         MessageUtils.systemInstall();
         MessageUtils.registerShutdownHook();
         try {
-            return new LocalInvoker(classWorld).invoke(new LocalParser().parse(args));
+            return new LocalInvoker(classWorld)
+                    .invoke(new LocalParser().parse(args, new ProtoLogger(), new JLineMessageBuilderFactory()));
         } catch (ParserException e) {
             System.err.println(e.getMessage());
             return 1;

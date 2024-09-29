@@ -19,7 +19,7 @@
 package org.apache.maven.cling.invoker.mvn;
 
 import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +52,8 @@ public class DefaultMavenInvokerRequest extends BaseInvokerRequest<MavenOptions>
             Path topDirectory,
             Path rootDirectory,
             InputStream in,
-            PrintStream out,
-            PrintStream err,
+            OutputStream out,
+            OutputStream err,
             List<CoreExtension> coreExtensions,
             MavenOptions options) {
         super(
