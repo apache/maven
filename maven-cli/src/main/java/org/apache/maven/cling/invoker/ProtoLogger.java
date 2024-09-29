@@ -20,36 +20,27 @@ package org.apache.maven.cling.invoker;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.apache.maven.api.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.Marker;
-import org.slf4j.helpers.FormattingTuple;
-import org.slf4j.helpers.MessageFormatter;
+import org.apache.maven.api.cli.Logger;
 
 /**
  * Proto {@link Logger}. Uses provided {@link PrintStream}s or {@link System} ones as fallback.
  * Supports only two levels: ERROR and WARNING, that is emitted to STDERR and STDOUT.
  */
 public class ProtoLogger implements Logger {
-    /**
-     * The only supported logging levels.
-     */
-    private enum Level {
-        WARNING,
-        ERROR
-    }
 
-    private final PrintStream out;
-    private final PrintStream err;
+    private final PrintWriter out;
+    private final PrintWriter err;
 
     public ProtoLogger() {
         this(null, null);
     }
 
     public ProtoLogger(@Nullable OutputStream out, @Nullable OutputStream err) {
-        this.out = toPsOrDef(out, System.out);
-        this.err = toPsOrDef(err, System.err);
+        this.out = new PrintWriter(toPsOrDef(out, System.out), true);
+        this.err = new PrintWriter(toPsOrDef(err, System.err), true);
     }
 
     private PrintStream toPsOrDef(OutputStream outputStream, PrintStream def) {
@@ -66,181 +57,14 @@ public class ProtoLogger implements Logger {
     // These are the only methods we need in our primordial logger
     //
 
-    private void doHandle(Level level, String message, Object... params) {
-        PrintStream ps = level == Level.ERROR ? err : out;
-        FormattingTuple tuple = MessageFormatter.arrayFormat(message, params);
-        ps.print(level.name());
-        ps.println(" ");
-        ps.println(tuple.getMessage());
-        if (tuple.getThrowable() != null) {
-            tuple.getThrowable().printStackTrace(ps);
+    @Override
+    public void log(Level level, String message, Throwable error) {
+        PrintWriter pw = level == Level.ERROR ? err : level == Level.WARN ? out : null;
+        if (pw != null) {
+            pw.print(level.name() + " " + message);
+            if (error != null) {
+                error.printStackTrace(pw);
+            }
         }
     }
-
-    public boolean isErrorEnabled() {
-        return true;
-    }
-
-    public void error(String msg) {
-        doHandle(Level.ERROR, msg);
-    }
-
-    public void error(String format, Object arg) {
-        doHandle(Level.ERROR, format, arg);
-    }
-
-    public void error(String format, Object... arguments) {
-        doHandle(Level.ERROR, format, arguments);
-    }
-
-    public void error(String format, Object arg1, Object arg2) {
-        doHandle(Level.ERROR, format, arg1, arg2);
-    }
-
-    public void error(String msg, Throwable t) {
-        doHandle(Level.ERROR, msg, t);
-    }
-
-    public boolean isWarnEnabled() {
-        return true;
-    }
-
-    public void warn(String msg) {
-        doHandle(Level.WARNING, msg);
-    }
-
-    public void warn(String format, Object arg) {
-        doHandle(Level.WARNING, format, arg);
-    }
-
-    public void warn(String format, Object... arguments) {
-        doHandle(Level.WARNING, format, arguments);
-    }
-
-    public void warn(String format, Object arg1, Object arg2) {
-        doHandle(Level.WARNING, format, arg1, arg2);
-    }
-
-    public void warn(String msg, Throwable t) {
-        doHandle(Level.WARNING, msg, t);
-    }
-
-    //
-    // Don't need any of this
-    //
-    public String getName() {
-        return null;
-    }
-
-    public boolean isTraceEnabled() {
-        return false;
-    }
-
-    public void trace(String msg) {}
-
-    public void trace(String format, Object arg) {}
-
-    public void trace(String format, Object arg1, Object arg2) {}
-
-    public void trace(String format, Object... arguments) {}
-
-    public void trace(String msg, Throwable t) {}
-
-    public boolean isTraceEnabled(Marker marker) {
-        return false;
-    }
-
-    public void trace(Marker marker, String msg) {}
-
-    public void trace(Marker marker, String format, Object arg) {}
-
-    public void trace(Marker marker, String format, Object arg1, Object arg2) {}
-
-    public void trace(Marker marker, String format, Object... argArray) {}
-
-    public void trace(Marker marker, String msg, Throwable t) {}
-
-    public boolean isDebugEnabled() {
-        return false;
-    }
-
-    public void debug(String msg) {}
-
-    public void debug(String format, Object arg) {}
-
-    public void debug(String format, Object arg1, Object arg2) {}
-
-    public void debug(String format, Object... arguments) {}
-
-    public void debug(String msg, Throwable t) {}
-
-    public boolean isDebugEnabled(Marker marker) {
-        return false;
-    }
-
-    public void debug(Marker marker, String msg) {}
-
-    public void debug(Marker marker, String format, Object arg) {}
-
-    public void debug(Marker marker, String format, Object arg1, Object arg2) {}
-
-    public void debug(Marker marker, String format, Object... arguments) {}
-
-    public void debug(Marker marker, String msg, Throwable t) {}
-
-    public boolean isInfoEnabled() {
-        return false;
-    }
-
-    public void info(String msg) {}
-
-    public void info(String format, Object arg) {}
-
-    public void info(String format, Object arg1, Object arg2) {}
-
-    public void info(String format, Object... arguments) {}
-
-    public void info(String msg, Throwable t) {}
-
-    public boolean isInfoEnabled(Marker marker) {
-        return false;
-    }
-
-    public void info(Marker marker, String msg) {}
-
-    public void info(Marker marker, String format, Object arg) {}
-
-    public void info(Marker marker, String format, Object arg1, Object arg2) {}
-
-    public void info(Marker marker, String format, Object... arguments) {}
-
-    public void info(Marker marker, String msg, Throwable t) {}
-
-    public boolean isWarnEnabled(Marker marker) {
-        return false;
-    }
-
-    public void warn(Marker marker, String msg) {}
-
-    public void warn(Marker marker, String format, Object arg) {}
-
-    public void warn(Marker marker, String format, Object arg1, Object arg2) {}
-
-    public void warn(Marker marker, String format, Object... arguments) {}
-
-    public void warn(Marker marker, String msg, Throwable t) {}
-
-    public boolean isErrorEnabled(Marker marker) {
-        return false;
-    }
-
-    public void error(Marker marker, String msg) {}
-
-    public void error(Marker marker, String format, Object arg) {}
-
-    public void error(Marker marker, String format, Object arg1, Object arg2) {}
-
-    public void error(Marker marker, String format, Object... arguments) {}
-
-    public void error(Marker marker, String msg, Throwable t) {}
 }

@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.cling.invoker.BaseInvokerRequest;
-import org.slf4j.Logger;
 
 import static java.util.Objects.requireNonNull;
 

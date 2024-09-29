@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.slf4j.Logger;
 
 import static java.util.Objects.requireNonNull;
 

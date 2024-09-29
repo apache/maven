@@ -336,7 +336,7 @@ public class LocalParser implements MavenParser {
         if (options.getUsedDeprecatedOptions().isEmpty()) {
             return;
         }
-        parserRequest.logger().warn("Detected deprecated option use in {}", location);
+        parserRequest.logger().warn("Detected deprecated option use in " + location);
         for (Option option : options.getUsedDeprecatedOptions()) {
             StringBuilder sb = new StringBuilder();
             sb.append("The option -").append(option.getOpt());

@@ -44,6 +44,7 @@ import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.cli.InvokerException;
+import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenInvoker;
 import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
@@ -116,7 +117,6 @@ import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.Comparator.comparing;
@@ -146,16 +146,16 @@ public class LocalInvoker implements MavenInvoker {
             this.logger = invokerRequest.logger();
         }
 
-        Logger logger;
-        DefaultMavenExecutionRequest mavenExecutionRequest;
-        ILoggerFactory loggerFactory;
-        PlexusContainer plexusContainer;
-        EventSpyDispatcher eventSpyDispatcher;
-        MavenExecutionRequestPopulator mavenExecutionRequestPopulator;
-        SettingsBuilder settingsBuilder;
-        ToolchainsBuilder toolchainsBuilder;
-        ModelProcessor modelProcessor;
-        Maven maven;
+        protected Logger logger;
+        protected DefaultMavenExecutionRequest mavenExecutionRequest;
+        protected ILoggerFactory loggerFactory;
+        protected PlexusContainer plexusContainer;
+        protected EventSpyDispatcher eventSpyDispatcher;
+        protected MavenExecutionRequestPopulator mavenExecutionRequestPopulator;
+        protected SettingsBuilder settingsBuilder;
+        protected ToolchainsBuilder toolchainsBuilder;
+        protected ModelProcessor modelProcessor;
+        protected Maven maven;
 
         @Override
         public void close() {
@@ -163,9 +163,13 @@ public class LocalInvoker implements MavenInvoker {
                 plexusContainer.dispose();
             }
         }
+
+        public boolean isVerbose() {
+            return invokerRequest.options().verbose().orElse(false);
+        }
     }
 
-    private final ClassWorld classWorld;
+    protected final ClassWorld classWorld;
 
     public LocalInvoker(ClassWorld classWorld) {
         this.classWorld = requireNonNull(classWorld);
@@ -202,11 +206,18 @@ public class LocalInvoker implements MavenInvoker {
                 populateRequest(localContext, localContext.mavenExecutionRequest);
                 return execute(localContext);
             } catch (Exception e) {
-                CLIReportingUtils.showError(
-                        localContext.logger,
-                        "Error executing Maven.",
-                        e,
-                        invokerRequest.options().showErrors().orElse(false));
+                boolean showStackTrace = invokerRequest.options().showErrors().orElse(false);
+                if (showStackTrace) {
+                    localContext.logger.error("Error executing Maven.", e);
+                } else {
+                    localContext.logger.error("Error executing Maven.");
+                    localContext.logger.error(e.getMessage());
+                    for (Throwable cause = e.getCause();
+                            cause != null && cause != cause.getCause();
+                            cause = cause.getCause()) {
+                        localContext.logger.error("Caused by: " + cause.getMessage());
+                    }
+                }
                 throw new InvokerException(e.getMessage(), e);
             }
         }
@@ -283,8 +294,11 @@ public class LocalInvoker implements MavenInvoker {
         }
 
         slf4jConfiguration.activate();
-        localContext.logger =
+        org.slf4j.Logger l =
                 localContext.loggerFactory.getLogger(this.getClass().getName());
+        localContext.logger = (level, message, error) -> l.atLevel(org.slf4j.event.Level.valueOf(level.name()))
+                .setCause(error)
+                .log(message);
 
         if (mavenOptions.failOnSeverity().isPresent()) {
             String logLevelThreshold = mavenOptions.failOnSeverity().get();
@@ -292,13 +306,13 @@ public class LocalInvoker implements MavenInvoker {
             if (localContext.loggerFactory instanceof MavenSlf4jWrapperFactory) {
                 LogLevelRecorder logLevelRecorder = new LogLevelRecorder(logLevelThreshold);
                 ((MavenSlf4jWrapperFactory) localContext.loggerFactory).setLogLevelRecorder(logLevelRecorder);
-                localContext.logger.info("Enabled to break the build on log level {}.", logLevelThreshold);
+                localContext.logger.info("Enabled to break the build on log level " + logLevelThreshold + ".");
             } else {
                 localContext.logger.warn(
-                        "Expected LoggerFactory to be of type '{}', but found '{}' instead. "
-                                + "The --fail-on-severity flag will not take effect.",
-                        MavenSlf4jWrapperFactory.class.getName(),
-                        localContext.loggerFactory.getClass().getName());
+                        "Expected LoggerFactory to be of type '" + MavenSlf4jWrapperFactory.class.getName()
+                                + "', but found '"
+                                + localContext.loggerFactory.getClass().getName() + "' instead. "
+                                + "The --fail-on-severity flag will not take effect.");
             }
         }
     }
@@ -389,8 +403,11 @@ public class LocalInvoker implements MavenInvoker {
         localContext.eventSpyDispatcher.init(eventSpyContext);
 
         // refresh logger in case container got customized by spy
-        localContext.logger =
+        org.slf4j.Logger l =
                 localContext.loggerFactory.getLogger(this.getClass().getName());
+        localContext.logger = (level, message, error) -> l.atLevel(org.slf4j.event.Level.valueOf(level.name()))
+                .setCause(error)
+                .log(message);
 
         // lookup the rest
         localContext.maven = container.lookup(Maven.class);
@@ -410,18 +427,17 @@ public class LocalInvoker implements MavenInvoker {
         if (extClassPath == null) {
             extClassPath = invokerRequest.systemProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
             if (extClassPath != null) {
-                localContext.logger.warn(
-                        "The property '{}' has been set using a JVM system property which is deprecated. "
-                                + "The property can be passed as a Maven argument or in the Maven project configuration file,"
-                                + "usually located at ${session.rootDirectory}/.mvn/maven.properties.",
-                        Constants.MAVEN_EXT_CLASS_PATH);
+                localContext.logger.warn("The property '" + Constants.MAVEN_EXT_CLASS_PATH
+                        + "' has been set using a JVM system property which is deprecated. "
+                        + "The property can be passed as a Maven argument or in the Maven project configuration file,"
+                        + "usually located at ${session.rootDirectory}/.mvn/maven.properties.");
             }
         }
         ArrayList<Path> jars = new ArrayList<>();
         if (extClassPath != null && !extClassPath.isEmpty()) {
             for (String jar : extClassPath.split(File.pathSeparator)) {
                 Path file = localContext.cwdResolver.apply(jar);
-                localContext.logger.debug("  included '{}'", file);
+                localContext.logger.debug("  included '" + file + "'");
                 jars.add(file);
             }
         }
@@ -440,10 +456,10 @@ public class LocalInvoker implements MavenInvoker {
 
             extRealm.setParentRealm(coreRealm);
 
-            logger.debug("Populating class realm '{}'", extRealm.getId());
+            logger.debug("Populating class realm '" + extRealm.getId() + "'");
 
             for (Path file : extClassPath) {
-                logger.debug("  included '{}'", file);
+                logger.debug("  included '" + file + "'");
                 extRealm.addURL(file.toUri().toURL());
             }
 
@@ -531,11 +547,11 @@ public class LocalInvoker implements MavenInvoker {
         }
         if (invokerRequest.options().relaxedChecksums().orElse(false)) {
             logger.info("Disabling strict checksum verification on all artifact downloads.");
-        } else if (invokerRequest.options().strictChecksums().orElse(false)) {
+        } else if (localContext.isVerbose()) {
             logger.info("Enabling strict checksum verification on all artifact downloads.");
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Message scheme: {}", (MessageUtils.isColorEnabled() ? "color" : "plain"));
+        if (localContext.invokerRequest.options().verbose().orElse(false)) {
+            logger.debug("Message scheme: " + (MessageUtils.isColorEnabled() ? "color" : "plain"));
             if (MessageUtils.isColorEnabled()) {
                 MessageBuilder buff = MessageUtils.builder();
                 buff.a("Message styles: ");
@@ -630,21 +646,21 @@ public class LocalInvoker implements MavenInvoker {
             localContext.eventSpyDispatcher.onEvent(settingsRequest);
         }
 
-        localContext.logger.debug(
-                "Reading installation settings from '{}'",
-                settingsRequest.getGlobalSettingsSource() != null
+        localContext.logger.debug("Reading installation settings from '"
+                + (settingsRequest.getGlobalSettingsSource() != null
                         ? settingsRequest.getGlobalSettingsSource().getLocation()
-                        : settingsRequest.getGlobalSettingsFile());
-        localContext.logger.debug(
-                "Reading project settings from '{}'",
-                settingsRequest.getProjectSettingsSource() != null
+                        : settingsRequest.getGlobalSettingsFile())
+                + "'");
+        localContext.logger.debug("Reading project settings from '"
+                + (settingsRequest.getProjectSettingsSource() != null
                         ? settingsRequest.getProjectSettingsSource().getLocation()
-                        : settingsRequest.getProjectSettingsFile());
-        localContext.logger.debug(
-                "Reading user settings from '{}'",
-                settingsRequest.getUserSettingsSource() != null
+                        : settingsRequest.getProjectSettingsFile())
+                + "'");
+        localContext.logger.debug("Reading user settings from '"
+                + (settingsRequest.getUserSettingsSource() != null
                         ? settingsRequest.getUserSettingsSource().getLocation()
-                        : settingsRequest.getUserSettingsFile());
+                        : settingsRequest.getUserSettingsFile())
+                + "'");
 
         SettingsBuildingResult settingsResult = settingsBuilder.build(settingsRequest);
 
@@ -654,12 +670,12 @@ public class LocalInvoker implements MavenInvoker {
 
         populateRequestFromSettings(localContext.mavenExecutionRequest, settingsResult.getEffectiveSettings());
 
-        if (!settingsResult.getProblems().isEmpty() && localContext.logger.isWarnEnabled()) {
+        if (!settingsResult.getProblems().isEmpty()) {
             localContext.logger.warn("");
             localContext.logger.warn("Some problems were encountered while building the effective settings");
 
             for (SettingsProblem problem : settingsResult.getProblems()) {
-                localContext.logger.warn("{} @ {}", problem.getMessage(), problem.getLocation());
+                localContext.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
             }
             localContext.logger.warn("");
         }
@@ -806,16 +822,16 @@ public class LocalInvoker implements MavenInvoker {
 
         localContext.eventSpyDispatcher.onEvent(toolchainsRequest);
 
-        localContext.logger.debug(
-                "Reading installation toolchains from '{}'",
-                toolchainsRequest.getGlobalToolchainsSource() != null
+        localContext.logger.debug("Reading installation toolchains from '"
+                + (toolchainsRequest.getGlobalToolchainsSource() != null
                         ? toolchainsRequest.getGlobalToolchainsSource().getLocation()
-                        : installationToolchainsFile);
-        localContext.logger.debug(
-                "Reading user toolchains from '{}'",
-                toolchainsRequest.getUserToolchainsSource() != null
+                        : installationToolchainsFile)
+                + "'");
+        localContext.logger.debug("Reading user toolchains from '"
+                + (toolchainsRequest.getUserToolchainsSource() != null
                         ? toolchainsRequest.getUserToolchainsSource().getLocation()
-                        : userToolchainsFile);
+                        : userToolchainsFile)
+                + "'");
 
         ToolchainsBuildingResult toolchainsResult = localContext.toolchainsBuilder.build(toolchainsRequest);
 
@@ -824,12 +840,12 @@ public class LocalInvoker implements MavenInvoker {
         localContext.mavenExecutionRequestPopulator.populateFromToolchains(
                 localContext.mavenExecutionRequest, toolchainsResult.getEffectiveToolchains());
 
-        if (!toolchainsResult.getProblems().isEmpty() && localContext.logger.isWarnEnabled()) {
+        if (!toolchainsResult.getProblems().isEmpty()) {
             localContext.logger.warn("");
             localContext.logger.warn("Some problems were encountered while building the effective toolchains");
 
             for (Problem problem : toolchainsResult.getProblems()) {
-                localContext.logger.warn("{} @ {}", problem.getMessage(), problem.getLocation());
+                localContext.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
             }
 
             localContext.logger.warn("");
@@ -953,11 +969,10 @@ public class LocalInvoker implements MavenInvoker {
             userDefinedLocalRepo =
                     localContext.invokerRequest.systemProperties().get(Constants.MAVEN_REPO_LOCAL);
             if (userDefinedLocalRepo != null) {
-                localContext.logger.warn(
-                        "The property '{}' has been set using a JVM system property which is deprecated. "
-                                + "The property can be passed as a Maven argument or in the Maven project configuration file,"
-                                + "usually located at ${session.rootDirectory}/.mvn/maven.properties.",
-                        Constants.MAVEN_REPO_LOCAL);
+                localContext.logger.warn("The property '" + Constants.MAVEN_REPO_LOCAL
+                        + "' has been set using a JVM system property which is deprecated. "
+                        + "The property can be passed as a Maven argument or in the Maven project configuration file,"
+                        + "usually located at ${session.rootDirectory}/.mvn/maven.properties.");
             }
         }
         return userDefinedLocalRepo;
@@ -1165,14 +1180,12 @@ public class LocalInvoker implements MavenInvoker {
             localContext.logger.error("");
 
             if (!localContext.invokerRequest.options().showErrors().orElse(false)) {
-                localContext.logger.error(
-                        "To see the full stack trace of the errors, re-run Maven with the '{}' switch",
-                        MessageUtils.builder().strong("-e"));
+                localContext.logger.error("To see the full stack trace of the errors, re-run Maven with the '"
+                        + MessageUtils.builder().strong("-e") + "' switch");
             }
-            if (!localContext.logger.isDebugEnabled()) {
-                localContext.logger.error(
-                        "Re-run Maven using the '{}' switch to enable verbose output",
-                        MessageUtils.builder().strong("-X"));
+            if (!localContext.isVerbose()) {
+                localContext.logger.error("Re-run Maven using the '"
+                        + MessageUtils.builder().strong("-X") + "' switch to enable verbose output");
             }
 
             if (!references.isEmpty()) {
@@ -1181,7 +1194,7 @@ public class LocalInvoker implements MavenInvoker {
                         + ", please read the following articles:");
 
                 for (Map.Entry<String, String> entry : references.entrySet()) {
-                    localContext.logger.error("{} {}", MessageUtils.builder().strong(entry.getValue()), entry.getKey());
+                    localContext.logger.error(MessageUtils.builder().strong(entry.getValue()) + " " + entry.getKey());
                 }
             }
 
