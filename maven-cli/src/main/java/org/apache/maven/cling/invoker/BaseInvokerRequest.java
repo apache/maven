@@ -28,13 +28,14 @@ import java.util.Optional;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.slf4j.Logger;
 
 import static java.util.Objects.requireNonNull;
 
-public abstract class BaseInvokerRequest implements InvokerRequest {
+public abstract class BaseInvokerRequest<T extends Options> implements InvokerRequest<T> {
     private final Path cwd;
     private final Path installationDirectory;
     private final Path userHomeDirectory;

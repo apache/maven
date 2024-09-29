@@ -18,8 +18,6 @@
  */
 package org.apache.maven.cling.invoker;
 
-import org.apache.maven.api.cli.Options;
-
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+
+import org.apache.maven.api.cli.Options;
 
 /**
  * Options that are "layered" by precedence order.

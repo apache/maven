@@ -37,7 +37,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Maven execution request.
  */
-public class DefaultMavenInvokerRequest extends BaseInvokerRequest implements MavenInvokerRequest {
+public class DefaultMavenInvokerRequest extends BaseInvokerRequest<MavenOptions> implements MavenInvokerRequest {
     private final MavenOptions options;
 
     @SuppressWarnings("ParameterNumber")

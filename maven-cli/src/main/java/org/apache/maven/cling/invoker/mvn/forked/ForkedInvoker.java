@@ -26,8 +26,8 @@ import java.util.Map;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.mvn.MavenInvoker;
 import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
-import org.apache.maven.cling.invoker.mvn.DefaultMavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.cling.invoker.mvn.DefaultMavenInvokerRequest;
 import org.apache.maven.utils.Os;
 
 import static java.util.Objects.requireNonNull;

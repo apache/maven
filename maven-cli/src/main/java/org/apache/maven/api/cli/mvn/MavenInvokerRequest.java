@@ -20,5 +20,4 @@ package org.apache.maven.api.cli.mvn;
 
 import org.apache.maven.api.cli.InvokerRequest;
 
-public interface MavenInvokerRequest extends InvokerRequest<MavenOptions> {
-}
+public interface MavenInvokerRequest extends InvokerRequest<MavenOptions> {}

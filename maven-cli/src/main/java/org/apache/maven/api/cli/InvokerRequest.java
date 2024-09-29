@@ -33,6 +33,8 @@ import org.slf4j.Logger;
 
 /**
  * Maven execution request.
+ *
+ * @param <T> the type of Options.
  */
 public interface InvokerRequest<T extends Options> {
     /**
