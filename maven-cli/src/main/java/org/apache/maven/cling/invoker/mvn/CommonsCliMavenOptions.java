@@ -27,14 +27,15 @@ import java.util.Optional;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
+import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cli.CLIManager;
-import org.apache.maven.cling.invoker.CommonsCliBaseOptions;
+import org.apache.maven.cling.invoker.CommonsCliOptions;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 
 import static org.apache.maven.cling.invoker.Utils.createInterpolator;
 
-public class CommonsCliMavenOptions extends CommonsCliBaseOptions implements MavenOptions {
+public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOptions {
     public CommonsCliMavenOptions(CLIManager cliManager, CommandLine commandLine) {
         super(cliManager, commandLine);
     }

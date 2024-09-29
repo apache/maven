@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker;
+package org.apache.maven.api.cli;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 /**
  * Maven execution request.
  */
-public interface InvokerRequest {
+public interface InvokerRequest<T extends Options> {
     /**
      * Mandatory: the current working directory, usually the {@code "user.dir"} Java System Property.
      */
@@ -121,5 +121,5 @@ public interface InvokerRequest {
      * The mandatory options.
      */
     @Nonnull
-    BaseOptions options();
+    T options();
 }

@@ -25,16 +25,17 @@ import java.util.Optional;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
+import org.apache.maven.api.cli.Options;
 import org.apache.maven.cli.CLIManager;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.Utils.toMap;
 
-public abstract class CommonsCliBaseOptions implements BaseOptions {
+public abstract class CommonsCliOptions implements Options {
     protected final CLIManager cliManager;
     protected final CommandLine commandLine;
 
-    public CommonsCliBaseOptions(CLIManager cliManager, CommandLine commandLine) {
+    public CommonsCliOptions(CLIManager cliManager, CommandLine commandLine) {
         this.cliManager = requireNonNull(cliManager);
         this.commandLine = requireNonNull(commandLine);
     }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn;
+package org.apache.maven.api.cli.mvn;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.cling.invoker.BaseOptions;
+import org.apache.maven.api.cli.Options;
 
 /**
  * Maven options.
@@ -32,7 +32,7 @@ import org.apache.maven.cling.invoker.BaseOptions;
  * This is pretty much what Maven CLI surface offers as knobs and switches. Also, {@code maven.config} may contain
  * subset of these (ie no goals).
  */
-public interface MavenOptions extends BaseOptions {
+public interface MavenOptions extends Options {
     @Nonnull
     Optional<String> alternatePomFile();
 

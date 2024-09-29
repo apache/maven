@@ -43,18 +43,19 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.cli.props.MavenPropertiesLoader;
-import org.apache.maven.cling.invoker.ParserException;
-import org.apache.maven.cling.invoker.ParserRequest;
+import org.apache.maven.api.cli.ParserException;
+import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.mvn.CommonsCliMavenOptions;
 import org.apache.maven.cling.invoker.mvn.LayeredMavenOptions;
-import org.apache.maven.cling.invoker.mvn.MavenInvokerRequest;
-import org.apache.maven.cling.invoker.mvn.MavenOptions;
-import org.apache.maven.cling.invoker.mvn.MavenParser;
+import org.apache.maven.cling.invoker.mvn.DefaultMavenInvokerRequest;
+import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.api.cli.mvn.MavenParser;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
@@ -135,7 +136,7 @@ public class LocalParser implements MavenParser {
         String userExtensionsFile = userProperties.get(Constants.MAVEN_USER_EXTENSIONS);
         extensions.addAll(readCoreExtensionsDescriptor(userExtensionsFile, fileSystem));
 
-        return new MavenInvokerRequest(
+        return new DefaultMavenInvokerRequest(
                 cwd,
                 installationDirectory,
                 userHomeDirectory,

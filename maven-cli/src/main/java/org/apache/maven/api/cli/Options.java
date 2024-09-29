@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker;
+package org.apache.maven.api.cli;
 
 import java.io.PrintStream;
 import java.util.Collection;
@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Base options, options supported by our tools.
  */
-public interface BaseOptions {
+public interface Options {
     @Nonnull
     Optional<Map<String, String>> userProperties();
 
@@ -78,11 +78,11 @@ public interface BaseOptions {
     Optional<Boolean> help();
 
     /**
-     * Returns new instance of {@link BaseOptions} that is result of interpolating this instance with given collection
+     * Returns new instance of {@link Options} that is result of interpolating this instance with given collection
      * of properties.
      */
     @Nonnull
-    BaseOptions interpolate(Collection<Map<String, String>> properties);
+    Options interpolate(Collection<Map<String, String>> properties);
 
     /**
      * Displays help.

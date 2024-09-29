@@ -26,12 +26,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.apache.maven.cling.invoker.LayeredBaseOptions;
+import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.cling.invoker.LayeredOptions;
 
 /**
  * Options that are "layered" by precedence order.
  */
-public class LayeredMavenOptions extends LayeredBaseOptions<MavenOptions> implements MavenOptions {
+public class LayeredMavenOptions extends LayeredOptions<MavenOptions> implements MavenOptions {
     public static MavenOptions layer(MavenOptions... options) {
         return layer(Arrays.asList(options));
     }

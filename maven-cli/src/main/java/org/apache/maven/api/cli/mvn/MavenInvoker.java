@@ -16,18 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker;
+package org.apache.maven.api.cli.mvn;
+
+import org.apache.maven.api.cli.Invoker;
+import org.apache.maven.api.cli.InvokerException;
 
 /**
- * Parser exception is a "terminal" exception, but usually denotes "user error", like bad argument lists, or
- * arguments point to a missing file, and alike. System stops, and user should fix the problem.
+ * Component responsible to invoke Maven using information provided in invoker request.
  */
-public class ParserException extends RuntimeException {
-    public ParserException(String message) {
-        super(message);
-    }
-
-    public ParserException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public interface MavenInvoker extends Invoker<MavenInvokerRequest> {
+    @Override
+    int invoke(MavenInvokerRequest invokerRequest) throws InvokerException;
 }
