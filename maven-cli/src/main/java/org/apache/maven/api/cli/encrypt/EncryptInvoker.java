@@ -24,7 +24,7 @@ import org.apache.maven.api.cli.InvokerException;
 /**
  * Component responsible to invoke Encrypt using information provided in invoker request.
  */
-public interface EncryptInvoker extends Invoker<EncryptOptions, EncryptInvokerRequest> {
+public interface EncryptInvoker extends Invoker<EncryptInvokerRequest> {
     @Override
     int invoke(EncryptInvokerRequest invokerRequest) throws InvokerException;
 }

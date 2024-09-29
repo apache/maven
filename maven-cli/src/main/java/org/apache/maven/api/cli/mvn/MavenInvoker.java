@@ -24,7 +24,7 @@ import org.apache.maven.api.cli.InvokerException;
 /**
  * Component responsible to invoke Maven using information provided in invoker request.
  */
-public interface MavenInvoker extends Invoker<MavenOptions, MavenInvokerRequest> {
+public interface MavenInvoker extends Invoker<MavenInvokerRequest> {
     @Override
     int invoke(MavenInvokerRequest invokerRequest) throws InvokerException;
 }
