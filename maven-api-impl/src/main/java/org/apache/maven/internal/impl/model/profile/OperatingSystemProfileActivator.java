@@ -56,9 +56,15 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
 
         boolean active = ensureAtLeastOneNonNull(os);
 
-        String actualOsName = context.getSystemProperties().get("os.name").toLowerCase(Locale.ENGLISH);
-        String actualOsArch = context.getSystemProperties().get("os.arch").toLowerCase(Locale.ENGLISH);
-        String actualOsVersion = context.getSystemProperties().get("os.version").toLowerCase(Locale.ENGLISH);
+        String actualOsName = context.getSystemProperties()
+                .getOrDefault("os.name", Os.OS_NAME)
+                .toLowerCase(Locale.ENGLISH);
+        String actualOsArch = context.getSystemProperties()
+                .getOrDefault("os.arch", Os.OS_ARCH)
+                .toLowerCase(Locale.ENGLISH);
+        String actualOsVersion = context.getSystemProperties()
+                .getOrDefault("os.version", Os.OS_VERSION)
+                .toLowerCase(Locale.ENGLISH);
 
         if (active && os.getFamily() != null) {
             active = determineFamilyMatch(os.getFamily(), actualOsName);
