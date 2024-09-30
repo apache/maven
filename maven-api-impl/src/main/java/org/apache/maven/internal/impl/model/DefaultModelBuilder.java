@@ -337,7 +337,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         private int getParallelism() {
-            int parallelism = Runtime.getRuntime().availableProcessors() / 2 + 1;
+            int parallelism = /*Runtime.getRuntime().availableProcessors() / 2 +*/ 1;
             try {
                 String str = request.getUserProperties().get(Constants.MAVEN_MODEL_BUILDER_PARALLELISM);
                 if (str != null) {
