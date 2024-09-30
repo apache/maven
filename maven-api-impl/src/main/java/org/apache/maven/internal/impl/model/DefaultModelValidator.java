@@ -413,17 +413,42 @@ public class DefaultModelValidator implements ModelValidator {
 
             Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
 
-            validateStringNoExpression("groupId", problems, Severity.WARNING, Version.V20, m.getGroupId(), m);
-            if (parent == null) {
-                validateStringNotEmpty("groupId", problems, Severity.FATAL, Version.V20, m.getGroupId(), m);
+            // The file pom may not contain the modelVersion yet, as it may be set later by the
+            // ModelVersionXMLFilter.
+            if (m.getModelVersion() != null && !m.getModelVersion().isEmpty()) {
+                validateModelVersion(problems, m.getModelVersion(), m, VALID_MODEL_VERSIONS);
             }
 
-            validateStringNoExpression("artifactId", problems, Severity.WARNING, Version.V20, m.getArtifactId(), m);
-            validateStringNotEmpty("artifactId", problems, Severity.FATAL, Version.V20, m.getArtifactId(), m);
+            boolean isModelVersion41OrMore = !Objects.equals(ModelBuilder.MODEL_VERSION_4_0_0, m.getModelVersion());
+            if (isModelVersion41OrMore) {
+                validateStringNoExpression("groupId", problems, Severity.FATAL, Version.V41, m.getGroupId(), m);
 
-            validateVersionNoExpression("version", problems, Severity.WARNING, Version.V20, m.getVersion(), m);
-            if (parent == null) {
-                validateStringNotEmpty("version", problems, Severity.FATAL, Version.V20, m.getVersion(), m);
+                validateStringNotEmpty("artifactId", problems, Severity.FATAL, Version.V20, m.getArtifactId(), m);
+                validateStringNoExpression("artifactId", problems, Severity.FATAL, Version.V20, m.getArtifactId(), m);
+
+                validateVersionNoExpression("version", problems, Severity.FATAL, Version.V41, m.getVersion(), m);
+
+                if (parent != null) {
+                    validateStringNoExpression(
+                            "groupId", problems, Severity.FATAL, Version.V41, parent.getGroupId(), m);
+                    validateStringNoExpression(
+                            "artifactId", problems, Severity.FATAL, Version.V41, parent.getArtifactId(), m);
+                    validateVersionNoExpression(
+                            "version", problems, Severity.FATAL, Version.V41, parent.getVersion(), m);
+                }
+            } else {
+                validateStringNoExpression("groupId", problems, Severity.WARNING, Version.V20, m.getGroupId(), m);
+                if (parent == null) {
+                    validateStringNotEmpty("groupId", problems, Severity.FATAL, Version.V20, m.getGroupId(), m);
+                }
+
+                validateStringNoExpression("artifactId", problems, Severity.WARNING, Version.V20, m.getArtifactId(), m);
+                validateStringNotEmpty("artifactId", problems, Severity.FATAL, Version.V20, m.getArtifactId(), m);
+
+                validateVersionNoExpression("version", problems, Severity.WARNING, Version.V20, m.getVersion(), m);
+                if (parent == null) {
+                    validateStringNotEmpty("version", problems, Severity.FATAL, Version.V20, m.getVersion(), m);
+                }
             }
 
             validate20RawDependencies(
