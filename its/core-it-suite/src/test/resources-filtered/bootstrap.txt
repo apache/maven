@@ -185,4 +185,5 @@ org.ow2.asm:asm:6.2
 org.ow2.asm:asm:7.2
 org.slf4j:slf4j-api:1.6.1
 org.slf4j:slf4j-api:1.7.36
+org.slf4j:slf4j-api:2.0.16
 org.sonatype.sisu:sisu-guice:jar:no_aop:3.1.0

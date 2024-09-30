@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 public class MavenITmng5774ConfigurationProcessorsTest extends AbstractMavenIntegrationTestCase {
     public MavenITmng5774ConfigurationProcessorsTest() {
-        super("(3.2.5,)");
+        super("(3.2.5,4.0.0-beta-4]");
     }
 
     @Test
