@@ -152,27 +152,6 @@ under the License.
 
   <build>
     <finalName>${distributionFileName}</finalName>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <configuration>
-            <excludes combine.children="append">
-              <!-- these are partial scripts, resulting in mvn scripts -->
-              <exclude>src/assembly/shared/init</exclude>
-              <exclude>src/assembly/shared/init.cmd</exclude>
-              <exclude>src/assembly/shared/mvnlauncher</exclude>
-              <exclude>src/assembly/shared/mvnlauncher.cmd</exclude>
-              <exclude>src/assembly/shared/mvnvalidate</exclude>
-              <exclude>src/assembly/shared/mvnvalidate.cmd</exclude>
-              <exclude>src/assembly/shared/run</exclude>
-              <exclude>src/assembly/shared/run.cmd</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
