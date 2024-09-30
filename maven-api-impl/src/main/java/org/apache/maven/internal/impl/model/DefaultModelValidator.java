@@ -74,8 +74,6 @@ import org.apache.maven.api.services.model.ModelVersionProcessor;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
 
-import static org.apache.maven.internal.impl.model.DefaultModelBuilder.NAMESPACE_PREFIX;
-
 /**
  */
 @Named
@@ -350,6 +348,10 @@ public class DefaultModelValidator implements ModelValidator {
                 }
             }
         } else if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
+            validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m);
+
+            validateModelVersion(problems, m.getModelVersion(), m, VALID_MODEL_VERSIONS);
+
             Set<String> modules = new HashSet<>();
             for (int i = 0, n = m.getModules().size(); i < n; i++) {
                 String module = m.getModules().get(i);
@@ -365,12 +367,6 @@ public class DefaultModelValidator implements ModelValidator {
                 }
             }
             String modelVersion = m.getModelVersion();
-            if (modelVersion == null) {
-                String namespace = m.getNamespaceUri();
-                if (namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
-                    modelVersion = namespace.substring(NAMESPACE_PREFIX.length());
-                }
-            }
             if (Objects.equals(modelVersion, ModelBuilder.MODEL_VERSION_4_0_0)) {
                 if (!m.getSubprojects().isEmpty()) {
                     addViolation(
@@ -421,12 +417,6 @@ public class DefaultModelValidator implements ModelValidator {
             }
 
             Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
-
-            // The file pom may not contain the modelVersion yet, as it may be set later by the
-            // ModelVersionXMLFilter.
-            if (m.getModelVersion() != null && !m.getModelVersion().isEmpty()) {
-                validateModelVersion(problems, m.getModelVersion(), m, VALID_MODEL_VERSIONS);
-            }
 
             validateStringNoExpression("groupId", problems, Severity.WARNING, Version.V20, m.getGroupId(), m);
             if (parent == null) {
@@ -562,16 +552,8 @@ public class DefaultModelValidator implements ModelValidator {
     @Override
     public void validateRawModel(
             Model m, int validationLevel, ModelBuilderRequest request, ModelProblemCollector problems) {
-        // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an
-        // effective model.
-        //
-        // As of 3.4, the model version is mandatory even in raw models. The XML element still is optional in the
-        // XML schema and this will not change anytime soon. We do not want to build effective models based on
-        // models without a version starting with 3.4.
-        validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m);
-
-        validateModelVersion(problems, m.getModelVersion(), m, VALID_MODEL_VERSIONS);
-
+        // Check that the model version is correctly set wrt the model definition, i.e., that the
+        // user does not use an attribute or element that is not available in the modelVersion used.
         String minVersion = new MavenModelVersion().getModelVersion(m);
         if (m.getModelVersion() != null && compareModelVersions(minVersion, m.getModelVersion()) > 0) {
             addViolation(
