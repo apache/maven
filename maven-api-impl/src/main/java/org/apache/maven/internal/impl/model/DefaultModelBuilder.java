@@ -76,6 +76,7 @@ import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.RepositoryFactory;
@@ -387,12 +388,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 dag.addEdge(from.toString(), p.toString());
                 return false;
             } catch (Graph.CycleDetectedException e) {
-                add(
-                        Severity.FATAL,
-                        ModelProblem.Version.BASE,
-                        "Cycle detected between models at " + from + " and " + p,
-                        null,
-                        e);
+                add(Severity.FATAL, Version.BASE, "Cycle detected between models at " + from + " and " + p, null, e);
                 return true;
             }
         }
@@ -422,13 +418,12 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         public boolean hasFatalErrors() {
-            return result.getProblems().stream().anyMatch(p -> p.getSeverity() == ModelProblem.Severity.FATAL);
+            return result.getProblems().stream().anyMatch(p -> p.getSeverity() == Severity.FATAL);
         }
 
         public boolean hasErrors() {
             return result.getProblems().stream()
-                    .anyMatch(p -> p.getSeverity() == ModelProblem.Severity.FATAL
-                            || p.getSeverity() == ModelProblem.Severity.ERROR);
+                    .anyMatch(p -> p.getSeverity() == Severity.FATAL || p.getSeverity() == Severity.ERROR);
         }
 
         @Override
@@ -782,7 +777,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         ModelProblem problem = new DefaultModelProblem(
                                 "Child subproject " + subproject + " of " + pomDirectory + " does not exist",
                                 Severity.ERROR,
-                                ModelProblem.Version.BASE,
+                                Version.BASE,
                                 model,
                                 -1,
                                 -1,
@@ -804,7 +799,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 "Child subproject " + subprojectFile + " of " + pom + " forms aggregation cycle "
                                         + buffer,
                                 Severity.ERROR,
-                                ModelProblem.Version.BASE,
+                                Version.BASE,
                                 model,
                                 -1,
                                 -1,
@@ -823,7 +818,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             } catch (ModelBuilderException e) {
                 // gathered with problem collector
-                add(Severity.ERROR, ModelProblem.Version.V40, "Failed to load project " + pom, e);
+                add(Severity.ERROR, Version.V40, "Failed to load project " + pom, e);
             }
             if (r != result) {
                 r.getProblems().forEach(result::addProblem);
@@ -903,7 +898,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 if (!"pom".equals(parentModel.getPackaging())) {
                     add(
                             Severity.ERROR,
-                            ModelProblem.Version.BASE,
+                            Version.BASE,
                             "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint(parentModel)
                                     + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"",
                             parentModel.getLocation("packaging"));
@@ -955,7 +950,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 buffer.append(parent.getArtifactId()).append(", please verify your project structure");
 
                 setSource(childModel);
-                add(Severity.WARNING, ModelProblem.Version.BASE, buffer.toString(), parent.getLocation(""));
+                add(Severity.WARNING, Version.BASE, buffer.toString(), parent.getLocation(""));
                 return null;
             }
 
@@ -973,18 +968,14 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                     if (rawChildModelVersion == null) {
                         // Message below is checked for in the MNG-2199 core IT.
-                        add(
-                                Severity.FATAL,
-                                ModelProblem.Version.V31,
-                                "Version must be a constant",
-                                childModel.getLocation(""));
+                        add(Severity.FATAL, Version.V31, "Version must be a constant", childModel.getLocation(""));
 
                     } else {
                         if (rawChildVersionReferencesParent(rawChildModelVersion)) {
                             // Message below is checked for in the MNG-2199 core IT.
                             add(
                                     Severity.FATAL,
-                                    ModelProblem.Version.V31,
+                                    Version.V31,
                                     "Version must be a constant",
                                     childModel.getLocation("version"));
                         }
@@ -1059,7 +1050,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     }
                 }
 
-                add(Severity.FATAL, ModelProblem.Version.BASE, buffer.toString(), parent.getLocation(""), e);
+                add(Severity.FATAL, Version.BASE, buffer.toString(), parent.getLocation(""), e);
                 throw newModelBuilderException();
             }
 
@@ -1075,17 +1066,13 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                 if (rawChildModelVersion == null) {
                     // Message below is checked for in the MNG-2199 core IT.
-                    add(
-                            Severity.FATAL,
-                            ModelProblem.Version.V31,
-                            "Version must be a constant",
-                            childModel.getLocation(""));
+                    add(Severity.FATAL, Version.V31, "Version must be a constant", childModel.getLocation(""));
                 } else {
                     if (rawChildVersionReferencesParent(rawChildModelVersion)) {
                         // Message below is checked for in the MNG-2199 core IT.
                         add(
                                 Severity.FATAL,
-                                ModelProblem.Version.V31,
+                                Version.V31,
                                 "Version must be a constant",
                                 childModel.getLocation("version"));
                     }
@@ -1263,7 +1250,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                     add(
                             Severity.ERROR,
-                            ModelProblem.Version.V20,
+                            Version.V20,
                             "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(),
                             e);
                 }
@@ -1283,7 +1270,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             } catch (XmlReaderException e) {
                 add(
                         Severity.FATAL,
-                        ModelProblem.Version.BASE,
+                        Version.BASE,
                         "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
                         e);
                 throw newModelBuilderException();
@@ -1297,11 +1284,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         msg = e.getClass().getSimpleName();
                     }
                 }
-                add(
-                        Severity.FATAL,
-                        ModelProblem.Version.BASE,
-                        "Non-readable POM " + modelSource.getLocation() + ": " + msg,
-                        e);
+                add(Severity.FATAL, Version.BASE, "Non-readable POM " + modelSource.getLocation() + ": " + msg, e);
                 throw newModelBuilderException();
             }
 
@@ -1369,7 +1352,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             model = model.withSubprojects(subprojects);
                         }
                     } catch (IOException e) {
-                        add(Severity.FATAL, ModelProblem.Version.V41, "Error discovering subprojects", e);
+                        add(Severity.FATAL, Version.V41, "Error discovering subprojects", e);
                     }
                 }
             }
@@ -1526,7 +1509,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (groupId == null || groupId.isEmpty()) {
                 add(
                         Severity.ERROR,
-                        ModelProblem.Version.BASE,
+                        Version.BASE,
                         "'dependencyManagement.dependencies.dependency.groupId' for " + dependency.getManagementKey()
                                 + " is missing.",
                         dependency.getLocation(""));
@@ -1535,7 +1518,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (artifactId == null || artifactId.isEmpty()) {
                 add(
                         Severity.ERROR,
-                        ModelProblem.Version.BASE,
+                        Version.BASE,
                         "'dependencyManagement.dependencies.dependency.artifactId' for " + dependency.getManagementKey()
                                 + " is missing.",
                         dependency.getLocation(""));
@@ -1544,7 +1527,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (version == null || version.isEmpty()) {
                 add(
                         Severity.ERROR,
-                        ModelProblem.Version.BASE,
+                        Version.BASE,
                         "'dependencyManagement.dependencies.dependency.version' for " + dependency.getManagementKey()
                                 + " is missing.",
                         dependency.getLocation(""));
@@ -1560,7 +1543,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     message.append(modelId).append(" -> ");
                 }
                 message.append(imported);
-                add(Severity.ERROR, ModelProblem.Version.BASE, message.toString());
+                add(Severity.ERROR, Version.BASE, message.toString());
                 return null;
             }
 
@@ -1612,7 +1595,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
                 buffer.append(": ").append(e.getMessage());
 
-                add(Severity.ERROR, ModelProblem.Version.BASE, buffer.toString(), dependency.getLocation(""), e);
+                add(Severity.ERROR, Version.BASE, buffer.toString(), dependency.getLocation(""), e);
                 return null;
             }
 
@@ -1627,7 +1610,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 if (sourcePath != null && sourcePath.startsWith(rootDirectory)) {
                     add(
                             Severity.WARNING,
-                            ModelProblem.Version.BASE,
+                            Version.BASE,
                             "BOM imports from within reactor should be avoided",
                             dependency.getLocation(""));
                 }
@@ -1711,7 +1694,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         try {
                             return xform.interpolate(s);
                         } catch (InterpolationException e) {
-                            problems.add(Severity.ERROR, ModelProblem.Version.BASE, e.getMessage(), e);
+                            problems.add(Severity.ERROR, Version.BASE, e.getMessage(), e);
                         }
                     }
                     return s;
@@ -1752,7 +1735,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     } catch (InterpolationException e) {
                         problems.add(
                                 Severity.ERROR,
-                                ModelProblem.Version.BASE,
+                                Version.BASE,
                                 "Failed to interpolate file location " + path + ": " + e.getMessage(),
                                 target.getLocation(locationKey),
                                 e);
@@ -1847,7 +1830,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             } catch (Exception e) {
                 problems.add(
                         Severity.ERROR,
-                        ModelProblem.Version.BASE,
+                        Version.BASE,
                         "Failed to interpolate field: "
                                 + interpolatedModel.getParent().getVersion()
                                 + " on class: ",
