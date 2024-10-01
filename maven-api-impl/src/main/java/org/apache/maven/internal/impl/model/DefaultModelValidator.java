@@ -70,7 +70,6 @@ import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ModelValidator;
-import org.apache.maven.api.services.model.ModelVersionProcessor;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
 
@@ -288,12 +287,8 @@ public class DefaultModelValidator implements ModelValidator {
 
     private final Set<String> validProfileIds = new HashSet<>();
 
-    private final ModelVersionProcessor versionProcessor;
-
     @Inject
-    public DefaultModelValidator(ModelVersionProcessor versionProcessor) {
-        this.versionProcessor = versionProcessor;
-    }
+    public DefaultModelValidator() {}
 
     @Override
     @SuppressWarnings("checkstyle:MethodLength")
@@ -418,17 +413,42 @@ public class DefaultModelValidator implements ModelValidator {
 
             Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
 
-            validateStringNoExpression("groupId", problems, Severity.WARNING, Version.V20, m.getGroupId(), m);
-            if (parent == null) {
-                validateStringNotEmpty("groupId", problems, Severity.FATAL, Version.V20, m.getGroupId(), m);
+            // The file pom may not contain the modelVersion yet, as it may be set later by the
+            // ModelVersionXMLFilter.
+            if (m.getModelVersion() != null && !m.getModelVersion().isEmpty()) {
+                validateModelVersion(problems, m.getModelVersion(), m, VALID_MODEL_VERSIONS);
             }
 
-            validateStringNoExpression("artifactId", problems, Severity.WARNING, Version.V20, m.getArtifactId(), m);
-            validateStringNotEmpty("artifactId", problems, Severity.FATAL, Version.V20, m.getArtifactId(), m);
+            boolean isModelVersion41OrMore = !Objects.equals(ModelBuilder.MODEL_VERSION_4_0_0, m.getModelVersion());
+            if (isModelVersion41OrMore) {
+                validateStringNoExpression("groupId", problems, Severity.FATAL, Version.V41, m.getGroupId(), m);
 
-            validateVersionNoExpression("version", problems, Severity.WARNING, Version.V20, m.getVersion(), m);
-            if (parent == null) {
-                validateStringNotEmpty("version", problems, Severity.FATAL, Version.V20, m.getVersion(), m);
+                validateStringNotEmpty("artifactId", problems, Severity.FATAL, Version.V20, m.getArtifactId(), m);
+                validateStringNoExpression("artifactId", problems, Severity.FATAL, Version.V20, m.getArtifactId(), m);
+
+                validateVersionNoExpression("version", problems, Severity.FATAL, Version.V41, m.getVersion(), m);
+
+                if (parent != null) {
+                    validateStringNoExpression(
+                            "groupId", problems, Severity.FATAL, Version.V41, parent.getGroupId(), m);
+                    validateStringNoExpression(
+                            "artifactId", problems, Severity.FATAL, Version.V41, parent.getArtifactId(), m);
+                    validateVersionNoExpression(
+                            "version", problems, Severity.FATAL, Version.V41, parent.getVersion(), m);
+                }
+            } else {
+                validateStringNoExpression("groupId", problems, Severity.WARNING, Version.V20, m.getGroupId(), m);
+                if (parent == null) {
+                    validateStringNotEmpty("groupId", problems, Severity.FATAL, Version.V20, m.getGroupId(), m);
+                }
+
+                validateStringNoExpression("artifactId", problems, Severity.WARNING, Version.V20, m.getArtifactId(), m);
+                validateStringNotEmpty("artifactId", problems, Severity.FATAL, Version.V20, m.getArtifactId(), m);
+
+                validateVersionNoExpression("version", problems, Severity.WARNING, Version.V20, m.getVersion(), m);
+                if (parent == null) {
+                    validateStringNotEmpty("version", problems, Severity.FATAL, Version.V20, m.getVersion(), m);
+                }
             }
 
             validate20RawDependencies(
@@ -1634,19 +1654,14 @@ public class DefaultModelValidator implements ModelValidator {
 
         Matcher m = EXPRESSION_NAME_PATTERN.matcher(string.trim());
         while (m.find()) {
-            String property = m.group(1);
-            if (!versionProcessor.isValidProperty(property)) {
-                addViolation(
-                        problems,
-                        severity,
-                        version,
-                        fieldName,
-                        null,
-                        "contains an expression but should be a constant.",
-                        tracker);
-
-                return false;
-            }
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    fieldName,
+                    null,
+                    "contains an expression but should be a constant.",
+                    tracker);
         }
 
         return true;
