@@ -118,7 +118,7 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
 
     private Resource alignToBaseDirectory(Resource resource, Path basedir) {
         if (resource != null) {
-            String newDir = alignToBaseDirectory(resource.getDirectory(), basedir);
+            String newDir = mayAlignToBaseDirectoryOrNull(resource.getDirectory(), basedir);
             if (newDir != null) {
                 return resource.withDirectory(newDir);
             }
@@ -127,6 +127,17 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
     }
 
     private String alignToBaseDirectory(String path, Path basedir) {
+        String newPath = mayAlignToBaseDirectoryOrNull(path, basedir);
+        if (newPath != null) {
+            return newPath;
+        }
+        return path;
+    }
+
+    /**
+     * Returns aligned path or {@code null} if no need for change.
+     */
+    private String mayAlignToBaseDirectoryOrNull(String path, Path basedir) {
         String newPath = pathTranslator.alignToBaseDirectory(path, basedir);
         return Objects.equals(path, newPath) ? null : newPath;
     }
