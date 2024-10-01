@@ -499,23 +499,30 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             List<ProjectBuildingResult> results = new ArrayList<>();
             List<ModelBuilderResult> allModels = results(result).toList();
             for (ModelBuilderResult r : allModels) {
-                File pom = r.getSource().getPath().toFile();
-                MavenProject project = projectIndex.get(r.getEffectiveModel().getId());
-                Path rootDirectory = rootLocator.findRoot(pom.getParentFile().toPath());
-                project.setRootDirectory(rootDirectory);
-                project.setFile(pom);
-                project.setExecutionRoot(pom.equals(pomFile));
-                initProject(project, r);
-                project.setCollectedProjects(results(r)
-                        .filter(cr -> cr != r)
-                        .map(cr -> projectIndex.get(cr.getEffectiveModel().getId()))
-                        .collect(Collectors.toList()));
+                if (r.getEffectiveModel() != null) {
+                    File pom = r.getSource().getPath().toFile();
+                    MavenProject project =
+                            projectIndex.get(r.getEffectiveModel().getId());
+                    Path rootDirectory =
+                            rootLocator.findRoot(pom.getParentFile().toPath());
+                    project.setRootDirectory(rootDirectory);
+                    project.setFile(pom);
+                    project.setExecutionRoot(pom.equals(pomFile));
+                    initProject(project, r);
+                    project.setCollectedProjects(results(r)
+                            .filter(cr -> cr != r)
+                            .map(cr -> projectIndex.get(cr.getEffectiveModel().getId()))
+                            .collect(Collectors.toList()));
 
-                DependencyResolutionResult resolutionResult = null;
-                if (request.isResolveDependencies()) {
-                    resolutionResult = resolveDependencies(project);
+                    DependencyResolutionResult resolutionResult = null;
+                    if (request.isResolveDependencies()) {
+                        resolutionResult = resolveDependencies(project);
+                    }
+                    results.add(
+                            new DefaultProjectBuildingResult(project, convert(result.getProblems()), resolutionResult));
+                } else {
+                    results.add(new DefaultProjectBuildingResult(null, convert(result.getProblems()), null));
                 }
-                results.add(new DefaultProjectBuildingResult(project, convert(result.getProblems()), resolutionResult));
             }
             return results;
         }
