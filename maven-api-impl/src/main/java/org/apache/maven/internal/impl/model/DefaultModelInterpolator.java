@@ -212,24 +212,24 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                     false);
             valueSources.add(baseUriValueSource);
             valueSources.add(new BuildTimestampValueSource(request.getSession().getStartTime(), modelProperties));
-        }
 
-        valueSources.add(new PrefixedValueSourceWrapper(
-                new AbstractValueSource(false) {
-                    @Override
-                    public Object getValue(String expression) {
-                        if ("rootDirectory".equals(expression)) {
-                            Path root = rootLocator.findMandatoryRoot(projectDir);
-                            return root.toFile().getPath();
-                        } else if (expression.startsWith("rootDirectory.")) {
-                            Path root = rootLocator.findMandatoryRoot(projectDir);
-                            return new ObjectBasedValueSource(root)
-                                    .getValue(expression.substring("rootDirectory.".length()));
+            valueSources.add(new PrefixedValueSourceWrapper(
+                    new AbstractValueSource(false) {
+                        @Override
+                        public Object getValue(String expression) {
+                            if ("rootDirectory".equals(expression)) {
+                                Path root = rootLocator.findMandatoryRoot(projectDir);
+                                return root.toFile().getPath();
+                            } else if (expression.startsWith("rootDirectory.")) {
+                                Path root = rootLocator.findMandatoryRoot(projectDir);
+                                return new ObjectBasedValueSource(root)
+                                        .getValue(expression.substring("rootDirectory.".length()));
+                            }
+                            return null;
                         }
-                        return null;
-                    }
-                },
-                getProjectPrefixes(request)));
+                    },
+                    getProjectPrefixes(request)));
+        }
 
         valueSources.add(projectPrefixValueSource);
 
