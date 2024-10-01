@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -61,7 +62,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
 
     @Override
     public List<MavenProject> collectProjects(MavenExecutionRequest request) throws ProjectBuildingException {
-        File moduleProjectPomFile = getMultiModuleProjectPomFile(request);
+        File moduleProjectPomFile = getRootProject(request);
         List<File> files = Collections.singletonList(moduleProjectPomFile.getAbsoluteFile());
         try {
             List<MavenProject> projects = projectsSelector.selectProjects(files, request);
@@ -96,24 +97,24 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
         }
     }
 
-    private File getMultiModuleProjectPomFile(MavenExecutionRequest request) {
-        File multiModuleProjectDirectory = request.getMultiModuleProjectDirectory();
-        if (request.getPom().getParentFile().equals(multiModuleProjectDirectory)) {
+    private File getRootProject(MavenExecutionRequest request) {
+        Path rootDirectory = request.getRootDirectory();
+        if (request.getPom().getParentFile().toPath().equals(rootDirectory)) {
             return request.getPom();
         } else {
-            File multiModuleProjectPom = modelLocator.locateExistingPom(multiModuleProjectDirectory);
-            if (multiModuleProjectPom == null) {
+            Path rootProjectPom = modelLocator.locateExistingPom(rootDirectory);
+            if (rootProjectPom == null) {
                 LOGGER.info(
                         "Maven detected that the requested POM file is part of a multi-module project, "
-                                + "but could not find a pom.xml file in the multi-module root directory '{}'.",
-                        multiModuleProjectDirectory);
+                                + "but could not find a pom.xml file in the root directory '{}'.",
+                        rootDirectory);
                 LOGGER.info(
                         "The reactor is limited to all projects under: {}",
                         request.getPom().getParent());
                 return request.getPom();
             }
 
-            return multiModuleProjectPom;
+            return rootProjectPom.toFile();
         }
     }
 
