@@ -24,10 +24,10 @@ import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3535">MNG-3535</a>.
- *
- *
  */
 public class MavenITmng3535SelfReferentialPropertiesTest extends AbstractMavenIntegrationTestCase {
 
@@ -45,9 +45,19 @@ public class MavenITmng3535SelfReferentialPropertiesTest extends AbstractMavenIn
 
         verifier.setAutoclean(false);
         verifier.addCliArgument("verify");
-        verifier.execute();
 
-        verifier.verifyErrorFreeLog();
+        if (matchesVersionRange("[4.0.0-beta-5,)")) {
+            assertThrows(
+                    Exception.class,
+                    () -> {
+                        verifier.execute();
+                        verifier.verifyErrorFreeLog();
+                    },
+                    "There is a self-referential property in this build; it should fail.");
+        } else {
+            verifier.execute();
+            verifier.verifyErrorFreeLog();
+        }
     }
 
     @Test
@@ -55,19 +65,16 @@ public class MavenITmng3535SelfReferentialPropertiesTest extends AbstractMavenIn
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3535/failure");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-
-        verifier.addCliArgument("-X");
-
         verifier.setAutoclean(false);
+        verifier.addCliArgument("-X");
+        verifier.addCliArgument("verify");
 
-        try {
-            verifier.addCliArgument("verify");
-            verifier.execute();
-
-            verifier.verifyErrorFreeLog();
-            fail("There is a self-referential property in this build; it should fail.");
-        } catch (Exception e) {
-            // should fail this verification, because there truly is a self-referential property.
-        }
+        assertThrows(
+                Exception.class,
+                () -> {
+                    verifier.execute();
+                    verifier.verifyErrorFreeLog();
+                },
+                "There is a self-referential property in this build; it should fail.");
     }
 }
