@@ -20,6 +20,8 @@ package org.apache.maven.api.services.model;
 
 import java.nio.file.Path;
 
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
@@ -32,9 +34,7 @@ import org.apache.maven.api.services.ModelProblemCollector;
 public interface ModelInterpolator {
 
     /**
-     * Interpolates expressions in the specified model. Note that implementations are free to either interpolate the
-     * provided model directly or to create a clone of the model and interpolate the clone. Callers should always use
-     * the returned model and must not rely on the input model being updated.
+     * Interpolates expressions in the specified model.
      *
      * @param model The model to interpolate, must not be {@code null}.
      * @param projectDir The project directory, may be {@code null} if the model does not belong to a local project but
@@ -44,5 +44,10 @@ public interface ModelInterpolator {
      * @return The interpolated model, never {@code null}.
      * @since 4.0.0
      */
-    Model interpolateModel(Model model, Path projectDir, ModelBuilderRequest request, ModelProblemCollector problems);
+    @Nonnull
+    Model interpolateModel(
+            @Nonnull Model model,
+            @Nullable Path projectDir,
+            @Nonnull ModelBuilderRequest request,
+            @Nonnull ModelProblemCollector problems);
 }

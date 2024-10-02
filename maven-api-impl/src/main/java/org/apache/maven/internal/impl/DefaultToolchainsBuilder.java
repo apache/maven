@@ -25,9 +25,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderException;
@@ -37,12 +41,9 @@ import org.apache.maven.api.services.xml.ToolchainsXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.toolchain.v4.MavenToolchainsMerger;
 import org.apache.maven.toolchain.v4.MavenToolchainsTransformer;
-import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.MapBasedValueSource;
-import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
 /**
  * Builds the effective toolchains from a user toolchains file and/or a global toolchains file.
@@ -52,6 +53,17 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
     private final MavenToolchainsMerger toolchainsMerger = new MavenToolchainsMerger();
+
+    private final Interpolator interpolator;
+
+    public DefaultToolchainsBuilder() {
+        this(new DefaultInterpolator());
+    }
+
+    @Inject
+    public DefaultToolchainsBuilder(Interpolator interpolator) {
+        this.interpolator = interpolator;
+    }
 
     @Override
     public ToolchainsBuilderResult build(ToolchainsBuilderRequest request) throws ToolchainsBuilderException {
@@ -154,39 +166,10 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
     private PersistedToolchains interpolate(
             PersistedToolchains toolchains, ToolchainsBuilderRequest request, List<BuilderProblem> problems) {
-
-        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
-
-        interpolator.addValueSource(new MapBasedValueSource(request.getSession().getUserProperties()));
-
-        interpolator.addValueSource(new MapBasedValueSource(request.getSession().getSystemProperties()));
-
-        try {
-            interpolator.addValueSource(new EnvarBasedValueSource());
-        } catch (IOException e) {
-            problems.add(new DefaultBuilderProblem(
-                    null,
-                    -1,
-                    -1,
-                    e,
-                    "Failed to use environment variables for interpolation: " + e.getMessage(),
-                    BuilderProblem.Severity.WARNING));
-        }
-
-        return new MavenToolchainsTransformer(value -> {
-                    try {
-                        return value != null ? interpolator.interpolate(value) : null;
-                    } catch (InterpolationException e) {
-                        problems.add(new DefaultBuilderProblem(
-                                null,
-                                -1,
-                                -1,
-                                e,
-                                "Failed to interpolate toolchains: " + e.getMessage(),
-                                BuilderProblem.Severity.WARNING));
-                        return value;
-                    }
-                })
+        Map<String, String> userProperties = request.getSession().getUserProperties();
+        Map<String, String> systemProperties = request.getSession().getSystemProperties();
+        Function<String, String> src = Interpolator.chain(List.of(userProperties::get, systemProperties::get));
+        return new MavenToolchainsTransformer(value -> value != null ? interpolator.interpolate(value, src) : null)
                 .visit(toolchains);
     }
 

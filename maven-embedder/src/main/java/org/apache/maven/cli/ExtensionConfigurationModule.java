@@ -18,29 +18,29 @@
  */
 package org.apache.maven.cli;
 
-import java.util.Arrays;
+import java.util.function.Function;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.StringSearchInterpolator;
-import org.codehaus.plexus.interpolation.ValueSource;
 
 public class ExtensionConfigurationModule implements Module {
 
     private final CoreExtensionEntry extension;
-    private final Iterable<ValueSource> valueSources;
+    private final Function<String, String> callback;
+    private final DefaultInterpolator interpolator = new DefaultInterpolator();
 
-    public ExtensionConfigurationModule(CoreExtensionEntry extension, ValueSource... valueSources) {
+    public ExtensionConfigurationModule(CoreExtensionEntry extension, Function<String, String> callback) {
         this.extension = extension;
-        this.valueSources = Arrays.asList(valueSources);
+        this.callback = callback;
     }
 
     @Override
@@ -50,7 +50,9 @@ public class ExtensionConfigurationModule implements Module {
             if (configuration == null) {
                 configuration = new XmlNodeImpl("configuration");
             }
-            configuration = new Interpolator().transform(configuration);
+            Function<String, String> cb = Interpolator.memoize(callback);
+            Function<String, String> it = s -> interpolator.interpolate(s, cb);
+            configuration = new ExtensionInterpolator(it).transform(configuration);
 
             binder.bind(XmlNode.class)
                     .annotatedWith(Names.named(extension.getKey()))
@@ -61,26 +63,13 @@ public class ExtensionConfigurationModule implements Module {
         }
     }
 
-    class Interpolator extends MavenTransformer {
-        final StringSearchInterpolator interpolator;
-
-        Interpolator() {
-            super(null);
-            interpolator = new StringSearchInterpolator();
-            interpolator.setCacheAnswers(true);
-            valueSources.forEach(interpolator::addValueSource);
+    static class ExtensionInterpolator extends MavenTransformer {
+        ExtensionInterpolator(Function<String, String> transformer) {
+            super(transformer);
         }
 
         public XmlNode transform(XmlNode node) {
             return super.transform(node);
-        }
-
-        protected String transform(String str) {
-            try {
-                return interpolator.interpolate(str);
-            } catch (InterpolationException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }

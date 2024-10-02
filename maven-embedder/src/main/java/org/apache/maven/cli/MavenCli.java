@@ -120,9 +120,6 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.interpolation.AbstractValueSource;
-import org.codehaus.plexus.interpolation.BasicInterpolator;
-import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
@@ -646,21 +643,29 @@ public class MavenCli {
         populateProperties(cliRequest.commandLine, paths, cliRequest.systemProperties, cliRequest.userProperties);
 
         // now that we have properties, interpolate all arguments
-        BasicInterpolator interpolator =
-                createInterpolator(paths, cliRequest.systemProperties, cliRequest.userProperties);
+        Function<String, String> callback = v -> {
+            String r = paths.getProperty(v);
+            if (r == null) {
+                r = cliRequest.systemProperties.getProperty(v);
+            }
+            if (r == null) {
+                r = cliRequest.userProperties.getProperty(v);
+            }
+            return r != null ? r : v;
+        };
         CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
         commandLineBuilder.setDeprecatedHandler(o -> {});
         for (Option option : cliRequest.commandLine.getOptions()) {
             if (!String.valueOf(CLIManager.SET_USER_PROPERTY).equals(option.getOpt())) {
                 List<String> values = option.getValuesList();
                 for (ListIterator<String> it = values.listIterator(); it.hasNext(); ) {
-                    it.set(interpolator.interpolate(it.next()));
+                    it.set(MavenPropertiesLoader.substVars(it.next(), null, null, callback));
                 }
             }
             commandLineBuilder.addOption(option);
         }
         for (String arg : cliRequest.commandLine.getArgList()) {
-            commandLineBuilder.addArg(interpolator.interpolate(arg));
+            commandLineBuilder.addArg(MavenPropertiesLoader.substVars(arg, null, null, callback));
         }
         cliRequest.commandLine = commandLineBuilder.build();
     }
@@ -719,15 +724,12 @@ public class MavenCli {
 
         container.setLoggerManager(plexusLoggerManager);
 
-        AbstractValueSource extensionSource = new AbstractValueSource(false) {
-            @Override
-            public Object getValue(String expression) {
-                Object value = cliRequest.userProperties.getProperty(expression);
-                if (value == null) {
-                    value = cliRequest.systemProperties.getProperty(expression);
-                }
-                return value;
+        Function<String, String> extensionSource = expression -> {
+            String value = cliRequest.userProperties.getProperty(expression);
+            if (value == null) {
+                value = cliRequest.systemProperties.getProperty(expression);
             }
+            return value;
         };
         for (CoreExtensionEntry extension : extensions) {
             container.discoverComponents(
@@ -1742,23 +1744,6 @@ public class MavenCli {
             }
             return null;
         };
-    }
-
-    private static BasicInterpolator createInterpolator(Properties... properties) {
-        StringSearchInterpolator interpolator = new StringSearchInterpolator();
-        interpolator.addValueSource(new AbstractValueSource(false) {
-            @Override
-            public Object getValue(String expression) {
-                for (Properties props : properties) {
-                    Object val = props.getProperty(expression);
-                    if (val != null) {
-                        return val;
-                    }
-                }
-                return null;
-            }
-        });
-        return interpolator;
     }
 
     private static String stripLeadingAndTrailingQuotes(String str) {

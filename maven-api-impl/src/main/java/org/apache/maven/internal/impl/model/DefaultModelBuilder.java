@@ -42,6 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
@@ -71,6 +72,8 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.BuilderProblem.Severity;
+import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
@@ -110,11 +113,6 @@ import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.internal.impl.util.PhasingExecutor;
 import org.apache.maven.model.v4.MavenTransformer;
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.Interpolator;
-import org.codehaus.plexus.interpolation.MapBasedValueSource;
-import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
-import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,6 +153,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final List<ModelTransformer> transformers;
     private final ModelCacheFactory modelCacheFactory;
     private final ModelResolver modelResolver;
+    private final Interpolator interpolator;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -177,7 +176,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             ModelVersionParser versionParser,
             List<ModelTransformer> transformers,
             ModelCacheFactory modelCacheFactory,
-            ModelResolver modelResolver) {
+            ModelResolver modelResolver,
+            Interpolator interpolator) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
         this.modelNormalizer = modelNormalizer;
@@ -197,6 +197,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.transformers = transformers;
         this.modelCacheFactory = modelCacheFactory;
         this.modelResolver = modelResolver;
+        this.interpolator = interpolator;
     }
 
     public ModelBuilderSession newSession() {
@@ -1652,6 +1653,73 @@ public class DefaultModelBuilder implements ModelBuilder {
         private <T> T cache(Source source, String tag, Supplier<T> supplier) {
             return cache.computeIfAbsent(source, tag, supplier);
         }
+
+        private List<Profile> interpolateActivations(
+                List<Profile> profiles, DefaultProfileActivationContext context, ModelProblemCollector problems) {
+            if (profiles.stream()
+                    .map(org.apache.maven.api.model.Profile::getActivation)
+                    .noneMatch(Objects::nonNull)) {
+                return profiles;
+            }
+            Interpolator interpolator = request.getSession().getService(Interpolator.class);
+
+            class ProfileInterpolator extends MavenTransformer implements UnaryOperator<Profile> {
+                ProfileInterpolator() {
+                    super(s -> {
+                        try {
+                            Map<String, String> map1 = context.getUserProperties();
+                            Map<String, String> map2 = context.getSystemProperties();
+                            return interpolator.interpolate(s, Interpolator.chain(List.of(map1::get, map2::get)));
+                        } catch (InterpolatorException e) {
+                            problems.add(Severity.ERROR, Version.BASE, e.getMessage(), e);
+                        }
+                        return s;
+                    });
+                }
+
+                @Override
+                public Profile apply(Profile p) {
+                    return Profile.newBuilder(p)
+                            .activation(transformActivation(p.getActivation()))
+                            .build();
+                }
+
+                @Override
+                protected ActivationFile.Builder transformActivationFile_Missing(
+                        Supplier<? extends ActivationFile.Builder> creator,
+                        ActivationFile.Builder builder,
+                        ActivationFile target) {
+                    String path = target.getMissing();
+                    String xformed = transformPath(path, target, "missing");
+                    return xformed != path ? (builder != null ? builder : creator.get()).missing(xformed) : builder;
+                }
+
+                @Override
+                protected ActivationFile.Builder transformActivationFile_Exists(
+                        Supplier<? extends ActivationFile.Builder> creator,
+                        ActivationFile.Builder builder,
+                        ActivationFile target) {
+                    final String path = target.getExists();
+                    final String xformed = transformPath(path, target, "exists");
+                    return xformed != path ? (builder != null ? builder : creator.get()).exists(xformed) : builder;
+                }
+
+                private String transformPath(String path, ActivationFile target, String locationKey) {
+                    try {
+                        return profileActivationFilePathInterpolator.interpolate(path, context);
+                    } catch (InterpolatorException e) {
+                        problems.add(
+                                Severity.ERROR,
+                                Version.BASE,
+                                "Failed to interpolate file location " + path + ": " + e.getMessage(),
+                                target.getLocation(locationKey),
+                                e);
+                    }
+                    return path;
+                }
+            }
+            return profiles.stream().map(new ProfileInterpolator()).toList();
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -1661,83 +1729,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             subprojects = activated.getModules();
         }
         return subprojects;
-    }
-
-    private List<Profile> interpolateActivations(
-            List<Profile> profiles, DefaultProfileActivationContext context, ModelProblemCollector problems) {
-        if (profiles.stream()
-                .map(org.apache.maven.api.model.Profile::getActivation)
-                .noneMatch(Objects::nonNull)) {
-            return profiles;
-        }
-        final Interpolator xform = new RegexBasedInterpolator();
-        xform.setCacheAnswers(true);
-        Stream.of(context.getUserProperties(), context.getSystemProperties())
-                .map(MapBasedValueSource::new)
-                .forEach(xform::addValueSource);
-
-        class ProfileInterpolator extends MavenTransformer implements UnaryOperator<Profile> {
-            ProfileInterpolator() {
-                super(s -> {
-                    if (isNotEmpty(s)) {
-                        try {
-                            return xform.interpolate(s);
-                        } catch (InterpolationException e) {
-                            problems.add(Severity.ERROR, Version.BASE, e.getMessage(), e);
-                        }
-                    }
-                    return s;
-                });
-            }
-
-            @Override
-            public Profile apply(Profile p) {
-                return Profile.newBuilder(p)
-                        .activation(transformActivation(p.getActivation()))
-                        .build();
-            }
-
-            @Override
-            protected ActivationFile.Builder transformActivationFile_Missing(
-                    Supplier<? extends ActivationFile.Builder> creator,
-                    ActivationFile.Builder builder,
-                    ActivationFile target) {
-                String path = target.getMissing();
-                String xformed = transformPath(path, target, "missing");
-                return xformed != path ? (builder != null ? builder : creator.get()).missing(xformed) : builder;
-            }
-
-            @Override
-            protected ActivationFile.Builder transformActivationFile_Exists(
-                    Supplier<? extends ActivationFile.Builder> creator,
-                    ActivationFile.Builder builder,
-                    ActivationFile target) {
-                final String path = target.getExists();
-                final String xformed = transformPath(path, target, "exists");
-                return xformed != path ? (builder != null ? builder : creator.get()).exists(xformed) : builder;
-            }
-
-            private String transformPath(String path, ActivationFile target, String locationKey) {
-                if (isNotEmpty(path)) {
-                    try {
-                        return profileActivationFilePathInterpolator.interpolate(path, context);
-                    } catch (InterpolationException e) {
-                        problems.add(
-                                Severity.ERROR,
-                                Version.BASE,
-                                "Failed to interpolate file location " + path + ": " + e.getMessage(),
-                                target.getLocation(locationKey),
-                                e);
-                    }
-                }
-                return path;
-            }
-        }
-        return profiles.stream().map(new ProfileInterpolator()).toList();
-    }
-
-    private static boolean isNotEmpty(String string) {
-        return string != null && !string.isEmpty();
     }
 
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
@@ -1807,13 +1798,13 @@ public class DefaultModelBuilder implements ModelBuilder {
         Model interpolatedModel =
                 modelInterpolator.interpolateModel(model, model.getProjectDirectory(), request, problems);
         if (interpolatedModel.getParent() != null) {
-            StringSearchInterpolator ssi = new StringSearchInterpolator();
-            ssi.addValueSource(new MapBasedValueSource(request.getSession().getUserProperties()));
-            ssi.addValueSource(new MapBasedValueSource(model.getProperties()));
-            ssi.addValueSource(new MapBasedValueSource(request.getSession().getSystemProperties()));
+            Map<String, String> map1 = request.getSession().getUserProperties();
+            Map<String, String> map2 = model.getProperties();
+            Map<String, String> map3 = request.getSession().getSystemProperties();
+            Function<String, String> cb = Interpolator.chain(List.of(map1::get, map2::get, map3::get));
             try {
                 String interpolated =
-                        ssi.interpolate(interpolatedModel.getParent().getVersion());
+                        interpolator.interpolate(interpolatedModel.getParent().getVersion(), cb);
                 interpolatedModel = interpolatedModel.withParent(
                         interpolatedModel.getParent().withVersion(interpolated));
             } catch (Exception e) {

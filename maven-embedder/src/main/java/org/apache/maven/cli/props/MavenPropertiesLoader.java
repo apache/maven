@@ -22,10 +22,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Function;
 
-import static org.apache.maven.cli.props.InterpolationHelper.substVars;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 
 public class MavenPropertiesLoader {
 
@@ -42,7 +43,7 @@ public class MavenPropertiesLoader {
             sp.load(path);
         }
         properties.forEach(
-                (k, v) -> sp.put(k.toString(), escape ? InterpolationHelper.escape(v.toString()) : v.toString()));
+                (k, v) -> sp.put(k.toString(), escape ? DefaultInterpolator.escape(v.toString()) : v.toString()));
         loadIncludes(path, sp, callback);
         substitute(sp, callback);
         sp.forEach(properties::setProperty);
@@ -57,9 +58,9 @@ public class MavenPropertiesLoader {
             }
             if (name.startsWith(OVERRIDE_PREFIX)) {
                 String overrideName = name.substring(OVERRIDE_PREFIX.length());
-                props.put(overrideName, substVars(value, name, null, props, callback));
+                props.put(overrideName, substVars(value, name, props, callback));
             } else {
-                props.put(name, substVars(value, name, null, props, callback));
+                props.put(name, substVars(value, name, props, callback));
             }
         }
         props.keySet().removeIf(k -> k.startsWith(OVERRIDE_PREFIX));
@@ -80,7 +81,7 @@ public class MavenPropertiesLoader {
             throws IOException {
         String includes = configProps.get(INCLUDES_PROPERTY);
         if (includes != null) {
-            includes = substVars(includes, INCLUDES_PROPERTY, null, configProps, callback);
+            includes = substVars(includes, INCLUDES_PROPERTY, configProps, callback);
             StringTokenizer st = new StringTokenizer(includes, "?\",", true);
             if (st.countTokens() > 0) {
                 String location;
@@ -157,5 +158,10 @@ public class MavenPropertiesLoader {
         }
 
         return optional ? "?" + retVal : retVal;
+    }
+
+    public static String substVars(
+            String value, String name, Map<String, String> props, Function<String, String> callback) {
+        return DefaultInterpolator.substVars(value, name, null, props, callback, null, false);
     }
 }
