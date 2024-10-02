@@ -128,7 +128,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                 : PROJECT_PREFIXES_3_1;
     }
 
-   String callback(
+    String callback(
             Model model,
             Path projectDir,
             ModelBuilderRequest request,
