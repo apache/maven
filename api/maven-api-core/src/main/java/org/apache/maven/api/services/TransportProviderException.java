@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Serial;
+
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 
@@ -27,6 +29,10 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 @Consumer
 public class TransportProviderException extends MavenException {
+
+    @Serial
+    private static final long serialVersionUID = -6066070072576465969L;
+
     public TransportProviderException(String message, Throwable cause) {
         super(message, cause);
     }

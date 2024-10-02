@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Serial;
+
 import org.apache.maven.api.annotations.Experimental;
 
 /**
@@ -28,6 +30,7 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 public class ArtifactResolverException extends MavenException {
 
+    @Serial
     private static final long serialVersionUID = 7252294837746943917L;
 
     /**

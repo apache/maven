@@ -18,11 +18,14 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Serial;
+
 import org.apache.maven.api.annotations.Experimental;
 
 @Experimental
 public class DependencyResolverException extends MavenException {
 
+    @Serial
     private static final long serialVersionUID = 1101171569179057614L;
 
     public DependencyResolverException(String message, Throwable cause) {
