@@ -306,7 +306,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     static class CleanLifecycle implements Lifecycle {
 
-        private static final String MAVEN_CLEAN_PLUGIN_VERSION = "3.2.0";
+        private static final String MAVEN_CLEAN_PLUGIN_VERSION = "4.0.0-beta-1";
 
         @Override
         public String id() {
