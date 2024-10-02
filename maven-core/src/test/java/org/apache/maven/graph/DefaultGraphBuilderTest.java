@@ -420,6 +420,7 @@ class DefaultGraphBuilderTest {
                 createProjectBuildingResultMocks(artifactIdProjectMap.values());
         when(projectBuilder.build(anyList(), anyBoolean(), any(ProjectBuildingRequest.class)))
                 .thenReturn(projectBuildingResults);
+        when(mavenExecutionRequest.getRootDirectory()).thenReturn(null);
     }
 
     private MavenProject getMavenProject(String artifactId, MavenProject parentProject) {

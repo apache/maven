@@ -24,17 +24,14 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.ActivationFile;
+import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.RootLocator;
-import org.codehaus.plexus.interpolation.AbstractValueSource;
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.MapBasedValueSource;
-import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
 /**
  * Finds an absolute path for {@link ActivationFile#getExists()} or {@link ActivationFile#getMissing()}
- *
  */
 @Named
 @Singleton
@@ -44,10 +41,14 @@ public class ProfileActivationFilePathInterpolator {
 
     private final RootLocator rootLocator;
 
+    private final Interpolator interpolator;
+
     @Inject
-    public ProfileActivationFilePathInterpolator(PathTranslator pathTranslator, RootLocator rootLocator) {
+    public ProfileActivationFilePathInterpolator(
+            PathTranslator pathTranslator, RootLocator rootLocator, Interpolator interpolator) {
         this.pathTranslator = pathTranslator;
         this.rootLocator = rootLocator;
+        this.interpolator = interpolator;
     }
 
     /**
@@ -55,45 +56,30 @@ public class ProfileActivationFilePathInterpolator {
      *
      * @return absolute path or {@code null} if the input was {@code null}
      */
-    public String interpolate(String path, ProfileActivationContext context) throws InterpolationException {
+    public String interpolate(String path, ProfileActivationContext context) throws InterpolatorException {
         if (path == null) {
             return null;
         }
 
-        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
-
         Path basedir = context.getProjectDirectory();
 
-        if (basedir != null) {
-            interpolator.addValueSource(new AbstractValueSource(false) {
-                @Override
-                public Object getValue(String expression) {
-                    if ("basedir".equals(expression) || "project.basedir".equals(expression)) {
-                        return basedir.toAbsolutePath().toString();
-                    }
-                    return null;
-                }
-            });
-        } else if (path.contains("${basedir}")) {
-            return null;
-        }
-
-        interpolator.addValueSource(new AbstractValueSource(false) {
-            @Override
-            public Object getValue(String expression) {
-                if ("project.rootDirectory".equals(expression)) {
-                    Path root = rootLocator.findMandatoryRoot(basedir);
-                    return root.toFile().getAbsolutePath();
-                }
-                return null;
+        String absolutePath = interpolator.interpolate(path, s -> {
+            if ("basedir".equals(s) || "project.basedir".equals(s)) {
+                return basedir != null ? basedir.toFile().getAbsolutePath() : null;
             }
+            if ("project.rootDirectory".equals(s)) {
+                Path root = rootLocator.findMandatoryRoot(basedir);
+                return root.toFile().getAbsolutePath();
+            }
+            String r = context.getProjectProperties().get(s);
+            if (r == null) {
+                r = context.getUserProperties().get(s);
+            }
+            if (r == null) {
+                r = context.getSystemProperties().get(s);
+            }
+            return r;
         });
-
-        interpolator.addValueSource(new MapBasedValueSource(context.getProjectProperties()));
-        interpolator.addValueSource(new MapBasedValueSource(context.getUserProperties()));
-        interpolator.addValueSource(new MapBasedValueSource(context.getSystemProperties()));
-
-        String absolutePath = interpolator.interpolate(path, "");
 
         return pathTranslator.alignToBaseDirectory(absolutePath, basedir);
     }

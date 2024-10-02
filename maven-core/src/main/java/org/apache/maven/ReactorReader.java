@@ -279,9 +279,8 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private Path relativizeOutputFile(final Path outputFile) {
-        Path projectBaseDirectory =
-                Paths.get(session.getRequest().getMultiModuleProjectDirectory().toURI());
-        return projectBaseDirectory.relativize(outputFile);
+        Path rootDirectory = session.getRequest().getRootDirectory();
+        return rootDirectory.relativize(outputFile);
     }
 
     /**
@@ -445,7 +444,7 @@ class ReactorReader implements MavenWorkspaceReader {
 
     private Path getProjectLocalRepo() {
         if (projectLocalRepository == null) {
-            Path root = session.getRequest().getMultiModuleProjectDirectory().toPath();
+            Path root = session.getRequest().getRootDirectory();
             List<MavenProject> projects = session.getProjects();
             if (projects != null) {
                 projectLocalRepository = projects.stream()

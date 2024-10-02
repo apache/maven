@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,9 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 public class SettingsBuilderException extends MavenException {
+
+    @Serial
+    private static final long serialVersionUID = 4714858598345418083L;
 
     private final List<BuilderProblem> problems;
 

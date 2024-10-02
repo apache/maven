@@ -42,7 +42,7 @@ public interface RootLocator extends Service {
             + " attribute on the root project's model to identify it.";
 
     @Nonnull
-    default Path findMandatoryRoot(Path basedir) {
+    default Path findMandatoryRoot(@Nullable Path basedir) {
         Path rootDirectory = findRoot(basedir);
         if (rootDirectory == null) {
             throw new IllegalStateException(getNoRootMessage());
@@ -51,7 +51,7 @@ public interface RootLocator extends Service {
     }
 
     @Nullable
-    default Path findRoot(Path basedir) {
+    default Path findRoot(@Nullable Path basedir) {
         Path rootDirectory = basedir;
         while (rootDirectory != null && !isRootDirectory(rootDirectory)) {
             rootDirectory = rootDirectory.getParent();

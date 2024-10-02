@@ -27,6 +27,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -164,15 +165,16 @@ public class MavenPropertiesTest {
     @Test
     public void testConfigInterpolation() throws IOException {
         String config = "a=$\\\\\\\\{var}\n" + "ab=${a}b\n" + "abc=${ab}c";
+        Map<String, String> expected = Map.of("a", "$\\{var}", "ab", "$\\{var}b", "abc", "$\\{var}bc");
 
         java.util.Properties props1 = new java.util.Properties();
         props1.load(new StringReader(config));
-        InterpolationHelper.performSubstitution((Map) props1, null);
+        new DefaultInterpolator().performSubstitution((Map) props1, null, true);
+        assertEquals(expected, props1);
 
         MavenProperties props2 = new MavenProperties();
         props2.load(new StringReader(config));
-
-        assertEquals(props1, props2);
+        assertEquals(expected, props2);
     }
 
     /**

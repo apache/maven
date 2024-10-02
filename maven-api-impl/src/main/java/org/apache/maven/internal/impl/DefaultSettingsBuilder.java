@@ -28,9 +28,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.SettingsBuilderException;
 import org.apache.maven.api.services.SettingsBuilderRequest;
@@ -44,12 +48,9 @@ import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.RepositoryPolicy;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.settings.v4.SettingsMerger;
 import org.apache.maven.settings.v4.SettingsTransformer;
-import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.MapBasedValueSource;
-import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
@@ -61,6 +62,17 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     private final DefaultSettingsValidator settingsValidator = new DefaultSettingsValidator();
 
     private final SettingsMerger settingsMerger = new SettingsMerger();
+
+    private final Interpolator interpolator;
+
+    public DefaultSettingsBuilder() {
+        this(new DefaultInterpolator());
+    }
+
+    @Inject
+    public DefaultSettingsBuilder(Interpolator interpolator) {
+        this.interpolator = interpolator;
+    }
 
     @Override
     public SettingsBuilderResult build(SettingsBuilderRequest request) throws SettingsBuilderException {
@@ -213,39 +225,10 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     }
 
     private Settings interpolate(Settings settings, SettingsBuilderRequest request, List<BuilderProblem> problems) {
-
-        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
-
-        interpolator.addValueSource(new MapBasedValueSource(request.getSession().getUserProperties()));
-
-        interpolator.addValueSource(new MapBasedValueSource(request.getSession().getSystemProperties()));
-
-        try {
-            interpolator.addValueSource(new EnvarBasedValueSource());
-        } catch (IOException e) {
-            problems.add(new DefaultBuilderProblem(
-                    null,
-                    -1,
-                    -1,
-                    e,
-                    "Failed to use environment variables for interpolation: " + e.getMessage(),
-                    BuilderProblem.Severity.WARNING));
-        }
-
-        return new SettingsTransformer(value -> {
-                    try {
-                        return value != null ? interpolator.interpolate(value) : null;
-                    } catch (InterpolationException e) {
-                        problems.add(new DefaultBuilderProblem(
-                                null,
-                                -1,
-                                -1,
-                                e,
-                                "Failed to interpolate settings: " + e.getMessage(),
-                                BuilderProblem.Severity.WARNING));
-                        return value;
-                    }
-                })
+        Map<String, String> userProperties = request.getSession().getUserProperties();
+        Map<String, String> systemProperties = request.getSession().getSystemProperties();
+        Function<String, String> src = Interpolator.chain(List.of(userProperties::get, systemProperties::get));
+        return new SettingsTransformer(value -> value != null ? interpolator.interpolate(value, src) : null)
                 .visit(settings);
     }
 

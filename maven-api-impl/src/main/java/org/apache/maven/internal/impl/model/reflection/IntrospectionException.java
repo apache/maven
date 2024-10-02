@@ -16,28 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.internal.impl.model.reflection;
 
-import java.io.Serial;
-
-import org.apache.maven.api.annotations.Experimental;
-
-/**
- *
- *
- * @since 4.0.0
- */
-@Experimental
-public class ArtifactResolverException extends MavenException {
-
-    @Serial
-    private static final long serialVersionUID = 7252294837746943917L;
+public class IntrospectionException extends Exception {
 
     /**
-     * @param message the message for the exception
-     * @param e the exception itself
+     *
      */
-    public ArtifactResolverException(String message, Exception e) {
-        super(message, e);
+    private static final long serialVersionUID = -6090771282553728784L;
+
+    IntrospectionException(String message) {
+        super(message);
+    }
+
+    IntrospectionException(Throwable cause) {
+        super(cause);
     }
 }

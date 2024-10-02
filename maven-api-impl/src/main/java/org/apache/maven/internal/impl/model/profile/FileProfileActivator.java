@@ -27,12 +27,12 @@ import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileActivator;
 import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
-import org.codehaus.plexus.interpolation.InterpolationException;
 
 /**
  * Determines profile activation based on the existence/absence of some file.
@@ -82,7 +82,7 @@ public class FileProfileActivator implements ProfileActivator {
 
         try {
             path = profileActivationFilePathInterpolator.interpolate(path, context);
-        } catch (InterpolationException e) {
+        } catch (InterpolatorException e) {
             problems.add(
                     BuilderProblem.Severity.ERROR,
                     ModelProblem.Version.BASE,
