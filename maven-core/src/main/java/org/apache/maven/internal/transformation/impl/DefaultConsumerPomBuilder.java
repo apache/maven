@@ -35,6 +35,7 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
@@ -96,6 +97,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private final List<ModelTransformer> transformers;
     private final ModelCacheFactory modelCacheFactory;
     private final ModelResolver modelResolver;
+    private final Interpolator interpolator;
 
     @Inject
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -118,7 +120,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             List<ModelTransformer> transformers,
             ModelCacheFactory modelCacheFactory,
-            ModelResolver modelResolver) {
+            ModelResolver modelResolver,
+            Interpolator interpolator) {
         this.profileInjector = profileInjector;
         this.inheritanceAssembler = inheritanceAssembler;
         this.dependencyManagementImporter = dependencyManagementImporter;
@@ -138,6 +141,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         this.transformers = transformers;
         this.modelCacheFactory = modelCacheFactory;
         this.modelResolver = modelResolver;
+        this.interpolator = interpolator;
     }
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -197,7 +201,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 versionParser,
                 transformers,
                 modelCacheFactory,
-                modelResolver);
+                modelResolver,
+                interpolator);
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
         request.requestType(ModelBuilderRequest.RequestType.BUILD_POM);

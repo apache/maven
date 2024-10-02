@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -36,6 +37,8 @@ import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ArtifactResolver;
+import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
@@ -54,6 +57,7 @@ import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.internal.impl.DefaultVersionParser;
 import org.apache.maven.internal.impl.DefaultVersionRangeResolver;
 import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
 import org.apache.maven.resolver.MavenChainedWorkspaceReader;
@@ -62,10 +66,6 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.Interpolator;
-import org.codehaus.plexus.interpolation.MapBasedValueSource;
-import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
@@ -138,7 +138,7 @@ public class BootstrapCoreExtensionManager {
             InternalSession.associate(repoSession, iSession);
 
             List<RemoteRepository> repositories = RepositoryUtils.toRepos(request.getPluginArtifactRepositories());
-            Interpolator interpolator = createInterpolator(request);
+            Function<String, String> interpolator = createInterpolator(request);
 
             return resolveCoreExtensions(repoSession, repositories, providedArtifacts, extensions, interpolator);
         }
@@ -149,7 +149,7 @@ public class BootstrapCoreExtensionManager {
             List<RemoteRepository> repositories,
             Set<String> providedArtifacts,
             List<CoreExtension> configuration,
-            Interpolator interpolator)
+            Function<String, String> interpolator)
             throws Exception {
         List<CoreExtensionEntry> extensions = new ArrayList<>();
 
@@ -207,7 +207,7 @@ public class BootstrapCoreExtensionManager {
             RepositorySystemSession repoSession,
             List<RemoteRepository> repositories,
             DependencyFilter dependencyFilter,
-            Interpolator interpolator)
+            Function<String, String> interpolator)
             throws ExtensionResolutionException {
         try {
             /* TODO: Enhance the PluginDependenciesResolver to provide a
@@ -215,9 +215,9 @@ public class BootstrapCoreExtensionManager {
              * object instead of a Plugin as this makes no sense.
              */
             Plugin plugin = Plugin.newBuilder()
-                    .groupId(interpolator.interpolate(extension.getGroupId()))
-                    .artifactId(interpolator.interpolate(extension.getArtifactId()))
-                    .version(interpolator.interpolate(extension.getVersion()))
+                    .groupId(interpolator.apply(extension.getGroupId()))
+                    .artifactId(interpolator.apply(extension.getArtifactId()))
+                    .version(interpolator.apply(extension.getVersion()))
                     .build();
 
             DependencyResult result = pluginDependenciesResolver.resolveCoreExtension(
@@ -226,16 +226,21 @@ public class BootstrapCoreExtensionManager {
                     .filter(ArtifactResult::isResolved)
                     .map(ArtifactResult::getArtifact)
                     .collect(Collectors.toList());
-        } catch (PluginResolutionException | InterpolationException e) {
+        } catch (PluginResolutionException | InterpolatorException e) {
             throw new ExtensionResolutionException(extension, e);
         }
     }
 
-    private static Interpolator createInterpolator(MavenExecutionRequest request) {
-        StringSearchInterpolator interpolator = new StringSearchInterpolator();
-        interpolator.addValueSource(new MapBasedValueSource(request.getUserProperties()));
-        interpolator.addValueSource(new MapBasedValueSource(request.getSystemProperties()));
-        return interpolator;
+    private static Function<String, String> createInterpolator(MavenExecutionRequest request) {
+        Interpolator interpolator = new DefaultInterpolator();
+        Function<String, String> callback = v -> {
+            String r = request.getUserProperties().getProperty(v);
+            if (r == null) {
+                r = request.getSystemProperties().getProperty(v);
+            }
+            return r != null ? r : v;
+        };
+        return v -> interpolator.interpolate(v, callback);
     }
 
     static class SimpleSession extends DefaultSession {
@@ -267,6 +272,8 @@ public class BootstrapCoreExtensionManager {
             } else if (clazz == RepositoryFactory.class) {
                 return (T) new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
                         new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider()));
+            } else if (clazz == Interpolator.class) {
+                return (T) new DefaultInterpolator();
                 // } else if (clazz == ModelResolver.class) {
                 //    return (T) new DefaultModelResolver();
             }

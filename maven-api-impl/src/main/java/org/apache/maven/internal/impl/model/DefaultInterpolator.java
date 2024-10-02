@@ -16,20 +16,75 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.props;
+package org.apache.maven.internal.impl.model;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class InterpolationHelper {
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.InterpolatorException;
 
-    private InterpolationHelper() {}
+@Named
+@Singleton
+public class DefaultInterpolator implements Interpolator {
 
     private static final char ESCAPE_CHAR = '\\';
     private static final String DELIM_START = "${";
     private static final String DELIM_STOP = "}";
     private static final String MARKER = "$__";
+
+    @Override
+    public void interpolate(
+            Map<String, String> map,
+            Function<String, String> callback,
+            BiFunction<String, String, String> postprocessor,
+            boolean defaultsToEmpty) {
+        Map<String, String> org = new HashMap<>(map);
+        for (String name : map.keySet()) {
+            map.compute(
+                    name,
+                    (k, value) -> interpolate(
+                            value,
+                            name,
+                            null,
+                            v -> {
+                                String r = org.get(v);
+                                if (r == null && callback != null) {
+                                    r = callback.apply(v);
+                                }
+                                return r;
+                            },
+                            postprocessor,
+                            defaultsToEmpty));
+        }
+    }
+
+    @Override
+    public String interpolate(
+            String val,
+            Function<String, String> callback,
+            BiFunction<String, String, String> postprocessor,
+            boolean defaultsToEmpty) {
+        return interpolate(val, null, null, callback, postprocessor, defaultsToEmpty);
+    }
+
+    @Nullable
+    public String interpolate(
+            @Nullable String val,
+            @Nullable String currentKey,
+            @Nullable Set<String> cycleMap,
+            @Nullable Function<String, String> callback,
+            @Nullable BiFunction<String, String, String> postprocessor,
+            boolean defaultsToEmpty) {
+        return substVars(val, currentKey, cycleMap, null, callback, postprocessor, defaultsToEmpty);
+    }
 
     /**
      * Perform substitution on a property set
@@ -37,8 +92,8 @@ public class InterpolationHelper {
      * @param properties the property set to perform substitution on
      * @param callback Callback for substitution
      */
-    public static void performSubstitution(Map<String, String> properties, Function<String, String> callback) {
-        performSubstitution(properties, callback, true, true);
+    public void performSubstitution(Map<String, String> properties, Function<String, String> callback) {
+        performSubstitution(properties, callback, true);
     }
 
     /**
@@ -46,20 +101,14 @@ public class InterpolationHelper {
      *
      * @param properties the property set to perform substitution on
      * @param callback the callback to obtain substitution values
-     * @param substituteFromConfig If substitute from configuration
      * @param defaultsToEmptyString sets an empty string if a replacement value is not found, leaves intact otherwise
      */
-    public static void performSubstitution(
-            Map<String, String> properties,
-            Function<String, String> callback,
-            boolean substituteFromConfig,
-            boolean defaultsToEmptyString) {
+    public void performSubstitution(
+            Map<String, String> properties, Function<String, String> callback, boolean defaultsToEmptyString) {
         Map<String, String> org = new HashMap<>(properties);
         for (String name : properties.keySet()) {
             properties.compute(
-                    name,
-                    (k, value) ->
-                            substVars(value, name, null, org, callback, substituteFromConfig, defaultsToEmptyString));
+                    name, (k, value) -> substVars(value, name, null, org, callback, null, defaultsToEmptyString));
         }
     }
 
@@ -82,11 +131,10 @@ public class InterpolationHelper {
      * @param cycleMap Map of variable references used to detect nested cycles.
      * @param configProps Set of configuration properties.
      * @return The value of the specified string after system property substitution.
-     * @throws IllegalArgumentException If there was a syntax error in the
+     * @throws InterpolatorException If there was a syntax error in the
      *         property placeholder syntax or a recursive variable reference.
      **/
-    public static String substVars(
-            String val, String currentKey, Map<String, String> cycleMap, Map<String, String> configProps) {
+    public String substVars(String val, String currentKey, Set<String> cycleMap, Map<String, String> configProps) {
         return substVars(val, currentKey, cycleMap, configProps, null);
     }
 
@@ -110,16 +158,16 @@ public class InterpolationHelper {
      * @param configProps Set of configuration properties.
      * @param callback the callback to obtain substitution values
      * @return The value of the specified string after system property substitution.
-     * @throws IllegalArgumentException If there was a syntax error in the
+     * @throws InterpolatorException If there was a syntax error in the
      *         property placeholder syntax or a recursive variable reference.
      **/
-    public static String substVars(
+    public String substVars(
             String val,
             String currentKey,
-            Map<String, String> cycleMap,
+            Set<String> cycleMap,
             Map<String, String> configProps,
             Function<String, String> callback) {
-        return substVars(val, currentKey, cycleMap, configProps, callback, true, false);
+        return substVars(val, currentKey, cycleMap, configProps, callback, null, false);
     }
 
     /**
@@ -141,7 +189,6 @@ public class InterpolationHelper {
      * @param cycleMap Map of variable references used to detect nested cycles.
      * @param configProps Set of configuration properties.
      * @param callback the callback to obtain substitution values
-     * @param substituteFromConfig If substitute from configuration
      * @param defaultsToEmptyString sets an empty string if a replacement value is not found, leaves intact otherwise
      * @return The value of the specified string after system property substitution.
      * @throws IllegalArgumentException If there was a syntax error in the
@@ -150,29 +197,34 @@ public class InterpolationHelper {
     public static String substVars(
             String val,
             String currentKey,
-            Map<String, String> cycleMap,
+            Set<String> cycleMap,
             Map<String, String> configProps,
             Function<String, String> callback,
-            boolean substituteFromConfig,
+            BiFunction<String, String, String> postprocessor,
             boolean defaultsToEmptyString) {
-        return unescape(doSubstVars(
-                val, currentKey, cycleMap, configProps, callback, substituteFromConfig, defaultsToEmptyString));
+        return unescape(
+                doSubstVars(val, currentKey, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString));
     }
 
     private static String doSubstVars(
             String val,
             String currentKey,
-            Map<String, String> cycleMap,
+            Set<String> cycleMap,
             Map<String, String> configProps,
             Function<String, String> callback,
-            boolean substituteFromConfig,
+            BiFunction<String, String, String> postprocessor,
             boolean defaultsToEmptyString) {
+        if (val == null || val.isEmpty()) {
+            return val;
+        }
         if (cycleMap == null) {
-            cycleMap = new HashMap<>();
+            cycleMap = new HashSet<>();
         }
 
         // Put the current key in the cycle map.
-        cycleMap.put(currentKey, currentKey);
+        if (currentKey != null) {
+            cycleMap.add(currentKey);
+        }
 
         // Assume we have a value that is something like:
         // "leading ${foo.${bar}} middle ${baz} trailing"
@@ -219,7 +271,7 @@ public class InterpolationHelper {
         // Strip expansion modifiers
         int idx1 = variable.lastIndexOf(":-");
         int idx2 = variable.lastIndexOf(":+");
-        int idx = idx1 >= 0 && idx2 >= 0 ? Math.min(idx1, idx2) : idx1 >= 0 ? idx1 : idx2;
+        int idx = idx1 >= 0 ? idx2 >= 0 ? Math.min(idx1, idx2) : idx1 : idx2;
         String op = null;
         if (idx >= 0) {
             op = variable.substring(idx);
@@ -227,20 +279,23 @@ public class InterpolationHelper {
         }
 
         // Verify that this is not a recursive variable reference.
-        if (cycleMap.get(variable) != null) {
-            throw new IllegalArgumentException("recursive variable reference: " + variable);
+        if (!cycleMap.add(variable)) {
+            throw new InterpolatorException("recursive variable reference: " + variable);
         }
 
         String substValue = null;
         // Get the value of the deepest nested variable placeholder.
         // Try to configuration properties first.
-        if (substituteFromConfig && configProps != null) {
+        if (configProps != null) {
             substValue = configProps.get(variable);
         }
         if (substValue == null) {
             if (!variable.isEmpty()) {
                 if (callback != null) {
-                    substValue = callback.apply(variable);
+                    String s1 = callback.apply(variable);
+                    String s2 = doSubstVars(
+                            s1, variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+                    substValue = postprocessor != null ? postprocessor.apply(variable, s2) : s2;
                 }
             }
         }
@@ -255,7 +310,7 @@ public class InterpolationHelper {
                     substValue = op.substring(":+".length());
                 }
             } else {
-                throw new IllegalArgumentException("Bad substitution: ${" + org + "}");
+                throw new InterpolatorException("Bad substitution: ${" + org + "}");
             }
         }
 
@@ -264,7 +319,7 @@ public class InterpolationHelper {
                 substValue = "";
             } else {
                 // alters the original token to avoid infinite recursion
-                // altered tokens are reverted in substVarsPreserveUnresolved()
+                // altered tokens are reverted in unescape()
                 substValue = MARKER + "{" + variable + "}";
             }
         }
@@ -281,8 +336,7 @@ public class InterpolationHelper {
 
         // Now perform substitution again, since there could still
         // be substitutions to make.
-        val = doSubstVars(
-                val, currentKey, cycleMap, configProps, callback, substituteFromConfig, defaultsToEmptyString);
+        val = doSubstVars(val, currentKey, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
 
         cycleMap.remove(currentKey);
 
@@ -290,12 +344,32 @@ public class InterpolationHelper {
         return val;
     }
 
-    public static String escape(String val) {
+    /**
+     * Escapes special characters in the given string to prevent unwanted interpolation.
+     *
+     * @param val The string to be escaped.
+     * @return The escaped string.
+     */
+    @Nullable
+    public static String escape(@Nullable String val) {
+        if (val == null || val.isEmpty()) {
+            return val;
+        }
         return val.replace("$", MARKER);
     }
 
-    private static String unescape(String val) {
-        val = val.replaceAll("\\" + MARKER, "\\$");
+    /**
+     * Unescapes previously escaped characters in the given string.
+     *
+     * @param val The string to be unescaped.
+     * @return The unescaped string.
+     */
+    @Nullable
+    public static String unescape(@Nullable String val) {
+        if (val == null || val.isEmpty()) {
+            return val;
+        }
+        val = val.replace(MARKER, "$");
         int escape = val.indexOf(ESCAPE_CHAR);
         while (escape >= 0 && escape < val.length() - 1) {
             char c = val.charAt(escape + 1);

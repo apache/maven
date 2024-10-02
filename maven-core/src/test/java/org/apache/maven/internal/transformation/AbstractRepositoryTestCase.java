@@ -30,6 +30,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.impl.DefaultRepositoryFactory;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -82,8 +83,10 @@ public abstract class AbstractRepositoryTestCase {
                 null,
                 null,
                 null,
-                new SimpleLookup(List.of(new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
-                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())))),
+                new SimpleLookup(List.of(
+                        new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
+                                new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())),
+                        new DefaultInterpolator())),
                 null);
         InternalSession.associate(rsession, session);
 

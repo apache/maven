@@ -35,6 +35,7 @@ import org.apache.maven.internal.impl.DefaultUrlNormalizer;
 import org.apache.maven.internal.impl.model.DefaultDependencyManagementImporter;
 import org.apache.maven.internal.impl.model.DefaultDependencyManagementInjector;
 import org.apache.maven.internal.impl.model.DefaultInheritanceAssembler;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.impl.model.DefaultModelBuilder;
 import org.apache.maven.internal.impl.model.DefaultModelCacheFactory;
 import org.apache.maven.internal.impl.model.DefaultModelInterpolator;
@@ -1046,7 +1047,10 @@ public class MavenRepositorySystemSupplier implements Supplier<RepositorySystem>
                 new DefaultModelValidator(),
                 new DefaultModelNormalizer(),
                 new DefaultModelInterpolator(
-                        new DefaultPathTranslator(), new DefaultUrlNormalizer(), new DefaultRootLocator()),
+                        new DefaultPathTranslator(),
+                        new DefaultUrlNormalizer(),
+                        new DefaultRootLocator(),
+                        new DefaultInterpolator()),
                 new DefaultModelPathTranslator(new DefaultPathTranslator()),
                 new DefaultModelUrlNormalizer(new DefaultUrlNormalizer()),
                 new DefaultSuperPomProvider(modelProcessor),
@@ -1057,11 +1061,13 @@ public class MavenRepositorySystemSupplier implements Supplier<RepositorySystem>
                 new DefaultDependencyManagementInjector(),
                 new DefaultDependencyManagementImporter(),
                 new DefaultPluginConfigurationExpander(),
-                new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), new DefaultRootLocator()),
+                new ProfileActivationFilePathInterpolator(
+                        new DefaultPathTranslator(), new DefaultRootLocator(), new DefaultInterpolator()),
                 new DefaultModelVersionParser(getVersionScheme()),
                 List.of(),
                 new DefaultModelCacheFactory(),
-                new org.apache.maven.internal.impl.resolver.DefaultModelResolver());
+                new org.apache.maven.internal.impl.resolver.DefaultModelResolver(),
+                new DefaultInterpolator());
     }
 
     private RepositorySystem repositorySystem;

@@ -44,6 +44,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
+
 /**
  * Enhancement of the standard <code>Properties</code>
  * managing the maintain of comments, etc.
@@ -472,7 +474,7 @@ public class MavenProperties extends AbstractMap<String, String> {
     }
 
     public void substitute(Function<String, String> callback) {
-        InterpolationHelper.performSubstitution(storage, callback);
+        new DefaultInterpolator().interpolate(storage, callback);
     }
 
     /**
