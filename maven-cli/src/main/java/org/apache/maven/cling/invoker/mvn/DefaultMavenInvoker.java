@@ -75,6 +75,7 @@ public abstract class DefaultMavenInvoker<
                 C extends DefaultMavenInvoker.MavenContext<O, R, C>>
         extends LookupInvoker<O, R, C> implements MavenInvoker<R> {
 
+    @SuppressWarnings("VisibilityModifier")
     protected static class MavenContext<
                     O extends MavenOptions,
                     R extends MavenInvokerRequest<O>,
@@ -84,12 +85,12 @@ public abstract class DefaultMavenInvoker<
             super(invoker, invokerRequest);
         }
 
-        protected MavenExecutionRequest mavenExecutionRequest;
-        protected EventSpyDispatcher eventSpyDispatcher;
-        protected MavenExecutionRequestPopulator mavenExecutionRequestPopulator;
-        protected ToolchainsBuilder toolchainsBuilder;
-        protected ModelProcessor modelProcessor;
-        protected Maven maven;
+        public MavenExecutionRequest mavenExecutionRequest;
+        public EventSpyDispatcher eventSpyDispatcher;
+        public MavenExecutionRequestPopulator mavenExecutionRequestPopulator;
+        public ToolchainsBuilder toolchainsBuilder;
+        public ModelProcessor modelProcessor;
+        public Maven maven;
     }
 
     public DefaultMavenInvoker(ProtoLookup protoLookup) {

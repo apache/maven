@@ -128,4 +128,18 @@ public class DefaultResidentMavenInvoker
     protected String getContextId(ResidentMavenInvokerRequest invokerRequest) {
         return "resident";
     }
+
+    @Override
+    protected void container(LocalContext context) throws Exception {
+        if (context.maven == null) {
+            super.container(context);
+        }
+    }
+
+    @Override
+    protected void lookup(LocalContext context) throws Exception {
+        if (context.maven == null) {
+            super.lookup(context);
+        }
+    }
 }
