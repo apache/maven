@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.forked;
+package org.apache.maven.cling.invoker.mvn.forked;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,8 +24,6 @@ import java.nio.file.Paths;
 
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLogger;
-import org.apache.maven.cling.invoker.mvn.forked.DefaultForkedMavenInvoker;
-import org.apache.maven.cling.invoker.mvn.forked.DefaultForkedMavenParser;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
