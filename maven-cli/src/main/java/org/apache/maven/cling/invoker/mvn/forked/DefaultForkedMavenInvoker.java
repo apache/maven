@@ -54,42 +54,136 @@ public class DefaultForkedMavenInvoker implements ForkedMavenInvoker {
                 cmdAndArguments.add("-D" + entry.getKey() + "=" + entry.getValue());
             }
         }
+        if (mavenOptions.showVersionAndExit().orElse(false)) {
+            cmdAndArguments.add("--version");
+        }
+        if (mavenOptions.showVersion().orElse(false)) {
+            cmdAndArguments.add("--show-version");
+        }
+        if (mavenOptions.quiet().orElse(false)) {
+            cmdAndArguments.add("--quiet");
+        }
+        if (mavenOptions.verbose().orElse(false)) {
+            cmdAndArguments.add("--verbose");
+        }
+        if (mavenOptions.showErrors().orElse(false)) {
+            cmdAndArguments.add("--errors");
+        }
+        if (mavenOptions.failOnSeverity().isPresent()) {
+            cmdAndArguments.add("--fail-on-severity");
+            cmdAndArguments.add(mavenOptions.failOnSeverity().get());
+        }
+        if (mavenOptions.nonInteractive().orElse(false)) {
+            cmdAndArguments.add("--non-interactive");
+        }
+        if (mavenOptions.forceInteractive().orElse(false)) {
+            cmdAndArguments.add("--force-interactive");
+        }
+        if (mavenOptions.altUserSettings().isPresent()) {
+            cmdAndArguments.add("--settings");
+            cmdAndArguments.add(mavenOptions.altUserSettings().get());
+        }
+        if (mavenOptions.altProjectSettings().isPresent()) {
+            cmdAndArguments.add("--project-settings");
+            cmdAndArguments.add(mavenOptions.altProjectSettings().get());
+        }
+        if (mavenOptions.altInstallationSettings().isPresent()) {
+            cmdAndArguments.add("--install-settings");
+            cmdAndArguments.add(mavenOptions.altInstallationSettings().get());
+        }
+        if (mavenOptions.altUserToolchains().isPresent()) {
+            cmdAndArguments.add("--toolchains");
+            cmdAndArguments.add(mavenOptions.altUserToolchains().get());
+        }
+        if (mavenOptions.altInstallationToolchains().isPresent()) {
+            cmdAndArguments.add("--install-toolchains");
+            cmdAndArguments.add(mavenOptions.altInstallationToolchains().get());
+        }
+        if (mavenOptions.logFile().isPresent()) {
+            cmdAndArguments.add("--log-file");
+            cmdAndArguments.add(mavenOptions.logFile().get());
+        }
+        if (mavenOptions.color().isPresent()) {
+            cmdAndArguments.add("--color");
+            cmdAndArguments.add(mavenOptions.color().get());
+        }
+        if (mavenOptions.help().orElse(false)) {
+            cmdAndArguments.add("--help");
+        }
         if (mavenOptions.alternatePomFile().isPresent()) {
-            cmdAndArguments.add("-f");
+            cmdAndArguments.add("--file");
             cmdAndArguments.add(mavenOptions.alternatePomFile().get());
         }
         if (mavenOptions.offline().orElse(false)) {
-            cmdAndArguments.add("-o");
-        }
-        if (mavenOptions.showVersionAndExit().orElse(false)) {
-            cmdAndArguments.add("-v");
-        }
-        if (mavenOptions.showVersion().orElse(false)) {
-            cmdAndArguments.add("-V");
-        }
-        if (mavenOptions.quiet().orElse(false)) {
-            cmdAndArguments.add("-q");
-        }
-        if (mavenOptions.verbose().orElse(false)) {
-            cmdAndArguments.add("-X");
-        }
-        if (mavenOptions.showErrors().orElse(false)) {
-            cmdAndArguments.add("-e");
+            cmdAndArguments.add("--offline");
         }
         if (mavenOptions.nonRecursive().orElse(false)) {
-            cmdAndArguments.add("-N");
+            cmdAndArguments.add("--non-recursive");
         }
         if (mavenOptions.updateSnapshots().orElse(false)) {
-            cmdAndArguments.add("-U");
+            cmdAndArguments.add("--update-snapshots");
         }
-        if (mavenOptions.nonInteractive().orElse(false)) {
-            cmdAndArguments.add("-B");
+        if (mavenOptions.activatedProfiles().isPresent()) {
+            cmdAndArguments.add("--activate-profiles");
+            cmdAndArguments.add(String.join(",", mavenOptions.activatedProfiles().get()));
         }
-        if (mavenOptions.logFile().isPresent()) {
-            cmdAndArguments.add("-l");
-            cmdAndArguments.add(mavenOptions.logFile().get());
+        if (mavenOptions.suppressSnapshotUpdates().orElse(false)) {
+            cmdAndArguments.add("--no-snapshot-updates");
         }
-        // TODO: etc
+        if (mavenOptions.strictChecksums().orElse(false)) {
+            cmdAndArguments.add("--strict-checksums");
+        }
+        if (mavenOptions.relaxedChecksums().orElse(false)) {
+            cmdAndArguments.add("--lax-checksums");
+        }
+        if (mavenOptions.failFast().orElse(false)) {
+            cmdAndArguments.add("--fail-fast");
+        }
+        if (mavenOptions.failAtEnd().orElse(false)) {
+            cmdAndArguments.add("--fail-at-end");
+        }
+        if (mavenOptions.failNever().orElse(false)) {
+            cmdAndArguments.add("--fail-never");
+        }
+        if (mavenOptions.resume().orElse(false)) {
+            cmdAndArguments.add("--resume");
+        }
+        if (mavenOptions.resumeFrom().isPresent()) {
+            cmdAndArguments.add("--resume-from");
+            cmdAndArguments.add(mavenOptions.resumeFrom().get());
+        }
+        if (mavenOptions.projects().isPresent()) {
+            cmdAndArguments.add("--projects");
+            cmdAndArguments.add(String.join(",", mavenOptions.projects().get()));
+        }
+        if (mavenOptions.alsoMake().orElse(false)) {
+            cmdAndArguments.add("--also-make");
+        }
+        if (mavenOptions.alsoMakeDependents().orElse(false)) {
+            cmdAndArguments.add("--also-make-dependents");
+        }
+        if (mavenOptions.threads().isPresent()) {
+            cmdAndArguments.add("--threads");
+            cmdAndArguments.add(mavenOptions.threads().get());
+        }
+        if (mavenOptions.builder().isPresent()) {
+            cmdAndArguments.add("--builder");
+            cmdAndArguments.add(mavenOptions.builder().get());
+        }
+        if (mavenOptions.noTransferProgress().orElse(false)) {
+            cmdAndArguments.add("--no-transfer-progress");
+        }
+        if (mavenOptions.cacheArtifactNotFound().isPresent()) {
+            cmdAndArguments.add("--cache-artifact-not-found");
+            cmdAndArguments.add(mavenOptions.cacheArtifactNotFound().get().toString());
+        }
+        if (mavenOptions.strictArtifactDescriptorPolicy().isPresent()) {
+            cmdAndArguments.add("--strict-artifact-descriptor-policy");
+            cmdAndArguments.add(mavenOptions.strictArtifactDescriptorPolicy().get().toString());
+        }
+        if (mavenOptions.ignoreTransitiveRepositories().isPresent()) {
+            cmdAndArguments.add("--ignore-transitive-repositories");
+        }
 
         // last the goals
         cmdAndArguments.addAll(mavenOptions.goals().orElse(Collections.emptyList()));
