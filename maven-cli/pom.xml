@@ -51,6 +51,11 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
+      <artifactId>org.eclipse.sisu.inject</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -96,6 +101,15 @@ under the License.
               <mainClass>org.apache.maven.cling.MavenCling</mainClass>
             </manifest>
           </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <maven.home>${maven.home}</maven.home>
+          </systemProperties>
         </configuration>
       </plugin>
     </plugins>

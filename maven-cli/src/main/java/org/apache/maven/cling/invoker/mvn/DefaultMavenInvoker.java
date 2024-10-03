@@ -104,7 +104,7 @@ public abstract class DefaultMavenInvoker<
     }
 
     @Override
-    protected void prepare(C localContext) {
+    protected void prepare(C localContext) throws Exception {
         // explicitly fill in "defaults"?
         DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         mavenExecutionRequest.setRepositoryCache(new DefaultRepositoryCache());
@@ -145,7 +145,7 @@ public abstract class DefaultMavenInvoker<
     }
 
     @Override
-    protected void postCommands(C localContext) {
+    protected void postCommands(C localContext) throws Exception {
         super.postCommands(localContext);
 
         R invokerRequest = localContext.invokerRequest;
@@ -257,7 +257,7 @@ public abstract class DefaultMavenInvoker<
     }
 
     @Override
-    protected void populateRequest(C context, MavenExecutionRequest request) {
+    protected void populateRequest(C context, MavenExecutionRequest request) throws Exception {
         super.populateRequest(context, request);
 
         MavenOptions options = context.invokerRequest.options();

@@ -82,15 +82,18 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
 
         // TODO: multiModuleProjectDirectory vs rootDirectory?
         // fallback if no root? otherwise make sure they are same?
-        Path mmpd = getCanonicalPath(cwd.resolve(requireNonNull(
-                System.getProperty("maven.multiModuleProjectDirectory"),
-                "maven.multiModuleProjectDirectory is not set")));
+        Path mmpd = System.getProperty("maven.multiModuleProjectDirectory") == null
+                ? null
+                : getCanonicalPath(cwd.resolve(requireNonNull(
+                        System.getProperty("maven.multiModuleProjectDirectory"),
+                        "maven.multiModuleProjectDirectory is not set")));
         if (rootDirectory == null) {
             parserRequest.logger().warn(rootLocator.getNoRootMessage());
-            rootDirectory = mmpd;
+            rootDirectory = requireNonNull(
+                    mmpd, "maven.multiModuleProjectDirectory is not set and rootDirectory was not discovered");
         } else {
             rootDirectory = getCanonicalPath(rootDirectory);
-            if (!Objects.equals(rootDirectory, mmpd)) {
+            if (mmpd != null && !Objects.equals(rootDirectory, mmpd)) {
                 parserRequest.logger().warn("Project root directory and multiModuleProjectDirectory are not aligned");
             }
         }

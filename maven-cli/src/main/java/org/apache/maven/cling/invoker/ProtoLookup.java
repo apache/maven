@@ -55,7 +55,7 @@ public class ProtoLookup implements Lookup {
 
     @Override
     public <T> Optional<T> lookupOptional(Class<T> type) {
-        return Optional.of(type.cast(components.get(type)));
+        return Optional.ofNullable(type.cast(components.get(type)));
     }
 
     @Override

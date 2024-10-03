@@ -28,10 +28,12 @@ import static java.util.Objects.requireNonNull;
  * Container capsule backed by Plexus Container.
  */
 public class PlexusContainerCapsule implements ContainerCapsule {
+    private final ClassLoader previousClassLoader;
     private final PlexusContainer plexusContainer;
     private final Lookup lookup;
 
-    public PlexusContainerCapsule(PlexusContainer plexusContainer) {
+    public PlexusContainerCapsule(ClassLoader previousClassLoader, PlexusContainer plexusContainer) {
+        this.previousClassLoader = requireNonNull(previousClassLoader, "previousClassLoader");
         this.plexusContainer = requireNonNull(plexusContainer, "plexusContainer");
         this.lookup = new DefaultLookup(plexusContainer);
     }
@@ -43,6 +45,10 @@ public class PlexusContainerCapsule implements ContainerCapsule {
 
     @Override
     public void close() {
-        plexusContainer.dispose();
+        try {
+            plexusContainer.dispose();
+        } finally {
+            Thread.currentThread().setContextClassLoader(previousClassLoader);
+        }
     }
 }

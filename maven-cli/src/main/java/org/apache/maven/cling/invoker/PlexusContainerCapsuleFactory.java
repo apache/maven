@@ -73,7 +73,7 @@ public class PlexusContainerCapsuleFactory<
     @Override
     public ContainerCapsule createContainerCapsule(C context) throws InvokerException {
         try {
-            return new PlexusContainerCapsule(container(context));
+            return new PlexusContainerCapsule(Thread.currentThread().getContextClassLoader(), container(context));
         } catch (Exception e) {
             throw new InvokerException("Failed to create plexus container capsule", e);
         }
@@ -248,6 +248,7 @@ public class PlexusContainerCapsuleFactory<
             }
         });
 
+        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         try {
             container.setLookupRealm(null);
             container.setLoggerManager(new Slf4jLoggerManager());
@@ -263,7 +264,11 @@ public class PlexusContainerCapsuleFactory<
                     .lookup(BootstrapCoreExtensionManager.class)
                     .loadCoreExtensions(mer, providedArtifacts, extensions));
         } finally {
-            container.dispose();
+            try {
+                container.dispose();
+            } finally {
+                Thread.currentThread().setContextClassLoader(oldCL);
+            }
         }
     }
 }

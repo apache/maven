@@ -34,8 +34,8 @@ public class DefaultForkedMavenInvokerTest {
     @Test
     void smoke(@TempDir Path tempDir) throws Exception {
         try (DefaultForkedMavenInvoker invoker = new DefaultForkedMavenInvoker()) {
+            Files.createDirectory(tempDir.resolve(".mvn"));
             Path log = tempDir.resolve("build.log").toAbsolutePath();
-            System.setProperty("maven.home", "/home/cstamas/.sdkman/candidates/maven/current");
             int exitcode = invoker.invoke(new DefaultForkedMavenParser()
                     .parse(
                             "mvn",

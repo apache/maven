@@ -45,10 +45,6 @@ public class DefaultResidentMavenInvoker
             super(invoker, invokerRequest);
         }
 
-        private boolean isReused() {
-            return maven != null;
-        }
-
         @Override
         public void close() throws InvokerException {
             // we are resident, we do not shut down here
@@ -57,9 +53,34 @@ public class DefaultResidentMavenInvoker
         public void shutDown() throws InvokerException {
             super.close();
         }
-    }
 
-    private static final String RESIDENT_ID = "resident";
+        public LocalContext createShadow() {
+            LocalContext shadow = new LocalContext((DefaultResidentMavenInvoker) invoker, invokerRequest);
+
+            shadow.logger = logger;
+            shadow.loggerFactory = loggerFactory;
+            shadow.loggerLevel = loggerLevel;
+            shadow.containerCapsule = containerCapsule;
+            shadow.lookup = lookup;
+            shadow.settingsBuilder = settingsBuilder;
+
+            shadow.interactive = interactive;
+            shadow.localRepositoryPath = localRepositoryPath;
+            shadow.installationSettingsPath = installationSettingsPath;
+            shadow.projectSettingsPath = projectSettingsPath;
+            shadow.userSettingsPath = userSettingsPath;
+            shadow.effectiveSettings = effectiveSettings;
+
+            shadow.mavenExecutionRequest = mavenExecutionRequest;
+            shadow.eventSpyDispatcher = eventSpyDispatcher;
+            shadow.mavenExecutionRequestPopulator = mavenExecutionRequestPopulator;
+            shadow.toolchainsBuilder = toolchainsBuilder;
+            shadow.modelProcessor = modelProcessor;
+            shadow.maven = maven;
+
+            return shadow;
+        }
+    }
 
     private final ConcurrentHashMap<String, LocalContext> residentContext;
 
@@ -87,20 +108,24 @@ public class DefaultResidentMavenInvoker
 
     @Override
     protected LocalContext createContext(ResidentMavenInvokerRequest invokerRequest) {
-        return residentContext.computeIfAbsent(RESIDENT_ID, k -> new LocalContext(this, invokerRequest));
+        return residentContext
+                .computeIfAbsent(getContextId(invokerRequest), k -> {
+                    LocalContext master = new LocalContext(this, invokerRequest);
+                    try {
+                        validate(master);
+                        prepare(master);
+                        logging(master);
+                        container(master);
+                        lookup(master);
+                        return master;
+                    } catch (Exception e) {
+                        throw new InvokerException("Failed to init master context", e);
+                    }
+                })
+                .createShadow();
     }
 
-    @Override
-    protected void container(LocalContext context) throws Exception {
-        if (!context.isReused()) {
-            super.container(context);
-        }
-    }
-
-    @Override
-    protected void lookup(LocalContext context) throws Exception {
-        if (!context.isReused()) {
-            super.lookup(context);
-        }
+    protected String getContextId(ResidentMavenInvokerRequest invokerRequest) {
+        return "resident";
     }
 }

@@ -166,7 +166,7 @@ public abstract class LookupInvoker<
                 lookup(context);
                 init(context);
                 postCommands(context);
-                settings(context, context.settingsBuilder);
+                settings(context);
                 return execute(context);
             } catch (Exception e) {
                 throw handleException(context, e);
@@ -189,11 +189,11 @@ public abstract class LookupInvoker<
         return new InvokerException(e.getMessage(), e);
     }
 
-    protected abstract C createContext(R invokerRequest);
+    protected abstract C createContext(R invokerRequest) throws InvokerException;
 
-    protected void validate(C context) throws InvokerException {}
+    protected void validate(C context) throws Exception {}
 
-    protected void prepare(C context) {}
+    protected void prepare(C context) throws Exception {}
 
     protected void logging(C context) throws Exception {
         R invokerRequest = context.invokerRequest;
@@ -267,7 +267,7 @@ public abstract class LookupInvoker<
         }
     }
 
-    protected void preCommands(C context) {
+    protected void preCommands(C context) throws Exception {
         Options mavenOptions = context.invokerRequest.options();
         if (mavenOptions.verbose().orElse(false) || mavenOptions.showVersion().orElse(false)) {
             context.stdOut.println(CLIReportingUtils.showVersion());
@@ -294,7 +294,7 @@ public abstract class LookupInvoker<
 
     protected void init(C context) throws Exception {}
 
-    protected void postCommands(C context) {
+    protected void postCommands(C context) throws Exception {
         R invokerRequest = context.invokerRequest;
         Logger logger = context.logger;
         if (invokerRequest.options().showErrors().orElse(false)) {
@@ -318,6 +318,10 @@ public abstract class LookupInvoker<
                 logger.debug(buff.toString());
             }
         }
+    }
+
+    protected void settings(C context) throws Exception {
+        settings(context, context.settingsBuilder);
     }
 
     protected void settings(C context, SettingsBuilder settingsBuilder) throws Exception {
@@ -425,9 +429,10 @@ public abstract class LookupInvoker<
         }
     }
 
-    protected void customizeSettingsRequest(C context, SettingsBuildingRequest settingsBuildingRequest) {}
+    protected void customizeSettingsRequest(C context, SettingsBuildingRequest settingsBuildingRequest)
+            throws Exception {}
 
-    protected void customizeSettingsResult(C context, SettingsBuildingResult settingsBuildingResult) {}
+    protected void customizeSettingsResult(C context, SettingsBuildingResult settingsBuildingResult) throws Exception {}
 
     protected boolean mayDisableInteractiveMode(C context, boolean proposedInteractive) {
         if (!context.invokerRequest.options().forceInteractive().orElse(false)) {
@@ -472,7 +477,7 @@ public abstract class LookupInvoker<
         return context.cwdResolver.apply(userDefinedLocalRepo);
     }
 
-    protected void populateRequest(C context, MavenExecutionRequest request) {
+    protected void populateRequest(C context, MavenExecutionRequest request) throws Exception {
         populateRequestFromSettings(request, context.effectiveSettings);
 
         Options options = context.invokerRequest.options();
@@ -507,7 +512,7 @@ public abstract class LookupInvoker<
                 "local", "file://" + baseDirectory.toUri().getRawPath(), layout, blah, blah);
     }
 
-    protected void populateRequestFromSettings(MavenExecutionRequest request, Settings settings) {
+    protected void populateRequestFromSettings(MavenExecutionRequest request, Settings settings) throws Exception {
         if (settings == null) {
             return;
         }
