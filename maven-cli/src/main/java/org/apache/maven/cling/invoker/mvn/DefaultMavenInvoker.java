@@ -64,7 +64,6 @@ import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.DefaultRepositoryCache;
 
 import static java.util.Comparator.comparing;
@@ -124,7 +123,7 @@ public abstract class DefaultMavenInvoker<
     }
 
     @Override
-    protected void lookup(C context) throws ComponentLookupException {
+    protected void lookup(C context) throws Exception {
         context.eventSpyDispatcher = context.lookup.lookup(EventSpyDispatcher.class);
         context.mavenExecutionRequestPopulator = context.lookup.lookup(MavenExecutionRequestPopulator.class);
         context.toolchainsBuilder = context.lookup.lookup(ToolchainsBuilder.class);

@@ -27,7 +27,6 @@ import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.resident.ResidentMavenOptions;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.DefaultMavenInvoker;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * Local invoker implementation, when Maven CLI is being run. System uses ClassWorld launcher, and class world
@@ -141,7 +140,7 @@ public class DefaultResidentMavenInvoker
     }
 
     @Override
-    protected void lookup(LocalContext context) throws ComponentLookupException {
+    protected void lookup(LocalContext context) throws Exception {
         if (!context.shadow) {
             super.lookup(context);
         }
