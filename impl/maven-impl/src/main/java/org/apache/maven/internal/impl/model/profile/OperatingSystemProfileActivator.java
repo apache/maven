@@ -100,7 +100,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
     }
 
     private boolean determineVersionMatch(String expectedVersion, String actualVersion) {
-        String test = expectedVersion;
+        String test = expectedVersion.toLowerCase(Locale.ENGLISH);
         boolean reverse = false;
         final boolean result;
         if (test.startsWith(REGEX_PREFIX)) {
@@ -117,7 +117,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
     }
 
     private boolean determineArchMatch(String expectedArch, String actualArch) {
-        String test = expectedArch;
+        String test = expectedArch.toLowerCase(Locale.ENGLISH);
         boolean reverse = false;
 
         if (test.startsWith("!")) {
@@ -130,8 +130,8 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
         return reverse != result;
     }
 
-    private boolean determineNameMatch(String expectedName, String actualName) {
-        String test = expectedName;
+    private boolean determineNameMatch(String family, String actualName) {
+        String test = family.toLowerCase(Locale.ENGLISH);
         boolean reverse = false;
 
         if (test.startsWith("!")) {

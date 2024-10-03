@@ -18,13 +18,13 @@
  */
 package org.apache.maven.internal.impl.model;
 
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 
 /**
@@ -41,9 +41,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     private Map<String, String> userProperties = Collections.emptyMap();
 
-    private Map<String, String> projectProperties = Collections.emptyMap();
-
-    private Path projectDirectory;
+    private Model model;
 
     @Override
     public List<String> getActiveProfileIds() {
@@ -138,34 +136,12 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     }
 
     @Override
-    public Path getProjectDirectory() {
-        return projectDirectory;
+    public Model getModel() {
+        return model;
     }
 
-    /**
-     * Sets the base directory of the current project.
-     *
-     * @param projectDirectory The base directory of the current project, may be {@code null} if profile activation
-     *                         happens in the context of metadata retrieval rather than project building.
-     * @return This context, never {@code null}.
-     */
-    public DefaultProfileActivationContext setProjectDirectory(Path projectDirectory) {
-        this.projectDirectory = projectDirectory;
-
-        return this;
-    }
-
-    @Override
-    public Map<String, String> getProjectProperties() {
-        return projectProperties;
-    }
-
-    public DefaultProfileActivationContext setProjectProperties(Properties projectProperties) {
-        return setProjectProperties(toMap(projectProperties));
-    }
-
-    public DefaultProfileActivationContext setProjectProperties(Map<String, String> projectProperties) {
-        this.projectProperties = unmodifiable(projectProperties);
+    public DefaultProfileActivationContext setModel(Model model) {
+        this.model = model;
 
         return this;
     }

@@ -102,7 +102,6 @@ import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.api.services.model.ModelVersionParser;
 import org.apache.maven.api.services.model.PluginConfigurationExpander;
 import org.apache.maven.api.services.model.PluginManagementInjector;
-import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileInjector;
 import org.apache.maven.api.services.model.ProfileSelector;
 import org.apache.maven.api.services.model.RootLocator;
@@ -1114,7 +1113,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationContext.setUserProperties(profileProps);
             }
 
-            profileActivationContext.setProjectProperties(inputModel.getProperties());
+            profileActivationContext.setModel(inputModel);
             setSource(inputModel);
             List<Profile> activePomProfiles = getActiveProfiles(inputModel.getProfiles(), profileActivationContext);
 
@@ -1192,7 +1191,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             model = modelNormalizer.mergeDuplicates(model, request, this);
 
             // profile activation
-            profileActivationContext.setProjectProperties(model.getProperties());
+            profileActivationContext.setModel(model);
 
             List<Profile> interpolatedProfiles =
                     interpolateActivations(model.getProfiles(), profileActivationContext, this);
@@ -1769,6 +1768,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
 
                 @Override
+                protected Activation.Builder transformActivation_Condition(
+                        Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
+                    // do not interpolate the condition activation
+                    return builder;
+                }
+
+                @Override
                 protected ActivationFile.Builder transformActivationFile_Missing(
                         Supplier<? extends ActivationFile.Builder> creator,
                         ActivationFile.Builder builder,
@@ -1846,13 +1852,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         context.setActiveProfileIds(request.getActiveProfileIds());
         context.setInactiveProfileIds(request.getInactiveProfileIds());
         context.setSystemProperties(request.getSystemProperties());
-        // enrich user properties with project packaging
-        Map<String, String> userProperties = new HashMap<>(request.getUserProperties());
-        if (!userProperties.containsKey(ProfileActivationContext.PROPERTY_NAME_PACKAGING)) {
-            userProperties.put(ProfileActivationContext.PROPERTY_NAME_PACKAGING, model.getPackaging());
-        }
-        context.setUserProperties(userProperties);
-        context.setProjectDirectory(model.getProjectDirectory());
+        context.setUserProperties(request.getUserProperties());
+        context.setModel(model);
 
         return context;
     }
