@@ -126,6 +126,8 @@ public class DefaultResidentMavenInvoker
     }
 
     protected String getContextId(ResidentMavenInvokerRequest invokerRequest) {
+        // TODO: in a moment Maven stop pushing user properties to system properties (and maybe something more)
+        // and allow multiple instances per JVM, this may become a pool?
         return "resident";
     }
 
