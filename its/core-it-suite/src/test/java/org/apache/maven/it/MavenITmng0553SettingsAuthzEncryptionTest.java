@@ -56,7 +56,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
     private int port;
 
     public MavenITmng0553SettingsAuthzEncryptionTest() {
-        super("[2.1.0,3.0-alpha-1),[3.0-alpha-3,)");
+        super("[2.1.0,3.0-alpha-1),[3.0-alpha-3,4.0.0-beta-4]");
     }
 
     @BeforeEach
