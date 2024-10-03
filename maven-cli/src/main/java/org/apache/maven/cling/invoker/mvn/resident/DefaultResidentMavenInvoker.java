@@ -27,6 +27,7 @@ import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.resident.ResidentMavenOptions;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.DefaultMavenInvoker;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * Local invoker implementation, when Maven CLI is being run. System uses ClassWorld launcher, and class world
@@ -40,8 +41,46 @@ public class DefaultResidentMavenInvoker
     protected static class LocalContext
             extends DefaultMavenInvoker.MavenContext<
                     ResidentMavenOptions, ResidentMavenInvokerRequest, DefaultResidentMavenInvoker.LocalContext> {
+
+        protected final boolean shadow;
+
         protected LocalContext(DefaultResidentMavenInvoker invoker, ResidentMavenInvokerRequest invokerRequest) {
+            this(invoker, invokerRequest, false);
+        }
+
+        protected LocalContext(
+                DefaultResidentMavenInvoker invoker, ResidentMavenInvokerRequest invokerRequest, boolean shadow) {
             super(invoker, invokerRequest);
+            this.shadow = shadow;
+        }
+
+        private LocalContext createShadow() {
+            if (maven == null) {
+                return this;
+            }
+            LocalContext shadow = new LocalContext((DefaultResidentMavenInvoker) invoker, invokerRequest, true);
+            shadow.logger = logger;
+            shadow.loggerFactory = loggerFactory;
+            shadow.loggerLevel = loggerLevel;
+            shadow.containerCapsule = containerCapsule;
+            shadow.lookup = lookup;
+            shadow.settingsBuilder = settingsBuilder;
+
+            shadow.interactive = interactive;
+            shadow.localRepositoryPath = localRepositoryPath;
+            shadow.installationSettingsPath = installationSettingsPath;
+            shadow.projectSettingsPath = projectSettingsPath;
+            shadow.userSettingsPath = userSettingsPath;
+            shadow.effectiveSettings = effectiveSettings;
+
+            shadow.mavenExecutionRequest = mavenExecutionRequest;
+            shadow.eventSpyDispatcher = eventSpyDispatcher;
+            shadow.mavenExecutionRequestPopulator = mavenExecutionRequestPopulator;
+            shadow.toolchainsBuilder = toolchainsBuilder;
+            shadow.modelProcessor = modelProcessor;
+            shadow.maven = maven;
+
+            return shadow;
         }
 
         @Override
@@ -54,17 +93,19 @@ public class DefaultResidentMavenInvoker
         }
     }
 
-    private final ConcurrentHashMap<String, LocalContext> contextPool;
+    private static final String RESIDENT_ID = "resident";
+
+    private final ConcurrentHashMap<String, LocalContext> residentContext;
 
     public DefaultResidentMavenInvoker(ProtoLookup protoLookup) {
         super(protoLookup);
-        this.contextPool = new ConcurrentHashMap<>();
+        this.residentContext = new ConcurrentHashMap<>();
     }
 
     @Override
     public void close() throws InvokerException {
         ArrayList<InvokerException> exceptions = new ArrayList<>();
-        for (LocalContext context : contextPool.values()) {
+        for (LocalContext context : residentContext.values()) {
             try {
                 context.shutDown();
             } catch (InvokerException e) {
@@ -80,7 +121,29 @@ public class DefaultResidentMavenInvoker
 
     @Override
     protected LocalContext createContext(ResidentMavenInvokerRequest invokerRequest) {
-        String id = "?";
-        return contextPool.computeIfAbsent(id, k -> new LocalContext(this, invokerRequest));
+        return residentContext
+                .computeIfAbsent(RESIDENT_ID, k -> new LocalContext(this, invokerRequest))
+                .createShadow();
+    }
+
+    @Override
+    protected void logging(LocalContext context) throws Exception {
+        if (!context.shadow) {
+            super.logging(context);
+        }
+    }
+
+    @Override
+    protected void container(LocalContext context) throws Exception {
+        if (!context.shadow) {
+            super.container(context);
+        }
+    }
+
+    @Override
+    protected void lookup(LocalContext context) throws ComponentLookupException {
+        if (!context.shadow) {
+            super.lookup(context);
+        }
     }
 }

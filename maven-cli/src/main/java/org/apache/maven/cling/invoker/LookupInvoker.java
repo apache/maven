@@ -91,7 +91,7 @@ public abstract class LookupInvoker<
     public static class LookupInvokerContext<
                     O extends Options, R extends InvokerRequest<O>, C extends LookupInvokerContext<O, R, C>>
             implements AutoCloseable {
-        public final LookupInvoker<O, R, C> lookupInvoker;
+        public final LookupInvoker<O, R, C> invoker;
         public final ProtoLookup protoLookup;
         public final R invokerRequest;
         public final Function<String, Path> cwdResolver;
@@ -99,9 +99,9 @@ public abstract class LookupInvoker<
         public final PrintWriter stdOut;
         public final PrintWriter stdErr;
 
-        protected LookupInvokerContext(LookupInvoker<O, R, C> lookupInvoker, R invokerRequest) {
-            this.lookupInvoker = lookupInvoker;
-            this.protoLookup = lookupInvoker.protoLookup;
+        protected LookupInvokerContext(LookupInvoker<O, R, C> invoker, R invokerRequest) {
+            this.invoker = invoker;
+            this.protoLookup = invoker.protoLookup;
             this.invokerRequest = requireNonNull(invokerRequest);
             this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
             this.stdIn = invokerRequest.in().orElse(System.in);
@@ -163,6 +163,8 @@ public abstract class LookupInvoker<
 
                 preCommands(context);
                 container(context);
+                lookup(context);
+                init(context);
                 postCommands(context);
                 settings(context, context.settingsBuilder);
                 return execute(context);
@@ -265,11 +267,16 @@ public abstract class LookupInvoker<
         }
     }
 
+    protected void preCommands(C context) {
+        Options mavenOptions = context.invokerRequest.options();
+        if (mavenOptions.verbose().orElse(false) || mavenOptions.showVersion().orElse(false)) {
+            context.stdOut.println(CLIReportingUtils.showVersion());
+        }
+    }
+
     protected void container(C context) throws Exception {
         context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(context);
         context.lookup = context.containerCapsule.getLookup();
-
-        postContainerCreated(context);
         context.settingsBuilder = context.lookup.lookup(SettingsBuilder.class);
 
         // refresh logger in case container got customized by spy
@@ -283,14 +290,9 @@ public abstract class LookupInvoker<
         return new PlexusContainerCapsuleFactory<>();
     }
 
-    protected void postContainerCreated(C context) throws Exception {}
+    protected void lookup(C context) throws Exception {}
 
-    protected void preCommands(C context) {
-        Options mavenOptions = context.invokerRequest.options();
-        if (mavenOptions.verbose().orElse(false) || mavenOptions.showVersion().orElse(false)) {
-            context.stdOut.println(CLIReportingUtils.showVersion());
-        }
-    }
+    protected void init(C context) throws Exception {}
 
     protected void postCommands(C context) {
         R invokerRequest = context.invokerRequest;

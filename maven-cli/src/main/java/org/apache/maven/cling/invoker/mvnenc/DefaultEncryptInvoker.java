@@ -57,7 +57,7 @@ public class DefaultEncryptInvoker
     }
 
     @Override
-    protected void postContainerCreated(LocalContext context) {
+    protected void lookup(LocalContext context) {
         context.secDispatcher = context.lookup.lookup(SecDispatcher.class);
     }
 

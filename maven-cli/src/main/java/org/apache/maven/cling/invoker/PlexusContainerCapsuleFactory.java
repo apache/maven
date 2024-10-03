@@ -254,10 +254,10 @@ public class PlexusContainerCapsuleFactory<
             container.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
             Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
-            context.lookupInvoker.settings(context, container.lookup(SettingsBuilder.class));
+            context.invoker.settings(context, container.lookup(SettingsBuilder.class));
 
             MavenExecutionRequest mer = new DefaultMavenExecutionRequest();
-            context.lookupInvoker.populateRequest(context, mer);
+            context.invoker.populateRequest(context, mer);
             mer = container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(mer);
             return Collections.unmodifiableList(container
                     .lookup(BootstrapCoreExtensionManager.class)

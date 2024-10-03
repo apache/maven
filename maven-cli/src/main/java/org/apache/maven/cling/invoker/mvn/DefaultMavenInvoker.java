@@ -124,14 +124,17 @@ public abstract class DefaultMavenInvoker<
     }
 
     @Override
-    protected void postContainerCreated(C context) throws ComponentLookupException {
-        MavenInvokerRequest<O> invokerRequest = context.invokerRequest;
+    protected void lookup(C context) throws ComponentLookupException {
         context.eventSpyDispatcher = context.lookup.lookup(EventSpyDispatcher.class);
         context.mavenExecutionRequestPopulator = context.lookup.lookup(MavenExecutionRequestPopulator.class);
         context.toolchainsBuilder = context.lookup.lookup(ToolchainsBuilder.class);
         context.modelProcessor = context.lookup.lookup(ModelProcessor.class);
         context.maven = context.lookup.lookup(Maven.class);
+    }
 
+    @Override
+    protected void init(C context) throws Exception {
+        MavenInvokerRequest<O> invokerRequest = context.invokerRequest;
         DefaultEventSpyContext eventSpyContext = new DefaultEventSpyContext();
         Map<String, Object> data = eventSpyContext.getData();
         data.put("plexus", context.lookup.lookup(PlexusContainer.class));
