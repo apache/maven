@@ -1685,6 +1685,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
 
                 @Override
+                protected Activation.Builder transformActivation_Condition(
+                        Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
+                    // do not interpolate the condition activation
+                    return builder;
+                }
+
+                @Override
                 protected ActivationFile.Builder transformActivationFile_Missing(
                         Supplier<? extends ActivationFile.Builder> creator,
                         ActivationFile.Builder builder,
