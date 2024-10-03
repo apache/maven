@@ -281,6 +281,17 @@ public class DefaultModelValidator implements ModelValidator {
                 stk.pop();
             }
         }
+
+        @Override
+        protected Activation.Builder transformActivation_Condition(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
+            stk.push(nextFrame("condition"));
+            try {
+                return super.transformActivation_Condition(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
     }
 
     private final Set<String> validCoordinatesIds = new HashSet<>();
@@ -450,6 +461,8 @@ public class DefaultModelValidator implements ModelValidator {
                     validateStringNotEmpty("version", problems, Severity.FATAL, Version.V20, m.getVersion(), m);
                 }
             }
+
+            validateStringNoExpression("packaging", problems, Severity.WARNING, Version.V20, m.getPackaging(), m);
 
             validate20RawDependencies(
                     problems, m.getDependencies(), "dependencies.dependency.", EMPTY, validationLevel, request);
