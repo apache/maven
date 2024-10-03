@@ -541,6 +541,8 @@ under the License.
           <systemPropertyVariables>
             <maven.version>${maven.version}</maven.version>
             <maven.home>${preparedMavenHome}</maven.home>
+            <!-- TODO: This is for now legacy as Verifier is confused otherwise -->
+            <maven.mainClass>org.apache.maven.cli.MavenCli</maven.mainClass>
             <maven.it.global-settings.dir>${project.build.testOutputDirectory}</maven.it.global-settings.dir>
           </systemPropertyVariables>
         </configuration>
