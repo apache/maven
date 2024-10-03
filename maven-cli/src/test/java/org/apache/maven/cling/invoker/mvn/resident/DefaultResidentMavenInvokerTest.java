@@ -27,9 +27,11 @@ import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+@Disabled("Works ONLY with Maven4!")
 public class DefaultResidentMavenInvokerTest {
     @Test
     void smoke(@TempDir Path tempDir) throws Exception {

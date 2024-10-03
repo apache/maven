@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-@Disabled
+@Disabled("Works ONLY with Maven4!")
 public class DefaultForkedMavenInvokerTest {
     @Test
     void smoke(@TempDir Path tempDir) throws Exception {
