@@ -37,16 +37,16 @@ public class DefaultResidentMavenInvokerTest {
         // works only in recent Maven4
         Assumptions.assumeTrue(Files.isRegularFile(
                 Paths.get(System.getProperty("maven.home")).resolve("conf").resolve("maven.properties")));
-        try (ClassWorld classWorld = new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader())) {
-            try (DefaultResidentMavenInvoker invoker = new DefaultResidentMavenInvoker(ProtoLookup.builder()
-                    .addMapping(ClassWorld.class, classWorld)
-                    .build())) {
-                DefaultResidentMavenParser parser = new DefaultResidentMavenParser();
-                Files.createDirectory(tempDir.resolve(".mvn"));
-                Path log = tempDir.resolve("build.log").toAbsolutePath();
+        try (ClassWorld classWorld = new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader());
+                DefaultResidentMavenInvoker invoker = new DefaultResidentMavenInvoker(ProtoLookup.builder()
+                        .addMapping(ClassWorld.class, classWorld)
+                        .build())) {
+            DefaultResidentMavenParser parser = new DefaultResidentMavenParser();
+            Files.createDirectory(tempDir.resolve(".mvn"));
+            Path log = tempDir.resolve("build.log").toAbsolutePath();
 
-                String pomString =
-                        """
+            String pomString =
+                    """
                         <?xml version="1.0" encoding="UTF-8"?>
                         <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
@@ -81,33 +81,32 @@ public class DefaultResidentMavenInvokerTest {
 
                         </project>
                         """;
-                Path pom = tempDir.resolve("pom.xml").toAbsolutePath();
-                Files.writeString(pom, pomString);
+            Path pom = tempDir.resolve("pom.xml").toAbsolutePath();
+            Files.writeString(pom, pomString);
 
-                int exitCode;
+            int exitCode;
 
-                exitCode = invoker.invoke(parser.parse(ParserRequest.builder(
-                                "mvn",
-                                new String[] {"-l", log.toString(), "clean"},
-                                new ProtoLogger(),
-                                new JLineMessageBuilderFactory())
-                        .cwd(tempDir)
-                        .build()));
-                System.out.println("1st exit code: " + exitCode);
-                System.out.println("log:");
-                System.out.println(Files.readString(log));
+            exitCode = invoker.invoke(parser.parse(ParserRequest.builder(
+                            "mvn",
+                            new String[] {"-l", log.toString(), "clean"},
+                            new ProtoLogger(),
+                            new JLineMessageBuilderFactory())
+                    .cwd(tempDir)
+                    .build()));
+            System.out.println("1st exit code: " + exitCode);
+            System.out.println("log:");
+            System.out.println(Files.readString(log));
 
-                exitCode = invoker.invoke(parser.parse(ParserRequest.builder(
-                                "mvn",
-                                new String[] {"-l", log.toString(), "clean"},
-                                new ProtoLogger(),
-                                new JLineMessageBuilderFactory())
-                        .cwd(tempDir)
-                        .build()));
-                System.out.println("2nd exit code: " + exitCode);
-                System.out.println("log:");
-                System.out.println(Files.readString(log));
-            }
+            exitCode = invoker.invoke(parser.parse(ParserRequest.builder(
+                            "mvn",
+                            new String[] {"-l", log.toString(), "clean"},
+                            new ProtoLogger(),
+                            new JLineMessageBuilderFactory())
+                    .cwd(tempDir)
+                    .build()));
+            System.out.println("2nd exit code: " + exitCode);
+            System.out.println("log:");
+            System.out.println(Files.readString(log));
         }
     }
 }
