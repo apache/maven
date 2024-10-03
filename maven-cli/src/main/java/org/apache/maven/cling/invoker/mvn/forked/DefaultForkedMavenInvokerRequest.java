@@ -78,6 +78,6 @@ public class DefaultForkedMavenInvokerRequest extends DefaultMavenInvokerRequest
 
     @Override
     public Optional<List<String>> jvmArguments() {
-        return Optional.of(jvmArguments);
+        return Optional.ofNullable(jvmArguments);
     }
 }

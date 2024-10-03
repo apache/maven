@@ -20,7 +20,6 @@ package org.apache.maven.cling.invoker.mvn.forked;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +73,7 @@ public class DefaultForkedMavenParser extends DefaultMavenParser<MavenOptions, F
     protected List<String> getJvmArguments(Path rootDirectory) {
         if (rootDirectory != null) {
             // TODO: do this
-            return Collections.emptyList();
+            return null;
         }
         return null;
     }

@@ -20,92 +20,94 @@ package org.apache.maven.cling.invoker.mvn.resident;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.mvn.resident.ResidentMavenParser;
 import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-@Disabled("Works ONLY with Maven4!")
 public class DefaultResidentMavenInvokerTest {
     @Test
     void smoke(@TempDir Path tempDir) throws Exception {
-        try (ClassWorld classWorld =
-                        new ClassWorld("plexus.core", Thread.currentThread().getContextClassLoader());
-                DefaultResidentMavenInvoker invoker = new DefaultResidentMavenInvoker(ProtoLookup.builder()
-                        .addMapping(ClassWorld.class, classWorld)
-                        .build())) {
-            ResidentMavenParser parser = new DefaultResidentMavenParser();
-            Files.createDirectory(tempDir.resolve(".mvn"));
-            Path log = tempDir.resolve("build.log").toAbsolutePath();
+        // works only in recent Maven4
+        Assumptions.assumeTrue(Files.isRegularFile(
+                Paths.get(System.getProperty("maven.home")).resolve("conf").resolve("maven.properties")));
+        try (ClassWorld classWorld = new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader())) {
+            try (DefaultResidentMavenInvoker invoker = new DefaultResidentMavenInvoker(ProtoLookup.builder()
+                    .addMapping(ClassWorld.class, classWorld)
+                    .build())) {
+                DefaultResidentMavenParser parser = new DefaultResidentMavenParser();
+                Files.createDirectory(tempDir.resolve(".mvn"));
+                Path log = tempDir.resolve("build.log").toAbsolutePath();
 
-            String pomString =
-                    """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+                String pomString =
+                        """
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
 
-                        <modelVersion>4.0.0</modelVersion>
+                            <modelVersion>4.0.0</modelVersion>
 
-                        <groupId>org.apache.maven.samples</groupId>
-                        <artifactId>resident-invoker</artifactId>
-                        <version>1.0.0</version>
+                            <groupId>org.apache.maven.samples</groupId>
+                            <artifactId>resident-invoker</artifactId>
+                            <version>1.0.0</version>
 
-                        <dependencyManagement>
-                          <dependencies>
-                            <dependency>
-                              <groupId>org.junit</groupId>
-                              <artifactId>junit-bom</artifactId>
-                              <version>5.11.1</version>
-                              <type>pom</type>
-                              <scope>import</scope>
-                            </dependency>
-                          </dependencies>
-                        </dependencyManagement>
+                            <dependencyManagement>
+                              <dependencies>
+                                <dependency>
+                                  <groupId>org.junit</groupId>
+                                  <artifactId>junit-bom</artifactId>
+                                  <version>5.11.1</version>
+                                  <type>pom</type>
+                                  <scope>import</scope>
+                                </dependency>
+                              </dependencies>
+                            </dependencyManagement>
 
-                        <dependencies>
-                          <dependency>
-                            <dependency>
-                              <groupId>org.junit.jupiter</groupId>
-                              <artifactId>junit-jupiter-api</artifactId>
-                              <scope>test</scope>
-                            </dependency>
-                          </dependency>
-                        </dependencies>
+                            <dependencies>
+                              <dependency>
+                                <dependency>
+                                  <groupId>org.junit.jupiter</groupId>
+                                  <artifactId>junit-jupiter-api</artifactId>
+                                  <scope>test</scope>
+                                </dependency>
+                              </dependency>
+                            </dependencies>
 
-                    </project>
-                    """;
-            Path pom = tempDir.resolve("pom.xml").toAbsolutePath();
-            Files.writeString(pom, pomString);
+                        </project>
+                        """;
+                Path pom = tempDir.resolve("pom.xml").toAbsolutePath();
+                Files.writeString(pom, pomString);
 
-            int exitCode;
+                int exitCode;
 
-            exitCode = invoker.invoke(parser.parse(ParserRequest.builder(
-                            "mvn",
-                            new String[] {"-l", log.toString(), "clean"},
-                            new ProtoLogger(),
-                            new JLineMessageBuilderFactory())
-                    .cwd(tempDir)
-                    .build()));
-            System.out.println("1st exit code: " + exitCode);
-            System.out.println("log:");
-            System.out.println(Files.readString(log));
+                exitCode = invoker.invoke(parser.parse(ParserRequest.builder(
+                                "mvn",
+                                new String[] {"-l", log.toString(), "clean"},
+                                new ProtoLogger(),
+                                new JLineMessageBuilderFactory())
+                        .cwd(tempDir)
+                        .build()));
+                System.out.println("1st exit code: " + exitCode);
+                System.out.println("log:");
+                System.out.println(Files.readString(log));
 
-            exitCode = invoker.invoke(parser.parse(ParserRequest.builder(
-                            "mvn",
-                            new String[] {"-l", log.toString(), "clean"},
-                            new ProtoLogger(),
-                            new JLineMessageBuilderFactory())
-                    .cwd(tempDir)
-                    .build()));
-            System.out.println("2nd exit code: " + exitCode);
-            System.out.println("log:");
-            System.out.println(Files.readString(log));
+                exitCode = invoker.invoke(parser.parse(ParserRequest.builder(
+                                "mvn",
+                                new String[] {"-l", log.toString(), "clean"},
+                                new ProtoLogger(),
+                                new JLineMessageBuilderFactory())
+                        .cwd(tempDir)
+                        .build()));
+                System.out.println("2nd exit code: " + exitCode);
+                System.out.println("log:");
+                System.out.println(Files.readString(log));
+            }
         }
     }
 }
