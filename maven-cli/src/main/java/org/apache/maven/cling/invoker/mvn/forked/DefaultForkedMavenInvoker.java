@@ -35,6 +35,7 @@ import static java.util.Objects.requireNonNull;
  * Forked invoker implementation, it spawns a subprocess with Maven.
  */
 public class DefaultForkedMavenInvoker implements ForkedMavenInvoker {
+    @SuppressWarnings("MethodLength")
     @Override
     public int invoke(ForkedMavenInvokerRequest invokerRequest) throws InvokerException {
         requireNonNull(invokerRequest);
@@ -125,7 +126,8 @@ public class DefaultForkedMavenInvoker implements ForkedMavenInvoker {
         }
         if (mavenOptions.activatedProfiles().isPresent()) {
             cmdAndArguments.add("--activate-profiles");
-            cmdAndArguments.add(String.join(",", mavenOptions.activatedProfiles().get()));
+            cmdAndArguments.add(
+                    String.join(",", mavenOptions.activatedProfiles().get()));
         }
         if (mavenOptions.suppressSnapshotUpdates().orElse(false)) {
             cmdAndArguments.add("--no-snapshot-updates");
@@ -179,7 +181,8 @@ public class DefaultForkedMavenInvoker implements ForkedMavenInvoker {
         }
         if (mavenOptions.strictArtifactDescriptorPolicy().isPresent()) {
             cmdAndArguments.add("--strict-artifact-descriptor-policy");
-            cmdAndArguments.add(mavenOptions.strictArtifactDescriptorPolicy().get().toString());
+            cmdAndArguments.add(
+                    mavenOptions.strictArtifactDescriptorPolicy().get().toString());
         }
         if (mavenOptions.ignoreTransitiveRepositories().isPresent()) {
             cmdAndArguments.add("--ignore-transitive-repositories");
