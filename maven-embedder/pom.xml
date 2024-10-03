@@ -34,6 +34,10 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-cli</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-settings</artifactId>
     </dependency>
     <dependency>
@@ -187,15 +191,14 @@ under the License.
         <configuration>
           <version>1.2.0</version>
           <models>
-            <model>src/main/mdo/core-extensions.mdo</model>
+            <model>../api/maven-api-cli/src/main/mdo/core-extensions.mdo</model>
           </models>
           <templates>
-            <template>model.vm</template>
             <template>reader-stax.vm</template>
             <template>writer-stax.vm</template>
           </templates>
           <params>
-            <param>packageModelV4=org.apache.maven.cli.internal.extension.model</param>
+            <param>packageModelV4=org.apache.maven.api.cli.extensions</param>
             <param>packageToolV4=org.apache.maven.cli.internal.extension.io</param>
           </params>
           <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>

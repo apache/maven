@@ -167,6 +167,7 @@ MAVEN_PROJECTBASEDIR="`find_maven_basedir "$@"`"
 MAVEN_OPTS="$MAVEN_OPTS `concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"`"
 LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/plexus-classworlds-*.jar`
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
+MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 
 # For Cygwin and MinGW, switch paths to Windows format before running java(1) command
 if $cygwin || $mingw ; then
@@ -185,6 +186,7 @@ exec "$JAVACMD" \
   -classpath "$LAUNCHER_JAR" \
   "-Dclassworlds.conf=$CLASSWORLDS_CONF" \
   "-Dmaven.home=$MAVEN_HOME" \
+  "-Dmaven.mainClass=$MAVEN_MAIN_CLASS" \
   "-Dlibrary.jansi.path=${MAVEN_HOME}/lib/jansi-native" \
   "-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR" \
   $LAUNCHER_CLASS \

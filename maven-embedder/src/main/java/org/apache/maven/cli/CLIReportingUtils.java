@@ -93,7 +93,7 @@ public final class CLIReportingUtils {
      * @param buildProperties The build properties
      * @return Readable build info
      */
-    static String createMavenVersionString(Properties buildProperties) {
+    public static String createMavenVersionString(Properties buildProperties) {
         String timestamp = reduce(buildProperties.getProperty("timestamp"));
         String version = reduce(buildProperties.getProperty(BUILD_VERSION_PROPERTY));
         String rev = reduce(buildProperties.getProperty("buildNumber"));
@@ -117,7 +117,7 @@ public final class CLIReportingUtils {
         return (s != null ? (s.startsWith("${") && s.endsWith("}") ? null : s) : null);
     }
 
-    static Properties getBuildProperties() {
+    public static Properties getBuildProperties() {
         Properties properties = new Properties();
 
         try (InputStream resourceAsStream =

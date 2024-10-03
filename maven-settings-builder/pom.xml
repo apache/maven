@@ -98,6 +98,7 @@ under the License.
               <exclude>org.apache.maven.settings.building.DefaultSettingsBuilder#setSettingsWriter(org.apache.maven.settings.io.SettingsWriter):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.settings.building.DefaultSettingsBuilder#DefaultSettingsBuilder(org.apache.maven.settings.io.SettingsReader,org.apache.maven.settings.io.SettingsWriter,org.apache.maven.settings.validation.SettingsValidator):CONSTRUCTOR_REMOVED</exclude>
               <exclude>org.apache.maven.settings.validation.DefaultSettingsValidator#DefaultSettingsValidator():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.settings.crypto.DefaultSettingsDecrypter#DefaultSettingsDecrypter(org.sonatype.plexus.components.sec.dispatcher.SecDispatcher):CONSTRUCTOR_REMOVED</exclude>
             </excludes>
           </parameter>
         </configuration>

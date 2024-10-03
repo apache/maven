@@ -173,6 +173,7 @@ for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do s
 
 for %%i in ("%MAVEN_HOME%"\boot\plexus-classworlds-*) do set LAUNCHER_JAR="%%i"
 set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
+if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCling
 
 "%JAVACMD%" ^
   %MAVEN_OPTS% ^
@@ -181,6 +182,7 @@ set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
   -classpath %LAUNCHER_JAR% ^
   "-Dclassworlds.conf=%CLASSWORLDS_CONF%" ^
   "-Dmaven.home=%MAVEN_HOME%" ^
+  "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" ^
   "-Dlibrary.jansi.path=%MAVEN_HOME%\lib\jansi-native" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
   %LAUNCHER_CLASS% ^

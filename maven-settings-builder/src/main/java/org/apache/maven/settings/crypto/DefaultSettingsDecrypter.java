@@ -30,8 +30,8 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.building.DefaultSettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
+import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
+import org.codehaus.plexus.components.secdispatcher.SecDispatcherException;
 
 /**
  * Decrypts passwords in the settings.
@@ -45,7 +45,7 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
     private final SecDispatcher securityDispatcher;
 
     @Inject
-    public DefaultSettingsDecrypter(@Named("maven") SecDispatcher securityDispatcher) {
+    public DefaultSettingsDecrypter(SecDispatcher securityDispatcher) {
         this.securityDispatcher = securityDispatcher;
     }
 
