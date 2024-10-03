@@ -18,13 +18,16 @@
  */
 package org.apache.maven.internal.impl.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The phasing executor allows executing tasks in parallel and waiting for all tasks
@@ -59,30 +62,35 @@ public class PhasingExecutor implements Executor, AutoCloseable {
     private final AtomicInteger activeTaskCount = new AtomicInteger(0);
     private final AtomicInteger completedTaskCount = new AtomicInteger(0);
     private final int id = ID.incrementAndGet();
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition taskCompletionCondition = lock.newCondition();
 
     public PhasingExecutor(ExecutorService executor) {
         this.executor = executor;
-        log("general", "PhasingExecutor created.");
-    }
-
-    private void log(String context, String message) {
-        LOGGER.debug("[" + id + "] [" + context + "] " + message);
+        log("[{}][general] PhasingExecutor created.");
     }
 
     @Override
     public void execute(Runnable command) {
         activeTaskCount.incrementAndGet();
-        log("task", "Task submitted. Active tasks: " + activeTaskCount.get());
+        log("[{}][task] Task submitted. Active tasks: {}", activeTaskCount.get());
         executor.execute(() -> {
             try {
-                log("task", "Task executing. Active tasks: " + activeTaskCount.get());
+                log("[{}][task] Task executing. Active tasks: {}", activeTaskCount.get());
                 command.run();
             } finally {
-                log("task", "Task completed. Active tasks: " + activeTaskCount.get());
-                completedTaskCount.incrementAndGet();
-                if (activeTaskCount.decrementAndGet() == 0 && shutdownInitiated.get()) {
-                    log("task", "Last task completed. Initiating executor shutdown.");
-                    executor.shutdown();
+                lock.lock();
+                try {
+                    completedTaskCount.incrementAndGet();
+                    activeTaskCount.decrementAndGet();
+                    log("[{}][task] Task completed. Active tasks: {}", activeTaskCount.get());
+                    taskCompletionCondition.signalAll();
+                    if (activeTaskCount.get() == 0 && shutdownInitiated.get()) {
+                        log("[{}][task] Last task completed. Initiating executor shutdown.");
+                        executor.shutdown();
+                    }
+                } finally {
+                    lock.unlock();
                 }
             }
         });
@@ -93,23 +101,23 @@ public class PhasingExecutor implements Executor, AutoCloseable {
             throw new IllegalStateException("Already in a phase");
         }
         int phaseNumber = completedTaskCount.get();
-        log("phase", "Entering phase " + phaseNumber + ". Active tasks: " + activeTaskCount.get());
+        log("[{}][phase] Entering phase {}. Active tasks: {}", phaseNumber, activeTaskCount.get());
         return () -> {
             try {
                 int tasksAtPhaseStart = completedTaskCount.get();
-                log("phase", "Closing phase " + phaseNumber + ". Waiting for all tasks to complete.");
-                while (true) {
-                    if (activeTaskCount.get() == 0) {
-                        break;
+                log("[{}][phase] Closing phase {}. Waiting for all tasks to complete.", phaseNumber);
+                lock.lock();
+                try {
+                    while (activeTaskCount.get() > 0
+                            && completedTaskCount.get() - tasksAtPhaseStart < activeTaskCount.get()) {
+                        taskCompletionCondition.await(100, TimeUnit.MILLISECONDS);
                     }
-                    if (completedTaskCount.get() - tasksAtPhaseStart >= activeTaskCount.get()) {
-                        break;
-                    }
-                    Thread.sleep(100); // Small delay to prevent busy-waiting
+                } finally {
+                    lock.unlock();
                 }
-                log("phase", "Phase " + phaseNumber + " completed. Total completed tasks: " + completedTaskCount.get());
+                log("[{}][phase] Phase {} completed. Total completed tasks: {}", phaseNumber, completedTaskCount.get());
             } catch (InterruptedException e) {
-                log("phase", "Phase " + phaseNumber + " was interrupted.");
+                log("[{}][phase] Phase {} was interrupted.", phaseNumber);
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Phase interrupted", e);
             } finally {
@@ -120,24 +128,38 @@ public class PhasingExecutor implements Executor, AutoCloseable {
 
     @Override
     public void close() {
-        log("close", "Closing PhasingExecutor. Active tasks: " + activeTaskCount.get());
+        log("[{}][close] Closing PhasingExecutor. Active tasks: {}", activeTaskCount.get());
         if (shutdownInitiated.getAndSet(true)) {
-            log("close", "Shutdown already initiated. Returning.");
+            log("[{}][close] Shutdown already initiated. Returning.");
             return;
         }
 
+        lock.lock();
         try {
             while (activeTaskCount.get() > 0) {
-                log("close", "Waiting for " + activeTaskCount.get() + " active tasks to complete.");
-                Thread.sleep(100);
+                log("[{}][close] Waiting for {} active tasks to complete.", activeTaskCount.get());
+                taskCompletionCondition.await(100, TimeUnit.MILLISECONDS);
             }
         } catch (InterruptedException e) {
-            log("close", "Interrupted while waiting for tasks to complete.");
+            log("[{}][close] Interrupted while waiting for tasks to complete.");
             Thread.currentThread().interrupt();
         } finally {
-            log("close", "All tasks completed. Shutting down executor.");
+            lock.unlock();
+            log("[{}][close] All tasks completed. Shutting down executor.");
             executor.shutdown();
         }
-        log("close", "PhasingExecutor closed. Total completed tasks: " + completedTaskCount.get());
+        log("[{}][close] PhasingExecutor closed. Total completed tasks: {}", completedTaskCount.get());
+    }
+
+    private void log(String message) {
+        LOGGER.debug(message, id);
+    }
+
+    private void log(String message, Object o1) {
+        LOGGER.debug(message, id, o1);
+    }
+
+    private void log(String message, Object o1, Object o2) {
+        LOGGER.debug(message, id, o1, o2);
     }
 }
