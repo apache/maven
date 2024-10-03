@@ -27,7 +27,6 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvoker;
 import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvokerRequest;
-import org.apache.maven.cling.invoker.mvn.DefaultMavenInvokerRequest;
 import org.apache.maven.utils.Os;
 
 import static java.util.Objects.requireNonNull;
@@ -39,6 +38,7 @@ public class DefaultForkedMavenInvoker implements ForkedMavenInvoker {
     @Override
     public int invoke(ForkedMavenInvokerRequest invokerRequest) throws InvokerException {
         requireNonNull(invokerRequest);
+        validate(invokerRequest);
 
         ArrayList<String> cmdAndArguments = new ArrayList<>();
         cmdAndArguments.add(invokerRequest
@@ -116,5 +116,5 @@ public class DefaultForkedMavenInvoker implements ForkedMavenInvoker {
         }
     }
 
-    protected void validate(DefaultMavenInvokerRequest invokerRequest) throws InvokerException {}
+    protected void validate(ForkedMavenInvokerRequest invokerRequest) throws InvokerException {}
 }
