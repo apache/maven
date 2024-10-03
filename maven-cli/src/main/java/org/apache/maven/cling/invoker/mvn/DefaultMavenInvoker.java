@@ -42,7 +42,6 @@ import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.LookupInvokerContext;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;

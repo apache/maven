@@ -22,7 +22,6 @@ import org.apache.maven.api.cli.mvnenc.EncryptInvoker;
 import org.apache.maven.api.cli.mvnenc.EncryptInvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.LookupInvokerContext;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 

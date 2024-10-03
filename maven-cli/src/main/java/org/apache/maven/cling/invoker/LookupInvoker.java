@@ -20,12 +20,15 @@ package org.apache.maven.cling.invoker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.cli.Invoker;
@@ -33,6 +36,7 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -64,6 +68,7 @@ import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.eclipse.aether.transfer.TransferListener;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
@@ -79,8 +84,53 @@ import static org.apache.maven.cling.invoker.Utils.toProperties;
  * @param <C> the context type
  */
 public abstract class LookupInvoker<
-                O extends Options, R extends InvokerRequest<O>, C extends LookupInvokerContext<O, R, C>>
+                O extends Options, R extends InvokerRequest<O>, C extends LookupInvoker.LookupInvokerContext<O, R, C>>
         implements Invoker<R> {
+
+    @SuppressWarnings("VisibilityModifier")
+    public static class LookupInvokerContext<
+                    O extends Options, R extends InvokerRequest<O>, C extends LookupInvokerContext<O, R, C>>
+            implements AutoCloseable {
+        public final LookupInvoker<O, R, C> lookupInvoker;
+        public final ProtoLookup protoLookup;
+        public final R invokerRequest;
+        public final Function<String, Path> cwdResolver;
+        public final InputStream stdIn;
+        public final PrintWriter stdOut;
+        public final PrintWriter stdErr;
+
+        protected LookupInvokerContext(LookupInvoker<O, R, C> lookupInvoker, R invokerRequest) {
+            this.lookupInvoker = lookupInvoker;
+            this.protoLookup = lookupInvoker.protoLookup;
+            this.invokerRequest = requireNonNull(invokerRequest);
+            this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
+            this.stdIn = invokerRequest.in().orElse(System.in);
+            this.stdOut = new PrintWriter(invokerRequest.out().orElse(System.out), true);
+            this.stdErr = new PrintWriter(invokerRequest.err().orElse(System.err), true);
+            this.logger = invokerRequest.logger();
+        }
+
+        public Logger logger;
+        public ILoggerFactory loggerFactory;
+        public Slf4jConfiguration.Level loggerLevel;
+        public ContainerCapsule containerCapsule;
+        public Lookup lookup;
+        public SettingsBuilder settingsBuilder;
+
+        public boolean interactive;
+        public Path localRepositoryPath;
+        public Path installationSettingsPath;
+        public Path projectSettingsPath;
+        public Path userSettingsPath;
+        public Settings effectiveSettings;
+
+        @Override
+        public void close() throws InvokerException {
+            if (containerCapsule != null) {
+                containerCapsule.close();
+            }
+        }
+    }
 
     protected final ProtoLookup protoLookup;
 

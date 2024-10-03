@@ -31,7 +31,7 @@ import org.apache.maven.api.cli.Options;
  * @param <C> the invoker context type
  */
 public interface ContainerCapsuleFactory<
-        O extends Options, R extends InvokerRequest<O>, C extends LookupInvokerContext<O, R, C>> {
+        O extends Options, R extends InvokerRequest<O>, C extends LookupInvoker.LookupInvokerContext<O, R, C>> {
     /**
      * Creates container capsule.
      */

@@ -68,7 +68,7 @@ import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
  * @param <C> the invoker context type
  */
 public class PlexusContainerCapsuleFactory<
-                O extends Options, R extends InvokerRequest<O>, C extends LookupInvokerContext<O, R, C>>
+                O extends Options, R extends InvokerRequest<O>, C extends LookupInvoker.LookupInvokerContext<O, R, C>>
         implements ContainerCapsuleFactory<O, R, C> {
     @Override
     public ContainerCapsule createContainerCapsule(C context) throws InvokerException {

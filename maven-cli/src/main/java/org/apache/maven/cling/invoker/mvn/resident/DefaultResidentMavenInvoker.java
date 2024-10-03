@@ -18,6 +18,9 @@
  */
 package org.apache.maven.cling.invoker.mvn.resident;
 
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvoker;
 import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvokerRequest;
@@ -40,19 +43,44 @@ public class DefaultResidentMavenInvoker
         protected LocalContext(DefaultResidentMavenInvoker invoker, ResidentMavenInvokerRequest invokerRequest) {
             super(invoker, invokerRequest);
         }
+
+        @Override
+        public void close() throws InvokerException {
+            // we are resident, we do not shut down here
+        }
+
+        public void shutDown() throws InvokerException {
+            super.close();
+        }
     }
+
+    private final ConcurrentHashMap<String, LocalContext> contextPool;
 
     public DefaultResidentMavenInvoker(ProtoLookup protoLookup) {
         super(protoLookup);
+        this.contextPool = new ConcurrentHashMap<>();
     }
 
     @Override
     public void close() throws InvokerException {
-        // TODO: shutdown
+        ArrayList<InvokerException> exceptions = new ArrayList<>();
+        for (LocalContext context : contextPool.values()) {
+            try {
+                context.shutDown();
+            } catch (InvokerException e) {
+                exceptions.add(e);
+            }
+        }
+        if (!exceptions.isEmpty()) {
+            InvokerException exception = new InvokerException("Could not cleanly shut down context pool");
+            exceptions.forEach(exception::addSuppressed);
+            throw exception;
+        }
     }
 
     @Override
     protected LocalContext createContext(ResidentMavenInvokerRequest invokerRequest) {
-        return new LocalContext(this, invokerRequest);
+        String id = "?";
+        return contextPool.computeIfAbsent(id, k -> new LocalContext(this, invokerRequest));
     }
 }
