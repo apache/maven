@@ -41,45 +41,12 @@ public class DefaultResidentMavenInvoker
             extends DefaultMavenInvoker.MavenContext<
                     ResidentMavenOptions, ResidentMavenInvokerRequest, DefaultResidentMavenInvoker.LocalContext> {
 
-        protected final boolean shadow;
-
         protected LocalContext(DefaultResidentMavenInvoker invoker, ResidentMavenInvokerRequest invokerRequest) {
-            this(invoker, invokerRequest, false);
-        }
-
-        protected LocalContext(
-                DefaultResidentMavenInvoker invoker, ResidentMavenInvokerRequest invokerRequest, boolean shadow) {
             super(invoker, invokerRequest);
-            this.shadow = shadow;
         }
 
-        private LocalContext createShadow() {
-            if (maven == null) {
-                return this;
-            }
-            LocalContext shadow = new LocalContext((DefaultResidentMavenInvoker) invoker, invokerRequest, true);
-            shadow.logger = logger;
-            shadow.loggerFactory = loggerFactory;
-            shadow.loggerLevel = loggerLevel;
-            shadow.containerCapsule = containerCapsule;
-            shadow.lookup = lookup;
-            shadow.settingsBuilder = settingsBuilder;
-
-            shadow.interactive = interactive;
-            shadow.localRepositoryPath = localRepositoryPath;
-            shadow.installationSettingsPath = installationSettingsPath;
-            shadow.projectSettingsPath = projectSettingsPath;
-            shadow.userSettingsPath = userSettingsPath;
-            shadow.effectiveSettings = effectiveSettings;
-
-            shadow.mavenExecutionRequest = mavenExecutionRequest;
-            shadow.eventSpyDispatcher = eventSpyDispatcher;
-            shadow.mavenExecutionRequestPopulator = mavenExecutionRequestPopulator;
-            shadow.toolchainsBuilder = toolchainsBuilder;
-            shadow.modelProcessor = modelProcessor;
-            shadow.maven = maven;
-
-            return shadow;
+        private boolean isReused() {
+            return maven != null;
         }
 
         @Override
@@ -120,28 +87,19 @@ public class DefaultResidentMavenInvoker
 
     @Override
     protected LocalContext createContext(ResidentMavenInvokerRequest invokerRequest) {
-        return residentContext
-                .computeIfAbsent(RESIDENT_ID, k -> new LocalContext(this, invokerRequest))
-                .createShadow();
-    }
-
-    @Override
-    protected void logging(LocalContext context) throws Exception {
-        if (!context.shadow) {
-            super.logging(context);
-        }
+        return residentContext.computeIfAbsent(RESIDENT_ID, k -> new LocalContext(this, invokerRequest));
     }
 
     @Override
     protected void container(LocalContext context) throws Exception {
-        if (!context.shadow) {
+        if (!context.isReused()) {
             super.container(context);
         }
     }
 
     @Override
     protected void lookup(LocalContext context) throws Exception {
-        if (!context.shadow) {
+        if (!context.isReused()) {
             super.lookup(context);
         }
     }
