@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli.mvn.daemon;
+package org.apache.maven.api.cli.mvn.resident;
 
 import java.util.Collection;
 import java.util.Map;
@@ -27,10 +27,10 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 
 /**
- * Daemon options.
+ * Resident options.
  */
 @Experimental
-public interface DaemonMavenOptions extends MavenOptions {
+public interface ResidentMavenOptions extends MavenOptions {
     /**
      * Indicates whether raw streams should be used with daemon.
      *
@@ -46,5 +46,5 @@ public interface DaemonMavenOptions extends MavenOptions {
      * @return a new MavenOptions instance with interpolated values
      */
     @Nonnull
-    DaemonMavenOptions interpolate(@Nonnull Collection<Map<String, String>> properties);
+    ResidentMavenOptions interpolate(@Nonnull Collection<Map<String, String>> properties);
 }

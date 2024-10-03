@@ -16,20 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli.mvn.daemon;
+package org.apache.maven.api.cli.mvn.resident;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.mvn.MavenInvoker;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 
 /**
- * Daemon invoker. Daemon is shut down when this instance is closed.
+ * Resident invoker. Instance is shut down when this instance is closed.
  *
  * @since 4.0.0
  */
 @Experimental
-public interface DaemonMavenInvoker extends MavenInvoker<MavenInvokerRequest<DaemonMavenOptions>> {
+public interface ResidentMavenInvoker extends MavenInvoker<ResidentMavenInvokerRequest> {
     /**
      * Closes cleanly the daemon.
      */

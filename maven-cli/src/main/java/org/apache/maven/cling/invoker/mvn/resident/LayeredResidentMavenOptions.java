@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.daemon;
+package org.apache.maven.cling.invoker.mvn.resident;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,22 +25,23 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.apache.maven.api.cli.mvn.daemon.DaemonMavenOptions;
+import org.apache.maven.api.cli.mvn.resident.ResidentMavenOptions;
 import org.apache.maven.cling.invoker.mvn.LayeredMavenOptions;
 
-public class LayeredDaemonMavenOptions extends LayeredMavenOptions<DaemonMavenOptions> implements DaemonMavenOptions {
-    public static DaemonMavenOptions layerDaemonMavenOptions(Collection<DaemonMavenOptions> options) {
-        List<DaemonMavenOptions> o = options.stream().filter(Objects::nonNull).toList();
+public class LayeredResidentMavenOptions extends LayeredMavenOptions<ResidentMavenOptions>
+        implements ResidentMavenOptions {
+    public static ResidentMavenOptions layerResidentMavenOptions(Collection<ResidentMavenOptions> options) {
+        List<ResidentMavenOptions> o = options.stream().filter(Objects::nonNull).toList();
         if (o.isEmpty()) {
             throw new IllegalArgumentException("No options specified (or all were null)");
         } else if (o.size() == 1) {
             return o.get(0);
         } else {
-            return new LayeredDaemonMavenOptions(o);
+            return new LayeredResidentMavenOptions(o);
         }
     }
 
-    private LayeredDaemonMavenOptions(List<DaemonMavenOptions> options) {
+    private LayeredResidentMavenOptions(List<ResidentMavenOptions> options) {
         super(options);
     }
 
@@ -50,11 +51,11 @@ public class LayeredDaemonMavenOptions extends LayeredMavenOptions<DaemonMavenOp
     }
 
     @Override
-    public DaemonMavenOptions interpolate(Collection<Map<String, String>> properties) {
-        ArrayList<DaemonMavenOptions> interpolatedOptions = new ArrayList<>(options.size());
-        for (DaemonMavenOptions o : options) {
+    public ResidentMavenOptions interpolate(Collection<Map<String, String>> properties) {
+        ArrayList<ResidentMavenOptions> interpolatedOptions = new ArrayList<>(options.size());
+        for (ResidentMavenOptions o : options) {
             interpolatedOptions.add(o.interpolate(properties));
         }
-        return layerDaemonMavenOptions(interpolatedOptions);
+        return layerResidentMavenOptions(interpolatedOptions);
     }
 }

@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.daemon;
+package org.apache.maven.cling.invoker.mvn.resident;
 
 import org.apache.maven.api.cli.InvokerException;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
-import org.apache.maven.api.cli.mvn.daemon.DaemonMavenInvoker;
-import org.apache.maven.api.cli.mvn.daemon.DaemonMavenOptions;
+import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvoker;
+import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvokerRequest;
+import org.apache.maven.api.cli.mvn.resident.ResidentMavenOptions;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.DefaultMavenInvoker;
 
@@ -29,23 +29,20 @@ import org.apache.maven.cling.invoker.mvn.DefaultMavenInvoker;
  * Local invoker implementation, when Maven CLI is being run. System uses ClassWorld launcher, and class world
  * instance is passed in via "enhanced" main method. Hence, this class expects fully setup ClassWorld via constructor.
  */
-public class DefaultDaemonMavenInvoker
+public class DefaultResidentMavenInvoker
         extends DefaultMavenInvoker<
-                DaemonMavenOptions, MavenInvokerRequest<DaemonMavenOptions>, DefaultDaemonMavenInvoker.LocalContext>
-        implements DaemonMavenInvoker {
+                ResidentMavenOptions, ResidentMavenInvokerRequest, DefaultResidentMavenInvoker.LocalContext>
+        implements ResidentMavenInvoker {
 
     protected static class LocalContext
             extends DefaultMavenInvoker.MavenContext<
-                    DaemonMavenOptions,
-                    MavenInvokerRequest<DaemonMavenOptions>,
-                    DefaultDaemonMavenInvoker.LocalContext> {
-        protected LocalContext(
-                DefaultDaemonMavenInvoker invoker, MavenInvokerRequest<DaemonMavenOptions> invokerRequest) {
+                    ResidentMavenOptions, ResidentMavenInvokerRequest, DefaultResidentMavenInvoker.LocalContext> {
+        protected LocalContext(DefaultResidentMavenInvoker invoker, ResidentMavenInvokerRequest invokerRequest) {
             super(invoker, invokerRequest);
         }
     }
 
-    public DefaultDaemonMavenInvoker(ProtoLookup protoLookup) {
+    public DefaultResidentMavenInvoker(ProtoLookup protoLookup) {
         super(protoLookup);
     }
 
@@ -55,7 +52,7 @@ public class DefaultDaemonMavenInvoker
     }
 
     @Override
-    protected LocalContext createContext(MavenInvokerRequest<DaemonMavenOptions> invokerRequest) {
+    protected LocalContext createContext(ResidentMavenInvokerRequest invokerRequest) {
         return new LocalContext(this, invokerRequest);
     }
 }

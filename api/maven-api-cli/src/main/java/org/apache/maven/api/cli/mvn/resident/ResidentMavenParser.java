@@ -16,16 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli.mvn.daemon;
+package org.apache.maven.api.cli.mvn.resident;
 
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenParser;
 
 /**
- * Daemon parser.
+ * Resident parser.
  *
  * @since 4.0.0
  */
 @Experimental
-public interface DaemonMavenParser extends MavenParser<MavenInvokerRequest<DaemonMavenOptions>> {}
+public interface ResidentMavenParser extends MavenParser<ResidentMavenInvokerRequest> {}

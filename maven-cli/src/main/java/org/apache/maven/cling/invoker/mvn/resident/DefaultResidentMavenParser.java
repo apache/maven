@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.daemon;
+package org.apache.maven.cling.invoker.mvn.resident;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -28,19 +29,17 @@ import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
-import org.apache.maven.api.cli.mvn.daemon.DaemonMavenOptions;
-import org.apache.maven.api.cli.mvn.daemon.DaemonMavenParser;
-import org.apache.maven.cling.invoker.mvn.DefaultMavenInvokerRequest;
+import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvokerRequest;
+import org.apache.maven.api.cli.mvn.resident.ResidentMavenOptions;
+import org.apache.maven.api.cli.mvn.resident.ResidentMavenParser;
 import org.apache.maven.cling.invoker.mvn.DefaultMavenParser;
 
-public class DefaultDaemonMavenParser
-        extends DefaultMavenParser<DaemonMavenOptions, MavenInvokerRequest<DaemonMavenOptions>>
-        implements DaemonMavenParser {
+public class DefaultResidentMavenParser extends DefaultMavenParser<ResidentMavenOptions, ResidentMavenInvokerRequest>
+        implements ResidentMavenParser {
 
     @SuppressWarnings("ParameterNumber")
     @Override
-    protected DefaultMavenInvokerRequest<DaemonMavenOptions> getInvokerRequest(
+    protected DefaultResidentMavenInvokerRequest getInvokerRequest(
             ParserRequest parserRequest,
             Path cwd,
             Path installationDirectory,
@@ -51,7 +50,7 @@ public class DefaultDaemonMavenParser
             Path rootDirectory,
             ArrayList<CoreExtension> extensions,
             Options options) {
-        return new DefaultMavenInvokerRequest<>(
+        return new DefaultResidentMavenInvokerRequest(
                 parserRequest.command(),
                 cwd,
                 installationDirectory,
@@ -66,20 +65,29 @@ public class DefaultDaemonMavenParser
                 parserRequest.out(),
                 parserRequest.err(),
                 extensions,
-                (DaemonMavenOptions) options);
+                getJvmArguments(rootDirectory),
+                (ResidentMavenOptions) options);
+    }
+
+    protected List<String> getJvmArguments(Path rootDirectory) {
+        if (rootDirectory != null) {
+            // TODO: do this
+            return Collections.emptyList();
+        }
+        return null;
     }
 
     @Override
-    protected DaemonMavenOptions parseArgs(String source, String[] args) throws ParserException {
+    protected ResidentMavenOptions parseArgs(String source, String[] args) throws ParserException {
         try {
-            return CommonsCliDaemonMavenOptions.parse(source, args);
+            return CommonsCliResidentMavenOptions.parse(source, args);
         } catch (ParseException e) {
             throw new ParserException("Failed to parse source " + source, e.getCause());
         }
     }
 
     @Override
-    protected DaemonMavenOptions assembleOptions(List<DaemonMavenOptions> parsedOptions) {
-        return LayeredDaemonMavenOptions.layerDaemonMavenOptions(parsedOptions);
+    protected ResidentMavenOptions assembleOptions(List<ResidentMavenOptions> parsedOptions) {
+        return LayeredResidentMavenOptions.layerResidentMavenOptions(parsedOptions);
     }
 }

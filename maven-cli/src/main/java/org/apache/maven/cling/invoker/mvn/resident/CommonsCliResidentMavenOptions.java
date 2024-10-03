@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.daemon;
+package org.apache.maven.cling.invoker.mvn.resident;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,20 +28,20 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.api.cli.mvn.daemon.DaemonMavenOptions;
+import org.apache.maven.api.cli.mvn.resident.ResidentMavenOptions;
 import org.apache.maven.cling.invoker.mvn.CommonsCliMavenOptions;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 
 import static org.apache.maven.cling.invoker.Utils.createInterpolator;
 
-public class CommonsCliDaemonMavenOptions extends CommonsCliMavenOptions implements DaemonMavenOptions {
-    public static CommonsCliDaemonMavenOptions parse(String source, String[] args) throws ParseException {
+public class CommonsCliResidentMavenOptions extends CommonsCliMavenOptions implements ResidentMavenOptions {
+    public static CommonsCliResidentMavenOptions parse(String source, String[] args) throws ParseException {
         CLIManager cliManager = new CLIManager();
-        return new CommonsCliDaemonMavenOptions(source, cliManager, cliManager.parse(args));
+        return new CommonsCliResidentMavenOptions(source, cliManager, cliManager.parse(args));
     }
 
-    protected CommonsCliDaemonMavenOptions(String source, CLIManager cliManager, CommandLine commandLine) {
+    protected CommonsCliResidentMavenOptions(String source, CLIManager cliManager, CommandLine commandLine) {
         super(source, cliManager, commandLine);
     }
 
@@ -53,8 +53,8 @@ public class CommonsCliDaemonMavenOptions extends CommonsCliMavenOptions impleme
         return Optional.empty();
     }
 
-    private static CommonsCliDaemonMavenOptions interpolate(
-            CommonsCliDaemonMavenOptions options, Collection<Map<String, String>> properties) {
+    private static CommonsCliResidentMavenOptions interpolate(
+            CommonsCliResidentMavenOptions options, Collection<Map<String, String>> properties) {
         try {
             // now that we have properties, interpolate all arguments
             BasicInterpolator interpolator = createInterpolator(properties);
@@ -72,7 +72,7 @@ public class CommonsCliDaemonMavenOptions extends CommonsCliMavenOptions impleme
             for (String arg : options.commandLine.getArgList()) {
                 commandLineBuilder.addArg(interpolator.interpolate(arg));
             }
-            return new CommonsCliDaemonMavenOptions(
+            return new CommonsCliResidentMavenOptions(
                     options.source, (CLIManager) options.cliManager, commandLineBuilder.build());
         } catch (InterpolationException e) {
             throw new IllegalArgumentException("Could not interpolate CommonsCliOptions", e);
@@ -80,7 +80,7 @@ public class CommonsCliDaemonMavenOptions extends CommonsCliMavenOptions impleme
     }
 
     @Override
-    public DaemonMavenOptions interpolate(Collection<Map<String, String>> properties) {
+    public ResidentMavenOptions interpolate(Collection<Map<String, String>> properties) {
         return interpolate(this, properties);
     }
 
