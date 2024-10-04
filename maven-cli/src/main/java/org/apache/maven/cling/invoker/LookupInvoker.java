@@ -25,10 +25,10 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
@@ -156,10 +156,14 @@ public abstract class LookupInvoker<
         try (C context = createContext(invokerRequest)) {
             Properties props = (Properties) System.getProperties().clone();
             try {
-                Set<String> sys = invokerRequest.systemProperties().keySet();
+                HashSet<String> sys =
+                        new HashSet<>(invokerRequest.systemProperties().keySet());
                 invokerRequest.userProperties().entrySet().stream()
                         .filter(k -> !sys.contains(k.getKey()))
                         .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
+                System.setProperty(
+                        Constants.MAVEN_HOME,
+                        invokerRequest.installationDirectory().toString());
 
                 validate(context);
                 prepare(context);
