@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
@@ -156,8 +155,6 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
             }
             result = getCanonicalPath(Paths.get(mavenHome));
         }
-        // TODO: we still do this but would be cool if this becomes unneeded
-        System.setProperty(Constants.MAVEN_HOME, result.toString());
         return result;
     }
 
@@ -294,15 +291,6 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         }
         Path propertiesFile = mavenConf.resolve("maven.properties");
         MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
-
-        // ----------------------------------------------------------------------
-        // I'm leaving the setting of system properties here as not to break
-        // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
-        // ----------------------------------------------------------------------
-        Set<String> sys = SystemProperties.getSystemProperties().stringPropertyNames();
-        userProperties.stringPropertyNames().stream()
-                .filter(k -> !sys.contains(k))
-                .forEach(k -> System.setProperty(k, userProperties.getProperty(k)));
 
         return toMap(userProperties);
     }

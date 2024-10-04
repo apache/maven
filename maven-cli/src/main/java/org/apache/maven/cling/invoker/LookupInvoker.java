@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
@@ -153,7 +154,13 @@ public abstract class LookupInvoker<
         requireNonNull(invokerRequest);
 
         try (C context = createContext(invokerRequest)) {
+            Properties props = (Properties) System.getProperties().clone();
             try {
+                Set<String> sys = invokerRequest.systemProperties().keySet();
+                invokerRequest.userProperties().entrySet().stream()
+                        .filter(k -> !sys.contains(k.getKey()))
+                        .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
+
                 validate(context);
                 prepare(context);
                 configureLogging(context);
@@ -181,6 +188,8 @@ public abstract class LookupInvoker<
                 return execute(context);
             } catch (Exception e) {
                 throw handleException(context, e);
+            } finally {
+                System.setProperties(props);
             }
         }
     }
