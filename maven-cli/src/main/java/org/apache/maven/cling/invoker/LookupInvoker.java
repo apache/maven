@@ -121,6 +121,7 @@ public abstract class LookupInvoker<
 
         public Logger logger;
         public ILoggerFactory loggerFactory;
+        public Slf4jConfiguration slf4jConfiguration;
         public Slf4jConfiguration.Level loggerLevel;
         public ContainerCapsule containerCapsule;
         public Lookup lookup;
@@ -156,6 +157,7 @@ public abstract class LookupInvoker<
                 validate(context);
                 prepare(context);
                 logging(context);
+                activateLogging(context);
 
                 if (invokerRequest.options().help().isPresent()) {
                     invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), context.stdOut);
@@ -231,7 +233,7 @@ public abstract class LookupInvoker<
         }
 
         context.loggerFactory = LoggerFactory.getILoggerFactory();
-        Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(context.loggerFactory);
+        context.slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(context.loggerFactory);
 
         context.loggerLevel = Slf4jConfiguration.Level.INFO;
         if (mavenOptions.verbose().orElse(false)) {
@@ -239,7 +241,7 @@ public abstract class LookupInvoker<
         } else if (mavenOptions.quiet().orElse(false)) {
             context.loggerLevel = Slf4jConfiguration.Level.ERROR;
         }
-        slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
+        context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
         // else fall back to default log level specified in conf
         // see https://issues.apache.org/jira/browse/MNG-2570
 
@@ -255,8 +257,13 @@ public abstract class LookupInvoker<
                 throw new InvokerException("Cannot set up log " + e.getMessage(), e);
             }
         }
+    }
 
-        slf4jConfiguration.activate();
+    protected void activateLogging(C context) throws Exception {
+        R invokerRequest = context.invokerRequest;
+        Options mavenOptions = invokerRequest.options();
+
+        context.slf4jConfiguration.activate();
         org.slf4j.Logger l = context.loggerFactory.getLogger(this.getClass().getName());
         context.logger = (level, message, error) -> l.atLevel(org.slf4j.event.Level.valueOf(level.name()))
                 .setCause(error)
