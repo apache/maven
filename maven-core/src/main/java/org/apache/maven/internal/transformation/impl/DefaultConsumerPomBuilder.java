@@ -65,7 +65,6 @@ import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.model.DefaultModelBuilder;
 import org.apache.maven.internal.impl.model.DefaultProfileSelector;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
@@ -93,7 +92,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private final PluginManagementInjector pluginManagementInjector;
     private final SuperPomProvider superPomProvider;
     private final ModelVersionParser versionParser;
-    private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final List<ModelTransformer> transformers;
     private final ModelCacheFactory modelCacheFactory;
     private final ModelResolver modelResolver;
@@ -117,7 +115,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
             PluginManagementInjector pluginManagementInjector,
             SuperPomProvider superPomProvider,
             ModelVersionParser versionParser,
-            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             List<ModelTransformer> transformers,
             ModelCacheFactory modelCacheFactory,
             ModelResolver modelResolver,
@@ -137,7 +134,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         this.pluginManagementInjector = pluginManagementInjector;
         this.superPomProvider = superPomProvider;
         this.versionParser = versionParser;
-        this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.transformers = transformers;
         this.modelCacheFactory = modelCacheFactory;
         this.modelResolver = modelResolver;
@@ -174,10 +170,13 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
 
     private ModelBuilderResult buildModel(RepositorySystemSession session, MavenProject project, Path src)
             throws ModelBuilderException {
-        ProfileSelector customSelector = new DefaultProfileSelector() {
+        ProfileSelector customSelector = new DefaultProfileSelector(null, null) {
             @Override
             public List<Profile> getActiveProfiles(
-                    Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems) {
+                    Collection<Profile> profiles,
+                    ProfileActivationContext context,
+                    ModelProblemCollector problems,
+                    boolean cascade) {
                 return new ArrayList<>();
             }
         };
@@ -197,7 +196,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 dependencyManagementInjector,
                 dependencyManagementImporter,
                 pluginConfigurationExpander,
-                profileActivationFilePathInterpolator,
                 versionParser,
                 transformers,
                 modelCacheFactory,

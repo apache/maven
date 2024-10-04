@@ -19,12 +19,15 @@
 package org.apache.maven.internal.impl.model;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 
 /**
@@ -168,6 +171,14 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         this.projectProperties = unmodifiable(projectProperties);
 
         return this;
+    }
+
+    public void addProfileProperties(Collection<Profile> profiles) {
+        Map<String, String> props = new HashMap<>(this.projectProperties);
+        for (var profile : profiles) {
+            props.putAll(profile.getProperties());
+        }
+        this.projectProperties = unmodifiable(props);
     }
 
     private static List<String> unmodifiable(List<String> list) {

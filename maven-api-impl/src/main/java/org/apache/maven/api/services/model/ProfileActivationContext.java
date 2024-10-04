@@ -19,8 +19,11 @@
 package org.apache.maven.api.services.model;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.maven.api.model.Profile;
 
 /**
  * Describes the environmental context used to determine the activation status of profiles.
@@ -78,4 +81,11 @@ public interface ProfileActivationContext {
      * @return The project properties, never {@code null}.
      */
     Map<String, String> getProjectProperties();
+
+    /**
+     * Inject properties from newly activated profiles in order to trigger the cascading mechanism.
+     *
+     * @param activatedProfiles The collection of profiles that have been activated that may trigger the cascading effect.
+     */
+    void addProfileProperties(Collection<Profile> activatedProfiles);
 }

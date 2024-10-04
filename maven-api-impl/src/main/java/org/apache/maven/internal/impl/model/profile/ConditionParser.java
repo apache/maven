@@ -72,7 +72,7 @@ public class ConditionParser {
                         inPropertyAlias = false;
                         tokens.add("property");
                         tokens.add("(");
-                        tokens.add("'" + sb.toString() + "'");
+                        tokens.add("'" + sb + "'");
                         tokens.add(")");
                         sb.setLength(0);
                     } else {
@@ -89,7 +89,7 @@ public class ConditionParser {
             }
 
             if (c == '$' && i + 1 < expression.length() && expression.charAt(i + 1) == '{') {
-                if (sb.length() > 0) {
+                if (!sb.isEmpty()) {
                     tokens.add(sb.toString());
                     sb.setLength(0);
                 }
@@ -100,7 +100,7 @@ public class ConditionParser {
             }
 
             if (c == '"' || c == '\'') {
-                if (sb.length() > 0) {
+                if (!sb.isEmpty()) {
                     tokens.add(sb.toString());
                     sb.setLength(0);
                 }
