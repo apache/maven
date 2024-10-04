@@ -29,7 +29,7 @@ public class DefaultLocalMavenInvoker
                 MavenOptions, MavenInvokerRequest<MavenOptions>, DefaultLocalMavenInvoker.LocalContext>
         implements LocalMavenInvoker {
 
-    protected static class LocalContext
+    public static class LocalContext
             extends DefaultMavenInvoker.MavenContext<
                     MavenOptions, MavenInvokerRequest<MavenOptions>, DefaultLocalMavenInvoker.LocalContext> {
         protected LocalContext(DefaultLocalMavenInvoker invoker, MavenInvokerRequest<MavenOptions> invokerRequest) {

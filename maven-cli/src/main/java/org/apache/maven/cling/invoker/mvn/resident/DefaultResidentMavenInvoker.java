@@ -37,7 +37,7 @@ public class DefaultResidentMavenInvoker
                 ResidentMavenOptions, ResidentMavenInvokerRequest, DefaultResidentMavenInvoker.LocalContext>
         implements ResidentMavenInvoker {
 
-    protected static class LocalContext
+    public static class LocalContext
             extends DefaultMavenInvoker.MavenContext<
                     ResidentMavenOptions, ResidentMavenInvokerRequest, DefaultResidentMavenInvoker.LocalContext> {
 
