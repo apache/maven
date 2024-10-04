@@ -95,6 +95,8 @@ public abstract class LookupInvoker<
         public final ProtoLookup protoLookup;
         public final R invokerRequest;
         public final Function<String, Path> cwdResolver;
+        public final Function<String, Path> installationResolver;
+        public final Function<String, Path> userResolver;
         public final InputStream stdIn;
         public final PrintWriter stdOut;
         public final PrintWriter stdErr;
@@ -104,6 +106,13 @@ public abstract class LookupInvoker<
             this.protoLookup = invoker.protoLookup;
             this.invokerRequest = requireNonNull(invokerRequest);
             this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
+            this.installationResolver = s -> invokerRequest
+                    .installationDirectory()
+                    .resolve(s)
+                    .normalize()
+                    .toAbsolutePath();
+            this.userResolver = s ->
+                    invokerRequest.userHomeDirectory().resolve(s).normalize().toAbsolutePath();
             this.stdIn = invokerRequest.in().orElse(System.in);
             this.stdOut = new PrintWriter(invokerRequest.out().orElse(System.out), true);
             this.stdErr = new PrintWriter(invokerRequest.err().orElse(System.err), true);
@@ -338,7 +347,7 @@ public abstract class LookupInvoker<
         } else {
             String userSettingsFileStr = context.invokerRequest.userProperties().get(Constants.MAVEN_USER_SETTINGS);
             if (userSettingsFileStr != null) {
-                userSettingsFile = context.cwdResolver.apply(userSettingsFileStr);
+                userSettingsFile = context.userResolver.apply(userSettingsFileStr);
             }
         }
 
@@ -374,7 +383,7 @@ public abstract class LookupInvoker<
             String installationSettingsFileStr =
                     context.invokerRequest.userProperties().get(Constants.MAVEN_INSTALLATION_SETTINGS);
             if (installationSettingsFileStr != null) {
-                installationSettingsFile = context.cwdResolver.apply(installationSettingsFileStr);
+                installationSettingsFile = context.installationResolver.apply(installationSettingsFileStr);
             }
         }
 
@@ -463,18 +472,18 @@ public abstract class LookupInvoker<
                         + "usually located at ${session.rootDirectory}/.mvn/maven.properties.");
             }
         }
+        if (userDefinedLocalRepo != null) {
+            return context.cwdResolver.apply(userDefinedLocalRepo);
+        }
         // settings
-        if (userDefinedLocalRepo == null) {
-            userDefinedLocalRepo = context.effectiveSettings.getLocalRepository();
+        userDefinedLocalRepo = context.effectiveSettings.getLocalRepository();
+        if (userDefinedLocalRepo != null) {
+            return context.userResolver.apply(userDefinedLocalRepo);
         }
         // defaults
-        if (userDefinedLocalRepo == null) {
-            userDefinedLocalRepo = context.cwdResolver
-                    .apply(context.invokerRequest.userProperties().get(Constants.MAVEN_USER_CONF))
-                    .resolve("repository")
-                    .toString();
-        }
-        return context.cwdResolver.apply(userDefinedLocalRepo);
+        return context.userResolver
+                .apply(context.invokerRequest.userProperties().get(Constants.MAVEN_USER_CONF))
+                .resolve("repository");
     }
 
     protected void populateRequest(C context, MavenExecutionRequest request) throws Exception {

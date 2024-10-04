@@ -54,7 +54,7 @@ public class DefaultResidentMavenInvoker
             super.close();
         }
 
-        public LocalContext copy() {
+        public LocalContext copy(ResidentMavenInvokerRequest invokerRequest) {
             LocalContext shadow = new LocalContext((DefaultResidentMavenInvoker) invoker, invokerRequest);
 
             shadow.logger = logger;
@@ -122,7 +122,7 @@ public class DefaultResidentMavenInvoker
                         throw new InvokerException("Failed to init master context", e);
                     }
                 })
-                .copy();
+                .copy(invokerRequest);
     }
 
     protected String getContextId(ResidentMavenInvokerRequest invokerRequest) {

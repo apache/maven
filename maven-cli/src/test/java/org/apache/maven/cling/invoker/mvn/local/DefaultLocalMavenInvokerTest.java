@@ -16,36 +16,52 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.forked;
+package org.apache.maven.cling.invoker.mvn.local;
 
+import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
+import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
-import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvokerRequest;
+import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Forked UT: it cannot use jimFS as it runs in child process.
+ * Local UT.
  */
-public class DefaultForkedMavenInvokerTest extends MavenInvokerTestSupport<MavenOptions, ForkedMavenInvokerRequest> {
-
+public class DefaultLocalMavenInvokerTest
+        extends MavenInvokerTestSupport<MavenOptions, MavenInvokerRequest<MavenOptions>> {
     @Override
-    protected Invoker<ForkedMavenInvokerRequest> createInvoker() {
-        return new DefaultForkedMavenInvoker();
+    protected Invoker<MavenInvokerRequest<MavenOptions>> createInvoker() {
+        return new DefaultLocalMavenInvoker(ProtoLookup.builder()
+                .addMapping(ClassWorld.class, new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader()))
+                .build());
     }
 
     @Override
-    protected Parser<ForkedMavenInvokerRequest> createParser() {
-        return new DefaultForkedMavenParser();
+    protected Parser<MavenInvokerRequest<MavenOptions>> createParser() {
+        return new DefaultLocalMavenParser();
     }
 
     @Test
     void defaultFs(@TempDir Path tempDir) throws Exception {
         invoke(tempDir, Arrays.asList("clean", "verify"));
+    }
+
+    @Disabled("Until we move off fully from File")
+    @Test
+    void jimFs() throws Exception {
+        try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
+            invoke(fs.getPath("/"), Arrays.asList("clean", "verify"));
+        }
     }
 }

@@ -23,10 +23,9 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,10 +68,9 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
 
         // the basics
         HashMap<String, String> overrides = new HashMap<>();
-        FileSystem fileSystem = requireNonNull(getFileSystem(parserRequest));
-        Path cwd = requireNonNull(getCwd(parserRequest, fileSystem, overrides));
-        Path installationDirectory = requireNonNull(getInstallationDirectory(parserRequest, fileSystem, overrides));
-        Path userHomeDirectory = requireNonNull(getUserHomeDirectory(parserRequest, fileSystem, overrides));
+        Path cwd = requireNonNull(getCwd(parserRequest, overrides));
+        Path installationDirectory = requireNonNull(getInstallationDirectory(parserRequest, overrides));
+        Path userHomeDirectory = requireNonNull(getUserHomeDirectory(parserRequest, overrides));
 
         // top/root
         Path topDirectory = getCanonicalPath(requireNonNull(getTopDirectory(parserRequest, cwd)));
@@ -113,7 +111,8 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         Map<String, String> paths = new HashMap<>();
         paths.put("session.topDirectory", topDirectory.toString());
         paths.put("session.rootDirectory", rootDirectory.toString());
-        Map<String, String> userProperties = populateUserProperties(systemProperties, fileSystem, paths, options);
+        Map<String, String> userProperties =
+                populateUserProperties(systemProperties, installationDirectory, paths, options);
 
         // options: interpolate
         Options interpolatedOptions = options.interpolate(Arrays.asList(paths, systemProperties, userProperties));
@@ -121,13 +120,13 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         // core extensions
         ArrayList<CoreExtension> extensions = new ArrayList<>();
         String installationExtensionsFile = userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptor(installationExtensionsFile, fileSystem));
+        extensions.addAll(readCoreExtensionsDescriptor(installationExtensionsFile, installationDirectory));
 
         String projectExtensionsFile = userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptor(projectExtensionsFile, fileSystem));
+        extensions.addAll(readCoreExtensionsDescriptor(projectExtensionsFile, cwd));
 
         String userExtensionsFile = userProperties.get(Constants.MAVEN_USER_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptor(userExtensionsFile, fileSystem));
+        extensions.addAll(readCoreExtensionsDescriptor(userExtensionsFile, userHomeDirectory));
 
         return getInvokerRequest(
                 parserRequest,
@@ -155,23 +154,18 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
             ArrayList<CoreExtension> extensions,
             Options options);
 
-    protected FileSystem getFileSystem(ParserRequest parserRequest) throws ParserException, IOException {
-        return parserRequest.cwd() != null ? parserRequest.cwd().getFileSystem() : FileSystems.getDefault();
-    }
-
-    protected Path getCwd(ParserRequest parserRequest, FileSystem fileSystem, Map<String, String> overrides)
-            throws ParserException {
+    protected Path getCwd(ParserRequest parserRequest, Map<String, String> overrides) throws ParserException {
         if (parserRequest.cwd() != null) {
             Path result = getCanonicalPath(parserRequest.cwd());
             overrides.put("user.dir", result.toString());
             return result;
         } else {
-            return getCanonicalPath(fileSystem.getPath(System.getProperty("user.dir")));
+            return getCanonicalPath(Paths.get(System.getProperty("user.dir")));
         }
     }
 
-    protected Path getInstallationDirectory(
-            ParserRequest parserRequest, FileSystem fileSystem, Map<String, String> overrides) throws ParserException {
+    protected Path getInstallationDirectory(ParserRequest parserRequest, Map<String, String> overrides)
+            throws ParserException {
         Path result;
         if (parserRequest.mavenHome() != null) {
             result = getCanonicalPath(parserRequest.mavenHome());
@@ -181,21 +175,21 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
             if (mavenHome == null) {
                 throw new ParserException("local mode requires " + Constants.MAVEN_HOME + " Java System Property set");
             }
-            result = getCanonicalPath(fileSystem.getPath(mavenHome));
+            result = getCanonicalPath(Paths.get(mavenHome));
         }
         // TODO: we still do this but would be cool if this becomes unneeded
         System.setProperty(Constants.MAVEN_HOME, result.toString());
         return result;
     }
 
-    protected Path getUserHomeDirectory(
-            ParserRequest parserRequest, FileSystem fileSystem, Map<String, String> overrides) throws ParserException {
+    protected Path getUserHomeDirectory(ParserRequest parserRequest, Map<String, String> overrides)
+            throws ParserException {
         if (parserRequest.userHome() != null) {
             Path result = getCanonicalPath(parserRequest.userHome());
             overrides.put("user.home", result.toString());
             return result;
         } else {
-            return getCanonicalPath(fileSystem.getPath(System.getProperty("user.home")));
+            return getCanonicalPath(Paths.get(System.getProperty("user.home")));
         }
     }
 
@@ -260,7 +254,10 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
     }
 
     protected Map<String, String> populateUserProperties(
-            Map<String, String> systemProperties, FileSystem fileSystem, Map<String, String> paths, Options options)
+            Map<String, String> systemProperties,
+            Path installationDirectory,
+            Map<String, String> paths,
+            Options options)
             throws ParserException, IOException {
         Properties userProperties = new Properties();
 
@@ -281,13 +278,15 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
 
         Path mavenConf;
         if (systemProperties.get(MAVEN_INSTALLATION_CONF) != null) {
-            mavenConf = fileSystem.getPath(systemProperties.get(MAVEN_INSTALLATION_CONF));
+            mavenConf = installationDirectory.resolve(systemProperties.get(MAVEN_INSTALLATION_CONF));
         } else if (systemProperties.get("maven.conf") != null) {
-            mavenConf = fileSystem.getPath(systemProperties.get("maven.conf"));
+            mavenConf = installationDirectory.resolve(systemProperties.get("maven.conf"));
         } else if (systemProperties.get(MAVEN_HOME) != null) {
-            mavenConf = fileSystem.getPath(systemProperties.get(MAVEN_HOME), "conf");
+            mavenConf = installationDirectory
+                    .resolve(systemProperties.get(MAVEN_HOME))
+                    .resolve("conf");
         } else {
-            mavenConf = fileSystem.getPath("");
+            mavenConf = installationDirectory.resolve("");
         }
         Path propertiesFile = mavenConf.resolve("maven.properties");
         MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
@@ -308,11 +307,11 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
 
     protected abstract O assembleOptions(List<O> parsedOptions);
 
-    protected List<CoreExtension> readCoreExtensionsDescriptor(String extensionsFile, FileSystem fileSystem)
+    protected List<CoreExtension> readCoreExtensionsDescriptor(String extensionsFile, Path cwd)
             throws ParserException, IOException {
         try {
             if (extensionsFile != null) {
-                Path extensionsPath = fileSystem.getPath(extensionsFile);
+                Path extensionsPath = cwd.resolve(extensionsFile);
                 if (Files.exists(extensionsPath)) {
                     try (InputStream is = Files.newInputStream(extensionsPath)) {
                         return new CoreExtensionsStaxReader().read(is, true).getExtensions();
