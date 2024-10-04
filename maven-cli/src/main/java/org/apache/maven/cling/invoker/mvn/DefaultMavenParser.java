@@ -30,10 +30,10 @@ import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
-import org.apache.maven.api.cli.mvn.local.LocalMavenParser;
+import org.apache.maven.api.cli.mvn.MavenParser;
 
 public class DefaultMavenParser extends BaseMavenParser<MavenOptions, MavenInvokerRequest<MavenOptions>>
-        implements LocalMavenParser {
+        implements MavenParser<MavenInvokerRequest<MavenOptions>> {
     @SuppressWarnings("ParameterNumber")
     @Override
     protected DefaultMavenInvokerRequest<MavenOptions> getInvokerRequest(
