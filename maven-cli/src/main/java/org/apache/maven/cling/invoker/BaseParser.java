@@ -38,7 +38,6 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.Parser;
@@ -73,8 +72,8 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         Path userHomeDirectory = requireNonNull(getUserHomeDirectory(parserRequest, overrides));
 
         // top/root
-        Path topDirectory = getCanonicalPath(requireNonNull(getTopDirectory(parserRequest, cwd)));
-        @Nullable Path rootDirectory = getCanonicalPath(getRootDirectory(parserRequest, cwd, topDirectory));
+        Path topDirectory = requireNonNull(getTopDirectory(parserRequest, cwd));
+        Path rootDirectory = requireNonNull(getRootDirectory(parserRequest, cwd, topDirectory));
 
         // options
         List<O> parsedOptions = parseCliOptions(rootDirectory, parserRequest.args());
@@ -200,13 +199,13 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
                 isAltFile = arg.equals("-f") || arg.equals("--file");
             }
         }
-        return topDirectory;
+        return getCanonicalPath(topDirectory);
     }
 
     protected Path getRootDirectory(ParserRequest parserRequest, Path cwd, Path topDirectory) throws ParserException {
         RootLocator rootLocator =
                 ServiceLoader.load(RootLocator.class).iterator().next();
-        @Nullable Path rootDirectory = rootLocator.findRoot(topDirectory);
+        Path rootDirectory = rootLocator.findRoot(topDirectory);
 
         // TODO: multiModuleProjectDirectory vs rootDirectory?
         // fallback if no root? otherwise make sure they are same?
@@ -225,7 +224,7 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
                 parserRequest.logger().warn("Project root directory and multiModuleProjectDirectory are not aligned");
             }
         }
-        return rootDirectory;
+        return getCanonicalPath(rootDirectory);
     }
 
     protected Map<String, String> populateSystemProperties(Map<String, String> overrides) throws ParserException {
