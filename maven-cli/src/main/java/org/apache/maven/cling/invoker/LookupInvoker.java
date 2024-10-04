@@ -156,7 +156,7 @@ public abstract class LookupInvoker<
             try {
                 validate(context);
                 prepare(context);
-                logging(context);
+                configureLogging(context);
                 activateLogging(context);
 
                 if (invokerRequest.options().help().isPresent()) {
@@ -208,7 +208,7 @@ public abstract class LookupInvoker<
 
     protected void prepare(C context) throws Exception {}
 
-    protected void logging(C context) throws Exception {
+    protected void configureLogging(C context) throws Exception {
         R invokerRequest = context.invokerRequest;
         // LOG COLOR
         Options mavenOptions = invokerRequest.options();

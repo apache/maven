@@ -114,7 +114,7 @@ public class DefaultResidentMavenInvoker
                     try {
                         validate(master);
                         prepare(master);
-                        logging(master);
+                        configureLogging(master);
                         container(master);
                         lookup(master);
                         return master;

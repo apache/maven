@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,6 @@ import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Problem;
 import org.apache.maven.cli.CLIReportingUtils;
-import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.invoker.ProtoLookup;
@@ -135,14 +135,13 @@ public abstract class DefaultMavenInvoker<
     @Override
     protected void init(C context) throws Exception {
         MavenInvokerRequest<O> invokerRequest = context.invokerRequest;
-        DefaultEventSpyContext eventSpyContext = new DefaultEventSpyContext();
-        Map<String, Object> data = eventSpyContext.getData();
+        Map<String, Object> data = new HashMap<>();
         data.put("plexus", context.lookup.lookup(PlexusContainer.class));
         data.put("workingDirectory", invokerRequest.cwd().toString());
         data.put("systemProperties", toProperties(invokerRequest.systemProperties()));
         data.put("userProperties", toProperties(invokerRequest.userProperties()));
         data.put("versionProperties", CLIReportingUtils.getBuildProperties());
-        context.eventSpyDispatcher.init(eventSpyContext);
+        context.eventSpyDispatcher.init(() -> data);
     }
 
     @Override
@@ -442,11 +441,6 @@ public abstract class DefaultMavenInvoker<
 
     protected int doExecute(C context) throws Exception {
         MavenExecutionRequest request = context.mavenExecutionRequest;
-
-        // why? No way to disable caching?
-        if (context.mavenExecutionRequest.getRepositoryCache() == null) {
-            context.mavenExecutionRequest.setRepositoryCache(new DefaultRepositoryCache());
-        }
 
         context.eventSpyDispatcher.onEvent(request);
 
