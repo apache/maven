@@ -70,10 +70,22 @@ public class FileProfileActivator implements ProfileActivator {
         String path;
         boolean missing;
 
-        if (file.getExists() != null && !file.getExists().isEmpty()) {
+        boolean hasExists = file.getExists() != null && !file.getExists().isEmpty();
+        boolean hasMissing = file.getMissing() != null && !file.getMissing().isEmpty();
+        if (hasExists) {
+            if (hasMissing) {
+                problems.add(
+                        BuilderProblem.Severity.WARNING,
+                        ModelProblem.Version.BASE,
+                        String.format(
+                                "Profile '%s' file activation conflict: Both 'missing' (%s) and 'exists' assertions are defined. "
+                                        + "The 'missing' assertion will be ignored. Please remove one assertion to resolve this conflict.",
+                                profile.getId(), file.getMissing()),
+                        file.getLocation("missing"));
+            }
             path = file.getExists();
             missing = false;
-        } else if (file.getMissing() != null && !file.getMissing().isEmpty()) {
+        } else if (hasMissing) {
             path = file.getMissing();
             missing = true;
         } else {
