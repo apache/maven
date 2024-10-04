@@ -21,8 +21,10 @@ package org.apache.maven.api.cli;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -36,15 +38,30 @@ import static java.util.Objects.requireNonNull;
  *
  * @since 4.0.0
  */
+@Immutable
 @Experimental
 public interface ParserRequest {
+    String MVN_CMD = "mvn";
+    String MVN_NAME = "Maven";
+
+    String MVNENC_CMD = "mvnenc";
+    String MVNENC_NAME = "Maven Password Encrypting Tool";
+
     /**
-     * Returns the Maven command to be executed.
+     * Returns the Maven command to be executed. This command is used in some invokers (ie forked) but also to
+     * present help to user.
      *
      * @return the command string
      */
     @Nonnull
     String command();
+
+    /**
+     * Returns the Maven command name (ie "Maven"). This string is used in some invokers to complete error messages.
+     *
+     * @return the command (human) name
+     */
+    String commandName();
 
     /**
      * Returns the logger to be used during the parsing process.
@@ -65,10 +82,10 @@ public interface ParserRequest {
     /**
      * Returns the command-line arguments to be parsed.
      *
-     * @return an array of argument strings
+     * @return a list of argument strings
      */
     @Nonnull
-    String[] args();
+    List<String> args();
 
     /**
      * Returns the current working directory for the Maven execution.
@@ -125,9 +142,38 @@ public interface ParserRequest {
     OutputStream err();
 
     /**
+     * Creates a new Builder instance for constructing a Maven ParserRequest.
+     *
+     * @param args the command-line arguments
+     * @param logger the logger to be used during parsing
+     * @param messageBuilderFactory the factory for creating message builders
+     * @return a new Builder instance
+     */
+    @Nonnull
+    static Builder mvn(
+            @Nonnull List<String> args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return builder(MVN_CMD, MVN_NAME, args, logger, messageBuilderFactory);
+    }
+
+    /**
+     * Creates a new Builder instance for constructing a Maven Encrypting Tool ParserRequest.
+     *
+     * @param args the command-line arguments
+     * @param logger the logger to be used during parsing
+     * @param messageBuilderFactory the factory for creating message builders
+     * @return a new Builder instance
+     */
+    @Nonnull
+    static Builder mvnenc(
+            @Nonnull List<String> args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return builder(MVNENC_CMD, MVNENC_NAME, args, logger, messageBuilderFactory);
+    }
+
+    /**
      * Creates a new Builder instance for constructing a ParserRequest.
      *
      * @param command the Maven command to be executed
+     * @param commandName the Maven command Name to be executed
      * @param args the command-line arguments
      * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
@@ -136,15 +182,17 @@ public interface ParserRequest {
     @Nonnull
     static Builder builder(
             @Nonnull String command,
-            @Nonnull String[] args,
+            @Nonnull String commandName,
+            @Nonnull List<String> args,
             @Nonnull Logger logger,
             @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return new Builder(command, args, logger, messageBuilderFactory);
+        return new Builder(command, commandName, args, logger, messageBuilderFactory);
     }
 
     class Builder {
         private final String command;
-        private final String[] args;
+        private final String commandName;
+        private final List<String> args;
         private final Logger logger;
         private final MessageBuilderFactory messageBuilderFactory;
         private Path cwd;
@@ -154,8 +202,14 @@ public interface ParserRequest {
         private OutputStream out;
         private OutputStream err;
 
-        private Builder(String command, String[] args, Logger logger, MessageBuilderFactory messageBuilderFactory) {
-            this.command = requireNonNull(command, "appName");
+        private Builder(
+                String command,
+                String commandName,
+                List<String> args,
+                Logger logger,
+                MessageBuilderFactory messageBuilderFactory) {
+            this.command = requireNonNull(command, "command");
+            this.commandName = requireNonNull(commandName, "commandName");
             this.args = requireNonNull(args, "args");
             this.logger = requireNonNull(logger, "logger");
             this.messageBuilderFactory = requireNonNull(messageBuilderFactory, "messageBuilderFactory");
@@ -193,15 +247,16 @@ public interface ParserRequest {
 
         public ParserRequest build() {
             return new ParserRequestImpl(
-                    command, args, logger, messageBuilderFactory, cwd, mavenHome, userHome, in, out, err);
+                    command, commandName, args, logger, messageBuilderFactory, cwd, mavenHome, userHome, in, out, err);
         }
 
         @SuppressWarnings("ParameterNumber")
         private static class ParserRequestImpl implements ParserRequest {
             private final String command;
+            private final String commandName;
             private final Logger logger;
             private final MessageBuilderFactory messageBuilderFactory;
-            private final String[] args;
+            private final List<String> args;
             private final Path cwd;
             private final Path mavenHome;
             private final Path userHome;
@@ -211,7 +266,8 @@ public interface ParserRequest {
 
             private ParserRequestImpl(
                     String command,
-                    String[] args,
+                    String commandName,
+                    List<String> args,
                     Logger logger,
                     MessageBuilderFactory messageBuilderFactory,
                     Path cwd,
@@ -220,8 +276,9 @@ public interface ParserRequest {
                     InputStream in,
                     OutputStream out,
                     OutputStream err) {
-                this.command = requireNonNull(command, "appName");
-                this.args = requireNonNull(args, "args");
+                this.command = requireNonNull(command, "command");
+                this.commandName = requireNonNull(commandName, "commandName");
+                this.args = List.copyOf(requireNonNull(args, "args"));
                 this.logger = requireNonNull(logger, "logger");
                 this.messageBuilderFactory = requireNonNull(messageBuilderFactory, "messageBuilderFactory");
                 this.cwd = cwd;
@@ -238,6 +295,11 @@ public interface ParserRequest {
             }
 
             @Override
+            public String commandName() {
+                return commandName;
+            }
+
+            @Override
             public Logger logger() {
                 return logger;
             }
@@ -248,7 +310,7 @@ public interface ParserRequest {
             }
 
             @Override
-            public String[] args() {
+            public List<String> args() {
                 return args;
             }
 

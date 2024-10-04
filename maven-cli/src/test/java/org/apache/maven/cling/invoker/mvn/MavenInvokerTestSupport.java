@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
@@ -98,9 +99,8 @@ public abstract class MavenInvokerTestSupport<O extends MavenOptions, R extends 
         try (Invoker<R> invoker = createInvoker()) {
             for (String goal : goals) {
                 Path logFile = cwd.resolve(goal + "-build.log").toAbsolutePath();
-                int exitCode = invoker.invoke(parser.parse(ParserRequest.builder(
-                                "mvn",
-                                new String[] {"-l", logFile.toString(), goal},
+                int exitCode = invoker.invoke(parser.parse(ParserRequest.mvn(
+                                List.of("-l", logFile.toString(), goal),
                                 new ProtoLogger(),
                                 new JLineMessageBuilderFactory())
                         .cwd(cwd)

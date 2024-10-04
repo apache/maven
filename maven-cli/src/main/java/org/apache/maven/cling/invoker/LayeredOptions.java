@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.cli.ParserRequest;
 
 /**
  * Options that are "layered" by precedence order.
@@ -132,11 +133,11 @@ public abstract class LayeredOptions<O extends Options> implements Options {
     }
 
     @Override
-    public void warnAboutDeprecatedOptions(PrintWriter printWriter) {}
+    public void warnAboutDeprecatedOptions(ParserRequest request, PrintWriter printWriter) {}
 
     @Override
-    public void displayHelp(String command, PrintWriter printWriter) {
-        options.get(0).displayHelp(command, printWriter);
+    public void displayHelp(ParserRequest request, PrintWriter printWriter) {
+        options.get(0).displayHelp(request, printWriter);
     }
 
     protected <T> Optional<T> returnFirstPresentOrEmpty(Function<O, Optional<T>> getter) {

@@ -31,6 +31,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cli.CleanArgument;
 import org.apache.maven.jline.MessageUtils;
 
@@ -201,7 +202,7 @@ public abstract class CommonsCliOptions implements Options {
     }
 
     @Override
-    public void warnAboutDeprecatedOptions(PrintWriter printWriter) {
+    public void warnAboutDeprecatedOptions(ParserRequest request, PrintWriter printWriter) {
         if (cliManager.getUsedDeprecatedOptions().isEmpty()) {
             return;
         }
@@ -217,15 +218,18 @@ public abstract class CommonsCliOptions implements Options {
                 sb.append("and will be removed in a future version");
             }
             if (option.getDeprecated().getSince() != null) {
-                sb.append("since Maven ").append(option.getDeprecated().getSince());
+                sb.append("since ")
+                        .append(request.commandName())
+                        .append(" ")
+                        .append(option.getDeprecated().getSince());
             }
             printWriter.println(sb);
         }
     }
 
     @Override
-    public void displayHelp(String command, PrintWriter printStream) {
-        cliManager.displayHelp(command, printStream);
+    public void displayHelp(ParserRequest request, PrintWriter printStream) {
+        cliManager.displayHelp(request.command(), printStream);
     }
 
     protected static class CLIManager {

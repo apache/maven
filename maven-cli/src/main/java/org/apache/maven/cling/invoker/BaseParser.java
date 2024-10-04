@@ -101,7 +101,7 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
 
         // warn about deprecated options
         parsedOptions.forEach(o -> o.warnAboutDeprecatedOptions(
-                new PrintWriter(parserRequest.out() != null ? parserRequest.out() : System.out, true)));
+                parserRequest, new PrintWriter(parserRequest.out() != null ? parserRequest.out() : System.out, true)));
 
         // assemble options if needed
         O options = assembleOptions(parsedOptions);
@@ -303,7 +303,8 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         return toMap(userProperties);
     }
 
-    protected abstract List<O> parseCliOptions(Path rootDirectory, String[] args) throws ParserException, IOException;
+    protected abstract List<O> parseCliOptions(Path rootDirectory, List<String> args)
+            throws ParserException, IOException;
 
     protected abstract O assembleOptions(List<O> parsedOptions);
 

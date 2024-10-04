@@ -53,7 +53,7 @@ public abstract class DefaultMavenParser<O extends MavenOptions, R extends Maven
             Options options);
 
     @Override
-    protected List<O> parseCliOptions(Path rootDirectory, String[] args) throws ParserException, IOException {
+    protected List<O> parseCliOptions(Path rootDirectory, List<String> args) throws ParserException, IOException {
         ArrayList<O> result = new ArrayList<>();
         // CLI args
         result.add(parseMavenCliOptions(args));
@@ -65,14 +65,14 @@ public abstract class DefaultMavenParser<O extends MavenOptions, R extends Maven
         return result;
     }
 
-    protected O parseMavenCliOptions(String[] args) throws ParserException {
+    protected O parseMavenCliOptions(List<String> args) throws ParserException {
         return parseArgs(Options.SOURCE_CLI, args);
     }
 
     protected O parseMavenConfigOptions(Path configFile) throws ParserException, IOException {
         try (Stream<String> lines = Files.lines(configFile, Charset.defaultCharset())) {
-            String[] args =
-                    lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#")).toArray(String[]::new);
+            List<String> args =
+                    lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#")).toList();
             O options = parseArgs("maven.config", args);
             if (options.goals().isPresent()) {
                 // This file can only contain options, not args (goals or phases)
@@ -83,5 +83,5 @@ public abstract class DefaultMavenParser<O extends MavenOptions, R extends Maven
         }
     }
 
-    protected abstract O parseArgs(String source, String[] args) throws ParserException;
+    protected abstract O parseArgs(String source, List<String> args) throws ParserException;
 }

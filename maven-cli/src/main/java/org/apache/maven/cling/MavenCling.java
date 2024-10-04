@@ -21,26 +21,26 @@ package org.apache.maven.cling;
 import java.io.IOException;
 
 import org.apache.maven.api.cli.Invoker;
-import org.apache.maven.api.cli.Parser;
+import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.local.DefaultLocalMavenInvoker;
 import org.apache.maven.cling.invoker.mvn.local.DefaultLocalMavenParser;
+import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Maven CLI "new-gen".
  */
 public class MavenCling extends ClingSupport<MavenOptions, MavenInvokerRequest<MavenOptions>> {
-    public static final String NAME = "mvn";
-
     /**
      * "Normal" Java entry point. Note: Maven uses ClassWorld Launcher and this entry point is NOT used under normal
      * circumstances.
      */
     public static void main(String[] args) throws IOException {
-        int exitCode = new MavenCling(NAME).run(args);
+        int exitCode = new MavenCling().run(args);
         System.exit(exitCode);
     }
 
@@ -48,15 +48,15 @@ public class MavenCling extends ClingSupport<MavenOptions, MavenInvokerRequest<M
      * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
      */
     public static int main(String[] args, ClassWorld world) throws IOException {
-        return new MavenCling(NAME, world).run(args);
+        return new MavenCling(world).run(args);
     }
 
-    public MavenCling(String command) {
-        super(command);
+    public MavenCling() {
+        super();
     }
 
-    public MavenCling(String command, ClassWorld classWorld) {
-        super(command, classWorld);
+    public MavenCling(ClassWorld classWorld) {
+        super(classWorld);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class MavenCling extends ClingSupport<MavenOptions, MavenInvokerRequest<M
     }
 
     @Override
-    protected Parser<MavenInvokerRequest<MavenOptions>> createParser() {
-        return new DefaultLocalMavenParser();
+    protected MavenInvokerRequest<MavenOptions> parseArguments(String[] args) throws ParserException, IOException {
+        return new DefaultLocalMavenParser().mvn(args, new ProtoLogger(), new JLineMessageBuilderFactory());
     }
 }

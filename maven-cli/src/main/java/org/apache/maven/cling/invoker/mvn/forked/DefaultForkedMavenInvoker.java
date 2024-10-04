@@ -45,7 +45,10 @@ public class DefaultForkedMavenInvoker implements ForkedMavenInvoker {
         cmdAndArguments.add(invokerRequest
                 .installationDirectory()
                 .resolve("bin")
-                .resolve(Os.IS_WINDOWS ? invokerRequest.command() + ".cmd" : invokerRequest.command())
+                .resolve(
+                        Os.IS_WINDOWS
+                                ? invokerRequest.parserRequest().command() + ".cmd"
+                                : invokerRequest.parserRequest().command())
                 .toString());
 
         MavenOptions mavenOptions = invokerRequest.options();

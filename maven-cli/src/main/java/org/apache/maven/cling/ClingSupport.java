@@ -23,13 +23,8 @@ import java.io.IOException;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
-import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserException;
-import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.cling.invoker.ProtoLogger;
-import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.apache.maven.jline.MessageUtils;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -44,26 +39,24 @@ import static java.util.Objects.requireNonNull;
 public abstract class ClingSupport<O extends Options, R extends InvokerRequest<O>> {
     static final String CORE_CLASS_REALM_ID = "plexus.core";
 
-    protected final String command;
     protected final ClassWorld classWorld;
     protected final boolean classWorldManaged;
 
     /**
      * Ctor that creates "managed" ClassWorld. This constructor is not used in "normal" circumstances.
      */
-    public ClingSupport(String command) {
-        this(command, new ClassWorld(CORE_CLASS_REALM_ID, Thread.currentThread().getContextClassLoader()), true);
+    public ClingSupport() {
+        this(new ClassWorld(CORE_CLASS_REALM_ID, Thread.currentThread().getContextClassLoader()), true);
     }
 
     /**
      * Ctor to be used when running in ClassWorlds Launcher.
      */
-    public ClingSupport(String command, ClassWorld classWorld) {
-        this(command, classWorld, false);
+    public ClingSupport(ClassWorld classWorld) {
+        this(classWorld, false);
     }
 
-    protected ClingSupport(String command, ClassWorld classWorld, boolean classWorldManaged) {
-        this.command = requireNonNull(command, "command");
+    private ClingSupport(ClassWorld classWorld, boolean classWorldManaged) {
         this.classWorld = requireNonNull(classWorld);
         this.classWorldManaged = classWorldManaged;
     }
@@ -75,7 +68,7 @@ public abstract class ClingSupport<O extends Options, R extends InvokerRequest<O
         MessageUtils.systemInstall();
         MessageUtils.registerShutdownHook();
         try (Invoker<R> invoker = createInvoker()) {
-            return invoker.invoke(createParser().parse(command, args, createLogger(), createMessageBuilderFactory()));
+            return invoker.invoke(parseArguments(args));
         } catch (ParserException e) {
             System.err.println(e.getMessage());
             return 1;
@@ -94,13 +87,5 @@ public abstract class ClingSupport<O extends Options, R extends InvokerRequest<O
 
     protected abstract Invoker<R> createInvoker();
 
-    protected abstract Parser<R> createParser();
-
-    protected Logger createLogger() {
-        return new ProtoLogger();
-    }
-
-    protected MessageBuilderFactory createMessageBuilderFactory() {
-        return new JLineMessageBuilderFactory();
-    }
+    protected abstract R parseArguments(String[] args) throws ParserException, IOException;
 }

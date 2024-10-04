@@ -49,14 +49,12 @@ public class DefaultEncryptParser extends BaseParser<EncryptOptions, EncryptInvo
             ArrayList<CoreExtension> extensions,
             Options options) {
         return new DefaultEncryptInvokerRequest(
-                parserRequest.command(),
+                parserRequest,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,
                 userProperties,
                 systemProperties,
-                parserRequest.logger(),
-                parserRequest.messageBuilderFactory(),
                 topDirectory,
                 rootDirectory,
                 parserRequest.in(),
@@ -67,13 +65,13 @@ public class DefaultEncryptParser extends BaseParser<EncryptOptions, EncryptInvo
     }
 
     @Override
-    protected List<EncryptOptions> parseCliOptions(Path rootDirectory, String[] args) throws ParserException {
+    protected List<EncryptOptions> parseCliOptions(Path rootDirectory, List<String> args) throws ParserException {
         return Collections.singletonList(parseEncryptCliOptions(args));
     }
 
-    protected CommonsCliEncryptOptions parseEncryptCliOptions(String[] args) throws ParserException {
+    protected CommonsCliEncryptOptions parseEncryptCliOptions(List<String> args) throws ParserException {
         try {
-            return CommonsCliEncryptOptions.parse(args);
+            return CommonsCliEncryptOptions.parse(args.toArray(new String[0]));
         } catch (ParseException e) {
             throw new ParserException("Failed to parse command line options: " + e.getMessage(), e);
         }

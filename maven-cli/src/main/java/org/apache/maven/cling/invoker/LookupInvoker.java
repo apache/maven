@@ -116,7 +116,7 @@ public abstract class LookupInvoker<
             this.stdIn = invokerRequest.in().orElse(System.in);
             this.stdOut = new PrintWriter(invokerRequest.out().orElse(System.out), true);
             this.stdErr = new PrintWriter(invokerRequest.err().orElse(System.err), true);
-            this.logger = invokerRequest.logger();
+            this.logger = invokerRequest.parserRequest().logger();
         }
 
         public Logger logger;
@@ -158,7 +158,7 @@ public abstract class LookupInvoker<
                 logging(context);
 
                 if (invokerRequest.options().help().isPresent()) {
-                    invokerRequest.options().displayHelp(context.invokerRequest.command(), context.stdOut);
+                    invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), context.stdOut);
                     return 0;
                 }
                 if (invokerRequest.options().showVersionAndExit().isPresent()) {
@@ -187,9 +187,11 @@ public abstract class LookupInvoker<
             throws InvokerException {
         boolean showStackTrace = context.invokerRequest.options().showErrors().orElse(false);
         if (showStackTrace) {
-            context.logger.error("Error executing Maven.", e);
+            context.logger.error(
+                    "Error executing " + context.invokerRequest.parserRequest().commandName() + ".", e);
         } else {
-            context.logger.error("Error executing Maven.");
+            context.logger.error(
+                    "Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
             context.logger.error(e.getMessage());
             for (Throwable cause = e.getCause(); cause != null && cause != cause.getCause(); cause = cause.getCause()) {
                 context.logger.error("Caused by: " + cause.getMessage());
