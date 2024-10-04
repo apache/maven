@@ -37,8 +37,14 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenInvoker;
 import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
-import org.apache.maven.building.FileSource;
-import org.apache.maven.building.Problem;
+import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.SettingsBuilderRequest;
+import org.apache.maven.api.services.SettingsBuilderResult;
+import org.apache.maven.api.services.Source;
+import org.apache.maven.api.services.ToolchainsBuilder;
+import org.apache.maven.api.services.ToolchainsBuilderRequest;
+import org.apache.maven.api.services.ToolchainsBuilderResult;
+import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupInvoker;
@@ -58,13 +64,7 @@ import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.logging.LoggingExecutionListener;
 import org.apache.maven.logging.MavenTransferListener;
-import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.building.SettingsBuildingRequest;
-import org.apache.maven.settings.building.SettingsBuildingResult;
-import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
-import org.apache.maven.toolchain.building.ToolchainsBuilder;
-import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
@@ -161,16 +161,16 @@ public abstract class DefaultMavenInvoker<
     }
 
     @Override
-    protected void customizeSettingsRequest(C context, SettingsBuildingRequest settingsBuildingRequest) {
+    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest) {
         if (context.eventSpyDispatcher != null) {
-            context.eventSpyDispatcher.onEvent(settingsBuildingRequest);
+            context.eventSpyDispatcher.onEvent(settingsBuilderRequest);
         }
     }
 
     @Override
-    protected void customizeSettingsResult(C context, SettingsBuildingResult settingsBuildingResult) {
+    protected void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) throws Exception {
         if (context.eventSpyDispatcher != null) {
-            context.eventSpyDispatcher.onEvent(settingsBuildingResult);
+            context.eventSpyDispatcher.onEvent(settingsBuilderResult);
         }
     }
 
@@ -216,39 +216,36 @@ public abstract class DefaultMavenInvoker<
         context.mavenExecutionRequest.setUserToolchainsFile(
                 userToolchainsFile != null ? userToolchainsFile.toFile() : null);
 
-        DefaultToolchainsBuildingRequest toolchainsRequest = new DefaultToolchainsBuildingRequest();
-        if (installationToolchainsFile != null && Files.isRegularFile(installationToolchainsFile)) {
-            toolchainsRequest.setGlobalToolchainsSource(new FileSource(installationToolchainsFile));
-        }
-        if (userToolchainsFile != null && Files.isRegularFile(userToolchainsFile)) {
-            toolchainsRequest.setUserToolchainsSource(new FileSource(userToolchainsFile));
-        }
+        ToolchainsBuilderRequest toolchainsRequest = ToolchainsBuilderRequest.builder()
+                .session(context.session)
+                .installationToolchainsSource(
+                        installationToolchainsFile != null && Files.isRegularFile(installationToolchainsFile)
+                                ? Source.fromPath(installationToolchainsFile)
+                                : null)
+                .userToolchainsSource(
+                        userToolchainsFile != null && Files.isRegularFile(userToolchainsFile)
+                                ? Source.fromPath(userToolchainsFile)
+                                : null)
+                .build();
 
         context.eventSpyDispatcher.onEvent(toolchainsRequest);
 
-        context.logger.debug("Reading installation toolchains from '"
-                + (toolchainsRequest.getGlobalToolchainsSource() != null
-                        ? toolchainsRequest.getGlobalToolchainsSource().getLocation()
-                        : installationToolchainsFile)
-                + "'");
-        context.logger.debug("Reading user toolchains from '"
-                + (toolchainsRequest.getUserToolchainsSource() != null
-                        ? toolchainsRequest.getUserToolchainsSource().getLocation()
-                        : userToolchainsFile)
-                + "'");
+        context.logger.debug("Reading installation toolchains from '" + installationToolchainsFile + "'");
+        context.logger.debug("Reading user toolchains from '" + userToolchainsFile + "'");
 
-        ToolchainsBuildingResult toolchainsResult = context.toolchainsBuilder.build(toolchainsRequest);
+        ToolchainsBuilderResult toolchainsResult = context.toolchainsBuilder.build(toolchainsRequest);
 
         context.eventSpyDispatcher.onEvent(toolchainsResult);
 
         context.mavenExecutionRequestPopulator.populateFromToolchains(
-                context.mavenExecutionRequest, toolchainsResult.getEffectiveToolchains());
+                context.mavenExecutionRequest,
+                new org.apache.maven.toolchain.model.PersistedToolchains(toolchainsResult.getEffectiveToolchains()));
 
         if (!toolchainsResult.getProblems().isEmpty()) {
             context.logger.warn("");
             context.logger.warn("Some problems were encountered while building the effective toolchains");
 
-            for (Problem problem : toolchainsResult.getProblems()) {
+            for (BuilderProblem problem : toolchainsResult.getProblems()) {
                 context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
             }
 
