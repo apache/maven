@@ -21,6 +21,7 @@ package org.apache.maven.api.cli;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -151,8 +152,36 @@ public interface ParserRequest {
      */
     @Nonnull
     static Builder mvn(
+            @Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return mvn(Arrays.asList(args), logger, messageBuilderFactory);
+    }
+
+    /**
+     * Creates a new Builder instance for constructing a Maven ParserRequest.
+     *
+     * @param args the command-line arguments
+     * @param logger the logger to be used during parsing
+     * @param messageBuilderFactory the factory for creating message builders
+     * @return a new Builder instance
+     */
+    @Nonnull
+    static Builder mvn(
             @Nonnull List<String> args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
         return builder(MVN_CMD, MVN_NAME, args, logger, messageBuilderFactory);
+    }
+
+    /**
+     * Creates a new Builder instance for constructing a Maven Encrypting Tool ParserRequest.
+     *
+     * @param args the command-line arguments
+     * @param logger the logger to be used during parsing
+     * @param messageBuilderFactory the factory for creating message builders
+     * @return a new Builder instance
+     */
+    @Nonnull
+    static Builder mvnenc(
+            @Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return mvnenc(Arrays.asList(args), logger, messageBuilderFactory);
     }
 
     /**

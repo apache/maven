@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.ParserException;
+import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptInvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.ProtoLogger;
@@ -67,6 +68,8 @@ public class MavenEncCling extends ClingSupport<EncryptOptions, EncryptInvokerRe
 
     @Override
     protected EncryptInvokerRequest parseArguments(String[] args) throws ParserException, IOException {
-        return new DefaultEncryptParser().mvn(args, new ProtoLogger(), new JLineMessageBuilderFactory());
+        return new DefaultEncryptParser()
+                .parse(ParserRequest.mvnenc(args, new ProtoLogger(), new JLineMessageBuilderFactory())
+                        .build());
     }
 }

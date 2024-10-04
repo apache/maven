@@ -19,8 +19,6 @@
 package org.apache.maven.api.cli;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -40,7 +38,7 @@ public interface Parser<R extends InvokerRequest<? extends Options>> {
     /**
      * Parses the given Maven arguments to create an InvokerRequest.
      * This is a convenience method that internally creates a ParserRequest using
-     * {@link ParserRequest#mvn(List, Logger, MessageBuilderFactory)}.
+     * {@link ParserRequest#mvn(String[], Logger, MessageBuilderFactory)}.
      *
      * @param args the command-line arguments
      * @param logger the logger to use during parsing
@@ -52,8 +50,7 @@ public interface Parser<R extends InvokerRequest<? extends Options>> {
     @Nonnull
     default R mvn(@Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory)
             throws ParserException, IOException {
-        return parse(ParserRequest.mvn(Arrays.asList(args), logger, messageBuilderFactory)
-                .build());
+        return parse(ParserRequest.mvn(args, logger, messageBuilderFactory).build());
     }
 
     /**

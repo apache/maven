@@ -27,6 +27,7 @@ import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvokerRequest;
 import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
@@ -45,7 +46,7 @@ public class DefaultForkedMavenInvokerTest extends MavenInvokerTestSupport<Maven
     }
 
     @Test
-    void defaultFs(@TempDir Path tempDir) throws Exception {
+    void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         invoke(tempDir, Arrays.asList("clean", "verify"));
     }
 }

@@ -33,6 +33,7 @@ import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
@@ -53,7 +54,7 @@ public class DefaultLocalMavenInvokerTest
     }
 
     @Test
-    void defaultFs(@TempDir Path tempDir) throws Exception {
+    void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         invoke(tempDir, Arrays.asList("clean", "verify"));
     }
 
