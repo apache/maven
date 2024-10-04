@@ -26,8 +26,8 @@ import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.ProtoLookup;
+import org.apache.maven.cling.invoker.mvn.DefaultMavenParser;
 import org.apache.maven.cling.invoker.mvn.local.DefaultLocalMavenInvoker;
-import org.apache.maven.cling.invoker.mvn.local.DefaultLocalMavenParser;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -67,6 +67,6 @@ public class MavenCling extends ClingSupport<MavenOptions, MavenInvokerRequest<M
 
     @Override
     protected MavenInvokerRequest<MavenOptions> parseArguments(String[] args) throws ParserException, IOException {
-        return new DefaultLocalMavenParser().mvn(args, new ProtoLogger(), new JLineMessageBuilderFactory());
+        return new DefaultMavenParser().mvn(args, new ProtoLogger(), new JLineMessageBuilderFactory());
     }
 }

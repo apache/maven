@@ -19,6 +19,8 @@
 package org.apache.maven.api.cli.mvn.resident;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
+import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.cli.mvn.MavenParser;
 
 /**
@@ -27,4 +29,4 @@ import org.apache.maven.api.cli.mvn.MavenParser;
  * @since 4.0.0
  */
 @Experimental
-public interface ResidentMavenParser extends MavenParser<ResidentMavenInvokerRequest> {}
+public interface ResidentMavenParser extends MavenParser<MavenInvokerRequest<MavenOptions>> {}

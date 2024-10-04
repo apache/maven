@@ -29,6 +29,7 @@ import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.ProtoLookup;
+import org.apache.maven.cling.invoker.mvn.DefaultMavenParser;
 import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
@@ -50,7 +51,7 @@ public class DefaultLocalMavenInvokerTest
 
     @Override
     protected Parser<MavenInvokerRequest<MavenOptions>> createParser() {
-        return new DefaultLocalMavenParser();
+        return new DefaultMavenParser();
     }
 
     @Test

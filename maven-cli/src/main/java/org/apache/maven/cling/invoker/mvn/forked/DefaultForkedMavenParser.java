@@ -31,11 +31,11 @@ import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.forked.ForkedMavenParser;
+import org.apache.maven.cling.invoker.mvn.BaseMavenParser;
 import org.apache.maven.cling.invoker.mvn.CommonsCliMavenOptions;
-import org.apache.maven.cling.invoker.mvn.DefaultMavenParser;
 import org.apache.maven.cling.invoker.mvn.LayeredMavenOptions;
 
-public class DefaultForkedMavenParser extends DefaultMavenParser<MavenOptions, ForkedMavenInvokerRequest>
+public class DefaultForkedMavenParser extends BaseMavenParser<MavenOptions, ForkedMavenInvokerRequest>
         implements ForkedMavenParser {
 
     @SuppressWarnings("ParameterNumber")
@@ -76,6 +76,7 @@ public class DefaultForkedMavenParser extends DefaultMavenParser<MavenOptions, F
         return null;
     }
 
+    // TODO: same is in DefaultMavenParser!!! (duplication)
     @Override
     protected MavenOptions parseArgs(String source, List<String> args) throws ParserException {
         try {
@@ -85,6 +86,7 @@ public class DefaultForkedMavenParser extends DefaultMavenParser<MavenOptions, F
         }
     }
 
+    // TODO: same is in DefaultMavenParser!!! (duplication)
     @Override
     protected MavenOptions assembleOptions(List<MavenOptions> parsedOptions) {
         return LayeredMavenOptions.layerMavenOptions(parsedOptions);
