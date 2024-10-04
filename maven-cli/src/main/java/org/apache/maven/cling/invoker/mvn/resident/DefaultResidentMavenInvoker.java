@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.cli.InvokerException;
+import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
+import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvoker;
-import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvokerRequest;
-import org.apache.maven.api.cli.mvn.resident.ResidentMavenOptions;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.DefaultMavenInvoker;
 
@@ -34,14 +34,14 @@ import org.apache.maven.cling.invoker.mvn.DefaultMavenInvoker;
  */
 public class DefaultResidentMavenInvoker
         extends DefaultMavenInvoker<
-                ResidentMavenOptions, ResidentMavenInvokerRequest, DefaultResidentMavenInvoker.LocalContext>
+                MavenOptions, MavenInvokerRequest<MavenOptions>, DefaultResidentMavenInvoker.LocalContext>
         implements ResidentMavenInvoker {
 
-    protected static class LocalContext
+    public static class LocalContext
             extends DefaultMavenInvoker.MavenContext<
-                    ResidentMavenOptions, ResidentMavenInvokerRequest, DefaultResidentMavenInvoker.LocalContext> {
+                    MavenOptions, MavenInvokerRequest<MavenOptions>, DefaultResidentMavenInvoker.LocalContext> {
 
-        protected LocalContext(DefaultResidentMavenInvoker invoker, ResidentMavenInvokerRequest invokerRequest) {
+        protected LocalContext(DefaultResidentMavenInvoker invoker, MavenInvokerRequest<MavenOptions> invokerRequest) {
             super(invoker, invokerRequest);
         }
 
@@ -54,7 +54,7 @@ public class DefaultResidentMavenInvoker
             super.close();
         }
 
-        public LocalContext copy(ResidentMavenInvokerRequest invokerRequest) {
+        public LocalContext copy(MavenInvokerRequest<MavenOptions> invokerRequest) {
             LocalContext shadow = new LocalContext((DefaultResidentMavenInvoker) invoker, invokerRequest);
 
             shadow.logger = logger;
@@ -107,7 +107,7 @@ public class DefaultResidentMavenInvoker
     }
 
     @Override
-    protected LocalContext createContext(ResidentMavenInvokerRequest invokerRequest) {
+    protected LocalContext createContext(MavenInvokerRequest<MavenOptions> invokerRequest) {
         return residentContext
                 .computeIfAbsent(getContextId(invokerRequest), k -> {
                     LocalContext master = new LocalContext(this, invokerRequest);
@@ -125,7 +125,7 @@ public class DefaultResidentMavenInvoker
                 .copy(invokerRequest);
     }
 
-    protected String getContextId(ResidentMavenInvokerRequest invokerRequest) {
+    protected String getContextId(MavenInvokerRequest<MavenOptions> invokerRequest) {
         // TODO: in a moment Maven stop pushing user properties to system properties (and maybe something more)
         // and allow multiple instances per JVM, this may become a pool?
         return "resident";

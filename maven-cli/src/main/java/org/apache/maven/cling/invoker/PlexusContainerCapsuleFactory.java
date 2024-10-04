@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
@@ -103,16 +104,9 @@ public class PlexusContainerCapsuleFactory<
             exportedArtifacts.addAll(extension.getExportedArtifacts());
             exportedPackages.addAll(extension.getExportedPackages());
         }
-        final CoreExports exports = new CoreExports(containerRealm, exportedArtifacts, exportedPackages);
+        CoreExports exports = new CoreExports(containerRealm, exportedArtifacts, exportedPackages);
         Thread.currentThread().setContextClassLoader(containerRealm);
-        DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(ILoggerFactory.class).toInstance(context.loggerFactory);
-                bind(CoreExports.class).toInstance(exports);
-                bind(MessageBuilderFactory.class).toInstance(context.invokerRequest.messageBuilderFactory());
-            }
-        });
+        DefaultPlexusContainer container = new DefaultPlexusContainer(cc, getCustomModule(context, exports));
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm(null);
@@ -155,6 +149,22 @@ public class PlexusContainerCapsuleFactory<
                 .log(message);
 
         return container;
+    }
+
+    /**
+     * Note: overriding this method should be avoided. Preferred way to replace Maven components is the "normal" way
+     * where the components are on index (are annotated with JSR330 annotations and Sisu index is created) and, they
+     * have priorities set.
+     */
+    protected Module getCustomModule(C context, CoreExports exports) {
+        return new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(ILoggerFactory.class).toInstance(context.loggerFactory);
+                bind(CoreExports.class).toInstance(exports);
+                bind(MessageBuilderFactory.class).toInstance(context.invokerRequest.messageBuilderFactory());
+            }
+        };
     }
 
     protected void customizeContainerConfiguration(C context, ContainerConfiguration configuration) throws Exception {}

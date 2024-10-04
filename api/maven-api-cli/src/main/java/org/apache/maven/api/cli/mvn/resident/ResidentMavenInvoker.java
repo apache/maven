@@ -21,6 +21,8 @@ package org.apache.maven.api.cli.mvn.resident;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.mvn.MavenInvoker;
+import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
+import org.apache.maven.api.cli.mvn.MavenOptions;
 
 /**
  * Resident invoker. Instance is shut down when this instance is closed.
@@ -28,7 +30,7 @@ import org.apache.maven.api.cli.mvn.MavenInvoker;
  * @since 4.0.0
  */
 @Experimental
-public interface ResidentMavenInvoker extends MavenInvoker<ResidentMavenInvokerRequest> {
+public interface ResidentMavenInvoker extends MavenInvoker<MavenInvokerRequest<MavenOptions>> {
     /**
      * Closes cleanly the daemon.
      */

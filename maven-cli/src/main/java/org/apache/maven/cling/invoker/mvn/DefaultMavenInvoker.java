@@ -76,7 +76,7 @@ public abstract class DefaultMavenInvoker<
         extends LookupInvoker<O, R, C> implements MavenInvoker<R> {
 
     @SuppressWarnings("VisibilityModifier")
-    protected static class MavenContext<
+    public static class MavenContext<
                     O extends MavenOptions,
                     R extends MavenInvokerRequest<O>,
                     C extends DefaultMavenInvoker.MavenContext<O, R, C>>
