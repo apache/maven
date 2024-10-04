@@ -450,22 +450,21 @@ public abstract class DefaultMavenInvoker<
 
         context.eventSpyDispatcher.onEvent(request);
 
-        MavenExecutionResult result = context.maven.execute(request);
-
-        context.eventSpyDispatcher.onEvent(result);
-
-        context.eventSpyDispatcher.close();
+        MavenExecutionResult result;
+        try {
+            result = context.maven.execute(request);
+            context.eventSpyDispatcher.onEvent(result);
+        } finally {
+            context.eventSpyDispatcher.close();
+        }
 
         if (result.hasExceptions()) {
             ExceptionHandler handler = new DefaultExceptionHandler();
-
             Map<String, String> references = new LinkedHashMap<>();
-
             List<MavenProject> failedProjects = new ArrayList<>();
 
             for (Throwable exception : result.getExceptions()) {
                 ExceptionSummary summary = handler.handleException(exception);
-
                 logSummary(context, summary, references, "");
 
                 if (exception instanceof LifecycleExecutionException) {
